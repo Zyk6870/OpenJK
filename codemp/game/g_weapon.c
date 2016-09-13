@@ -1,5 +1,26 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 // g_weapon.c
 // perform the server side effects of a weapon firing
 
@@ -250,6 +271,42 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire, int weapon )
 	{
 		missile->methodOfDeath = MOD_BRYAR_PISTOL;
 	}
+	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
+
+	// we don't want it to bounce forever
+	missile->bounceCount = 8;
+}
+
+// zyk: used by Wrist Shot ability
+void zyk_WP_FireBryarPistol(gentity_t *ent)
+//---------------------------------------------------------
+{
+	int damage = zyk_blaster_pistol_damage.integer * 24;
+	int count = 5;
+	float boxSize = BRYAR_ALT_SIZE*(2.5);
+
+	vec3_t zyk_origin, dir, zyk_forward;
+
+	VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
+	VectorSet(zyk_origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 34);
+
+	AngleVectors(dir, zyk_forward, NULL, NULL);
+
+	gentity_t	*missile = CreateMissile(zyk_origin, zyk_forward, zyk_blaster_pistol_velocity.integer, 10000, ent, qtrue);
+
+	missile->classname = "bryar_proj";
+	missile->s.weapon = WP_BRYAR_PISTOL;
+
+	missile->s.generic1 = count; // The missile will then render according to the charge level.
+
+	VectorSet(missile->r.maxs, boxSize, boxSize, boxSize);
+	VectorSet(missile->r.mins, -boxSize, -boxSize, -boxSize);
+
+	missile->damage = damage;
+	missile->dflags = DAMAGE_DEATH_KNOCKBACK;
+
+	missile->methodOfDeath = MOD_BRYAR_PISTOL_ALT;
+
 	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
 
 	// we don't want it to bounce forever
@@ -669,7 +726,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 	int			damage = 0, skip;
 	qboolean	render_impact = qtrue;
 	vec3_t		start, end;
-	vec3_t		muzzle2;
+	//vec3_t		muzzle2;
 	trace_t		tr;
 	gentity_t	*traceEnt, *tent;
 	float		shotRange = 16384.0f; // zyk: default 8192
@@ -680,7 +737,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 
 	damage = zyk_disruptor_alt_damage.integer-30;
 
-	VectorCopy( muzzle, muzzle2 ); // making a backup copy
+	//VectorCopy( muzzle, muzzle2 ); // making a backup copy
 
 	if (ent->client)
 	{
@@ -741,9 +798,18 @@ void WP_DisruptorAltFire( gentity_t *ent )
 			trap->Trace( &tr, start, NULL, NULL, end, skip, MASK_SHOT, qfalse, 0, 0 );
 		}
 
-		// fix: shooting ourselves shouldn't be allowed
-		if (tr.entityNum == ent->s.number)
-			break;
+		if ( tr.entityNum == ent->s.number )
+		{
+			// should never happen, but basically we don't want to consider a hit to ourselves?
+			// Get ready for an attempt to trace through another person
+			//VectorCopy( tr.endpos, muzzle2 );
+			VectorCopy( tr.endpos, start );
+			skip = tr.entityNum;
+#ifdef _DEBUG
+			trap->Print( "BAD! Disruptor gun shot somehow traced back and hit the owner!\n" );
+#endif
+			continue;
+		}
 
 		traceEnt = &g_entities[tr.entityNum];
 
@@ -1582,8 +1648,8 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 
 		if (gent != myOwner)
 		{
-			if (gent->client && gent->client->pers.quest_power_status & (1 << 0))
-			{ // zyk: Immunity Power users cannot be hit by Lightning Dome
+			if (gent->client && gent->client->pers.quest_power_status & (1 << 0) && myOwner->client->pers.rpg_class != 3)
+			{ // zyk: Immunity Power users cannot be hit by Lightning Dome, but can be hit by Lightning Shield discharge
 				continue;
 			}
 
@@ -1914,7 +1980,7 @@ void rocketThink( gentity_t *ent )
 	vec3_t	org;
 	float dot, dot2, dis;
 	int i;
-	float vel = (ent->spawnflags&1)?ent->speed:zyk_rocket_velocity.integer;
+	float vel = (ent->spawnflags&1)?ent->speed:zyk_rocket_alt_velocity.integer;
 
 	if ( ent->genericValue1 && ent->genericValue1 < level.time )
 	{//time's up, we're done, remove us
@@ -2020,7 +2086,7 @@ void rocketThink( gentity_t *ent )
 			newdir[2] = ( (targetdir[2]*newDirMult) + (ent->movedir[2]*oldDirMult) ) * 0.5;
 
 			// let's also slow down a lot
-			vel *= 0.5f;
+			// vel *= 0.5f; zyk: no longer slow it down. Cvar controls its velocity
 		}
 		else if ( dot < 0.70f )
 		{
@@ -2057,7 +2123,7 @@ void rocketThink( gentity_t *ent )
 
 		VectorNormalize( newdir );
 
-		VectorScale( newdir, vel * 0.5f, ent->s.pos.trDelta );
+		VectorScale( newdir, vel /* * 0.5f */, ent->s.pos.trDelta ); // zyk: no more scale the rocket velocity here
 		VectorCopy( newdir, ent->movedir );
 		SnapVector( ent->s.pos.trDelta );			// save net bandwidth
 		VectorCopy( ent->r.currentOrigin, ent->s.pos.trBase );
@@ -2093,7 +2159,7 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 
 	if ( altFire )
 	{
-		vel *= 0.5f;
+		vel = zyk_rocket_alt_velocity.integer;
 	}
 
 	missile = CreateMissile( muzzle, forward, vel, 30000, ent, altFire );
@@ -2169,6 +2235,68 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 	{
 		splash_damage = splash_damage * 1.25;
 	}
+
+	missile->splashDamage = splash_damage;
+	missile->splashRadius = ROCKET_SPLASH_RADIUS;
+
+	// we don't want it to ever bounce
+	missile->bounceCount = 0;
+}
+
+// zyk: used by Homing Rocket ability
+//---------------------------------------------------------
+void zyk_WP_FireRocket(gentity_t *ent)
+//---------------------------------------------------------
+{
+	int	damage = zyk_rocket_damage.integer * 2.3;
+	int splash_damage = zyk_rocket_splash_damage.integer * 2.3;
+	int	vel = zyk_rocket_velocity.integer;
+	gentity_t *missile;
+	vec3_t zyk_origin, dir, zyk_forward;
+
+	// zyk: subtracts 90 to make rocket go up before targetting the enemy
+	VectorSet(dir, ent->client->ps.viewangles[0] - 90, ent->client->ps.viewangles[1], 0);
+	VectorSet(zyk_origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 20);
+
+	AngleVectors(dir, zyk_forward, NULL, NULL);
+
+	missile = CreateMissile(zyk_origin, zyk_forward, vel, 30000, ent, qfalse);
+
+	// zyk: sets the target
+	if (ent->client && ent->client->ps.rocketLockIndex != ENTITYNUM_NONE)
+	{
+		missile->enemy = &g_entities[ent->client->ps.rocketLockIndex];
+
+		missile->angle = 0.5f;
+		missile->think = rocketThink;
+		missile->nextthink = level.time + ROCKET_ALT_THINK_TIME;
+
+		ent->client->ps.rocketLockIndex = ENTITYNUM_NONE;
+		ent->client->ps.rocketLockTime = 0;
+		ent->client->ps.rocketTargetTime = 0;
+	}
+
+	missile->classname = "rocket_proj";
+	missile->s.weapon = WP_ROCKET_LAUNCHER;
+
+	// Make it easier to hit things
+	VectorSet(missile->r.maxs, ROCKET_SIZE, ROCKET_SIZE, ROCKET_SIZE);
+	VectorScale(missile->r.maxs, -1, missile->r.mins);
+
+	missile->damage = damage;
+	missile->dflags = DAMAGE_DEATH_KNOCKBACK;
+
+	missile->methodOfDeath = MOD_ROCKET_HOMING;
+	missile->splashMethodOfDeath = MOD_ROCKET_HOMING_SPLASH;
+
+	//===testing being able to shoot rockets out of the air==================================
+	missile->health = 10;
+	missile->takedamage = qtrue;
+	missile->r.contents = MASK_SHOT;
+	missile->die = RocketDie;
+	//===testing being able to shoot rockets out of the air==================================
+
+	missile->clipmask = MASK_SHOT;
 
 	missile->splashDamage = splash_damage;
 	missile->splashRadius = ROCKET_SPLASH_RADIUS;
@@ -2329,6 +2457,79 @@ gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean altFire )
 	VectorCopy (start, bolt->r.currentOrigin);
 
 	VectorCopy( start, bolt->pos2 );
+
+	bolt->bounceCount = -5;
+
+	return bolt;
+}
+
+// zyk: used by Thermal Throw ability
+gentity_t *zyk_WP_FireThermalDetonator(gentity_t *ent)
+//---------------------------------------------------------
+{
+	gentity_t	*bolt;
+	vec3_t		dir, start;
+	float chargeAmount = 1.0f; // default of full charge
+
+	vec3_t zyk_origin, zyk_forward;
+
+	VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
+	VectorSet(zyk_origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 30);
+	AngleVectors(dir, zyk_forward, NULL, NULL);
+
+	VectorCopy(zyk_forward, dir);
+	VectorCopy(zyk_origin, start);
+
+	bolt = G_Spawn();
+
+	bolt->physicsObject = qtrue;
+
+	bolt->classname = "thermal_detonator";
+	bolt->think = thermalThinkStandard;
+	bolt->nextthink = level.time;
+	bolt->touch = touch_NULL;
+
+	// How 'bout we give this thing a size...
+	VectorSet(bolt->r.mins, -3.0f, -3.0f, -3.0f);
+	VectorSet(bolt->r.maxs, 3.0f, 3.0f, 3.0f);
+	bolt->clipmask = MASK_SHOT;
+
+	W_TraceSetStart(ent, start, bolt->r.mins, bolt->r.maxs);//make sure our start point isn't on the other side of a wall
+
+	// normal ones bounce, alt ones explode on impact
+	bolt->genericValue5 = level.time + TD_TIME; // How long 'til she blows
+	bolt->s.pos.trType = TR_GRAVITY;
+	bolt->parent = ent;
+	bolt->r.ownerNum = ent->s.number;
+	VectorScale(dir, zyk_thermal_velocity.integer * chargeAmount, bolt->s.pos.trDelta);
+
+	if (ent->health >= 0)
+	{
+		bolt->s.pos.trDelta[2] += 120;
+	}
+
+	bolt->s.loopSound = G_SoundIndex("sound/weapons/thermal/thermloop.wav");
+	bolt->s.loopIsSoundset = qfalse;
+
+	bolt->damage = zyk_thermal_damage.integer * 2.5;
+	bolt->dflags = 0;
+	bolt->splashDamage = zyk_thermal_splash_damage.integer * 2.5;
+	bolt->splashRadius = 180;
+
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weapon = WP_THERMAL;
+
+	bolt->methodOfDeath = MOD_THERMAL;
+	bolt->splashMethodOfDeath = MOD_THERMAL_SPLASH;
+
+	bolt->s.pos.trTime = level.time;		// move a bit on the very first frame
+	VectorCopy(start, bolt->s.pos.trBase);
+
+	SnapVector(bolt->s.pos.trDelta);			// save net bandwidth
+	VectorCopy(start, bolt->r.currentOrigin);
+
+	VectorCopy(start, bolt->pos2);
 
 	bolt->bounceCount = -5;
 
@@ -3266,7 +3467,7 @@ void WP_DropDetPack( gentity_t *ent, qboolean alt_fire )
 		CalcMuzzlePoint( ent, forward, vright, up, muzzle );
 
 		VectorNormalize( forward );
-		VectorMA( muzzle, -4, forward, muzzle );
+		VectorMA( muzzle, 2, forward, muzzle ); // zyk: changed scale to 2. Default -4
 		drop_charge( ent, muzzle, forward );
 
 		ent->client->ps.hasDetPackPlanted = qtrue;
@@ -3279,7 +3480,7 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 	int			damage = zyk_concussion_alt_damage.integer, skip, traces = DISRUPTOR_ALT_TRACES;
 	qboolean	render_impact = qtrue;
 	vec3_t		start, end;
-	vec3_t		muzzle2, dir;
+	vec3_t		/*muzzle2,*/ dir;
 	trace_t		tr;
 	gentity_t	*traceEnt, *tent;
 	float		shotRange = 8192.0f;
@@ -3302,7 +3503,7 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 	//FIXME: only if on ground?  So no "rocket jump"?  Or: (see next FIXME)
 	//FIXME: instead, set a forced ucmd backmove instead of this sliding
 
-	VectorCopy( muzzle, muzzle2 ); // making a backup copy
+	//VectorCopy( muzzle, muzzle2 ); // making a backup copy
 
 	VectorCopy( muzzle, start );
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );
@@ -3359,7 +3560,7 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 		{
 			// should never happen, but basically we don't want to consider a hit to ourselves?
 			// Get ready for an attempt to trace through another person
-			VectorCopy( tr.endpos, muzzle2 );
+			//VectorCopy( tr.endpos, muzzle2 );
 			VectorCopy( tr.endpos, start );
 			skip = tr.entityNum;
 #ifdef _DEBUG
@@ -3512,7 +3713,7 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 			}
 		}
 		// Get ready for an attempt to trace through another person
-		VectorCopy( tr.endpos, muzzle2 );
+		//VectorCopy( tr.endpos, muzzle2 );
 		VectorCopy( tr.endpos, start );
 		skip = tr.entityNum;
 		hitDodged = qfalse;
@@ -3692,13 +3893,9 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 		G_Damage( tr_ent, ent, ent, forward, tr.endpos, zyk_stun_baton_damage.integer, (DAMAGE_NO_KNOCKBACK|DAMAGE_HALF_ABSORB), MOD_STUN_BATON );
 
 		// zyk: if stun baton is in level 2 in RPG mode, does double damage
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[18] == 2)
+		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[18] > 1)
 		{
-			G_Damage( tr_ent, ent, ent, forward, tr.endpos, zyk_stun_baton_damage.integer * 2, (DAMAGE_NO_KNOCKBACK|DAMAGE_HALF_ABSORB), MOD_STUN_BATON );
-		}
-		else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[18] == 3)
-		{ // zyk: if in level 3, causes triple damage
-			G_Damage( tr_ent, ent, ent, forward, tr.endpos, zyk_stun_baton_damage.integer * 3, (DAMAGE_NO_KNOCKBACK|DAMAGE_HALF_ABSORB), MOD_STUN_BATON );
+			G_Damage( tr_ent, ent, ent, forward, tr.endpos, zyk_stun_baton_damage.integer * ent->client->pers.skill_levels[18], (DAMAGE_NO_KNOCKBACK|DAMAGE_HALF_ABSORB), MOD_STUN_BATON );
 		}
 		else
 		{
@@ -3732,13 +3929,13 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 					}
 				}
 
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[18] >= 2 && (tr_ent->client->sess.amrpgmode < 2 || tr_ent->client->pers.rpg_class != 5) && tr_ent->client->ps.powerups[PW_CLOAKED])
-				{ // zyk: stun baton level 2 or 3 decloaks players except Stealth Attacker
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 15) && (tr_ent->client->sess.amrpgmode < 2 || tr_ent->client->pers.rpg_class != 5) && tr_ent->client->ps.powerups[PW_CLOAKED])
+				{ // zyk: stun baton upgrade decloaks players except Stealth Attacker
 					Jedi_Decloak(tr_ent);
 				}
 
-				// zyk: if the player has stun baton at level 3 in RPG mode, enemy has its speed decreased
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[18] == 3)
+				// zyk: if the player has stun baton upgrade in RPG mode, enemy has its speed decreased
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 15))
 				{
 					// zyk: allies cant be hit by it
 					if (zyk_is_ally(ent,tr_ent) == qtrue)
@@ -3759,7 +3956,7 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 					}
 
 					if (zyk_can_hit_target(ent, tr_ent) == qfalse)
-					{ // zyk: testing if the target player can get the stun baton 3/3 effect
+					{ // zyk: testing if the target player can get hit by the stun baton
 						return;
 					}
 
@@ -3810,41 +4007,62 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			{ // zyk: Magic Bolt
 				vec3_t origin, dir, zyk_forward;
 				gentity_t *missile = NULL;
+				int i = 0;
+				int number_of_shots = 1;
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 10);
 				else
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 35);
 
-				VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
+				if (ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 4) && 
+					ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && ent->client->pers.player_statuses & (1 << 21))
+				{ // zyk: Magic Master Unique Upgrade 1 increases number of electric bolt shots
+					number_of_shots = 3;
+				}
 
-				AngleVectors( dir, zyk_forward, NULL, NULL );
+				for (i = 0; i < number_of_shots; i++)
+				{
+					if (number_of_shots > 1)
+					{ // zyk: Spread Electric Bolts code to make them spread
+						VectorSet(dir, ent->client->ps.viewangles[0] + crandom() * 3.0, ent->client->ps.viewangles[1] + crandom() * 3.0, 0);
+					}
+					else
+					{
+						VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
+					}
 
-				missile = CreateMissile( origin, zyk_forward, zyk_magic_fist_velocity.integer, 10000, ent, qfalse);
+					AngleVectors(dir, zyk_forward, NULL, NULL);
 
-				missile->classname = "bowcaster_proj";
-				missile->s.weapon = WP_BOWCASTER;
+					missile = CreateMissile(origin, zyk_forward, zyk_magic_fist_velocity.integer, 10000, ent, qfalse);
 
-				VectorSet( missile->r.maxs, BOWCASTER_SIZE, BOWCASTER_SIZE, BOWCASTER_SIZE );
-				VectorScale( missile->r.maxs, -1, missile->r.mins );
+					missile->classname = "bowcaster_proj";
+					missile->s.weapon = WP_BOWCASTER;
 
-				if (ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time) // zyk: Unique Skill increases damage
-					missile->damage = zyk_magic_fist_damage.integer * 2;
-				else
-					missile->damage = zyk_magic_fist_damage.integer;
+					VectorSet(missile->r.maxs, BOWCASTER_SIZE, BOWCASTER_SIZE, BOWCASTER_SIZE);
+					VectorScale(missile->r.maxs, -1, missile->r.mins);
 
-				missile->dflags = DAMAGE_DEATH_KNOCKBACK;
-				missile->methodOfDeath = MOD_MELEE;
-				missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
+					if (ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && !(ent->client->pers.player_statuses & (1 << 21))) // zyk: Unique Skill increases damage
+						missile->damage = zyk_magic_fist_damage.integer * 2;
+					else
+						missile->damage = zyk_magic_fist_damage.integer;
 
-				// we don't want it to bounce
-				missile->bounceCount = 0;
+					missile->dflags = DAMAGE_DEATH_KNOCKBACK;
+					missile->methodOfDeath = MOD_MELEE;
+					missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
 
-				rpg_skill_counter(ent, 10);
+					// we don't want it to bounce
+					missile->bounceCount = 0;
+
+					rpg_skill_counter(ent, 10);
+				}
 
 				G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/noghri/fire.mp3"));
 
-				ent->client->pers.magic_power -= zyk_magic_fist_mp_cost.integer;
+				if (number_of_shots > 1)
+					ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 4);
+				else
+					ent->client->pers.magic_power -= zyk_magic_fist_mp_cost.integer;
 
 				send_rpg_events(2000);
 			}
@@ -3852,40 +4070,62 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			{ // zyk: Electric Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;
+				int i = 0;
+				int number_of_shots = 1;
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 10);
 				else
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 35);
+
+				if (ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 10) && 
+					ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && ent->client->pers.player_statuses & (1 << 21))
+				{ // zyk: Magic Master Unique Upgrade 1 increases number of electric bolt shots
+					number_of_shots = 3;
+				}
 			
-				VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
+				for (i = 0; i < number_of_shots; i++)
+				{
+					if (number_of_shots > 1)
+					{ // zyk: Spread Electric Bolts code to make them spread
+						VectorSet(dir, ent->client->ps.viewangles[0] + crandom() * 3.0, ent->client->ps.viewangles[1] + crandom() * 3.0, 0);
+					}
+					else
+					{
+						VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
+					}
 
-				AngleVectors( dir, zyk_forward, NULL, NULL );
+					AngleVectors(dir, zyk_forward, NULL, NULL);
 
-				VectorNormalize(zyk_forward);
+					VectorNormalize(zyk_forward);
 
-				missile = CreateMissile( origin, zyk_forward, zyk_magic_fist_velocity.integer, 10000, ent, qfalse);
+					missile = CreateMissile(origin, zyk_forward, zyk_magic_fist_velocity.integer, 10000, ent, qfalse);
 
-				missile->classname = "demp2_proj";
-				missile->s.weapon = WP_DEMP2;
+					missile->classname = "demp2_proj";
+					missile->s.weapon = WP_DEMP2;
 
-				VectorSet( missile->r.maxs, 2, 2, 2 );
-				VectorScale( missile->r.maxs, -1, missile->r.mins );
+					VectorSet(missile->r.maxs, 2, 2, 2);
+					VectorScale(missile->r.maxs, -1, missile->r.mins);
 
-				if (ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time) // zyk: Unique Skill increases damage
-					missile->damage = zyk_magic_fist_damage.integer * 4;
+					if (ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && !(ent->client->pers.player_statuses & (1 << 21))) // zyk: Unique Skill increases damage
+						missile->damage = zyk_magic_fist_damage.integer * 3.8;
+					else
+						missile->damage = zyk_magic_fist_damage.integer * 1.9;
+
+					missile->dflags = DAMAGE_DEATH_KNOCKBACK;
+					missile->methodOfDeath = MOD_MELEE;
+					missile->clipmask = MASK_SHOT;
+
+					// we don't want it to ever bounce
+					missile->bounceCount = 0;
+
+					rpg_skill_counter(ent, 20);
+				}
+
+				if (number_of_shots > 1)
+					ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 10);
 				else
-					missile->damage = zyk_magic_fist_damage.integer * 2;
-
-				missile->dflags = DAMAGE_DEATH_KNOCKBACK;
-				missile->methodOfDeath = MOD_MELEE;
-				missile->clipmask = MASK_SHOT;
-
-				// we don't want it to ever bounce
-				missile->bounceCount = 0;
-
-				rpg_skill_counter(ent, 20);
-				ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 2);
+					ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 2);
 
 				G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/demp2/fire.mp3"));
 
@@ -4100,7 +4340,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			{ // zyk: Ultra Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;
-				int damage = zyk_magic_fist_damage.integer * 1.9;
+				int damage = zyk_magic_fist_damage.integer * 1.8;
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 10);
@@ -4147,6 +4387,43 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 
 				send_rpg_events(2000);
 			}
+		}
+		else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2 && 
+				 ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && ent->client->ps.ammo[AMMO_METAL_BOLTS] > 0)
+		{ // zyk: Bounty Hunter Unique Skill, fire poison darts
+			vec3_t		fwd, dir, origin;
+			gentity_t	*missile;
+
+			ent->client->ps.ammo[AMMO_METAL_BOLTS] -= 1;
+
+			VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
+
+			AngleVectors( dir, fwd, NULL, NULL );
+
+			if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
+				VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 10);
+			else
+				VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 35);
+
+			missile = CreateMissile( origin, fwd, 4500, 10000, ent, qfalse);
+
+			missile->classname = "flech_proj";
+			missile->s.weapon = WP_FLECHETTE;
+
+			VectorSet( missile->r.maxs, FLECHETTE_SIZE, FLECHETTE_SIZE, FLECHETTE_SIZE );
+			VectorScale( missile->r.maxs, -1, missile->r.mins );
+
+			missile->damage = 1;
+			missile->dflags = DAMAGE_DEATH_KNOCKBACK;
+			missile->methodOfDeath = MOD_MELEE;
+			missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
+
+			// we don't want it to bounce forever
+			missile->bounceCount = 2;
+
+			missile->flags |= FL_BOUNCE_SHRAPNEL;
+
+			G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/tusken_rifle/fire_gun.wav"));
 		}
 
 		VectorCopy(ent->client->ps.origin, muzzlePunch);

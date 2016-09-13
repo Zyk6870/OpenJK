@@ -1,5 +1,26 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 // bg_pmove.c -- both games player movement code
 // takes a playerstate and a usercmd as input and returns a modifed playerstate
 
@@ -12,7 +33,7 @@
 	#include "g_local.h"
 #elif _CGAME
 	#include "cgame/cg_local.h"
-#elif _UI
+#elif UI_BUILD
 	#include "ui/ui_local.h"
 #endif
 
@@ -169,7 +190,7 @@ int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] =
 		999,//FP_SEE,//duration
 		999,//FP_SABER_OFFENSE,
 		999,//FP_SABER_DEFENSE,
-		999//FP_SABERTHROW,
+		20//FP_SABERTHROW,
 		//NUM_FORCE_POWERS
 	},
 	{ // zyk: level 5
@@ -6177,7 +6198,7 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			if ( (pm->cmd.buttons & BUTTON_ALT_ATTACK)
 				&& pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] >= weaponData[pm->ps->weapon].altEnergyPerShot )
 			{
-				PM_RocketLock(2048,qfalse);
+				PM_RocketLock(4096,qfalse); // zyk: default 2048. Changed to 4096
 				charging = qtrue;
 				altFire = qtrue;
 			}
@@ -7347,19 +7368,29 @@ static void PM_Weapon( void )
 		BG_InRoll(pm->ps, pm->ps->legsAnim) ||
 		PM_InRollComplete(pm->ps, pm->ps->legsAnim))
 	{
-		/*
-		if (pm->cmd.weapon != WP_MELEE &&
-			pm->ps->weapon != WP_MELEE &&
-			(pm->ps->stats[STAT_WEAPONS] & (1<<WP_SABER)))
-		{ //it's alright also if we are melee
-			pm->cmd.weapon = WP_SABER;
-			pm->ps->weapon = WP_SABER;
+#if defined (_GAME)
+		gentity_t *player_ent = &g_entities[pm->ps->clientNum];
+		qboolean is_a_force_gunner = qfalse;
+
+		// zyk: Force Gunner class can use weapon even if it is doing some special move
+		if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.rpg_class == 7)
+		{
+			is_a_force_gunner = qtrue;
 		}
-		*/
+
+		if (is_a_force_gunner == qfalse)
+		{
+			if (pm->ps->weaponTime < pm->ps->legsTimer)
+			{
+				pm->ps->weaponTime = pm->ps->legsTimer;
+			}
+		}
+#else
 		if (pm->ps->weaponTime < pm->ps->legsTimer)
 		{
 			pm->ps->weaponTime = pm->ps->legsTimer;
 		}
+#endif
 	}
 
 	if (pm->ps->duelInProgress)
@@ -10034,7 +10065,7 @@ static QINLINE void PM_CmdForSaberMoves(usercmd_t *ucmd)
 void PM_VehicleViewAngles(playerState_t *ps, bgEntity_t *veh, usercmd_t *ucmd)
 {
 	Vehicle_t *pVeh = veh->m_pVehicle;
-	qboolean setAngles = qtrue;
+	qboolean setAngles = qfalse;
 	vec3_t clampMin;
 	vec3_t clampMax;
 	int i;
@@ -10579,6 +10610,12 @@ void PmoveSingle (pmove_t *pmove) {
 	qboolean noAnimate = qfalse;
 	int savedGravity = 0;
 
+#if defined( _GAME )
+	gentity_t *player_ent = NULL;
+
+	int rpg_class = -1;
+#endif
+
 	pm = pmove;
 
 	if (pm->cmd.buttons & BUTTON_ATTACK && pm->cmd.buttons & BUTTON_USE_HOLDABLE)
@@ -10637,6 +10674,15 @@ void PmoveSingle (pmove_t *pmove) {
 			pm->cmd.upmove = 0;
 		}
 	}
+
+#if defined( _GAME )
+	player_ent = &g_entities[pm->ps->clientNum];
+
+	if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+	{
+		rpg_class = player_ent->client->pers.rpg_class;
+	}
+#endif
 
 	if (pm->ps->pm_type == PM_FLOAT)
 	{ //You get no control over where you go in grip movement
@@ -10726,24 +10772,35 @@ void PmoveSingle (pmove_t *pmove) {
 	else if ( BG_FullBodyTauntAnim( pm->ps->legsAnim )
 		&& BG_FullBodyTauntAnim( pm->ps->torsoAnim ) )
 	{
-		if ( (pm->cmd.buttons&BUTTON_ATTACK)
+		qboolean stop_meditate_anim = qtrue;
+
+#if defined( _GAME )
+		if (rpg_class == 4 &&
+			player_ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && player_ent->client->pers.player_statuses & (1 << 21))
+		{ // zyk: Monk Meditation Strength ability does not allow stop the meditate anim
+			stop_meditate_anim = qfalse;
+		}
+#endif
+
+		if (stop_meditate_anim == qtrue && 
+			((pm->cmd.buttons&BUTTON_ATTACK)
 			|| (pm->cmd.buttons&BUTTON_ALT_ATTACK)
 			|| (pm->cmd.buttons&BUTTON_FORCEPOWER)
 			|| (pm->cmd.buttons&BUTTON_FORCEGRIP)
 			|| (pm->cmd.buttons&BUTTON_FORCE_LIGHTNING)
 			|| (pm->cmd.buttons&BUTTON_FORCE_DRAIN)
-			|| pm->cmd.upmove )
+			|| pm->cmd.upmove) )
 		{//stop the anim
-			if ( pm->ps->legsAnim == BOTH_MEDITATE
-				&& pm->ps->torsoAnim == BOTH_MEDITATE )
+			if (pm->ps->legsAnim == BOTH_MEDITATE
+				&& pm->ps->torsoAnim == BOTH_MEDITATE)
 			{
-				PM_SetAnim( SETANIM_BOTH, BOTH_MEDITATE_END, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
+				PM_SetAnim(SETANIM_BOTH, BOTH_MEDITATE_END, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD);
 			}
 			else
 			{
 				pm->ps->legsTimer = pm->ps->torsoTimer = 0;
 			}
-			if ( pm->ps->forceHandExtend == HANDEXTEND_TAUNT )
+			if (pm->ps->forceHandExtend == HANDEXTEND_TAUNT)
 			{
 				pm->ps->forceHandExtend = 0;
 			}
@@ -10871,6 +10928,24 @@ void PmoveSingle (pmove_t *pmove) {
 		}
 	}
 	*/
+
+#if defined( _GAME )
+	if (rpg_class == 0 &&
+		player_ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && player_ent->client->pers.player_statuses & (1 << 22))
+	{ // zyk: Free Warrior Super Beam ability does not allow him to move
+		stiffenedUp = qtrue;
+	}
+	else if (rpg_class == 1 &&
+		player_ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && player_ent->client->pers.player_statuses & (1 << 21))
+	{ // zyk: Force User Force Maelstrom ability does not allow him to move
+		stiffenedUp = qtrue;
+	}
+	else if (rpg_class == 9 &&
+		player_ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && player_ent->client->pers.player_statuses & (1 << 22))
+	{ // zyk: Force Tank Force Scream ability does not allow him to move
+		stiffenedUp = qtrue;
+	}
+#endif
 
 	if (stiffenedUp)
 	{

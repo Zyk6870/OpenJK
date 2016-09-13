@@ -1,5 +1,26 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 // cg_event.c -- handle entity events at snapshot or playerstate transitions
 
 #include "cg_local.h"
@@ -2614,27 +2635,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_USE_ITEM8:
 		DEBUGNAME("EV_USE_ITEM8");
 		//CG_UseItem( cent ); zyk: commented this, not used in mod
-
-		if (cg.snap->ps.clientNum == es->number)
-		{
-			if (es->eventParm <= 100)
-			{ // zyk: current magic power
-				cg.magic_power = es->eventParm;
-			}
-			else if (es->eventParm == 101)
-			{ // zyk: Immunity Power
-				cg.immunity_power_duration = cg.time + 25000;
-			}
-			else if (es->eventParm == 102)
-			{ // zyk: Ultra Strength
-				cg.ultra_strength_duration = cg.time + 30000;
-			}
-			else if (es->eventParm == 103)
-			{ // zyk: Ultra Resistance
-				cg.ultra_resistance_duration = cg.time + 30000;
-			}
-		}
-
 		break;
 	case EV_USE_ITEM9:
 		DEBUGNAME("EV_USE_ITEM9");
@@ -2688,6 +2688,18 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				cg.ultra_resistance_duration = cg.time + 30000;
 			}
 		}
+
+		if (es->number < MAX_CLIENTS)
+		{
+			if (es->eventParm >= 104 && es->eventParm <= 114)
+			{
+				if (es->eventParm == 114) // zyk: is not in RPG Mode
+					cg.rpg_class[es->number] = -1;
+				else // zyk: set the RPG class
+					cg.rpg_class[es->number] = es->eventParm - 104;
+			}
+		}
+
 		break;
 	case EV_USE_ITEM14:
 		DEBUGNAME("EV_USE_ITEM14");

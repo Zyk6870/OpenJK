@@ -1,5 +1,26 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2005 - 2015, ioquake3 contributors
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
 
 #include "g_local.h"
 #include "bg_saga.h"
@@ -783,25 +804,6 @@ qboolean ClientInactivityTimer( gclient_t *client ) {
 	return qtrue;
 }
 
-void zyk_force_user_shield(gentity_t *ent, int amount_of_tempentities)
-{
-	gentity_t *evEnt;
-	vec3_t zyk_dir;
-	int i = 0;
-
-	for (i = 0; i < amount_of_tempentities; i++)
-	{
-		VectorCopy(ent->client->ps.viewangles, zyk_dir);
-		VectorNormalize(zyk_dir);
-
-		// zyk: shows shield effect around the player
-		evEnt = G_TempEntity(ent->r.currentOrigin, EV_SHIELD_HIT);
-		evEnt->s.otherEntityNum = ent->s.number;
-		evEnt->s.eventParm = DirToByte(zyk_dir);
-		evEnt->s.time2 = 50;
-	}
-}
-
 /*
 ==================
 ClientTimerActions
@@ -816,6 +818,37 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 	client = ent->client;
 	client->timeResidual += msec;
+
+	if (client->sess.amrpgmode == 2 && client->ps.powerups[PW_NEUTRALFLAG] < level.time)
+	{
+		if (client->pers.player_statuses & (1 << 21))
+		{
+			if (client->pers.rpg_class == 4)
+			{ // zyk: Monk Meditation Strength run out. Remove flag from his allies
+				int i = 0;
+
+				for (i = 0; i < level.maxclients; i++)
+				{
+					gentity_t *player_ent = &g_entities[i];
+
+					if (zyk_is_ally(ent, player_ent) == qtrue)
+					{
+						player_ent->client->pers.player_statuses &= ~(1 << 23);
+					}
+				}
+			}
+			else if (client->pers.rpg_class == 9)
+			{ // zyk: Force Tank Force Armor run out. Remove shield flag
+				ent->flags &= ~FL_SHIELDED;
+			}
+
+			client->pers.player_statuses &= ~(1 << 21);
+		}
+		else if (client->pers.player_statuses & (1 << 22))
+		{
+			client->pers.player_statuses &= ~(1 << 22);
+		}
+	}
 
 	while ( client->timeResidual >= 1000 )
 	{
@@ -852,21 +885,68 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 		if (client->sess.amrpgmode == 2)
 		{
-			if (client->pers.rpg_class == 1 && client->ps.powerups[PW_NEUTRALFLAG] > level.time)
-			{ // zyk: Force User Unique Skill
-				zyk_force_user_shield(ent, 5);
-			}
-
 			if (client->pers.rpg_class == 4 && ent->health > 0)
 			{ // zyk: Monk auto-healing ability
-				if (ent->health < client->pers.max_rpg_health)
-					ent->health += 1;
-			}
+				if (client->ps.powerups[PW_NEUTRALFLAG] > level.time)
+				{ // zyk: Monk Unique Skill
+					int heal_amount = 4;
 
-			if (client->pers.rpg_class == 3 && ent->health > 0)
+					if (client->pers.player_statuses & (1 << 21) && client->ps.legsAnim == BOTH_MEDITATE)
+					{ // zyk: Meditation Strength
+						heal_amount *= 2;
+					}
+
+					if ((ent->health + heal_amount) < client->pers.max_rpg_health)
+					{
+						ent->health += heal_amount;
+					}
+					else
+					{
+						ent->health = client->pers.max_rpg_health;
+					}
+				}
+				else
+				{
+					if (client->pers.player_statuses & (1 << 21))
+					{ // zyk: end of Meditation Strength
+						int player_it = 0;
+
+						client->pers.player_statuses &= ~(1 << 21);
+
+						for (player_it = 0; player_it < level.maxclients; player_it++)
+						{
+							gentity_t *player_ent = &g_entities[player_it];
+
+							if (zyk_is_ally(ent, player_ent) == qtrue)
+							{
+								player_ent->client->pers.player_statuses &= ~(1 << 21);
+							}
+						}
+					}
+
+					if (ent->health < client->pers.max_rpg_health)
+					{
+						ent->health += 1;
+					}
+				}
+			}
+			else if (client->pers.rpg_class == 3 && ent->health > 0)
 			{ // zyk: Armored Soldier auto-shield-healing ability
-				if (client->ps.stats[STAT_ARMOR] < client->pers.max_rpg_shield)
+				if (client->ps.powerups[PW_NEUTRALFLAG] > level.time && !(client->pers.player_statuses & (1 << 21)))
+				{ // zyk: Armored Soldier Unique Skill
+					if ((client->ps.stats[STAT_ARMOR] + 4) < client->pers.max_rpg_shield)
+					{
+						client->ps.stats[STAT_ARMOR] += 4;
+					}
+					else
+					{
+						client->ps.stats[STAT_ARMOR] = client->pers.max_rpg_shield;
+					}
+				}
+				else if (client->ps.stats[STAT_ARMOR] < client->pers.max_rpg_shield)
+				{
 					client->ps.stats[STAT_ARMOR] += 1;
+				}
 			}
 
 			if (client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && client->pers.universe_quest_counter & (1 << 29) &&
@@ -887,8 +967,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				if (client->ps.fd.forcePower < client->pers.max_force_power)
 					client->ps.fd.forcePower += 1;
 
-				client->ps.powerups[PW_SHIELDHIT] = level.time + 2000;
-
 				send_rpg_events(1000);
 			}
 
@@ -899,8 +977,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 				Add_Ammo(ent, AMMO_BLASTER, 1);
 				Add_Ammo(ent, AMMO_POWERCELL, 1);
-
-				client->ps.powerups[PW_SHIELDHIT] = level.time + 2000;
 			}
 		}
 
@@ -967,6 +1043,15 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 			client->pers.player_statuses |= (1 << 3);
 		}
+		else if (!(client->pers.player_statuses & (1 << 7)))
+		{ // zyk: tells the RPG class to the client-side mod to render the Force Shield effect and the resistance shield
+			if (client->sess.amrpgmode == 2)
+				G_AddEvent(ent, EV_USE_ITEM13, (104 + client->pers.rpg_class));
+			else
+				G_AddEvent(ent, EV_USE_ITEM13, 114);
+
+			client->pers.player_statuses |= (1 << 7);
+		}
 		else
 		{
 			// zyk: event to set the stealth attacker upgrade
@@ -977,6 +1062,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 			client->pers.player_statuses &= ~(1 << 2);
 			client->pers.player_statuses &= ~(1 << 3);
+			client->pers.player_statuses &= ~(1 << 7);
 			client->pers.player_statuses &= ~(1 << 14);
 		}
 	}
@@ -1276,126 +1362,66 @@ void SendPendingPredictableEvents( playerState_t *ps ) {
 	}
 }
 
-/*
-==================
-G_UpdateClientBroadcasts
+static const float maxJediMasterDistance = 2500.0f * 2500.0f; // x^2, optimisation
+static const float maxJediMasterFOV = 100.0f;
+static const float maxForceSightDistance = Square( 1500.0f ) * 1500.0f; // x^2, optimisation
+static const float maxForceSightFOV = 100.0f;
 
-Determines whether this client should be broadcast to any other clients.
-A client is broadcast when another client is using force sight or is
-==================
-*/
-#define MAX_JEDIMASTER_DISTANCE	2500
-#define MAX_JEDIMASTER_FOV		100
-
-#define MAX_SIGHT_DISTANCE		1500
-#define MAX_SIGHT_FOV			100
-
-static void G_UpdateForceSightBroadcasts ( gentity_t *self )
-{
+void G_UpdateClientBroadcasts( gentity_t *self ) {
 	int i;
+	gentity_t *other;
 
-	// Any clients with force sight on should see this client
-	for ( i = 0; i < level.numConnectedClients; i ++ )
-	{
-		gentity_t *ent = &g_entities[level.sortedClients[i]];
-		float	  dist;
-		vec3_t	  angles;
+	// we are always sent to ourselves
+	// we are always sent to other clients if we are in their PVS
+	// if we are not in their PVS, we must set the broadcastClients bit field
+	// if we do not wish to be sent to any particular entity, we must set the broadcastClients bit field and the
+	//	SVF_BROADCASTCLIENTS bit flag
+	self->r.broadcastClients[0] = 0u;
+	self->r.broadcastClients[1] = 0u;
 
-		if ( ent == self )
-		{
+	for ( i = 0, other = g_entities; i < MAX_CLIENTS; i++, other++ ) {
+		qboolean send = qfalse;
+		float dist;
+		vec3_t angles;
+
+		if ( !other->inuse || other->client->pers.connected != CON_CONNECTED ) {
+			// no need to compute visibility for non-connected clients
 			continue;
 		}
 
-		// Not using force sight so we shouldnt broadcast to this one
-		if ( !(ent->client->ps.fd.forcePowersActive & (1<<FP_SEE) ) )
-		{
+		if ( other == self ) {
+			// we are always sent to ourselves anyway, this is purely an optimisation
 			continue;
 		}
 
-		VectorSubtract( self->client->ps.origin, ent->client->ps.origin, angles );
-		dist = VectorLengthSquared ( angles );
-		vectoangles ( angles, angles );
+		VectorSubtract( self->client->ps.origin, other->client->ps.origin, angles );
+		dist = VectorLengthSquared( angles );
+		vectoangles( angles, angles );
 
-		// Too far away then just forget it
-		if ( dist > MAX_SIGHT_DISTANCE * MAX_SIGHT_DISTANCE )
-		{
-			continue;
+		// broadcast jedi master to everyone if we are in distance/field of view
+		if ( level.gametype == GT_JEDIMASTER && self->client->ps.isJediMaster ) {
+			if ( dist < maxJediMasterDistance
+				&& InFieldOfVision( other->client->ps.viewangles, maxJediMasterFOV, angles ) )
+			{
+				send = qtrue;
+			}
 		}
 
-		// If not within the field of view then forget it
-		if ( !InFieldOfVision ( ent->client->ps.viewangles, MAX_SIGHT_FOV, angles ) )
-		{
-			break;
+		// broadcast this client to everyone using force sight if we are in distance/field of view
+		if ( (other->client->ps.fd.forcePowersActive & (1 << FP_SEE)) ) {
+			if ( dist < maxForceSightDistance
+				&& InFieldOfVision( other->client->ps.viewangles, maxForceSightFOV, angles ) )
+			{
+				send = qtrue;
+			}
 		}
 
-		// Turn on the broadcast bit for the master and since there is only one
-		// master we are done
-		self->r.broadcastClients[ent->s.clientNum/32] |= (1 << (ent->s.clientNum%32));
-
-		break;
-	}
-}
-
-static void G_UpdateJediMasterBroadcasts ( gentity_t *self )
-{
-	int i;
-
-	// Not jedi master mode then nothing to do
-	if ( level.gametype != GT_JEDIMASTER )
-	{
-		return;
-	}
-
-	// This client isnt the jedi master so it shouldnt broadcast
-	if ( !self->client->ps.isJediMaster )
-	{
-		return;
+		if ( send ) {
+			Q_AddToBitflags( self->r.broadcastClients, i, 32 );
+		}
 	}
 
-	// Broadcast ourself to all clients within range
-	for ( i = 0; i < level.numConnectedClients; i ++ )
-	{
-		gentity_t *ent = &g_entities[level.sortedClients[i]];
-		float	  dist;
-		vec3_t	  angles;
-
-		if ( ent == self )
-		{
-			continue;
-		}
-
-		VectorSubtract( self->client->ps.origin, ent->client->ps.origin, angles );
-		dist = VectorLengthSquared ( angles );
-		vectoangles ( angles, angles );
-
-		// Too far away then just forget it
-		if ( dist > MAX_JEDIMASTER_DISTANCE * MAX_JEDIMASTER_DISTANCE )
-		{
-			continue;
-		}
-
-		// If not within the field of view then forget it
-		if ( !InFieldOfVision ( ent->client->ps.viewangles, MAX_JEDIMASTER_FOV, angles ) )
-		{
-			continue;
-		}
-
-		// Turn on the broadcast bit for the master and since there is only one
-		// master we are done
-		self->r.broadcastClients[ent->s.clientNum/32] |= (1 << (ent->s.clientNum%32));
-	}
-}
-
-void G_UpdateClientBroadcasts ( gentity_t *self )
-{
-	// Clear all the broadcast bits for this client
-	memset ( self->r.broadcastClients, 0, sizeof ( self->r.broadcastClients ) );
-
-	// The jedi master is broadcast to everyone in range
-	G_UpdateJediMasterBroadcasts ( self );
-
-	// Anyone with force sight on should see this client
-	G_UpdateForceSightBroadcasts ( self );
+	trap->LinkEntity( (sharedEntity_t *)self );
 }
 
 void G_AddPushVecToUcmd( gentity_t *self, usercmd_t *ucmd )
@@ -1723,33 +1749,7 @@ static int NPC_GetRunSpeed( gentity_t *ent )
 
 	if ( ( ent->client == NULL ) || ( ent->NPC == NULL ) )
 		return 0;
-/*
-	switch ( ent->client->playerTeam )
-	{
-	case TEAM_BORG:
-		runSpeed = ent->NPC->stats.runSpeed;
-		runSpeed += BORG_RUN_INCR * (g_npcspskill->integer%3);
-		break;
 
-	case TEAM_8472:
-		runSpeed = ent->NPC->stats.runSpeed;
-		runSpeed += SPECIES_RUN_INCR * (g_npcspskill->integer%3);
-		break;
-
-	case TEAM_STASIS:
-		runSpeed = ent->NPC->stats.runSpeed;
-		runSpeed += STASIS_RUN_INCR * (g_npcspskill->integer%3);
-		break;
-
-	case TEAM_BOTS:
-		runSpeed = ent->NPC->stats.runSpeed;
-		break;
-
-	default:
-		runSpeed = ent->NPC->stats.runSpeed;
-		break;
-	}
-*/
 	// team no longer indicates species/race.  Use NPC_class to adjust speed for specific npc types
 	switch( ent->client->NPC_class)
 	{
@@ -2517,7 +2517,6 @@ void ClientThink_real( gentity_t *ent ) {
 						if ( ent->NPC->currentSpeed >= 80 && !controlledByPlayer )
 						{//At higher speeds, need to slow down close to stuff
 							//Slow down as you approach your goal
-						//	if ( ent->NPC->distToGoal < SLOWDOWN_DIST && client->race != RACE_BORG && !(ent->NPC->aiFlags&NPCAI_NO_SLOWDOWN) )//128
 							if ( ent->NPC->distToGoal < SLOWDOWN_DIST && !(ent->NPC->aiFlags&NPCAI_NO_SLOWDOWN) )//128
 							{
 								if ( ent->NPC->desiredSpeed > MIN_NPC_SPEED )
@@ -3470,31 +3469,110 @@ void ClientThink_real( gentity_t *ent ) {
 				}
 
 				if (pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE && ent->client->ps.weapon == WP_MELEE)
-				{ // zyk: Unique Skill, used by some RPG classes
-					if (ent->client->pers.unique_skill_timer < level.time)
+				{ // zyk: Unique Skill, used by RPG classes
+					if (ent->client->pers.unique_skill_timer < level.time && ent->client->pers.skill_levels[38] > 0)
 					{
-						if (ent->client->pers.secrets_found & (1 << 2) && ent->client->pers.rpg_class == 1)
+						if (ent->client->pers.rpg_class == 0)
+						{ // zyk: Free Warrior
+							if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer/2))
+							{
+								ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer/2);
+
+								ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 1000;
+
+								// zyk: recovers hp, shield and mp
+								if ((ent->health + 20) < ent->client->pers.max_rpg_health)
+									ent->health += 20;
+								else
+									ent->health = ent->client->pers.max_rpg_health;
+
+								if ((ent->client->ps.stats[STAT_ARMOR] + 20) < ent->client->pers.max_rpg_shield)
+									ent->client->ps.stats[STAT_ARMOR] += 20;
+								else
+									ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
+
+								if ((ent->client->pers.magic_power + 20) < zyk_max_magic_power(ent))
+									ent->client->pers.magic_power += 20;
+								else
+									ent->client->pers.magic_power = zyk_max_magic_power(ent);
+
+								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/boon.wav"));
+
+								send_rpg_events(2000);
+
+								ent->client->pers.unique_skill_timer = level.time + 55000;
+							}
+							else
+							{
+								trap->SendServerCommand( ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer/2)));
+							}
+						}
+						else if (ent->client->pers.rpg_class == 1)
 						{ // zyk: Force User
 							if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer/4))
 							{
-								zyk_force_user_shield(ent, 5);
-
 								ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer/4);
 
-								ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 8000;
+								ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 9000;
 
-								ent->client->pers.unique_skill_timer = level.time + 60000;
+								ent->client->pers.unique_skill_timer = level.time + 50000;
 							}
 							else
 							{
 								trap->SendServerCommand( ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer/4)));
 							}
 						}
-						else if (ent->client->pers.secrets_found & (1 << 3) && ent->client->pers.rpg_class == 4)
+						else if (ent->client->pers.rpg_class == 2)
+						{ // zyk: Bounty Hunter
+							if (ent->client->ps.ammo[AMMO_METAL_BOLTS] >= 2)
+							{
+								ent->client->ps.ammo[AMMO_METAL_BOLTS] -= 2;
+
+								ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 15000;
+
+								ent->client->pers.unique_skill_timer = level.time + 45000;
+							}
+							else
+							{
+								trap->SendServerCommand( ent->s.number, "chat \"^3Unique Skill: ^7needs 2 metal bolts ammo to use it\"");
+							}
+						}
+						else if (ent->client->pers.rpg_class == 3)
+						{ // zyk: Armored Soldier
+							if (ent->client->ps.ammo[AMMO_POWERCELL] >= 2)
+							{
+								ent->client->ps.ammo[AMMO_POWERCELL] -= 2;
+
+								ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 15000;
+
+								ent->client->pers.unique_skill_timer = level.time + 30000;
+							}
+							else
+							{
+								trap->SendServerCommand( ent->s.number, "chat \"^3Unique Skill: ^7needs 2 power cell ammo to use it\"");
+							}
+						}
+						else if (ent->client->pers.rpg_class == 4)
 						{ // zyk: Monk
 							if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer/4))
 							{
+								int player_it = 0;
+
 								ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer/4);
+
+								// zyk: disable grip of the enemy
+								for (player_it = 0; player_it < level.num_entities; player_it++)
+								{
+									gentity_t *player_ent = &g_entities[player_it];
+
+									if (ent->s.number != player_it && player_ent && player_ent->client && 
+										player_ent->client->ps.fd.forcePowersActive & (1 << FP_GRIP) && 
+										player_ent->client->ps.fd.forceGripEntityNum == ent->s.number)
+									{
+										WP_ForcePowerStop(player_ent, FP_GRIP);
+										break;
+									}
+								}
 
 								ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 15000;
 
@@ -3505,7 +3583,22 @@ void ClientThink_real( gentity_t *ent ) {
 								trap->SendServerCommand( ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer/4)));
 							}
 						}
-						else if (ent->client->pers.secrets_found & (1 << 4) && ent->client->pers.rpg_class == 6)
+						else if (ent->client->pers.rpg_class == 5)
+						{ // zyk: Stealth Attacker
+							if (ent->client->ps.ammo[AMMO_POWERCELL] >= 2)
+							{
+								ent->client->ps.ammo[AMMO_POWERCELL] -= 2;
+
+								ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 10000;
+
+								ent->client->pers.unique_skill_timer = level.time + 45000;
+							}
+							else
+							{
+								trap->SendServerCommand( ent->s.number, "chat \"^3Unique Skill: ^7needs 2 power cell ammo to use it\"");
+							}
+						}
+						else if (ent->client->pers.rpg_class == 6)
 						{ // zyk: Duelist
 							if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer/4))
 							{
@@ -3537,16 +3630,29 @@ void ClientThink_real( gentity_t *ent ) {
 												{ //disable jetpack temporarily
 													if (player_ent->client->jetPackOn)
 														Jetpack_Off(player_ent);
-													player_ent->client->jetPackToggleTime = level.time + 7000;
+													player_ent->client->jetPackToggleTime = level.time + 8000;
+													player_ent->client->ps.powerups[PW_QUAD] = level.time + 8000;
 												}
 												else if (player_ent->NPC && player_ent->client->NPC_class == CLASS_BOBAFETT)
 												{ // zyk: also disables npc jetpack
 													Boba_FlyStop(player_ent);
+													player_ent->client->ps.powerups[PW_QUAD] = level.time + 8000;
+												}
+
+												if (player_ent->client->ps.powerups[PW_CLOAKED] && 
+													!(player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.rpg_class == 5))
+												{ // zyk: disables cloak of enemies, except Stealth Attacker
+													Jedi_Decloak(player_ent);
 												}
 
 												if (player_ent->client->ps.fd.forcePowerMax > 0)
 												{ // zyk: disables force regen
-													player_ent->client->ps.powerups[PW_QUAD] = level.time + 7000;
+													player_ent->client->ps.powerups[PW_QUAD] = level.time + 8000;
+
+													if (player_ent->client->ps.fd.forcePowersActive & (1 << FP_SPEED))
+													{ // zyk: disables force Speed
+														WP_ForcePowerStop(player_ent, FP_SPEED);
+													}
 												}
 											}
 										}
@@ -3559,9 +3665,9 @@ void ClientThink_real( gentity_t *ent ) {
 								else
 									ent->client->pers.magic_power = zyk_max_magic_power(ent);
 
-								send_rpg_events(2000);
-
 								ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 1000;
+
+								send_rpg_events(2000);
 
 								ent->client->pers.unique_skill_timer = level.time + 45000;
 							}
@@ -3570,7 +3676,7 @@ void ClientThink_real( gentity_t *ent ) {
 								trap->SendServerCommand( ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer/4)));
 							}
 						}
-						else if (ent->client->pers.secrets_found & (1 << 5) && ent->client->pers.rpg_class == 7)
+						else if (ent->client->pers.rpg_class == 7)
 						{ // zyk: Force Gunner
 							if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer/4))
 							{
@@ -3644,24 +3750,24 @@ void ClientThink_real( gentity_t *ent ) {
 								trap->SendServerCommand( ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer/4)));
 							}
 						}
-						else if (ent->client->pers.secrets_found & (1 << 6) && ent->client->pers.rpg_class == 8)
+						else if (ent->client->pers.rpg_class == 8)
 						{ // zyk: Magic Master
-							if (ent->client->pers.magic_power > 0)
+							if (ent->client->pers.magic_power >= 2)
 							{
-								ent->client->pers.magic_power--;
-
-								send_rpg_events(2000);
+								ent->client->pers.magic_power -= 2;
 
 								ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 15000;
+
+								send_rpg_events(2000);
 
 								ent->client->pers.unique_skill_timer = level.time + 50000;
 							}
 							else
 							{
-								trap->SendServerCommand( ent->s.number, "chat \"^3Unique Skill: ^7needs at least 1 MP to use it\"");
+								trap->SendServerCommand( ent->s.number, "chat \"^3Unique Skill: ^7needs at least 2 MP to use it\"");
 							}
 						}
-						else if (ent->client->pers.secrets_found & (1 << 18) && ent->client->pers.rpg_class == 9)
+						else if (ent->client->pers.rpg_class == 9)
 						{ // zyk: Force Tank
 							if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer/4))
 							{
@@ -3677,7 +3783,7 @@ void ClientThink_real( gentity_t *ent ) {
 							}
 						}
 					}
-					else
+					else if (ent->client->pers.skill_levels[38] > 0)
 					{ // zyk: still in cooldown time, shows the time left in chat
 						trap->SendServerCommand( ent->s.number, va("chat \"^3Unique Skill: ^7%d seconds left\"", ((ent->client->pers.unique_skill_timer - level.time)/1000)));
 					}

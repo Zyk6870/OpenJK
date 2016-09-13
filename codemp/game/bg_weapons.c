@@ -1,5 +1,25 @@
-// Copyright (C) 2001-2002 Raven Software
-//
+/*
+===========================================================================
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 // bg_weapons.c -- part of bg_pmove functionality
 
 #include "qcommon/q_shared.h"
@@ -224,7 +244,7 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 		1,						//	int		energyPerShot;		// Amount of energy used per shot
 		900,					//	int		fireTime;			// Amount of time between firings
 		8192,					//	int		range;				// Range of weapon
-		2,						//	int		altEnergyPerShot;	// Amount of energy used for alt-fire
+		1,						//	int		altEnergyPerShot;	// Amount of energy used for alt-fire
 		1200,					//	int		altFireTime;		// Amount of time between alt-firings
 		8192,					//	int		altRange;			// Range of alt-fire
 		0,						//	int		chargeSubTime;		// ms interval for subtracting ammo during charge

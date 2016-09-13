@@ -1,5 +1,26 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 // g_combat.c
 
 #include "b_local.h"
@@ -2131,17 +2152,31 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	// zyk: remove any quest_power status from this player
 	self->client->pers.quest_power_status = 0;
+	self->client->pers.player_statuses &= ~(1 << 20);
+
+	// zyk: removing Monk Meditation Strength bonus resistance and damage from ally
+	self->client->pers.player_statuses &= ~(1 << 23);
 
 	// zyk: resetting boss battle music to default one if needed
 	if (self->client->pers.guardian_invoked_by_id != -1)
 	{
-		gentity_t *this_quest_player = &g_entities[self->client->pers.guardian_invoked_by_id];
-		if (this_quest_player->client->pers.guardian_mode > 0)
-			level.boss_battle_music_reset_timer = level.time + 1000;
+		level.boss_battle_music_reset_timer = level.time + 1000;
 	}
 	else if (self->client->sess.amrpgmode == 2 && self->client->pers.guardian_mode > 0 && self->client->pers.can_play_quest == 1)
-	{
+	{ // zyk: quest player died. Reset boss battle music and guardian_mode of his allies
+		int ally_it = 0;
+
 		level.boss_battle_music_reset_timer = level.time + 1000;
+
+		for (ally_it = 0; ally_it < level.maxclients; ally_it++)
+		{
+			gentity_t *this_ent = &g_entities[ally_it];
+
+			if (zyk_is_ally(self,this_ent) == qtrue)
+			{
+				this_ent->client->pers.guardian_mode = 0;
+			}
+		}
 	}
 
 	if (self->client->pers.race_position > 0) // zyk: if a player dies during a race, he loses the race
@@ -2149,20 +2184,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		self->client->pers.race_position = 0;
 		trap->SendServerCommand( -1, va("chat \"^3Race System: ^7%s ^7died during the race!\n\"",self->client->pers.netname) );
 		try_finishing_race();
-	}
-
-	if (self->client->sess.amrpgmode == 2 && self->client->pers.can_play_quest == 1 && self->client->pers.universe_quest_counter & (1 << 29))
-	{
-		self->client->pers.defeated_guardians = 0;
-		self->client->pers.hunter_quest_progress = 0;
-		self->client->pers.eternity_quest_progress = 0;
-		self->client->pers.universe_quest_progress = 0;
-		self->client->pers.universe_quest_counter = 0;
-		self->client->pers.player_settings &= ~(1 << 15);
-
-		save_account(self);
-
-		trap->SendServerCommand( self->s.number, va("chat \"^3Quest System: ^7%s^7! You died in the Challenge Mode! You lost all your quests!\n\"", self->client->pers.netname) );
 	}
 
 	// zyk: setting the credits_modifier and the bonus score for the RPG player
@@ -2193,9 +2214,10 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		{ // zyk: if player defeated the map guardian npc
 			attacker->client->pers.score_modifier = 2;
 			attacker->client->pers.credits_modifier = 990;
-			trap->SendServerCommand( -1, va("chat \"^3Guardian Quest: ^7%s^7 receives ^31000 ^7credits for defeating the map guardian\n\"", attacker->client->pers.netname) );
+			trap->SendServerCommand( -1, va("chat \"^3Guardian Quest: ^7%s^7 receives ^31000 ^7credits for defeating the Guardian of Map\n\"", attacker->client->pers.netname) );
 			level.guardian_quest = 0;
 			level.boss_battle_music_reset_timer = level.time + 1000;
+			level.guardian_quest_timer = level.time + zyk_guardian_quest_timer.integer;
 		}
 
 		if (attacker->client->pers.rpg_class == 2)
@@ -2238,7 +2260,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		self->client->pers.being_mind_controlled = -1;
 	}
 
-	if (!self->NPC && self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[38] > 0 && self->client->pers.mind_controlled1_id > -1)
+	if (!self->NPC && self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1 && self->client->pers.mind_controlled1_id > -1)
 	{
 		gentity_t *controlled_ent = &g_entities[self->client->pers.mind_controlled1_id];
 		self->client->pers.mind_controlled1_id = -1;
@@ -2248,6 +2270,11 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if (self->client->pers.guardian_invoked_by_id != -1)
 	{ // zyk: rpg mode boss. Getting the quest player
 		quest_player = &g_entities[self->client->pers.guardian_invoked_by_id];
+
+		if (quest_player && quest_player->client && quest_player->client->pers.guardian_mode == 0)
+		{ // zyk: player died before. Do not give anything to quest_player
+			quest_player = NULL;
+		}
 	}
 
 	// zyk: artifact holder of Universe Quest, set the player universe_quest_artifact_holder_id to -2 so he can get the artifact when he touches the force boon item
@@ -2493,14 +2520,10 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		self->client->pers.player_statuses &= ~(1 << 10);
 		self->client->pers.player_statuses &= ~(1 << 11);
 
-		// zyk: RPG players lose credits if they die
-		remove_credits(self, 10);
-		save_account(self);
-
 		// zyk: player has the Resurrection Power. Uses mp. Not allowed in CTF gametype
 		if (self->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && !(self->client->pers.player_settings & (1 << 7)) && 
 			g_gametype.integer != GT_CTF && !(self->client->ps.eFlags2 & EF2_HELD_BY_MONSTER) && 
-			self->client->pers.magic_power >= 5)
+			self->client->pers.magic_power >= 5 && zyk_enable_resurrection_power.integer == 1)
 		{
 			self->client->pers.magic_power -= 5;
 			self->client->pers.quest_power_status |= (1 << 10);
@@ -4802,27 +4825,35 @@ void G_Knockdown( gentity_t *victim )
 // zyk: tests if this rpg player can damage saber-only damage things
 qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *inflictor, int mod)
 {
-	if ((mod == MOD_ROCKET || mod == MOD_ROCKET_HOMING || mod == MOD_ROCKET_SPLASH || mod == MOD_ROCKET_HOMING_SPLASH) && attacker && 
-		attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.skill_levels[26] == 2)
+	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 	{
-		return qtrue;
-	}
+		if ((mod == MOD_ROCKET || mod == MOD_ROCKET_HOMING || mod == MOD_ROCKET_SPLASH || mod == MOD_ROCKET_HOMING_SPLASH) && 
+			attacker->client->pers.skill_levels[26] == 2)
+		{
+			return qtrue;
+		}
 	
-	if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && 
-		attacker->client->pers.skill_levels[27] == 2)
-	{
-		return qtrue;
-	}
+		if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && attacker->client->pers.skill_levels[27] == 2)
+		{
+			return qtrue;
+		}
 
-	if (mod == MOD_MELEE && attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.rpg_class == 4)
-	{ // zyk: Monk melee
-		return qtrue;
-	}
+		if (mod == MOD_MELEE && attacker->client->pers.rpg_class == 4)
+		{ // zyk: Monk melee
+			return qtrue;
+		}
 
-	if (mod == MOD_MELEE && attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.rpg_class == 8 &&
-		inflictor && inflictor->s.weapon == WP_CONCUSSION)
-	{ // zyk: Magic Master bolts, the Ultra Bolt
-		return qtrue;
+		if (mod == MOD_MELEE && attacker->client->pers.rpg_class == 8 &&
+			inflictor && inflictor->s.weapon == WP_CONCUSSION)
+		{ // zyk: Magic Master bolts, the Ultra Bolt
+			return qtrue;
+		}
+
+		if ((mod == MOD_DISRUPTOR || mod == MOD_DISRUPTOR_SNIPER || mod == MOD_DISRUPTOR_SPLASH) && attacker->client->pers.rpg_class == 5 && 
+			attacker->client->pers.skill_levels[38] > 0 && attacker->client->ps.powerups[PW_NEUTRALFLAG] > level.time)
+		{ // zyk: Stealth Attacker using disruptor and Unique Skill
+			return qtrue;
+		}
 	}
 
 	return qfalse;
@@ -4864,8 +4895,8 @@ extern void Boba_FlyStop( gentity_t *self );
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
 void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
-	int			take, asave = 0, subamt = 0, knockback;
-	float		famt = 0, hamt = 0, shieldAbsorbed = 0;
+	int			take, asave = 0, knockback;
+	float		shieldAbsorbed = 0;
 	int			check_shield = 1; // zyk: tests if damage can be absorbed by shields
 	qboolean	can_damage_heavy_things = qfalse; // zyk: will be qtrue if attacker is a RPG Mode Monk using melee or a Magic Master using Magic Fist
 
@@ -4964,9 +4995,15 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 	{ // zyk: bonus damage of each RPG class
+		// zyk: Monk Meditation Strength increases damage of allies
+		if (attacker->client->pers.player_statuses & (1 << 23))
+		{
+			damage = (int)ceil(damage * (1.1));
+		}
+
 		if (attacker->client->pers.rpg_class == 0)
 		{
-			damage = (int)ceil(damage * (1.0 + (0.04 * attacker->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (1.0 + (0.03 * attacker->client->pers.skill_levels[55])));
 		}
 		else if (attacker->client->pers.rpg_class == 1 && (mod == MOD_SABER || mod == MOD_FORCE_DARK))
 			damage = (int)ceil(damage * (1.05 + (0.05 * attacker->client->pers.skill_levels[55])));
@@ -5034,7 +5071,15 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	{ // zyk: attacker is a RPG boss. Increase damage based in the number of allies of the quest player
 		gentity_t *quest_player_ent = &g_entities[attacker->client->pers.guardian_invoked_by_id];
 
-		damage += ((int)ceil(damage * 0.1 * zyk_number_of_allies(quest_player_ent)));
+		if (quest_player_ent && quest_player_ent->client && quest_player_ent->client->sess.amrpgmode == 2 && 
+			quest_player_ent->client->pers.universe_quest_counter & (1 << 29))
+		{
+			damage += ((int)ceil(damage * 0.1 * (1 + zyk_number_of_allies(quest_player_ent, qtrue))));
+		}
+		else
+		{
+			damage += ((int)ceil(damage * 0.05 * zyk_number_of_allies(quest_player_ent, qtrue)));
+		}
 	}
 
 	if (targ && targ->client && targ->NPC && targ->client->pers.guardian_invoked_by_id != -1)
@@ -5063,6 +5108,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		{ // zyk: npcs spawned in the Universe Quest last mission. They cannot be killed
 			return;
 		}
+	}
+
+	if (targ && targ->client && targ->client->sess.amrpgmode == 2 && 
+		targ->client->pers.can_play_quest == 1 && targ->client->pers.universe_quest_counter & (1 << 29))
+	{ // zyk: Challenge Mode increases damage taken from anything
+		damage = (int)ceil(damage*1.1);
 	}
 
 	if (targ && targ->client && (targ->NPC || targ->client->sess.amrpgmode == 2) && targ->client->pers.quest_power_status & (1 << 16))
@@ -5096,6 +5147,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			damage = (int)ceil(damage * 0.85);
 		}
 
+		// zyk: Monk Meditation Strength increases resistance to damage of allies
+		if (targ->client->pers.player_statuses & (1 << 23))
+		{
+			damage = (int)ceil(damage * (0.9));
+		}
+
 		if (targ->client->pers.rpg_class == 1 && targ->client->ps.powerups[PW_NEUTRALFLAG] > level.time) // zyk: Force User damage resistance
 		{ // zyk: Unique Skill of Force User
 			damage = (int)ceil(damage * 0.25);
@@ -5106,12 +5163,29 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			// zyk: Armored Soldier Upgrade increases damage resistance
 			if (targ->client->pers.secrets_found & (1 << 16))
 				armored_soldier_bonus_resistance = 0.05;
+
+			// zyk: Armored Soldier Lightning Shield reduces damage
+			if (targ->client->ps.powerups[PW_SHIELDHIT] > level.time)
+			{
+				armored_soldier_bonus_resistance += 0.25;
+			}
 			
 			damage = (int)ceil(damage * (0.9 - ((0.05 * targ->client->pers.skill_levels[55]) + armored_soldier_bonus_resistance)));
 		}
+		else if (targ->client->pers.rpg_class == 4 && targ->client->pers.player_statuses & (1 << 21) && 
+				 targ->client->ps.legsAnim == BOTH_MEDITATE)
+		{ // zyk: Monk Meditation Strength increases resistance to damage of Monk
+			damage = (int)ceil(damage * (0.5));
+		}
 		else if (targ->client->pers.rpg_class == 0) // zyk: Free Warrior damage resistance
 		{
-			damage = (int)ceil(damage * (1.0 - (0.04 * targ->client->pers.skill_levels[55])));
+			// zyk: Free Warrior Mimic Damage ability. Deals half of the damage taken back to the enemy
+			if (targ->client->ps.powerups[PW_NEUTRALFLAG] > level.time && targ->client->pers.player_statuses & (1 << 21))
+			{
+				G_Damage(attacker, targ, targ, NULL, NULL, (int)ceil(damage * (0.5)), 0, MOD_UNKNOWN);
+			}
+
+			damage = (int)ceil(damage * (1.0 - (0.03 * targ->client->pers.skill_levels[55])));
 		}
 		else if (targ->client->pers.rpg_class == 5 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT))
 		{ // zyk: Stealth Attacker damage resistance against DEMP2
@@ -5136,10 +5210,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			if (targ->client->ps.powerups[PW_NEUTRALFLAG] > level.time)
 			{ // zyk: Force Tank Unique Skill increases damage resistance
-				force_tank_bonus_resistance += 0.1;
+				force_tank_bonus_resistance += 0.15;
 			}
 
-			damage = (int)ceil(damage * (0.95 - force_tank_bonus_resistance - (0.1 * targ->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (0.9 - force_tank_bonus_resistance - (0.1 * targ->client->pers.skill_levels[55])));
 		}
 	}
 
@@ -5164,6 +5238,14 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				targ->client->ps.electrifyTime = level.time + Q_irand( 300, 800 );
 			}
 		}
+	}
+
+	if ((mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_FLECHETTE) && targ && targ->client && attacker && attacker->client)
+	{ // zyk: hit by poison dart
+		targ->client->pers.poison_dart_hit_counter = 8;
+		targ->client->pers.poison_dart_user_id = attacker->s.number;
+		targ->client->pers.poison_dart_hit_timer = level.time + 1000;
+		targ->client->pers.player_statuses |= (1 << 20);
 	}
 
 	if (level.gametype == GT_SIEGE &&
@@ -5882,10 +5964,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
-	// zyk: Electric Bolts of Magic Master can disable jetpacks
+	// zyk: Electric Bolts of Magic Master can disable jetpacks. Except Stealth Attacker ones
 	if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2 && client)
 	{
-		if (client->jetPackOn)
+		if (client->jetPackOn && (client->sess.amrpgmode != 2 || client->pers.rpg_class != 5 || !(client->pers.secrets_found & (1 << 7))))
 		{ //disable jetpack temporarily
 			Jetpack_Off(targ);
 			client->jetPackToggleTime = level.time + Q_irand(3000, 10000);
@@ -6060,17 +6142,17 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				if (targ->client->ps.fd.forcePowerLevel[FP_PROTECT] == FORCE_LEVEL_1)
 				{
 					targ->client->ps.fd.forcePower -= (int)ceil(take*0.5*force_decrease_change);
-					take = (int)ceil(take*0.8);
+					take = (int)ceil(take*0.85);
 				}
 				else if (targ->client->ps.fd.forcePowerLevel[FP_PROTECT] == FORCE_LEVEL_2)
 				{
 					targ->client->ps.fd.forcePower -= (int)ceil(take*0.25*force_decrease_change);
-					take = (int)ceil(take*0.6);
+					take = (int)ceil(take*0.65);
 				}
 				else if (targ->client->ps.fd.forcePowerLevel[FP_PROTECT] == FORCE_LEVEL_3)
 				{
 					targ->client->ps.fd.forcePower -= (int)ceil(take*0.125*force_decrease_change);
-					take = (int)ceil(take*0.4);
+					take = (int)ceil(take*0.45);
 				}
 
 				if (targ->client->ps.fd.forcePower < 0)
@@ -6098,11 +6180,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		if (targ->client && (targ->client->ps.fd.forcePowersActive & (1 << FP_RAGE)) && (inflictor->client || attacker->client))
 		{ // zyk: new Force Rage code
 			if (targ->client->ps.fd.forcePowerLevel[FP_RAGE] == 1)
-				take = (int)ceil(take*0.8);
+				take = (int)ceil(take*0.85);
 			else if (targ->client->ps.fd.forcePowerLevel[FP_RAGE] == 2)
-				take = (int)ceil(take*0.6);
+				take = (int)ceil(take*0.65);
 			else if (targ->client->ps.fd.forcePowerLevel[FP_RAGE] == 3)
-				take = (int)ceil(take*0.4);
+				take = (int)ceil(take*0.45);
 		}
 
 		if (!targ->NPC && targ->client && targ->client->sess.amrpgmode == 2)
@@ -6112,8 +6194,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			// zyk: if player is a Bounty Hunter and has the Bounty Hunter Upgrade, absorbs some damage taken
 			if (targ->client->pers.rpg_class == 2 && targ->client->pers.secrets_found & (1 << 1))
 				bonus_resistance = 0.05;
-			else if (targ->client->pers.rpg_class == 4 && targ->client->ps.powerups[PW_NEUTRALFLAG] > level.time) // zyk: Monk damage resistance
-				bonus_resistance = 0.14;
 
 			take = (int)ceil(take * (1.0 - bonus_resistance - (0.1 * targ->client->pers.skill_levels[32])));
 		}
@@ -6449,16 +6529,17 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						npcs_on_same_team(quest_power_user, ent) == qtrue || zyk_is_ally(quest_power_user,ent) == qtrue))
 					{
 						if (quest_power_user->client->sess.amrpgmode == 2 && quest_power_user->client->pers.rpg_class == 8 && 
-							quest_power_user->client->ps.powerups[PW_NEUTRALFLAG] > level.time)
+							quest_power_user->client->ps.powerups[PW_NEUTRALFLAG] > level.time && 
+							!(quest_power_user->client->pers.player_statuses & (1 << 21)))
 						{ // zyk: Magic Master Unique Skill increases amount of health recovered
-							int heal_amount = 3;
-							int shield_amount = 1;
+							int heal_amount = 5;
+							int shield_amount = 2;
 
 							// zyk: Universe Power
 							if (quest_power_user->client->pers.quest_power_status & (1 << 13))
 							{
-								heal_amount += 1;
-								shield_amount += 1;
+								heal_amount += 2;
+								shield_amount += 2;
 							}
 
 							if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
@@ -6478,7 +6559,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						}
 						else
 						{
-							int heal_amount = 2;
+							int heal_amount = 3;
 
 							// zyk: Universe Power
 							if (quest_power_user->client->pers.quest_power_status & (1 << 13))
@@ -6496,7 +6577,12 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 				
 				if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 && level.special_power_effects[attacker->s.number] != ent->s.number)
 				{ // zyk: if it is an effect used by special power, then attacker must be the owner of the effect. Also, do not hit the owner
-					if (!ent->client || ent->client->sess.amrpgmode != 2 || ((ent->client->sess.amrpgmode == 2 || ent->client->pers.guardian_invoked_by_id != -1) && !(ent->client->pers.quest_power_status & (1 << 0))))
+					if (!ent->client || ent->client->sess.amrpgmode != 2 || 
+						((ent->client->sess.amrpgmode == 2 || ent->client->pers.guardian_invoked_by_id != -1) && 
+						(!(ent->client->pers.quest_power_status & (1 << 0)) || 
+						  Q_stricmp(attacker->targetname, "zyk_effect_scream") == 0 || 
+						  Q_stricmp(attacker->targetname, "zyk_timed_bomb_explosion") == 0 ||
+						  Q_stricmp(attacker->targetname, "zyk_vertical_dfa") == 0)))
 					{ // zyk: can only hit if this player or boss is not using Immunity Power
 						gentity_t *quest_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
 
@@ -6528,9 +6614,21 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							Q_stricmp(attacker->targetname, "zyk_quest_effect_dome") == 0 || 
 							Q_stricmp(attacker->targetname, "zyk_quest_effect_flame") == 0 || 
 							Q_stricmp(attacker->targetname, "zyk_quest_effect_drain") == 0 ||
-							Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0)
+							Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0 || 
+							Q_stricmp(attacker->targetname, "zyk_vertical_dfa") == 0)
 						{
 							G_Damage (ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
+						}
+						else if (Q_stricmp(attacker->targetname, "zyk_effect_scream") == 0)
+						{ // zyk: it will also not knockback by Force Scream ability
+							if (ent->client && Q_irand(0, 3) == 0 && zyk_is_ally(quest_power_user, ent) == qfalse)
+							{ // zyk: it has a chance of setting a stun anim on the target
+								ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+								ent->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
+								ent->client->ps.forceHandExtendTime = level.time + 3000;
+							}
+
+							G_Damage(ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
 						}
 						else
 						{

@@ -1,5 +1,26 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 // cg_players.c -- handle the media and animation for player entities
 #include "cg_local.h"
 #include "ghoul2/G2.h"
@@ -863,21 +884,17 @@ void CG_LoadCISounds(clientInfo_t *ci, qboolean modelloaded)
 
 		i = fLen;
 
-		while (i >= 0 && soundpath[i] != '\n')
-		{
-			if (soundpath[i] == 'f')
-			{
+		while (i >= 0 && soundpath[i] != '\n') {
+			if (soundpath[i] == 'f') {
 				isFemale = qtrue;
 				soundpath[i] = 0;
 			}
-
 			i--;
 		}
 
 		i = 0;
 
-		while (soundpath[i] && soundpath[i] != '\r' && soundpath[i] != '\n')
-		{
+		while (soundpath[i] && soundpath[i] != '\r' && soundpath[i] != '\n') {
 			i++;
 		}
 		soundpath[i] = 0;
@@ -895,7 +912,10 @@ void CG_LoadCISounds(clientInfo_t *ci, qboolean modelloaded)
 	}
 	else
 	{
-		isFemale = ci->gender == GENDER_FEMALE;
+		if ( cgs.gametype != GT_SIEGE )
+			isFemale = ci->gender == GENDER_FEMALE;
+		else
+			isFemale = qfalse;
 	}
 
 	trap->S_Shutup(qtrue);
@@ -956,7 +976,9 @@ void CG_LoadCISounds(clientInfo_t *ci, qboolean modelloaded)
 			// if the model didn't load use the sounds of the default model
 			if (soundpath[0])
 			{
-				ci->siegeSounds[i] = trap->S_RegisterSound( va("sound/%s/%s", soundpath, soundName) );
+				ci->siegeSounds[i] = trap->S_RegisterSound( va("sound/chars/%s/misc/%s", soundpath, soundName) );
+				if ( !ci->siegeSounds[i] )
+					ci->siegeSounds[i] = trap->S_RegisterSound( va( "sound/%s/%s", soundpath, soundName ) );
 			}
 			else
 			{
@@ -1630,10 +1652,10 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	// Gender hints
 	if ( (v = Info_ValueForKey( configstring, "ds" )) )
 	{
-		if ( *v == 'm' )
-			newInfo.gender = GENDER_MALE;
-		else
+		if ( *v == 'f' )
 			newInfo.gender = GENDER_FEMALE;
+		else
+			newInfo.gender = GENDER_MALE;
 	}
 
 	// team task
@@ -2741,7 +2763,7 @@ void CG_TriggerAnimSounds( centity_t *cent )
 	{
 		CG_PlayerAnimEvents( cent->localAnimIndex, sFileIndex, qfalse, cent->pe.legs.frame, curFrame, cent->currentState.number );
 	}
-	cent->pe.legs.oldFrame = cent->pe.torso.frame;
+	cent->pe.legs.oldFrame = cent->pe.legs.frame;
 	cent->pe.legs.frame = curFrame;
 
 	if (cent->noLumbar)
@@ -6662,6 +6684,20 @@ void CG_DrawPlayerSphere(centity_t *cent, vec3_t origin, float scale, int shader
 		ent.shaderRGBA[2] = 255;
 		ent.shaderRGBA[3] = 20;
 	}
+	else if (shader == cgs.media.ysaliredShader)
+	{ // zyk: added the red ysal shader
+		ent.shaderRGBA[0] = 255;
+		ent.shaderRGBA[1] = 20;
+		ent.shaderRGBA[2] = 0;
+		ent.shaderRGBA[3] = 80;
+	}
+	else if (shader == cgs.media.ysaliblueShader)
+	{ // zyk: added the blue ysal shader
+		ent.shaderRGBA[0] = 0;
+		ent.shaderRGBA[1] = 20;
+		ent.shaderRGBA[2] = 255;
+		ent.shaderRGBA[3] = 80;
+	}
 	else
 	{ //ysal red/blue, boon
 		ent.shaderRGBA[0] = 255.0f;
@@ -6921,7 +6957,7 @@ int CG_HandleAppendedSkin(char *modelName)
 }
 
 //Create a temporary ghoul2 instance and get the gla name so we can try loading animation data and sounds.
-void BG_GetVehicleModelName(char *modelname, int len);
+void BG_GetVehicleModelName(char *modelName, const char *vehicleName, size_t len);
 void BG_GetVehicleSkinName(char *skinname, int len);
 
 void CG_CacheG2AnimInfo(char *modelName)
@@ -6937,7 +6973,7 @@ void CG_CacheG2AnimInfo(char *modelName)
 
 	if (modelName[0] == '$')
 	{ //it's a vehicle name actually, let's precache the whole vehicle
-		BG_GetVehicleModelName(useModel, sizeof( useModel ) );
+		BG_GetVehicleModelName(useModel, useModel, sizeof( useModel ) );
 		BG_GetVehicleSkinName(useSkin, sizeof( useSkin ) );
 		if ( useSkin[0] )
 		{ //use a custom skin
@@ -7099,7 +7135,7 @@ void CG_G2AnimEntModelLoad(centity_t *cent)
 			//attach the handles for fx cgame-side
 			CG_RegisterVehicleAssets(cent->m_pVehicle);
 
-			BG_GetVehicleModelName(modelName, sizeof( modelName ) );
+			BG_GetVehicleModelName(modelName, modelName, sizeof( modelName ) );
 			if (cent->m_pVehicle->m_pVehicleInfo->skin &&
 				cent->m_pVehicle->m_pVehicleInfo->skin[0])
 			{ //use a custom skin
@@ -9937,6 +9973,44 @@ void CG_Player( centity_t *cent ) {
 		}
 	}
 
+	if (cent->currentState.number < MAX_CLIENTS && 
+		cent->currentState.powerups & (1 << PW_NEUTRALFLAG))
+	{ 
+		if (cg.rpg_class[cent->currentState.number] == 1) // zyk: Force User, draws the Force Shield effect
+			CG_DrawPlayerSphere(cent, cent->lerpOrigin, 1.4f, cgs.media.ysaliblueShader );
+		else if (cg.rpg_class[cent->currentState.number] == 9) // zyk: Force Tank, draws the resistance shield around him
+			CG_DrawPlayerSphere(cent, cent->lerpOrigin, 1.4f, cgs.media.ysaliredShader );
+
+		if (cg.snap->ps.clientNum == cent->currentState.number && cg.rpg_class[cent->currentState.number] >= 0 && cg.unique_cooldown_timer == 0)
+		{ // zyk: classes that are using Unique Skill must show the cooldown time
+			int unique_duration = 0;
+
+			if (cg.rpg_class[cent->currentState.number] == 0)
+				unique_duration = 55000;
+			else if (cg.rpg_class[cent->currentState.number] == 1)
+				unique_duration = 50000;
+			else if (cg.rpg_class[cent->currentState.number] == 2)
+				unique_duration = 45000;
+			else if (cg.rpg_class[cent->currentState.number] == 3)
+				unique_duration = 30000;
+			else if (cg.rpg_class[cent->currentState.number] == 4)
+				unique_duration = 30000;
+			else if (cg.rpg_class[cent->currentState.number] == 5)
+				unique_duration = 45000;
+			else if (cg.rpg_class[cent->currentState.number] == 6)
+				unique_duration = 45000;
+			else if (cg.rpg_class[cent->currentState.number] == 7)
+				unique_duration = 40000;
+			else if (cg.rpg_class[cent->currentState.number] == 8)
+				unique_duration = 50000;
+			else if (cg.rpg_class[cent->currentState.number] == 9)
+				unique_duration = 50000;
+
+			cg.unique_cooldown_timer = cg.time + unique_duration;
+			cg.unique_duration = unique_duration;
+		}
+	}
+
 	if (cent->currentState.powerups & (1 << PW_FORCE_BOON))
 	{
 		CG_DrawPlayerSphere(cent, cent->lerpOrigin, 2.0f, cgs.media.boonShader );
@@ -10570,17 +10644,25 @@ stillDoSaber:
 		legs.renderfx |= RF_MINLIGHT;
 	}
 
-	if (cg.snap->ps.duelInProgress /*&& cent->currentState.number != cg.snap->ps.clientNum*/)
+	if (cg.snap->ps.duelInProgress/*&& cent->currentState.number != cg.snap->ps.clientNum*/)
 	{ //I guess go ahead and glow your own client too in a duel
 		if (cent->currentState.number != cg.snap->ps.duelIndex &&
-			cent->currentState.number != cg.snap->ps.clientNum)
+			cent->currentState.number != cg.snap->ps.clientNum) 
 		{ //everyone not involved in the duel is drawn very dark
-			legs.shaderRGBA[0] /= 5.0f;
-			legs.shaderRGBA[1] /= 5.0f;
-			legs.shaderRGBA[2] /= 5.0f;
-			legs.renderfx |= RF_RGB_TINT;
+			if (cg_zyk_duel_only_render_duelists.integer)
+			{ // zyk: if this cvar is enabled, do not render players other than the duelists themselves
+				return;
+			}
+
+			if (!cg_zyk_duel_keep_colors.integer)
+			{ // zyk: if this cvar is not enabled, dont change skin colors of other players
+				legs.shaderRGBA[0] /= 5.0f;
+				legs.shaderRGBA[1] /= 5.0f;
+				legs.shaderRGBA[2] /= 5.0f;
+				legs.renderfx |= RF_RGB_TINT;
+			}
 		}
-		else
+		else if (!cg_zyk_duel_keep_duelists_colors.integer) // zyk: if this cvar is not enabled, change skin colors and draw shell in duelists
 		{ //adjust the glow by how far away you are from your dueling partner
 			centity_t *duelEnt;
 
@@ -10609,9 +10691,9 @@ stillDoSaber:
 					savRGBA[0] = legs.shaderRGBA[0];
 					savRGBA[1] = legs.shaderRGBA[1];
 					savRGBA[2] = legs.shaderRGBA[2];
-					legs.shaderRGBA[0] = max(255-subLen/4,1);
-					legs.shaderRGBA[1] = max(255-subLen/4,1);
-					legs.shaderRGBA[2] = max(255-subLen/4,1);
+					legs.shaderRGBA[0] = Q_max(255-subLen/4,1);
+					legs.shaderRGBA[1] = Q_max(255-subLen/4,1);
+					legs.shaderRGBA[2] = Q_max(255-subLen/4,1);
 
 					legs.renderfx &= ~RF_RGB_TINT;
 					legs.renderfx &= ~RF_FORCE_ENT_ALPHA;
@@ -10621,9 +10703,9 @@ stillDoSaber:
 
 					legs.customShader = 0;	//reset to player model
 
-					legs.shaderRGBA[0] = max(savRGBA[0]-subLen/8,1);
-					legs.shaderRGBA[1] = max(savRGBA[1]-subLen/8,1);
-					legs.shaderRGBA[2] = max(savRGBA[2]-subLen/8,1);
+					legs.shaderRGBA[0] = Q_max(savRGBA[0]-subLen/8,1);
+					legs.shaderRGBA[1] = Q_max(savRGBA[1]-subLen/8,1);
+					legs.shaderRGBA[2] = Q_max(savRGBA[2]-subLen/8,1);
 				}
 
 				if (subLen <= 1024)
@@ -11240,7 +11322,7 @@ void CG_ResetPlayerEntity( centity_t *cent )
 		cent->pe.legs.pitchAngle = 0;
 		cent->pe.legs.pitching = qfalse;
 
-		memset( &cent->pe.torso, 0, sizeof( cent->pe.legs ) );
+		memset( &cent->pe.torso, 0, sizeof( cent->pe.torso ) );
 		cent->pe.torso.yawAngle = cent->rawAngles[YAW];
 		cent->pe.torso.yawing = qfalse;
 		cent->pe.torso.pitchAngle = cent->rawAngles[PITCH];

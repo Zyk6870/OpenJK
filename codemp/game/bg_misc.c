@@ -1,5 +1,26 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 // bg_misc.c -- both games misc functions, all completely stateless
 
 #include "qcommon/q_shared.h"
@@ -9,7 +30,7 @@
 	#include "g_local.h"
 #elif defined(_CGAME)
 	#include "cgame/cg_local.h"
-#elif defined(_UI)
+#elif defined(UI_BUILD)
 	#include "ui/ui_local.h"
 #endif
 
@@ -310,7 +331,7 @@ qboolean BG_FileExists(const char *fileName)
 		trap->FS_Open(fileName, &fh, FS_READ);
 	#elif _CGAME
 		trap->FS_Open(fileName, &fh, FS_READ);
-	#elif _UI
+	#elif UI_BUILD
 		trap->FS_Open(fileName, &fh, FS_READ);
 	#endif
 		if (fh > 0)
@@ -319,7 +340,7 @@ qboolean BG_FileExists(const char *fileName)
 			trap->FS_Close(fh);
 		#elif _CGAME
 			trap->FS_Close(fh);
-		#elif _UI
+		#elif UI_BUILD
 			trap->FS_Close(fh);
 		#endif
 			return qtrue;
@@ -1705,10 +1726,12 @@ qboolean BG_CanUseFPNow(int gametype, playerState_t *ps, int time, forcePowers_t
 		return qfalse;
 	}
 
+	/* zyk: not it will be possible
 	if (ps->weapon == WP_EMPLACED_GUN)
 	{ //can't use any of your powers while on an emplaced weapon
 		return qfalse;
 	}
+	*/
 
 	// zyk: now it is possible to use force powers while riding a vehicle
 	/*
@@ -2048,6 +2071,41 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 	item = &bg_itemlist[ent->modelindex];
 
+#if defined(_CGAME)
+	// zyk: Some RPG classes cant pickup some items
+	if (cg.rpg_class[ps->clientNum] == 1 && ((item->giType == IT_WEAPON && item->giTag != WP_STUN_BATON) || item->giType == IT_AMMO || 
+		item->giType == IT_HOLDABLE))
+	{
+		return qfalse;
+	}
+	else if (cg.rpg_class[ps->clientNum] == 3 && item->giType == IT_HOLDABLE && item->giTag == HI_CLOAK)
+	{
+		return qfalse;
+	}
+	else if (cg.rpg_class[ps->clientNum] == 4 && ((item->giType == IT_WEAPON && item->giTag != WP_STUN_BATON) || 
+				item->giType == IT_AMMO || item->giType == IT_HOLDABLE))
+	{
+		return qfalse;
+	}
+	else if (cg.rpg_class[ps->clientNum] == 6 && ((item->giType == IT_WEAPON && item->giTag != WP_STUN_BATON) || 
+				item->giType == IT_AMMO || item->giType == IT_HOLDABLE))
+	{
+		return qfalse;
+	}
+	else if (cg.rpg_class[ps->clientNum] == 8 && ((item->giType == IT_WEAPON && item->giTag != WP_STUN_BATON) || item->giType == IT_AMMO || 
+			    (item->giType == IT_HOLDABLE && item->giTag != HI_MEDPAC && item->giTag != HI_CLOAK && item->giTag != HI_JETPACK)))
+	{ // zyk: Magic Master can only pickup some items
+		return qfalse;
+	}
+	else if (cg.rpg_class[ps->clientNum] == 9 && ((item->giType == IT_WEAPON &&
+		(item->giTag == WP_THERMAL || item->giTag == WP_TRIP_MINE || item->giTag == WP_DET_PACK)) ||
+		(item->giType == IT_AMMO &&
+		(item->giTag == AMMO_THERMAL || item->giTag == AMMO_TRIPMINE || item->giTag == AMMO_DETPACK))))
+	{
+		return qfalse;
+	}
+#endif
+
 	if ( ps )
 	{
 		if ( ps->trueJedi )
@@ -2318,7 +2376,7 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 	}
 }
 
-char *eventnames[] = {
+const char *eventnames[] = {
 	"EV_NONE",
 
 	"EV_CLIENTJOIN",
@@ -3078,7 +3136,7 @@ int BG_ModelCache(const char *modelName, const char *skinName)
 	#define MAX_POOL_SIZE	6000000 //1024000 // zyk: increased from 3000000 to 6000000
 #elif defined(_CGAME) //don't need as much for cgame stuff. 2mb will be fine.
 	#define MAX_POOL_SIZE	2048000
-#elif defined(_UI) //And for the ui the only thing we'll be using this for anyway is allocating anim data for g2 menu models
+#elif defined(UI_BUILD) //And for the ui the only thing we'll be using this for anyway is allocating anim data for g2 menu models
 	#define MAX_POOL_SIZE	512000
 #endif
 

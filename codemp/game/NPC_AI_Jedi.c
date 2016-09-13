@@ -1,3 +1,25 @@
+/*
+===========================================================================
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 #include "b_local.h"
 #include "g_nav.h"
 #include "anims.h"
@@ -4143,7 +4165,7 @@ static void Jedi_CombatTimersUpdate( int enemy_dist )
 		}
 		else if ( NPCS.NPC->client->ps.fd.forceRageRecoveryTime > level.time )
 		{//recovering
-			Jedi_Aggression( NPCS.NPC, Q_irand( 0, -2 ) );
+			Jedi_Aggression( NPCS.NPC, Q_irand( -2, 0 ) );
 		}
 		if ( NPCS.NPC->enemy && NPCS.NPC->enemy->client )
 		{
@@ -6565,6 +6587,44 @@ void NPC_BSJedi_Default( void )
 			//NPC->client->ps.eFlags |= EF_FORCE_DRAINED;
 			//FIXME: precache me!
 			NPCS.NPC->s.loopSound = G_SoundIndex( "sound/movers/objects/green_beam_lp2.wav" );//test/charm.wav" );
+		}
+
+		// zyk: now if this timer is done and the enemy is no longer in our line of sight, try to get a new enemy later
+		if (TIMER_Done( NPCS.NPC, "zyk_check_enemy" ))
+		{
+			TIMER_Set( NPCS.NPC, "zyk_check_enemy", Q_irand( 5000, 10000 ) );
+
+			if (NPCS.NPC->enemy && !NPC_ClearLOS4(NPCS.NPC->enemy) && NPCS.NPC->health > 0)
+			{ // zyk: if enemy cant be seen, try getting one later
+				if (NPCS.NPC->client && NPCS.NPC->client->pers.guardian_mode == 0)
+				{
+					NPCS.NPC->enemy = NULL;
+					if (NPCS.NPC->client->NPC_class == CLASS_BOBAFETT)
+					{
+						NPC_BSST_Patrol();
+					}
+					else
+					{
+						Jedi_Patrol();
+					}
+					return;
+				}
+				else if (NPCS.NPC->client)
+				{ // zyk: guardians have a different way to find enemies. He tries to find the quest player and his allies
+					int zyk_it = 0;
+
+					for (zyk_it = 0; zyk_it < level.maxclients; zyk_it++)
+					{
+						gentity_t *allied_player = &g_entities[zyk_it];
+
+						if (allied_player && allied_player->client && allied_player->client->pers.guardian_mode > 0 &&
+							NPC_ClearLOS4(allied_player))
+						{ // zyk: the quest player or one of his allies. If one of them is in line of sight, choose him as enemy
+							NPCS.NPC->enemy = allied_player;
+						}
+					}
+				}
+			}
 		}
 
 		Jedi_Attack();

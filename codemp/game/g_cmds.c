@@ -1,5 +1,27 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2005 - 2015, ioquake3 contributors
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 #include "g_local.h"
 #include "bg_saga.h"
 
@@ -206,6 +228,12 @@ void Cmd_Emote_f( gentity_t *ent )
 	if (zyk_allow_emotes.integer < 1)
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"Cannot use emotes in this server\n\"" );
+		return;
+	}
+
+	if (level.gametype == GT_SIEGE)
+	{
+		trap->SendServerCommand( ent-g_entities, "print \"Cannot use emotes in Siege gametype\n\"" );
 		return;
 	}
 
@@ -739,24 +767,6 @@ void Cmd_KillOther_f( gentity_t *ent )
 	G_Kill( otherEnt );
 }
 
-gentity_t *G_GetDuelWinner(gclient_t *client)
-{
-	gclient_t *wCl;
-	int i;
-
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		wCl = &level.clients[i];
-
-		if (wCl && wCl != client && /*wCl->ps.clientNum != client->ps.clientNum &&*/
-			wCl->pers.connected == CON_CONNECTED && wCl->sess.sessionTeam != TEAM_SPECTATOR)
-		{
-			return &g_entities[wCl->ps.clientNum];
-		}
-	}
-
-	return NULL;
-}
-
 /*
 =================
 BroadCastTeamChange
@@ -783,29 +793,8 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam )
 		trap->SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " %s\n\"",
 		client->pers.netname, G_GetStringEdString("MP_SVGAME", "JOINEDTHESPECTATORS")));
 	} else if ( client->sess.sessionTeam == TEAM_FREE ) {
-		if (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL)
-		{
-			/*
-			gentity_t *currentWinner = G_GetDuelWinner(client);
-
-			if (currentWinner && currentWinner->client)
-			{
-				trap->SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " %s %s\n\"",
-				currentWinner->client->pers.netname, G_GetStringEdString("MP_SVGAME", "VERSUS"), client->pers.netname));
-			}
-			else
-			{
-				trap->SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " %s\n\"",
-				client->pers.netname, G_GetStringEdString("MP_SVGAME", "JOINEDTHEBATTLE")));
-			}
-			*/
-			//NOTE: Just doing a vs. once it counts two players up
-		}
-		else
-		{
-			trap->SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " %s\n\"",
-			client->pers.netname, G_GetStringEdString("MP_SVGAME", "JOINEDTHEBATTLE")));
-		}
+		trap->SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " %s\n\"",
+		client->pers.netname, G_GetStringEdString("MP_SVGAME", "JOINEDTHEBATTLE")));
 	}
 
 	G_LogPrintf( "ChangeTeam: %i [%s] (%s) \"%s^7\" %s -> %s\n", (int)(client - level.clients), client->sess.IP, client->pers.guid, client->pers.netname, TeamName( oldTeam ), TeamName( client->sess.sessionTeam ) );
@@ -1157,7 +1146,7 @@ void StopFollowing( gentity_t *ent ) {
 	ent->client->ps.forceHandExtend = HANDEXTEND_NONE;
 	ent->client->ps.forceHandExtendTime = 0;
 	ent->client->ps.zoomMode = 0;
-	ent->client->ps.zoomLocked = 0;
+	ent->client->ps.zoomLocked = qfalse;
 	ent->client->ps.zoomLockTime = 0;
 	ent->client->ps.saberMove = LS_NONE;
 	ent->client->ps.legsAnim = 0;
@@ -1666,7 +1655,7 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 		clientnum += dir;
 		if ( clientnum >= level.maxclients )
 		{
-			//JAC: Avoid /team follow1 crash
+			// Avoid /team follow1 crash
 			if ( looped )
 			{
 				clientnum = original;
@@ -1730,9 +1719,9 @@ qboolean zyk_answer(gentity_t *ent, char *arg1)
 	if (ent->client->sess.amrpgmode == 2)
 	{
 		if (level.quest_map == 10 && ent->client->pers.can_play_quest == 1 && ent->client->pers.eternity_quest_timer > 0 && 
-			ent->client->pers.eternity_quest_progress < (NUMBER_OF_ETERNITY_QUEST_OBJECTIVES - 1) && (int) ent->client->ps.origin[0] > -576 && 
-			(int) ent->client->ps.origin[0] < -396 && (int) ent->client->ps.origin[1] > 1383 && (int) ent->client->ps.origin[1] < 1560 && 
-			(int) ent->client->ps.origin[2] > 84 && (int) ent->client->ps.origin[2] < 92)
+			ent->client->pers.eternity_quest_progress < (NUMBER_OF_ETERNITY_QUEST_OBJECTIVES - 1) && (int) ent->client->ps.origin[0] > -676 && 
+			(int) ent->client->ps.origin[0] < -296 && (int) ent->client->ps.origin[1] > 1283 && (int) ent->client->ps.origin[1] < 1663 && 
+			(int) ent->client->ps.origin[2] > 60 && (int) ent->client->ps.origin[2] < 120)
 		{ // zyk: Eternity Quest
 			if (ent->client->pers.eternity_quest_progress == 0 && Q_stricmp( arg1, "key" ) == 0)
 			{
@@ -2061,7 +2050,7 @@ static void Cmd_SayTeam_f( gentity_t *ent ) {
 	}
 
 	// zyk: if not in TEAM gametypes and player has allies, use allychat (SAY_ALLY) instead of SAY_ALL
-	if (zyk_number_of_allies(ent) > 0)
+	if (zyk_number_of_allies(ent,qfalse) > 0)
 		G_Say( ent, NULL, (level.gametype>=GT_TEAM) ? SAY_TEAM : SAY_ALLY, p );
 	else
 		G_Say( ent, NULL, (level.gametype>=GT_TEAM) ? SAY_TEAM : SAY_ALL, p );
@@ -2592,9 +2581,37 @@ static voteString_t validVoteStrings[] = {
 	{	"map_restart",			"restart",			G_VoteMapRestart,		0,		GTB_ALL,								qtrue,			"<optional delay>" },
 	{	"nextmap",				NULL,				G_VoteNextmap,			0,		GTB_ALL,								qtrue,			NULL },
 	{	"poll",					NULL,				G_VotePoll,				0,		GTB_ALL,								qtrue,			"<message>" },
-	{	"timelimit",			"time",				G_VoteTimelimit,		1,		GTB_ALL,								qtrue,			"<num>" },
+	{	"timelimit",			"time",				G_VoteTimelimit,		1,		GTB_ALL &~GTB_SIEGE,					qtrue,			"<num>" },
 };
 static const int validVoteStringsSize = ARRAY_LEN( validVoteStrings );
+
+void Svcmd_ToggleAllowVote_f( void ) {
+	if ( trap->Argc() == 1 ) {
+		int i = 0;
+		for ( i = 0; i<validVoteStringsSize; i++ ) {
+			if ( (g_allowVote.integer & (1 << i)) )	trap->Print( "%2d [X] %s\n", i, validVoteStrings[i].string );
+			else									trap->Print( "%2d [ ] %s\n", i, validVoteStrings[i].string );
+		}
+		return;
+	}
+	else {
+		char arg[8] = { 0 };
+		int index;
+
+		trap->Argv( 1, arg, sizeof( arg ) );
+		index = atoi( arg );
+
+		if ( index < 0 || index >= validVoteStringsSize ) {
+			Com_Printf( "ToggleAllowVote: Invalid range: %i [0, %i]\n", index, validVoteStringsSize - 1 );
+			return;
+		}
+
+		trap->Cvar_Set( "g_allowVote", va( "%i", (1 << index) ^ (g_allowVote.integer & ((1 << validVoteStringsSize) - 1)) ) );
+		trap->Cvar_Update( &g_allowVote );
+
+		Com_Printf( "%s %s^7\n", validVoteStrings[index].string, ((g_allowVote.integer & (1 << index)) ? "^2Enabled" : "^1Disabled") );
+	}
+}
 
 void Cmd_CallVote_f( gentity_t *ent ) {
 	int				i=0, numArgs=0;
@@ -3244,6 +3261,22 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 	{
 		return;
 	}
+
+	if ( level.intermissionQueued || level.intermissiontime )
+	{
+		trap->SendServerCommand( ent-g_entities, va( "print \"%s (saberAttackCycle)\n\"", G_GetStringEdString( "MP_SVGAME", "CANNOT_TASK_INTERMISSION" ) ) );
+		return;
+	}
+
+	if ( ent->health <= 0
+			|| ent->client->tempSpectate >= level.time
+			|| ent->client->sess.sessionTeam == TEAM_SPECTATOR )
+	{
+		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "MUSTBEALIVE" ) ) );
+		return;
+	}
+
+
 	if ( ent->client->ps.weapon != WP_SABER )
 	{
         return;
@@ -3561,6 +3594,10 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 
 			challenged->health = 100;
 			challenged->client->ps.stats[STAT_ARMOR] = 100;
+
+			// zyk: disable jetpack of both players
+			Jetpack_Off(ent);
+			Jetpack_Off(challenged);
 
 			ent->client->ps.duelTime = level.time + 2000;
 			challenged->client->ps.duelTime = level.time + 2000;
@@ -4178,7 +4215,7 @@ qboolean TryGrapple(gentity_t *ent)
 					else if (use_this_power == 19 && zyk_enable_ice_boulder.integer == 1 && ent->client->pers.magic_power >= (int)ceil((zyk_ice_boulder_mp_cost.integer * universe_mp_cost_factor)))
 					{
 						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
-						ice_boulder(ent,400,80);
+						ice_boulder(ent,380,70);
 						ent->client->pers.magic_power -= (int)ceil((zyk_ice_boulder_mp_cost.integer * universe_mp_cost_factor));
 						if (ent->client->pers.rpg_class == 8)
 							ent->client->pers.quest_power_usage_timer = level.time + (zyk_ice_boulder_cooldown.integer * ((4.0 - ent->client->pers.skill_levels[55])/4.0));
@@ -4391,7 +4428,8 @@ void zyk_jetpack(gentity_t *ent)
 {
 	// zyk: player starts with jetpack if it is enabled in player settings, is not in Siege Mode, and does not have all force powers through /give command
 	if (!(ent->client->pers.player_settings & (1 << 12)) && zyk_allow_jetpack_command.integer && 
-		(g_gametype.integer != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && !(ent->client->pers.player_statuses & (1 << 12)) &&
+		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && level.gametype != GT_JEDIMASTER && 
+		!(ent->client->pers.player_statuses & (1 << 12)) &&
 		((ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[34] > 0) || ent->client->sess.amrpgmode == 1))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
@@ -4518,7 +4556,6 @@ void load_account(gentity_t *ent, qboolean change_mode)
 
 		// zyk: initializing mind control attributes used in RPG mode
 		ent->client->pers.being_mind_controlled = -1;
-		ent->client->pers.skill_levels[38] = 0;
 		ent->client->pers.mind_controlled1_id = -1;
 
 		// zyk: loading player_settings value
@@ -4657,10 +4694,13 @@ void load_account(gentity_t *ent, qboolean change_mode)
 			// zyk: reset the force powers of this player
 			WP_InitForcePowers( ent );
 
-			if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] > FORCE_LEVEL_0)
+			if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] > FORCE_LEVEL_0 && 
+				level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE
+				)
 				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
 
-			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
+			if (level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
 
 			zyk_load_common_settings(ent);
 		}
@@ -4868,47 +4908,12 @@ void rpg_score(gentity_t *ent, qboolean admin_rp_mode)
 // zyk: increases the RPG skill counter by this amount
 void rpg_skill_counter(gentity_t *ent, int amount)
 {
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.level < MAX_RPG_LEVEL)
 	{ // zyk: now RPG mode increases level up score after a certain amount of attacks
 		ent->client->pers.skill_counter += amount;
-		if (ent->client->pers.skill_counter >= MAX_SKILL_COUNTER)
+		if (ent->client->pers.skill_counter >= zyk_max_skill_counter.integer)
 		{
 			ent->client->pers.skill_counter = 0;
-
-			// zyk: some classes, after reaching level 10, get the Unique Skill
-			if (ent->client->pers.level >= 10)
-			{
-				if (ent->client->pers.rpg_class == 1 && !(ent->client->pers.secrets_found & (1 << 2)))
-				{
-					ent->client->pers.secrets_found |= (1 << 2);
-					trap->SendServerCommand( ent->s.number, "chat \"^3Skill Counter: ^7learned Force User Unique Skill!\"");
-				}
-				else if (ent->client->pers.rpg_class == 4 && !(ent->client->pers.secrets_found & (1 << 3)))
-				{
-					ent->client->pers.secrets_found |= (1 << 3);
-					trap->SendServerCommand( ent->s.number, "chat \"^3Skill Counter: ^7learned Monk Unique Skill!\"");
-				}
-				else if (ent->client->pers.rpg_class == 6 && !(ent->client->pers.secrets_found & (1 << 4)))
-				{
-					ent->client->pers.secrets_found |= (1 << 4);
-					trap->SendServerCommand( ent->s.number, "chat \"^3Skill Counter: ^7learned Duelist Unique Skill!\"");
-				}
-				else if (ent->client->pers.rpg_class == 7 && !(ent->client->pers.secrets_found & (1 << 5)))
-				{
-					ent->client->pers.secrets_found |= (1 << 5);
-					trap->SendServerCommand( ent->s.number, "chat \"^3Skill Counter: ^7learned Force Gunner Unique Skill!\"");
-				}
-				else if (ent->client->pers.rpg_class == 8 && !(ent->client->pers.secrets_found & (1 << 6)))
-				{
-					ent->client->pers.secrets_found |= (1 << 6);
-					trap->SendServerCommand( ent->s.number, "chat \"^3Skill Counter: ^7learned Magic Master Unique Skill!\"");
-				}
-				else if (ent->client->pers.rpg_class == 9 && !(ent->client->pers.secrets_found & (1 << 18)))
-				{
-					ent->client->pers.secrets_found |= (1 << 18);
-					trap->SendServerCommand( ent->s.number, "chat \"^3Skill Counter: ^7learned Force Tank Unique Skill!\"");
-				}
-			}
 
 			// zyk: skill counter does not give credits, only Level Up Score
 			ent->client->pers.credits_modifier = -10;
@@ -5167,8 +5172,6 @@ void initialize_rpg_skills(gentity_t *ent)
 		}
 
 		// zyk: setting rpg control attributes
-		ent->client->pers.unique_skill_timer = 0;
-
 		ent->client->pers.thermal_vision = qfalse;
 
 		if (ent->client->pers.rpg_class != 8 || magic_master_has_this_power(ent, ent->client->sess.selected_special_power) == qfalse || 
@@ -5409,6 +5412,13 @@ void initialize_rpg_skills(gentity_t *ent)
 			ent->client->pers.quest_power_status &= ~(1 << 13);
 		}
 
+		// zyk: the player can have only one of the Unique Abilities. If for some reason he has more, remove all of them
+		if (ent->client->pers.secrets_found & (1 << 2) && ent->client->pers.secrets_found & (1 << 3))
+		{
+			ent->client->pers.secrets_found &= ~(1 << 2);
+			ent->client->pers.secrets_found &= ~(1 << 3);
+		}
+
 		// zyk: update the rpg stuff info at the client-side game
 		send_rpg_events(10000);
 	}
@@ -5633,8 +5643,6 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 
 			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-				// zyk: adding credits because killing the player makes him lose credits, and in this case he should not lose any
-				add_credits(ent, 10);
 				G_Kill(ent);
 			}
 		}
@@ -6150,15 +6158,13 @@ Cmd_LogoutAccount_f
 ==================
 */
 void Cmd_LogoutAccount_f( gentity_t *ent ) {
-	int i = 0;
-
 	if (ent->client->pers.being_mind_controlled != -1)
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"You cant logout while being mind-controlled.\n\"" );
 		return;
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.mind_controlled1_id != -1)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 1 && ent->client->pers.mind_controlled1_id != -1)
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"You cant logout while using Mind Control on someone.\n\"" );
 		return;
@@ -6203,10 +6209,13 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 	// zyk: resetting force powers
 	WP_InitForcePowers( ent );
 
-	if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] > FORCE_LEVEL_0)
+	if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] > FORCE_LEVEL_0 &&
+		level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE
+		)
 		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
 
-	ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
+	if (level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
 
 	// zyk: update the rpg stuff info at the client-side game
 	send_rpg_events(10000);
@@ -6360,7 +6369,7 @@ qboolean rpg_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont_show
 
 	if (upgrade_value == 8)
 	{
-		if (ent->client->pers.skill_levels[7] < 3)
+		if (ent->client->pers.skill_levels[7] < 4)
 		{
 			if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABERTHROW)))
 				ent->client->ps.fd.forcePowersKnown |= (1 << FP_SABERTHROW);
@@ -6576,7 +6585,7 @@ qboolean rpg_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont_show
 
 	if (upgrade_value == 19)
 	{
-		if (ent->client->pers.skill_levels[18] < 3)
+		if (ent->client->pers.skill_levels[18] < 4)
 		{
 			ent->client->pers.skill_levels[18]++;
 			ent->client->pers.skillpoints--;
@@ -6887,7 +6896,7 @@ qboolean rpg_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont_show
 		else
 		{
 			if (dont_show_message == qfalse)
-				trap->SendServerCommand( ent-g_entities, "print \"You reached the maximum level of ^3Mind Control ^7skill.\n\"" );
+				trap->SendServerCommand( ent-g_entities, "print \"You reached the maximum level of ^3Unique Skill^7.\n\"" );
 			return qfalse;
 		}
 	}
@@ -7282,7 +7291,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 		{
 			if (i == 0 || i == 5 || i == 30 || i == 54)
 				strcpy(content,va("%s%d/5-",content,ent->client->pers.skill_levels[i]));
-			else if (i == 3 || i == 8 || i == 10 || i == 13 || i == 16 || i == 31 || i == 32)
+			else if (i == 3 || i == 7 || i == 8 || i == 10 || i == 13 || i == 16 || i == 18 || i == 31 || i == 32)
 				strcpy(content,va("%s%d/4-",content,ent->client->pers.skill_levels[i]));
 			else if (i > 18 && i < 29)
 				strcpy(content,va("%s%d/2-",content,ent->client->pers.skill_levels[i]));
@@ -7314,7 +7323,17 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 		strcpy(content,va("%s%d-%d-%d-%d-%d-%d-",content,ent->client->pers.secrets_found,ent->client->pers.defeated_guardians,ent->client->pers.hunter_quest_progress,
 			ent->client->pers.eternity_quest_progress,ent->client->pers.universe_quest_progress,universe_quest_counter_value));
 
-		trap->SendServerCommand( ent-g_entities, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-%s-%s\"",ent->client->pers.level,MAX_RPG_LEVEL,ent->client->pers.level_up_score,ent->client->pers.level,ent->client->pers.skillpoints,ent->client->pers.skill_counter,MAX_SKILL_COUNTER,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,zyk_rpg_class(ent),content));
+		// zyk: new setting added
+		if (!(ent->client->pers.player_settings & (1 << 17)))
+		{
+			strcpy(content,va("%sON-",content));
+		}
+		else
+		{
+			strcpy(content,va("%sOFF-",content));
+		}
+
+		trap->SendServerCommand( ent-g_entities, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-%s-%s\"",ent->client->pers.level,MAX_RPG_LEVEL,ent->client->pers.level_up_score,ent->client->pers.level,ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,zyk_rpg_class(ent),content));
 	}
 	else if (ent->client->sess.amrpgmode == 1)
 	{ // zyk: just sends the player settings
@@ -7360,56 +7379,56 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 		return qfalse;
 	}
 
-	if (ent->client->pers.rpg_class == 2 && ((upgrade_value >= 1 && upgrade_value <= 4) || (upgrade_value >= 6 && upgrade_value <= 18) || upgrade_value == 34 || (upgrade_value >= 36 && upgrade_value <= 39) || upgrade_value == 55))
+	if (ent->client->pers.rpg_class == 2 && ((upgrade_value >= 1 && upgrade_value <= 4) || (upgrade_value >= 6 && upgrade_value <= 18) || upgrade_value == 34 || (upgrade_value >= 36 && upgrade_value <= 38) || upgrade_value == 55))
 	{
 		if (dont_show_message == qfalse)
 			trap->SendServerCommand( ent-g_entities, "print \"Bounty Hunter class doesn't allow this skill.\n\"" );
 		return qfalse;
 	}
 
-	if (ent->client->pers.rpg_class == 3 && ((upgrade_value >= 1 && upgrade_value <= 4) || (upgrade_value >= 6 && upgrade_value <= 18) || upgrade_value == 34 || (upgrade_value >= 36 && upgrade_value <= 39) || upgrade_value == 49 || (upgrade_value >= 52 && upgrade_value <= 55)))
+	if (ent->client->pers.rpg_class == 3 && ((upgrade_value >= 1 && upgrade_value <= 4) || (upgrade_value >= 6 && upgrade_value <= 18) || upgrade_value == 34 || (upgrade_value >= 36 && upgrade_value <= 38) || upgrade_value == 49 || (upgrade_value >= 52 && upgrade_value <= 55)))
 	{
 		if (dont_show_message == qfalse)
 			trap->SendServerCommand( ent-g_entities, "print \"Armored Soldier class doesn't allow this skill.\n\"" );
 		return qfalse;
 	}
 
-	if (ent->client->pers.rpg_class == 4 && (upgrade_value == 4 || (upgrade_value >= 6 && upgrade_value <= 9) || upgrade_value == 11 || upgrade_value == 14 || upgrade_value == 17 || (upgrade_value >= 20 && upgrade_value <= 29) || upgrade_value == 35 || (upgrade_value >= 39 && upgrade_value <= 54)))
+	if (ent->client->pers.rpg_class == 4 && (upgrade_value == 4 || (upgrade_value >= 6 && upgrade_value <= 9) || upgrade_value == 11 || upgrade_value == 14 || upgrade_value == 17 || (upgrade_value >= 20 && upgrade_value <= 29) || upgrade_value == 35 || (upgrade_value >= 40 && upgrade_value <= 54)))
 	{
 		if (dont_show_message == qfalse)
 			trap->SendServerCommand( ent-g_entities, "print \"Monk class doesn't allow this skill.\n\"" );
 		return qfalse;
 	}
 
-	if (ent->client->pers.rpg_class == 5 && ((upgrade_value >= 1 && upgrade_value <= 4) || (upgrade_value >= 6 && upgrade_value <= 18) || (upgrade_value >= 20 && upgrade_value <= 21) || upgrade_value == 23 || (upgrade_value >= 26 && upgrade_value <= 27) || upgrade_value == 29 || upgrade_value == 34 || (upgrade_value >= 36 && upgrade_value <= 40) || (upgrade_value >= 43 && upgrade_value <= 44) || (upgrade_value >= 48 && upgrade_value <= 49) || (upgrade_value >= 51 && upgrade_value <= 53) || upgrade_value == 55))
+	if (ent->client->pers.rpg_class == 5 && ((upgrade_value >= 1 && upgrade_value <= 4) || (upgrade_value >= 6 && upgrade_value <= 18) || (upgrade_value >= 20 && upgrade_value <= 21) || upgrade_value == 23 || (upgrade_value >= 26 && upgrade_value <= 27) || upgrade_value == 29 || upgrade_value == 34 || (upgrade_value >= 36 && upgrade_value <= 38) || upgrade_value == 40 || (upgrade_value >= 43 && upgrade_value <= 44) || (upgrade_value >= 48 && upgrade_value <= 49) || (upgrade_value >= 51 && upgrade_value <= 53) || upgrade_value == 55))
 	{
 		if (dont_show_message == qfalse)
 			trap->SendServerCommand( ent-g_entities, "print \"Stealth Attacker class doesn't allow this skill.\n\"" );
 		return qfalse;
 	}
 
-	if (ent->client->pers.rpg_class == 6 && ((upgrade_value >= 12 && upgrade_value <= 13) || (upgrade_value >= 17 && upgrade_value <= 18) || (upgrade_value >= 20 && upgrade_value <= 29) || upgrade_value == 35 || (upgrade_value >= 38 && upgrade_value <= 54)))
+	if (ent->client->pers.rpg_class == 6 && ((upgrade_value >= 12 && upgrade_value <= 13) || (upgrade_value >= 17 && upgrade_value <= 18) || (upgrade_value >= 20 && upgrade_value <= 29) || upgrade_value == 35 || upgrade_value == 38 || (upgrade_value >= 40 && upgrade_value <= 54)))
 	{
 		if (dont_show_message == qfalse)
 			trap->SendServerCommand( ent-g_entities, "print \"Duelist class doesn't allow this skill.\n\"" );
 		return qfalse;
 	}
 
-	if (ent->client->pers.rpg_class == 7 && (upgrade_value == 4 || (upgrade_value >= 6 && upgrade_value <= 8) || (upgrade_value >= 11 && upgrade_value <= 12) || upgrade_value == 15 || upgrade_value == 17 || upgrade_value == 20 || upgrade_value == 23 || (upgrade_value >= 25 && upgrade_value <= 26) || (upgrade_value >= 28 && upgrade_value <= 29) || upgrade_value == 39 || (upgrade_value >= 45 && upgrade_value <= 46) || upgrade_value == 48 || upgrade_value == 51 || (upgrade_value >= 53 && upgrade_value <= 54)))
+	if (ent->client->pers.rpg_class == 7 && (upgrade_value == 4 || (upgrade_value >= 6 && upgrade_value <= 8) || (upgrade_value >= 11 && upgrade_value <= 12) || upgrade_value == 15 || upgrade_value == 17 || upgrade_value == 20 || upgrade_value == 23 || (upgrade_value >= 25 && upgrade_value <= 26) || (upgrade_value >= 28 && upgrade_value <= 29) || (upgrade_value >= 45 && upgrade_value <= 46) || upgrade_value == 48 || upgrade_value == 51 || (upgrade_value >= 53 && upgrade_value <= 54)))
 	{
 		if (dont_show_message == qfalse)
 			trap->SendServerCommand( ent-g_entities, "print \"Force Gunner class doesn't allow this skill.\n\"" );
 		return qfalse;
 	}
 
-	if (ent->client->pers.rpg_class == 8 && ((upgrade_value >= 1 && upgrade_value <= 4) || (upgrade_value >= 6 && upgrade_value <= 18) || (upgrade_value >= 20 && upgrade_value <= 29) || upgrade_value == 34 || (upgrade_value >= 36 && upgrade_value <= 47) || (upgrade_value >= 49 && upgrade_value <= 55)))
+	if (ent->client->pers.rpg_class == 8 && ((upgrade_value >= 1 && upgrade_value <= 4) || (upgrade_value >= 6 && upgrade_value <= 18) || (upgrade_value >= 20 && upgrade_value <= 29) || upgrade_value == 34 || (upgrade_value >= 36 && upgrade_value <= 38) || (upgrade_value >= 40 && upgrade_value <= 47) || (upgrade_value >= 49 && upgrade_value <= 55)))
 	{
 		if (dont_show_message == qfalse)
 			trap->SendServerCommand( ent-g_entities, "print \"Magic Master class doesn't allow this skill.\n\"" );
 		return qfalse;
 	}
 
-	if (ent->client->pers.rpg_class == 9 && (upgrade_value == 4 || upgrade_value == 10 || (upgrade_value >= 12 && upgrade_value <= 13) || upgrade_value == 14 || upgrade_value == 16 || upgrade_value == 18 || (upgrade_value >= 20 && upgrade_value <= 29) || (upgrade_value >= 34 && upgrade_value <= 54)))
+	if (ent->client->pers.rpg_class == 9 && (upgrade_value == 4 || upgrade_value == 10 || (upgrade_value >= 12 && upgrade_value <= 13) || upgrade_value == 14 || upgrade_value == 16 || upgrade_value == 18 || (upgrade_value >= 20 && upgrade_value <= 29) || (upgrade_value >= 34 && upgrade_value <= 38) || (upgrade_value >= 40 && upgrade_value <= 54)))
 	{
 		if (dont_show_message == qfalse)
 			trap->SendServerCommand( ent-g_entities, "print \"Force Tank class doesn't allow this skill.\n\"" );
@@ -8087,6 +8106,7 @@ void do_downgrade_skill(gentity_t *ent, int downgrade_value)
 		if (ent->client->pers.skill_levels[30] > 0)
 		{
 			ent->client->pers.skill_levels[30]--;
+			set_max_shield(ent);
 			ent->client->pers.skillpoints++;
 		}
 		else
@@ -8211,7 +8231,7 @@ void do_downgrade_skill(gentity_t *ent, int downgrade_value)
 		}
 		else
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"You reached the minimum level of ^3Mind Control ^7skill.\n\"" );
+			trap->SendServerCommand( ent-g_entities, "print \"You reached the minimum level of ^3Unique Skill ^7.\n\"" );
 			return;
 		}
 	}
@@ -8549,9 +8569,9 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 			sprintf(message_content[6],"^3 7 - Saber Defense: %d/3 ",ent->client->pers.skill_levels[6]);
 				
 		if (ent->client->pers.rpg_class == 2 || ent->client->pers.rpg_class == 3 || ent->client->pers.rpg_class == 4 || ent->client->pers.rpg_class == 5 || ent->client->pers.rpg_class == 7 || ent->client->pers.rpg_class == 8)
-			sprintf(message_content[7],"^0 8 - Saber Throw: %d/3   ",ent->client->pers.skill_levels[7]);
+			sprintf(message_content[7],"^0 8 - Saber Throw: %d/4   ",ent->client->pers.skill_levels[7]);
 		else
-			sprintf(message_content[7],"^3 8 - Saber Throw: %d/3   ",ent->client->pers.skill_levels[7]);
+			sprintf(message_content[7],"^3 8 - Saber Throw: %d/4   ",ent->client->pers.skill_levels[7]);
 				
 		if (ent->client->pers.rpg_class == 2 || ent->client->pers.rpg_class == 3 || ent->client->pers.rpg_class == 4 || ent->client->pers.rpg_class == 5 || ent->client->pers.rpg_class == 8)
 			sprintf(message_content[8],"^0 9 - Absorb: %d/4        ",ent->client->pers.skill_levels[8]);
@@ -8612,7 +8632,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp( arg1, "weapons" ) == 0)
 	{
-		sprintf(message_content[0],"^319 - Stun Baton: %d/3        ",ent->client->pers.skill_levels[18]);
+		sprintf(message_content[0],"^319 - Stun Baton: %d/4        ",ent->client->pers.skill_levels[18]);
 					
 		if (ent->client->pers.rpg_class == 1 || ent->client->pers.rpg_class == 4 || ent->client->pers.rpg_class == 5 || ent->client->pers.rpg_class == 6 || ent->client->pers.rpg_class == 7 || ent->client->pers.rpg_class == 8 || ent->client->pers.rpg_class == 9)
 			sprintf(message_content[1],"^020 - Blaster Pistol: %d/2    ",ent->client->pers.skill_levels[19]);
@@ -8702,14 +8722,11 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 			sprintf(message_content[6],"^637 - Shield Heal: %d/3      ", ent->client->pers.skill_levels[36]);
 
 		if (ent->client->pers.rpg_class == 2 || ent->client->pers.rpg_class == 3 || ent->client->pers.rpg_class == 5 || ent->client->pers.rpg_class == 6 || ent->client->pers.rpg_class == 8 || ent->client->pers.rpg_class == 9)
-			sprintf(message_content[7],"^038 - Team Shield Heal: %d/3 ", ent->client->pers.skill_levels[37]);
+			sprintf(message_content[7],"^038 - Team Shield Heal: %d/3\n", ent->client->pers.skill_levels[37]);
 		else
-			sprintf(message_content[7],"^638 - Team Shield Heal: %d/3 ", ent->client->pers.skill_levels[37]);
+			sprintf(message_content[7],"^638 - Team Shield Heal: %d/3\n", ent->client->pers.skill_levels[37]);
 
-		if (ent->client->pers.rpg_class == 2 || ent->client->pers.rpg_class == 3 || ent->client->pers.rpg_class == 4 || ent->client->pers.rpg_class == 5 || ent->client->pers.rpg_class == 6 || ent->client->pers.rpg_class == 7 || ent->client->pers.rpg_class == 8 || ent->client->pers.rpg_class == 9)
-			sprintf(message_content[8],"^039 - Mind Control: %d/1\n", ent->client->pers.skill_levels[38]);
-		else
-			sprintf(message_content[8],"^639 - Mind Control: %d/1\n", ent->client->pers.skill_levels[38]);
+		sprintf(message_content[8],"^739 - Unique Skill: %d/1\n", ent->client->pers.skill_levels[38]);
 
 		if (ent->client->pers.rpg_class == 2 || ent->client->pers.rpg_class == 3 || ent->client->pers.rpg_class == 5 || ent->client->pers.rpg_class == 8)
 			sprintf(message_content[9],"^055 - Force Power: %d/5\n", ent->client->pers.skill_levels[54]);
@@ -8779,25 +8796,6 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 			sprintf(message_content[6],"%s^3s  ^6- Magic Powers: ^2yes\n",message_content[6]);
 		else
 			sprintf(message_content[6],"%s^3s  ^6- Magic Powers: ^1no\n",message_content[6]);
-
-		if (ent->client->pers.secrets_found & (1 << 2) && ent->client->pers.rpg_class == 1)
-			sprintf(message_content[7],"%s^3#  ^7- Unique Skill: ^2yes\n",message_content[7]);
-		else if (ent->client->pers.secrets_found & (1 << 3) && ent->client->pers.rpg_class == 4)
-			sprintf(message_content[7],"%s^3#  ^7- Unique Skill: ^2yes\n",message_content[7]);
-		else if (ent->client->pers.secrets_found & (1 << 4) && ent->client->pers.rpg_class == 6)
-			sprintf(message_content[7],"%s^3#  ^7- Unique Skill: ^2yes\n",message_content[7]);
-		else if (ent->client->pers.secrets_found & (1 << 5) && ent->client->pers.rpg_class == 7)
-			sprintf(message_content[7],"%s^3#  ^7- Unique Skill: ^2yes\n",message_content[7]);
-		else if (ent->client->pers.secrets_found & (1 << 6) && ent->client->pers.rpg_class == 8)
-			sprintf(message_content[7],"%s^3#  ^7- Unique Skill: ^2yes\n",message_content[7]);
-		else if (ent->client->pers.secrets_found & (1 << 18) && ent->client->pers.rpg_class == 9)
-			sprintf(message_content[7],"%s^3#  ^7- Unique Skill: ^2yes\n",message_content[7]);
-		else if (ent->client->pers.rpg_class == 1 || ent->client->pers.rpg_class == 4 || 
-					ent->client->pers.rpg_class == 6 || ent->client->pers.rpg_class == 7 ||
-					ent->client->pers.rpg_class == 8 || ent->client->pers.rpg_class == 9)
-			sprintf(message_content[7],"%s^3#  ^7- Unique Skill: ^1no\n",message_content[7]);
-		else
-			sprintf(message_content[7],"%s^0#  ^0- Unique Skill: no\n",message_content[7]);
 
 		for (i = 0; i < 11; i++)
 		{
@@ -8891,6 +8889,94 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 }
 
+void zyk_list_stuff(gentity_t *ent, gentity_t *target_ent)
+{
+	char stuff_message[1024];
+	strcpy(stuff_message, "");
+
+	if (ent->client->pers.secrets_found & (1 << 0))
+		strcpy(stuff_message, va("%s^3\nHoldable Items Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3\nHoldable Items Upgrade - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 1))
+		strcpy(stuff_message, va("%s^3Bounty Hunter Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Bounty Hunter Upgrade - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 2))
+		strcpy(stuff_message, va("%s^3Unique Ability 1 - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Unique Ability 1 - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 3))
+		strcpy(stuff_message, va("%s^3Unique Ability 2 - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Unique Ability 2 - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 7))
+		strcpy(stuff_message, va("%s^3Stealth Attacker Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Stealth Attacker Upgrade - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 8))
+		strcpy(stuff_message, va("%s^3Force Gunner Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Force Gunner Upgrade - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 9))
+		strcpy(stuff_message, va("%s^3Impact Reducer - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Impact Reducer - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 10))
+		strcpy(stuff_message, va("%s^3Flame Thrower - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Flame Thrower - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 11))
+		strcpy(stuff_message, va("%s^3Power Cell Weapons Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Power Cell Weapons Upgrade - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 12))
+		strcpy(stuff_message, va("%s^3Blaster Pack Weapons Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Blaster Pack Weapons Upgrade - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 13))
+		strcpy(stuff_message, va("%s^3Metal Bolts Weapons Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Metal Bolts Weapons Upgrade - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 14))
+		strcpy(stuff_message, va("%s^3Rocket Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Rocket Upgrade - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 15))
+		strcpy(stuff_message, va("%s^3Stun Baton Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Stun Baton Upgrade - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 16))
+		strcpy(stuff_message, va("%s^3Armored Soldier Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Armored Soldier Upgrade - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 17))
+		strcpy(stuff_message, va("%s^3Jetpack Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Jetpack Upgrade - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 19))
+		strcpy(stuff_message, va("%s^3Force Tank Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3Force Tank Upgrade - ^1no\n", stuff_message));
+
+	trap->SendServerCommand(target_ent - g_entities, va("print \"%s\n\"", stuff_message));
+}
+
 /*
 ==================
 Cmd_ListAccount_f
@@ -8905,7 +8991,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 			strcpy(rpg_class,zyk_rpg_class(ent));
 
-			trap->SendServerCommand(ent-g_entities, va("print \"\n^3Level: ^7%d/%d\n^3Level Up Score: ^7%d/%d\n^3Skill Points: ^7%d\n^3Skill Counter: ^7%d/%d\n^3Magic Power: ^7%d/%d\n^3Credits: ^7%d\n^3RPG Class: ^7%s\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", ent->client->pers.level, MAX_RPG_LEVEL, ent->client->pers.level_up_score, ent->client->pers.level, ent->client->pers.skillpoints, ent->client->pers.skill_counter, MAX_SKILL_COUNTER, ent->client->pers.magic_power, zyk_max_magic_power(ent), ent->client->pers.credits, rpg_class));
+			trap->SendServerCommand(ent-g_entities, va("print \"\n^2Account: ^7%s\n\n^3Level: ^7%d/%d\n^3Level Up Score: ^7%d/%d\n^3Skill Points: ^7%d\n^3Skill Counter: ^7%d/%d\n^3Magic Power: ^7%d/%d\n^3Credits: ^7%d\n^3RPG Class: ^7%s\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", ent->client->sess.filename, ent->client->pers.level, MAX_RPG_LEVEL, ent->client->pers.level_up_score, ent->client->pers.level, ent->client->pers.skillpoints, ent->client->pers.skill_counter, zyk_max_skill_counter.integer, ent->client->pers.magic_power, zyk_max_magic_power(ent), ent->client->pers.credits, rpg_class));
 		}
 		else if (trap->Argc() == 2)
 		{
@@ -9205,7 +9291,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			}
 			else if (Q_stricmp( arg1, "classes" ) == 0)
 			{
-				trap->SendServerCommand( ent-g_entities, "print \"\n^30 - Free Warrior\n^7 Has all skills, but no unique features\n^31 - Force User\n^7 Has saber and force with more damage and force powers use less force\n^32 - Bounty Hunter\n^7 Has guns with more damage. Gets more credits in battles\n^33 - Armored Soldier\n^7 Deflects some gun shots. Has guns and some holdable items. Takes less damage. Has auto-heal in shield\n^34 - Monk\n^7 Has highest melee damage and some force powers. Melee can destroy some objects. Has auto-heal in HP\n^35 - Stealth Attacker\n^7 Uses some guns. Has highest gun damage. Does not decloak by electric attacks\n^36 - Duelist\n^7 Has some force powers, more melee damage and the highest saber damage. \n^37 - Force Gunner\n^7 Has some force powers and guns. Improvements increase more damage and resistance than Free Warrior\n^38 - Magic Master\n^7 Has very few skills. Learn special powers\n^39 - Force Tank\n^7 uses saber and force. Has more resistance to damage but no heal\n\n^3/rpgclass <class number>\n\"" );
+				trap->SendServerCommand( ent-g_entities, "print \"\n^30 - Free Warrior\n^7 The most balanced class\n^31 - Force User\n^7 Has saber and force. Force powers use less force. Mind Trick can mind control enemies\n^32 - Bounty Hunter\n^7 Has guns. Gets more credits in battles\n^33 - Armored Soldier\n^7 Deflects some gun shots. Has guns. Takes less damage. Has auto-heal in shield\n^34 - Monk\n^7 Has highest melee damage and some force powers. Melee can destroy objects. Has auto-heal in HP\n^35 - Stealth Attacker\n^7 Uses some guns. Has highest gun damage. Does not decloak by electric attacks\n^36 - Duelist\n^7 Has some force powers, more melee damage and the highest saber damage. \n^37 - Force Gunner\n^7 Has some force powers and guns. Can do acrobatic moves (like wall run) while holding a gun and can shoot while doing them\n^38 - Magic Master\n^7 Has very few skills. Learns all magic powers\n^39 - Force Tank\n^7 uses saber and force. Has more resistance to damage but no heal\n\n^3/rpgclass <class number>\n\"" );
 			}
 			else if (Q_stricmp( arg1, "info" ) == 0)
 			{
@@ -9213,80 +9299,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			}
 			else if (Q_stricmp( arg1, "stuff" ) == 0)
 			{
-				char stuff_message[1024];
-				strcpy(stuff_message,"");
-
-				if (ent->client->pers.secrets_found & (1 << 0))
-					strcpy(stuff_message,va("%s^3\nHoldable Items Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3\nHoldable Items Upgrade - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 1))
-					strcpy(stuff_message,va("%s^3Bounty Hunter Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Bounty Hunter Upgrade - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 7))
-					strcpy(stuff_message,va("%s^3Stealth Attacker Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Stealth Attacker Upgrade - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 8))
-					strcpy(stuff_message,va("%s^3Force Gunner Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Force Gunner Upgrade - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 9))
-					strcpy(stuff_message,va("%s^3Impact Reducer - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Impact Reducer - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 10))
-					strcpy(stuff_message,va("%s^3Flame Thrower - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Flame Thrower - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 11))
-					strcpy(stuff_message,va("%s^3Power Cell Weapons Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Power Cell Weapons Upgrade - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 12))
-					strcpy(stuff_message,va("%s^3Blaster Pack Weapons Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Blaster Pack Weapons Upgrade - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 13))
-					strcpy(stuff_message,va("%s^3Metal Bolts Weapons Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Metal Bolts Weapons Upgrade - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 14))
-					strcpy(stuff_message,va("%s^3Rocket Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Rocket Upgrade - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 15))
-					strcpy(stuff_message,va("%s^3Stun Baton Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Stun Baton Upgrade - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 16))
-					strcpy(stuff_message,va("%s^3Armored Soldier Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Armored Soldier Upgrade - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 17))
-					strcpy(stuff_message,va("%s^3Jetpack Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Jetpack Upgrade - ^1no\n",stuff_message));
-
-				if (ent->client->pers.secrets_found & (1 << 19))
-					strcpy(stuff_message,va("%s^3Force Tank Upgrade - ^2yes\n",stuff_message));
-				else
-					strcpy(stuff_message,va("%s^3Force Tank Upgrade - ^1no\n",stuff_message));
-
-				trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"",stuff_message) );
+				zyk_list_stuff(ent, ent);
 			}
 			else
 			{ // zyk: the player can also list the specific info of a skill passing the skill number as argument
@@ -9308,7 +9321,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					if (i == 7)
 						trap->SendServerCommand( ent-g_entities, "print \"^3Saber Defense: ^7increases your ability to block, parry enemy saber attacks or enemy shots\n\"" );
 					if (i == 8)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Saber Throw: ^7throws your saber at enemy and gets it back\n\"" );
+						trap->SendServerCommand( ent-g_entities, "print \"^3Saber Throw: ^7throws your saber at enemy and gets it back. Each level increases max distance and saber throw speed\n\"" );
 					if (i == 9)
 						trap->SendServerCommand( ent-g_entities, "print \"^3Absorb: ^7allows you to absorb force power attacks done to you\n\"" );
 					if (i == 10)
@@ -9316,7 +9329,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					if (i == 11)
 						trap->SendServerCommand( ent-g_entities, "print \"^3Protect: ^7decreases damage done to you by non-force power attacks. At level 4 decreases force consumption when receiving damage\n\"" );
 					if (i == 12)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Mind Trick: ^7makes yourself invisible to the players affected by this force power. If you have Mind Control, you can also control a player or npc. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds\n\"" );
+						trap->SendServerCommand( ent-g_entities, "print \"^3Mind Trick: ^7makes yourself invisible to the players affected by this force power. Force User class can mind control a player or npc. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds\n\"" );
 					if (i == 13)
 						trap->SendServerCommand( ent-g_entities, "print \"^3Team Heal: ^7restores some health to players near you\n\"" );
 					if (i == 14)
@@ -9324,17 +9337,17 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					if (i == 15)
 						trap->SendServerCommand( ent-g_entities, "print \"^3Grip: ^7attacks a player by holding and damaging him\n\"" );
 					if (i == 16)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Drain: ^7drains force power from a player to restore you health\n\"" );
+						trap->SendServerCommand( ent-g_entities, "print \"^3Drain: ^7drains force power from a player to restore your health\n\"" );
 					if (i == 17)
 						trap->SendServerCommand( ent-g_entities, "print \"^3Rage: ^7makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage\n\"" );
 					if (i == 18)
 						trap->SendServerCommand( ent-g_entities, "print \"^3Team Energize: ^7restores some force power to players near you. If Improvements skill is at least at level 1, regens blaster pack and power cell ammo of the target players\n\"" );
 					if (i == 19)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Stun Baton: ^7attacks someone with a small electric charge. Has %d damage. Level 2 does double damage and decloaks enemies. Level 3 does triple damage and decreases enemy run speed. Can fire the flame thrower when using alternate fire (does not work for Force User, Monk, Duelist or Magic Master). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects\n\"", zyk_stun_baton_damage.integer));
+						trap->SendServerCommand( ent-g_entities, va("print \"^3Stun Baton: ^7attacks someone with a small electric charge. Has %d damage multiplied by the stun baton level. Can fire the flame thrower when using alternate fire (does not work for Force User, Monk, Duelist or Magic Master). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds\n\"", zyk_stun_baton_damage.integer));
 					if (i == 20)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Blaster Pistol: ^7the popular Star Wars pistol used by Han Solo, Leia and other people in the movies. Normal fire is a single laser shot, alternate fire allows you to fire a powerful charged shot. The pistol laser causes %d damage. The charged shot causes a lot more damage depending on how much it was charged. At level 2 causes 25 per cent more damage\n\"", zyk_blaster_pistol_damage.integer));
+						trap->SendServerCommand( ent-g_entities, va("print \"^3Blaster Pistol: ^7the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged. At level 2 causes 25 per cent more damage\n\"", zyk_blaster_pistol_damage.integer));
 					if (i == 21)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3E11 Blaster Rifle: ^7the rifle used by the Storm Troopers. E11 shots cause %d damage. Normal fire is a single shot, while the alternate fire is the rapid fire. At level 2 causes 25 per cent more damage\n\"", zyk_e11_blaster_rifle_damage.integer) );
+						trap->SendServerCommand( ent-g_entities, va("print \"^3E11 Blaster Rifle: ^7the rifle used by the Storm Troopers. E11 shots do %d damage. Normal fire is a single shot, while the alternate fire is the rapid fire. At level 2 does 25 per cent more damage and has less spread\n\"", zyk_e11_blaster_rifle_damage.integer) );
 					if (i == 22)
 						trap->SendServerCommand( ent-g_entities, va("print \"^3Disruptor: ^7the sniper, used by the rodians ingame. Normal fire is a shot that causes %d damage, alternate fire allows zoom and a charged shot that when fully charged, causes %d damage. At level 2 causes 25 per cent more damage and has a better fire rate\n\"", zyk_disruptor_damage.integer, zyk_disruptor_alt_damage.integer) );
 					if (i == 23)
@@ -9360,17 +9373,17 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					if (i == 33)
 						trap->SendServerCommand( ent-g_entities, "print \"^3Health Strength: ^7Increases your health resistance to damage. Each level increases your health resistance by 10 per cent\n\"" );
 					if (i == 34)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Drain Shield: ^7When using Drain force power, and your health is full, restores some shield\n\"" );
+						trap->SendServerCommand( ent-g_entities, "print \"^3Drain Shield: ^7When using Drain force power, and your health is full, restores some shield. It also makes Drain suck hp/shield from the enemy to restore your hp/shield\n\"" );
 					if (i == 35)
 						trap->SendServerCommand( ent-g_entities, "print \"^3Jetpack: ^7the jetpack, used by Boba Fett. Allows you to fly. To use it, jump and press the Use key (usually R) while in the middle of the jump. Each level uses less fuel, allowing you to fly for a longer time\n\"" );
 					if (i == 36)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Sense Health: ^7allows you to see someone health and shield, including npcs. To use it, when you are near a player or npc, use ^3Sense ^7force power\n\"" );
+						trap->SendServerCommand( ent-g_entities, "print \"^3Sense Health: ^7allows you to see info about someone, like his health and shield, including npcs. To use it, when you are near a player or npc, use ^3Sense ^7force power\n\"" );
 					if (i == 37)
 						trap->SendServerCommand( ent-g_entities, va("print \"^3Shield Heal: ^7recovers 4 shield at level 1, 8 shield at level 2 and 12 shield at level 3. To use it, use Heal force power when you have full HP. This skill uses %d force power\n\"", zyk_max_force_power.integer/2) );
 					if (i == 38)
 						trap->SendServerCommand( ent-g_entities, va("print \"^3Team Shield Heal: ^7recovers 3 shield at level 1, 6 shield at level 2 and 9 shield at level 3 to players near you. To use it, when near players, use Team Heal force power. It will heal their shield after they have full HP\n\"") );
 					if (i == 39)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Mind Control: ^7allows you to control every action of a player or npc. To use it, when near a player or npc, use Mind Trick force power, if you have Mind Control\n\"") );
+						trap->SendServerCommand( ent-g_entities, va("print \"^3Unique Skill: ^7Used by pressing Saber Style key when using melee\nFree Warrior: recovers some hp, shield and mp\nForce User: creates a force shield around the player that greatly reduces damage and protects against force powers\nBounty Hunter: allows firing poison darts with melee by spending metal bolts ammo\nArmored Soldier: spends power cell ammo to increase auto-shield-heal rate\nMonk: increases auto-healing rate and disables enemy Grip\nStealth Attacker: spends power cell ammo to increase disruptor firerate and make it destroy saber-only damage objects\nDuelist: recovers some MP and disables jetpack, cloak, speed and force regen of enemies nearby\nForce Gunner: disarms enemies nearby\nMagic Master: increases magic bolts, Inner Area Damage, Lightning Dome, Magic Explosion and Healing Area damage. Healing Area heals more\nForce Tank: increases resistance to damage for some seconds\n\"") );
 					if (i == 40)
 						trap->SendServerCommand( ent-g_entities, va("print \"^3Blaster Pack: ^7used as ammo for Blaster Pistol, Bryar Pistol and E11 Blaster Rifle. You can carry up to %d ammo\n\"",zyk_max_blaster_pack_ammo.integer) );
 					if (i == 41)
@@ -9466,10 +9479,6 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						trap->SendServerCommand( ent-g_entities, va("print \"^3Inner Area Damage: ^7damages everyone near you. MP cost: %d\n^3Healing Area: ^7creates an energy area that heals you and your allies and damage enemies. MP cost: %d\n^3Lightning Dome: ^7creates a dome that does lightning damage. MP cost: %d\n^3Magic Explosion: ^7creates a short explosion that does a lot of damage. MP cost: %d\n\nThis class can use any of the Light Quest special powers. Use A, W or D and melee kata to use a power. You can set each of A, W and D powers with the force power keys (usually the F3, F4, F5, F6, F7 and F8 keys)\n\"", zyk_inner_area_mp_cost.integer, zyk_healing_area_mp_cost.integer, zyk_lightning_dome_mp_cost.integer, zyk_magic_explosion_mp_cost.integer) );
 					else if (ent->client->pers.rpg_class == 9)
 						trap->SendServerCommand( ent-g_entities, va("print \"^3Ice Boulder: ^7creates a boulder that damages and traps enemies nearby for some seconds. Attack with D + special melee to use this power. MP cost: %d\n^3Ice Stalagmite: ^7greatly damages enemies nearby with a stalagmite. Attack with A + special melee to use this power. MP cost: %d\n\"", zyk_ice_boulder_mp_cost.integer, zyk_ice_stalagmite_mp_cost.integer) );
-				}
-				else if (Q_stricmp( arg1, "#" ) == 0)
-				{
-					trap->SendServerCommand( ent-g_entities, va("print \"^3Unique Skill: ^7Used by pressing Saber Style key when using melee\nIt is got after player is at least at level 10 and fills the skill counter\nForce User: creates a force shield around the player that greatly reduces damage and protects against force powers\nMonk: increases resistance to damage\nDuelist: recovers some MP and disables jetpack and force regen of enemies nearby\nForce Gunner: disarms enemies nearby\nMagic Master: increases magic bolts damage. Inner Area Damage, Lightning Dome and Magic Explosion have more damage and Healing Area has more damage and heals more\nForce Tank: increases resistance to damage for some seconds\n\"") );
 				}
 				else
 				{
@@ -9572,7 +9581,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^38 - Stealth Attacker Upgrade: ^7Buy: 5000 - Sell: ^1no\n^315 - Impact Reducer: ^7Buy: 5000 - Sell: ^1no\n^316 - Flame Thrower: ^7Buy: 3000 - Sell: ^1no\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000 - Sell: ^1no\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1500 - Sell: ^1no\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2500 - Sell: ^1no\n^328 - Rocket Upgrade: ^7Buy: 3000 - Sell: ^1no\n^329 - Bounty Hunter Upgrade: ^7Buy: 5000 - Sell: ^1no\n^333 - Stun Baton Upgrade: ^7Buy: 1000 - Sell: ^1no\n^339 - Armored Soldier Upgrade: ^7Buy: 5000 - Sell: ^1no\n^340 - Holdable Items Upgrade: ^7Buy: 3000 - Sell: ^1no\n^345 - Force Gunner Upgrade: ^7Buy: 5000 - Sell: ^1no\n^346 - Jetpack Upgrade: ^7Buy: 10000 - Sell: ^1no\n^347 - Force Tank Upgrade: ^7Buy: 5000 - Sell: ^1no^7\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^38 - Stealth Attacker Upgrade: ^7Buy: 5000\n^315 - Impact Reducer: ^7Buy: 4300\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1500\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2500\n^328 - Rocket Upgrade: ^7Buy: 3000\n^329 - Bounty Hunter Upgrade: ^7Buy: 5000\n^333 - Stun Baton Upgrade: ^7Buy: 1200\n^339 - Armored Soldier Upgrade: ^7Buy: 5000\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^345 - Force Gunner Upgrade: ^7Buy: 5000\n^346 - Jetpack Upgrade: ^7Buy: 10000\n^347 - Force Tank Upgrade: ^7Buy: 5000\n^353 - Unique Ability 1: ^7Buy: 7000\n^354 - Unique Ability 2: ^7Buy: 7000\n\n\"");
 		}
 		else if (i == 1)
 		{
@@ -9684,11 +9693,11 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 28)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Rocket Upgrade: ^7increases damage of rocket launcher which uses rockets as ammo. Also adds a new feature to it\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Rocket Upgrade: ^7increases damage of rocket launcher which uses rockets as ammo. Makes it damage saber-only damage objects in map\n\n\"");
 		}
 		else if (i == 29)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Bounty Hunter Upgrade: ^7increases Bounty Hunter health resistance to damage by 5 per cent and shield resistance by 5 per cent. Seeker Drone lasts 20 seconds more, has fast shooting rate and more damage. Sentry Gun has more damage. Allows placing more sentry guns and recovering them by pressing Use key on each one. Allows recovering force fields by pressing Use key on them. Allows buying and selling from seller remotely, so no need to call him. Gives the Thermal Vision, used with Binoculars. Gives the Radar Upgrade (requires Zyk OpenJK Client installed)\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Bounty Hunter Upgrade: ^7increases Bounty Hunter health resistance to damage by 5 per cent and shield resistance by 5 per cent. Seeker Drone lasts 20 seconds more, has fast shooting rate and more damage. Sentry Gun has more damage and range. Allows placing more sentry guns and recovering them by pressing Use key on each one. Allows recovering force fields by pressing Use key on them. Allows buying and selling from seller remotely, so no need to call him. Gives the Thermal Vision, used with Binoculars. Gives the Radar Upgrade (requires Zyk OpenJK Client installed)\n\n\"");
 		}
 		else if (i == 30)
 		{
@@ -9704,7 +9713,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 33)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Stun Baton Upgrade: ^7allows stun baton to open any door, including locked ones, move elevators, and move or destroy other objects\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Stun Baton Upgrade: ^7allows stun baton to open any door, including locked ones, move elevators, and move or destroy other objects. Also makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"");
 		}
 		else if (i == 34)
 		{
@@ -9782,6 +9791,96 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand( ent-g_entities, "print \"\n^3Energy Crystal: ^7regens shield, blaster pack ammo and power cell ammo. If the player dies, he loses the crystal\n\n\"");
 		}
+		else if (i == 53)
+		{
+			if (ent->client->pers.rpg_class == 0)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Free Warrior gets Mimic Damage. If you take damage, does part of the damage back to the enemy. Spends 50 force and 25 mp\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 1)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Force User gets Force Maelstrom, which grips enemies nearby, damages them, sets force shield and uses lightning if player has the force power. Spends 50 force\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 2)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Bounty Hunter gets Homing Rocket, which shoots a powerful rocket that automatically goes after the nearest target. Spends 5 rocket ammo\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 3)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Armored Soldier gets the Lightning Shield, which increases resistance to damage. Using /unique again will release a small lightning dome. Spends 5 power cell ammo\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 4)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Monk gets Meditation Strength, which doubles the auto-healing, doubles force regen, increases damage and resistance of his nearby allies and his own resistance is heavily increased. Spends 50 force\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 5)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Stealth Attacker gets Ultra Cloak, which makes him completely invisible. Spends 5 power cell ammo\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 6)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Duelist gets Impale Stab, which hits the enemy with his saber doing a lot of damage. Spends 50 force\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 7)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Force Gunner gets Thermal Throw, which throws a thermal detonator with high damage. Spends 1 thermal and 5 power cell ammo\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 8)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Magic Master gets Spread Bolts, which makes Normal and Electric Bolts shoot 3 spread bolts. Each shot spends some mp\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 9)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Force Tank gets Force Armor, which activates his resistance shield, with damage resistance, gun shot deflection, and ability to resist force powers. Spends 50 force\n\n\"");
+			}
+		}
+		else if (i == 54)
+		{
+			if (ent->client->pers.rpg_class == 0)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Free Warrior gets Super Beam, a powerful beam that highly damages enemies. Spends 100 force and 25 mp\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 1)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Force User gets Force Repulse, which pushes everyone away from you. Spends 50 force\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 2)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Bounty Hunter gets Wrist Shot, which shoots a powerful blaster shot. Spends 10 blaster pack ammo\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 3)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Armored Soldier gets Shield to Ammo, which recovers some ammo by spending his shield. Spends 20 shield\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 4)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Monk gets Spin Kick ability. Kicks everyone around the Monk with very high damage. Spends 50 force\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 5)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Stealth Attacker gets Timed Bomb, which places a powerful bomb that explodes after some seconds. Spends 5 power cell ammo and 5 metal bolts ammo\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 6)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Duelist gets Vertical DFA, which makes him jump and hit the enemy with the saber, with a very high damage. Spends 50 force\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 7)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Force Gunner gets No Attack, which makes the nearby enemies not able to attack for some seconds. Spends 50 force\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 8)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Magic Master gets Elemental Attack, a magic power that hits enemies with the power of the elements. Spends 20 mp\n\n\"");
+			}
+			else if (ent->client->pers.rpg_class == 9)
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Force Tank gets Force Scream, which sets the resistance shield during 6 seconds. Player makes a scream that damages nearby enemies and may cause stun anim on them. Spends 50 force\n\n\"");
+			}
+			else
+			{
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7You can only have one Unique Ability at a time.\n\n\"");
+			}
+		}
 	}
 }
 
@@ -9793,7 +9892,7 @@ Cmd_Buy_f
 void Cmd_Buy_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	int value = 0;
-	int item_costs[NUMBER_OF_SELLER_ITEMS] = {15,20,25,40,80,120,150,5000,150,170,180,200,300,200,5000,3000,100,120,150,200,110,90,170,300,2000,1500,2500,3000,5000,200,200,20,1000,100,150,150,90,10,5000,3000,50,50,200,50,5000,10000,5000,700,2000,2000,2000,2000};
+	int item_costs[NUMBER_OF_SELLER_ITEMS] = {15,20,25,40,80,120,150,5000,150,170,180,200,300,200,4300,3000,100,120,150,200,110,90,170,300,2000,1500,2500,3000,5000,200,200,20,1200,100,150,150,90,10,5000,3000,50,50,200,50,5000,10000,5000,700,2000,2000,2000,2000,7000,7000};
 
 	if (trap->Argc() == 1)
 	{
@@ -9859,6 +9958,11 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			(value >= 17 && value <= 24) || (value >= 35 && value <= 38)))
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"Magic Master can't buy this item.\n\"" );
+		return;
+	}
+	else if (ent->client->pers.rpg_class == 9 && ((value >= 5 && value <= 7) || value == 48))
+	{
+		trap->SendServerCommand(ent - g_entities, "print \"Force Tank can't buy this item.\n\"");
 		return;
 	}
 
@@ -10180,6 +10284,16 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		{
 			ent->client->pers.player_statuses |= (1 << 11);
 		}
+		else if (value == 53)
+		{
+			ent->client->pers.secrets_found |= (1 << 2);
+			ent->client->pers.secrets_found &= ~(1 << 3);
+		}
+		else if (value == 54)
+		{
+			ent->client->pers.secrets_found &= ~(1 << 2);
+			ent->client->pers.secrets_found |= (1 << 3);
+		}
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
@@ -10206,7 +10320,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	int value = 0;
 	int sold = 0;
-	int items_costs[NUMBER_OF_SELLER_ITEMS] = {10,15,20,30,35,40,45,0,0,60,65,70,80,50,0,0,50,60,70,100,50,45,90,150,0,0,0,0,0,0,0,10,0,20,30,90,45,5,0,0,0,20,50,0,0,0,0,0,0,0,0,0};
+	int items_costs[NUMBER_OF_SELLER_ITEMS] = {10,15,20,30,35,40,45,0,0,60,65,70,80,50,0,0,50,60,70,100,50,45,90,150,0,0,0,0,0,0,0,10,0,20,30,90,45,5,0,0,0,20,50,0,0,0,0,0,0,0,0,0,0,0};
 
 	if (trap->Argc() == 1)
 	{
@@ -10420,7 +10534,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SENTRY_GUN)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER)) && 
 		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_EWEB)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC_BIG)) && 
 		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SHIELD)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_CLOAK)))
-	{ // zyk: if player sold an holdable item and no longer has no items left, deselect the held item
+	{ // zyk: if player sold an holdable item and has no items left, deselect the held item
 		ent->client->ps.stats[STAT_HOLDABLE_ITEM] = 0;
 	}
 			
@@ -10516,8 +10630,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 
 		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-			// zyk: adding credits because killing the player makes him lose credits, and in this case he should not lose any
-			add_credits(ent, 10);
 			G_Kill(ent);
 		}
 	}
@@ -10529,14 +10641,15 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 		ent->client->pers.universe_quest_progress = 0;
 		ent->client->pers.universe_quest_counter = 0;
 
+		// zyk: resetting Difficulty to Normal Mode
+		ent->client->pers.player_settings &= ~(1 << 15);
+
 		save_account(ent);
 
 		trap->SendServerCommand( ent-g_entities, "print \"Your quests are reset.\n\"" );
 
 		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-			// zyk: adding credits because killing the player makes him lose credits, and in this case he should not lose any
-			add_credits(ent, 10);
 			G_Kill(ent);
 		}
 	}
@@ -10562,8 +10675,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 
 		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-			// zyk: adding credits because killing the player makes him lose credits, and in this case he should not lose any
-			add_credits(ent, 10);
 			G_Kill(ent);
 		}
 	}
@@ -11158,6 +11269,15 @@ void Cmd_Settings_f( gentity_t *ent ) {
 			sprintf(message,"%s\n^316 - Allow Screen Message ^2ON", message);
 		}
 
+		if (ent->client->pers.player_settings & (1 << 17))
+		{
+			sprintf(message,"%s\n^317 - Use healing force only at allied players ^1OFF", message);
+		}
+		else
+		{
+			sprintf(message,"%s\n^317 - Use healing force only at allied players ^2ON", message);
+		}
+
 		trap->SendServerCommand( ent-g_entities, va("print \"%s\n\n^7Choose a setting above and use ^3/settings <number> ^7to turn it ^2ON ^7or ^1OFF^7\n\"", message) );
 	}
 	else
@@ -11169,7 +11289,7 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		trap->Argv(1, arg1, sizeof( arg1 ));
 		value = atoi(arg1);
 
-		if (value < 0 || value > 16)
+		if (value < 0 || value > 17)
 		{
 			trap->SendServerCommand( ent-g_entities, "print \"Invalid settings value.\n\"" );
 			return;
@@ -11370,11 +11490,13 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Allow Screen Message %s\n\"", new_status) );
 		}
+		else if (value == 17)
+		{
+			trap->SendServerCommand( ent-g_entities, va("print \"Use healing force only at allied players %s\n\"", new_status) );
+		}
 
 		if (value == 0 && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)
 		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-			// zyk: adding credits because killing the player makes him lose credits, and in this case he should not lose any
-			add_credits(ent, 10);
 			G_Kill(ent);
 		}
 
@@ -11384,7 +11506,7 @@ void Cmd_Settings_f( gentity_t *ent ) {
 
 void load_config(gentity_t *ent)
 {
-	FILE *config_file;
+	FILE *config_file = NULL;
 	gclient_t *client;
 	char content[32];
 	int value = 0;
@@ -11441,7 +11563,7 @@ void load_config(gentity_t *ent)
 
 void save_config(gentity_t *ent)
 {
-	FILE *config_file;
+	FILE *config_file = NULL;
 	gclient_t *client;
 	client = ent->client;
 
@@ -11513,13 +11635,13 @@ void do_change_class(gentity_t *ent, int value)
 
 	if (zyk_allow_class_change.integer == 1)
 	{
-		if (ent->client->pers.credits < 10)
+		if (ent->client->pers.credits < 20)
 		{
 			trap->SendServerCommand( ent-g_entities, "print \"You don't have enough credits to change your class.\n\"" );
 			return;
 		}
 
-		remove_credits(ent, 10);
+		remove_credits(ent, 20);
 	}
 
 	save_config(ent);
@@ -11544,8 +11666,6 @@ void do_change_class(gentity_t *ent, int value)
 
 	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 	{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-		// zyk: adding credits because killing the player makes him lose credits, and in this case he should not lose any
-		add_credits(ent, 10);
 		G_Kill(ent);
 	}
 
@@ -11591,6 +11711,12 @@ void Cmd_GuardianQuest_f( gentity_t *ent ) {
 	if (zyk_allow_mini_quests.integer != 1)
 	{
 		trap->SendServerCommand( ent-g_entities, va("chat \"^3Guardian Quest: ^7this quest is not allowed in this server\n\"") );
+		return;
+	}
+
+	if (level.guardian_quest_timer > level.time)
+	{
+		trap->SendServerCommand( ent-g_entities, va("chat \"^3Guardian Quest: ^7wait %d seconds and try again\n\"", (level.guardian_quest_timer - level.time)/1000) );
 		return;
 	}
 
@@ -11714,7 +11840,14 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 	save_account(ent);
 
 	if (ent->client->sess.amrpgmode == 1)
+	{
+		if (level.bounty_quest_choose_target == qfalse && level.bounty_quest_target_id == ent->s.number)
+		{ // zyk: if this player was the target, remove it so the bounty quest can get a new target
+			level.bounty_quest_choose_target = qtrue;
+			level.bounty_quest_target_id++;
+		}
 		trap->SendServerCommand( ent-g_entities, "print \"^7You are now in ^2Admin-Only mode^7.\n\"" );
+	}
 	else
 	{
 		zyk_load_magic_master_config(ent);
@@ -11724,8 +11857,6 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 
 	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)
 	{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-		// zyk: adding credits because killing the player makes him lose credits, and in this case he should not lose any
-		add_credits(ent, 10);
 		G_Kill(ent);
 	}
 }
@@ -12152,12 +12283,212 @@ void Cmd_Jetpack_f( gentity_t *ent ) {
 
 /*
 ==================
+Cmd_Remap_f
+==================
+*/
+void Cmd_Remap_f( gentity_t *ent ) {
+	int number_of_args = trap->Argc();
+	char arg1[MAX_STRING_CHARS];
+	char arg2[MAX_STRING_CHARS];
+	float f = level.time * 0.001;
+
+	if (!(ent->client->pers.bitvalue & (1 << ADM_ENTITYSYSTEM)))
+	{ // zyk: admin command
+		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
+		return;
+	}
+
+	if ( number_of_args < 3)
+	{
+		trap->SendServerCommand( ent-g_entities, va("print \"You must specify the old shader and new shader. Ex: ^3/remap models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta^7\n\"") );
+		return;
+	}
+
+	trap->Argv( 1, arg1, sizeof( arg1 ) );
+	trap->Argv( 2, arg2, sizeof( arg2 ) );
+
+	AddRemap(G_NewString(arg1), G_NewString(arg2), f);
+	trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+
+	trap->SendServerCommand( ent-g_entities, "print \"Shader remapped\n\"" );
+}
+
+/*
+==================
+Cmd_RemapDeleteFile_f
+==================
+*/
+void Cmd_RemapDeleteFile_f( gentity_t *ent ) {
+	int number_of_args = trap->Argc();
+	char arg1[MAX_STRING_CHARS];
+	char serverinfo[MAX_INFO_STRING] = {0};
+	char zyk_mapname[128] = {0};
+	FILE *this_file = NULL;
+
+	if (!(ent->client->pers.bitvalue & (1 << ADM_ENTITYSYSTEM)))
+	{ // zyk: admin command
+		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
+		return;
+	}
+
+	if ( number_of_args < 2)
+	{
+		trap->SendServerCommand( ent-g_entities, va("print \"You must specify a file name.\n\"") );
+		return;
+	}
+
+	trap->Argv( 1, arg1, sizeof( arg1 ) );
+
+	// zyk: getting mapname
+	trap->GetServerinfo( serverinfo, sizeof( serverinfo ) );
+	Q_strncpyz(zyk_mapname, Info_ValueForKey( serverinfo, "mapname" ), sizeof(zyk_mapname));
+
+	// zyk: creating directories where the remap files will be loaded from
+#if defined(__linux__)
+	system(va("mkdir -p remaps/%s",zyk_mapname));
+#else
+	system(va("mkdir \"remaps/%s\"",zyk_mapname));
+#endif
+
+	this_file = fopen(va("remaps/%s/%s.txt",zyk_mapname,arg1),"r");
+	if (this_file)
+	{
+		fclose(this_file);
+
+		remove(va("remaps/%s/%s.txt",zyk_mapname,arg1));
+
+		trap->SendServerCommand( ent-g_entities, va("print \"File %s deleted from server\n\"", arg1) );
+	}
+	else
+	{
+		trap->SendServerCommand( ent-g_entities, va("print \"File %s does not exist\n\"", arg1) );
+	}
+}
+
+/*
+==================
+Cmd_RemapSave_f
+==================
+*/
+void Cmd_RemapSave_f( gentity_t *ent ) {
+	int number_of_args = trap->Argc();
+	char arg1[MAX_STRING_CHARS];
+	char serverinfo[MAX_INFO_STRING] = {0};
+	char zyk_mapname[128] = {0};
+	int i = 0;
+	FILE *remap_file = NULL;
+
+	if (!(ent->client->pers.bitvalue & (1 << ADM_ENTITYSYSTEM)))
+	{ // zyk: admin command
+		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
+		return;
+	}
+
+	if ( number_of_args < 2)
+	{
+		trap->SendServerCommand( ent-g_entities, va("print \"You must specify the file name\n\"") );
+		return;
+	}
+
+	trap->Argv( 1, arg1, sizeof( arg1 ) );
+
+	// zyk: getting mapname
+	trap->GetServerinfo( serverinfo, sizeof( serverinfo ) );
+	Q_strncpyz(zyk_mapname, Info_ValueForKey( serverinfo, "mapname" ), sizeof(zyk_mapname));
+
+	// zyk: creating directories where the remap files will be saved
+#if defined(__linux__)
+	system(va("mkdir -p remaps/%s",zyk_mapname));
+#else
+	system(va("mkdir \"remaps/%s\"",zyk_mapname));
+#endif
+
+	// zyk: saving remaps in the file
+	remap_file = fopen(va("remaps/%s/%s.txt",zyk_mapname,arg1),"w");
+	for (i = 0; i < zyk_get_remap_count(); i++)
+	{
+		fprintf(remap_file,"%s\n%s\n%f\n",remappedShaders[i].oldShader,remappedShaders[i].newShader,remappedShaders[i].timeOffset);
+	}
+	fclose(remap_file);
+
+	trap->SendServerCommand( ent-g_entities, va("print \"Remaps saved in %s file\n\"", arg1) );
+}
+
+/*
+==================
+Cmd_RemapLoad_f
+==================
+*/
+void Cmd_RemapLoad_f( gentity_t *ent ) {
+	int number_of_args = trap->Argc();
+	char arg1[MAX_STRING_CHARS];
+	char serverinfo[MAX_INFO_STRING] = {0};
+	char zyk_mapname[128] = {0};
+	char old_shader[128];
+	char new_shader[128];
+	char time_offset[128];
+	FILE *remap_file = NULL;
+
+	if (!(ent->client->pers.bitvalue & (1 << ADM_ENTITYSYSTEM)))
+	{ // zyk: admin command
+		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
+		return;
+	}
+
+	if ( number_of_args < 2)
+	{
+		trap->SendServerCommand( ent-g_entities, va("print \"You must specify the file name\n\"") );
+		return;
+	}
+
+	trap->Argv( 1, arg1, sizeof( arg1 ) );
+
+	strcpy(old_shader,"");
+	strcpy(new_shader,"");
+	strcpy(time_offset,"");
+
+	// zyk: getting mapname
+	trap->GetServerinfo( serverinfo, sizeof( serverinfo ) );
+	Q_strncpyz(zyk_mapname, Info_ValueForKey( serverinfo, "mapname" ), sizeof(zyk_mapname));
+
+	// zyk: creating directories of the remap files 
+#if defined(__linux__)
+	system(va("mkdir -p remaps/%s",zyk_mapname));
+#else
+	system(va("mkdir \"remaps/%s\"",zyk_mapname));
+#endif
+
+	// zyk: loading remaps from the file
+	remap_file = fopen(va("remaps/%s/%s.txt",zyk_mapname,arg1),"r");
+	if (remap_file)
+	{
+		while(fscanf(remap_file,"%s",old_shader) != EOF)
+		{
+			fscanf(remap_file,"%s",new_shader);
+			fscanf(remap_file,"%s",time_offset);
+
+			AddRemap(G_NewString(old_shader), G_NewString(new_shader), atof(time_offset));
+		}
+		
+		fclose(remap_file);
+
+		trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+
+		trap->SendServerCommand( ent-g_entities, va("print \"Remaps loaded from %s file\n\"", arg1) );
+	}
+	else
+	{
+		trap->SendServerCommand( ent-g_entities, va("print \"Remaps not loaded. File %s not found\n\"", arg1) );
+	}
+}
+
+/*
+==================
 Cmd_EntAdd_f
 ==================
 */
 void Cmd_EntAdd_f( gentity_t *ent ) {
 	gentity_t *new_ent = NULL;
-	qboolean worked = qfalse;
 	int number_of_args = trap->Argc();
 	int i = 0;
 	char key[64];
@@ -12239,7 +12570,6 @@ Cmd_EntEdit_f
 */
 void Cmd_EntEdit_f( gentity_t *ent ) {
 	gentity_t *this_ent = NULL;
-	qboolean worked = qfalse;
 	int number_of_args = trap->Argc();
 	int entity_id = -1;
 	int i = 0;
@@ -13695,7 +14025,7 @@ void Cmd_EntitySystem_f( gentity_t *ent ) {
 		return;
 	}
 
-	trap->SendServerCommand( ent-g_entities, va("print \"\n^2Entity System Commands\n\n^3/entadd <classname> <spawnflags> <key value key value ... etc>: ^7adds a new entity in the map\n^3/entedit <entity id> [key value key value ... etc]: ^7shows entity info or edits the entity fields\n^3/entnear: ^7lists entities with a distance to you less than 200 map units\n^3/entlist <page number>: ^7lists all entities of the map. This command lists 10 entities per page\n^3/entsave <filename>: ^7saves entities into a file\n^3/entload <filename>: ^7loads entities from a file\n^3/entremove <entity id>: ^7removes the entity from the map\n^3/entdeletefile <filename>: ^7removes a file created by /entsave\n\n\"") );
+	trap->SendServerCommand( ent-g_entities, va("print \"\n^2Entity System Commands\n\n^3/entadd <classname> <spawnflags> <key value key value ... etc>: ^7adds a new entity in the map\n^3/entedit <entity id> [key value key value ... etc]: ^7shows entity info or edits the entity fields\n^3/entnear: ^7lists entities with a distance to you less than 200 map units\n^3/entlist <page number>: ^7lists all entities of the map. This command lists 10 entities per page\n^3/entsave <filename>: ^7saves entities into a file. Use ^3default ^7name to make it load with the map\n^3/entload <filename>: ^7loads entities from a file\n^3/entremove <entity id>: ^7removes the entity from the map\n^3/entdeletefile <filename>: ^7removes a file created by /entsave\n^3/remap <old shader> <new shader>: ^7remaps shaders in the map\n^3/remapsave <file name>: ^7saves remapped shaders in a file. Use ^3default ^7name to make file load with the map\n^3/remapload <file name>: ^7loads remapped shaders from a file\n^3/remapdeletefile <file name>: ^7deletes a remap file\n\n\"") );
 }
 
 /*
@@ -13930,9 +14260,9 @@ void Cmd_Players_f( gentity_t *ent ) {
 
 		if (number_of_args == 2)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"\n%s^3\n\nLevel: ^7%d\n^3Level Up Score: ^7%d\n^3Skill Points: ^7%d\n^3Credits: ^7%d\n^3Skill Counter: ^7%d\n^3RPG Class: ^7%s\n\"", 
+			trap->SendServerCommand( ent-g_entities, va("print \"\n%s^3\n\nLevel: ^7%d\n^3Level Up Score: ^7%d\n^3Skill Points: ^7%d\n^3Credits: ^7%d\n^3Skill Counter: ^7%d\n^3Magic Power: ^7%d\n^3RPG Class: ^7%s\n\"", 
 				player_ent->client->pers.netname, player_ent->client->pers.level, player_ent->client->pers.level_up_score, player_ent->client->pers.skillpoints, 
-				player_ent->client->pers.credits, player_ent->client->pers.skill_counter, zyk_rpg_class(player_ent)) );
+				player_ent->client->pers.credits, player_ent->client->pers.skill_counter, player_ent->client->pers.magic_power, zyk_rpg_class(player_ent)) );
 		}
 		else
 		{
@@ -13944,6 +14274,10 @@ void Cmd_Players_f( gentity_t *ent ) {
 				Q_stricmp(arg2, "ammo") == 0 || Q_stricmp(arg2, "items") == 0)
 			{ // zyk: show skills of the player
 				zyk_list_player_skills(player_ent, ent, G_NewString(arg2));
+			}
+			else if (Q_stricmp(arg2, "stuff") == 0)
+			{ // zyk: lists stuff bought by the player
+				zyk_list_stuff(player_ent, ent);
 			}
 			else
 			{
@@ -14146,6 +14480,647 @@ void Cmd_Saber_f( gentity_t *ent ) {
 	}
 }
 
+qboolean zyk_can_use_unique(gentity_t *ent)
+{
+	if ((ent->client->ps.forceHandExtend != HANDEXTEND_NONE && ent->client->ps.forceHandExtend != HANDEXTEND_FORCE_HOLD) ||
+		 ent->client->pers.quest_power_status & (1 << 2))
+	{ // zyk: using emotes/anims, special moves, and hit by Time Power. Cannot use unique ability
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
+/*
+==================
+Cmd_Unique_f
+==================
+*/
+extern void Jedi_Cloak(gentity_t *self);
+extern void WP_AddAsMindtricked(forcedata_t *fd, int entNum);
+extern qboolean G_InGetUpAnim(playerState_t *ps);
+extern void zyk_WP_FireBryarPistol(gentity_t *ent);
+extern void zyk_WP_FireRocket(gentity_t *ent);
+extern gentity_t *zyk_WP_FireThermalDetonator(gentity_t *ent);
+extern void zyk_add_bomb_model(gentity_t *ent);
+extern void elemental_attack(gentity_t *ent);
+extern void zyk_super_beam(gentity_t *ent);
+extern void force_scream(gentity_t *ent);
+extern qboolean zyk_unique_ability_can_hit_target(gentity_t *attacker, gentity_t *target);
+extern void zyk_vertical_dfa_effect(gentity_t *ent);
+void Cmd_Unique_f(gentity_t *ent) {
+	if (ent->client->pers.secrets_found & (1 << 2))
+	{ // zyk: Unique Ability 1
+		if (ent->client->pers.rpg_class == 3 && ent->client->ps.powerups[PW_SHIELDHIT] > level.time)
+		{ // zyk: releasing the small lightning dome
+			ent->client->ps.powerups[PW_SHIELDHIT] = 0;
+
+			ent->client->ps.powerups[PW_NEUTRALFLAG] = 0;
+
+			lightning_dome(ent, 50);
+
+			return;
+		}
+
+		if (zyk_can_use_unique(ent) == qfalse)
+		{
+			trap->SendServerCommand(ent->s.number, "chat \"^3Unique Ability: ^7cannot use Unique Ability now\"");
+			return;
+		}
+
+		if (ent->client->pers.unique_skill_timer < level.time)
+		{
+			if (ent->client->pers.rpg_class == 0)
+			{ // zyk: Free Warrior Mimic Damage. Makes the enemy receive back part of the damage he did
+				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4) && ent->client->pers.magic_power >= 25)
+				{
+					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
+					ent->client->pers.magic_power -= 25;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 8000;
+
+					ent->client->pers.player_statuses |= (1 << 21);
+
+					send_rpg_events(2000);
+
+					ent->client->pers.unique_skill_timer = level.time + 55000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs %d force and 25 mp to use it\"", (zyk_max_force_power.integer / 4)));
+				}
+			}
+			else if (ent->client->pers.rpg_class == 1)
+			{ // zyk: Force User Force Maelstrom
+				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
+				{
+					int i = 0;
+
+					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
+
+					for (i = 0; i < level.num_entities; i++)
+					{
+						gentity_t *player_ent = &g_entities[i];
+
+						if (player_ent && player_ent->client && ent != player_ent && zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue &&
+							Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 300)
+						{
+							G_Damage(player_ent, ent, ent, NULL, NULL, 70, 0, MOD_FORCE_DARK);
+
+							//Must play custom sounds on the actual entity. Don't use G_Sound (it creates a temp entity for the sound)
+							G_EntitySound(player_ent, CHAN_VOICE, G_SoundIndex(va("*choke%d.wav", Q_irand(1, 3))));
+
+							player_ent->client->ps.forceHandExtend = HANDEXTEND_CHOKE;
+							player_ent->client->ps.forceHandExtendTime = level.time + 4000;
+
+							player_ent->client->ps.fd.forceGripBeingGripped = level.time + 4000;
+						}
+					}
+
+					// zyk: activating Force Lightning
+					ent->client->ps.fd.forcePowersActive |= (1 << FP_LIGHTNING);
+					ent->client->ps.fd.forcePowerDuration[FP_LIGHTNING] = level.time + 4000;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 4000;
+
+					ent->client->pers.player_statuses |= (1 << 21);
+
+					ent->client->pers.unique_skill_timer = level.time + 50000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
+				}
+			}
+			else if (ent->client->pers.rpg_class == 2)
+			{ // zyk: Bounty Hunter Homing Rocket. Shoots a powerful rocket that automatically goes after someone
+				if (ent->client->ps.ammo[AMMO_ROCKETS] >= 5)
+				{
+					int i = 0;
+					int min_dist = 900;
+					gentity_t *chosen_ent = NULL;
+
+					ent->client->ps.ammo[AMMO_ROCKETS] -= 5;
+
+					for (i = 0; i < level.num_entities; i++)
+					{
+						gentity_t *player_ent = &g_entities[i];
+
+						if (player_ent && player_ent->client && ent != player_ent && player_ent->health > 0 && 
+							zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue)
+						{
+							int player_dist = Distance(ent->client->ps.origin, player_ent->client->ps.origin);
+
+							if (player_dist < min_dist)
+							{
+								min_dist = player_dist;
+
+								chosen_ent = player_ent;
+							}
+						}
+					}
+
+					if (chosen_ent)
+					{ // zyk: if we have a target, shoot a rocket at him
+						ent->client->ps.rocketLockIndex = chosen_ent->s.number;
+						ent->client->ps.rocketLockTime = level.time;
+					}
+
+					zyk_WP_FireRocket(ent);
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+
+					ent->client->pers.unique_skill_timer = level.time + 45000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, "chat \"^3Unique Ability: ^7needs 5 rocket ammo to use it\"");
+				}
+			}
+			else if (ent->client->pers.rpg_class == 3)
+			{ // zyk: Armored Soldier Lightning Shield. Decreases damage and releases a small lightning dome when /unique is used again
+				if (ent->client->ps.ammo[AMMO_POWERCELL] >= 5)
+				{
+					ent->client->ps.ammo[AMMO_POWERCELL] -= 5;
+
+					ent->client->ps.powerups[PW_SHIELDHIT] = level.time + 8000;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 8000;
+
+					ent->client->pers.player_statuses |= (1 << 21);
+
+					ent->client->pers.unique_skill_timer = level.time + 30000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, "chat \"^3Unique Ability: ^7needs 5 power cell ammo to use it\"");
+				}
+			}
+			else if (ent->client->pers.rpg_class == 4)
+			{ // zyk: Monk Meditation Strength. Setting the meditate taunt and the duration of the ability
+				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer/4))
+				{
+					int i = 0;
+
+					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer/4);
+
+					for (i = 0; i < level.maxclients; i++)
+					{
+						gentity_t *player_ent = &g_entities[i];
+
+						if (zyk_is_ally(ent, player_ent) == qtrue)
+						{
+							player_ent->client->pers.player_statuses |= (1 << 23);
+						}
+					}
+
+					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+					ent->client->ps.forceDodgeAnim = BOTH_MEDITATE;
+					ent->client->ps.forceHandExtendTime = level.time + 8000;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 8000;
+
+					ent->client->pers.player_statuses |= (1 << 21);
+
+					ent->client->pers.unique_skill_timer = level.time + 30000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
+				}
+			}
+			else if (ent->client->pers.rpg_class == 5)
+			{ // zyk: Stealth Attacker Ultra Cloak. Uses Mind Trick code to make it work
+				if (ent->client->ps.ammo[AMMO_POWERCELL] >= 5)
+				{
+					int i = 0;
+
+					ent->client->ps.ammo[AMMO_POWERCELL] -= 5;
+
+					for (i = 0; i < level.maxclients; i++)
+					{
+						gentity_t *player_ent = &g_entities[i];
+
+						if (player_ent && player_ent->client && ent->s.number != i)
+						{
+							WP_AddAsMindtricked(&ent->client->ps.fd, i);
+						}
+					}
+
+					ent->client->ps.fd.forcePowersActive |= (1 << FP_TELEPATHY);
+
+					ent->client->ps.fd.forcePowerDuration[FP_TELEPATHY] = level.time + 9000;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+
+					Jedi_Cloak(ent);
+
+					ent->client->pers.unique_skill_timer = level.time + 45000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, "chat \"^3Unique Ability: ^7needs 5 power cell ammo to use it\"");
+				}
+			}
+			else if (ent->client->pers.rpg_class == 6)
+			{ // zyk: Duelist Impale Stab
+				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
+				{
+					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
+
+					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+					ent->client->ps.forceDodgeAnim = BOTH_PULL_IMPALE_STAB;
+					ent->client->ps.forceHandExtendTime = level.time + 2000;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
+
+					ent->client->pers.unique_skill_timer = level.time + 45000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
+				}
+			}
+			else if (ent->client->pers.rpg_class == 7)
+			{ // zyk: Force Gunner Ammo Fill. Recovers some ammo in all of his ammo skills
+				if (ent->client->ps.ammo[AMMO_POWERCELL] >= 5 && ent->client->ps.ammo[AMMO_THERMAL] >= 1)
+				{
+					ent->client->ps.ammo[AMMO_POWERCELL] -= 5;
+					ent->client->ps.ammo[AMMO_THERMAL] -= 1;
+
+					zyk_WP_FireThermalDetonator(ent);
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+
+					ent->client->pers.unique_skill_timer = level.time + 40000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, "chat \"^3Unique Ability: ^7needs 1 thermal and 5 power cell ammo to use it\"");
+				}
+			}
+			else if (ent->client->pers.rpg_class == 8)
+			{ // zyk: Magic Master Spread Bolts activation
+				if (ent->client->pers.magic_power >= 1)
+				{
+					ent->client->pers.magic_power -= 1;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 15000;
+
+					ent->client->pers.player_statuses |= (1 << 21);
+
+					send_rpg_events(2000);
+
+					ent->client->pers.unique_skill_timer = level.time + 50000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, "chat \"^3Unique Ability: ^7needs at least 1 MP to use it\"");
+				}
+			}
+			else if (ent->client->pers.rpg_class == 9)
+			{ // zyk: Force Tank Force Armor. Increases resistance, resists force powers and has shield flag
+				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
+				{
+					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
+
+					ent->flags |= FL_SHIELDED;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 10000;
+
+					ent->client->pers.player_statuses |= (1 << 21);
+
+					ent->client->pers.unique_skill_timer = level.time + 50000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
+				}
+			}
+		}
+		else
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7%d seconds left\"", ((ent->client->pers.unique_skill_timer - level.time) / 1000)));
+		}
+	}
+	else if (ent->client->pers.secrets_found & (1 << 3))
+	{ // zyk: Unique Ability 2
+		if (zyk_can_use_unique(ent) == qfalse)
+		{
+			trap->SendServerCommand(ent->s.number, "chat \"^3Unique Ability: ^7cannot use Unique Ability now\"");
+			return;
+		}
+
+		if (ent->client->pers.unique_skill_timer < level.time)
+		{
+			if (ent->client->pers.rpg_class == 0)
+			{ // zyk: Free Warrior Super Beam
+				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 2) && ent->client->pers.magic_power >= 25)
+				{
+					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 2);
+					ent->client->pers.magic_power -= 25;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
+
+					ent->client->pers.player_statuses |= (1 << 22);
+
+					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+					ent->client->ps.forceDodgeAnim = BOTH_FORCE_DRAIN_START;
+					ent->client->ps.forceHandExtendTime = level.time + 2000;
+
+					zyk_super_beam(ent);
+
+					send_rpg_events(2000);
+
+					ent->client->pers.unique_skill_timer = level.time + 55000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs %d force and 25 mp to use it\"", (zyk_max_force_power.integer / 2)));
+				}
+			}
+			else if (ent->client->pers.rpg_class == 1)
+			{ // zyk: Force User Force Repulse
+				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
+				{
+					int i = 0;
+					int push_scale = 700;
+
+					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
+
+					for (i = 0; i < level.num_entities; i++)
+					{
+						gentity_t *player_ent = &g_entities[i];
+
+						if (player_ent && player_ent->client && ent != player_ent && 
+							zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue &&
+							Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 300)
+						{
+							vec3_t dir;
+
+							G_Damage(player_ent, ent, ent, NULL, NULL, 20, 0, MOD_UNKNOWN);
+
+							VectorSubtract(player_ent->client->ps.origin, ent->client->ps.origin, dir);
+							VectorNormalize(dir);
+
+							player_ent->client->ps.velocity[0] = dir[0] * push_scale;
+							player_ent->client->ps.velocity[1] = dir[1] * push_scale;
+							player_ent->client->ps.velocity[2] = 250;
+
+							player_ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
+							player_ent->client->ps.forceHandExtendTime = level.time + 1000;
+							player_ent->client->ps.forceDodgeAnim = 0; //this toggles between 1 and 0, when it's 1 we should play the get up anim
+							player_ent->client->ps.quickerGetup = qtrue;
+						}
+					}
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+
+					G_Sound(ent, CHAN_BODY, G_SoundIndex("sound/weapons/force/push.wav"));
+					if (ent->client->ps.forceHandExtend == HANDEXTEND_NONE)
+					{
+						ent->client->ps.forceHandExtend = HANDEXTEND_FORCEPUSH;
+						ent->client->ps.forceHandExtendTime = level.time + 1000;
+					}
+					else if (ent->client->ps.forceHandExtend == HANDEXTEND_KNOCKDOWN && G_InGetUpAnim(&ent->client->ps))
+					{
+						if (ent->client->ps.forceDodgeAnim > 4)
+						{
+							ent->client->ps.forceDodgeAnim -= 8;
+						}
+						ent->client->ps.forceDodgeAnim += 8; //special case, play push on upper torso, but keep playing current knockdown anim on legs
+					}
+					ent->client->ps.powerups[PW_DISINT_4] = level.time + 1100;
+					ent->client->ps.powerups[PW_PULL] = 0;
+
+					ent->client->pers.unique_skill_timer = level.time + 50000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
+				}
+			}
+			else if (ent->client->pers.rpg_class == 2)
+			{ // zyk: Bounty Hunter Wrist Shot
+				if (ent->client->ps.ammo[AMMO_BLASTER] >= 10)
+				{
+					ent->client->ps.ammo[AMMO_BLASTER] -= 10;
+
+					zyk_WP_FireBryarPistol(ent);
+
+					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+					ent->client->ps.forceDodgeAnim = TORSO_WEAPONREADY4;
+					ent->client->ps.forceHandExtendTime = level.time + 1200;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+
+					G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/bryar/alt_fire.mp3"));
+
+					ent->client->pers.unique_skill_timer = level.time + 45000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, "chat \"^3Unique Ability: ^7needs 10 blaster pack ammo to use it\"");
+				}
+			}
+			else if (ent->client->pers.rpg_class == 3)
+			{ // zyk: Armored Soldier Shield to Ammo. Recovers ammo by spending his shield
+				if (ent->client->ps.stats[STAT_ARMOR] >= 20)
+				{
+					ent->client->ps.stats[STAT_ARMOR] -= 20;
+
+					Add_Ammo(ent, AMMO_BLASTER, 200);
+
+					Add_Ammo(ent, AMMO_POWERCELL, 200);
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+
+					ent->client->pers.unique_skill_timer = level.time + 30000;
+
+					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs 20 shield to use it\""));
+				}
+			}
+			else if (ent->client->pers.rpg_class == 4)
+			{ // zyk: Monk Spin Kick ability. Kicks everyone around the Monk with very high damage
+				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
+				{
+					int i = 0;
+
+					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
+
+					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+					ent->client->ps.forceDodgeAnim = BOTH_A7_KICK_S;
+					ent->client->ps.forceHandExtendTime = level.time + 2000;
+
+					for (i = 0; i < level.num_entities; i++)
+					{
+						gentity_t *player_ent = &g_entities[i];
+
+						if (player_ent && player_ent->client && ent != player_ent && 
+							zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue &&
+							Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 80)
+						{
+							G_Damage(player_ent, ent, ent, NULL, NULL, 20, 0, MOD_MELEE);
+
+							// zyk: removing emotes to prevent exploits
+							if (player_ent->client->pers.player_statuses & (1 << 1))
+							{
+								player_ent->client->pers.player_statuses &= ~(1 << 1);
+								player_ent->client->ps.forceHandExtendTime = level.time;
+							}
+
+							player_ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
+							player_ent->client->ps.forceHandExtendTime = level.time + 1000;
+							player_ent->client->ps.velocity[2] += 200;
+							player_ent->client->ps.forceDodgeAnim = 0;
+							player_ent->client->ps.quickerGetup = qtrue;
+
+							G_Sound(ent, CHAN_AUTO, G_SoundIndex(va("sound/weapons/melee/punch%d", Q_irand(1, 4))));
+						}
+					}
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+
+					ent->client->pers.unique_skill_timer = level.time + 30000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
+				}
+			}
+			else if (ent->client->pers.rpg_class == 5)
+			{ // zyk: Stealth Attacker Timed Bomb
+				if (ent->client->ps.ammo[AMMO_POWERCELL] >= 5 && ent->client->ps.ammo[AMMO_METAL_BOLTS] >= 5)
+				{
+					ent->client->ps.ammo[AMMO_POWERCELL] -= 5;
+					ent->client->ps.ammo[AMMO_METAL_BOLTS] -= 5;
+
+					zyk_add_bomb_model(ent);
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+
+					ent->client->pers.unique_skill_timer = level.time + 45000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, "chat \"^3Unique Ability: ^7needs 5 power cell ammo and 5 metal bolts ammo to use it\"");
+				}
+			}
+			else if (ent->client->pers.rpg_class == 6)
+			{ // zyk: Duelist Vertical DFA
+				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
+				{
+					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
+
+					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+					ent->client->ps.forceDodgeAnim = BOTH_FORCELEAP2_T__B_;
+					ent->client->ps.forceHandExtendTime = level.time + 2000;
+					ent->client->ps.velocity[2] = 300;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
+
+					zyk_vertical_dfa_effect(ent);
+
+					ent->client->pers.unique_skill_timer = level.time + 45000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
+				}
+			}
+			else if (ent->client->pers.rpg_class == 7)
+			{ // zyk: Force Gunner No Attack
+				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
+				{
+					int i = 0;
+
+					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
+
+					for (i = 0; i < level.num_entities; i++)
+					{
+						gentity_t *player_ent = &g_entities[i];
+
+						if (player_ent && player_ent->client && ent != player_ent && 
+							zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue &&
+							Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 300)
+						{
+							G_Damage(player_ent, ent, ent, NULL, NULL, 15, 0, MOD_UNKNOWN);
+
+							player_ent->client->ps.weaponTime = 3000;
+							player_ent->client->ps.electrifyTime = level.time + 3000;
+						}
+					}
+
+					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/hologram_off.mp3"));
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+
+					ent->client->pers.unique_skill_timer = level.time + 40000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
+				}
+			}
+			else if (ent->client->pers.rpg_class == 8)
+			{ // zyk: Magic Master Elemental Attack
+				if (ent->client->pers.magic_power >= 20 && ent->client->pers.quest_power_usage_timer < level.time)
+				{
+					ent->client->pers.magic_power -= 20;
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+
+					elemental_attack(ent);
+
+					send_rpg_events(2000);
+
+					ent->client->pers.quest_power_usage_timer = level.time + 20000;
+
+					display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
+
+					ent->client->pers.unique_skill_timer = level.time + 50000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, "chat \"^3Unique Ability: ^7needs at least 20 MP to use it and wait some seconds after last magic used\"");
+				}
+			}
+			else if (ent->client->pers.rpg_class == 9)
+			{ // zyk: Force Tank Force Scream
+				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
+				{
+					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
+
+					force_scream(ent);
+
+					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 6000;
+
+					ent->client->pers.player_statuses |= (1 << 22);
+
+					ent->client->pers.unique_skill_timer = level.time + 50000;
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
+				}
+			}
+		}
+		else
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Ability: ^7%d seconds left\"", ((ent->client->pers.unique_skill_timer - level.time) / 1000)));
+		}
+	}
+	else
+	{
+		trap->SendServerCommand(ent - g_entities, "print \"You have no Unique Abilities to use this command\n\"");
+		return;
+	}
+}
+
 /*
 ==================
 Cmd_Magic_f
@@ -14162,7 +15137,7 @@ void Cmd_Magic_f( gentity_t *ent ) {
 
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand( ent-g_entities, va("print \"\n 1 - Inner Area Damage - %s^7\n 2 - Healing Water - %s^7\n 3 - Water Splash - %s^7\n 4 - Earthquake - %s^7\n 5 - Rockfall - %s^7\n 6 - Sleeping Flowers - %s^7\n 7 - Poison Mushrooms - %s^7\n 8 - Magic Shield - %s^7\n 9 - Dome of Damage - %s^7\n10 - Ultra Speed - %s^7\n11 - Slow Motion - %s^7\n12 - Flame Burst - %s^7\n13 - Ultra Flame - %s^7\n14 - Blowing Wind - %s^7\n15 - Hurricane - %s^7\n16 - Ultra Resistance - %s^7\n17 - Ultra Strength - %s^7\n18 - Ice Stalagmite - %s^7\n19 - Ice Boulder - %s^7\n20 - Healing Area - %s^7\n21 - Lightning Dome - %s^7\n22 - Magic Explosion - %s^7\n\"", 
+		trap->SendServerCommand( ent-g_entities, va("print \"\n 1 - Inner Area Damage - %s^7\n 2 - Healing Water - %s^7\n 3 - Water Splash - %s^7\n 4 - Earthquake - %s^7\n 5 - Rockfall - %s^7\n 6 - Sleeping Flowers - %s^7\n 7 - Poison Mushrooms - %s^7\n 8 - Magic Shield - %s^7\n 9 - Dome of Damage - %s^7\n10 - Ultra Speed - %s^7\n11 - Slow Motion - %s^7\n12 - Flame Burst - %s^7\n13 - Ultra Flame - %s^7\n14 - Blowing Wind - %s^7\n15 - Hurricane - %s^7\n16 - Ultra Resistance - %s^7\n17 - Ultra Strength - %s^7\n18 - Ice Stalagmite - %s^7\n19 - Ice Boulder - %s^7\n20 - Healing Area - %s^7\n21 - Magic Explosion - %s^7\n22 - Lightning Dome - %s^7\n\"", 
 			!(ent->client->sess.magic_master_disabled_powers & (1 << 1)) ? "^2yes" : "^1no", !(ent->client->sess.magic_master_disabled_powers & (1 << 2)) ? "^2yes" : "^1no", 
 			!(ent->client->sess.magic_master_disabled_powers & (1 << 3)) ? "^2yes" : "^1no", !(ent->client->sess.magic_master_disabled_powers & (1 << 4)) ? "^2yes" : "^1no", 
 			!(ent->client->sess.magic_master_disabled_powers & (1 << 5)) ? "^2yes" : "^1no", !(ent->client->sess.magic_master_disabled_powers & (1 << 6)) ? "^2yes" : "^1no", 
@@ -14225,6 +15200,7 @@ typedef struct command_s {
 int cmdcmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((command_t*)b)->name );
 }
+
 
 /* This array MUST be sorted correctly by alphabetical name field */
 command_t commands[] = {
@@ -14295,6 +15271,10 @@ command_t commands[] = {
 	{ "playermode",			Cmd_PlayerMode_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "players",			Cmd_Players_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "racemode",			Cmd_RaceMode_f,				CMD_ALIVE|CMD_NOINTERMISSION },
+	{ "remap",				Cmd_Remap_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
+	{ "remapdeletefile",	Cmd_RemapDeleteFile_f,		CMD_LOGGEDIN|CMD_NOINTERMISSION },
+	{ "remapload",			Cmd_RemapLoad_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
+	{ "remapsave",			Cmd_RemapSave_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "resetaccount",		Cmd_ResetAccount_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "rpgclass",			Cmd_RpgClass_f,				CMD_RPG|CMD_NOINTERMISSION },
 	{ "rpmode",				Cmd_RpMode_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
@@ -14320,6 +15300,7 @@ command_t commands[] = {
 	{ "tell",				Cmd_Tell_f,					0 },
 	{ "thedestroyer",		Cmd_TheDestroyer_f,			CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "t_use",				Cmd_TargetUse_f,			CMD_CHEAT|CMD_ALIVE },
+	{ "unique",				Cmd_Unique_f,				CMD_RPG | CMD_ALIVE | CMD_NOINTERMISSION },
 	{ "up",					Cmd_UpSkill_f,				CMD_RPG|CMD_NOINTERMISSION },
 	{ "vehiclelist",		Cmd_VehicleList_f,			CMD_NOINTERMISSION },
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			CMD_NOINTERMISSION },
@@ -14347,7 +15328,7 @@ void ClientCommand( int clientNum ) {
 		return;
 	//end rww
 
-	command = (command_t *)bsearch( cmd, commands, numCommands, sizeof( commands[0] ), cmdcmp );
+	command = (command_t *)Q_LinearSearch( cmd, commands, numCommands, sizeof( commands[0] ), cmdcmp );
 	if ( !command )
 	{
 		trap->SendServerCommand( clientNum, va( "print \"Unknown command %s\n\"", cmd ) );

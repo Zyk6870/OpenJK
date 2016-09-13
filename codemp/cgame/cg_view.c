@@ -1,5 +1,26 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 // cg_view.c -- setup all the parameters (position, angle, etc)
 // for a 3D rendering
 #include "cg_local.h"
@@ -1104,22 +1125,6 @@ static void CG_OffsetFighterView( void )
 	VectorCopy(camOrg, cg.refdef.vieworg);
 }
 //======================================================================
-
-void CG_ZoomDown_f( void ) {
-	if ( cg.zoomed ) {
-		return;
-	}
-	cg.zoomed = qtrue;
-	cg.zoomTime = cg.time;
-}
-
-void CG_ZoomUp_f( void ) {
-	if ( !cg.zoomed ) {
-		return;
-	}
-	cg.zoomed = qfalse;
-	cg.zoomTime = cg.time;
-}
 
 /*
 ====================
@@ -2558,8 +2563,10 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	if (cg.snap->ps.stats[STAT_HEALTH] > 0)
 	{
-		if (cg.predictedPlayerState.weapon == WP_EMPLACED_GUN && cg.predictedPlayerState.emplacedIndex /*&&
-			cg_entities[cg.predictedPlayerState.emplacedIndex].currentState.weapon == WP_NONE*/)
+		
+		if (cg.predictedPlayerState.weapon == WP_EMPLACED_GUN && cg.predictedPlayerState.emplacedIndex && 
+			!cg_fpls.integer// zyk: allow first person for emplaced gun
+			/* cg_entities[cg.predictedPlayerState.emplacedIndex].currentState.weapon == WP_NONE*/) 
 		{ //force third person for e-web and emplaced use
 			cg.renderingThirdPerson = 1;
 		}
@@ -2569,7 +2576,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 			cg.predictedPlayerState.m_iVehicleNum || PM_InKnockDown(&cg.predictedPlayerState))
 		{
 			if (cg_fpls.integer && (cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE))
-			{ //force to first person for fpls // zyk: melee will also allow it
+			{ //force to first person for fpls // zyk: added this back to mod
 				cg.renderingThirdPerson = 0;
 			}
 			else

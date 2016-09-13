@@ -1,3 +1,25 @@
+/*
+===========================================================================
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 #include "g_local.h"
 #include "bg_local.h"
 #include "w_saber.h"
@@ -4316,6 +4338,16 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 				dmg = 0;
 		}
 
+		// zyk: Duelist Unique Upgrades. Heavily increases saber damage
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 6 && 
+			self->client->ps.powerups[PW_NEUTRALFLAG] > level.time)
+		{
+			if (self->client->ps.torsoAnim == BOTH_PULL_IMPALE_STAB) // zyk: Impale Stab
+				dmg = 80;
+			else if (self->client->ps.torsoAnim == BOTH_FORCELEAP2_T__B_) // zyk: Vertical DFA
+				dmg = 80;
+		}
+
 		idleDamage = qtrue;
 	}
 	else
@@ -5895,7 +5927,12 @@ static QINLINE qboolean CheckThrownSaberDamaged(gentity_t *saberent, gentity_t *
 	float veclen;
 	gentity_t *te;
 
-	if (saberOwner && saberOwner->client && saberOwner->client->ps.saberAttackWound > level.time)
+	if (!saberOwner || !saberOwner->client)
+	{
+		return qfalse;
+	}
+
+	if (saberOwner->client->ps.saberAttackWound > level.time)
 	{
 		return qfalse;
 	}
@@ -7287,7 +7324,11 @@ void saberFirstThrown(gentity_t *saberent)
 
 		VectorNormalize(dir);
 
-		VectorScale(dir, 500, saberent->s.pos.trDelta );
+		if (saberOwn->client->ps.fd.forcePowerLevel[FP_SABERTHROW] >= FORCE_LEVEL_4) // zyk: level 4 makes it even faster
+			VectorScale(dir, 900, saberent->s.pos.trDelta );
+		else
+			VectorScale(dir, 500, saberent->s.pos.trDelta );
+
 		saberent->s.pos.trTime = level.time;
 
 		if (saberOwn->client->ps.fd.forcePowerLevel[FP_SABERTHROW] >= FORCE_LEVEL_3)

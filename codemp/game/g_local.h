@@ -1,7 +1,29 @@
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2005 - 2015, ioquake3 contributors
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 #pragma once
 
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
 // g_local.h -- local definitions for game module
 
 #include "qcommon/q_shared.h"
@@ -22,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Zyk OpenJK Mod v3.32"
+#define	GAMEVERSION	"Zyk OpenJK Mod v3.43"
 
 #define SECURITY_LOG "security.log"
 
@@ -550,9 +572,6 @@ typedef enum {
 // zyk: number of RPG Mode skills
 #define NUMBER_OF_SKILLS 56
 
-// zyk: max value of the skill counter to increase level up score of the rpg player
-#define MAX_SKILL_COUNTER 25000
-
 // zyk: max sentries a Bounty Hunter can have if he has the Upgrade
 #define MAX_BOUNTY_HUNTER_SENTRIES 5
 
@@ -567,7 +586,7 @@ typedef enum {
 #define JETPACK_SCALE 100 // zyk: used to scale the MAX_JETPACK_FUEL to set the jetpackFuel attribute. Dividing MAX_JETPACK_FUEL per JETPACK_SCALE must result in 100
 
 // zyk: quantity of items at the jawa seller
-#define NUMBER_OF_SELLER_ITEMS 52
+#define NUMBER_OF_SELLER_ITEMS 54
 
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
@@ -604,7 +623,7 @@ typedef struct clientPersistant_s {
 	// 4 - Scaled player
 	// 5 - Chat protection activated for this player
 	// 6 - Paralyzed by an admin
-	// 7 - unused
+	// 7 - send event so client-side mod knows if this is a Force User or not, to render the Force Shield effect
 	// 8 - using Saber Armor
 	// 9 - using Gun Armor
 	// 10 - using Healing Crystal
@@ -617,7 +636,20 @@ typedef struct clientPersistant_s {
 	// 17 - Sending Ultra Resistance event
 	// 18 - NPC has the guard order
 	// 19 - NPC has the cover order
+	// 20 - hit by poison dart
+	// 21 - Unique Ability 1
+	// 22 - Unique Ability 2
+	// 23 - Monk ally with meditation strength bonus damage and resistance
 	int player_statuses;
+
+	// zyk: amount of times player must be hit by poison
+	int poison_dart_hit_counter;
+
+	// zyk: player who hit the target with poison dart
+	int poison_dart_user_id;
+
+	// zyk: timer of the poison darts
+	int poison_dart_hit_timer;
 
 	int player_scale;
 
@@ -713,11 +745,11 @@ typedef struct clientPersistant_s {
 	// Possible bit values (1 << bit_value) are:
 	// 0 - Holdable Items Upgrade
 	// 1 - Bounty Hunter Upgrade
-	// 2 - Force User Unique Skill - got after player reaches level 10 and fills the skill counter once
-	// 3 - Monk Unique Skill - got after player reaches level 10 and fills the skill counter once
-	// 4 - Duelist Unique Skill - got after player reaches level 10 and fills the skill counter once
-	// 5 - Force Gunner Unique Skill - got after player reaches level 10 and fills the skill counter once
-	// 6 - Magic Master Unique Skill - got after player reaches level 10 and fills the skill counter once
+	// 2 - Unique Ability 1
+	// 3 - Unique Ability 2
+	// 4 - unused
+	// 5 - unused
+	// 6 - unused
 	// 7 - Stealth Attacker Upgrade
 	// 8 - Force Gunner Upgrade
 	// 9 - Impact Reducer
@@ -729,7 +761,7 @@ typedef struct clientPersistant_s {
 	// 15 - Stun Baton Upgrade
 	// 16 - Armored Soldier Upgrade
 	// 17 - Jetpack Upgrade
-	// 18 - Force Tank Unique Skill - got after player reaches level 10 and fills the skill counter once
+	// 18 - unused
 	// 19 - Force Tank Upgrade
 	int secrets_found;
 
@@ -1461,6 +1493,9 @@ typedef struct level_locals_s {
 	// zyk: Guardian Quest. Default 0. After the guardian is spawned, guardian_quest will have the guardian npc id
 	int guardian_quest;
 
+	// zyk: timer to start the Guardian Quest
+	int guardian_quest_timer;
+
 	// zyk: allows guardian of map to get his weapons back
 	int initial_map_guardian_weapons;
 
@@ -1506,13 +1541,28 @@ typedef struct level_locals_s {
 
 	// zyk: has the player_ids that are ignored for each player
 	int ignored_players[32][2];
+
+	char		mapname[MAX_QPATH];
+	char		rawmapname[MAX_QPATH];
 } level_locals_t;
 
 
 // zyk: functions used in a lot of places
 qboolean zyk_is_ally(gentity_t *ent, gentity_t *other);
-int zyk_number_of_allies(gentity_t *ent);
+int zyk_number_of_allies(gentity_t *ent, qboolean in_rpg_mode);
 void send_rpg_events(int send_event_timer);
+int zyk_get_remap_count();
+
+// zyk: shader remap struct
+typedef struct shaderRemap_s {
+  char oldShader[MAX_QPATH];
+  char newShader[MAX_QPATH];
+  float timeOffset;
+} shaderRemap_t;
+
+#define MAX_SHADER_REMAPS 128
+
+shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
 
 //
 // g_spawn.c
@@ -1538,8 +1588,6 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent);
 int G_ItemUsable(playerState_t *ps, int forcedUse);
 void Cmd_ToggleSaber_f(gentity_t *ent);
 void Cmd_EngageDuel_f(gentity_t *ent);
-
-gentity_t *G_GetDuelWinner(gclient_t *client);
 
 //
 // g_items.c
@@ -2022,6 +2070,7 @@ typedef enum userinfoValidationBits_e {
 } userinfoValidationBits_t;
 
 void Svcmd_ToggleUserinfoValidation_f( void );
+void Svcmd_ToggleAllowVote_f( void );
 
 // g_cvar.c
 #define XCVAR_PROTO

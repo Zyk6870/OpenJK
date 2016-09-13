@@ -1,5 +1,26 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 // g_misc.c
 
 #include "g_local.h"
@@ -2788,6 +2809,41 @@ void fx_runner_think( gentity_t *ent )
 		}
 	}
 
+	// zyk: Super Beam. Traces enemies and damages them
+	if (Q_stricmp(ent->targetname, "zyk_super_beam") == 0)
+	{
+		gentity_t *user_ent = ent->parent;
+		gentity_t *player_ent = NULL;
+		trace_t		tr;
+		vec3_t		tfrom, tto, fwd;
+		vec3_t		shot_mins, shot_maxs;
+		int radius = 32768;
+
+		VectorCopy(ent->s.origin, tfrom);
+		AngleVectors(ent->s.angles, fwd, NULL, NULL);
+		tto[0] = tfrom[0] + fwd[0] * radius;
+		tto[1] = tfrom[1] + fwd[1] * radius;
+		tto[2] = tfrom[2] + fwd[2] * radius;
+
+		VectorSet(shot_mins, -20, -20, -20);
+		VectorSet(shot_maxs, 20, 20, 20);
+
+		trap->Trace(&tr, tfrom, shot_mins, shot_maxs, tto, user_ent->s.number, MASK_PLAYERSOLID, qfalse, 0, 0);
+
+		if (tr.fraction != 1.0 &&
+			tr.entityNum != ENTITYNUM_NONE)
+		{ // zyk: actually hit something
+			player_ent = &g_entities[tr.entityNum];
+		}
+
+		if (player_ent && player_ent->client && user_ent && user_ent->client && user_ent != player_ent &&
+			zyk_is_ally(user_ent, player_ent) == qfalse)
+		{ // zyk: if the enemy is hit by the super beam, damage him
+			G_Damage(player_ent, user_ent, user_ent, NULL, player_ent->client->ps.origin, 40, DAMAGE_NO_PROTECTION, MOD_UNKNOWN);
+		}
+
+		ent->nextthink = level.time + 100;
+	}
 }
 
 //----------------------------------------------------------
@@ -2923,14 +2979,20 @@ void fx_runner_link( gentity_t *ent )
 
 		// Let's get to work right now!
 		ent->think = fx_runner_think;
-		
-		if (Q_stricmp(ent->targetname, "zyk_quest_effect_rockfall") == 0)
+
+		if (Q_stricmp(ent->targetname, "zyk_super_beam") == 0)
+		{ // zyk: starts the super beam effect right now
+			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
+			ent->nextthink = level.time + 100; // wait a small bit, then start working
+			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/artus/artus_gen.wav"));
+		}
+		else if (Q_stricmp(ent->targetname, "zyk_quest_effect_rockfall") == 0)
 		{ // zyk: Rockfall power. Starts the effect imediately but damages a bit later
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 1500;
 		}
 		else if (Q_stricmp(ent->targetname, "zyk_quest_effect_watersplash") == 0 || Q_stricmp(ent->targetname, "zyk_quest_effect_sleeping") == 0 || 
-				 Q_stricmp(ent->targetname, "zyk_quest_effect_time") == 0)
+				 Q_stricmp(ent->targetname, "zyk_quest_effect_time") == 0 || Q_stricmp(ent->targetname, "zyk_quest_effect_poison") == 0)
 		{ // zyk: starts the effect imediately for these magic powers
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 200; // wait a small bit, then start working
@@ -2999,7 +3061,16 @@ void SP_fx_runner( gentity_t *ent )
 
 	// Give us a bit of time to spawn in the other entities, since we may have to target one of 'em
 	ent->think = fx_runner_link;
-	ent->nextthink = level.time + 400;
+
+	// zyk: no need to wait 400 ms with Super Beam effect
+	if (Q_stricmp(ent->targetname, "zyk_super_beam") == 0)
+	{
+		ent->nextthink = level.time;
+	}
+	else
+	{
+		ent->nextthink = level.time + 400;
+	}
 
 	// Save our position and link us up!
 	G_SetOrigin( ent, ent->s.origin );
@@ -3008,6 +3079,71 @@ void SP_fx_runner( gentity_t *ent )
 	VectorScale( ent->r.maxs, -1, ent->r.mins );
 
 	trap->LinkEntity( (sharedEntity_t *)ent );
+}
+
+/*QUAKED fx_wind (0 .5 .8) (-16 -16 -16) (16 16 16) NORMAL CONSTANT GUSTING SWIRLING x  FOG LIGHT_FOG
+Generates global wind forces
+
+NORMAL    creates a random light global wind
+CONSTANT  forces all wind to go in a specified direction
+GUSTING   causes random gusts of wind
+SWIRLING  causes random swirls of wind
+
+"angles" the direction for constant wind
+"speed"  the speed for constant wind
+*/
+void SP_CreateWind( gentity_t *ent )
+{
+	char	temp[256];
+
+	// Normal Wind
+	//-------------
+	if ( ent->spawnflags & 1 )
+	{
+		G_EffectIndex( "*wind" );
+	}
+
+	// Constant Wind
+	//---------------
+	if ( ent->spawnflags & 2 )
+	{
+		vec3_t	windDir;
+		AngleVectors( ent->s.angles, windDir, 0, 0 );
+		G_SpawnFloat( "speed", "500", &ent->speed );
+		VectorScale( windDir, ent->speed, windDir );
+
+		Com_sprintf( temp, sizeof(temp), "*constantwind ( %f %f %f )", windDir[0], windDir[1], windDir[2] );
+		G_EffectIndex( temp );
+	}
+
+	// Gusting Wind
+	//--------------
+	if ( ent->spawnflags & 4 )
+	{
+		G_EffectIndex( "*gustingwind" );
+	}
+
+	// Swirling Wind
+	//---------------
+	/*if ( ent->spawnflags & 8 )
+	{
+		G_EffectIndex( "*swirlingwind" );
+	}*/
+
+
+	// MISTY FOG
+	//===========
+	if ( ent->spawnflags & 32 )
+	{
+		G_EffectIndex( "*fog" );
+	}
+
+	// MISTY FOG
+	//===========
+	if ( ent->spawnflags & 64 )
+	{
+		G_EffectIndex( "*light_fog" );
+	}
 }
 
 /*QUAKED fx_spacedust (1 0 0) (-16 -16 -16) (16 16 16)
@@ -3033,18 +3169,58 @@ void SP_CreateSnow( gentity_t *ent )
 {
 	G_EffectIndex("*snow");
 	G_EffectIndex("*fog");
-	G_EffectIndex("*constantwind (100 100 -100)");
+	G_EffectIndex("*constantwind ( 100 100 -100 )");
 }
 
-/*QUAKED fx_rain (1 0 0) (-16 -16 -16) (16 16 16)
+/*QUAKED fx_rain (1 0 0) (-16 -16 -16) (16 16 16) LIGHT MEDIUM HEAVY ACID x MISTY_FOG
 This world effect will spawn rain globally into the level.
 
-"count" the number of rain particles (default of 500)
+LIGHT   create light drizzle
+MEDIUM  create average medium rain
+HEAVY   create heavy downpour (with fog)
+ACID    create acid rain
+
+MISTY_FOG      causes clouds of misty fog to float through the level
 */
 //----------------------------------------------------------
 void SP_CreateRain( gentity_t *ent )
 {
-	G_EffectIndex(va("*rain init %i", ent->count));
+	if ( ent->spawnflags == 0 )
+	{
+		G_EffectIndex( "*rain" );
+		return;
+	}
+
+	// Different Types Of Rain
+	//-------------------------
+	if ( ent->spawnflags & 1 )
+	{
+		G_EffectIndex( "*lightrain" );
+	}
+	else if ( ent->spawnflags & 2 )
+	{
+		G_EffectIndex( "*rain" );
+	}
+	else if ( ent->spawnflags & 4 )
+	{
+		G_EffectIndex( "*heavyrain" );
+
+		// Automatically Get Heavy Fog
+		//-----------------------------
+		G_EffectIndex( "*heavyrainfog" );
+	}
+	else if ( ent->spawnflags & 8 )
+	{
+		G_EffectIndex( "world/acid_fizz" );
+		G_EffectIndex( "*acidrain" );
+	}
+
+	// MISTY FOG
+	//===========
+	if ( ent->spawnflags & 32 )
+	{
+		G_EffectIndex( "*fog" );
+	}
 }
 
 /*QUAKED zyk_weather (1 0 0) (-16 -16 -16) (16 16 16)
@@ -3096,8 +3272,8 @@ void zyk_regen_unit_think(gentity_t *ent)
 	{
 		this_ent = &g_entities[entity_ids[i]];
 
-		if (this_ent && this_ent->client && this_ent->s.number < MAX_CLIENTS)
-		{ // zyk: must be a player
+		if (this_ent && this_ent->client && this_ent->s.number < MAX_CLIENTS && this_ent->health > 0)
+		{ // zyk: must be a player that is alive
 			if (ent->spawnflags & 1)
 			{
 				if ((this_ent->health + ent->count) < this_ent->client->ps.stats[STAT_MAX_HEALTH])

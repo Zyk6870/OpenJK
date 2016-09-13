@@ -1,5 +1,27 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2005 - 2015, ioquake3 contributors
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 
 #include "g_local.h"
 #include "g_ICARUScb.h"
@@ -128,6 +150,13 @@ void G_CacheGametype( void )
 		level.gametype = atoi( g_gametype.string );
 
 	trap->Cvar_Set( "g_gametype", va( "%i", level.gametype ) );
+	trap->Cvar_Update( &g_gametype );
+}
+
+void G_CacheMapname( const vmCvar_t *mapname )
+{
+	Com_sprintf( level.mapname, sizeof( level.mapname ), "maps/%s.bsp", mapname->string );
+	Com_sprintf( level.rawmapname, sizeof( level.rawmapname ), "maps/%s", mapname->string );
 }
 
 // zyk: this function spawns an info_player_deathmatch entity in the map
@@ -306,6 +335,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// zyk: variable used in the SP buged maps fix
 	char zyk_mapname[128] = {0};
 	FILE *zyk_entities_file = NULL;
+	FILE *zyk_remap_file = NULL;
 
 	//Init RMG to 0, it will be autoset to 1 if there is terrain on the level.
 	trap->Cvar_Set("RMG", "0");
@@ -441,6 +471,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	InitSiegeMode();
 
 	trap->Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
+	G_CacheMapname( &mapname );
 	trap->Cvar_Register( &ckSum, "sv_mapChecksum", "", CVAR_ROM );
 
 	// navCalculatePaths	= ( trap->Nav_Load( mapname.string, ckSum.integer ) == qfalse );
@@ -658,6 +689,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	level.server_empty_change_map_timer = 0;
 	level.num_fully_connected_clients = 0;
+
+	level.guardian_quest_timer = 0;
 
 	level.load_entities_timer = 0;
 	strcpy(level.load_entities_file,"");
@@ -1325,6 +1358,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 				G_FreeEntity( ent );
 			}
 		}
+
+		zyk_create_info_player_deathmatch(2195,7611,4380,-90);
+		zyk_create_info_player_deathmatch(2305,7640,4380,-90);
 	}
 	else if (Q_stricmp(zyk_mapname, "t3_stamp") == 0)
 	{
@@ -1548,6 +1584,32 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		strcpy(level.load_entities_file, va("entities/%s/default.txt",zyk_mapname));
 
 		level.load_entities_timer = level.time + 1050;
+	}
+
+	// zyk: loading default remaps
+	zyk_remap_file = fopen(va("remaps/%s/default.txt",zyk_mapname),"r");
+
+	if (zyk_remap_file != NULL)
+	{
+		char old_shader[128];
+		char new_shader[128];
+		char time_offset[128];
+
+		strcpy(old_shader,"");
+		strcpy(new_shader,"");
+		strcpy(time_offset,"");
+
+		while(fscanf(zyk_remap_file,"%s",old_shader) != EOF)
+		{
+			fscanf(zyk_remap_file,"%s",new_shader);
+			fscanf(zyk_remap_file,"%s",time_offset);
+
+			AddRemap(G_NewString(old_shader), G_NewString(new_shader), atof(time_offset));
+		}
+		
+		fclose(zyk_remap_file);
+
+		trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
 	}
 }
 
@@ -3687,6 +3749,7 @@ void CheckTournament( void ) {
 		if ( level.time > level.warmupTime ) {
 			level.warmupTime += 10000;
 			trap->Cvar_Set( "g_restarted", "1" );
+			trap->Cvar_Update( &g_restarted );
 			trap->SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = qtrue;
 			return;
@@ -4077,13 +4140,11 @@ int BG_GetTime(void)
 void zyk_TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	gentity_t	*tent;
 	qboolean	isNPC = qfalse;
-	qboolean	noAngles;
+
 	if (player->s.eType == ET_NPC)
 	{
 		isNPC = qtrue;
 	}
-
-	noAngles = (angles[0] > 999999.0) ? qtrue : qfalse;
 
 	// use temp events at source and destination to prevent the effect
 	// from getting dropped by a second player event
@@ -4170,14 +4231,16 @@ qboolean zyk_is_ally(gentity_t *ent, gentity_t *other)
 }
 
 // zyk: counts how many allies this player has
-int zyk_number_of_allies(gentity_t *ent)
+int zyk_number_of_allies(gentity_t *ent, qboolean in_rpg_mode)
 {
 	int i = 0;
 	int number_of_allies = 0;
 
 	for (i = 0; i < level.maxclients; i++)
 	{
-		if (zyk_is_ally(ent,&g_entities[i]) == qtrue)
+		gentity_t *allied_player = &g_entities[i];
+
+		if (zyk_is_ally(ent,allied_player) == qtrue && (in_rpg_mode == qfalse || allied_player->client->sess.amrpgmode == 2))
 			number_of_allies++;
 	}
 
@@ -4205,17 +4268,45 @@ void spawn_boss(gentity_t *ent,int x,int y,int z,int yaw,char *boss_name,int gx,
 {
 	vec3_t player_origin;
 	vec3_t player_yaw;
+	vec3_t boss_spawn_point;
 	gentity_t *npc_ent = NULL;
 	int i = 0;
+	float boss_bonus_hp = 0;
+
+	// zyk: exploding trip mines and detpacks near the boss to prevent 1-hit-kill exploits
+	if ((guardian_mode >= 1 && guardian_mode <= 7) || guardian_mode == 11 || guardian_mode >= 14)
+		VectorSet(boss_spawn_point, gx, gy, gz);
+	else
+		VectorSet(boss_spawn_point, x, y, z);
+
+	for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
+	{
+		gentity_t *this_ent = &g_entities[i];
+
+		if (this_ent && Q_stricmp(this_ent->classname, "laserTrap") == 0 && 
+			Distance(this_ent->r.currentOrigin, boss_spawn_point) < 384.0)
+		{
+			this_ent->think = G_FreeEntity;
+			this_ent->nextthink = level.time;
+		}
+		else if (this_ent && Q_stricmp(this_ent->classname, "detpack") == 0 &&
+			Distance(this_ent->r.currentOrigin, boss_spawn_point) < 384.0)
+		{
+			this_ent->think = G_FreeEntity;
+			this_ent->nextthink = level.time;
+		}
+	}
 
 	// zyk: removing scale from allies
 	for (i = 0; i < level.maxclients; i++)
 	{
-		if (zyk_is_ally(ent,&g_entities[i]) == qtrue)
+		gentity_t *allied_player = &g_entities[i];
+
+		if (zyk_is_ally(ent,allied_player) == qtrue && allied_player->client->sess.amrpgmode == 2)
 		{
-			g_entities[i].client->pers.guardian_mode = guardian_mode;
-			do_scale(&g_entities[i], 100);
-			g_entities[i].client->noclip = qfalse;
+			allied_player->client->pers.guardian_mode = guardian_mode;
+			do_scale(allied_player, 100);
+			allied_player->client->noclip = qfalse;
 		}
 	}
 
@@ -4235,9 +4326,18 @@ void spawn_boss(gentity_t *ent,int x,int y,int z,int yaw,char *boss_name,int gx,
 	else
 		npc_ent = NPC_SpawnType(ent,boss_name,NULL,qfalse);
 
+	if (ent->client->pers.universe_quest_counter & (1 << 29))
+	{ // zyk: Challenge Mode increases boss hp more
+		boss_bonus_hp = 0.8 * (1 + zyk_number_of_allies(ent, qtrue));
+	}
+	else
+	{
+		boss_bonus_hp = 0.15 * zyk_number_of_allies(ent, qtrue);
+	}
+
 	if (npc_ent)
 	{
-		npc_ent->NPC->stats.health += (npc_ent->NPC->stats.health/10 * zyk_number_of_allies(ent));
+		npc_ent->NPC->stats.health += (npc_ent->NPC->stats.health * boss_bonus_hp);
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
@@ -4293,6 +4393,43 @@ qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target)
 	if (attacker->NPC && target->NPC && attacker->client->playerTeam == target->client->playerTeam)
 	{
 		return qtrue;
+	}
+
+	return qfalse;
+}
+
+qboolean zyk_unique_ability_can_hit_target(gentity_t *attacker, gentity_t *target)
+{
+	int i = target->s.number;
+
+	if (attacker && target && attacker->s.number != i && target->client && target->health > 0 && zyk_can_hit_target(attacker, target) == qtrue &&
+		(i > MAX_CLIENTS || (target->client->pers.connected == CON_CONNECTED && target->client->sess.sessionTeam != TEAM_SPECTATOR &&
+			target->client->ps.duelInProgress == qfalse)))
+	{ // zyk: target is a player or npc that can be hit by the attacker
+		int is_ally = 0;
+
+		if (i < level.maxclients && !attacker->NPC &&
+			zyk_is_ally(attacker, target) == qtrue)
+		{ // zyk: allies will not be hit by this power
+			is_ally = 1;
+		}
+
+		if (OnSameTeam(attacker, target) == qtrue || npcs_on_same_team(attacker, target) == qtrue)
+		{ // zyk: if one of them is npc, also check for allies
+			is_ally = 1;
+		}
+
+		if (is_ally == 0 &&
+			(attacker->client->pers.guardian_mode == target->client->pers.guardian_mode ||
+			((attacker->client->pers.guardian_mode == 12 || attacker->client->pers.guardian_mode == 13) && target->NPC &&
+				(Q_stricmp(target->NPC_type, "guardian_of_universe") || Q_stricmp(target->NPC_type, "quest_reborn") ||
+					Q_stricmp(target->NPC_type, "quest_reborn_blue") || Q_stricmp(target->NPC_type, "quest_reborn_red") ||
+					Q_stricmp(target->NPC_type, "quest_reborn_boss"))
+				)
+				))
+		{ // zyk: target cannot be attacker ally and cannot be using Immunity Power. Also, non-quest players cannot hit quest players and his allies or bosses and vice-versa
+			return qtrue;
+		}
 	}
 
 	return qfalse;
@@ -4516,7 +4653,8 @@ void inner_area_damage(gentity_t *ent, int distance, int damage)
 
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qtrue, &targets_hit) == qtrue)
 		{
-			if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time)
+			if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && 
+				ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && !(ent->client->pers.player_statuses & (1 << 21)))
 			{ // zyk: Magic Master Unique Skill increases damage
 				G_Damage(player_ent,ent,ent,NULL,NULL,damage * 2,0,MOD_UNKNOWN);
 			}
@@ -4548,7 +4686,10 @@ void lightning_dome(gentity_t *ent, int damage)
 
 	VectorCopy( tr.plane.normal, missile->pos1 );
 
-	missile->count = 9;
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 3) // zyk: Armored Soldier Lightning Shield has less radius
+		missile->count = 6;
+	else
+		missile->count = 9;
 
 	missile->classname = "demp2_alt_proj";
 	missile->s.weapon = WP_DEMP2;
@@ -4557,12 +4698,19 @@ void lightning_dome(gentity_t *ent, int damage)
 	missile->nextthink = level.time;
 
 	// zyk: Magic Master Unique Skill increases damage
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time &&
+		!(ent->client->pers.player_statuses & (1 << 21)))
+	{
 		damage *= 2;
+	}
 
 	missile->splashDamage = missile->damage = damage;
 	missile->splashMethodOfDeath = missile->methodOfDeath = MOD_DEMP2;
-	missile->splashRadius = 768;
+
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 3) // zyk: Armored Soldier Lightning Shield has less radius
+		missile->splashRadius = 512;
+	else
+		missile->splashRadius = 768;
 
 	missile->r.ownerNum = ent->s.number;
 
@@ -4614,7 +4762,11 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 		zyk_set_entity_field(new_ent,"classname","fx_runner");
 		zyk_set_entity_field(new_ent,"spawnflags",spawnflags);
 		zyk_set_entity_field(new_ent,"targetname",targetname);
-		zyk_set_entity_field(new_ent,"origin",va("%d %d %d",(int)target_ent->r.currentOrigin[0],(int)target_ent->r.currentOrigin[1],(int)target_ent->r.currentOrigin[2]));
+
+		if (Q_stricmp(targetname, "zyk_effect_scream") == 0)
+			zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)target_ent->r.currentOrigin[0], (int)target_ent->r.currentOrigin[1], (int)target_ent->r.currentOrigin[2] + 50));
+		else
+			zyk_set_entity_field(new_ent,"origin",va("%d %d %d",(int)target_ent->r.currentOrigin[0],(int)target_ent->r.currentOrigin[1],(int)target_ent->r.currentOrigin[2]));
 
 		new_ent->s.modelindex = G_EffectIndex( effect_path );
 
@@ -4650,6 +4802,168 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 		level.special_power_effects[new_ent->s.number] = ent->s.number;
 		level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
 	}
+}
+
+// zyk: used by Duelist Vertical DFA ability
+void zyk_vertical_dfa_effect(gentity_t *ent)
+{
+	gentity_t *new_ent = G_Spawn();
+
+	zyk_set_entity_field(new_ent, "classname", "fx_runner");
+	zyk_set_entity_field(new_ent, "spawnflags", "4");
+	zyk_set_entity_field(new_ent, "targetname", "zyk_vertical_dfa");
+
+	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->r.currentOrigin[0], (int)ent->r.currentOrigin[1], (int)ent->r.currentOrigin[2] - 20));
+
+	new_ent->s.modelindex = G_EffectIndex("repeater/concussion");
+
+	zyk_spawn_entity(new_ent);
+
+	new_ent->splashDamage = 100;
+
+	new_ent->splashRadius = 100;
+
+	new_ent->nextthink = level.time + 900;
+
+	level.special_power_effects[new_ent->s.number] = ent->s.number;
+	level.special_power_effects_timer[new_ent->s.number] = level.time + 1550;
+}
+
+void zyk_bomb_model_think(gentity_t *ent)
+{
+	// zyk: bomb timer seconds to explode. Each call to this function decrease counter until it reaches 0
+	ent->count--;
+
+	if (ent->count == 0)
+	{ // zyk: explodes the bomb
+		zyk_quest_effect_spawn(ent->parent, ent, "zyk_timed_bomb_explosion", "4", "explosions/hugeexplosion1", 0, 500, 400, 800);
+
+		ent->think = G_FreeEntity;
+		ent->nextthink = level.time + 500;
+	}
+	else
+	{
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/mpalarm.wav"));
+		ent->nextthink = level.time + 1000;
+	}
+}
+
+void zyk_add_bomb_model(gentity_t *ent)
+{
+	gentity_t *new_ent = G_Spawn();
+
+	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
+	zyk_set_entity_field(new_ent, "spawnflags", "0");
+	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->r.currentOrigin[0], (int)ent->r.currentOrigin[1], (int)ent->r.currentOrigin[2] - 20));
+
+	zyk_set_entity_field(new_ent, "model", "models/map_objects/factory/bomb_new_deact.md3");
+
+	zyk_set_entity_field(new_ent, "targetname", "zyk_timed_bomb");
+
+	zyk_set_entity_field(new_ent, "count", "3");
+
+	new_ent->parent = ent;
+	new_ent->think = zyk_bomb_model_think;
+	new_ent->nextthink = level.time + 1000;
+
+	zyk_spawn_entity(new_ent);
+
+	G_Sound(new_ent, CHAN_AUTO, G_SoundIndex("sound/effects/cloth1.mp3"));
+}
+
+void zyk_spawn_ice_element(gentity_t *ent, gentity_t *player_ent)
+{
+	int i = 0;
+	int initial_angle = -179;
+
+	for (i = 0; i < 4; i++)
+	{
+		gentity_t *new_ent = G_Spawn();
+
+		zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
+		zyk_set_entity_field(new_ent, "spawnflags", "65537");
+		zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)player_ent->r.currentOrigin[0], (int)player_ent->r.currentOrigin[1], (int)player_ent->r.currentOrigin[2]));
+
+		zyk_set_entity_field(new_ent, "angles", va("0 %d 0", initial_angle + (i * 89)));
+
+		zyk_set_entity_field(new_ent, "mins", "-70 -70 -70");
+		zyk_set_entity_field(new_ent, "maxs", "70 70 70");
+
+		zyk_set_entity_field(new_ent, "model", "models/map_objects/rift/crystal_wall.md3");
+
+		zyk_set_entity_field(new_ent, "targetname", "zyk_elemental_ice");
+
+		zyk_spawn_entity(new_ent);
+
+		level.special_power_effects[new_ent->s.number] = ent->s.number;
+		level.special_power_effects_timer[new_ent->s.number] = level.time + 4000;
+	}
+}
+
+// zyk: Elemental Attack
+void elemental_attack(gentity_t *ent)
+{
+	int i = 0;
+	int targets_hit = 0;
+	int min_distance = 100;
+
+	for (i = 0; i < level.num_entities; i++)
+	{
+		gentity_t *player_ent = &g_entities[i];
+
+		if (zyk_special_power_can_hit_target(ent, player_ent, i, min_distance, 500, qfalse, &targets_hit) == qtrue)
+		{
+			// zyk: first element, Ice
+			zyk_spawn_ice_element(ent, player_ent);
+
+			// zyk: second element, Fire
+			zyk_quest_effect_spawn(ent, player_ent, "zyk_elemental_fire", "4", "env/flame_jet", 1000, 40, 35, 2500);
+
+			// zyk: third element, Earth
+			zyk_quest_effect_spawn(ent, player_ent, "zyk_elemental_earth", "4", "env/rock_smash", 2500, 40, 35, 4000);
+
+			// zyk: fourth element, Wind
+			player_ent->client->pers.quest_power_status |= (1 << 5);
+			player_ent->client->pers.quest_power_hit_counter = -179;
+			player_ent->client->pers.quest_target4_timer = level.time + 7000;
+
+			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
+		}
+	}
+}
+
+// zyk: Super Beam ability
+void zyk_super_beam(gentity_t *ent)
+{
+	gentity_t *new_ent = G_Spawn();
+	int angle_yaw = ent->client->ps.viewangles[1];
+
+	if (angle_yaw == 0)
+		angle_yaw = 1;
+
+	zyk_set_entity_field(new_ent, "classname", "fx_runner");
+	zyk_set_entity_field(new_ent, "spawnflags", "0");
+	zyk_set_entity_field(new_ent, "targetname", "zyk_super_beam");
+
+	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->client->ps.origin[0], (int)ent->client->ps.origin[1], ((int)ent->client->ps.origin[2] + ent->client->ps.viewheight)));
+	zyk_set_entity_field(new_ent, "angles", va("%d %d 0", (int)ent->client->ps.viewangles[0], angle_yaw));
+
+	new_ent->s.modelindex = G_EffectIndex("env/hevil_bolt");
+
+	new_ent->parent = ent;
+
+	zyk_spawn_entity(new_ent);
+
+	level.special_power_effects[new_ent->s.number] = ent->s.number;
+	level.special_power_effects_timer[new_ent->s.number] = level.time + 2000;
+}
+
+// zyk: Force Scream ability
+void force_scream(gentity_t *ent)
+{
+	zyk_quest_effect_spawn(ent, ent, "zyk_effect_scream", "4", "howler/sonic", 0, 25, 300, 6000);
+
+	G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/chars/howler/howl.mp3"));
 }
 
 // zyk: Healing Water
@@ -4849,7 +5163,7 @@ void ice_boulder(gentity_t *ent, int distance, int damage)
 	// zyk: Universe Power
 	if (ent->client->pers.quest_power_status & (1 << 13))
 	{
-		distance += 100;
+		distance += 50;
 	}
 
 	for (i = 0; i < level.num_entities; i++)
@@ -4880,7 +5194,8 @@ void magic_explosion(gentity_t *ent, int radius, int damage, int duration)
 		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_explosion", "4", "explosions/hugeexplosion1", 1500, damage, radius, duration + 1000);
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && 
+		!(ent->client->pers.player_statuses & (1 << 21)))
 	{ // zyk: Magic Master Unique Skill increases damage
 		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_explosion", "4", "explosions/hugeexplosion1", 500, damage * 2, radius, duration);
 	}
@@ -4899,7 +5214,8 @@ void healing_area(gentity_t *ent, int damage, int duration)
 		damage += 1;
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && 
+		!(ent->client->pers.player_statuses & (1 << 21)))
 	{ // zyk: Magic Master Unique Skill increases damage
 		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_healing", "4", "env/red_cyc", 0, damage * 2, 228, duration);
 	}
@@ -4986,10 +5302,10 @@ void ultra_flame(gentity_t *ent, int distance, int damage)
 	// zyk: Universe Power
 	if (ent->client->pers.quest_power_status & (1 << 13))
 	{
-		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 800, damage, 35, 5000, 30, 30);
-		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 800, damage, 35, 5000, -30, 30);
-		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 800, damage, 35, 5000, 30, -30);
-		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 800, damage, 35, 5000, -30, -30);
+		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 200, damage, 35, 5000, 30, 30);
+		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 200, damage, 35, 5000, -30, 30);
+		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 200, damage, 35, 5000, 30, -30);
+		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 200, damage, 35, 5000, -30, -30);
 	}
 
 	for (i = 0; i < level.num_entities; i++)
@@ -4998,7 +5314,7 @@ void ultra_flame(gentity_t *ent, int distance, int damage)
 
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
 		{
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_flame", "4", "env/flame_jet", 800, damage, 35, 50000);
+			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_flame", "4", "env/flame_jet", 200, damage, 35, 30000);
 		}
 	}
 }
@@ -5357,8 +5673,30 @@ void zyk_print_special_power(gentity_t *ent, int selected_power, char direction)
 	}
 }
 
+// zyk: returns the amount of magic powers that are enabled with /magic command
+int zyk_number_of_enabled_magic_powers(gentity_t *ent)
+{
+	int i = 0;
+	int number_of_enabled_powers = 0;
+
+	for (i = 1; i <= 22; i++)
+	{
+		if (!(ent->client->sess.magic_master_disabled_powers & (1 << i)))
+		{
+			number_of_enabled_powers++;
+		}
+	}
+
+	return number_of_enabled_powers;
+}
+
 void zyk_show_magic_master_powers(gentity_t *ent, qboolean next_power)
 {
+	if (zyk_number_of_enabled_magic_powers(ent) == 0)
+	{
+		return;
+	}
+
 	if (next_power == qtrue)
 	{
 		do
@@ -5383,6 +5721,11 @@ void zyk_show_magic_master_powers(gentity_t *ent, qboolean next_power)
 
 void zyk_show_left_magic_master_powers(gentity_t *ent, qboolean next_power)
 {
+	if (zyk_number_of_enabled_magic_powers(ent) == 0)
+	{
+		return;
+	}
+
 	if (next_power == qtrue)
 	{
 		do
@@ -5407,6 +5750,11 @@ void zyk_show_left_magic_master_powers(gentity_t *ent, qboolean next_power)
 
 void zyk_show_right_magic_master_powers(gentity_t *ent, qboolean next_power)
 {
+	if (zyk_number_of_enabled_magic_powers(ent) == 0)
+	{
+		return;
+	}
+
 	if (next_power == qtrue)
 	{
 		do
@@ -5482,11 +5830,13 @@ void quest_power_events(gentity_t *ent)
 
 					if (poison_mushrooms_user && poison_mushrooms_user->client)
 					{
+						zyk_quest_effect_spawn(poison_mushrooms_user, ent, "zyk_quest_effect_poison", "0", "noghri_stick/gas_cloud", 0, 0, 0, 800);
+
 						// zyk: Universe Power
 						if (ent->client->pers.quest_power_status & (1 << 13))
-							G_Damage(ent,poison_mushrooms_user,poison_mushrooms_user,NULL,NULL,45,0,MOD_UNKNOWN);
+							G_Damage(ent,poison_mushrooms_user,poison_mushrooms_user,NULL,NULL,38,0,MOD_UNKNOWN);
 						else
-							G_Damage(ent,poison_mushrooms_user,poison_mushrooms_user,NULL,NULL,40,0,MOD_UNKNOWN);
+							G_Damage(ent,poison_mushrooms_user,poison_mushrooms_user,NULL,NULL,32,0,MOD_UNKNOWN);
 					}
 
 					ent->client->pers.quest_power_hit_counter--;
@@ -5633,6 +5983,25 @@ void quest_power_events(gentity_t *ent)
 			ent->client->ps.cloakFuel = 100;
 			ent->client->pers.quest_power_status &= ~(1 << 10);
 		}
+	}
+}
+
+// zyk: damages target player with posion hits
+void poison_dart_hits(gentity_t *ent)
+{
+	if (ent && ent->client && ent->health > 0 && ent->client->pers.player_statuses & (1 << 20) && ent->client->pers.poison_dart_hit_counter > 0 && 
+		ent->client->pers.poison_dart_hit_timer < level.time)
+	{
+		gentity_t *poison_user = &g_entities[ent->client->pers.poison_dart_user_id];
+
+		G_Damage(ent,poison_user,poison_user,NULL,NULL,30,0,MOD_UNKNOWN);
+
+		ent->client->pers.poison_dart_hit_counter--;
+		ent->client->pers.poison_dart_hit_timer = level.time + 1000;
+
+		// zyk: no more do poison damage if counter is 0
+		if (ent->client->pers.poison_dart_hit_counter == 0)
+			ent->client->pers.player_statuses &= ~(1 << 20);
 	}
 }
 
@@ -7839,6 +8208,7 @@ void G_RunFrame( int levelTime ) {
 			}
 
 			quest_power_events(ent);
+			poison_dart_hits(ent);
 
 			if (zyk_chat_protection_timer.integer > 0)
 			{ // zyk: chat protection. If 0, it is off. If greater than 0, set the timer to protect the player
@@ -7863,6 +8233,13 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.skill_levels[21] == 2 && ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4)
 				{
 					ent->client->ps.weaponTime = (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4;
+				}
+
+				// zyk: Stealth Attacker using his Unique Skill, increase firerate of disruptor
+				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_class == 5 && ent->client->pers.skill_levels[38] > 0 && 
+					ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/3.0)
+				{
+					ent->client->ps.weaponTime = (weaponData[WP_DISRUPTOR].fireTime * 1.0)/3.0;
 				}
 
 				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.skill_levels[23] == 2 && ent->client->ps.weaponTime > weaponData[WP_REPEATER].altFireTime/2)
@@ -7904,8 +8281,8 @@ void G_RunFrame( int levelTime ) {
 					}
 				}
 
-				if (level.quest_map > 0 && ent->client->ps.duelInProgress == qfalse)
-				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now and is not in a private duel
+				if (level.quest_map > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0)
+				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
 					// zyk: fixing exploit in boss battles. If player is in a vehicle, kill the player
 					if (ent->client->pers.guardian_mode > 0 && ent->client->ps.m_iVehicleNum > 0)
 						G_Kill( ent );
@@ -8487,7 +8864,7 @@ void G_RunFrame( int levelTime ) {
 							}
 						}
 
-						if (ent->client->pers.eternity_quest_progress < NUMBER_OF_ETERNITY_QUEST_OBJECTIVES && ent->client->pers.eternity_quest_timer < level.time && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->client->ps.origin[0] > -576 && (int) ent->client->ps.origin[0] < -396 && (int) ent->client->ps.origin[1] > 1383 && (int) ent->client->ps.origin[1] < 1560 && (int) ent->client->ps.origin[2] > 84 && (int) ent->client->ps.origin[2] < 92)
+						if (ent->client->pers.eternity_quest_progress < NUMBER_OF_ETERNITY_QUEST_OBJECTIVES && ent->client->pers.eternity_quest_timer < level.time && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->client->ps.origin[0] > -676 && (int) ent->client->ps.origin[0] < -296 && (int) ent->client->ps.origin[1] > 1283 && (int) ent->client->ps.origin[1] < 1663 && (int) ent->client->ps.origin[2] > 60 && (int) ent->client->ps.origin[2] < 120)
 						{
 							if (ent->client->pers.eternity_quest_progress == 0)
 							{
@@ -9011,12 +9388,10 @@ void G_RunFrame( int levelTime ) {
 
 						if (ent->client->pers.universe_quest_progress == 10 && ent->client->pers.can_play_quest == 1 && ent->client->pers.universe_quest_timer < level.time && (int) ent->client->ps.origin[0] > -18684 && (int) ent->client->ps.origin[0] < -17485 && (int) ent->client->ps.origin[1] > 17652 && (int) ent->client->ps.origin[1] < 18781 && (int) ent->client->ps.origin[2] > 1505 && (int) ent->client->ps.origin[2] < 1850)
 						{ // zyk: eleventh objective of Universe Quest. Setting Guardian of Time free
-							gentity_t *npc_ent = NULL;
-
 							if (ent->client->pers.universe_quest_messages == 1)
 								trap->SendServerCommand( ent->s.number, va("chat \"%s^7: This is it. I will use the crystals.\"", ent->client->pers.netname));
 							else if (ent->client->pers.universe_quest_messages == 2)
-								npc_ent = Zyk_NPC_SpawnType("guardian_of_time",-18084,17970,1658,-90);
+								Zyk_NPC_SpawnType("guardian_of_time",-18084,17970,1658,-90);
 							else if (ent->client->pers.universe_quest_messages == 3)
 								trap->SendServerCommand( ent->s.number, va("chat \"^7Guardian of Time^7: I am finally free.\""));
 							else if (ent->client->pers.universe_quest_messages == 4)
@@ -9536,7 +9911,7 @@ void G_RunFrame( int levelTime ) {
 
 								origin[0] = -1915.0f;
 								origin[1] = -26945.0f;
-								origin[2] = 200.0f;
+								origin[2] = 300.0f;
 								angles[0] = 0.0f;
 								angles[1] = -179.0f;
 								angles[2] = 0.0f;
@@ -9583,7 +9958,7 @@ void G_RunFrame( int levelTime ) {
 								}
 								else if (ent->client->pers.universe_quest_messages == 9)
 								{ // zyk: teleports the quest player to the Sacred Dimension
-									if ((int) ent->client->ps.origin[0] > -2015 && (int) ent->client->ps.origin[0] < -1815 && (int) ent->client->ps.origin[1] > -27045 && (int) ent->client->ps.origin[1] < -26845 && (int) ent->client->ps.origin[2] > 100 && (int) ent->client->ps.origin[2] < 300)
+									if ((int) ent->client->ps.origin[0] > -2415 && (int) ent->client->ps.origin[0] < -1415 && (int) ent->client->ps.origin[1] > -27445 && (int) ent->client->ps.origin[1] < -26445 && (int) ent->client->ps.origin[2] > 100 && (int) ent->client->ps.origin[2] < 400)
 									{
 										ent->client->pers.universe_quest_messages = 10;
 									}
@@ -10354,6 +10729,7 @@ void G_RunFrame( int levelTime ) {
 			WP_SaberStartMissileBlockCheck(ent, &ent->client->pers.cmd);
 
 			quest_power_events(ent);
+			poison_dart_hits(ent);
 
 			if (ent->client->pers.universe_quest_artifact_holder_id != -1 && ent->health > 0 && ent->client->ps.powerups[PW_FORCE_BOON] < (level.time + 1000))
 			{ // zyk: artifact holder npcs. Keep their artifact (force boon) active
@@ -10388,7 +10764,7 @@ void G_RunFrame( int levelTime ) {
 				{ // zyk: Guardian of Earth
 					if (ent->client->pers.guardian_timer < level.time)
 					{ // zyk: uses earthquake ability
-						earthquake(ent,2000,((ent->client->ps.stats[STAT_MAX_HEALTH] - ent->health)/20),3000);
+						earthquake(ent,2000,350,3000);
 						ent->client->pers.guardian_timer = level.time + 3000 + ent->health;
 						trap->SendServerCommand( -1, "chat \"^3Guardian of Earth: ^7Earthquake!\"");
 					}
@@ -10406,16 +10782,16 @@ void G_RunFrame( int levelTime ) {
 					{ // zyk: uses sleeping flowers or poison mushrooms
 						if (Q_irand(0,3) != 0)
 						{
-							sleeping_flowers(ent,3000,900);
+							sleeping_flowers(ent,3000,1500);
 							trap->SendServerCommand( -1, "chat \"^2Guardian of Forest: ^7Sleeping Flowers!\"");
+							ent->client->pers.guardian_timer = level.time + 12000;
 						}
 						else
 						{
-							poison_mushrooms(ent,100,1800);
+							poison_mushrooms(ent,100,3000);
 							trap->SendServerCommand( -1, va("chat \"^2Guardian of Forest: ^7Poison Mushrooms!\""));
+							ent->client->pers.guardian_timer = level.time + 11000;
 						}
-
-						ent->client->pers.guardian_timer = level.time + 12000;
 					}
 				}
 				else if (ent->client->pers.guardian_mode == 4)
@@ -10689,8 +11065,6 @@ void G_RunFrame( int levelTime ) {
 				{ // zyk: Guardian of Chaos
 					if (ent->client->pers.guardian_timer < level.time)
 					{
-						gentity_t *player_ent = &g_entities[ent->client->pers.guardian_invoked_by_id];
-
 						if (ent->client->pers.hunter_quest_messages == 0)
 						{
 							if (!ent->client->ps.powerups[PW_CLOAKED])

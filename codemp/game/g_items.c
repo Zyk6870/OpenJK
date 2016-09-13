@@ -1,5 +1,26 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 #include "g_local.h"
 #include "ghoul2/G2.h"
 #include "qcommon/q_shared.h"
@@ -574,6 +595,7 @@ static qboolean pas_find_enemies( gentity_t *self )
 //-----------------------------------------------------
 {
 	qboolean	found = qfalse;
+	int			distance_to_find_enemies = TURRET_RADIUS;
 	int			count, i;
 	float		bestDist = TURRET_RADIUS*TURRET_RADIUS;
 	float		enemyDist;
@@ -593,7 +615,15 @@ static qboolean pas_find_enemies( gentity_t *self )
 
 	VectorCopy(self->s.pos.trBase, org2);
 
-	count = G_RadiusList( org2, TURRET_RADIUS, self, qtrue, entity_list );
+	// zyk: Bounty Hunter Upgrade allows it to find enemies in a greater distance
+	if (self->parent && self->parent->client && self->parent->client->sess.amrpgmode == 2 && 
+		self->parent->client->pers.rpg_class == 2 && self->parent->client->pers.secrets_found & (1 << 1))
+	{
+		distance_to_find_enemies *= 2;
+		bestDist = distance_to_find_enemies*distance_to_find_enemies;
+	}
+
+	count = G_RadiusList( org2, distance_to_find_enemies, self, qtrue, entity_list );
 
 	for ( i = 0; i < count; i++ )
 	{
@@ -1074,7 +1104,6 @@ void ItemUse_Sentry( gentity_t *ent )
 	vec3_t yawonly;
 	vec3_t mins, maxs;
 	gentity_t *sentry;
-	int sentry_guns_iterator = 0; // zyk: Bounty Hunter Upgrade allows placing more sentry guns
 
 	if (!ent || !ent->client)
 	{
@@ -1152,7 +1181,7 @@ void ItemUse_Sentry( gentity_t *ent )
 	// zyk: Bounty Hunter sentry gun has more HP and with the Upgrade, player can place more sentry guns
 	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2)
 	{
-		sentry->health = 100 * (ent->client->pers.skill_levels[55] + 2);
+		sentry->health = 100 * (ent->client->pers.skill_levels[55] + 1);
 
 		// zyk: validating quantity of sentry guns that the Bounty Hunter can place
 		ent->client->pers.bounty_hunter_placed_sentries++;
@@ -2496,6 +2525,13 @@ void RespawnItem( gentity_t *ent ) {
 			;
 	}
 
+	if (ent->r.currentOrigin[0] != ent->s.origin[0] || ent->r.currentOrigin[1] != ent->s.origin[1])
+	{ // zyk: if a player pushed/pulled this item, make it return to its default origin
+		G_SetOrigin(ent, ent->s.origin);
+		ent->s.pos.trType = TR_GRAVITY;
+		ent->s.pos.trTime = level.time;
+	}
+
 	ent->r.contents = CONTENTS_TRIGGER;
 	//ent->s.eFlags &= ~EF_NODRAW;
 	ent->s.eFlags &= ~(EF_NODRAW | EF_ITEMPLACEHOLDER);
@@ -2611,6 +2647,13 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		else if (other->client->pers.rpg_class == 8 && ((ent->item->giType == IT_WEAPON && ent->item->giTag != WP_STUN_BATON) || ent->item->giType == IT_AMMO || 
 			     (ent->item->giType == IT_HOLDABLE && ent->item->giTag != HI_MEDPAC && ent->item->giTag != HI_CLOAK && ent->item->giTag != HI_JETPACK)))
 		{ // zyk: Magic Master can only pickup some items
+			return;
+		}
+		else if (other->client->pers.rpg_class == 9 && ((ent->item->giType == IT_WEAPON && 
+			    (ent->item->giTag == WP_THERMAL || ent->item->giTag == WP_TRIP_MINE || ent->item->giTag == WP_DET_PACK)) || 
+				(ent->item->giType == IT_AMMO && 
+			    (ent->item->giTag == AMMO_THERMAL || ent->item->giTag == AMMO_TRIPMINE || ent->item->giTag == AMMO_DETPACK))))
+		{
 			return;
 		}
 

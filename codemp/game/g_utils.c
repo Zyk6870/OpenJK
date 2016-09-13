@@ -1,21 +1,38 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+===========================================================================
+Copyright (C) 1999 - 2005, Id Software, Inc.
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 // g_utils.c -- misc utility functions for game module
 
 #include "g_local.h"
 #include "bg_saga.h"
 #include "qcommon/q_shared.h"
 
-typedef struct shaderRemap_s {
-  char oldShader[MAX_QPATH];
-  char newShader[MAX_QPATH];
-  float timeOffset;
-} shaderRemap_t;
-
-#define MAX_SHADER_REMAPS 128
-
 int remapCount = 0;
-shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
+
+int zyk_get_remap_count()
+{
+	return remapCount;
+}
 
 void AddRemap(const char *oldShader, const char *newShader, float timeOffset) {
 	int i;

@@ -1,3 +1,25 @@
+/*
+===========================================================================
+Copyright (C) 2000 - 2013, Raven Software, Inc.
+Copyright (C) 2001 - 2013, Activision, Inc.
+Copyright (C) 2013 - 2015, OpenJK contributors
+
+This file is part of the OpenJK source code.
+
+OpenJK is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.
+===========================================================================
+*/
+
 //b_spawn.cpp
 //added by MCG
 #include "b_local.h"
@@ -511,19 +533,6 @@ int NPC_WeaponsForTeam( team_t team, int spawnflags, const char *NPC_type )
 	//*** not sure how to handle this, should I pass in class instead of team and go from there? - dmv
 	switch(team)
 	{
-	// no longer exists
-//	case TEAM_BORG:
-//		break;
-
-//	case TEAM_HIROGEN:
-//		if( Q_stricmp( "hirogenalpha", NPC_type ) == 0 )
-//			return ( 1 << WP_BLASTER);
-		//Falls through
-
-//	case TEAM_KLINGON:
-
-		//NOTENOTE: Falls through
-
 //	case TEAM_IMPERIAL:
 	case NPCTEAM_ENEMY:
 		if ( Q_stricmp( "tavion", NPC_type ) == 0 ||
@@ -668,9 +677,6 @@ int NPC_WeaponsForTeam( team_t team, int spawnflags, const char *NPC_type )
 		break;
 
 	case NPCTEAM_PLAYER:
-
-//		if(spawnflags & SFB_TRICORDER)
-//			return ( 1 << WP_TRICORDER);
 
 		if(spawnflags & SFB_RIFLEMAN)
 			return ( 1 << WP_REPEATER);
@@ -1406,7 +1412,7 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 
 	if ( newent == NULL )
 	{
-		Com_Printf ( S_COLOR_RED"ERROR: NPC G_Spawn failed\n" );
+		Com_Printf ( S_COLOR_RED "ERROR: NPC G_Spawn failed\n" );
 		return NULL;
 	}
 
@@ -1415,7 +1421,7 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 	newent->NPC = New_NPC_t(newent->s.number);
 	if ( newent->NPC == NULL )
 	{
-		Com_Printf ( S_COLOR_RED"ERROR: NPC G_Alloc NPC failed\n" );
+		Com_Printf ( S_COLOR_RED "ERROR: NPC G_Alloc NPC failed\n" );
 		goto finish;
 	//	return NULL;
 	}
@@ -1438,7 +1444,7 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 
 	if ( newent->client == NULL )
 	{
-		Com_Printf ( S_COLOR_RED"ERROR: NPC BG_Alloc client failed\n" );
+		Com_Printf ( S_COLOR_RED "ERROR: NPC BG_Alloc client failed\n" );
 		goto finish;
 	//	return NULL;
 	}
@@ -2974,8 +2980,10 @@ void SP_NPC_MorganKatarn( gentity_t *self)
 //ALLIES
 //=============================================================================================
 
-/*QUAKED NPC_Jedi(1 0 0) (-16 -16 -24) (16 16 40) TRAINER x x x CEILING CINEMATIC NOTSOLID STARTINSOLID SHY
+/*QUAKED NPC_Jedi(1 0 0) (-16 -16 -24) (16 16 40) TRAINER MASTER RANDOM x CEILING CINEMATIC NOTSOLID STARTINSOLID SHY
 TRAINER - Special Jedi- instructor
+MASTER - Special Jedi- master
+RANDOM - creates a random Jedi student using the available player models/skins
 CEILING - Sticks to the ceiling until he sees an enemy or takes pain
 CINEMATIC - Will spawn with no default AI (BS_CINEMATIC)
 NOTSOLID - Starts not solid
@@ -2988,7 +2996,54 @@ void SP_NPC_Jedi( gentity_t *self)
 {
 	if(!self->NPC_type)
 	{
-		if ( self->spawnflags & 1 )
+		if ( self->spawnflags & 4 )
+		{//random!
+			switch ( Q_irand( 0, 11 ) )
+			{
+			case 0:
+				self->NPC_type = "jedi_hf1";
+				break;
+			case 1:
+				self->NPC_type = "jedi_hf2";
+				break;
+			case 2:
+				self->NPC_type = "jedi_hm1";
+				break;
+			case 3:
+				self->NPC_type = "jedi_hm2";
+				break;
+			case 4:
+				self->NPC_type = "jedi_kdm1";
+				break;
+			case 5:
+				self->NPC_type = "jedi_kdm2";
+				break;
+			case 6:
+				self->NPC_type = "jedi_rm1";
+				break;
+			case 7:
+				self->NPC_type = "jedi_rm2";
+				break;
+			case 8:
+				self->NPC_type = "jedi_tf1";
+				break;
+			case 9:
+				self->NPC_type = "jedi_tf2";
+				break;
+			case 10:
+				self->NPC_type = "jedi_zf1";
+				break;
+			case 11:
+			default://just in case
+				self->NPC_type = "jedi_zf2";
+				break;
+			}
+		}
+		else if ( self->spawnflags & 2 )
+		{
+			self->NPC_type = "jedimaster";
+		}
+		else if ( self->spawnflags & 1 )
 		{
 			self->NPC_type = "jeditrainer";
 		}
