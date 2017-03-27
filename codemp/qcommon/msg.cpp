@@ -894,6 +894,7 @@ netField_t	entityStateFields[] =
 // fully used
 { NETF(bolt2), GENTITYNUM_BITS },
 { NETF(constantLight), 32 },
+{ NETF(constantLightIntensity), 32},
 { NETF(time), 32 },
 // why doesn't lookTarget just indicate this?
 { NETF(hasLookTarget), 1 },
