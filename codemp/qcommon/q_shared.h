@@ -2107,6 +2107,7 @@ typedef struct entityState_s {
 	int		groundEntityNum;	// ENTITYNUM_NONE = in air
 
 	int		constantLight;	// r + (g<<8) + (b<<16) + (intensity<<24)
+	int		constantLightIntensity; // for light intensity > 255
 	int		loopSound;		// constantly loop this sound
 	qboolean	loopIsSoundset; //qtrue if the loopSound index is actually a soundset index
 

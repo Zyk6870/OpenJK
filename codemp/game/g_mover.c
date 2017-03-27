@@ -1006,6 +1006,7 @@ void InitMover( gentity_t *ent )
 			i = 255;
 		}
 		ent->s.constantLight = r | ( g << 8 ) | ( b << 16 ) | ( i << 24 );
+		ent->s.constantLightIntensity = light;
 	}
 
 	ent->use = Use_BinaryMover;

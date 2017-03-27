@@ -345,7 +345,7 @@ static void CG_EntityEffects( centity_t *cent ) {
 
 
 	// constant light glow
-	if ( cent->currentState.constantLight && cent->currentState.eType != ET_PLAYER && cent->currentState.eType != ET_BODY && cent->currentState.eType != ET_NPC && cent->currentState.eType != ET_INVISIBLE ) {
+	if ( cent->currentState.constantLight && cent->currentState.constantLightIntensity && cent->currentState.eType != ET_PLAYER && cent->currentState.eType != ET_BODY && cent->currentState.eType != ET_NPC && cent->currentState.eType != ET_INVISIBLE ) {
 		int		cl;
 		float	i, r, g, b;
 
@@ -354,7 +354,7 @@ static void CG_EntityEffects( centity_t *cent ) {
 		g = (float) ((cl >> 8) & 0xFF) / 255.0;
 		b = (float) ((cl >> 16) & 0xFF) / 255.0;
 		i = (float) ((cl >> 24) & 0xFF) * 4.0;
-		trap->R_AddLightToScene( cent->lerpOrigin, i, r, g, b );
+		trap->R_AddLightToScene( cent->lerpOrigin, (float)cent->currentState.constantLightIntensity, r, g, b );
 	}
 
 }
