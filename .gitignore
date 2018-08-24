@@ -28,6 +28,13 @@ local.properties
 # PDT-specific
 .buildpath
 
+#################
+## CSCOPE
+#################
+
+# Ignore CSCOPE database files
+cscope.*
+
 
 #################
 ## Visual Studio
