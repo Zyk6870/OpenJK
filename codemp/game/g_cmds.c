@@ -5298,15 +5298,6 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->ps.fd.forcePowerMax = ent->client->pers.max_force_power;
 		ent->client->ps.fd.forcePower = ent->client->ps.fd.forcePowerMax;
 
-		if (ent->client->pers.rpg_class == 3 && ent->client->pers.secrets_found & (1 << 16))
-		{ // zyk: setting the shot deflect of the Armored Soldier
-			ent->flags |= FL_SHIELDED;
-		}
-		else
-		{
-			ent->flags &= ~FL_SHIELDED;
-		}
-
 		// zyk: setting rpg control attributes
 		ent->client->pers.thermal_vision = qfalse;
 
@@ -6468,7 +6459,7 @@ void choose_new_player(gentity_t *next_player)
 			}
 		}
 
-		next_player->client->pers.quest_afk_timer = level.time + QUEST_AFK_TIME;
+		next_player->client->pers.quest_afk_timer = level.time + zyk_quest_afk_timer.integer;
 		next_player->client->pers.can_play_quest = 1;
 
 		do_scale(next_player, 100);
@@ -6610,9 +6601,6 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 
 	// zyk: saving the not logged player mode in session
 	ent->client->sess.amrpgmode = 0;
-
-	// zyk: removing the gun deflection flag
-	ent->flags &= ~FL_SHIELDED;
 
 	// zyk: if this player was playing a quest, find a new one to play quests in this map
 	if (ent->client->pers.can_play_quest == 1)
@@ -9964,7 +9952,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				if (i >= 1 && i <= NUMBER_OF_SKILLS)
 				{
 					if (i == 1)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Jump: ^7makes you jump higher\n\"" );
+						trap->SendServerCommand( ent-g_entities, "print \"^3Jump: ^7makes you use the force to jump higher. Level 5 has no height limit, you can continue jumping up until you run out of force, and it also lets you jump out of water\n\"" );
 					if (i == 2)
 						trap->SendServerCommand( ent-g_entities, "print \"^3Push: ^7pushes the opponent forward\n\"" );
 					if (i == 3)
@@ -10074,7 +10062,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					if (i == 55)
 						trap->SendServerCommand( ent-g_entities, va("print \"^3Force Power: ^7increases the max force power you have. Necessary to allow you to use force powers and force-based skills\n\"") );
 					if (i == 56)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Improvements:\n^7Free Warrior gets more damage and more resistance to damage\nForce User gets more saber damage and force regens faster\nBounty Hunter gets more gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health\nArmored Soldier gets more resistance to damage\nMonk gets more run speed, melee damage and melee attack speed\nStealth Attacker gets more gun damage and more resistance to electric attacks\nDuelist gets more saber and melee damage and faster force regen\nForce Gunner gets more damage and more resistance to damage\nMagic Master spends less jetpack fuel, gets more Magic Points, new magic bolt types, new magic powers and has less magic power cooldown\nForce Tank gets more resistance to damage\n\"") );
+						trap->SendServerCommand( ent-g_entities, va("print \"^3Improvements:\n^7Free Warrior gets more damage and more resistance to damage\nForce User gets more saber damage and force regens faster\nBounty Hunter gets more gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health\nArmored Soldier gets more resistance to damage\nMonk gets more run speed, melee damage and melee attack speed\nStealth Attacker gets more gun damage and more resistance to electric attacks\nDuelist gets more saber and melee damage and faster force regen\nForce Gunner gets more damage and more resistance to damage\nMagic Master gets more Magic Points, new magic bolt types, new magic powers, recovers some jetpack fuel with Magic Points if it runs out and has less magic power cooldown\nForce Tank gets more resistance to damage\n\"") );
 				}
 				else if (Q_stricmp( arg1, "l" ) == 0)
 				{
@@ -10409,7 +10397,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 39)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Armored Soldier Upgrade: ^7increases damage resistance by 5 per cent, gives gun shot deflection, cuts flame thrower fuel usage by half, has less chance of losing gun to force pull, has a chance of setting ysalamiri for some seconds if attacked by force powers. It also protects from drowning\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Armored Soldier Upgrade: ^7increases damage resistance by 5 per cent, deflects some gun shots, cuts flame thrower fuel usage by half, has less chance of losing gun to force pull, has a chance of setting ysalamiri for some seconds if attacked by force powers. It also protects from drowning\n\n\"");
 		}
 		else if (i == 40)
 		{
@@ -10947,11 +10935,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == 39)
 		{
 			ent->client->pers.secrets_found |= (1 << 16);
-
-			if (ent->client->pers.rpg_class == 3)
-			{ // zyk: setting the shot deflect of the Armored Soldier
-				ent->flags |= FL_SHIELDED;
-			}
 		}
 		else if (value == 40)
 		{
@@ -11774,6 +11757,18 @@ void zyk_add_ally(gentity_t *ent, int client_id)
 	}
 }
 
+void zyk_remove_ally(gentity_t *ent, int client_id)
+{
+	if (client_id > 15)
+	{
+		ent->client->sess.ally2 &= ~(1 << (client_id - 16));
+	}
+	else
+	{
+		ent->client->sess.ally1 &= ~(1 << client_id);
+	}
+}
+
 /*
 ==================
 Cmd_AllyAdd_f
@@ -11889,14 +11884,7 @@ void Cmd_AllyRemove_f( gentity_t *ent ) {
 		}
 
 		// zyk: removes this ally
-		if (client_id > 15)
-		{
-			ent->client->sess.ally2 &= ~(1 << (client_id-16));
-		}
-		else
-		{
-			ent->client->sess.ally1 &= ~(1 << client_id);
-		}
+		zyk_remove_ally(ent, client_id);
 
 		// zyk: sending event to update radar at client-side
 		G_AddEvent(ent, EV_USE_ITEM14, (client_id + MAX_CLIENTS));
@@ -12752,9 +12740,6 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 			level.bounty_quest_choose_target = qtrue;
 			level.bounty_quest_target_id++;
 		}
-
-		// zyk: removing the gun deflection flag
-		ent->flags &= ~FL_SHIELDED;
 
 		trap->SendServerCommand( ent-g_entities, "print \"^7You are now in ^2Admin-Only mode^7.\n\"" );
 	}
@@ -15366,8 +15351,26 @@ void Cmd_Saber_f( gentity_t *ent ) {
 	}
 }
 
+qboolean zyk_can_deflect_shots(gentity_t *ent)
+{
+	if (ent->client && ent->client->sess.amrpgmode == 2 &&
+		((ent->client->pers.rpg_class == 3 && ent->client->pers.secrets_found & (1 << 16)) || // zyk: Armored Soldier Upgrade has chance to deflect shots
+		(ent->client->pers.rpg_class == 9 && ent->client->pers.player_statuses & (1 << 21)) // zyk: Force Armor unique ability has chance to deflect shots
+		))
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 qboolean zyk_can_use_unique(gentity_t *ent)
 {
+	if (ent->health < 1)
+	{ // zyk: must be alive to use unique skills or unique abilities
+		return qfalse;
+	}
+
 	if ((ent->client->ps.forceHandExtend != HANDEXTEND_NONE && ent->client->ps.forceHandExtend != HANDEXTEND_FORCE_HOLD) ||
 		 ent->client->pers.quest_power_status & (1 << 2))
 	{ // zyk: using emotes/anims, special moves, and hit by Time Power. Cannot use unique ability
@@ -15691,8 +15694,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
 				{
 					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
-
-					ent->flags |= FL_SHIELDED;
 
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 10000;
 
@@ -16625,7 +16626,7 @@ void duel_show_table(gentity_t *ent)
 	}
 
 	// zyk: put the number of matches
-	strcpy(content, va("\n^7Total Matches: %d\nPlayed Matches: %d\n\n", level.duel_matches_quantity, level.duel_matches_done));
+	strcpy(content, va("\n^7Total: %d\nPlayed: %d\n\n", level.duel_matches_quantity, level.duel_matches_done));
 
 	for (i = 0; i < MAX_CLIENTS; i++)
 	{ // zyk: adding players to sorted_players and calculating the array length
@@ -16671,7 +16672,7 @@ void duel_show_table(gentity_t *ent)
 			strcpy(ally_name, "");
 		}
 
-		strcpy(content, va("%s^7%s^7%s^7: ^3%d   ^1%d\n", content, player_ent->client->pers.netname, ally_name, level.duel_players[player_ent->s.number], level.duel_players_hp[player_ent->s.number]));
+		strcpy(content, va("%s^7%s^7%s^7: ^3%d  ^1%d\n", content, player_ent->client->pers.netname, ally_name, level.duel_players[player_ent->s.number], level.duel_players_hp[player_ent->s.number]));
 	}
 
 	trap->SendServerCommand(show_table_id, va("print \"%s\n\"", content));

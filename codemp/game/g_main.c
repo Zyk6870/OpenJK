@@ -4690,6 +4690,12 @@ qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target)
 		{ // zyk: noclip does not allow hitting
 			return qfalse;
 		}
+
+		if (level.duel_tournament_mode > 0 && level.duel_players[attacker->s.number] != -1 && level.duel_players[target->s.number] != -1 && 
+			level.duel_allies[attacker->s.number] == target->s.number && level.duel_allies[target->s.number] == attacker->s.number)
+		{ // zyk: Duel Tournament allies. Cannot hit each other
+			return qfalse;
+		}
 	}
 
 	return qtrue;
@@ -4728,13 +4734,10 @@ qboolean zyk_unique_ability_can_hit_target(gentity_t *attacker, gentity_t *targe
 
 		if (is_ally == 0 &&
 			(attacker->client->pers.guardian_mode == target->client->pers.guardian_mode ||
-			((attacker->client->pers.guardian_mode == 12 || attacker->client->pers.guardian_mode == 13) && target->NPC &&
-				(Q_stricmp(target->NPC_type, "guardian_of_universe") || Q_stricmp(target->NPC_type, "quest_reborn") ||
-					Q_stricmp(target->NPC_type, "quest_reborn_blue") || Q_stricmp(target->NPC_type, "quest_reborn_red") ||
-					Q_stricmp(target->NPC_type, "quest_reborn_boss") || Q_stricmp(target->NPC_type, "quest_mage"))
-				)
-				))
-		{ // zyk: target cannot be attacker ally. Also, non-quest players cannot hit quest players and his allies or bosses and vice-versa
+			(attacker->NPC && attacker->client->pers.guardian_mode == 0) ||
+			(!attacker->NPC && attacker->client->pers.guardian_mode > 0 && target->NPC)))
+		{ // zyk: players in bosses can only hit bosses and their helper npcs. Players not in boss battles
+		  // can only hit normal enemy npcs and npcs spawned by bosses but not the bosses themselves. Unique-using npcs can hit everyone that are not their allies
 			return qtrue;
 		}
 	}
@@ -4771,13 +4774,10 @@ qboolean zyk_special_power_can_hit_target(gentity_t *attacker, gentity_t *target
 
 			if (is_ally == 0 && !(target->client->pers.quest_power_status & (1 << 0)) && 
 				(attacker->client->pers.guardian_mode == target->client->pers.guardian_mode || 
-				  ((attacker->client->pers.guardian_mode == 12 || attacker->client->pers.guardian_mode == 13) && target->NPC && 
-					(Q_stricmp(target->NPC_type, "guardian_of_universe") || Q_stricmp(target->NPC_type, "quest_reborn") || 
-					Q_stricmp(target->NPC_type, "quest_reborn_blue") || Q_stricmp(target->NPC_type, "quest_reborn_red") || 
-					Q_stricmp(target->NPC_type, "quest_reborn_boss") || Q_stricmp(target->NPC_type, "quest_mage"))
-				  )
-				))
-			{ // zyk: target cannot be attacker ally and cannot be using Immunity Power. Also, non-quest players cannot hit quest players and his allies or bosses and vice-versa
+				(attacker->NPC && attacker->client->pers.guardian_mode == 0) ||
+				(!attacker->NPC && attacker->client->pers.guardian_mode > 0 && target->NPC)))
+			{ // zyk: Cannot hit target with Immunity Power. Players in bosses can only hit bosses and their helper npcs. Players not in boss battles
+			  // can only hit normal enemy npcs and npcs spawned by bosses but not the bosses themselves. Magic-using npcs can hit everyone that are not their allies
 				(*targets_hit)++;
 
 				return qtrue;
@@ -7570,8 +7570,6 @@ void duel_tournament_prepare(gentity_t *ent)
 	VectorSet(ent->client->ps.velocity, 0, 0, 0);
 }
 
-extern void zyk_add_ally(gentity_t *ent, int client_id);
-
 // zyk: generate the teams and validates them
 int duel_tournament_generate_teams()
 {
@@ -7587,13 +7585,11 @@ int duel_tournament_generate_teams()
 		}
 	}
 
+	// zyk: counting the teams
 	for (i = 0; i < MAX_CLIENTS; i++)
 	{
 		if (level.duel_allies[i] != -1 && i < level.duel_allies[i] && level.duel_allies[level.duel_allies[i]] == i)
 		{ // zyk: both players added themselves as allies
-			zyk_add_ally(&g_entities[i], level.duel_allies[i]);
-			zyk_add_ally(&g_entities[level.duel_allies[i]], i);
-
 			// zyk: must count both as a single player (team)
 			number_of_teams--;
 		}
@@ -9664,10 +9660,6 @@ void G_RunFrame( int levelTime ) {
 					{ // zyk: Bounty Hunter can have a more efficient jetpack
 						jetpack_debounce_amount -= ((ent->client->pers.skill_levels[34] * 3) + (ent->client->pers.skill_levels[55]));
 					}
-					else if (ent->client->pers.rpg_class == 8)
-					{ // zyk: Magic Master has the best jetpack
-						jetpack_debounce_amount -= ((ent->client->pers.skill_levels[34] * 3) + (ent->client->pers.skill_levels[55] * 2));
-					}
 					else
 					{
 						jetpack_debounce_amount -= (ent->client->pers.skill_levels[34] * 3);
@@ -9683,6 +9675,14 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				ent->client->pers.jetpack_fuel -= jetpack_debounce_amount;
+
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->pers.jetpack_fuel <= 0 && 
+					ent->client->pers.magic_power >= 10 && ent->client->pers.skill_levels[55] > 0)
+				{ // zyk: Magic Master Improvements skill allows recovering jetpack fuel with magic
+					ent->client->pers.jetpack_fuel = (100 * ent->client->pers.skill_levels[55]);
+					ent->client->pers.magic_power -= 10;
+					send_rpg_events(2000);
+				}
 
 				if (ent->client->pers.jetpack_fuel <= 0)
 				{ // zyk: out of fuel. Turn jetpack off
@@ -10072,7 +10072,7 @@ void G_RunFrame( int levelTime ) {
 
 						player_die(ent, ent, ent, 100000, MOD_SUICIDE);
 
-						trap->SendServerCommand(-1, va("chat \"^3Quest System: ^7%s ^7afk for 5 minutes.\"", ent->client->pers.netname));
+						trap->SendServerCommand(-1, va("chat \"^3Quest System: ^7%s ^7afk for %d seconds.\"", ent->client->pers.netname, (zyk_quest_afk_timer.integer/1000)));
 					}
 
 					if (level.quest_map == 1)

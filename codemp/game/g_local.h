@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Zyk OpenJK Mod v3.70"
+#define	GAMEVERSION	"Zyk OpenJK Mod v3.72"
 
 #define SECURITY_LOG "security.log"
 
@@ -634,9 +634,6 @@ typedef enum {
 
 // zyk: duration of the duelists protection in Duel Tournament
 #define DUEL_TOURNAMENT_PROTECTION_TIME 2000
-
-// zyk: time in miliseconds in which the player can be afk during a quest
-#define QUEST_AFK_TIME 300000
 
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
@@ -1782,6 +1779,7 @@ int zyk_number_of_allies(gentity_t *ent, qboolean in_rpg_mode);
 void send_rpg_events(int send_event_timer);
 int zyk_get_remap_count();
 void zyk_text_message(gentity_t *ent, char *filename, qboolean show_in_chat, qboolean broadcast_message, ...);
+qboolean zyk_can_deflect_shots(gentity_t *ent);
 
 // zyk: shader remap struct
 typedef struct shaderRemap_s {

@@ -1748,7 +1748,7 @@ void TryUse( gentity_t *ent )
 	}
 
 	if (level.duel_tournament_mode == 1 && ent->client->sess.amrpgmode < 2 && target && target->client && target->client->sess.amrpgmode < 2 && target->s.number < MAX_CLIENTS && 
-		level.duel_players[ent->s.number] != -1 && level.duel_players[target->s.number] != -1)
+		level.duel_players[ent->s.number] != -1 && level.duel_players[target->s.number] != -1 && zyk_duel_tournament_allow_teams.integer > 0)
 	{ // zyk: adding this plater as ally in Duel Tournament
 		if (level.duel_allies[ent->s.number] != target->s.number)
 		{

@@ -593,7 +593,7 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 
 	if (other && other->client && other->client->sess.amrpgmode == 2 &&
 		other->client->pers.rpg_class == 9 && other->client->ps.powerups[PW_NEUTRALFLAG] > level.time && 
-		other->flags & FL_SHIELDED)
+		other->client->pers.player_statuses & (1 << 21))
 	{ // zyk: Force Tank Force Armor protects against force powers
 		return 0;
 	}
