@@ -486,7 +486,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		}
 	}
 
-	if ((other->flags & FL_SHIELDED) &&
+	if ((other->flags & FL_SHIELDED || zyk_can_deflect_shots(other)) &&
 		ent->s.weapon != WP_ROCKET_LAUNCHER &&
 		ent->s.weapon != WP_THERMAL &&
 		ent->s.weapon != WP_TRIP_MINE &&

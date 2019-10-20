@@ -1388,8 +1388,10 @@ void ItemUse_Jetpack( gentity_t *ent )
 
 	if (!ent->client->jetPackOn &&
 		// ent->client->ps.jetpackFuel < 5
-		ent->client->pers.jetpack_fuel < JETPACK_SCALE)
+		ent->client->pers.jetpack_fuel < JETPACK_SCALE && 
+		(ent->client->sess.amrpgmode != 2 || ent->client->pers.rpg_class != 8 || ent->client->pers.magic_power < 10 || ent->client->pers.skill_levels[55] == 0))
 	{ //too low on fuel to start it up
+		// zyk: Magic Master can use magic to restore fuel so allow him to activate jetpack
 		return;
 	}
 

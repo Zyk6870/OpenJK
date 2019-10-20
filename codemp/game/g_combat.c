@@ -5260,37 +5260,51 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && mod == MOD_SABER)
-	{ // zyk: player in RPG mode, with duals or staff, has a better damage depending on Saber Attack level
-		if (attacker->client->saber[0].saberFlags&SFL_TWO_HANDED || (attacker->client->saber[0].model[0] && attacker->client->saber[1].model[0]))
-		{
-			if (attacker->client->pers.skill_levels[5] <= FORCE_LEVEL_1)
+	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
+	{
+		if (mod == MOD_SABER)
+		{ // zyk: player in RPG mode, with duals or staff, has a better damage depending on Saber Attack level
+			if (attacker->client->saber[0].saberFlags&SFL_TWO_HANDED || (attacker->client->saber[0].model[0] && attacker->client->saber[1].model[0]))
 			{
-				damage = (int)ceil(damage*0.2);
-			}
-			else if (attacker->client->pers.skill_levels[5] == FORCE_LEVEL_2)
-			{
-				damage = (int)ceil(damage*0.4);
-			}
-			else if (attacker->client->pers.skill_levels[5] == FORCE_LEVEL_3)
-			{
-				damage = (int)ceil(damage*0.6);
-			}
-			else if (attacker->client->pers.skill_levels[5] == FORCE_LEVEL_4)
-			{
-				damage = (int)ceil(damage*0.8);
+				if (attacker->client->pers.skill_levels[5] <= FORCE_LEVEL_1)
+				{
+					damage = (int)ceil(damage*0.2);
+				}
+				else if (attacker->client->pers.skill_levels[5] == FORCE_LEVEL_2)
+				{
+					damage = (int)ceil(damage*0.4);
+				}
+				else if (attacker->client->pers.skill_levels[5] == FORCE_LEVEL_3)
+				{
+					damage = (int)ceil(damage*0.6);
+				}
+				else if (attacker->client->pers.skill_levels[5] == FORCE_LEVEL_4)
+				{
+					damage = (int)ceil(damage*0.8);
+				}
 			}
 		}
-	}
-
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && mod == MOD_MELEE)
-	{ // zyk: setting melee damage in RPG Mode
-		if (attacker->client->pers.skill_levels[29] == 0)
-			damage = (int)ceil((damage * 1.0)/2.0);
-		else if (attacker->client->pers.skill_levels[29] == 2)
-			damage = damage * 2;
-		else if (attacker->client->pers.skill_levels[29] == 3)
-			damage = damage * 3;
+		else if (attacker->client->pers.skill_levels[24] == 2 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT))
+		{ // zyk: DEMP2 2/2 in RPG Mode causes more damage
+			damage = (int)ceil(damage * 1.12);
+		}
+		else if (attacker->client->pers.skill_levels[25] == 2 && (mod == MOD_FLECHETTE || mod == MOD_FLECHETTE_ALT_SPLASH))
+		{ // zyk: Flechette 2/2 in RPG Mode causes more damage
+			damage = (int)ceil(damage * 1.12);
+		}
+		else if (attacker->client->pers.skill_levels[27] == 2 && (mod == MOD_CONC || mod == MOD_CONC_ALT))
+		{ // zyk: Concussion Rifle 2/2 in RPG Mode causes more damage
+			damage = (int)ceil(damage * 1.12);
+		}
+		else if (mod == MOD_MELEE)
+		{ // zyk: setting melee damage in RPG Mode
+			if (attacker->client->pers.skill_levels[29] == 0)
+				damage = (int)ceil((damage * 1.0) / 2.0);
+			else if (attacker->client->pers.skill_levels[29] == 2)
+				damage = damage * 2;
+			else if (attacker->client->pers.skill_levels[29] == 3)
+				damage = damage * 3;
+		}
 	}
 
 	// zyk: force Rage increases damage of attacks
@@ -5358,21 +5372,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (inflictor && (inflictor->s.weapon == WP_BOWCASTER || inflictor->s.weapon == WP_DEMP2 || inflictor->s.weapon == WP_CONCUSSION))
 				can_damage_heavy_things = qtrue;
 		}
-	}
-
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.skill_levels[24] == 2 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT))
-	{ // zyk: DEMP2 2/2 in RPG Mode causes more damage
-		damage = (int)ceil(damage * 1.12);
-	}
-
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.skill_levels[25] == 2 && (mod == MOD_FLECHETTE || mod == MOD_FLECHETTE_ALT_SPLASH))
-	{ // zyk: Flechette 2/2 in RPG Mode causes more damage
-		damage = (int)ceil(damage * 1.12);
-	}
-
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.skill_levels[27] == 2 && (mod == MOD_CONC || mod == MOD_CONC_ALT))
-	{ // zyk: Concussion Rifle 2/2 in RPG Mode causes more damage
-		damage = (int)ceil(damage * 1.12);
 	}
 
 	if (attacker && attacker->client && (attacker->NPC || attacker->client->sess.amrpgmode == 2) && attacker->client->pers.quest_power_status & (1 << 15))
@@ -6484,12 +6483,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				else if (targ->client->ps.fd.forcePowerLevel[FP_PROTECT] == FORCE_LEVEL_2)
 				{
 					targ->client->ps.fd.forcePower -= (int)ceil(take*0.25*force_decrease_change);
-					take = (int)ceil(take*0.65);
+					take = (int)ceil(take*0.7);
 				}
 				else if (targ->client->ps.fd.forcePowerLevel[FP_PROTECT] == FORCE_LEVEL_3)
 				{
 					targ->client->ps.fd.forcePower -= (int)ceil(take*0.125*force_decrease_change);
-					take = (int)ceil(take*0.45);
+					take = (int)ceil(take*0.55);
 				}
 
 				if (targ->client->ps.fd.forcePower < 0)
@@ -6520,9 +6519,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (targ->client->ps.fd.forcePowerLevel[FP_RAGE] == 1)
 				take = (int)ceil(take*0.85);
 			else if (targ->client->ps.fd.forcePowerLevel[FP_RAGE] == 2)
-				take = (int)ceil(take*0.65);
+				take = (int)ceil(take*0.7);
 			else if (targ->client->ps.fd.forcePowerLevel[FP_RAGE] == 3)
-				take = (int)ceil(take*0.45);
+				take = (int)ceil(take*0.55);
 		}
 
 		if (!targ->NPC && targ->client && targ->client->sess.amrpgmode == 2)
@@ -6948,68 +6947,81 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 				
 				if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 && level.special_power_effects[attacker->s.number] != ent->s.number)
 				{ // zyk: if it is an effect used by special power, then attacker must be the owner of the effect. Also, do not hit the owner
-					if (!ent->client || ent->client->sess.amrpgmode != 2 || 
-						((ent->client->sess.amrpgmode == 2 || ent->client->pers.guardian_invoked_by_id != -1) && 
-						(!(ent->client->pers.quest_power_status & (1 << 0)) || 
-						  Q_stricmp(attacker->targetname, "zyk_effect_scream") == 0 || 
-						  Q_stricmp(attacker->targetname, "zyk_timed_bomb_explosion") == 0 ||
-						  Q_stricmp(attacker->targetname, "zyk_vertical_dfa") == 0 ||
-						  Q_stricmp(attacker->targetname, "zyk_force_storm") == 0)))
-					{ // zyk: can only hit if this player or boss is not using Immunity Power
-						gentity_t *quest_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
+					gentity_t *quest_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
 
-						// zyk: if the power user and the target are allies (player or npc), then do not hit
-						if (quest_power_user && quest_power_user->client && ent && ent->client &&
-							(OnSameTeam(quest_power_user, ent) == qtrue || npcs_on_same_team(quest_power_user, ent) == qtrue))
+					if (ent && ent->client && ent->client->pers.quest_power_status & (1 << 0) && 
+						Q_stricmp(attacker->targetname, "zyk_effect_scream") != 0 &&
+						Q_stricmp(attacker->targetname, "zyk_timed_bomb_explosion") != 0 &&
+						Q_stricmp(attacker->targetname, "zyk_vertical_dfa") != 0 &&
+						Q_stricmp(attacker->targetname, "zyk_force_storm") != 0)
+					{ // zyk: do not hit enemies using Immunity Power if the effect is not from some unique abilities
+						continue;
+					}
+
+					// zyk: if the power user and the target are allies (player or npc), then do not hit
+					if (quest_power_user && quest_power_user->client && ent && ent->client &&
+						(OnSameTeam(quest_power_user, ent) == qtrue || npcs_on_same_team(quest_power_user, ent) == qtrue))
+					{
+						continue;
+					}
+
+					if (zyk_is_ally(quest_power_user, ent) == qtrue)
+					{
+						continue;
+					}
+
+					if (quest_power_user && quest_power_user->client && ent && ent->client && 
+						quest_power_user->client->pers.guardian_mode != ent->client->pers.guardian_mode &&
+						!(quest_power_user->NPC && quest_power_user->client->pers.guardian_mode == 0) && 
+						!(!quest_power_user->NPC && quest_power_user->client->pers.guardian_mode > 0 && ent->NPC))
+					{ // zyk: validating boss battles
+						continue;
+					}
+
+					if (Q_stricmp(attacker->targetname, "zyk_quest_effect_drain") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_quest_effect_watersplash") == 0)
+					{ // zyk: Ultra Drain heals the power user
+						if (quest_power_user && quest_power_user->client && quest_power_user->health > 0 && 
+							zyk_can_hit_target(quest_power_user, ent) == qtrue && zyk_is_ally(quest_power_user, ent) == qfalse && ent->health > 0)
 						{
-							continue;
+							int heal_amount = (int)points;
+
+							if ((quest_power_user->health + heal_amount) < quest_power_user->client->ps.stats[STAT_MAX_HEALTH])
+								quest_power_user->health += heal_amount;
+							else
+								quest_power_user->health = quest_power_user->client->ps.stats[STAT_MAX_HEALTH];
+						}
+					}
+
+					// zyk: target will not be knocked back by Rockfall, Dome of Damage, Ultra Flame, Ultra Drain, Water Splash, 
+					// Acid Water, Flaming Area, Healing Area, Vertical DFA and Force Storm
+					if (Q_stricmp(attacker->targetname, "zyk_quest_effect_rockfall") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_quest_effect_watersplash") == 0 ||
+						Q_stricmp(attacker->targetname, "zyk_quest_effect_dome") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_quest_effect_flame") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_quest_effect_flaming_area") == 0 ||
+						Q_stricmp(attacker->targetname, "zyk_quest_effect_acid") == 0 ||
+						Q_stricmp(attacker->targetname, "zyk_quest_effect_drain") == 0 ||
+						Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_vertical_dfa") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_force_storm") == 0)
+					{
+						G_Damage (ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
+					}
+					else if (Q_stricmp(attacker->targetname, "zyk_effect_scream") == 0)
+					{ // zyk: it will also not knockback by Force Scream ability
+						if (ent->client && Q_irand(0, 3) == 0 && zyk_unique_ability_can_hit_target(quest_power_user, ent) == qtrue)
+						{ // zyk: it has a chance of setting a stun anim on the target
+							ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+							ent->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
+							ent->client->ps.forceHandExtendTime = level.time + 3000;
 						}
 
-						if (Q_stricmp(attacker->targetname, "zyk_quest_effect_drain") == 0 || 
-							Q_stricmp(attacker->targetname, "zyk_quest_effect_watersplash") == 0)
-						{ // zyk: Ultra Drain heals the power user
-							if (quest_power_user && quest_power_user->client && quest_power_user->health > 0 && 
-								zyk_can_hit_target(quest_power_user, ent) == qtrue && zyk_is_ally(quest_power_user, ent) == qfalse && ent->health > 0)
-							{
-								int heal_amount = (int)points;
-
-								if ((quest_power_user->health + heal_amount) < quest_power_user->client->ps.stats[STAT_MAX_HEALTH])
-									quest_power_user->health += heal_amount;
-								else
-									quest_power_user->health = quest_power_user->client->ps.stats[STAT_MAX_HEALTH];
-							}
-						}
-
-						// zyk: target will not be knocked back by Rockfall, Dome of Damage, Ultra Flame, Ultra Drain, Water Splash, 
-						// Acid Water, Flaming Area, Healing Area, Vertical DFA and Force Storm
-						if (Q_stricmp(attacker->targetname, "zyk_quest_effect_rockfall") == 0 || 
-							Q_stricmp(attacker->targetname, "zyk_quest_effect_watersplash") == 0 ||
-							Q_stricmp(attacker->targetname, "zyk_quest_effect_dome") == 0 || 
-							Q_stricmp(attacker->targetname, "zyk_quest_effect_flame") == 0 || 
-							Q_stricmp(attacker->targetname, "zyk_quest_effect_flaming_area") == 0 ||
-							Q_stricmp(attacker->targetname, "zyk_quest_effect_acid") == 0 ||
-							Q_stricmp(attacker->targetname, "zyk_quest_effect_drain") == 0 ||
-							Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0 || 
-							Q_stricmp(attacker->targetname, "zyk_vertical_dfa") == 0 || 
-							Q_stricmp(attacker->targetname, "zyk_force_storm") == 0)
-						{
-							G_Damage (ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
-						}
-						else if (Q_stricmp(attacker->targetname, "zyk_effect_scream") == 0)
-						{ // zyk: it will also not knockback by Force Scream ability
-							if (ent->client && Q_irand(0, 3) == 0 && zyk_unique_ability_can_hit_target(quest_power_user, ent) == qtrue)
-							{ // zyk: it has a chance of setting a stun anim on the target
-								ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-								ent->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
-								ent->client->ps.forceHandExtendTime = level.time + 3000;
-							}
-
-							G_Damage(ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
-						}
-						else
-						{
-							G_Damage (ent, quest_power_user, quest_power_user, dir, origin, (int)points, DAMAGE_RADIUS, mod);
-						}
+						G_Damage(ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
+					}
+					else
+					{
+						G_Damage (ent, quest_power_user, quest_power_user, dir, origin, (int)points, DAMAGE_RADIUS, mod);
 					}
 				}
 				else if (!attacker || level.special_power_effects[attacker->s.number] == -1)

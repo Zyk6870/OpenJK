@@ -2869,18 +2869,18 @@ setAnimLegs:
 				}
 				else if (ps->fd.forcePowersActive & (1 << FP_SPEED))
 				{
-					// zyk: creating if for force speed level 
+					// zyk: creating if for force speed level. The default was 1.7 for every Speed level
 					if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_1){
-						ps->legsTimer /= 1.5;  // zyk: changed speed value from 1.7 to something depending on the level
+						ps->legsTimer /= 1.7;
 					}
 					else if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_2){
-						ps->legsTimer /= 2.0;	// zyk: changed speed value
+						ps->legsTimer /= 2.1;
 					}
 					else if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_3){
-						ps->legsTimer /= 2.5;	// zyk: changed speed value
+						ps->legsTimer /= 2.5;
 					}
 					else if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_4){
-						ps->legsTimer /= 3.0;	// zyk: changed speed value
+						ps->legsTimer /= 2.9;
 					}
 				}
 			}

@@ -2781,7 +2781,15 @@ static qboolean PM_CheckJump( void )
 	*/
 	if ( pm->ps->groundEntityNum == ENTITYNUM_NONE )
 	{
-		return qfalse;
+		// zyk: Jump 5/5 will allow jumping out of water, so dont return qfalse here if player has it
+		if (!(pm->waterlevel == 1 && pm->cmd.upmove > 0 && pm->ps->fd.forcePowerLevel[FP_LEVITATION] == FORCE_LEVEL_5 && pm->ps->fd.forcePower >= 5))
+		{
+			return qfalse;
+		}
+		else
+		{ // zyk: jumping out of water uses some force
+			pm->ps->fd.forcePower -= 5;
+		}
 	}
 	if ( pm->cmd.upmove > 0 )
 	{//no special jumps
@@ -8812,18 +8820,18 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 
 	if (ps->fd.forcePowersActive & (1 << FP_SPEED))
 	{
-		// zyk: creating condition for force speed level 
+		// zyk: creating condition for force speed level. The default was 1.7 for every Speed level
 		if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_1){
-			ps->speed *= 1.5f; // zyk: changed speed value  // zyk: changed speed value from 1.7 to something depending on the level
+			ps->speed *= 1.7f; // zyk: changed speed value
 		}
 		else if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_2){
-			ps->speed *= 2.0f; // zyk: changed speed value	// zyk: changed speed value
+			ps->speed *= 2.1f; // zyk: changed speed value
 		}
 		else if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_3){
-			ps->speed *= 2.5f; // zyk: changed speed value	// zyk: changed speed value
+			ps->speed *= 2.5f; // zyk: changed speed value
 		}
 		else if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_4){
-			ps->speed *= 3.0f; // zyk: changed speed value	// zyk: changed speed value
+			ps->speed *= 2.9f; // zyk: changed speed value
 		}
 	}
 	else if (ps->fd.forcePowersActive & (1 << FP_RAGE))

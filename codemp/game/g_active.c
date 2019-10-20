@@ -823,11 +823,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 	{ // zyk: Unique Ability run out. Remove the flags
 		if (client->pers.player_statuses & (1 << 21))
 		{
-			if (client->pers.rpg_class == 9)
-			{ // zyk: Force Tank Force Armor run out. Remove shield flag
-				ent->flags &= ~FL_SHIELDED;
-			}
-
 			client->pers.player_statuses &= ~(1 << 21);
 		}
 		else if (client->pers.player_statuses & (1 << 22))
@@ -1603,7 +1598,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			(ent->client->ps.weaponTime > 0 && ent->client->ps.weapon == WP_SABER) || 
 			 ent->client->ps.weaponstate == WEAPON_CHARGING || ent->client->ps.weaponstate == WEAPON_CHARGING_ALT))
 		{ // zyk: in these situations, player in rpg is no longer afk
-			ent->client->pers.quest_afk_timer = level.time + QUEST_AFK_TIME;
+			ent->client->pers.quest_afk_timer = level.time + zyk_quest_afk_timer.integer;
 		}
 
 		if (brokeOut &&

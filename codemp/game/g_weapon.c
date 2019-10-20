@@ -648,7 +648,7 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 				return;
 			}
 		}
-		else if ( (traceEnt->flags&FL_SHIELDED) )
+		else if ( (traceEnt->flags&FL_SHIELDED) || zyk_can_deflect_shots(traceEnt))
 		{//stopped cold
 			return;
 		}
@@ -670,7 +670,7 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 
 	if ( render_impact )
 	{
-		if ( tr.entityNum < ENTITYNUM_WORLD && traceEnt->takedamage )
+		if ( tr.entityNum < ENTITYNUM_WORLD && traceEnt->takedamage && zyk_can_deflect_shots(traceEnt) == qfalse)
 		{
 			if ( traceEnt->client && LogAccuracyHit( traceEnt, ent ))
 			{
@@ -966,7 +966,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 				break; // and don't try any more traces
 			}
 
-			if ( (traceEnt->flags&FL_SHIELDED) )
+			if ( (traceEnt->flags&FL_SHIELDED) || zyk_can_deflect_shots(traceEnt))
 			{//stops us cold
 				break;
 			}
@@ -3670,6 +3670,12 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 						ent->client->accuracy_hits++;
 					}
 
+					if (traceEnt->client && ent->client->pers.guardian_mode != traceEnt->client->pers.guardian_mode &&
+						!(ent->client->pers.guardian_mode > 0 && traceEnt->NPC && traceEnt->client->pers.guardian_mode == 0))
+					{ // zyk: non quest player cant hit quest players in boss battles and vice-versa
+						break;
+					}
+
 					noKnockBack = (traceEnt->flags&FL_NO_KNOCKBACK);//will be set if they die, I want to know if it was on *before* they died
 					if ( traceEnt && traceEnt->client && traceEnt->client->NPC_class == CLASS_GALAKMECH )
 					{//hehe
@@ -3704,18 +3710,6 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 							if (traceEnt->client->sess.amrpgmode == 2 && traceEnt->client->pers.rpg_class == 9)
 							{ // zyk: Force Tank cannot be knocked down
 								break;
-							}
-
-							if (ent->client->pers.guardian_mode != traceEnt->client->pers.guardian_mode)
-							{ // zyk: non quest player cant hit quest players in boss battles and vice-versa
-								if (!((ent->client->pers.guardian_mode == 12 || ent->client->pers.guardian_mode == 13) && traceEnt->NPC && 
-									   (Q_stricmp(traceEnt->NPC_type, "guardian_of_universe") || Q_stricmp(traceEnt->NPC_type, "quest_reborn") || 
-									    Q_stricmp(traceEnt->NPC_type, "quest_reborn_blue") || Q_stricmp(traceEnt->NPC_type, "quest_reborn_red") || 
-										Q_stricmp(traceEnt->NPC_type, "quest_reborn_boss")))
-									)
-								{
-									break;
-								}
 							}
 
 							if (traceEnt->client->ps.duelInProgress == qtrue)
@@ -4217,7 +4211,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 
 				send_rpg_events(2000);
 			}
-			else if (ent->client->sess.magic_fist_selection == 2 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 3))
+			else if (ent->client->sess.magic_fist_selection == 2 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
 			{ // zyk: Instant-Hit Bolt
 				int skip, traces = DISRUPTOR_ALT_TRACES;
 				qboolean	render_impact = qtrue;
@@ -4228,7 +4222,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				float		shotRange = 8192.0f;
 				vec3_t shot_mins, shot_maxs;
 				int			i;
-				int damage = zyk_magic_fist_damage.integer * 1.4;
+				int damage = zyk_magic_fist_damage.integer * 1.2;
 
 				if (ent->client->ps.powerups[PW_NEUTRALFLAG] > level.time && !(ent->client->pers.player_statuses & (1 << 21)) &&
 					!(ent->client->pers.player_statuses & (1 << 22)) && !(ent->client->pers.player_statuses & (1 << 23)))
@@ -4320,6 +4314,12 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 
 							noKnockBack = (traceEnt->flags&FL_NO_KNOCKBACK);//will be set if they die, I want to know if it was on *before* they died
 
+							if (traceEnt->client && ent->client->pers.guardian_mode != traceEnt->client->pers.guardian_mode &&
+								!(ent->client->pers.guardian_mode > 0 && traceEnt->NPC && traceEnt->client->pers.guardian_mode == 0))
+							{ // zyk: non quest player cant hit quest players in boss battles and vice-versa
+								break;
+							}
+
 							G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, MOD_MELEE );
 
 							//do knockback and knockdown manually
@@ -4343,18 +4343,6 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 									if (traceEnt->client->sess.amrpgmode == 2 && traceEnt->client->pers.rpg_class == 9)
 									{ // zyk Force Tank cannot be knocked down
 										break;
-									}
-
-									if (ent->client->pers.guardian_mode != traceEnt->client->pers.guardian_mode)
-									{ // zyk: non quest player cant hit quest players in boss battles and vice-versa
-										if (!((ent->client->pers.guardian_mode == 12 || ent->client->pers.guardian_mode == 13) && traceEnt->NPC && 
-												(Q_stricmp(traceEnt->NPC_type, "guardian_of_universe") || Q_stricmp(traceEnt->NPC_type, "quest_reborn") || 
-												Q_stricmp(traceEnt->NPC_type, "quest_reborn_blue") || Q_stricmp(traceEnt->NPC_type, "quest_reborn_red") || 
-												Q_stricmp(traceEnt->NPC_type, "quest_reborn_boss")))
-											)
-										{
-											break;
-										}
 									}
 
 									if (traceEnt->client->ps.duelInProgress == qtrue)
@@ -4433,14 +4421,14 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				VectorCopy(origin, tent->s.origin2);
 				VectorCopy(forward, tent->s.angles2);
 
-				rpg_skill_counter(ent, 30);
-				ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 3);
+				rpg_skill_counter(ent, 20);
+				ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 2);
 
 				G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/movers/objects/green_beam_start.mp3"));
 
 				send_rpg_events(2000);
 			}
-			else if (ent->client->sess.magic_fist_selection == 3 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 3))
+			else if (ent->client->sess.magic_fist_selection == 3 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
 			{ // zyk: Ultra Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;
@@ -4487,8 +4475,8 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				// we don't want it to ever bounce
 				missile->bounceCount = 0;
 
-				rpg_skill_counter(ent, 30);
-				ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 3);
+				rpg_skill_counter(ent, 20);
+				ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 2);
 
 				G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/concussion/fire.mp3"));
 

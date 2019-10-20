@@ -593,7 +593,7 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 
 	if (other && other->client && other->client->sess.amrpgmode == 2 &&
 		other->client->pers.rpg_class == 9 && other->client->ps.powerups[PW_NEUTRALFLAG] > level.time && 
-		other->flags & FL_SHIELDED)
+		other->client->pers.player_statuses & (1 << 21))
 	{ // zyk: Force Tank Force Armor protects against force powers
 		return 0;
 	}
@@ -1234,6 +1234,8 @@ void ForceHeal( gentity_t *self )
 			self->client->ps.fd.forcePower -= zyk_max_force_power.integer/2;
 
 			G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/player/pickupshield.wav"));
+
+			rpg_skill_counter(self, 100);
 		}
 		return;
 	}
@@ -1424,6 +1426,9 @@ void ForceTeamHeal( gentity_t *self )
 			}
 
 			g_entities[pl[i]].client->ps.stats[STAT_HEALTH] += healthadd;
+
+			rpg_skill_counter(self, 20);
+
 			if (g_entities[pl[i]].client->ps.stats[STAT_HEALTH] > g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH])
 			{
 				g_entities[pl[i]].client->ps.stats[STAT_HEALTH] = g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH];
@@ -1568,6 +1573,8 @@ void ForceTeamForceReplenish( gentity_t *self )
 				g_entities[pl[i]].client->ps.fd.forcePower = g_entities[pl[i]].client->pers.max_force_power;
 			else if (g_entities[pl[i]].client->sess.amrpgmode < 2 && g_entities[pl[i]].client->ps.fd.forcePower > zyk_max_force_power.integer) // zyk: now it must be the cvar, because this cvar is the max force
 				g_entities[pl[i]].client->ps.fd.forcePower = zyk_max_force_power.integer;
+
+			rpg_skill_counter(self, 20);
 		}
 
 		//At this point we know we got one, so add him into the collective event client bitflag
