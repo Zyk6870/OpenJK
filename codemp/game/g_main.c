@@ -4751,7 +4751,12 @@ qboolean zyk_check_immunity_power(gentity_t *ent)
 {
 	if (ent && ent->client && ent->client->pers.quest_power_status & (1 << 0))
 	{
-		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_immunity", "0", "scepter/invincibility", 0, 0, 0, 300);
+		if (ent->client->pers.immunity_power_effect_cooldown < level.time)
+		{
+			zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_immunity", "0", "scepter/invincibility", 0, 0, 0, 300);
+
+			ent->client->pers.immunity_power_effect_cooldown = level.time + 500;
+		}
 
 		return qtrue;
 	}
@@ -5243,6 +5248,8 @@ void immunity_power(gentity_t *ent, int duration)
 {
 	ent->client->pers.quest_power_status |= (1 << 0);
 	ent->client->pers.quest_power1_timer = level.time + duration;
+
+	ent->client->pers.immunity_power_effect_cooldown = level.time + 500;
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_immunity", "0", "scepter/invincibility", 0, 0, 0, 300);
 

@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Zyk OpenJK Mod v3.79"
+#define	GAMEVERSION	"Zyk OpenJK Mod v3.80"
 
 #define SECURITY_LOG "security.log"
 
@@ -1030,6 +1030,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: sets the id of the effect of the magic used by this player
 	int quest_power_effect1_id;
+
+	// zyk: interval between each time the Immunity Power effect is shown to avoid spamming too many effects
+	int immunity_power_effect_cooldown;
 
 	// zyk: magic power, required to use Special Powers
 	int magic_power;
