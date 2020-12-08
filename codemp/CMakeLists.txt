@@ -1,5 +1,5 @@
 #============================================================================
-# Copyright (C) 2013 - 2015, OpenJK contributors
+# Copyright (C) 2013 - 2018, OpenJK contributors
 #
 # This file is part of the OpenJK source code.
 #
@@ -396,9 +396,14 @@ if(BuildMPEngine)
 			${OpenJKLibDir}/SDL2/include
 			)
 	else()
-		find_package(SDL2 REQUIRED)
-		set(MPEngineIncludeDirectories ${MPEngineIncludeDirectories} ${SDL2_INCLUDE_DIR})
-		set(MPEngineLibraries ${MPEngineLibraries} ${SDL2_LIBRARY})
+		find_package(SDL2 REQUIRED CONFIG)
+		if (TARGET SDL2::SDL2)
+			set(SDL2_INCLUDE_DIRS "")
+			set(SDL2_LIBRARIES SDL2::SDL2)
+		endif()
+		string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
+		set(MPEngineIncludeDirectories ${MPEngineIncludeDirectories} ${SDL2_INCLUDE_DIRS})
+		set(MPEngineLibraries ${MPEngineLibraries} ${SDL2_LIBRARIES})
 	endif()
 
 	# EAX is Windows-Only (right?)
@@ -524,6 +529,7 @@ if(BuildMPEngine)
 			"${MPDir}/win32/icon.ico"
 			"${MPDir}/win32/resource.h"
 			"${MPDir}/win32/openjk.rc"
+			"${SharedDir}/sys/win_manifest.manifest"
 			)
 
 		set(MPEngineFiles ${MPEngineFiles} ${MPEngineWin32Files})
@@ -578,6 +584,12 @@ if(BuildMPEngine)
 	endif(WIN32)
 
 	if(MakeApplicationBundles)
+		install(CODE "
+			include(BundleUtilities)
+			set(BU_CHMOD_BUNDLE_ITEMS ON)
+			fixup_bundle(\"${CMAKE_BINARY_DIR}/${MPEngine}.app\" \"\" \"\")
+			"
+			COMPONENT Runtime)
 		install(TARGETS ${MPEngine}
 			BUNDLE
 			DESTINATION ${JKAInstallDir}

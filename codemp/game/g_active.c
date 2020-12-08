@@ -2223,6 +2223,7 @@ void ClientThink_real( gentity_t *ent ) {
 	qboolean	isNPC = qfalse;
 	qboolean	controlledByPlayer = qfalse;
 	qboolean	killJetFlags = qtrue;
+	qboolean	isFollowing;
 
 	client = ent->client;
 
@@ -2260,7 +2261,9 @@ void ClientThink_real( gentity_t *ent ) {
 		}
 	}
 
-	if (!(client->ps.pm_flags & PMF_FOLLOW))
+	isFollowing = (client->ps.pm_flags & PMF_FOLLOW) ? qtrue : qfalse;
+
+	if (!isFollowing)
 	{
 		if (level.gametype == GT_SIEGE &&
 			client->siegeClass != -1 &&
@@ -2344,7 +2347,7 @@ void ClientThink_real( gentity_t *ent ) {
 	// mark the time, so the connection sprite can be removed
 	ucmd = &ent->client->pers.cmd;
 
-	if ( client && (client->ps.eFlags2&EF2_HELD_BY_MONSTER) )
+	if ( client && !isFollowing && (client->ps.eFlags2&EF2_HELD_BY_MONSTER) )
 	{
 		G_HeldByMonster( ent, ucmd );
 	}

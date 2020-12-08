@@ -1,5 +1,5 @@
 #============================================================================
-# Copyright (C) 2013 - 2015, OpenJK contributors
+# Copyright (C) 2013 - 2018, OpenJK contributors
 #
 # This file is part of the OpenJK source code.
 #
@@ -89,9 +89,14 @@ if(BuildSPEngine OR BuildJK2SPEngine)
 			${OpenJKLibDir}/SDL2/include
 			)
 	else()
-		find_package(SDL2 REQUIRED)
-		set(SPEngineIncludeDirectories ${SPEngineIncludeDirectories} ${SDL2_INCLUDE_DIR})
-		set(SPEngineLibraries ${SPEngineLibraries} ${SDL2_LIBRARY})
+		find_package(SDL2 REQUIRED CONFIG)
+		if (TARGET SDL2::SDL2)
+			set(SDL2_INCLUDE_DIRS "")
+			set(SDL2_LIBRARIES SDL2::SDL2)
+		endif()
+		string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
+		set(SPEngineIncludeDirectories ${SPEngineIncludeDirectories} ${SDL2_INCLUDE_DIRS})
+		set(SPEngineLibraries ${SPEngineLibraries} ${SDL2_LIBRARIES})
 	endif()
 
 	#    Source Files
@@ -323,6 +328,7 @@ if(BuildSPEngine OR BuildJK2SPEngine)
 		set(SPEngineWin32Files
 			"${SPDir}/win32/resource.h"
 			"${SPDir}/win32/winquake.rc"
+			"${SharedDir}/sys/win_manifest.manifest"
 			)
 		source_group("win32" FILES ${SPEngineWin32Files})
 		set(SPEngineFiles ${SPEngineFiles} ${SPEngineWin32Files})
@@ -400,6 +406,12 @@ if(BuildSPEngine OR BuildJK2SPEngine)
 		endif(WIN32)
 
 		if(MakeApplicationBundles)
+			install(CODE "
+				include(BundleUtilities)
+				set(BU_CHMOD_BUNDLE_ITEMS ON)
+				fixup_bundle(\"${CMAKE_BINARY_DIR}/${ProjectName}.app\" \"\" \"\")
+				"
+				COMPONENT Runtime)
 			install(TARGETS ${ProjectName}
 				BUNDLE
 				DESTINATION ${InstallDir}

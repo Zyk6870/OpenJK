@@ -86,8 +86,8 @@ static void SNDDMA_AudioCallback(void *userdata, Uint8 *stream, int len)
 
 static struct
 {
-	Uint16	enumFormat;
-	char		*stringFormat;
+	Uint16		enumFormat;
+	const char	*stringFormat;
 } formatToStringTable[ ] =
 {
 	{ AUDIO_U8,     "AUDIO_U8" },
@@ -95,10 +95,14 @@ static struct
 	{ AUDIO_U16LSB, "AUDIO_U16LSB" },
 	{ AUDIO_S16LSB, "AUDIO_S16LSB" },
 	{ AUDIO_U16MSB, "AUDIO_U16MSB" },
-	{ AUDIO_S16MSB, "AUDIO_S16MSB" }
+	{ AUDIO_S16MSB, "AUDIO_S16MSB" },
+	{ AUDIO_S32LSB, "AUDIO_S32LSB" },
+	{ AUDIO_S32MSB, "AUDIO_S32MSB" },
+	{ AUDIO_F32LSB, "AUDIO_F32LSB" },
+	{ AUDIO_F32MSB, "AUDIO_F32MSB" }
 };
 
-static int formatToStringTableSize = ARRAY_LEN( formatToStringTable );
+static const size_t formatToStringTableSize = ARRAY_LEN( formatToStringTable );
 
 /*
 ===============
@@ -107,12 +111,11 @@ SNDDMA_PrintAudiospec
 */
 static void SNDDMA_PrintAudiospec(const char *str, const SDL_AudioSpec *spec)
 {
-	int		i;
-	char	*fmt = NULL;
+	const char	*fmt = NULL;
 
-	Com_Printf("%s:\n", str);
+	Com_Printf( "%s:\n", str );
 
-	for( i = 0; i < formatToStringTableSize; i++ ) {
+	for( size_t i = 0; i < formatToStringTableSize; i++ ) {
 		if( spec->format == formatToStringTable[ i ].enumFormat ) {
 			fmt = formatToStringTable[ i ].stringFormat;
 		}
@@ -121,7 +124,7 @@ static void SNDDMA_PrintAudiospec(const char *str, const SDL_AudioSpec *spec)
 	if( fmt ) {
 		Com_Printf( "  Format:   %s\n", fmt );
 	} else {
-		Com_Printf( "  Format:   " S_COLOR_RED "UNKNOWN\n");
+		Com_Printf( "  Format:   " S_COLOR_RED "UNKNOWN (%d)\n", (int)spec->format);
 	}
 
 	Com_Printf( "  Freq:     %d\n", (int) spec->freq );
@@ -129,12 +132,23 @@ static void SNDDMA_PrintAudiospec(const char *str, const SDL_AudioSpec *spec)
 	Com_Printf( "  Channels: %d\n", (int) spec->channels );
 }
 
+static int SNDDMA_ExpandSampleFrequencyKHzToHz(int khz)
+{
+	switch (khz)
+	{
+		default:
+		case 44: return 44100;
+		case 22: return 22050;
+		case 11: return 11025;
+	}
+}
+
 /*
 ===============
 SNDDMA_Init
 ===============
 */
-qboolean SNDDMA_Init(void)
+qboolean SNDDMA_Init(int sampleFrequencyInKHz)
 {
 	SDL_AudioSpec desired;
 	SDL_AudioSpec obtained;
@@ -145,7 +159,6 @@ qboolean SNDDMA_Init(void)
 
 	if (!s_sdlBits) {
 		s_sdlBits = Cvar_Get("s_sdlBits", "16", CVAR_ARCHIVE_ND);
-		s_sdlSpeed = Cvar_Get("s_sdlSpeed", "0", CVAR_ARCHIVE);
 		s_sdlChannels = Cvar_Get("s_sdlChannels", "2", CVAR_ARCHIVE_ND);
 		s_sdlDevSamps = Cvar_Get("s_sdlDevSamps", "0", CVAR_ARCHIVE_ND);
 		s_sdlMixSamps = Cvar_Get("s_sdlMixSamps", "0", CVAR_ARCHIVE_ND);
@@ -173,8 +186,7 @@ qboolean SNDDMA_Init(void)
 	if ((tmp != 16) && (tmp != 8))
 		tmp = 16;
 
-	desired.freq = (int) s_sdlSpeed->value;
-	if(!desired.freq) desired.freq = 44100;
+	desired.freq = SNDDMA_ExpandSampleFrequencyKHzToHz(sampleFrequencyInKHz);
 	desired.format = ((tmp == 16) ? AUDIO_S16SYS : AUDIO_U8);
 
 	// I dunno if this is the best idea, but I'll give it a try...

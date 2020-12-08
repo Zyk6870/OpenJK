@@ -1,5 +1,5 @@
 #============================================================================
-# Copyright (C) 2013 - 2015, OpenJK contributors
+# Copyright (C) 2013 - 2018, OpenJK contributors
 # 
 # This file is part of the OpenJK source code.
 # 
@@ -16,7 +16,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 #============================================================================
 
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.1)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
 
 # For checks in subdirectories
@@ -94,7 +94,7 @@ if(APPLE)
 endif()
 
 # Custom CMake Modules needed
-list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/CMakeModules")
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
 Include(CheckTypeSize)
 check_type_size("void*" CMAKE_SIZEOF_VOID_P)
@@ -136,14 +136,16 @@ else()
 	endif()
 endif()
 
-message("Architecture is ${Architecture}")
+message(STATUS "Architecture is ${Architecture}")
 
-
+if(WIN32 AND CMAKE_VERSION VERSION_LESS "3.4")
+message(WARNING "Building on Windows platform with CMake version less than 3.4 is deprecated. Manifest file will fail to be included.")
+endif()
 
 # Current Git SHA1 hash
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
-message("Git revision is ${GIT_SHA1}")
+message(STATUS "Git revision is ${GIT_SHA1}")
 
 
 
@@ -287,7 +289,7 @@ else()
 endif()
 
 if (NOT CMAKE_BUILD_TYPE)
-	message("No build type selected, default to RELEASE")
+	message(STATUS "No build type selected, default to RELEASE")
 	set(CMAKE_BUILD_TYPE "RELEASE")
 endif()
 

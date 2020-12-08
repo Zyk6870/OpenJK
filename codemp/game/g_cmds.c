@@ -2357,7 +2357,7 @@ void Cmd_Where_f( gentity_t *ent ) {
 	}
 }
 
-static const char *gameNames[] = {
+static const char *gameNames[GT_MAX_GAME_TYPE] = {
 	"Free For All",
 	"Holocron FFA",
 	"Jedi Master",
