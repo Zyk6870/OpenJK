@@ -10710,7 +10710,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You must specify a product number.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"You must specify a product number.\n\"" );
 		return;
 	}
 
@@ -10724,9 +10724,15 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		return;
 	}
 
+	if (ent->client->pers.quest_power_status & (1 << 2))
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Cannot buy while frozen by Time Power.\n\"");
+		return;
+	}
+
 	if (value < 1 || value > NUMBER_OF_SELLER_ITEMS)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid product number.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"Invalid product number.\n\"" );
 		return;
 	}
 	else
@@ -11219,6 +11225,12 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	if (ent->client->pers.buy_sell_timer > level.time)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"In Buy/Sell cooldown time.\n\"");
+		return;
+	}
+
+	if (ent->client->pers.quest_power_status & (1 << 2))
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Cannot sell while frozen by Time Power.\n\"");
 		return;
 	}
 
