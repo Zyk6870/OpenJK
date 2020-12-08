@@ -9738,9 +9738,9 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					strcpy(guardian_message, "^7Completed!");
 				}
 
-				sprintf(message,"\n^5Light Quest\n%s^7\n\n",guardian_message);
+				strcpy(message, va("\n^5Light Quest\n%s^7\n\n", guardian_message));
 
-				trap->SendServerCommand( ent-g_entities, va("print \"%s\"", message) );
+				trap->SendServerCommand( ent->s.number, va("print \"%s\"", message) );
 			}
 			else if (Q_stricmp( arg1, "dark" ) == 0)
 			{
@@ -9808,9 +9808,9 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					strcpy(dark_quest_message, "^7Completed!");
 				}
 
-				sprintf(message,"\n^1Dark Quest\n^7%s\n\n",dark_quest_message);
+				strcpy(message, va("\n^1Dark Quest\n^7%s\n\n", dark_quest_message));
 
-				trap->SendServerCommand( ent-g_entities, va("print \"%s\"", message) );
+				trap->SendServerCommand( ent->s.number, va("print \"%s\"", message) );
 			}
 			else if (Q_stricmp( arg1, "eternity" ) == 0)
 			{
@@ -9829,9 +9829,9 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					strcpy(eternity_message, "^7Completed!");
 				}
 
-				sprintf(message,"\n^3Eternity Quest\n^7%s\n\n",eternity_message);
+				strcpy(message, va("\n^3Eternity Quest\n^7%s\n\n", eternity_message));
 
-				trap->SendServerCommand( ent-g_entities, va("print \"%s\"", message) );
+				trap->SendServerCommand( ent->s.number, va("print \"%s\"", message) );
 			}
 			else if (Q_stricmp( arg1, "universe" ) == 0)
 			{
@@ -9980,9 +9980,9 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					strcpy(universe_message, "^7Completed!");
 				}
 
-				sprintf(message,"\n^2Universe Quest\n%s\n\n",universe_message);
+				strcpy(message, va("\n^2Universe Quest\n%s\n\n", universe_message));
 
-				trap->SendServerCommand( ent-g_entities, va("print \"%s\"", message) );
+				trap->SendServerCommand( ent->s.number, va("print \"%s\"", message) );
 			}
 			else if (Q_stricmp( arg1, "bounty" ) == 0)
 			{
@@ -12065,157 +12065,157 @@ void Cmd_Settings_f( gentity_t *ent ) {
 
 		if (ent->client->pers.player_settings & (1 << 0))
 		{
-			sprintf(message,"\n^3 0 - RPG quests - ^1OFF");
+			strcpy(message,"\n^3 0 - RPG quests - ^1OFF");
 		}
 		else
 		{
-			sprintf(message,"\n^3 0 - RPG quests - ^2ON");
+			strcpy(message,"\n^3 0 - RPG quests - ^2ON");
 		}
 
 		if (ent->client->pers.player_settings & (1 << 1))
 		{
-			sprintf(message,"%s\n^3 1 - Light Power - ^1OFF", message);
+			strcpy(message, va("%s\n^3 1 - Light Power - ^1OFF", message));
 		}
 		else
 		{
-			sprintf(message,"%s\n^3 1 - Light Power - ^2ON", message);
+			strcpy(message, va("%s\n^3 1 - Light Power - ^2ON", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 2))
 		{
-			sprintf(message,"%s\n^3 2 - Dark Power - ^1OFF", message);
+			strcpy(message, va("%s\n^3 2 - Dark Power - ^1OFF", message));
 		}
 		else
 		{
-			sprintf(message,"%s\n^3 2 - Dark Power - ^2ON", message);
+			strcpy(message, va("%s\n^3 2 - Dark Power - ^2ON", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 3))
 		{
-			sprintf(message,"%s\n^3 3 - Eternity Power - ^1OFF", message);
+			strcpy(message, va("%s\n^3 3 - Eternity Power - ^1OFF", message));
 		}
 		else
 		{
-			sprintf(message,"%s\n^3 3 - Eternity Power - ^2ON", message);
+			strcpy(message, va("%s\n^3 3 - Eternity Power - ^2ON", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 4))
 		{
-			sprintf(message,"%s\n^3 4 - Universe Power - ^1OFF", message);
+			strcpy(message, va("%s\n^3 4 - Universe Power - ^1OFF", message));
 		}
 		else
 		{
-			sprintf(message,"%s\n^3 4 - Universe Power - ^2ON", message);
+			strcpy(message, va("%s\n^3 4 - Universe Power - ^2ON", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 5))
 		{
-			sprintf(message, "%s\n^3 5 - Language - ^1Custom", message);
+			strcpy(message, va("%s\n^3 5 - Language - ^1Custom", message));
 		}
 		else
 		{
-			sprintf(message, "%s\n^3 5 - Language - ^3English", message);
+			strcpy(message, va("%s\n^3 5 - Language - ^3English", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 6))
 		{
-			sprintf(message, "%s\n^3 6 - Allow Force Powers from allies - ^1OFF", message);
+			strcpy(message, va("%s\n^3 6 - Allow Force Powers from allies - ^1OFF", message));
 		}
 		else
 		{
-			sprintf(message, "%s\n^3 6 - Allow Force Powers from allies - ^2ON", message);
+			strcpy(message, va("%s\n^3 6 - Allow Force Powers from allies - ^2ON", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 7))
 		{
-			sprintf(message, "%s\n^3 7 - Show magic cast in chat - ^1OFF", message);
+			strcpy(message, va("%s\n^3 7 - Show magic cast in chat - ^1OFF", message));
 		}
 		else
 		{
-			sprintf(message, "%s\n^3 7 - Show magic cast in chat - ^2ON", message);
+			strcpy(message, va("%s\n^3 7 - Show magic cast in chat - ^2ON", message));
 		}
 
 		// zyk: Saber Style flags
 		if (ent->client->pers.player_settings & (1 << 26))
-			sprintf(message,"%s\n^3 8 - Starting Single Saber Style - ^3Yellow", message);
+			strcpy(message, va("%s\n^3 8 - Starting Single Saber Style - ^3Yellow", message));
 		else if (ent->client->pers.player_settings & (1 << 27))
-			sprintf(message,"%s\n^3 8 - Starting Single Saber Style - ^1Red", message);
+			strcpy(message, va("%s\n^3 8 - Starting Single Saber Style - ^1Red", message));
 		else if (ent->client->pers.player_settings & (1 << 28))
-			sprintf(message,"%s\n^3 8 - Starting Single Saber Style - ^1Desann", message);
+			strcpy(message, va("%s\n^3 8 - Starting Single Saber Style - ^1Desann", message));
 		else if (ent->client->pers.player_settings & (1 << 29))
-			sprintf(message,"%s\n^3 8 - Starting Single Saber Style - ^5Tavion", message);
+			strcpy(message, va("%s\n^3 8 - Starting Single Saber Style - ^5Tavion", message));
 		else
-			sprintf(message,"%s\n^3 8 - Starting Single Saber Style - ^5Blue", message);
+			strcpy(message, va("%s\n^3 8 - Starting Single Saber Style - ^5Blue", message));
 
 		if (ent->client->pers.player_settings & (1 << 9))
 		{
-			sprintf(message,"%s\n^3 9 - Allow Screen Message - ^1OFF", message);
+			strcpy(message, va("%s\n^3 9 - Allow Screen Message - ^1OFF", message));
 		}
 		else
 		{
-			sprintf(message,"%s\n^3 9 - Allow Screen Message - ^2ON", message);
+			strcpy(message, va("%s\n^3 9 - Allow Screen Message - ^2ON", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 10))
 		{
-			sprintf(message,"%s\n^310 - Use healing force only at allied players - ^1OFF", message);
+			strcpy(message, va("%s\n^310 - Use healing force only at allied players - ^1OFF", message));
 		}
 		else
 		{
-			sprintf(message,"%s\n^310 - Use healing force only at allied players - ^2ON", message);
+			strcpy(message, va("%s\n^310 - Use healing force only at allied players - ^2ON", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 11))
 		{
-			sprintf(message,"%s\n^311 - Start With Saber ^1OFF", message);
+			strcpy(message, va("%s\n^311 - Start With Saber ^1OFF", message));
 		}
 		else
 		{
-			sprintf(message,"%s\n^311 - Start With Saber ^2ON", message);
+			strcpy(message, va("%s\n^311 - Start With Saber ^2ON", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 12))
 		{
-			sprintf(message,"%s\n^312 - Jetpack ^1OFF", message);
+			strcpy(message, va("%s\n^312 - Jetpack ^1OFF", message));
 		}
 		else
 		{
-			sprintf(message,"%s\n^312 - Jetpack ^2ON", message);
+			strcpy(message, va("%s\n^312 - Jetpack ^2ON", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 13))
 		{
-			sprintf(message,"%s\n^313 - Admin Protect ^1OFF", message);
+			strcpy(message, va("%s\n^313 - Admin Protect ^1OFF", message));
 		}
 		else
 		{
-			sprintf(message,"%s\n^313 - Admin Protect ^2ON", message);
+			strcpy(message, va("%s\n^313 - Admin Protect ^2ON", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 14))
 		{
-			sprintf(message,"%s\n^314 - Boss Battle Music ^1Custom", message);
+			strcpy(message, va("%s\n^314 - Boss Battle Music ^1Custom", message));
 		}
 		else if (ent->client->pers.player_settings & (1 << 24))
 		{
-			sprintf(message,"%s\n^314 - Boss Battle Music ^7Korriban Action", message);
+			strcpy(message, va("%s\n^314 - Boss Battle Music ^7Korriban Action", message));
 		}
 		else if (ent->client->pers.player_settings & (1 << 25))
 		{
-			sprintf(message,"%s\n^314 - Boss Battle Music ^3MP Duel", message);
+			strcpy(message, va("%s\n^314 - Boss Battle Music ^3MP Duel", message));
 		}
 		else
 		{
-			sprintf(message,"%s\n^314 - Boss Battle Music ^2Hoth2 Action", message);
+			strcpy(message, va("%s\n^314 - Boss Battle Music ^2Hoth2 Action", message));
 		}
 
 		if (ent->client->pers.player_settings & (1 << 15))
 		{
-			sprintf(message,"%s\n^315 - Difficulty ^1Challenge", message);
+			strcpy(message, va("%s\n^315 - Difficulty ^1Challenge", message));
 		}
 		else
 		{
-			sprintf(message,"%s\n^315 - Difficulty ^2Normal", message);
+			strcpy(message, va("%s\n^315 - Difficulty ^2Normal", message));
 		}
 
 		trap->SendServerCommand( ent-g_entities, va("print \"%s\n\n^7Choose a setting above and use ^3/settings <number> ^7to turn it ^2ON ^7or ^1OFF^7\n\"", message) );
@@ -14227,7 +14227,7 @@ void Cmd_EntList_f( gentity_t *ent ) {
 			if (i >= ((page_number - 1) * 10) && i < (page_number * 10))
 			{ // zyk: this command lists 10 entities per page
 				target_ent = &g_entities[i];
-				sprintf(message,"%s\n%d - %s - %s - %s",message,i,target_ent->classname,target_ent->targetname,target_ent->target);
+				strcpy(message, va("%s\n%d - %s - %s - %s",message,i,target_ent->classname,target_ent->targetname,target_ent->target));
 			}
 		}
 	}
@@ -14244,7 +14244,7 @@ void Cmd_EntList_f( gentity_t *ent ) {
 				 (target_ent->targetname && strstr(target_ent->targetname, G_NewString(arg1))) ||
 				 (target_ent->target && strstr(target_ent->target, G_NewString(arg1)))))
 			{
-				sprintf(message,"%s\n%d - %s - %s - %s",message,i,target_ent->classname,target_ent->targetname,target_ent->target);
+				strcpy(message, va("%s\n%d - %s - %s - %s",message,i,target_ent->classname,target_ent->targetname,target_ent->target));
 				found_entities++;
 			}
 
@@ -14254,7 +14254,7 @@ void Cmd_EntList_f( gentity_t *ent ) {
 		}
 	}
 
-	trap->SendServerCommand( ent-g_entities, va("print \"^3\nID - classname - targetname - target\n^7%s\n\n\"",message) );
+	trap->SendServerCommand( ent->s.number, va("print \"^3\nID - classname - targetname - target\n^7%s\n\n\"",message) );
 }
 
 /*
