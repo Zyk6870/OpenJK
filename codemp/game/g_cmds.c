@@ -11202,9 +11202,9 @@ void Cmd_ZykFile_f(gentity_t *ent) {
 		}
 		else
 		{ // zyk: search for the string
-			while (i < results_per_page && fgets(content, sizeof(content), server_file) != NULL)
+			while (i < results_per_page && fgets(content, MAX_STRING_CHARS, server_file) != NULL)
 			{ // zyk: fgets returns NULL at EOF
-				if (strstr(G_NewString(content), G_NewString(arg2)))
+				if (strstr(content, arg2))
 				{
 					strcpy(file_content, va("%s%s", file_content, content));
 					i++;
@@ -15699,7 +15699,7 @@ void Cmd_Tutorial_f(gentity_t *ent) {
 		{ // zyk: search for the string
 			while (i < results_per_page && fgets(content, sizeof(content), tutorial_file) != NULL)
 			{ // zyk: fgets returns NULL at EOF
-				if (strstr(G_NewString(content), G_NewString(arg1)))
+				if (strstr(content, arg1))
 				{
 					strcpy(file_content, va("%s%s", file_content, content));
 					i++;
