@@ -168,6 +168,78 @@ char* zyk_skill_name(int skill_index)
 	}
 }
 
+// zy: returns the description of a RPG skill
+char* zyk_skill_description(int skill_index)
+{
+	char* skill_description[NUMBER_OF_SKILLS] = {
+		"makes you use the force to jump higher. Level 5 has no height limit, you can continue jumping up until you run out of force, and it also lets you jump out of water",
+		"pushes the opponent forward",
+		"pulls the opponent towards you",
+		"increases your speed. Level 1 is 1.7 times normal speed. Level 2 is 2.1, level 3 is 2.5 times and level 4 is 2.9 times",
+		"allows you to see people through walls, invisible people or cloaked people and you can dodge disruptor shots. Represents your mind strength to resist Mind Control if your sense level is equal or higher than the enemy's mind trick level",
+		G_NewString(va("gives you the saber. If you are using Single Saber, gives you the saber styles. If using duals or staff, increases saber damage, which is increased by 20 per cent for each level. This server has a saber damage scale of %.2f", g_saberDamageScale.value)),
+		"increases your ability to block, parry enemy saber attacks or enemy shots",
+		G_NewString(va("throws your saber at enemy and gets it back. Each level increases max distance and saber throw speed. Has %d damage", zyk_saber_throw_damage.integer)),
+		"allows you to absorb force power attacks done to you",
+		"recover some Health. Level 1 restores 5 hp, level 2 restores 10 hp and level 3 restores 25 hp",
+		"decreases damage done to you by non-force power attacks. At level 4 decreases force consumption when receiving damage",
+		"makes yourself invisible to the players affected by this force power. Force User class can mind control a player or npc. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds",
+		"restores some health to players near you",
+		"attacks with a powerful electric attack at players near you. At level 4, does more damage and pushes the enemy back",
+		"attacks a player by holding and damaging him",
+		"drains force power from a player to restore your health",
+		"makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage. Force Guardian class, with Improvements skill at least on level 1, can regen some force when taking damage on health while Rage is active",
+		"restores some force power to players near you. If Improvements skill is at least at level 1, regens blaster pack and power cell ammo of the target players",
+		G_NewString(va("attacks someone with a small electric charge. Has %d damage multiplied by the stun baton level. Can fire the flame thrower when using alternate fire (does not work for Force User, Monk, Duelist or Magic Master). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer)),
+		G_NewString(va("the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged", zyk_blaster_pistol_damage.integer)),
+		G_NewString(va("the rifle used by the Storm Troopers. E11 shots do %d damage. Normal fire is a single shot, while the alternate fire is the rapid fire", zyk_e11_blaster_rifle_damage.integer)),
+		G_NewString(va("the sniper, used by the rodians ingame. Normal fire is a shot that causes %d damage, alternate fire allows zoom and a charged shot that when fully charged, causes %d damage", zyk_disruptor_damage.integer, zyk_disruptor_alt_damage.integer)),
+		G_NewString(va("the famous weapon used by Chewbacca. Normal fire can be charged to fire up to 5 shots at once. It does %d damage", zyk_bowcaster_damage.integer)),
+		G_NewString(va("a powerful weapon with a rapid fire and a plasma bomb. Normal fire shoots the rapid fire, and does %d damage. Alt fire fires the plasma bomb and does %d damage", zyk_repeater_damage.integer, zyk_repeater_alt_damage.integer)),
+		G_NewString(va("a very powerful weapon against machine npc and some vehicles, causing more damage to them and stunning them. Normal fire does %d damage and alt fire can be charged and does %d damage", zyk_demp2_damage.integer, zyk_demp2_alt_damage.integer)),
+		G_NewString(va("this weapon is similar to a shotgun. Normal fire causes %d damage. Alt fire shoots 2 bombs and causes %d damage", zyk_flechette_damage.integer, zyk_flechette_alt_damage.integer)),
+		G_NewString(va("a powerful explosive weapon. Normal fire shoots a rocket causing %d damage. Alt fire shoots a homing missile", zyk_rocket_damage.integer)),
+		G_NewString(va("it shoots a powerful shot that has a big damage area. Alt fire shoots a ray similar to disruptor shots, but it can go through force fields and can throw the enemy on the ground. Normal fire does %d damage and alt fire does %d damage", zyk_concussion_damage.integer, zyk_concussion_alt_damage.integer)),
+		G_NewString(va("very similar to the blaster pistol, but this one has a better fire rate with normal shot. Does %d damage", zyk_blaster_pistol_damage.integer)),
+		G_NewString(va("allows you to attack with your fists and legs. You can punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer)),
+		"The max shield (armor) the player can have. Each level increases 20 per cent of max shield the player can have",
+		"Each level increases your shield resistance by 7 per cent",
+		"Each level increases your health resistance by 7 per cent",
+		"When using Drain force power, and your health is full, restores some shield. It also makes Drain suck hp/shield from the enemy to restore your hp/shield",
+		"the jetpack, used by Boba Fett. Allows you to fly. To use it, jump and press the Use key (usually R) while in the middle of the jump. Each level uses less fuel, allowing you to fly for a longer time",
+		"allows you to see info about someone, including npcs. Level 1 shows current health. Level 2 shows name, health and shield. Level 3 shows name, health and max health, shield and max shield, force and max force, mp and max mp. To use it, when you are near a player or npc, use ^3Sense ^7force power",
+		G_NewString(va("recovers 4 shield at level 1, 8 shield at level 2 and 12 shield at level 3. To use it, use Heal force power when you have full HP. This skill uses %d force power", zyk_max_force_power.integer / 2)),
+		"recovers 3 shield at level 1, 6 shield at level 2 and 9 shield at level 3 to players near you. To use it, when near players, use Team Heal force power. It will heal their shield after they have full HP",
+		"Used by pressing Engage Duel key\nFree Warrior: recovers some hp, shield and mp\nForce User: creates a force shield around the player that greatly reduces damage and protects against force powers\nBounty Hunter: allows firing poison darts with melee by spending metal bolts ammo\nArmored Soldier: spends power cell ammo to increase auto-shield-heal rate\nMonk: increases auto-healing rate and disables enemy Grip\nStealth Attacker: spends power cell ammo to increase disruptor firerate\nDuelist: recovers some MP and disables jetpack, cloak, speed and force regen of enemies nearby\nForce Gunner: disarms enemies nearby\nMagic Master: increases magic bolts, Lightning Dome, Magic Explosion and Healing Area damage. Increases Magic Sense duration. Healing Area heals more\nForce Guardian: increases resistance to damage for some seconds",
+		G_NewString(va("used as ammo for Blaster Pistol, Bryar Pistol and E11 Blaster Rifle. You can carry up to %d ammo",zyk_max_blaster_pack_ammo.integer)),
+		G_NewString(va("used as ammo for Disruptor, Bowcaster and DEMP2. You can carry up to %d ammo",zyk_max_power_cell_ammo.integer)),
+		G_NewString(va("used as ammo for Repeater, Flechette and Concussion Rifle. You can carry up to %d ammo",zyk_max_metal_bolt_ammo.integer)),
+		G_NewString(va("used as ammo for Rocket Launcher. You can carry up to %d ammo",zyk_max_rocket_ammo.integer)),
+		G_NewString(va("the famous detonator used by Leia in Ep 6 at the Jabba Palace. Normal fire throws it, which explodes after some seconds. Alt fire throws it and it explodes as soon as it touches something. Thermals cause %d damage", zyk_thermal_damage.integer)),
+		G_NewString(va("a mine that can be planted somewhere. Normal fire plants a mine with a laser that when touched makes the mine explode, causing %d damage. Alt fire plants proximity mines", zyk_tripmine_damage.integer)),
+		G_NewString(va("a very powerful explosive, which you can detonate remotely with the alt fire button. Causes %d damage", zyk_detpack_damage.integer)),
+		"this item allows you to see distant things better with its zoom",
+		"allows you to recover 25 HP",
+		"after placed on the ground, shoots at any nearby enemy",
+		"a flying ball that flies around you, shooting anyone in its range",
+		"allows you to shoot at people with it, it has a good fire rate",
+		"allows you to recover 50 HP",
+		"a powerful shield that protects you from enemy attacks, it can resist a lot against any weapon",
+		"makes you almost invisible to players and invisible to npcs. Can cloak your vehicle by pressing the Lightsaber Style key (default L) if you have the Holdable Items Upgrade",
+		"increases the max force power you have. Necessary to allow you to use force powers and force-based skills",
+		"\nFree Warrior ^7gets more damage and more resistance to damage\n^3Force User ^7gets more saber damage and force regens faster\n^3Bounty Hunter ^7gets more gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health\n^3Armored Soldier ^7gets more resistance to damage\n^3Monk ^7gets more run speed, melee damage and melee attack speed\n^3Stealth Attacker ^7gets more gun damage and more resistance to electric attacks\n^3Duelist ^7gets more saber and melee damage and faster force regen\n^3Force Gunner ^7gets more damage and more resistance to damage\n^3Magic Master ^7gets more Magic Points, new magic bolt types, new magic powers, recovers some jetpack fuel with Magic Points if it runs out and has less magic power cooldown\n^3Force Guardian ^7gets more resistance to damage"
+	};
+
+	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
+	{
+		return G_NewString(skill_description[skill_index]);
+	}
+	else
+	{
+		return "";
+	}
+}
+
 /*
 ==================
 DeathmatchScoreboardMessage
@@ -8330,120 +8402,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			else
 			{ // zyk: the player can also list the specific info of a skill passing the skill number as argument
 				i = atoi(arg1);
+
 				if (i >= 1 && i <= NUMBER_OF_SKILLS)
 				{
-					if (i == 1)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Jump: ^7makes you use the force to jump higher. Level 5 has no height limit, you can continue jumping up until you run out of force, and it also lets you jump out of water\n\"" );
-					if (i == 2)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Push: ^7pushes the opponent forward\n\"" );
-					if (i == 3)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Pull: ^7pulls the opponent towards you\n\"" );
-					if (i == 4)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Speed: ^7increases your speed. Level 1 is 1.5 times normal speed. Level 2 is 2.0, level 3 is 2.5 times and level 4 is 3.0 times\n\"" );
-					if (i == 5)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Sense: ^7allows you to see people through walls, invisible people or cloaked people and you can dodge disruptor shots. Represents your mind strength to resist Mind Control if your sense level is equal or higher than the enemy's mind trick level\n\"" );
-					if (i == 6)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Saber Attack: ^7gives you the saber. If you are using Single Saber, gives you the saber styles. If using duals or staff, increases saber damage, which is increased by 20 per cent for each level. This server has a saber damage scale of %.2f\n\"", g_saberDamageScale.value) );
-					if (i == 7)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Saber Defense: ^7increases your ability to block, parry enemy saber attacks or enemy shots\n\"" );
-					if (i == 8)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Saber Throw: ^7throws your saber at enemy and gets it back. Each level increases max distance and saber throw speed. Has %d damage\n\"", zyk_saber_throw_damage.integer) );
-					if (i == 9)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Absorb: ^7allows you to absorb force power attacks done to you\n\"" );
-					if (i == 10)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Heal: ^7recover some Health. Level 1 restores 5 hp, level 2 restores 10 hp and level 3 restores 25 hp\n\"" );
-					if (i == 11)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Protect: ^7decreases damage done to you by non-force power attacks. At level 4 decreases force consumption when receiving damage\n\"" );
-					if (i == 12)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Mind Trick: ^7makes yourself invisible to the players affected by this force power. Force User class can mind control a player or npc. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds\n\"" );
-					if (i == 13)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Team Heal: ^7restores some health to players near you\n\"" );
-					if (i == 14)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Lightning: ^7attacks with a powerful electric attack at players near you. At level 4, does more damage and pushes the enemy back\n\"" );
-					if (i == 15)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Grip: ^7attacks a player by holding and damaging him\n\"" );
-					if (i == 16)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Drain: ^7drains force power from a player to restore your health\n\"" );
-					if (i == 17)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Rage: ^7makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage. Force Guardian class, with Improvements skill at least on level 1, can regen some force when taking damage on health while Rage is active\n\"" );
-					if (i == 18)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Team Energize: ^7restores some force power to players near you. If Improvements skill is at least at level 1, regens blaster pack and power cell ammo of the target players\n\"" );
-					if (i == 19)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Stun Baton: ^7attacks someone with a small electric charge. Has %d damage multiplied by the stun baton level. Can fire the flame thrower when using alternate fire (does not work for Force User, Monk, Duelist or Magic Master). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds\n\"", zyk_stun_baton_damage.integer));
-					if (i == 20)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Blaster Pistol: ^7the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged\n\"", zyk_blaster_pistol_damage.integer));
-					if (i == 21)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3E11 Blaster Rifle: ^7the rifle used by the Storm Troopers. E11 shots do %d damage. Normal fire is a single shot, while the alternate fire is the rapid fire\n\"", zyk_e11_blaster_rifle_damage.integer) );
-					if (i == 22)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Disruptor: ^7the sniper, used by the rodians ingame. Normal fire is a shot that causes %d damage, alternate fire allows zoom and a charged shot that when fully charged, causes %d damage\n\"", zyk_disruptor_damage.integer, zyk_disruptor_alt_damage.integer) );
-					if (i == 23)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Bowcaster: ^7the famous weapon used by Chewbacca. Normal fire can be charged to fire up to 5 shots at once. It does %d damage\n\"", zyk_bowcaster_damage.integer) );
-					if (i == 24)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Repeater: ^7a powerful weapon with a rapid fire and a plasma bomb. Normal fire shoots the rapid fire, and does %d damage. Alt fire fires the plasma bomb and does %d damage\n\"", zyk_repeater_damage.integer, zyk_repeater_alt_damage.integer) );
-					if (i == 25)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3DEMP2: ^7a very powerful weapon against machine npc and some vehicles, causing more damage to them and stunning them. Normal fire does %d damage and alt fire can be charged and does %d damage\n\"", zyk_demp2_damage.integer, zyk_demp2_alt_damage.integer) );
-					if (i == 26)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Flechette: ^7this weapon is similar to a shotgun. Normal fire causes %d damage. Alt fire shoots 2 bombs and causes %d damage\n\"", zyk_flechette_damage.integer, zyk_flechette_alt_damage.integer) );
-					if (i == 27)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Rocket Launcher: ^7a powerful explosive weapon. Normal fire shoots a rocket causing %d damage. Alt fire shoots a homing missile\n\"", zyk_rocket_damage.integer) );
-					if (i == 28)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Concussion Rifle: ^7it shoots a powerful shot that has a big damage area. Alt fire shoots a ray similar to disruptor shots, but it can go through force fields and can throw the enemy on the ground. Normal fire does %d damage and alt fire does %d damage\n\"", zyk_concussion_damage.integer, zyk_concussion_alt_damage.integer) );
-					if (i == 29)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Bryar Pistol: ^7very similar to the blaster pistol, but this one has a better fire rate with normal shot. Does %d damage\n\"", zyk_blaster_pistol_damage.integer) );
-					if (i == 30)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Melee: ^7allows you to attack with your fists and legs. You can punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1\n\"", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer) );
-					if (i == 31)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Max Shield: ^7The max shield (armor) the player can have. Each level increases 20 per cent of max shield the player can have\n\"" );
-					if (i == 32)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Shield Strength: ^7Each level increases your shield resistance by 7 per cent\n\"" );
-					if (i == 33)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Health Strength: ^7Each level increases your health resistance by 7 per cent\n\"" );
-					if (i == 34)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Drain Shield: ^7When using Drain force power, and your health is full, restores some shield. It also makes Drain suck hp/shield from the enemy to restore your hp/shield\n\"" );
-					if (i == 35)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Jetpack: ^7the jetpack, used by Boba Fett. Allows you to fly. To use it, jump and press the Use key (usually R) while in the middle of the jump. Each level uses less fuel, allowing you to fly for a longer time\n\"" );
-					if (i == 36)
-						trap->SendServerCommand( ent-g_entities, "print \"^3Sense Health: ^7allows you to see info about someone, including npcs. Level 1 shows current health. Level 2 shows name, health and shield. Level 3 shows name, health and max health, shield and max shield, force and max force, mp and max mp. To use it, when you are near a player or npc, use ^3Sense ^7force power\n\"" );
-					if (i == 37)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Shield Heal: ^7recovers 4 shield at level 1, 8 shield at level 2 and 12 shield at level 3. To use it, use Heal force power when you have full HP. This skill uses %d force power\n\"", zyk_max_force_power.integer/2) );
-					if (i == 38)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Team Shield Heal: ^7recovers 3 shield at level 1, 6 shield at level 2 and 9 shield at level 3 to players near you. To use it, when near players, use Team Heal force power. It will heal their shield after they have full HP\n\"") );
-					if (i == 39)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Unique Skill: ^7Used by pressing Engage Duel key\nFree Warrior: recovers some hp, shield and mp\nForce User: creates a force shield around the player that greatly reduces damage and protects against force powers\nBounty Hunter: allows firing poison darts with melee by spending metal bolts ammo\nArmored Soldier: spends power cell ammo to increase auto-shield-heal rate\nMonk: increases auto-healing rate and disables enemy Grip\nStealth Attacker: spends power cell ammo to increase disruptor firerate\nDuelist: recovers some MP and disables jetpack, cloak, speed and force regen of enemies nearby\nForce Gunner: disarms enemies nearby\nMagic Master: increases magic bolts, Lightning Dome, Magic Explosion and Healing Area damage. Increases Magic Sense duration. Healing Area heals more\nForce Guardian: increases resistance to damage for some seconds\n\"") );
-					if (i == 40)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Blaster Pack: ^7used as ammo for Blaster Pistol, Bryar Pistol and E11 Blaster Rifle. You can carry up to %d ammo\n\"",zyk_max_blaster_pack_ammo.integer) );
-					if (i == 41)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Power Cell: ^7used as ammo for Disruptor, Bowcaster and DEMP2. You can carry up to %d ammo\n\"",zyk_max_power_cell_ammo.integer) );
-					if (i == 42)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Metallic Bolt: ^7used as ammo for Repeater, Flechette and Concussion Rifle. You can carry up to %d ammo\n\"",zyk_max_metal_bolt_ammo.integer) );
-					if (i == 43)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Rockets: ^7used as ammo for Rocket Launcher. You can carry up to %d ammo\n\"",zyk_max_rocket_ammo.integer) );
-					if (i == 44)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Thermal Detonator: ^7the famous detonator used by Leia in Ep 6 at the Jabba Palace. Normal fire throws it, which explodes after some seconds. Alt fire throws it and it explodes as soon as it touches something. Thermals cause %d damage\n\"", zyk_thermal_damage.integer) );
-					if (i == 45)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Trip Mine: ^7a mine that can be planted somewhere. Normal fire plants a mine with a laser that when touched makes the mine explode, causing %d damage. Alt fire plants proximity mines\n\"", zyk_tripmine_damage.integer) );
-					if (i == 46)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Det Pack: ^7a very powerful explosive, which you can detonate remotely with the alt fire button. Causes %d damage\n\"", zyk_detpack_damage.integer) );
-					if (i == 47)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Binoculars: ^7this item allows you to see distant things better with its zoom.\n\"") );
-					if (i == 48)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Bacta Canister: ^7allows you to recover 25 HP\n\"") );
-					if (i == 49)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Sentry Gun: ^7after placed on the ground, shoots at any nearby enemy\n\"") );
-					if (i == 50)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Seeker Drone: ^7a flying ball that flies around you, shooting anyone in its range\n\"") );
-					if (i == 51)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3E-Web: ^7allows you to shoot at people with it, it has a good fire rate\n\"") );
-					if (i == 52)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Big Bacta: ^7allows you to recover 50 HP\n\"") );
-					if (i == 53)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Force Field: ^7a powerful shield that protects you from enemy attacks, it can resist a lot against any weapon\n\"") );
-					if (i == 54)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Cloak Item: ^7makes you almost invisible to players and invisible to npcs. Can cloak your vehicle by pressing the Lightsaber Style key (default L) if you have the Holdable Items Upgrade\n\"") );
-					if (i == 55)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Force Power: ^7increases the max force power you have. Necessary to allow you to use force powers and force-based skills\n\"") );
-					if (i == 56)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Improvements:\nFree Warrior ^7gets more damage and more resistance to damage\n^3Force User ^7gets more saber damage and force regens faster\n^3Bounty Hunter ^7gets more gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health\n^3Armored Soldier ^7gets more resistance to damage\n^3Monk ^7gets more run speed, melee damage and melee attack speed\n^3Stealth Attacker ^7gets more gun damage and more resistance to electric attacks\n^3Duelist ^7gets more saber and melee damage and faster force regen\n^3Force Gunner ^7gets more damage and more resistance to damage\n^3Magic Master ^7gets more Magic Points, new magic bolt types, new magic powers, recovers some jetpack fuel with Magic Points if it runs out and has less magic power cooldown\n^3Force Guardian ^7gets more resistance to damage\n\"") );
+					trap->SendServerCommand( ent->s.number, va("print \"^3%s: ^7%s\n\"", zyk_skill_name(i - 1), zyk_skill_description(i - 1)));
 				}
 				else if (Q_stricmp( arg1, "l" ) == 0)
 				{
