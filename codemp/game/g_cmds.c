@@ -14036,6 +14036,8 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 					Jedi_Cloak(ent);
 
+					ent->client->pers.player_statuses |= (1 << 21);
+
 					rpg_skill_counter(ent, 200);
 
 					ent->client->pers.unique_skill_timer = level.time + 45000;
