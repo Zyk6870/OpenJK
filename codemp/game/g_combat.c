@@ -5625,7 +5625,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
-	if ((mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_FLECHETTE) && targ && targ->client && targ->health > 0 && attacker && attacker->client &&
+	if (inflictor && inflictor->s.weapon == WP_FLECHETTE && inflictor->methodOfDeath == MOD_MELEE && 
+		targ && targ->client && targ->health > 0 && attacker && attacker->client &&
 		(targ->s.number < MAX_CLIENTS || targ->client->NPC_class != CLASS_VEHICLE))
 	{ // zyk: hit by poison dart
 		targ->client->pers.poison_dart_hit_counter = 40;
