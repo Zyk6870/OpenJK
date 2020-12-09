@@ -4574,10 +4574,10 @@ qboolean TryGrapple(gentity_t *ent)
 					else if (use_this_power == MAGIC_HURRICANE && zyk_enable_hurricane.integer == 1 && ent->client->pers.magic_power >= (int)ceil((zyk_hurricane_mp_cost.integer * universe_mp_cost_factor)))
 					{
 						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
-						hurricane(ent,600,5000);
+						hurricane(ent,400,5000);
 						ent->client->pers.magic_power -= (int)ceil((zyk_hurricane_mp_cost.integer * universe_mp_cost_factor));
 
-						zyk_set_magic_power_cooldown_time(ent, 12000);
+						zyk_set_magic_power_cooldown_time(ent, 14000);
 
 						zyk_show_magic_in_chat(ent, use_this_power);
 					}
