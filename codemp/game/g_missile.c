@@ -359,6 +359,7 @@ G_MissileImpact
 */
 void WP_SaberBlockNonRandom( gentity_t *self, vec3_t hitloc, qboolean missileBlock );
 void WP_flechette_alt_blow( gentity_t *ent );
+extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
 void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	gentity_t		*other;
 	qboolean		hitClient = qfalse;
@@ -462,7 +463,8 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			int cannot_deflect = 0;
 
 			// zyk: Magic Fist can hit anything!
-			if (ent->methodOfDeath == MOD_MELEE && (ent->s.weapon == WP_BOWCASTER || ent->s.weapon == WP_DEMP2 || ent->s.weapon == WP_CONCUSSION))
+			if (ent->methodOfDeath == MOD_MELEE && (ent->s.weapon == WP_BOWCASTER || ent->s.weapon == WP_DEMP2 || 
+				(ent->s.weapon == WP_FLECHETTE && Q_stricmp(ent->classname, "flech_alt") == 0) || ent->s.weapon == WP_CONCUSSION))
 			{
 				cannot_deflect = 1;
 			}
@@ -521,7 +523,8 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		}
 
 		// zyk: Magic Fist can hit anything!
-		if (ent->methodOfDeath == MOD_MELEE && (ent->s.weapon == WP_BOWCASTER || ent->s.weapon == WP_DEMP2 || ent->s.weapon == WP_CONCUSSION))
+		if (ent->methodOfDeath == MOD_MELEE && (ent->s.weapon == WP_BOWCASTER || ent->s.weapon == WP_DEMP2 || 
+			(ent->s.weapon == WP_FLECHETTE && Q_stricmp(ent->classname, "flech_alt") == 0) || ent->s.weapon == WP_CONCUSSION))
 		{
 			cannot_deflect = 1;
 		}
@@ -550,6 +553,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		ent->s.weapon != WP_DET_PACK &&
 		ent->s.weapon != WP_DEMP2 &&
 		!(ent->s.weapon == WP_CONCUSSION && ent->methodOfDeath == MOD_MELEE) && // zyk: cannot be Ultra Bolt
+		!(ent->s.weapon == WP_FLECHETTE && ent->methodOfDeath == MOD_MELEE && Q_stricmp(ent->classname, "flech_alt") == 0) && // zyk: cannot be Fire Bolt
 		ent->methodOfDeath != MOD_REPEATER_ALT &&
 		ent->methodOfDeath != MOD_FLECHETTE_ALT_SPLASH &&
 		ent->methodOfDeath != MOD_CONC &&
@@ -623,6 +627,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			ent->s.weapon != WP_DET_PACK &&
 			ent->s.weapon != WP_DEMP2 &&
 			!(ent->s.weapon == WP_CONCUSSION && ent->methodOfDeath == MOD_MELEE) && // zyk: cannot be Ultra Bolt
+			!(ent->s.weapon == WP_FLECHETTE && ent->methodOfDeath == MOD_MELEE && Q_stricmp(ent->classname, "flech_alt") == 0) && // zyk: cannot be Fire Bolt
 			ent->methodOfDeath != MOD_REPEATER_ALT &&
 			ent->methodOfDeath != MOD_FLECHETTE_ALT_SPLASH &&
 			ent->methodOfDeath != MOD_CONC &&
@@ -719,8 +724,8 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			if (ent->s.weapon == WP_BOWCASTER || ent->s.weapon == WP_FLECHETTE ||
 				ent->s.weapon == WP_ROCKET_LAUNCHER)
 			{
-				if (ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING))
-				{
+				if (ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING) && ent->methodOfDeath != MOD_MELEE)
+				{ // zyk: added the methodOfDeath condition because of Fire Bolts
 					/* fix: there are rare situations where flechette did
 					explode by timeout AND by impact in the very same frame, then here
 					ent->think was set to G_FreeEntity, so the folowing think
@@ -825,6 +830,14 @@ killProj:
 		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
 	}
 
+	// zyk: Fire Bolt when removed spawns a fire in the ground
+	if (ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING) && ent->methodOfDeath == MOD_MELEE)
+	{
+		zyk_quest_effect_spawn(ent, ent, "zyk_effect_fire_bolt_hit", "4", "env/fire", 0, 10, 100, 300);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
+	}
+
 	if (!isKnockedSaber)
 	{
 		ent->freeAfterEvent = qtrue;
@@ -838,11 +851,12 @@ killProj:
 	G_SetOrigin( ent, trace->endpos );
 
 	ent->takedamage = qfalse;
+
 	// splash damage (doesn't apply to person directly hit)
 	if ( ent->splashDamage ) {
 		// zyk: added the Flechette alt fire condition so it does not damage againm since the call to think(), which does the flechette splash damage, was already done before
-		if(!(ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING)) && G_RadiusDamage( trace->endpos, ent->parent, ent->splashDamage, ent->splashRadius,
-			other, ent, ent->splashMethodOfDeath ) ) 
+		if(!(ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING) && ent->methodOfDeath != MOD_MELEE) && 
+			G_RadiusDamage( trace->endpos, ent->parent, ent->splashDamage, ent->splashRadius, other, ent, ent->splashMethodOfDeath ) ) 
 		{
 			if( !hitClient
 				&& g_entities[ent->r.ownerNum].client ) {

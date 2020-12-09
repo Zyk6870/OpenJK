@@ -3847,6 +3847,9 @@ void ClientSpawn(gentity_t *ent) {
 	// zyk: initializing flame thrower timer
 	ent->client->pers.flame_thrower = 0;
 
+	// zyk: reset the Fire Bolt hits
+	client->pers.fire_bolt_hits_counter = 0;
+
 	// zyk: initializing Quest Power attributes
 	ent->client->pers.quest_power_status = 0;
 

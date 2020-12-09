@@ -56,7 +56,7 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	3, // Drain
 	4, // Rage
 	3, // Team Energize
-	4, // Stun Baton
+	3, // Stun Baton
 	2, // Blaster Pistol
 	2, // E11 Blaster Rifle
 	2, // Disruptor
@@ -93,7 +93,7 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	1, // Force Field
 	1, // Cloak Item
 	5, // Force Power
-	3 // Improvements
+	4 // Improvements
 };
 
 // zyk: returns the name of a RPG skill
@@ -4001,7 +4001,7 @@ int zyk_max_magic_power(gentity_t *ent)
 	if (ent->client->pers.rpg_class == 8) // zyk: Magic Master has more Magic Power
 	{
 		max_mp = ent->client->pers.level * 4;
-		return (max_mp + (50 * (ent->client->pers.skill_levels[55] + 1)));
+		return (max_mp + (40 * (ent->client->pers.skill_levels[55] + 1)));
 	}
 
 	return max_mp;
@@ -4166,7 +4166,7 @@ void zyk_set_magic_power_cooldown_time(gentity_t *ent, int duration)
 {
 	// zyk: Magic Master has less cooldown time after casting magic powers
 	if (ent->client->pers.rpg_class == 8)
-		ent->client->pers.quest_power_usage_timer = level.time + (duration * (1.0 - (ent->client->pers.skill_levels[55] * 0.2)));
+		ent->client->pers.quest_power_usage_timer = level.time + (duration * (1.0 - (ent->client->pers.skill_levels[55] * 0.15)));
 	else
 		ent->client->pers.quest_power_usage_timer = level.time + duration;
 }
@@ -5519,8 +5519,20 @@ void initialize_rpg_skills(gentity_t *ent)
 {
 	if (ent->client->sess.amrpgmode == 2)
 	{
+		int i = 0;
+
 		if (validate_rpg_class(ent) == qfalse)
 			return;
+
+		// zyk: validating max skill levels. If for some reason a skill is above max, get the skillpoint back
+		for (i = 0; i < NUMBER_OF_SKILLS; i++)
+		{
+			if (ent->client->pers.skill_levels[i] > max_skill_levels[i])
+			{
+				ent->client->pers.skill_levels[i]--;
+				ent->client->pers.skillpoints++;
+			}
+		}
 
 		// zyk: Challenge Mode player who changed to Normal after finishing old Universe Quest with 15 missions. Reset his settings to Challenge
 		if (ent->client->pers.universe_quest_progress == 15 && !(ent->client->pers.player_settings & (1 << 15)) && 
@@ -5852,13 +5864,13 @@ void initialize_rpg_skills(gentity_t *ent)
 					ent->client->pers.bounty_hunter_placed_sentries++;
 			}
 
-			ent->client->ps.ammo[AMMO_BLASTER] += ent->client->ps.ammo[AMMO_BLASTER]/6 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_POWERCELL] += ent->client->ps.ammo[AMMO_POWERCELL]/6 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_METAL_BOLTS] += ent->client->ps.ammo[AMMO_METAL_BOLTS]/6 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_ROCKETS] += ent->client->ps.ammo[AMMO_ROCKETS]/6 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_THERMAL] += ent->client->ps.ammo[AMMO_THERMAL]/6 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_TRIPMINE] += ent->client->ps.ammo[AMMO_TRIPMINE]/6 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_DETPACK] += ent->client->ps.ammo[AMMO_DETPACK]/6 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_BLASTER] += ent->client->ps.ammo[AMMO_BLASTER]/8 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_POWERCELL] += ent->client->ps.ammo[AMMO_POWERCELL]/8 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_METAL_BOLTS] += ent->client->ps.ammo[AMMO_METAL_BOLTS]/8 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_ROCKETS] += ent->client->ps.ammo[AMMO_ROCKETS]/8 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_THERMAL] += ent->client->ps.ammo[AMMO_THERMAL]/8 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_TRIPMINE] += ent->client->ps.ammo[AMMO_TRIPMINE]/8 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_DETPACK] += ent->client->ps.ammo[AMMO_DETPACK]/8 * ent->client->pers.skill_levels[55];
 		}
 
 		// zyk: reseting initial holdable items of the player

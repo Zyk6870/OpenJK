@@ -4406,6 +4406,62 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				send_rpg_events(2000);
 			}
 			else if (ent->client->sess.magic_fist_selection == 3 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
+			{ // zyk: Fire Bolt
+				gentity_t* missile;
+				vec3_t origin, dir, zyk_forward;
+				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * (1.1 + ((ent->client->pers.level * 1.0) / 200.0)));
+
+				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
+					VectorSet(origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 12);
+				else
+					VectorSet(origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 36);
+
+				VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
+
+				AngleVectors(dir, zyk_forward, NULL, NULL);
+
+				VectorNormalize(zyk_forward);
+
+				missile = CreateMissile(origin, zyk_forward, magic_fist_velocity(ent), 10000, ent, qfalse);
+
+				missile->classname = "flech_alt";
+				missile->s.weapon = WP_FLECHETTE;
+				missile->mass = 4;
+
+				// How 'bout we give this thing a size...
+				VectorSet(missile->r.mins, -3.0f, -3.0f, -3.0f);
+				VectorSet(missile->r.maxs, 3.0f, 3.0f, 3.0f);
+
+				if (ent->client->pers.unique_skill_duration > level.time && !(ent->client->pers.player_statuses & (1 << 21)) &&
+					!(ent->client->pers.player_statuses & (1 << 22)) && !(ent->client->pers.player_statuses & (1 << 23)))
+				{ // zyk: Unique Skill increases damage
+					fist_damage *= 2;
+				}
+
+				missile->damage = fist_damage;
+
+				missile->dflags = 0;
+				missile->methodOfDeath = MOD_MELEE;
+				missile->splashMethodOfDeath = MOD_MELEE;
+				missile->clipmask = MASK_SHOT;
+
+				missile->splashDamage = fist_damage;
+
+				missile->splashRadius = CONC_SPLASH_RADIUS / 4;
+
+				missile->s.eFlags |= EF_ALT_FIRING;
+
+				// we don't want it to ever bounce
+				missile->bounceCount = 0;
+
+				rpg_skill_counter(ent, 20);
+				ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 2);
+
+				G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/effects/fireout.mp3"));
+
+				send_rpg_events(2000);
+			}
+			else if (ent->client->sess.magic_fist_selection == 4 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
 			{ // zyk: Ultra Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;

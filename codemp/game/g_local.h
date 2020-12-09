@@ -512,10 +512,11 @@ typedef struct clientSession_s {
 	
 	// zyk: activates Magic Fist types
 	// Possible values are:
-	// 0 - Magic Fist
-	// 1 - Fist Charged Attack
-	// 2 - Fist Spray Attack
-	// 3 - No fist attacks
+	// 0 - Normal Bolt
+	// 1 - Electric Bolt
+	// 2 - Instant-Hit Bolt
+	// 3 - Fire Bolt
+	// 4 - Ultra Bolt
 	int magic_fist_selection;
 
 	// zyk: magic powers that will not be shown in Magic power selection
@@ -689,6 +690,7 @@ typedef struct clientPersistant_s {
 	// 26 - Using nofight command
 	// 27 - Has just lost his duel in Duel Tournament
 	// 28 - Custom Quest npc
+	// 29 - hit by Fire Bolt
 	int player_statuses;
 
 	// zyk: used to backup player force powers before some event that does not allow them. They will be restored after event ends
@@ -706,6 +708,11 @@ typedef struct clientPersistant_s {
 
 	// zyk: timer of the poison darts
 	int poison_dart_hit_timer;
+
+	// zyk: timer used to keep spawning fire effects on player who cath fire after neing hit by Fire Bolt
+	int fire_bolt_timer;
+	int fire_bolt_user_id;
+	int fire_bolt_hits_counter;
 
 	// zyk: used by Wrist Shot ability
 	int wrist_shot_counter;

@@ -2157,6 +2157,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	// zyk: remove any quest_power status from this player
 	self->client->pers.quest_power_status = 0;
 	self->client->pers.player_statuses &= ~(1 << 20);
+	self->client->pers.player_statuses &= ~(1 << 29);
 	self->client->pers.unique_skill_duration = 0;
 
 	// zyk: stoping Unique Abilities when player dies
@@ -3165,7 +3166,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 		if (attacker->client->pers.rpg_class == 2)
 		{ // zyk: Bounty Hunter class receives more credits
-			attacker->client->pers.credits_modifier += 5 * (attacker->client->pers.skill_levels[55] + 1);
+			attacker->client->pers.credits_modifier += 4 * (attacker->client->pers.skill_levels[55] + 1);
 		}
 
 		// zyk: Bounty Quest manager
@@ -5359,19 +5360,19 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	{ // zyk: bonus damage of each RPG class
 		if (attacker->client->pers.rpg_class == 0)
 		{ // zyk: Free Warrior
-			damage = (int)ceil(damage * (1.0 + (0.03 * attacker->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (1.0 + (0.025 * attacker->client->pers.skill_levels[55])));
 		}
 		else if (attacker->client->pers.rpg_class == 1 && (mod == MOD_SABER || mod == MOD_FORCE_DARK))
 		{ // zyk: Force User
-			damage = (int)ceil(damage * (1.0 + (0.05 * attacker->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (1.0 + (0.04 * attacker->client->pers.skill_levels[55])));
 		}
 		else if (attacker->client->pers.rpg_class == 2 && mod != MOD_SABER && mod != MOD_MELEE && mod != MOD_FORCE_DARK)
 		{ // zyk: Bounty Hunter
-			damage = (int)ceil(damage * (1.0 + (0.05 * attacker->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (1.0 + (0.04 * attacker->client->pers.skill_levels[55])));
 		}
 		else if (attacker->client->pers.rpg_class == 4 && mod == MOD_MELEE)
 		{ // zyk: Monk
-			damage = damage * (1.0 + (attacker->client->pers.skill_levels[55]*0.5));
+			damage = damage * (1.0 + (attacker->client->pers.skill_levels[55]*0.4));
 			can_damage_heavy_things = qtrue;
 		}
 		else if (attacker->client->pers.rpg_class == 5 && (mod == MOD_STUN_BATON || mod == MOD_DISRUPTOR || mod == MOD_DISRUPTOR_SNIPER || 
@@ -5385,15 +5386,15 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (attacker->client->pers.secrets_found & (1 << 7))
 				stealth_attacker_bonus_damage = 0.2;
 
-			damage = (int)ceil(damage * (1.05 + (0.15 * attacker->client->pers.skill_levels[55]) + stealth_attacker_bonus_damage));
+			damage = (int)ceil(damage * (1.06 + (0.11 * attacker->client->pers.skill_levels[55]) + stealth_attacker_bonus_damage));
 		}
 		else if (attacker->client->pers.rpg_class == 6 && (mod == MOD_SABER || mod == MOD_MELEE))
 		{ // zyk: Duelist has higher damage in saber and melee
-			damage = (int)ceil(damage * (1.2 + (0.2 * attacker->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (1.2 + (0.15 * attacker->client->pers.skill_levels[55])));
 		}
 		else if (attacker->client->pers.rpg_class == 7)
 		{ // zyk: Force Gunner bonus damage
-			damage = (int)ceil(damage * (1.0 + (0.06 * attacker->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (1.0 + (0.04 * attacker->client->pers.skill_levels[55])));
 		}
 		else if (attacker->client->pers.rpg_class == 8 && mod == MOD_MELEE)
 		{ // zyk: Magic Master bolts can damage heavy things
@@ -5548,7 +5549,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				armored_soldier_bonus_resistance += 0.25;
 			}
 			
-			damage = (int)ceil(damage * (0.9 - ((0.05 * targ->client->pers.skill_levels[55]) + armored_soldier_bonus_resistance)));
+			damage = (int)ceil(damage * (0.9 - ((0.04 * targ->client->pers.skill_levels[55]) + armored_soldier_bonus_resistance)));
 		}
 		else if (targ->client->pers.rpg_class == 4 && 
 				 targ->client->ps.legsAnim == BOTH_MEDITATE)
@@ -5570,7 +5571,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			damage = (int)ceil(damage * (1.0 - (0.03 * targ->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (1.0 - (0.025 * targ->client->pers.skill_levels[55])));
 		}
 		else if (targ->client->pers.rpg_class == 5 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT))
 		{ // zyk: Stealth Attacker damage resistance against DEMP2
@@ -5578,11 +5579,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (targ->client->pers.secrets_found & (1 << 7))
 				return;
 
-			damage = (int)ceil(damage * (1 - (0.25 * targ->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (1 - (0.2 * targ->client->pers.skill_levels[55])));
 		}
 		else if (targ->client->pers.rpg_class == 7)
 		{ // zyk: Force Gunner damage resistance
-			damage = (int)ceil(damage * (1.0 - (0.06 * targ->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (1.0 - (0.04 * targ->client->pers.skill_levels[55])));
 		}
 		else if (targ->client->pers.rpg_class == 9)
 		{ // zyk: Force Guardian damage resistance
@@ -5598,7 +5599,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				force_tank_bonus_resistance += 0.15;
 			}
 
-			damage = (int)ceil(damage * (0.9 - force_tank_bonus_resistance - (0.1 * targ->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (0.9 - force_tank_bonus_resistance - (0.075 * targ->client->pers.skill_levels[55])));
 		}
 	}
 
@@ -5625,7 +5626,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
-	if (inflictor && inflictor->s.weapon == WP_FLECHETTE && inflictor->methodOfDeath == MOD_MELEE && 
+	if (inflictor && inflictor->s.weapon == WP_FLECHETTE && inflictor->methodOfDeath == MOD_MELEE && Q_stricmp(inflictor->classname, "flech_proj") == 0 &&
 		targ && targ->client && targ->health > 0 && attacker && attacker->client &&
 		(targ->s.number < MAX_CLIENTS || targ->client->NPC_class != CLASS_VEHICLE))
 	{ // zyk: hit by poison dart
@@ -5633,6 +5634,16 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		targ->client->pers.poison_dart_user_id = attacker->s.number;
 		targ->client->pers.poison_dart_hit_timer = level.time + 200;
 		targ->client->pers.player_statuses |= (1 << 20);
+	}
+
+	if (inflictor && inflictor->s.weapon == WP_FLECHETTE && inflictor->methodOfDeath == MOD_MELEE && Q_stricmp(inflictor->classname, "flech_alt") == 0 &&
+		targ && targ->client && targ->health > 0 && attacker && attacker->client &&
+		(targ->s.number < MAX_CLIENTS || targ->client->NPC_class != CLASS_VEHICLE))
+	{ // zyk: hit by Fire Bolt
+		targ->client->pers.fire_bolt_hits_counter += 5;
+		targ->client->pers.fire_bolt_user_id = attacker->s.number;
+		targ->client->pers.fire_bolt_timer = level.time + 200;
+		targ->client->pers.player_statuses |= (1 << 29);
 	}
 
 	if (level.gametype == GT_SIEGE &&
@@ -7019,6 +7030,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 					if (ent && ent->client &&
 						Q_stricmp(attacker->targetname, "zyk_effect_scream") != 0 &&
+						Q_stricmp(attacker->targetname, "zyk_effect_fire_bolt_hit") != 0 &&
 						Q_stricmp(attacker->targetname, "zyk_timed_bomb_explosion") != 0 &&
 						Q_stricmp(attacker->targetname, "zyk_vertical_dfa") != 0 &&
 						Q_stricmp(attacker->targetname, "zyk_force_storm") != 0 &&
@@ -7074,7 +7086,9 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_drain") == 0 ||
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_vertical_dfa") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_force_storm") == 0)
+						Q_stricmp(attacker->targetname, "zyk_force_storm") == 0 ||
+						Q_stricmp(attacker->targetname, "zyk_effect_scream") == 0 ||
+						Q_stricmp(attacker->targetname, "zyk_effect_fire_bolt_hit") == 0)
 					{
 						if (Q_stricmp(attacker->targetname, "zyk_quest_effect_flaming_area") == 0 && quest_power_user && quest_power_user != ent && ent->client)
 						{ // zyk: if player touches the flame, will keep catching fire for some seconds
@@ -7083,19 +7097,15 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							ent->client->pers.quest_power_hit4_counter = 15;
 							ent->client->pers.quest_target8_timer = level.time + 200;
 						}
-
-						G_Damage (ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
-					}
-					else if (Q_stricmp(attacker->targetname, "zyk_effect_scream") == 0)
-					{ // zyk: it will also not knockback by Force Scream ability
-						if (ent->client && Q_irand(0, 3) == 0 && zyk_unique_ability_can_hit_target(quest_power_user, ent) == qtrue)
+						else if (Q_stricmp(attacker->targetname, "zyk_effect_scream") == 0 && ent->client && Q_irand(0, 3) == 0 && 
+							zyk_unique_ability_can_hit_target(quest_power_user, ent) == qtrue)
 						{ // zyk: it has a chance of setting a stun anim on the target
 							ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 							ent->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
 							ent->client->ps.forceHandExtendTime = level.time + 3000;
 						}
 
-						G_Damage(ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
+						G_Damage (ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
 					}
 					else
 					{

@@ -1907,13 +1907,13 @@ void ammo_generic_power_converter_use( gentity_t *self, gentity_t *other, gentit
 	// zyk: Bounty Hunter class has more max ammo
 	if (activator->client->sess.amrpgmode == 2 && activator->client->pers.rpg_class == 2)
 	{
-		max_blasterpack_ammo += max_blasterpack_ammo/6 * activator->client->pers.skill_levels[55];
-		max_powercell_ammo += max_powercell_ammo/6 * activator->client->pers.skill_levels[55];
-		max_metalbolt_ammo += max_metalbolt_ammo/6 * activator->client->pers.skill_levels[55];
-		max_rocket_ammo += max_rocket_ammo/6 * activator->client->pers.skill_levels[55];
-		max_thermal_ammo += max_thermal_ammo/6 * activator->client->pers.skill_levels[55];
-		max_tripmine_ammo += max_tripmine_ammo/6 * activator->client->pers.skill_levels[55];
-		max_detpack_ammo += max_detpack_ammo/6 * activator->client->pers.skill_levels[55];
+		max_blasterpack_ammo += max_blasterpack_ammo/8 * activator->client->pers.skill_levels[55];
+		max_powercell_ammo += max_powercell_ammo/8 * activator->client->pers.skill_levels[55];
+		max_metalbolt_ammo += max_metalbolt_ammo/8 * activator->client->pers.skill_levels[55];
+		max_rocket_ammo += max_rocket_ammo/8 * activator->client->pers.skill_levels[55];
+		max_thermal_ammo += max_thermal_ammo/8 * activator->client->pers.skill_levels[55];
+		max_tripmine_ammo += max_tripmine_ammo/8 * activator->client->pers.skill_levels[55];
+		max_detpack_ammo += max_detpack_ammo/8 * activator->client->pers.skill_levels[55];
 	}
 
 	if (self->setTime < level.time)
@@ -3046,7 +3046,8 @@ void fx_runner_link( gentity_t *ent )
 		else if (Q_stricmp(ent->targetname, "zyk_quest_effect_watersplash") == 0 || Q_stricmp(ent->targetname, "zyk_quest_effect_sleeping") == 0 || 
 				 Q_stricmp(ent->targetname, "zyk_quest_effect_time") == 0 || Q_stricmp(ent->targetname, "zyk_quest_effect_poison") == 0 || 
 				 Q_stricmp(ent->targetname, "zyk_quest_effect_sand") == 0 || Q_stricmp(ent->targetname, "zyk_quest_effect_immunity") == 0 || 
-				 Q_stricmp(ent->targetname, "zyk_quest_effect_flaming_area_hit") == 0 || Q_stricmp(ent->targetname, "zyk_quest_effect_chaos") == 0)
+				 Q_stricmp(ent->targetname, "zyk_quest_effect_flaming_area_hit") == 0 || Q_stricmp(ent->targetname, "zyk_quest_effect_chaos") == 0 || 
+				 Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0)
 		{ // zyk: starts the effect imediately for these magic powers
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 200; // wait a small bit, then start working
@@ -3117,7 +3118,8 @@ void SP_fx_runner( gentity_t *ent )
 		Q_stricmp(ent->targetname, "zyk_effect_force_dash") == 0 || Q_stricmp(ent->targetname, "zyk_quest_effect_enemy_nerf") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_quest_effect_magic_disable") == 0 || Q_stricmp(ent->targetname, "zyk_vertical_dfa") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_quest_effect_poison") == 0 || Q_stricmp(ent->targetname, "zyk_quest_effect_immunity") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_quest_effect_flaming_area_hit") == 0 || Q_stricmp(ent->targetname, "zyk_quest_effect_chaos") == 0)
+		Q_stricmp(ent->targetname, "zyk_quest_effect_flaming_area_hit") == 0 || Q_stricmp(ent->targetname, "zyk_quest_effect_chaos") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0)
 	{
 		ent->nextthink = level.time;
 	}
