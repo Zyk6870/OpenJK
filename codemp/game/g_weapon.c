@@ -4447,7 +4447,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 
 				missile->splashDamage = fist_damage;
 
-				missile->splashRadius = CONC_SPLASH_RADIUS / 4;
+				missile->splashRadius = 40;
 
 				missile->s.eFlags |= EF_ALT_FIRING;
 

@@ -7353,7 +7353,7 @@ void fire_bolt_hits(gentity_t* ent)
 
 		zyk_quest_effect_spawn(fire_bolt_user, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 300);
 
-		G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 10, 0, MOD_UNKNOWN);
+		G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 4, 0, MOD_UNKNOWN);
 
 		ent->client->pers.fire_bolt_hits_counter--;
 		ent->client->pers.fire_bolt_timer = level.time + 200;

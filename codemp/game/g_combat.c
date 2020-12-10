@@ -5640,7 +5640,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		targ && targ->client && targ->health > 0 && attacker && attacker->client &&
 		(targ->s.number < MAX_CLIENTS || targ->client->NPC_class != CLASS_VEHICLE))
 	{ // zyk: hit by Fire Bolt
-		targ->client->pers.fire_bolt_hits_counter += 5;
+		targ->client->pers.fire_bolt_hits_counter += 8;
 		targ->client->pers.fire_bolt_user_id = attacker->s.number;
 		targ->client->pers.fire_bolt_timer = level.time + 200;
 		targ->client->pers.player_statuses |= (1 << 29);

@@ -831,9 +831,10 @@ killProj:
 	}
 
 	// zyk: Fire Bolt when removed spawns a fire in the ground
-	if (ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING) && ent->methodOfDeath == MOD_MELEE)
+	if (ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING) && ent->methodOfDeath == MOD_MELEE &&
+		ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_class == 8)
 	{
-		zyk_quest_effect_spawn(ent, ent, "zyk_effect_fire_bolt_hit", "4", "env/fire", 0, 10, 100, 300);
+		zyk_quest_effect_spawn(ent->parent, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 100);
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
 	}
