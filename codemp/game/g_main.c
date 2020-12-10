@@ -10274,6 +10274,25 @@ void G_RunFrame( int levelTime ) {
 						ent->client->ps.weaponTime = weaponData[WP_BRYAR_PISTOL].fireTime * 0.3;
 					}
 				}
+				else if (ent->client->pers.rpg_class == 3 && ent->client->pers.player_statuses & (1 << 21) && ent->client->pers.lightning_shield_timer < level.time)
+				{ // zyk: Armored Soldier Lightning Shield damage to enemies nearby
+					int player_it = 0;
+
+					for (player_it = 0; player_it < level.num_entities; player_it++)
+					{
+						gentity_t* player_ent = &g_entities[player_it];
+
+						if (player_ent && player_ent->client && ent != player_ent &&
+							zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue && Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 60)
+						{
+							G_Damage(player_ent, ent, ent, NULL, NULL, 8, 0, MOD_UNKNOWN);
+
+							player_ent->client->ps.electrifyTime = level.time + 500;
+						}
+					}
+
+					ent->client->pers.lightning_shield_timer = level.time + 200;
+				}
 				else if (ent->client->pers.rpg_class == 4 && 
 						(ent->client->pers.player_statuses & (1 << 22) || ent->client->pers.player_statuses & (1 << 23)) &&
 						 ent->client->pers.monk_unique_timer < level.time)

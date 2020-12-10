@@ -5735,6 +5735,8 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->pers.monk_unique_timer = 0;
 		ent->client->pers.unique_skill_duration = 0;
 
+		ent->client->pers.lightning_shield_timer = 0;
+
 		ent->client->pers.credits_modifier = 0;
 		ent->client->pers.score_modifier = 0;
 
@@ -8826,7 +8828,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 			}
 			else if (ent->client->pers.rpg_class == 3)
 			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Armored Soldier gets the Lightning Shield, which increases resistance to damage. Using /unique again will release a small lightning dome. Spends 5 power cell ammo\n\n\"");
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Armored Soldier gets the Lightning Shield, which increases resistance to damage and does a bit of damage to enemies nearby. Using /unique again will release a small lightning dome. Spends 5 power cell ammo\n\n\"");
 			}
 			else if (ent->client->pers.rpg_class == 4)
 			{
@@ -14001,6 +14003,8 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 8000;
 					ent->client->pers.unique_skill_duration = level.time + 8000;
+
+					ent->client->pers.lightning_shield_timer = level.time + 200;
 
 					ent->client->pers.player_statuses |= (1 << 21);
 
