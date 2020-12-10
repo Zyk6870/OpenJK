@@ -11681,6 +11681,7 @@ void Cmd_Jetpack_f( gentity_t *ent ) {
 Cmd_Remap_f
 ==================
 */
+extern shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
 void Cmd_Remap_f( gentity_t *ent ) {
 	int number_of_args = trap->Argc();
 	char arg1[MAX_STRING_CHARS];

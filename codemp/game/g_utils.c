@@ -29,6 +29,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 int remapCount = 0;
 
+shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
+
 int zyk_get_remap_count()
 {
 	return remapCount;
