@@ -4347,11 +4347,11 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 			self->client->pers.unique_skill_duration > level.time)
 		{
 			if (self->client->ps.torsoAnim == BOTH_PULL_IMPALE_STAB) // zyk: Impale Stab
-				dmg = 55;
+				dmg = 70;
 			else if (self->client->ps.torsoAnim == BOTH_FORCELEAP2_T__B_) // zyk: Vertical DFA
 				dmg = 28;
-			else if (self->client->ps.torsoAnim == BOTH_ALORA_SPIN_THROW) // zyk: Super Throw
-				dmg = 75;
+			else if (self->client->ps.torsoAnim == BOTH_ALORA_SPIN_SLASH || self->client->ps.torsoAnim == BOTH_ALORA_SPIN_THROW) // zyk: Spin Throw
+				dmg = 55;
 		}
 
 		idleDamage = qtrue;

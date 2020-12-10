@@ -8926,7 +8926,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 			}
 			else if (ent->client->pers.rpg_class == 6)
 			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Duelist gets Super Throw, which throws the saber ahead, doing a lot of damage. Spends 50 force\n\n\"");
+				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Duelist gets Spin Throw, which spins the saber and does a slash attack, doing a lot of damage. If used again during the first spin slash move, does a spin throw attack. Spends 50 force\n\n\"");
 			}
 			else if (ent->client->pers.rpg_class == 7)
 			{
@@ -14545,12 +14545,17 @@ void Cmd_Unique_f(gentity_t *ent) {
 			}
 
 			// zyk: transport the player to the effect place
-			zyk_TeleportPlayer(ent, effect_ent->s.origin, ent->client->ps.viewangles);
+			if (effect_ent)
+			{
+				zyk_TeleportPlayer(ent, effect_ent->s.origin, ent->client->ps.viewangles);
+
+				level.special_power_effects_timer[effect_ent->s.number] = level.time + 500;
+			}
 
 			// zyk: set timers to finish the unique and clear the effect entity
 			ent->client->ps.powerups[PW_NEUTRALFLAG] = 0;
 			ent->client->pers.unique_skill_duration = 0;
-			level.special_power_effects_timer[effect_ent->s.number] = level.time + 500;
+			
 			return;
 		}
 		else if (ent->client->pers.rpg_class == 2 && ent->client->pers.player_statuses & (1 << 23) && ent->client->pers.ice_bomb_counter == 1)
@@ -14558,6 +14563,20 @@ void Cmd_Unique_f(gentity_t *ent) {
 			ent->client->pers.ice_bomb_counter = 2;
 
 			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/cloth1.mp3"));
+
+			return;
+		}
+		else if (ent->client->pers.rpg_class == 6 && ent->client->pers.player_statuses & (1 << 23))
+		{ // zyk: Spin Throw second move, the throw
+			if (ent->client->ps.torsoAnim == BOTH_ALORA_SPIN_SLASH)
+			{
+				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 3800;
+				ent->client->pers.unique_skill_duration = level.time + 3800;
+
+				ent->client->ps.weaponTime = 2800;
+
+				G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_ALORA_SPIN_THROW, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+			}
 
 			return;
 		}
@@ -14766,7 +14785,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				}
 			}
 			else if (ent->client->pers.rpg_class == 6)
-			{ // zyk: Duelist Super Throw
+			{ // zyk: Duelist Spin Throw
 				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
 				{
 					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
@@ -14776,7 +14795,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 					ent->client->ps.weaponTime = 2800;
 
-					G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_ALORA_SPIN_THROW, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+					G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_ALORA_SPIN_SLASH, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
 
 					ent->client->pers.player_statuses |= (1 << 23);
 
