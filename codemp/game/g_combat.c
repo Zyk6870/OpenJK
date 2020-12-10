@@ -5632,7 +5632,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	{ // zyk: hit by poison dart
 		targ->client->pers.poison_dart_hit_counter = 40;
 		targ->client->pers.poison_dart_user_id = attacker->s.number;
-		targ->client->pers.poison_dart_hit_timer = level.time + 200;
+		targ->client->pers.poison_dart_hit_timer = level.time + 100;
 		targ->client->pers.player_statuses |= (1 << 20);
 	}
 
@@ -5642,7 +5642,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	{ // zyk: hit by Fire Bolt
 		targ->client->pers.fire_bolt_hits_counter += 8;
 		targ->client->pers.fire_bolt_user_id = attacker->s.number;
-		targ->client->pers.fire_bolt_timer = level.time + 200;
+		targ->client->pers.fire_bolt_timer = level.time + 100;
 		targ->client->pers.player_statuses |= (1 << 29);
 	}
 
