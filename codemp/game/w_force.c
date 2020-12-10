@@ -2279,6 +2279,11 @@ void ForceDrainDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec3_t 
 					if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[33] > 0 && traceEnt->client->ps.fd.forcePower <= 0)
 					{ // zyk: Drain Shield skill. Enemy has no force. Damages him
 						G_Damage( traceEnt, self, self, NULL, impactPoint, (dmg/2), 0, MOD_FORCE_DARK );
+
+						if (zyk_is_ally(self, traceEnt))
+						{ // zyk: if target is an allied player, he will not receive any damage and has no Force, so do not regen hp
+							dmg = 0;
+						}
 					}
 					else if (traceEnt->client->ps.fd.forcePower >= dmg)
 					{
