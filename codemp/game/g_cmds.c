@@ -11203,9 +11203,9 @@ void Cmd_ZykFile_f(gentity_t *ent) {
 	trap->Argv(2, arg2, sizeof(arg2));
 	page = atoi(arg2);
 
-	if (strstr(arg1, "/") || strstr(arg1, ".."))
+	if (strstr(arg1, "/") || strstr(arg1, "..") || strstr(arg1, "\\"))
 	{ // zyk: validating filename. Cannot contain / or .. so player cant search other folders
-		trap->SendServerCommand(ent->s.number, "print \"Filename cannot contain .. or / characters\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"Filename cannot contain .. \\ / characters\n\"");
 		return;
 	}
 
