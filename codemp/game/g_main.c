@@ -15637,6 +15637,7 @@ void G_RunFrame( int levelTime ) {
 											int zyk_enemy = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcenemy%d", level.zyk_custom_quest_counter)));
 											int zyk_ally = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcally%d", level.zyk_custom_quest_counter)));
 											int zyk_health = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npchealth%d", level.zyk_custom_quest_counter)));
+											int zyk_boss = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcboss%d", level.zyk_custom_quest_counter)));
 
 											zyk_npc->client->pers.player_statuses |= (1 << 28);
 
@@ -15657,6 +15658,11 @@ void G_RunFrame( int levelTime ) {
 											{ // zyk: force it to be ally
 												zyk_npc->client->playerTeam = NPCTEAM_PLAYER;
 												zyk_npc->client->enemyTeam = NPCTEAM_ENEMY;
+											}
+
+											if (zyk_boss > 0)
+											{ // zyk: set it as a Custom Quest boss
+												zyk_npc->client->pers.custom_quest_boss_npc = 1;
 											}
 
 											if (zyk_npc->client->playerTeam == NPCTEAM_PLAYER)

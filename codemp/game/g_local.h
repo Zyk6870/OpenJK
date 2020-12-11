@@ -693,6 +693,9 @@ typedef struct clientPersistant_s {
 	// 29 - hit by Fire Bolt
 	int player_statuses;
 
+	// zyk: setting this to 1 means the npc has the npcboss Custom Quest field
+	int custom_quest_boss_npc;
+
 	// zyk: used to backup player force powers before some event that does not allow them. They will be restored after event ends
 	int zyk_saved_force_powers;
 	int zyk_saved_force_power_levels[NUM_FORCE_POWERS];

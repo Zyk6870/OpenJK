@@ -3920,6 +3920,11 @@ void ForceThrow( gentity_t *self, qboolean pull )
 							canPullWeapon = qfalse;
 						}
 
+						if (push_list[x]->NPC && push_list[x]->client->pers.custom_quest_boss_npc > 0)
+						{ // zyk: Custom Quest bosses cannot have their weapon pulled from them
+							canPullWeapon = qfalse;
+						}
+
 						if (push_list[x]->NPC && push_list[x]->client->NPC_class == CLASS_VEHICLE)
 						{ // zyk: cannot pull anything from vehicles
 							canPullWeapon = qfalse;

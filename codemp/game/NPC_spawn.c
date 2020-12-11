@@ -1779,6 +1779,7 @@ finish:
 		newent->client->pers.seller_invoked_by_id = -1;
 		newent->client->pers.stun_baton_less_speed_timer = 0;
 		newent->client->pers.send_event_timer = 0;
+		newent->client->pers.custom_quest_boss_npc = 0;
 
 		newent->client->sess.ally1 = 0;
 		newent->client->sess.ally2 = 0;

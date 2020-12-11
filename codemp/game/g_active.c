@@ -3889,7 +3889,8 @@ void ClientThink_real( gentity_t *ent ) {
 												found = 1;
 											}
 
-											if (found == 0 && ent->client->pers.guardian_mode == this_ent->client->pers.guardian_mode)
+											if (found == 0 && ent->client->pers.guardian_mode == this_ent->client->pers.guardian_mode && 
+												this_ent->client->pers.custom_quest_boss_npc == 0)
 											{
 												if (this_ent->client->ps.weapon == WP_SABER)
 												{
