@@ -8327,10 +8327,6 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				trap->SendServerCommand( ent-g_entities, va("print \"\n^3Bounty Quest\n^7Use ^3/bountyquest ^7so the server chooses a player to be the target. If the target defeats a RPG player, he receives 200 bonus credits. If a bounty hunter kills the target, he receives bonus credits based in the target player level.\n\n\"") );
 			}
-			else if (Q_stricmp( arg1, "guardian" ) == 0)
-			{
-				trap->SendServerCommand( ent-g_entities, va("print \"\n^3Guardian Quest\n^7Use ^3/guardianquest ^7so the server spawns the map guardian somewhere. If the player defeats it, he gets 3 experience points (Level Up Score) and 1000 credits.\n\n\"") );
-			}
 			else if (Q_stricmp(arg1, "custom") == 0)
 			{
 				int j = 0;
@@ -10733,94 +10729,6 @@ void Cmd_RpgClass_f( gentity_t *ent ) {
 	value = atoi(arg1);
 
 	do_change_class(ent, value);
-}
-
-/*
-==================
-Cmd_GuardianQuest_f
-==================
-*/
-extern void zyk_start_boss_battle_music(gentity_t *ent);
-extern gentity_t *Zyk_NPC_SpawnType( char *npc_type, int x, int y, int z, int yaw );
-void Cmd_GuardianQuest_f( gentity_t *ent ) {
-
-	if (zyk_allow_guardian_quest.integer != 1)
-	{
-		trap->SendServerCommand( ent-g_entities, va("chat \"^3Guardian Quest: ^7this quest is not allowed in this server\n\"") );
-		return;
-	}
-
-	if (level.guardian_quest_timer > level.time)
-	{
-		trap->SendServerCommand( ent-g_entities, va("chat \"^3Guardian Quest: ^7wait %d seconds and try again\n\"", (level.guardian_quest_timer - level.time)/1000) );
-		return;
-	}
-
-	if (level.guardian_quest == 0)
-	{
-		int i = 0, j = 0, num_spawn_points = 0, chosen_spawn_point = -1;
-		gentity_t *this_ent = NULL;
-		gentity_t *npc_ent = NULL;
-		vec3_t npc_origin, npc_angles;
-
-		// zyk: player cant spawn if someone is fighting a guardian
-		for (i = 0; i < level.maxclients; i++)
-		{
-			this_ent = &g_entities[i];
-			if (this_ent && this_ent->client && this_ent->client->sess.amrpgmode == 2 && this_ent->client->pers.guardian_mode > 0)
-			{
-				trap->SendServerCommand( ent-g_entities, "print \"You can't start this quest while a player is fighting a guardian.\n\"" );
-				return;
-			}
-		}
-
-		for (i = 0; i < level.num_entities; i++)
-		{
-			this_ent = &g_entities[i];
-			if (this_ent && Q_stricmp(this_ent->classname, "info_player_deathmatch") == 0)
-			{
-				num_spawn_points++;
-			}
-		}
-
-		chosen_spawn_point = Q_irand(1,num_spawn_points) - 1;
-
-		// zyk: finds the chosen spawn point entity and gets its origin, which will be the guardian origin
-		for (i = 0; i < level.num_entities; i++)
-		{
-			this_ent = &g_entities[i];
-			if (this_ent && Q_stricmp(this_ent->classname, "info_player_deathmatch") == 0)
-			{
-				if (chosen_spawn_point == j)
-				{
-					VectorCopy(this_ent->s.origin, npc_origin);
-					VectorCopy(this_ent->s.angles, npc_angles);
-					break;
-				}
-
-				j++;
-			}
-		}
-
-		npc_ent = Zyk_NPC_SpawnType("map_guardian",(int)npc_origin[0],(int)npc_origin[1],(int)npc_origin[2],(int)npc_angles[1]);
-
-		if (npc_ent)
-		{
-			npc_ent->client->pers.hunter_quest_messages = 0;
-			npc_ent->client->pers.hunter_quest_timer = level.time + 5000;
-			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
-			level.initial_map_guardian_weapons = npc_ent->client->ps.stats[STAT_WEAPONS];
-			level.guardian_quest = npc_ent->s.number;
-		}
-
-		zyk_start_boss_battle_music(ent);
-
-		trap->SendServerCommand( -1, va("chat \"^3Guardian Quest: ^7The ^3Guardian Quest ^7is activated!\"") );
-	}
-	else
-	{
-		trap->SendServerCommand( ent->s.number, va("print \"Guardian Quest is already active.\n\"") );
-	}
 }
 
 /*
@@ -16577,7 +16485,6 @@ command_t commands[] = {
 	{ "gc",					Cmd_GameCommand_f,			CMD_NOINTERMISSION },
 	{ "give",				Cmd_Give_f,					CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "god",				Cmd_God_f,					CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
-	{ "guardianquest",		Cmd_GuardianQuest_f,		CMD_ALIVE|CMD_RPG|CMD_NOINTERMISSION },
 	{ "ignore",				Cmd_Ignore_f,				CMD_NOINTERMISSION },
 	{ "ignorelist",			Cmd_IgnoreList_f,			CMD_NOINTERMISSION },
 	{ "jetpack",			Cmd_Jetpack_f,				CMD_ALIVE|CMD_NOINTERMISSION },

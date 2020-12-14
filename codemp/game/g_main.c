@@ -691,18 +691,12 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.bounty_quest_target_id = 0;
 	level.bounty_quest_choose_target = qtrue;
 
-	// zyk: initializing guardian quest values
-	level.guardian_quest = 0;
-	level.initial_map_guardian_weapons = 0;
-
 	level.boss_battle_music_reset_timer = 0;
 
 	level.voting_player = -1;
 
 	level.server_empty_change_map_timer = 0;
 	level.num_fully_connected_clients = 0;
-
-	level.guardian_quest_timer = 0;
 
 	// zyk: initializing Duel Tournament variables
 	level.duel_tournament_mode = 0;
@@ -9639,41 +9633,6 @@ void G_RunFrame( int levelTime ) {
 			if (level.duel_leaderboard_add_ally == qtrue)
 			{
 				duel_tournament_generate_leaderboard(G_NewString(level.duel_leaderboard_ally_acc), G_NewString(level.duel_leaderboard_ally_name));
-			}
-		}
-	}
-
-	// zyk: Guardian of Map abilities
-	if (level.guardian_quest > 0)
-	{
-		gentity_t *npc_ent = &g_entities[level.guardian_quest];
-
-		if (npc_ent && npc_ent->client && npc_ent->health > 0)
-		{		
-			npc_ent->client->ps.stats[STAT_WEAPONS] = level.initial_map_guardian_weapons;
-
-			if (npc_ent->client->pers.hunter_quest_timer < level.time)
-			{
-				if (npc_ent->client->pers.hunter_quest_messages == 0)
-				{
-					healing_area(npc_ent, 5, 5000);
-					trap->SendServerCommand(-1, "chat \"^3Guardian of Map: ^7Healing Area!\"");
-					npc_ent->client->pers.hunter_quest_messages++;
-				}
-				else if (npc_ent->client->pers.hunter_quest_messages == 1)
-				{
-					magic_explosion(npc_ent, 320, 130, 900);
-					trap->SendServerCommand(-1, "chat \"^3Guardian of Map: ^7Magic Explosion!\"");
-					npc_ent->client->pers.hunter_quest_messages++;
-				}
-				else if (npc_ent->client->pers.hunter_quest_messages == 2)
-				{
-					lightning_dome(npc_ent, 70);
-					trap->SendServerCommand(-1, "chat \"^3Guardian of Map: ^7Lightning Dome!\"");
-					npc_ent->client->pers.hunter_quest_messages = 0;
-				}
-
-				npc_ent->client->pers.hunter_quest_timer = level.time + Q_irand(6000, 9000);
 			}
 		}
 	}

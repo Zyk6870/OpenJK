@@ -5046,12 +5046,6 @@ void Cmd_NPC_f( gentity_t *ent )
 					return;
 				}
 
-				if (thisent->client && level.guardian_quest > 0 && level.guardian_quest == thisent->s.number)
-				{
-					trap->SendServerCommand( ent-g_entities, "print \"NPC team cannot be used in the Guardian of Map.\n\"" );
-					return;
-				}
-
 				if (Q_stricmp(cmd2,"player") == 0)
 				{
 					thisent->client->playerTeam = NPCTEAM_PLAYER;

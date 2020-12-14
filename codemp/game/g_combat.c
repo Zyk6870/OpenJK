@@ -3154,16 +3154,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			attacker->client->pers.credits_modifier = self->client->pers.credits_modifier;
 		}
 
-		if (level.guardian_quest > 0 && self->NPC && self->s.number == level.guardian_quest)
-		{ // zyk: if player defeated the map guardian npc
-			attacker->client->pers.score_modifier = 2;
-			attacker->client->pers.credits_modifier = 990;
-			trap->SendServerCommand(-1, va("chat \"^3Guardian Quest: ^7%s^7 receives ^31000 ^7credits for defeating the Guardian of Map\n\"", attacker->client->pers.netname));
-			level.guardian_quest = 0;
-			level.boss_battle_music_reset_timer = level.time + 1000;
-			level.guardian_quest_timer = level.time + zyk_guardian_quest_timer.integer;
-		}
-
 		if (attacker->client->pers.rpg_class == 2)
 		{ // zyk: Bounty Hunter class receives more credits
 			attacker->client->pers.credits_modifier += 4 * (attacker->client->pers.skill_levels[55] + 1);
@@ -3187,13 +3177,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7%s^7 receives ^3%d ^7bonus credits\n\"", attacker->client->pers.netname, (self->client->pers.level * 15)));
 			}
 		}
-	}
-
-	if (level.guardian_quest > 0 && self->NPC && self->s.number == level.guardian_quest)
-	{ // zyk: map guardian npc defeated by a non-rpg player
-		trap->SendServerCommand(-1, va("chat \"^3Guardian Quest: ^7Map Guardian not defeated by rpg player\n\""));
-		level.guardian_quest = 0;
-		level.boss_battle_music_reset_timer = level.time + 1000;
 	}
 
 	// check for an almost capture
