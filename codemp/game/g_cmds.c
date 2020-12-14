@@ -8732,7 +8732,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 39)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Armored Soldier Upgrade: ^7increases damage resistance by 5 per cent, deflects some gun shots, cuts flame thrower fuel usage by half, has less chance of losing gun to force pull, has a chance of setting ysalamiri for some seconds if attacked by force powers. It also protects from drowning\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Armored Soldier Upgrade: ^7increases damage resistance by 5 per cent, makes unique skill deflect some gun shots, cuts flame thrower fuel usage by half, has less chance of losing gun to force pull, has a chance of setting ysalamiri for some seconds if attacked by force powers. It also protects from drowning\n\n\"");
 		}
 		else if (i == 40)
 		{
@@ -13266,12 +13266,20 @@ void Cmd_Saber_f( gentity_t *ent ) {
 
 qboolean zyk_can_deflect_shots(gentity_t *ent)
 {
-	if (ent->client && ent->client->sess.amrpgmode == 2 &&
-		((ent->client->pers.rpg_class == 3 && ent->client->pers.secrets_found & (1 << 16)) || // zyk: Armored Soldier Upgrade has chance to deflect shots
-		(ent->client->pers.rpg_class == 9 && ent->client->pers.player_statuses & (1 << 21)) // zyk: Force Armor unique ability has chance to deflect shots
-		))
+	if (ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		return qtrue;
+		if (ent->client->pers.rpg_class == 3 && ent->client->pers.secrets_found & (1 << 16) && ent->client->pers.unique_skill_duration > level.time && 
+			!(ent->client->pers.player_statuses & (1 << 21)) &&
+			!(ent->client->pers.player_statuses & (1 << 22)) && 
+			!(ent->client->pers.player_statuses & (1 << 23))
+			)
+		{ // zyk: Armored Soldier unique skill with Armored Soldier Upgrade deflects shots
+			return qtrue;
+		}
+		else if (ent->client->pers.rpg_class == 9 && ent->client->pers.player_statuses & (1 << 21))
+		{ // zyk: Force Armor unique ability deflects shots
+			return qtrue;
+		}
 	}
 
 	return qfalse;
