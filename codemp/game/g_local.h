@@ -482,26 +482,6 @@ typedef struct clientSession_s {
 	char rpgchar[32]; // zyk: file name of the RPG char
 
 	// zyk: current power selected by Magic Master to use
-	// 1 - Magic Sense
-	// 2 - Healing Water
-	// 3 - Water Splash
-	// 4 - Earthquake
-	// 5 - Rockfall
-	// 6 - Sleeping Flowers
-	// 7 - Poison Mushrooms
-	// 8 - Magic Shield
-	// 9 - Dome of Damage
-	// 10 - Ultra Speed
-	// 11 - Slow Motion
-	// 12 - Flame Burst
-	// 13 - Ultra Flame
-	// 14 - Blowing Wind
-	// 15 - Hurricane
-	// 16 - Ultra Resistance
-	// 17 - Ultra Strength
-	// 18 - Ice Stalagmite
-	// 19 - Ice Boulder
-	// 20 - Healing Area
 	int selected_special_power;
 
 	// zyk: same as above but selects power to be used with A + melee kata

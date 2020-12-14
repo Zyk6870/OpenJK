@@ -292,38 +292,38 @@ char* zyk_skill_description(int skill_index)
 		"makes you almost invisible to players and invisible to npcs. Can cloak your vehicle by pressing the Lightsaber Style key (default L) if you have the Holdable Items Upgrade",
 		"increases the max force power you have. Necessary to allow you to use force powers and force-based skills",
 		"\nFree Warrior ^7gets more damage and more resistance to damage\n^3Force User ^7gets more saber damage and force regens faster\n^3Bounty Hunter ^7gets more gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health\n^3Armored Soldier ^7gets more resistance to damage\n^3Monk ^7gets more run speed, melee damage and melee attack speed\n^3Stealth Attacker ^7gets more gun damage and more resistance to electric attacks\n^3Duelist ^7gets more saber and melee damage and faster force regen\n^3Force Gunner ^7gets more damage and more resistance to damage\n^3Magic Master ^7gets more Magic Points, new magic bolt types, new magic powers, recovers some jetpack fuel with Magic Points if it runs out and has less magic power cooldown\n^3Force Guardian ^7gets more resistance to damage"
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		""
+		"similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels",
+		"creates an energy area that heals you and your allies and damage enemies",
+		"creates an explosion that does a lot of damage",
+		"creates a dome that does lightning damage. Damage is based on player level",
+		"damages enemies, draining their hp and healing you",
+		"attacks enemies nearby with water, causing high damage",
+		"greatly damages enemies nearby with a stalagmite",
+		"creates a block of ice around you, protecting you from attacks and increasing your resistance to damage",
+		"knocks people down causing damage",
+		"rocks keep falling at the enemies, causing high damage",
+		"a shifting sand appears, sending you to your nearest enemy. Stand near the sand to be transported to the enemy",
+		"a big tree appears, protecting you from attacks and healing you",
+		"fires a flame burst for some seconds",
+		"a flame jet appears at the enemies and damages them",
+		"creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds",
+		"the power of the Fire element boots your strength, making you cause more damage with your attacks and making enemies catch fire if you get near them",
+		"blows people away for some seconds",
+		"makes people go towards you",
+		"increases your run speed",
+		"decreases run speed of enemies nearby",
+		"an energy dome appears at enemies, damaging anyone inside it",
+		"creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers",
+		"makes enemies unable to use magic powers for some seconds. Not so effective against magic using npcs, like bosses",
+		"decreases damage and resistance of enemies nearby",
+		"knocks down enemies for some seconds",
+		"poisons enemies nearby, making them take damage for some seconds",
+		"creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive",
+		"damages, stuns, slowers and electrifies enemies",
+		"damages enemies in the area and recovers your hp",
+		"creates a big shining light around you, draining enemies mp and restoring your health, while slowing them down and confusing them",
+		"protects you from other magic powers for some seconds",
+		"paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed"
 	};
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
@@ -7672,84 +7672,9 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					trap->SendServerCommand( ent->s.number, va("print \"^3%s: ^7%s\n\"", zyk_skill_name(i - 1), zyk_skill_description(i - 1)));
 				}
-				else if (Q_stricmp( arg1, "l" ) == 0)
-				{
-					trap->SendServerCommand( ent-g_entities, va("print \"^3Light Power: ^7Regens 1 hp per second. Regens shield if hp is full. You must finish ^5Light Quest ^7to have it\n\"") );
-				}
-				else if (Q_stricmp( arg1, "d" ) == 0)
-				{
-					trap->SendServerCommand( ent-g_entities, va("print \"^3Dark Power: ^7Increases damage by 10 per cent. You must finish ^1Dark Quest ^7to have it\n\"") );
-				}
-				else if (Q_stricmp( arg1, "e" ) == 0)
-				{
-					trap->SendServerCommand( ent-g_entities, va("print \"^3Eternity Power: ^7Absorbs 10 per cent of damage. You must finish the ^3Eternity Quest ^7to have it\n\"") );
-				}
-				else if (Q_stricmp( arg1, "u" ) == 0)
-				{
-					trap->SendServerCommand( ent-g_entities, va("print \"^3Universe Power: ^7Increases strength of your magic powers, except ultimate power. You must defeat the ^2Guardian of Universe ^7to have it\n\"") );
-				}
-				else if (Q_stricmp( arg1, "!" ) == 0)
-				{
-					if (ent->client->pers.universe_quest_progress < 14)
-					{
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Ultimate Power: ^7You must finish the 14th mission of ^2Universe Quest ^7to have this power\n\"") );
-					}
-					else
-					{
-						if (ent->client->pers.universe_quest_counter & (1 << 0))
-							trap->SendServerCommand(ent->s.number, va("print \"^3Ultra Drain: ^7damages enemies in the area and recovers your hp. Attack with S + special melee to use this power\n\"") );
-						else if (ent->client->pers.universe_quest_counter & (1 << 1))
-							trap->SendServerCommand(ent->s.number, va("print \"^3Immunity Power: ^7protects you from other magic powers. Attack S + with special melee to use this power\n\"") );
-						else if (ent->client->pers.universe_quest_counter & (1 << 2))
-							trap->SendServerCommand(ent->s.number, va("print \"^3Chaos Power: ^7damages, stuns, slowers and electrifies enemies. Attack with S + special melee to use this power\n\"") );
-						else if (ent->client->pers.universe_quest_counter & (1 << 3))
-							trap->SendServerCommand(ent->s.number, va("print \"^3Time Power: ^7paralyzes enemies for some seconds. Disables target enemies force powers, force regen, mp regen and hp/shield regen. Increases target enemies magic cooldown of enemies. Enemies take less damage while paralyzed. Attack with S + special melee to use this power\n\"") );
-					}
-				}
-				else if (Q_stricmp( arg1, "r" ) == 0)
-				{
-					if (ent->client->pers.universe_quest_progress < NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES)
-					{
-						trap->SendServerCommand(ent->s.number, va("print \"^3Final Power: ^7You must finish ^2Universe Quest ^7to have this power\n\""));
-					}
-					else
-					{
-						if (ent->client->pers.universe_quest_counter & (1 << 0))
-							trap->SendServerCommand(ent->s.number, va("print \"^3Magic Regen: ^7regens 1 mp per second. Finish Universe Quest to have it\n\""));
-						else if (ent->client->pers.universe_quest_counter & (1 << 1))
-							trap->SendServerCommand(ent->s.number, va("print \"^3Magic Boost: ^7Decreases cooldown time of magic powers. Finish Universe Quest to have it\n\""));
-						else if (ent->client->pers.universe_quest_counter & (1 << 2))
-							trap->SendServerCommand(ent->s.number, va("print \"^3Unique Boost: ^7decreases cooldown time of unique skill and unique abilities. Finish Universe Quest to have it\n\""));
-						else if (ent->client->pers.universe_quest_counter & (1 << 3))
-							trap->SendServerCommand(ent->s.number, va("print \"^3Magic Improvement: ^7makes Universe Power have no additional mp cost. Finish Universe Quest to have it\n\""));
-					}
-				}
-				else if (Q_stricmp( arg1, "s" ) == 0)
-				{
-					if (ent->client->pers.rpg_class == 0)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Ultra Resistance: ^7increases resistance to damage. Attack with D + special melee to use this power. MP cost: %d\n^3Ultra Strength: ^7increases damage. Attack with A + special melee to use this power. MP cost: %d\n^3Enemy Weakening: ^7decreases damage and resistance of enemies nearby. Attack with W + special melee to use this power. MP cost: %d\n\n\"", zyk_ultra_resistance_mp_cost.integer, zyk_ultra_strength_mp_cost.integer, zyk_enemy_nerf_mp_cost.integer) );
-					else if (ent->client->pers.rpg_class == 1)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Sleeping Flowers: ^7knocks down enemies for some seconds. Attack with D + special melee to use this power. MP cost: %d\n^3Poison Mushrooms: ^7keep damaging the enemies for some time. Attack with A + special melee to use this power. MP cost: %d\n^3Tree of Life: ^7a big tree appears, protecting you from attacks and healing you. Attack with W + special melee to use this power. MP cost: %d\n\"", zyk_sleeping_flowers_mp_cost.integer, zyk_poison_mushrooms_mp_cost.integer, zyk_tree_of_life_mp_cost.integer) );
-					else if (ent->client->pers.rpg_class == 2)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Blowing Wind: ^7blows people away for some seconds. Attack with D + special melee to use this power. MP cost: %d\n^3Hurricane: ^7makes enemies fly up like if they were inside a tornado. Attack with A + special melee to use this power. MP cost: %d\n^3Reverse Wind: ^7makes people go towards you. Attack with W + special melee to use this power. MP cost: %d\n\"", zyk_blowing_wind_mp_cost.integer, zyk_hurricane_mp_cost.integer, zyk_reverse_wind_mp_cost.integer) );
-					else if (ent->client->pers.rpg_class == 3)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Earthquake: ^7knocks people down causing damage. Attack with D + special melee to use this power. MP cost: %d\n^3Rockfall: ^7rocks keep falling at the enemies. Attack with A + special melee to use this power. MP cost: %d\n^3Shifting Sand: ^7a shifting sand appears, sending you to your nearest enemy. Stand near the sand to be transported to the enemy. Attack with W + special melee to use this power. MP cost: %d\n\"", zyk_earthquake_mp_cost.integer, zyk_rockfall_mp_cost.integer, zyk_shifting_sand_mp_cost.integer) );
-					else if (ent->client->pers.rpg_class == 4)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Flame Burst: ^7fires a flame burst for some seconds. Attack with D + special melee to use this power. MP cost: %d\n^3Ultra Flame: ^7a flame jet appears at the enemies and damages them. Attack with A + special melee to use this power. MP cost: %d\n^3Flaming Area: ^7creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds. Attack with W + special melee to use this power. MP cost: %d\n\"", zyk_flame_burst_mp_cost.integer, zyk_ultra_flame_mp_cost.integer, zyk_flaming_area_mp_cost.integer) );
-					else if (ent->client->pers.rpg_class == 5)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Healing Water: ^7instantly recovers some hp. Attack with D + special melee to use this power. MP cost: %d\n^3Water Splash: ^7damages enemies, draining their hp and healing you. Attack with A + special melee to use this power. MP cost: %d\n^3Water Attack: ^7attacks enemies nearby with water, with high damage. Attack with W + special melee to use this power. MP cost: %d\n\"", zyk_healing_water_mp_cost.integer, zyk_water_splash_mp_cost.integer, zyk_water_attack_mp_cost.integer) );
-					else if (ent->client->pers.rpg_class == 6)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Magic Shield: ^7creates a shield that makes you take very little dmage from enemies for a short time. Also protects from Push, Pull and Grip force powers. Attack with D + special melee to use this power. MP cost: %d\n^3Dome of Damage: ^7an energy dome appears at enemies, damaging anyone inside the dome. Attack with A + special melee to use this power. MP cost: %d\n^3Magic Disable: ^7makes enemies unable to use magic powers for some seconds. Not so effective against magic using npcs, like bosses. Attack with W + special melee to use this power. MP cost: %d\n\"", zyk_magic_shield_mp_cost.integer, zyk_dome_of_damage_mp_cost.integer, zyk_magic_disable_mp_cost.integer) );
-					else if (ent->client->pers.rpg_class == 7)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Ultra Speed: ^7increases your run speed. Attack with D + special melee to use this power. MP cost: %d\n^3Slow Motion: ^7decreases the run speed of enemies nearby. Attack with A + special melee to use this power. MP cost: %d\n^3Fast and Slow: ^7increases your speed and decreases enemies speed, with less duration than the other two magic powers. Attack with W + special melee to use this power. MP cost: %d\n\"", zyk_ultra_speed_mp_cost.integer, zyk_slow_motion_mp_cost.integer, zyk_fast_and_slow_mp_cost.integer) );
-					else if (ent->client->pers.rpg_class == 8)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Magic Sense: ^7similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels. MP cost: %d\n^3Healing Area: ^7creates an energy area that heals you and your allies and damage enemies. MP cost: %d\n^3Lightning Dome: ^7creates a dome that does lightning damage. Damage is based on player level. MP cost: %d\n^3Magic Explosion: ^7creates an explosion that does a lot of damage. MP cost: %d\n\nThis class can use any of the Light Quest special powers. Use A, W or D and melee kata to use a power. You can set each of A, W and D powers with the force power keys (usually the F3, F4, F5, F6, F7 and F8 keys)\n\"", zyk_magic_sense_mp_cost.integer, zyk_healing_area_mp_cost.integer, zyk_lightning_dome_mp_cost.integer, zyk_magic_explosion_mp_cost.integer) );
-					else if (ent->client->pers.rpg_class == 9)
-						trap->SendServerCommand( ent-g_entities, va("print \"^3Ice Boulder: ^7creates a boulder that damages and traps enemies nearby for some seconds. Attack with D + special melee to use this power. MP cost: %d\n^3Ice Stalagmite: ^7greatly damages enemies nearby with a stalagmite. Attack with A + special melee to use this power. MP cost: %d\n^3Ice Block: ^7creates a block of ice around you, protecting you from attacks and increasing your resistance to damage. Attack with W + special melee to use this power. MP cost: %d\n\"", zyk_ice_boulder_mp_cost.integer, zyk_ice_stalagmite_mp_cost.integer, zyk_ice_block_mp_cost.integer) );
-				}
 				else
 				{
-					trap->SendServerCommand( ent-g_entities, "print \"Invalid skill number.\n\"" );
+					trap->SendServerCommand( ent->s.number, "print \"Invalid skill number.\n\"" );
 				}
 			}
 		}
@@ -13659,235 +13584,227 @@ void Cmd_Unique_f(gentity_t *ent) {
 Cmd_Magic_f
 ==================
 */
+int zyk_get_magic_cost(int magic_number)
+{
+	int magic_costs[MAX_MAGIC_POWERS] = {
+		5, // Magic Sense
+		5, // Healing Area
+		10, // Magic Explosion
+		15, // Lightning Dome
+		20, // Water Splash
+		21, // Water Attack
+		20, // Ice Stalagmite
+		20, // Ice Block
+		18, // Earthquake
+		18, // Rockfall
+		18, // Shifting Sand
+		17, // Tree of Life
+		23, // Flame Burst
+		21, // Ultra Flame
+		22, // Flaming Area
+		15, // Flaming Rage
+		20, // Blowing Wind
+		23, // Reverse Wind
+		17, // Ultra Speed
+		17, // Slow Motion
+		22, // Dome of Damage
+		25, // Magic Shield
+		18, // Magic Disable
+		18, // Enemy Weakening
+		25, // Sleeping Flowers
+		18, // Poison Mushrooms
+		30, // Black Hole
+		30, // Chaos Power
+		30, // Ultra Drain
+		30, // Light of Judgement
+		30, // Magic Immunity
+		30 // Time Stop
+	};
+
+	return magic_costs[magic_number];
+}
+
 void zyk_cast_magic(gentity_t* ent, int magic_number)
 {
 	if (ent->client->pers.quest_power_usage_timer < level.time)
 	{
 		ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
 
-		if (magic_number == MAGIC_MAGIC_SENSE && ent->client->pers.magic_power >= zyk_magic_sense_mp_cost.integer)
+		if (ent->client->pers.magic_power >= zyk_get_magic_cost(magic_number))
 		{
-			magic_sense(ent, 3000);
-			ent->client->pers.magic_power -= zyk_magic_sense_mp_cost.integer;
+			if (magic_number == MAGIC_MAGIC_SENSE)
+			{
+				magic_sense(ent, 3000);
+				zyk_set_magic_power_cooldown_time(ent, 14000);
+			}
+			else if (magic_number == MAGIC_HEALING_AREA)
+			{
+				healing_area(ent, 2, 5000);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
+			}
+			else if (magic_number == MAGIC_MAGIC_EXPLOSION)
+			{
+				magic_explosion(ent, 320, 130, 900);
+				zyk_set_magic_power_cooldown_time(ent, 24000);
+			}
+			else if (magic_number == MAGIC_LIGHTNING_DOME)
+			{
+				lightning_dome(ent, 70);
+				zyk_set_magic_power_cooldown_time(ent, 25000);
+			}
+			else if (magic_number == MAGIC_WATER_SPLASH)
+			{
+				water_splash(ent, 400, 15);
+				zyk_set_magic_power_cooldown_time(ent, 11000);
+			}
+			else if (magic_number == MAGIC_WATER_ATTACK)
+			{
+				water_attack(ent, 500, 40);
+				zyk_set_magic_power_cooldown_time(ent, 12000);
+			}
+			else if (magic_number == MAGIC_ICE_STALAGMITE)
+			{
+				ice_stalagmite(ent, 500, 130);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
+			}
+			else if (magic_number == MAGIC_ICE_BLOCK)
+			{
+				ice_block(ent, 3500);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
+			}
+			else if (magic_number == MAGIC_EARTHQUAKE)
+			{
+				earthquake(ent, 2000, 300, 500);
+				zyk_set_magic_power_cooldown_time(ent, 11000);
+			}
+			else if (magic_number == MAGIC_ROCKFALL)
+			{
+				rock_fall(ent, 500, 40);
+				zyk_set_magic_power_cooldown_time(ent, 11000);
+			}
+			else if (magic_number == MAGIC_SHIFTING_SAND)
+			{
+				shifting_sand(ent, 1000);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
+			}
+			else if (magic_number == MAGIC_TREE_OF_LIFE)
+			{
+				tree_of_life(ent);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
+			}
+			else if (magic_number == MAGIC_FLAME_BURST)
+			{
+				flame_burst(ent, 5000);
+				zyk_set_magic_power_cooldown_time(ent, 10000);
+			}
+			else if (magic_number == MAGIC_ULTRA_FLAME)
+			{
+				ultra_flame(ent, 600, 35);
+				zyk_set_magic_power_cooldown_time(ent, 10000);
+			}
+			else if (magic_number == MAGIC_FLAMING_AREA)
+			{
+				flaming_area(ent, 20);
+				zyk_set_magic_power_cooldown_time(ent, 18000);
+			}
+			else if (magic_number == MAGIC_FLAMING_RAGE)
+			{
 
-			zyk_set_magic_power_cooldown_time(ent, 14000);
+			}
+			else if (magic_number == MAGIC_BLOWING_WIND)
+			{
+				blowing_wind(ent, 700, 5000);
+				zyk_set_magic_power_cooldown_time(ent, 12000);
+			}
+			else if (magic_number == MAGIC_REVERSE_WIND)
+			{
+				reverse_wind(ent, 700, 5000);
+				zyk_set_magic_power_cooldown_time(ent, 12000);
+			}
+			else if (magic_number == MAGIC_ULTRA_SPEED)
+			{
+				ultra_speed(ent, 15000);
+				zyk_set_magic_power_cooldown_time(ent, 9000);
+			}
+			else if (magic_number == MAGIC_SLOW_MOTION)
+			{
+				slow_motion(ent, 400, 15000);
+				zyk_set_magic_power_cooldown_time(ent, 9000);
+			}
+			else if (magic_number == MAGIC_DOME_OF_DAMAGE)
+			{
+				dome_of_damage(ent, 500, 25);
+				zyk_set_magic_power_cooldown_time(ent, 16000);
+			}
+			else if (magic_number == MAGIC_MAGIC_SHIELD)
+			{
+				magic_shield(ent, 6000);
+				zyk_set_magic_power_cooldown_time(ent, 24000);
+			}
+			else if (magic_number == MAGIC_MAGIC_DISABLE)
+			{
+				magic_disable(ent, 450);
+				zyk_set_magic_power_cooldown_time(ent, 6000);
+			}
+			else if (magic_number == MAGIC_ENEMY_WEAKENING)
+			{
+				enemy_nerf(ent, 450);
+				zyk_set_magic_power_cooldown_time(ent, 12000);
+			}
+			else if (magic_number == MAGIC_SLEEPING_FLOWERS)
+			{
+				sleeping_flowers(ent, 2500, 350);
+				zyk_set_magic_power_cooldown_time(ent, 15000);
+			}
+			else if (magic_number == MAGIC_POISON_MUSHROOMS)
+			{
+				poison_mushrooms(ent, 100, 600);
+				zyk_set_magic_power_cooldown_time(ent, 10000);
+			}
+			else if (magic_number == MAGIC_BLACK_HOLE)
+			{
+
+			}
+			else if (magic_number == MAGIC_CHAOS_POWER)
+			{
+				chaos_power(ent, 400, 4600);
+				zyk_set_magic_power_cooldown_time(ent, 28000);
+			}
+			else if (magic_number == MAGIC_ULTRA_DRAIN)
+			{
+				ultra_drain(ent, 450, 30, 8000);
+				zyk_set_magic_power_cooldown_time(ent, 28000);
+			}
+			else if (magic_number == MAGIC_LIGHT_OF_JUDGEMENT)
+			{
+
+			}
+			else if (magic_number == MAGIC_MAGIC_IMMUNITY)
+			{
+				immunity_power(ent, 25000);
+				zyk_set_magic_power_cooldown_time(ent, 28000);
+
+				ent->client->pers.player_statuses |= (1 << 15);
+			}
+			else if (magic_number == MAGIC_TIME_STOP)
+			{
+				time_power(ent, 400, 4000);
+				zyk_set_magic_power_cooldown_time(ent, 28000);
+			}
+
+			// zyk: magic powers cost mp
+			ent->client->pers.magic_power -= zyk_get_magic_cost(magic_number);
+
+			zyk_show_magic_in_chat(ent, magic_number);
+
+			display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
+
+			send_rpg_events(2000);
 		}
-		else if (magic_number == MAGIC_HEALING_AREA && ent->client->pers.magic_power >= zyk_healing_area_mp_cost.integer)
+		else
 		{
-			healing_area(ent, 2, 5000);
-			ent->client->pers.magic_power -= zyk_healing_area_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 20000);
+			trap->SendServerCommand(ent->s.number, va("print \"You need %d mp to cast this magic.\n\"", zyk_get_magic_cost(magic_number)));
 		}
-		else if (magic_number == MAGIC_MAGIC_EXPLOSION && ent->client->pers.magic_power >= zyk_magic_explosion_mp_cost.integer)
-		{
-			magic_explosion(ent, 320, 130, 900);
-			ent->client->pers.magic_power -= zyk_magic_explosion_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 24000);
-		}
-		else if (magic_number == MAGIC_LIGHTNING_DOME && ent->client->pers.magic_power >= zyk_lightning_dome_mp_cost.integer)
-		{
-			lightning_dome(ent, 70);
-			ent->client->pers.magic_power -= zyk_lightning_dome_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 25000);
-		}
-		else if (magic_number == MAGIC_WATER_SPLASH && ent->client->pers.magic_power >= zyk_water_splash_mp_cost.integer)
-		{
-			water_splash(ent, 400, 15);
-			ent->client->pers.magic_power -= zyk_water_splash_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 11000);
-		}
-		else if (magic_number == MAGIC_WATER_ATTACK && ent->client->pers.magic_power >= zyk_water_attack_mp_cost.integer)
-		{
-			water_attack(ent, 500, 40);
-			ent->client->pers.magic_power -= zyk_water_attack_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 12000);
-		}
-		else if (magic_number == MAGIC_ICE_STALAGMITE && ent->client->pers.magic_power >= zyk_ice_stalagmite_mp_cost.integer)
-		{
-			ice_stalagmite(ent, 500, 130);
-			ent->client->pers.magic_power -= zyk_ice_stalagmite_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 20000);
-		}
-		else if (magic_number == MAGIC_ICE_BLOCK && ent->client->pers.magic_power >= zyk_ice_block_mp_cost.integer)
-		{
-			ice_block(ent, 3500);
-			ent->client->pers.magic_power -= zyk_ice_block_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 20000);
-		}
-		else if (magic_number == MAGIC_EARTHQUAKE && ent->client->pers.magic_power >= zyk_earthquake_mp_cost.integer)
-		{
-			earthquake(ent, 2000, 300, 500);
-			ent->client->pers.magic_power -= zyk_earthquake_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 11000);
-		}
-		else if (magic_number == MAGIC_ROCKFALL && ent->client->pers.magic_power >= zyk_rockfall_mp_cost.integer)
-		{
-			rock_fall(ent, 500, 40);
-			ent->client->pers.magic_power -= zyk_rockfall_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 11000);
-		}
-		else if (magic_number == MAGIC_SHIFTING_SAND && ent->client->pers.magic_power >= zyk_shifting_sand_mp_cost.integer)
-		{
-			shifting_sand(ent, 1000);
-			ent->client->pers.magic_power -= zyk_shifting_sand_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 20000);
-		}
-		else if (magic_number == MAGIC_TREE_OF_LIFE && ent->client->pers.magic_power >= zyk_tree_of_life_mp_cost.integer)
-		{
-			tree_of_life(ent);
-			ent->client->pers.magic_power -= zyk_tree_of_life_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 20000);
-		}
-		else if (magic_number == MAGIC_FLAME_BURST && ent->client->pers.magic_power >= zyk_flame_burst_mp_cost.integer)
-		{
-			flame_burst(ent, 5000);
-			ent->client->pers.magic_power -= zyk_flame_burst_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 10000);
-		}
-		else if (magic_number == MAGIC_ULTRA_FLAME && ent->client->pers.magic_power >= zyk_ultra_flame_mp_cost.integer)
-		{
-			ultra_flame(ent, 600, 35);
-			ent->client->pers.magic_power -= zyk_ultra_flame_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 10000);
-		}
-		else if (magic_number == MAGIC_FLAMING_AREA && ent->client->pers.magic_power >= zyk_flaming_area_mp_cost.integer)
-		{
-			flaming_area(ent, 20);
-			ent->client->pers.magic_power -= zyk_flaming_area_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 18000);
-		}
-		else if (magic_number == MAGIC_FLAMING_RAGE)
-		{
-			
-		}
-		else if (magic_number == MAGIC_BLOWING_WIND && ent->client->pers.magic_power >= zyk_blowing_wind_mp_cost.integer)
-		{
-			blowing_wind(ent, 700, 5000);
-			ent->client->pers.magic_power -= zyk_blowing_wind_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 12000);
-		}
-		else if (magic_number == MAGIC_REVERSE_WIND && ent->client->pers.magic_power >= zyk_reverse_wind_mp_cost.integer)
-		{
-			reverse_wind(ent, 700, 5000);
-			ent->client->pers.magic_power -= zyk_reverse_wind_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 12000);
-		}
-		else if (magic_number == MAGIC_ULTRA_SPEED && ent->client->pers.magic_power >= zyk_ultra_speed_mp_cost.integer)
-		{
-			ultra_speed(ent, 15000);
-			ent->client->pers.magic_power -= zyk_ultra_speed_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 9000);
-		}
-		else if (magic_number == MAGIC_SLOW_MOTION && ent->client->pers.magic_power >= zyk_slow_motion_mp_cost.integer)
-		{
-			slow_motion(ent, 400, 15000);
-			ent->client->pers.magic_power -= zyk_slow_motion_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 9000);
-		}
-		else if (magic_number == MAGIC_DOME_OF_DAMAGE && ent->client->pers.magic_power >= zyk_dome_of_damage_mp_cost.integer)
-		{
-			dome_of_damage(ent, 500, 25);
-			ent->client->pers.magic_power -= zyk_dome_of_damage_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 16000);
-		}
-		else if (magic_number == MAGIC_MAGIC_SHIELD && ent->client->pers.magic_power >= zyk_magic_shield_mp_cost.integer)
-		{
-			magic_shield(ent, 6000);
-			ent->client->pers.magic_power -= zyk_magic_shield_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 24000);
-		}
-		else if (magic_number == MAGIC_MAGIC_DISABLE && ent->client->pers.magic_power >= zyk_magic_disable_mp_cost.integer)
-		{
-			magic_disable(ent, 450);
-			ent->client->pers.magic_power -= zyk_magic_disable_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 6000);
-		}
-		else if (magic_number == MAGIC_ENEMY_WEAKENING && ent->client->pers.magic_power >= zyk_enemy_nerf_mp_cost.integer)
-		{
-			enemy_nerf(ent, 450);
-			ent->client->pers.magic_power -= zyk_enemy_nerf_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 12000);
-		}
-		else if (magic_number == MAGIC_SLEEPING_FLOWERS && ent->client->pers.magic_power >= zyk_sleeping_flowers_mp_cost.integer)
-		{
-			sleeping_flowers(ent, 2500, 350);
-			ent->client->pers.magic_power -= zyk_sleeping_flowers_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 15000);
-		}
-		else if (magic_number == MAGIC_POISON_MUSHROOMS && ent->client->pers.magic_power >= zyk_poison_mushrooms_mp_cost.integer)
-		{
-			poison_mushrooms(ent, 100, 600);
-			ent->client->pers.magic_power -= (int)ceil((zyk_poison_mushrooms_mp_cost.integer));
-
-			zyk_set_magic_power_cooldown_time(ent, 10000);
-		}
-		else if (magic_number == MAGIC_BLACK_HOLE)
-		{
-			
-		}
-		else if (magic_number == MAGIC_CHAOS_POWER && ent->client->pers.magic_power >= zyk_chaos_power_mp_cost.integer)
-		{ // zyk: uses Chaos Power
-			chaos_power(ent, 400, 4600);
-			ent->client->pers.magic_power -= zyk_chaos_power_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 28000);
-		}
-		else if (magic_number == MAGIC_ULTRA_DRAIN && ent->client->pers.magic_power >= zyk_ultra_drain_mp_cost.integer)
-		{ // zyk: Ultra Drain
-			ultra_drain(ent, 450, 30, 8000);
-			ent->client->pers.magic_power -= zyk_ultra_drain_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 28000);
-		}
-		else if (magic_number == MAGIC_LIGHT_OF_JUDGEMENT)
-		{
-			
-		}
-		else if (magic_number == MAGIC_MAGIC_IMMUNITY && ent->client->pers.magic_power >= zyk_immunity_power_mp_cost.integer)
-		{ // zyk: Immunity Power
-			immunity_power(ent, 25000);
-			ent->client->pers.magic_power -= zyk_immunity_power_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 28000);
-
-			ent->client->pers.player_statuses |= (1 << 15);
-		}
-		else if (magic_number == MAGIC_TIME_STOP && ent->client->pers.magic_power >= zyk_time_power_mp_cost.integer)
-		{ // zyk: uses Time Power
-			time_power(ent, 400, 4000);
-			ent->client->pers.magic_power -= zyk_time_power_mp_cost.integer;
-
-			zyk_set_magic_power_cooldown_time(ent, 28000);
-		}
-
-		zyk_show_magic_in_chat(ent, magic_number);
-
-		display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
-
-		send_rpg_events(2000);
 	}
 	else
 	{
@@ -13906,11 +13823,13 @@ void Cmd_Magic_f( gentity_t *ent ) {
 	else
 	{
 		int magic_power_skill_number = 0;
-		int skill_index = magic_power_skill_number - 1;
+		int skill_index = (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS);
 
 		trap->Argv( 1, arg1, sizeof( arg1 ) );
 
 		magic_power_skill_number = atoi(arg1);
+
+		skill_index = magic_power_skill_number - 1;
 
 		if (magic_power_skill_number <= (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) || magic_power_skill_number > NUMBER_OF_SKILLS)
 		{
