@@ -13627,19 +13627,23 @@ int zyk_get_magic_cost(int magic_number)
 void zyk_cast_magic(gentity_t* ent, int skill_index, int magic_number)
 {
 	if (ent->client->pers.quest_power_usage_timer < level.time)
-	{
-		// zyk: magic usage effect
-		if (ent->client->pers.skill_levels[skill_index] > 1)
-		{
-			ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = level.time + 1000;
-		}
-		else
-		{
-			ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
-		}
-		
+	{		
 		if (ent->client->pers.magic_power >= zyk_get_magic_cost(magic_number))
 		{
+			// zyk: magic usage effect
+			if (ent->client->pers.skill_levels[skill_index] > 1)
+			{
+				ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = level.time + 1000;
+			}
+			else
+			{
+				ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
+			}
+
+			// zyk: magic usage anim
+			G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCELIGHTNING_HOLD, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+			ent->client->ps.weaponTime = 1000;
+
 			if (magic_number == MAGIC_MAGIC_SENSE)
 			{
 				magic_sense(ent, 3000);
