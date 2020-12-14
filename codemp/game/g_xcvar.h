@@ -326,7 +326,6 @@ XCVAR_DEF( zyk_flame_thrower_damage,	"2",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART
 XCVAR_DEF( zyk_add_ammo_scale,	"0.5",					NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_rp_mode,		"0",						NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_allow_saving_in_rp_mode,	"0",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
-XCVAR_DEF( zyk_allow_class_change,		"1",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_allow_free_warrior,		"1",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_allow_force_user,		"1",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_allow_bounty_hunter,		"1",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )

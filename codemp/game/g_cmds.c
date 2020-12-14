@@ -10866,18 +10866,20 @@ void do_change_class(gentity_t *ent, int value)
 
 	if (value < 0 || value > 9)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid RPG Class.\n\"" );
+		trap->SendServerCommand(ent->s.number, "print \"Invalid RPG Class.\n\"" );
 		return;
 	}
 
-	if (zyk_allow_class_change.integer != 1 && ent->client->pers.level > 1)
+	if (ent->client->pers.level > 1)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You cannot change class after level 1 in this server.\n\"" );
+		trap->SendServerCommand(ent->s.number, "print \"You cannot change class after level 1.\n\"" );
 		return;
 	}
+
+	// zyk: change the class
+	ent->client->pers.rpg_class = value;
 
 	// zyk validating the new class
-	ent->client->pers.rpg_class = value;
 	if (validate_rpg_class(ent) == qfalse)
 	{
 		ent->client->pers.rpg_class = old_class;
@@ -10885,17 +10887,6 @@ void do_change_class(gentity_t *ent, int value)
 	}
 
 	ent->client->pers.rpg_class = old_class;
-
-	if (zyk_allow_class_change.integer == 1)
-	{
-		if (ent->client->pers.credits < 20)
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"You don't have enough credits to change your class.\n\"" );
-			return;
-		}
-
-		remove_credits(ent, 20);
-	}
 
 	save_config(ent);
 
@@ -10915,7 +10906,7 @@ void do_change_class(gentity_t *ent, int value)
 
 	save_account(ent, qtrue);
 
-	trap->SendServerCommand( ent-g_entities, va("print \"You are now a %s\n\"", zyk_rpg_class(ent)) );
+	trap->SendServerCommand(ent->s.number, va("print \"You are now a %s\n\"", zyk_rpg_class(ent)) );
 
 	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 	{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
