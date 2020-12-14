@@ -519,10 +519,6 @@ typedef struct clientSession_s {
 	// 4 - Ultra Bolt
 	int magic_fist_selection;
 
-	// zyk: magic powers that will not be shown in Magic power selection
-	int magic_disabled_powers;
-	int magic_more_disabled_powers;
-
 	// zyk: vote timer, used to avoid vote spam
 	int vote_timer;
 

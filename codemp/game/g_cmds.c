@@ -4372,19 +4372,8 @@ qboolean TryGrapple(gentity_t *ent)
 						}
 					}
 				}
-
-				if (ent->client->sess.magic_disabled_powers & (1 << use_this_power))
-				{ // zyk: if the magic power is not enabled or player does not have it, do not use it
-					use_this_power = -1;
-				}
-
-				if (ent->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && ent->client->pers.universe_quest_counter & (1 << 3) && 
-					!(ent->client->sess.magic_more_disabled_powers & (1 << 1)))
-				{ // zyk: Magic Improvement. Decreases mp cost of Universe Power
-					universe_mp_cost_factor = 1.0;
-				}
 				
-				if (ent->client->pers.cmd.forwardmove < 0 && ent->client->pers.universe_quest_progress >= 14 && !(ent->client->sess.magic_more_disabled_powers & (1 << 0)))
+				if (ent->client->pers.cmd.forwardmove < 0 && ent->client->pers.universe_quest_progress >= 14)
 				{ // zyk: Ultimate Power
 					if (zyk_enable_ultra_drain.integer == 1 && ent->client->pers.universe_quest_counter & (1 << 0) && ent->client->pers.magic_power >= zyk_ultra_drain_mp_cost.integer)
 					{ // zyk: Ultra Drain
@@ -4689,15 +4678,6 @@ qboolean TryGrapple(gentity_t *ent)
 
 						zyk_show_magic_in_chat(ent, use_this_power);
 					}
-				}
-
-				if (ent->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && ent->client->pers.universe_quest_counter & (1 << 1) && 
-					!(ent->client->sess.magic_more_disabled_powers & (1 << 1)))
-				{ // zyk: Magic Boost, reward for completing quests in Guardians Sequel. Decreases cooldown time of magic powers
-					if (ent->client->pers.rpg_class == 8)
-						ent->client->pers.quest_power_usage_timer -= 500;
-					else
-						ent->client->pers.quest_power_usage_timer -= 3000;
 				}
 
 				display_yellow_bar(ent,(ent->client->pers.quest_power_usage_timer - level.time));
@@ -5098,14 +5078,6 @@ void load_account(gentity_t *ent)
 			fscanf(account_file, "%s", content);
 			ent->client->pers.rpg_class = atoi(content);
 
-			// zyk: loading disabled magic powers
-			fscanf(account_file, "%s", content);
-			ent->client->sess.magic_disabled_powers = atoi(content);
-
-			// zyk: loading more disabled magic powers
-			fscanf(account_file, "%s", content);
-			ent->client->sess.magic_more_disabled_powers = atoi(content);
-
 			// zyk: loading Magic Master first selection and selected powers
 			fscanf(account_file, "%s", content);
 			ent->client->sess.magic_fist_selection = atoi(content);
@@ -5182,11 +5154,10 @@ void save_account(gentity_t *ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt",ent->client->sess.filename, ent->client->sess.rpgchar),"w");
 
-			fprintf(account_file,"%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+			fprintf(account_file,"%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
 			client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.defeated_guardians, client->pers.hunter_quest_progress
 			, client->pers.eternity_quest_progress, client->pers.secrets_found, client->pers.universe_quest_progress, client->pers.universe_quest_counter, client->pers.credits
-			, client->pers.rpg_class, client->sess.magic_disabled_powers, client->sess.magic_more_disabled_powers, client->sess.magic_fist_selection, client->sess.selected_special_power
-			, client->sess.selected_left_special_power, client->sess.selected_right_special_power);
+			, client->pers.rpg_class, client->sess.magic_fist_selection, client->sess.selected_special_power, client->sess.selected_left_special_power, client->sess.selected_right_special_power);
 
 			fclose(account_file);
 		}
@@ -5874,8 +5845,6 @@ void add_new_char(gentity_t *ent)
 	ent->client->pers.universe_quest_counter = 0;
 	ent->client->pers.credits = 100;
 	ent->client->pers.rpg_class = 0;
-	ent->client->sess.magic_disabled_powers = 0;
-	ent->client->sess.magic_more_disabled_powers = 0;
 	ent->client->sess.selected_special_power = MAGIC_MAGIC_SENSE;
 	ent->client->sess.selected_left_special_power = MAGIC_MAGIC_SENSE;
 	ent->client->sess.selected_right_special_power = MAGIC_MAGIC_SENSE;
@@ -6003,192 +5972,6 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	ent->client->pers.player_statuses |= (1 << 25);
 }
 
-// zyk: loads the player account the old way
-void legacy_load_account(gentity_t *ent)
-{
-	FILE *account_file;
-	char content[128];
-
-	strcpy(content, "");
-	account_file = fopen(va("zykmod/accounts/%s.txt", ent->client->sess.filename), "r");
-	if (account_file != NULL)
-	{
-		int i = 0;
-		// zyk: this variable will validate the skillpoints this player has
-		// if he has more than the max skillpoints defined, then server must remove the exceeding ones
-		int validate_skillpoints = 0;
-		int max_skillpoints = 0;
-		int j = 0;
-
-		// zyk: loading the account password
-		fscanf(account_file, "%s", content);
-		strcpy(ent->client->pers.password, content);
-
-		// zyk: loading the amrpgmode value
-		fscanf(account_file, "%s", content);
-		ent->client->sess.amrpgmode = atoi(content);
-
-		if ((zyk_allow_rpg_mode.integer == 0 || (zyk_allow_rpg_in_other_gametypes.integer == 0 && level.gametype != GT_FFA)) && ent->client->sess.amrpgmode == 2)
-		{ // zyk: RPG Mode not allowed. Change his account to Admin-Only Mode
-			ent->client->sess.amrpgmode = 1;
-		}
-		else if (level.gametype == GT_SIEGE || level.gametype == GT_JEDIMASTER)
-		{ // zyk: Siege and Jedi Master will never allow RPG Mode
-			ent->client->sess.amrpgmode = 1;
-		}
-
-		// zyk: loading player_settings value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.player_settings = atoi(content);
-
-		// zyk: loading the admin command bit value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.bitvalue = atoi(content);
-
-		// zyk: loading level up score value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.level_up_score = atoi(content);
-
-		// zyk: loading Level value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.level = atoi(content);
-
-		// zyk: loading Skillpoints value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.skillpoints = atoi(content);
-
-		if (ent->client->pers.level > zyk_rpg_max_level.integer)
-		{ // zyk: validating level
-			ent->client->pers.level = zyk_rpg_max_level.integer;
-		}
-		else if (ent->client->pers.level < 1)
-		{
-			ent->client->pers.level = 1;
-		}
-
-		for (j = 1; j <= ent->client->pers.level; j++)
-		{
-			if ((j % 10) == 0)
-			{ // zyk: level divisible by 10 has more skillpoints
-				max_skillpoints += (1 + j / 10);
-			}
-			else
-			{
-				max_skillpoints++;
-			}
-		}
-
-		validate_skillpoints = ent->client->pers.skillpoints;
-		// zyk: loading skill levels
-		for (i = 0; i < NUMBER_OF_SKILLS; i++)
-		{
-			fscanf(account_file, "%s", content);
-			ent->client->pers.skill_levels[i] = atoi(content);
-			validate_skillpoints += ent->client->pers.skill_levels[i];
-		}
-
-		// zyk: validating skillpoints
-		if (validate_skillpoints != max_skillpoints)
-		{
-			// zyk: if not valid, reset all skills and set the max skillpoints he can have in this level
-			for (i = 0; i < NUMBER_OF_SKILLS; i++)
-			{
-				ent->client->pers.skill_levels[i] = 0;
-			}
-
-			ent->client->pers.skillpoints = max_skillpoints;
-		}
-
-		// zyk: Other RPG attributes
-		// zyk: loading Light Quest Defeated Guardians number value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.defeated_guardians = atoi(content);
-
-		// zyk: compability with old mod versions, in which the players who completed the quest had a value of 9
-		if (ent->client->pers.defeated_guardians == 9)
-			ent->client->pers.defeated_guardians = NUMBER_OF_GUARDIANS;
-
-		// zyk: loading Dark Quest completed objectives value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.hunter_quest_progress = atoi(content);
-
-		// zyk: loading Eternity Quest progress value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.eternity_quest_progress = atoi(content);
-
-		// zyk: loading secrets found value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.secrets_found = atoi(content);
-
-		// zyk: loading Universe Quest Progress value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.universe_quest_progress = atoi(content);
-
-		// zyk: loading Universe Quest Counter value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.universe_quest_counter = atoi(content);
-
-		// zyk: loading credits value
-		fscanf(account_file, "%s", content);
-		ent->client->pers.credits = atoi(content);
-
-		// zyk: validating credits
-		if (ent->client->pers.credits > zyk_max_rpg_credits.integer)
-		{
-			ent->client->pers.credits = zyk_max_rpg_credits.integer;
-		}
-		else if (ent->client->pers.credits < 0)
-		{
-			ent->client->pers.credits = 0;
-		}
-
-		// zyk: loading RPG class
-		fscanf(account_file, "%s", content);
-		ent->client->pers.rpg_class = atoi(content);
-
-		// zyk: loading disabled magic powers
-		fscanf(account_file, "%s", content);
-		ent->client->sess.magic_disabled_powers = atoi(content);
-
-		// zyk: loading more disabled magic powers
-		fscanf(account_file, "%s", content);
-		ent->client->sess.magic_more_disabled_powers = atoi(content);
-
-		if (ent->client->sess.amrpgmode == 1)
-		{
-			ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
-
-			// zyk: setting default max hp and shield
-			ent->client->ps.stats[STAT_MAX_HEALTH] = 100;
-
-			if (ent->health > 100)
-				ent->health = 100;
-
-			if (ent->client->ps.stats[STAT_ARMOR] > 100)
-				ent->client->ps.stats[STAT_ARMOR] = 100;
-
-			// zyk: reset the force powers of this player
-			WP_InitForcePowers(ent);
-
-			if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] > FORCE_LEVEL_0 &&
-				level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE
-				)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
-
-			if (level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
-
-			zyk_load_common_settings(ent);
-		}
-
-		fclose(account_file);
-	}
-	else
-	{
-		trap->SendServerCommand(ent - g_entities, "print \"There is no account with this login or password.\n\"");
-	}
-}
-
 /*
 ==================
 Cmd_LoginAccount_f
@@ -6208,7 +5991,7 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 
 		if ( trap->Argc() != 3)
 		{ 
-			trap->SendServerCommand( ent-g_entities, "print \"You must write your login and password.\n\"" ); 
+			trap->SendServerCommand( ent->s.number, "print \"You must write your login and password.\n\"" );
 			return;
 		}
 
@@ -6220,7 +6003,7 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 			player_ent = &g_entities[i];
 			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode > 0 && Q_stricmp(player_ent->client->sess.filename,arg1) == 0)
 			{
-				trap->SendServerCommand( ent-g_entities, "print \"There is already someone logged in this account.\n\"" );
+				trap->SendServerCommand( ent->s.number, "print \"There is already someone logged in this account.\n\"" );
 				return;
 			}
 		}
@@ -6242,7 +6025,7 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 		account_file = fopen(va("zykmod/accounts/%s.txt",arg1),"r");
 		if (account_file == NULL)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"Login does not exist.\n\"" );
+			trap->SendServerCommand( ent->s.number, "print \"Login does not exist.\n\"" );
 			return;
 		}
 
@@ -6251,7 +6034,7 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 		fclose(account_file);
 		if (strlen(password) != strlen(arg2) || Q_strncmp(password, arg2, strlen(password)) != 0)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"The password is incorrect.\n\"" );
+			trap->SendServerCommand( ent->s.number, "print \"The password is incorrect.\n\"" );
 			return;
 		}
 
@@ -6259,30 +6042,16 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 		strcpy(ent->client->sess.filename, arg1);
 		strcpy(ent->client->pers.password, arg2);
 
-		account_file = fopen(va("zykmod/accounts/%s_%s.txt", arg1, arg1), "r");
-		if (account_file == NULL)
-		{ // zyk: old account. Use the legacy function to convert it to the Char system
-			legacy_load_account(ent);
-
-			// zyk: saving the default char
-			strcpy(ent->client->sess.rpgchar, arg1);
-
-			save_account(ent, qfalse);
-			save_account(ent, qtrue);
-		}
-		else
-		{
-			fclose(account_file);
-
-			load_account(ent);
-		}
+		load_account(ent);
 
 		if (ent->client->sess.amrpgmode == 1)
-			trap->SendServerCommand( ent-g_entities, "print \"^7Account loaded succesfully in ^2Admin-Only Mode^7. Use command ^3/list^7.\n\"" );
+		{
+			trap->SendServerCommand(ent->s.number, "print \"^7Account loaded succesfully in ^2Admin-Only Mode^7. Use command ^3/list^7.\n\"");
+		}
 		else if (ent->client->sess.amrpgmode == 2)
 		{
 			initialize_rpg_skills(ent);
-			trap->SendServerCommand( ent-g_entities, "print \"^7Account loaded succesfully in ^2RPG Mode^7. Use command ^3/list^7.\n\"" );
+			trap->SendServerCommand( ent->s.number, "print \"^7Account loaded succesfully in ^2RPG Mode^7. Use command ^3/list^7.\n\"" );
 
 			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
@@ -6292,7 +6061,7 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 	}
 	else
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You are already logged in.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"You are already logged in.\n\"" );
 	}
 }
 
@@ -7134,12 +6903,6 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 		else if (ent->client->pers.universe_quest_progress > 14)
 		{
 			universe_quest_counter_value = ent->client->pers.universe_quest_counter;
-
-			if (ent->client->pers.unique_skill_timer > level.time && ent->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES &&
-				ent->client->pers.universe_quest_counter & (1 << 2) && !(ent->client->sess.magic_more_disabled_powers & (1 << 1)))
-			{ // zyk: Unique Boost decreases unique cooldown time
-				universe_quest_counter_value |= (1 << 30);
-			}
 		}
 
 		if (ent->client->pers.unique_skill_duration > level.time)
@@ -9595,7 +9358,7 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 			
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"^2Choose one of the options below\n\n^3/resetaccount rpg: ^7resets your entire account except admin commands.\n^3/resetaccount quests: ^7resets your RPG quests.\n^3/resetaccount levels: ^7resets your levels and upgrades.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"^2Choose one of the options below\n\n^3/resetaccount rpg: ^7resets your entire account except admin commands.\n^3/resetaccount quests: ^7resets your RPG quests.\n^3/resetaccount levels: ^7resets your levels and upgrades.\n\"" );
 		return;
 	}
 
@@ -9631,12 +9394,10 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 		ent->client->sess.selected_left_special_power = MAGIC_MAGIC_SENSE;
 		ent->client->sess.selected_right_special_power = MAGIC_MAGIC_SENSE;
 		ent->client->sess.magic_fist_selection = 0;
-		ent->client->sess.magic_disabled_powers = 0;
-		ent->client->sess.magic_more_disabled_powers = 0;
 
 		save_account(ent, qtrue);
 
-		trap->SendServerCommand( ent-g_entities, "print \"Your entire account is reset.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"Your entire account is reset.\n\"" );
 
 		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
@@ -9657,7 +9418,7 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 
 		save_account(ent, qtrue);
 
-		trap->SendServerCommand( ent-g_entities, "print \"Your quests are reset.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"Your quests are reset.\n\"" );
 
 		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
@@ -9684,12 +9445,10 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 		ent->client->sess.selected_left_special_power = MAGIC_MAGIC_SENSE;
 		ent->client->sess.selected_right_special_power = MAGIC_MAGIC_SENSE;
 		ent->client->sess.magic_fist_selection = 0;
-		ent->client->sess.magic_disabled_powers = 0;
-		ent->client->sess.magic_more_disabled_powers = 0;
 
 		save_account(ent, qtrue);
 
-		trap->SendServerCommand( ent-g_entities, "print \"Your levels are reset.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"Your levels are reset.\n\"" );
 
 		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
@@ -9698,7 +9457,7 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 	}
 	else
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid option.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"Invalid option.\n\"" );
 	}
 }
 
@@ -13171,16 +12930,6 @@ qboolean zyk_can_use_unique(gentity_t *ent)
 	return qtrue;
 }
 
-// zyk: Unique Boost, makes unique skill cooldown time lower
-void zyk_unique_boost(gentity_t *ent)
-{
-	if (ent->client->pers.unique_skill_timer > level.time && ent->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES &&
-		ent->client->pers.universe_quest_counter & (1 << 2) && !(ent->client->sess.magic_more_disabled_powers & (1 << 1)))
-	{
-		ent->client->pers.unique_skill_timer -= ((ent->client->pers.unique_skill_timer - level.time) / 5);
-	}
-}
-
 /*
 ==================
 Cmd_Unique_f
@@ -13526,7 +13275,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 				}
 			}
 
-			zyk_unique_boost(ent);
 			Cmd_ZykMod_f(ent);
 		}
 		else
@@ -13851,7 +13599,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 				}
 			}
 
-			zyk_unique_boost(ent);
 			Cmd_ZykMod_f(ent);
 		}
 		else
@@ -14276,7 +14023,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 				}
 			}
 
-			zyk_unique_boost(ent);
 			Cmd_ZykMod_f(ent);
 		}
 		else
@@ -14286,7 +14032,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 	}
 	else
 	{
-		trap->SendServerCommand(ent - g_entities, "print \"You have no Unique Abilities to use this command\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"You have no Unique Abilities to use this command\n\"");
 		return;
 	}
 }
@@ -14301,23 +14047,7 @@ void Cmd_Magic_f( gentity_t *ent ) {
 
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand( ent->s.number, va("print \" 0 Magic Sense - %s^7      31 Ultimate - %s^7        32 Final - %s^7\n 1 ^4Healing Water - %s^7     2 ^4Water Splash - %s^7     3 ^4Water Attack - %s^7\n 4 ^3Earthquake - %s^7        5 ^3Rockfall - %s^7         6 ^3Shifting Sand - %s^7\n 7 ^2Sleeping Flowers - %s^7  8 ^2Poison Mushrooms - %s^7 9 ^2Tree of Life - %s^7\n10 ^5Magic Shield - %s^7     11 ^5Dome of Damage - %s^7  12 ^5Magic Disable - %s^7\n13 ^6Ultra Speed - %s^7      14 ^6Slow Motion - %s^7     15 ^6Fast and Slow - %s^7\n16 ^1Flame Burst - %s^7      17 ^1Ultra Flame - %s^7     18 ^1Flaming Area - %s^7\n19 Blowing Wind - %s^7     20 Hurricane - %s^7       21 Reverse Wind - %s^7\n22 ^3Ultra Resistance - %s^7 23 ^3Ultra Strength - %s^7  24 ^3Enemy Weakening - %s^7\n25 ^5Ice Stalagmite - %s^7   26 ^5Ice Boulder - %s^7     27 ^5Ice Block - %s^7\n28 Healing Area - %s^7     29 Magic Explosion - %s^7 30 Lightning Dome - %s^7\n\"", 
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_MAGIC_SENSE)) ? "^2yes" : "^1no ", 
-			!(ent->client->sess.magic_more_disabled_powers & (1 << 0)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_more_disabled_powers & (1 << 1)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_WATER_SPLASH)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_WATER_ATTACK)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_EARTHQUAKE)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ROCKFALL)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_SHIFTING_SAND)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_SLEEPING_FLOWERS)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_POISON_MUSHROOMS)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_TREE_OF_LIFE)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_MAGIC_SHIELD)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_DOME_OF_DAMAGE)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_MAGIC_DISABLE)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ULTRA_SPEED)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_SLOW_MOTION)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_FLAME_BURST)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ULTRA_FLAME)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_FLAMING_AREA)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_BLOWING_WIND)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_REVERSE_WIND)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ENEMY_WEAKENING)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ICE_STALAGMITE)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ICE_BLOCK)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_HEALING_AREA)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_MAGIC_EXPLOSION)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_LIGHTNING_DOME)) ? "^2yes" : "^1no ") );
+		
 	}
 	else
 	{
@@ -14333,35 +14063,7 @@ void Cmd_Magic_f( gentity_t *ent ) {
 			return;
 		}
 
-		if (magic_power >= 31)
-		{
-			magic_power -= 31;
 
-			if (ent->client->sess.magic_more_disabled_powers & (1 << magic_power))
-			{
-				ent->client->sess.magic_more_disabled_powers &= ~(1 << magic_power);
-				save_account(ent, qtrue);
-				trap->SendServerCommand(ent->s.number, "print \"Enabled a magic power.\n\"");
-			}
-			else
-			{
-				ent->client->sess.magic_more_disabled_powers |= (1 << magic_power);
-				save_account(ent, qtrue);
-				trap->SendServerCommand(ent->s.number, "print \"Disabled a magic power.\n\"");
-			}
-		}
-		else if (ent->client->sess.magic_disabled_powers & (1 << magic_power))
-		{
-			ent->client->sess.magic_disabled_powers &= ~(1 << magic_power);
-			save_account(ent, qtrue);
-			trap->SendServerCommand(ent->s.number, "print \"Enabled a magic power.\n\"" );
-		}
-		else
-		{
-			ent->client->sess.magic_disabled_powers |= (1 << magic_power);
-			save_account(ent, qtrue);
-			trap->SendServerCommand(ent->s.number, "print \"Disabled a magic power.\n\"" );
-		}
 	}
 }
 

@@ -6517,10 +6517,6 @@ qboolean magic_master_has_this_power(gentity_t *ent, int selected_power)
 	{ // zyk: if, for some reason, there is an invalid selected power value, does not allow it
 		return qfalse;
 	}
-	else if (ent->client->sess.magic_disabled_powers & (1 << selected_power))
-	{ // zyk: this power was disabled by the player
-		return qfalse;
-	}
 
 	return qtrue;
 }
@@ -6629,30 +6625,8 @@ void zyk_print_special_power(gentity_t *ent, int selected_power, char direction)
 	}
 }
 
-// zyk: returns the amount of magic powers that are enabled with /magic command
-int zyk_number_of_enabled_magic_powers(gentity_t *ent)
-{
-	int i = 0;
-	int number_of_enabled_powers = 0;
-
-	for (i = MAGIC_MAGIC_SENSE; i < MAX_MAGIC_POWERS; i++)
-	{
-		if (!(ent->client->sess.magic_disabled_powers & (1 << i)) && magic_master_has_this_power(ent, i) == qtrue)
-		{
-			number_of_enabled_powers++;
-		}
-	}
-
-	return number_of_enabled_powers;
-}
-
 void zyk_show_magic_master_powers(gentity_t *ent, qboolean next_power)
 {
-	if (zyk_number_of_enabled_magic_powers(ent) == 0)
-	{
-		return;
-	}
-
 	if (next_power == qtrue)
 	{
 		do
@@ -6677,11 +6651,6 @@ void zyk_show_magic_master_powers(gentity_t *ent, qboolean next_power)
 
 void zyk_show_left_magic_master_powers(gentity_t *ent, qboolean next_power)
 {
-	if (zyk_number_of_enabled_magic_powers(ent) == 0)
-	{
-		return;
-	}
-
 	if (next_power == qtrue)
 	{
 		do
@@ -6706,11 +6675,6 @@ void zyk_show_left_magic_master_powers(gentity_t *ent, qboolean next_power)
 
 void zyk_show_right_magic_master_powers(gentity_t *ent, qboolean next_power)
 {
-	if (zyk_number_of_enabled_magic_powers(ent) == 0)
-	{
-		return;
-	}
-
 	if (next_power == qtrue)
 	{
 		do

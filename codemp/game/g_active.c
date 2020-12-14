@@ -924,13 +924,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				}
 			}
 
-			if (client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && client->pers.universe_quest_counter & (1 << 0) &&
-				client->pers.magic_power < zyk_max_magic_power(ent) && !(client->sess.magic_more_disabled_powers & (1 << 1)))
-			{ // zyk: Final Power of Sages Sequel. Magic Regen. Adds auto-healing of mp
-				client->pers.magic_power += 1;
-				send_rpg_events(1000);
-			}
-
 			if (client->pers.player_statuses & (1 << 10))
 			{ // zyk: Healing Crystal
 				if (ent->health < client->pers.max_rpg_health)
@@ -2195,7 +2188,6 @@ extern void zyk_show_magic_master_powers(gentity_t *ent, qboolean next_power);
 extern void zyk_show_left_magic_master_powers(gentity_t *ent, qboolean next_power);
 extern void zyk_show_right_magic_master_powers(gentity_t *ent, qboolean next_power);
 extern void save_account(gentity_t *ent, qboolean save_char_file);
-extern void zyk_unique_boost(gentity_t *ent);
 extern void Cmd_ZykMod_f(gentity_t *ent);
 extern void TossClientWeapon(gentity_t *self, vec3_t direction, float speed);
 extern qboolean saberKnockOutOfHand(gentity_t *saberent, gentity_t *saberOwner, vec3_t velocity);
@@ -3958,7 +3950,6 @@ void ClientThink_real( gentity_t *ent ) {
 							}
 						}
 
-						zyk_unique_boost(ent);
 						Cmd_ZykMod_f(ent);
 					}
 					else if (ent->client->pers.skill_levels[38] > 0)
