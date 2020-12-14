@@ -976,18 +976,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 			client->pers.player_statuses &= ~(1 << 15);
 		}
-		else if (client->pers.player_statuses & (1 << 16))
-		{ // zyk: Ultra Strength
-			G_AddEvent(ent, EV_USE_ITEM13, 102);
-
-			client->pers.player_statuses &= ~(1 << 16);
-		}
-		else if (client->pers.player_statuses & (1 << 17))
-		{ // zyk: Ultra Resistance
-			G_AddEvent(ent, EV_USE_ITEM13, 103);
-
-			client->pers.player_statuses &= ~(1 << 17);
-		}
 		else if (!(client->pers.player_statuses & (1 << 14)))
 		{
 			int scaled_magic_power = ((float)client->pers.magic_power/zyk_max_magic_power(ent)) * 100.0;

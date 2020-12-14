@@ -562,7 +562,6 @@ typedef enum {
 // zyk: magic powers values
 typedef enum {
 	MAGIC_MAGIC_SENSE,
-	MAGIC_HEALING_WATER,
 	MAGIC_WATER_SPLASH,
 	MAGIC_WATER_ATTACK,
 	MAGIC_EARTHQUAKE,
@@ -576,22 +575,24 @@ typedef enum {
 	MAGIC_MAGIC_DISABLE,
 	MAGIC_ULTRA_SPEED,
 	MAGIC_SLOW_MOTION,
-	MAGIC_FAST_AND_SLOW,
 	MAGIC_FLAME_BURST,
 	MAGIC_ULTRA_FLAME,
 	MAGIC_FLAMING_AREA,
+	MAGIC_FLAMING_RAGE,
 	MAGIC_BLOWING_WIND,
-	MAGIC_HURRICANE,
 	MAGIC_REVERSE_WIND,
-	MAGIC_ULTRA_RESISTANCE,
-	MAGIC_ULTRA_STRENGTH,
 	MAGIC_ENEMY_WEAKENING,
 	MAGIC_ICE_STALAGMITE,
-	MAGIC_ICE_BOULDER,
 	MAGIC_ICE_BLOCK,
 	MAGIC_HEALING_AREA,
 	MAGIC_MAGIC_EXPLOSION,
 	MAGIC_LIGHTNING_DOME,
+	MAGIC_ULTRA_DRAIN,
+	MAGIC_CHAOS_POWER,
+	MAGIC_BLACK_HOLE,
+	MAGIC_MAGIC_IMMUNITY,
+	MAGIC_TIME_FREEZE,
+	MAGIC_LIGHT_OF_JUDGEMENT,
 	MAX_MAGIC_POWERS
 } zyk_magic_t;
 
@@ -676,8 +677,8 @@ typedef struct clientPersistant_s {
 	// 13 - Give Command - Guns
 	// 14 - Sending current Magic Power event
 	// 15 - Sending Immunity Power event
-	// 16 - Sending Ultra Strength event
-	// 17 - Sending Ultra Resistance event
+	// 16 - unused
+	// 17 - unused
 	// 18 - NPC has the guard order
 	// 19 - NPC has the cover order
 	// 20 - hit by poison dart
@@ -973,11 +974,11 @@ typedef struct clientPersistant_s {
 	//  0 - using Immunity Power
 	//  1 - hit by Chaos Power
 	//  2 - hit by Time Power
-	//  3 - using Ultra Strength
+	//  3 - unused
 	//  4 - hit by Poison Mushrooms
-	//  5 - hit by Hurricane
+	//  5 - unused
 	//  6 - hit by Slow Motion
-	//  7 - using Ultra Resistance
+	//  7 - unused
 	//  8 - hit by Blowing Wind
 	//  9 - using Ultra Speed
 	// 10 - using Resurrection Power
@@ -995,7 +996,7 @@ typedef struct clientPersistant_s {
 	// 22 - using Ice Block
 	// 23 - hit by Flaming Area
 	// 24 - hit by Sleeping Flowers
-	// 25 - hit by Ice Boulder
+	// 25 - unused
 	// 26 - hit by Elemental Attack
 	int quest_power_status;
 

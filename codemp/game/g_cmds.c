@@ -4039,10 +4039,6 @@ void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
 		{
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Magic Sense!\"", ent->client->pers.netname));
 		}
-		else if (magic_power == MAGIC_ULTRA_STRENGTH)
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Ultra Strength!\"", ent->client->pers.netname));
-		}
 		else if (magic_power == MAGIC_POISON_MUSHROOMS)
 		{
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Poison Mushrooms!\"", ent->client->pers.netname));
@@ -4063,25 +4059,13 @@ void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
 		{
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Dome of Damage!\"", ent->client->pers.netname));
 		}
-		else if (magic_power == MAGIC_HURRICANE)
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Hurricane!\"", ent->client->pers.netname));
-		}
 		else if (magic_power == MAGIC_SLOW_MOTION)
 		{
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Slow Motion!\"", ent->client->pers.netname));
 		}
-		else if (magic_power == MAGIC_ULTRA_RESISTANCE)
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Ultra Resistance!\"", ent->client->pers.netname));
-		}
 		else if (magic_power == MAGIC_SLEEPING_FLOWERS)
 		{
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Sleeping Flowers!\"", ent->client->pers.netname));
-		}
-		else if (magic_power == MAGIC_HEALING_WATER)
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Healing Water!\"", ent->client->pers.netname));
 		}
 		else if (magic_power == MAGIC_FLAME_BURST)
 		{
@@ -4106,10 +4090,6 @@ void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
 		else if (magic_power == MAGIC_ICE_STALAGMITE)
 		{
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Ice Stalagmite!\"", ent->client->pers.netname));
-		}
-		else if (magic_power == MAGIC_ICE_BOULDER)
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Ice Boulder!\"", ent->client->pers.netname));
 		}
 		else if (magic_power == MAGIC_HEALING_AREA)
 		{
@@ -4138,10 +4118,6 @@ void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
 		else if (magic_power == MAGIC_MAGIC_DISABLE)
 		{
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Magic Disable!\"", ent->client->pers.netname));
-		}
-		else if (magic_power == MAGIC_FAST_AND_SLOW)
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Fast and Slow!\"", ent->client->pers.netname));
 		}
 		else if (magic_power == MAGIC_FLAMING_AREA)
 		{
@@ -4173,7 +4149,6 @@ void zyk_set_magic_power_cooldown_time(gentity_t *ent, int duration)
 
 extern void poison_mushrooms(gentity_t *ent, int min_distance, int max_distance);
 extern void magic_sense(gentity_t *ent, int duration);
-extern void healing_water(gentity_t *ent, int heal_amount);
 extern void earthquake(gentity_t *ent, int stun_time, int strength, int distance);
 extern void blowing_wind(gentity_t *ent, int distance, int duration);
 extern void sleeping_flowers(gentity_t *ent, int stun_time, int distance);
@@ -4184,12 +4159,8 @@ extern void ultra_flame(gentity_t *ent, int distance, int damage);
 extern void rock_fall(gentity_t *ent, int distance, int damage);
 extern void dome_of_damage(gentity_t *ent, int distance, int damage);
 extern void ice_stalagmite(gentity_t *ent, int distance, int damage);
-extern void ice_boulder(gentity_t *ent, int distance, int damage);
-extern void hurricane(gentity_t *ent, int distance, int duration);
 extern void slow_motion(gentity_t *ent, int distance, int duration);
 extern void ultra_speed(gentity_t *ent, int duration);
-extern void ultra_strength(gentity_t *ent, int duration);
-extern void ultra_resistance(gentity_t *ent, int duration);
 extern void immunity_power(gentity_t *ent, int duration);
 extern void ultra_drain(gentity_t *ent, int radius, int damage, int duration);
 extern void magic_shield(gentity_t *ent, int duration);
@@ -4201,7 +4172,6 @@ extern void water_attack(gentity_t *ent, int distance, int damage);
 extern void shifting_sand(gentity_t *ent, int distance);
 extern void tree_of_life(gentity_t *ent);
 extern void magic_disable(gentity_t *ent, int distance);
-extern void fast_and_slow(gentity_t *ent, int distance, int duration);
 extern void flaming_area(gentity_t *ent, int damage);
 extern void reverse_wind(gentity_t *ent, int distance, int duration);
 extern void enemy_nerf(gentity_t *ent, int distance);
@@ -4287,20 +4257,10 @@ qboolean TryGrapple(gentity_t *ent)
 					if (ent->client->pers.cmd.rightmove > 0)
 					{ // zyk: Magic Power Right direction
 						// zyk: can use the power if he beat a specific light quest boss
-						if (ent->client->pers.rpg_class == 0 && (ent->client->pers.defeated_guardians & (1 << 11) || 
-							ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-						{ // zyk: Ultra Resistance
-							use_this_power = MAGIC_ULTRA_RESISTANCE;
-						}
-						else if (ent->client->pers.rpg_class == 1 && (ent->client->pers.defeated_guardians & (1 << 6) || 
+						if (ent->client->pers.rpg_class == 1 && (ent->client->pers.defeated_guardians & (1 << 6) || 
 								 ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
 						{ // zyk: Sleeping Flowers
 							use_this_power = MAGIC_SLEEPING_FLOWERS;
-						}
-						else if (ent->client->pers.rpg_class == 5 && (ent->client->pers.defeated_guardians & (1 << 4) || 
-								 ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-						{ // zyk: Healing Water
-							use_this_power = MAGIC_HEALING_WATER;
 						}
 						else if (ent->client->pers.rpg_class == 4 && (ent->client->pers.defeated_guardians & (1 << 9) || 
 								 ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
@@ -4327,21 +4287,11 @@ qboolean TryGrapple(gentity_t *ent)
 						{ // zyk: Ultra Speed
 							use_this_power = MAGIC_ULTRA_SPEED;
 						}
-						else if (ent->client->pers.rpg_class == 9 && (ent->client->pers.defeated_guardians & (1 << 12) || 
-								 ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-						{ // zyk: Ice Boulder
-							use_this_power = MAGIC_ICE_BOULDER;
-						}
 					}
 					else if (ent->client->pers.cmd.rightmove < 0)
 					{ // zyk: Magic Power Left direction
 						// zyk: can use the power if he beat a specific light quest boss
-						if (ent->client->pers.rpg_class == 0 && (ent->client->pers.defeated_guardians & (1 << 11) || 
-							ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-						{ // zyk: Ultra Strength
-							use_this_power = MAGIC_ULTRA_STRENGTH;
-						}
-						else if (ent->client->pers.rpg_class == 1 && (ent->client->pers.defeated_guardians & (1 << 6) || 
+						if (ent->client->pers.rpg_class == 1 && (ent->client->pers.defeated_guardians & (1 << 6) || 
 								 ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
 						{ // zyk: Poison Mushrooms
 							use_this_power = MAGIC_POISON_MUSHROOMS;
@@ -4365,11 +4315,6 @@ qboolean TryGrapple(gentity_t *ent)
 								 ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
 						{ // zyk: Dome of Damage
 							use_this_power = MAGIC_DOME_OF_DAMAGE;
-						}
-						else if (ent->client->pers.rpg_class == 2 && (ent->client->pers.defeated_guardians & (1 << 10) || 
-								 ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-						{ // zyk: Hurricane
-							use_this_power = MAGIC_HURRICANE;
 						}
 						else if (ent->client->pers.rpg_class == 7 && (ent->client->pers.defeated_guardians & (1 << 8) || 
 								 ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
@@ -4419,11 +4364,6 @@ qboolean TryGrapple(gentity_t *ent)
 							ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
 						{ // zyk: Magic Disable
 							use_this_power = MAGIC_MAGIC_DISABLE;
-						}
-						else if (ent->client->pers.rpg_class == 7 && (ent->client->pers.defeated_guardians & (1 << 8) ||
-							ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-						{ // zyk: Fast and Slow
-							use_this_power = MAGIC_FAST_AND_SLOW;
 						}
 						else if (ent->client->pers.rpg_class == 9 && (ent->client->pers.defeated_guardians & (1 << 12) ||
 							ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
@@ -4509,18 +4449,6 @@ qboolean TryGrapple(gentity_t *ent)
 
 						zyk_show_magic_in_chat(ent, use_this_power);
 					}
-					else if (use_this_power == MAGIC_ULTRA_STRENGTH && zyk_enable_ultra_strength.integer == 1 && ent->client->pers.magic_power >= (int)ceil((zyk_ultra_strength_mp_cost.integer * universe_mp_cost_factor)))
-					{
-						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
-						ultra_strength(ent,30000);
-						ent->client->pers.magic_power -= (int)ceil((zyk_ultra_strength_mp_cost.integer * universe_mp_cost_factor));
-
-						zyk_set_magic_power_cooldown_time(ent, 8000);
-
-						ent->client->pers.player_statuses |= (1 << 16);
-
-						zyk_show_magic_in_chat(ent, use_this_power);
-					}
 					else if (use_this_power == MAGIC_POISON_MUSHROOMS && zyk_enable_poison_mushrooms.integer == 1 && ent->client->pers.magic_power >= (int)ceil((zyk_poison_mushrooms_mp_cost.integer * universe_mp_cost_factor)))
 					{
 						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
@@ -4571,16 +4499,6 @@ qboolean TryGrapple(gentity_t *ent)
 
 						zyk_show_magic_in_chat(ent, use_this_power);
 					}
-					else if (use_this_power == MAGIC_HURRICANE && zyk_enable_hurricane.integer == 1 && ent->client->pers.magic_power >= (int)ceil((zyk_hurricane_mp_cost.integer * universe_mp_cost_factor)))
-					{
-						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
-						hurricane(ent,400,5000);
-						ent->client->pers.magic_power -= (int)ceil((zyk_hurricane_mp_cost.integer * universe_mp_cost_factor));
-
-						zyk_set_magic_power_cooldown_time(ent, 14000);
-
-						zyk_show_magic_in_chat(ent, use_this_power);
-					}
 					else if (use_this_power == MAGIC_SLOW_MOTION && zyk_enable_slow_motion.integer == 1 && ent->client->pers.magic_power >= (int)ceil((zyk_slow_motion_mp_cost.integer * universe_mp_cost_factor)))
 					{
 						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
@@ -4591,18 +4509,6 @@ qboolean TryGrapple(gentity_t *ent)
 
 						zyk_show_magic_in_chat(ent, use_this_power);
 					}
-					else if (use_this_power == MAGIC_ULTRA_RESISTANCE && zyk_enable_ultra_resistance.integer == 1 && ent->client->pers.magic_power >= (int)ceil((zyk_ultra_resistance_mp_cost.integer * universe_mp_cost_factor)))
-					{
-						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
-						ultra_resistance(ent,30000);
-						ent->client->pers.magic_power -= (int)ceil((zyk_ultra_resistance_mp_cost.integer * universe_mp_cost_factor));
-
-						zyk_set_magic_power_cooldown_time(ent, 8000);
-
-						ent->client->pers.player_statuses |= (1 << 17);
-
-						zyk_show_magic_in_chat(ent, use_this_power);
-					}
 					else if (use_this_power == MAGIC_SLEEPING_FLOWERS && zyk_enable_sleeping_flowers.integer == 1 && ent->client->pers.magic_power >= (int)ceil((zyk_sleeping_flowers_mp_cost.integer * universe_mp_cost_factor)))
 					{
 						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
@@ -4610,16 +4516,6 @@ qboolean TryGrapple(gentity_t *ent)
 						ent->client->pers.magic_power -= (int)ceil((zyk_sleeping_flowers_mp_cost.integer * universe_mp_cost_factor));
 
 						zyk_set_magic_power_cooldown_time(ent, 15000);
-
-						zyk_show_magic_in_chat(ent, use_this_power);
-					}
-					else if (use_this_power == MAGIC_HEALING_WATER && zyk_enable_healing_water.integer == 1 && ent->client->pers.magic_power >= (int)ceil((zyk_healing_water_mp_cost.integer * universe_mp_cost_factor)))
-					{
-						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
-						healing_water(ent,120);
-						ent->client->pers.magic_power -= (int)ceil((zyk_healing_water_mp_cost.integer * universe_mp_cost_factor));
-
-						zyk_set_magic_power_cooldown_time(ent, 12000);
 
 						zyk_show_magic_in_chat(ent, use_this_power);
 					}
@@ -4678,16 +4574,6 @@ qboolean TryGrapple(gentity_t *ent)
 						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
 						ice_stalagmite(ent, 500, 130);
 						ent->client->pers.magic_power -= (int)ceil((zyk_ice_stalagmite_mp_cost.integer * universe_mp_cost_factor));
-
-						zyk_set_magic_power_cooldown_time(ent, 20000);
-
-						zyk_show_magic_in_chat(ent, use_this_power);
-					}
-					else if (use_this_power == MAGIC_ICE_BOULDER && zyk_enable_ice_boulder.integer == 1 && ent->client->pers.magic_power >= (int)ceil((zyk_ice_boulder_mp_cost.integer * universe_mp_cost_factor)))
-					{
-						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
-						ice_boulder(ent, 380, 40);
-						ent->client->pers.magic_power -= (int)ceil((zyk_ice_boulder_mp_cost.integer * universe_mp_cost_factor));
 
 						zyk_set_magic_power_cooldown_time(ent, 20000);
 
@@ -4760,16 +4646,6 @@ qboolean TryGrapple(gentity_t *ent)
 						ent->client->pers.magic_power -= (int)ceil((zyk_magic_disable_mp_cost.integer * universe_mp_cost_factor));
 
 						zyk_set_magic_power_cooldown_time(ent, 6000);
-
-						zyk_show_magic_in_chat(ent, use_this_power);
-					}
-					else if (use_this_power == MAGIC_FAST_AND_SLOW && zyk_enable_fast_and_slow.integer == 1 && ent->client->pers.magic_power >= (int)ceil((zyk_fast_and_slow_mp_cost.integer * universe_mp_cost_factor)))
-					{
-						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
-						fast_and_slow(ent, 400, 6000);
-						ent->client->pers.magic_power -= (int)ceil((zyk_fast_and_slow_mp_cost.integer * universe_mp_cost_factor));
-
-						zyk_set_magic_power_cooldown_time(ent, 12000);
 
 						zyk_show_magic_in_chat(ent, use_this_power);
 					}
@@ -14428,20 +14304,18 @@ void Cmd_Magic_f( gentity_t *ent ) {
 		trap->SendServerCommand( ent->s.number, va("print \" 0 Magic Sense - %s^7      31 Ultimate - %s^7        32 Final - %s^7\n 1 ^4Healing Water - %s^7     2 ^4Water Splash - %s^7     3 ^4Water Attack - %s^7\n 4 ^3Earthquake - %s^7        5 ^3Rockfall - %s^7         6 ^3Shifting Sand - %s^7\n 7 ^2Sleeping Flowers - %s^7  8 ^2Poison Mushrooms - %s^7 9 ^2Tree of Life - %s^7\n10 ^5Magic Shield - %s^7     11 ^5Dome of Damage - %s^7  12 ^5Magic Disable - %s^7\n13 ^6Ultra Speed - %s^7      14 ^6Slow Motion - %s^7     15 ^6Fast and Slow - %s^7\n16 ^1Flame Burst - %s^7      17 ^1Ultra Flame - %s^7     18 ^1Flaming Area - %s^7\n19 Blowing Wind - %s^7     20 Hurricane - %s^7       21 Reverse Wind - %s^7\n22 ^3Ultra Resistance - %s^7 23 ^3Ultra Strength - %s^7  24 ^3Enemy Weakening - %s^7\n25 ^5Ice Stalagmite - %s^7   26 ^5Ice Boulder - %s^7     27 ^5Ice Block - %s^7\n28 Healing Area - %s^7     29 Magic Explosion - %s^7 30 Lightning Dome - %s^7\n\"", 
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_MAGIC_SENSE)) ? "^2yes" : "^1no ", 
 			!(ent->client->sess.magic_more_disabled_powers & (1 << 0)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_more_disabled_powers & (1 << 1)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_HEALING_WATER)) ? "^2yes" : "^1no ",
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_WATER_SPLASH)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_WATER_ATTACK)) ? "^2yes" : "^1no ",
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_EARTHQUAKE)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ROCKFALL)) ? "^2yes" : "^1no ",
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_SHIFTING_SAND)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_SLEEPING_FLOWERS)) ? "^2yes" : "^1no ",
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_POISON_MUSHROOMS)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_TREE_OF_LIFE)) ? "^2yes" : "^1no ",
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_MAGIC_SHIELD)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_DOME_OF_DAMAGE)) ? "^2yes" : "^1no ",
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_MAGIC_DISABLE)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ULTRA_SPEED)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_SLOW_MOTION)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_FAST_AND_SLOW)) ? "^2yes" : "^1no ",
+			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_SLOW_MOTION)) ? "^2yes" : "^1no ",
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_FLAME_BURST)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ULTRA_FLAME)) ? "^2yes" : "^1no ",
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_FLAMING_AREA)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_BLOWING_WIND)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_HURRICANE)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_REVERSE_WIND)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ULTRA_RESISTANCE)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ULTRA_STRENGTH)) ? "^2yes" : "^1no ",
+			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_REVERSE_WIND)) ? "^2yes" : "^1no ",
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ENEMY_WEAKENING)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ICE_STALAGMITE)) ? "^2yes" : "^1no ",
-			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ICE_BOULDER)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ICE_BLOCK)) ? "^2yes" : "^1no ",
+			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_ICE_BLOCK)) ? "^2yes" : "^1no ",
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_HEALING_AREA)) ? "^2yes" : "^1no ", !(ent->client->sess.magic_disabled_powers & (1 << MAGIC_MAGIC_EXPLOSION)) ? "^2yes" : "^1no ",
 			!(ent->client->sess.magic_disabled_powers & (1 << MAGIC_LIGHTNING_DOME)) ? "^2yes" : "^1no ") );
 	}
