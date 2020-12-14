@@ -5338,15 +5338,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			damage = (int)ceil(damage * 1.09);
 	}
 
-	if (attacker && attacker->client && (attacker->NPC || attacker->client->sess.amrpgmode == 2) && attacker->client->pers.quest_power_status & (1 << 3))
-	{ // zyk: Ultra Strength bonus damage
-		// zyk: Universe Power
-		if (attacker->client->pers.quest_power_status & (1 << 13))
-			damage = (int)ceil(damage * 1.12);
-		else
-			damage = (int)ceil(damage * 1.08);
-	}
-
 	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 	{ // zyk: bonus damage of each RPG class
 		if (attacker->client->pers.rpg_class == 0)
@@ -5392,11 +5383,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (inflictor && (inflictor->s.weapon == WP_BOWCASTER || inflictor->s.weapon == WP_DEMP2 || inflictor->s.weapon == WP_CONCUSSION))
 				can_damage_heavy_things = qtrue;
 		}
-	}
-
-	if (attacker && attacker->client && (attacker->NPC || attacker->client->sess.amrpgmode == 2) && attacker->client->pers.quest_power_status & (1 << 15))
-	{ // zyk: Dark Power increases damage of every attack
-		damage = (int)ceil(damage*1.1);
 	}
 
 	if (attacker && attacker->client && attacker->client->pers.quest_power_status & (1 << 21))
@@ -5458,19 +5444,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		damage = (int)ceil(damage*1.15);
 	}
 
-	if (targ && targ->client && (targ->NPC || targ->client->sess.amrpgmode == 2) && targ->client->pers.quest_power_status & (1 << 16))
-	{ // zyk: Eternity Power reduces damage of every attack
-		damage = (int)ceil(damage*0.9);
-	}
-
 	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 21))
 	{ // zyk: Enemy Weakening increases damage taken
 		damage = (int)ceil(damage*1.08);
-	}
-
-	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 25))
-	{ // zyk: Ice Boulder decreases damage taken
-		damage = (int)ceil(damage*0.6);
 	}
 
 	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 26))
@@ -5493,15 +5469,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 2))
 	{
 		damage = (int)ceil(damage * 0.1);
-	}
-
-	if (targ && targ->client && (targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.quest_power_status & (1 << 7))
-	{ // zyk: Ultra Resistance bonus resistance
-		// zyk: Universe Power
-		if (targ->client->pers.quest_power_status & (1 << 13))
-			damage = (int)ceil(damage * 0.88);
-		else
-			damage = (int)ceil(damage * 0.92);
 	}
 
 	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 24))

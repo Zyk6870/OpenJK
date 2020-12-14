@@ -4648,10 +4648,8 @@ void spawn_boss(gentity_t *ent,int x,int y,int z,int yaw,char *boss_name,int gx,
 		}
 
 		if (ent->client->pers.universe_quest_counter & (1 << 29))
-		{ // zyk: if quest player is in Challenge Mode, bosses always use the improved version of powers (Universe Power)
-			npc_ent->client->pers.quest_power_status |= (1 << 13);
-
-			// zyk: they also start using magic a bit earlier
+		{ // zyk: if quest player is in Challenge Mode, do these
+			// zyk: bosses start using magic a bit earlier
 			npc_ent->client->pers.light_quest_timer = level.time + 5000;
 			npc_ent->client->pers.guardian_timer = level.time + 3000;
 			npc_ent->client->pers.universe_quest_timer = level.time + 9000;
@@ -15359,22 +15357,6 @@ void G_RunFrame( int levelTime ) {
 					{
 						time_power(ent, 400, 4000);
 					}
-					else if (ent->client->sess.selected_right_special_power  & (1 << 4) && random_number == 4)
-					{ // zyk: Light Power
-						ent->client->pers.quest_power_status |= (1 << 14);
-					}
-					else if (ent->client->sess.selected_right_special_power  & (1 << 5) && random_number == 5)
-					{ // zyk: Dark Power
-						ent->client->pers.quest_power_status |= (1 << 15);
-					}
-					else if (ent->client->sess.selected_right_special_power  & (1 << 6) && random_number == 6)
-					{ // zyk: Eternity Power
-						ent->client->pers.quest_power_status |= (1 << 16);
-					}
-					else if (ent->client->sess.selected_right_special_power  & (1 << 7) && random_number == 7)
-					{ // zyk: Universe Power
-						ent->client->pers.quest_power_status |= (1 << 13);
-					}
 
 					ent->client->pers.hunter_quest_timer = level.time + ent->client->pers.hunter_quest_messages;
 				}
@@ -15607,13 +15589,6 @@ void G_RunFrame( int levelTime ) {
 				}
 				else if (ent->client->pers.guardian_mode == 8 || (ent->client->pers.guardian_mode == 18 && Q_stricmp(ent->NPC_type, "guardian_boss_9") == 0))
 				{ // zyk: Guardian of Light
-					if (ent->client->pers.hunter_quest_messages == 0 && ent->health < (ent->client->ps.stats[STAT_MAX_HEALTH]))
-					{ // zyk: after losing half HP, uses his special ability
-						ent->client->pers.hunter_quest_messages = 1;
-						ent->client->pers.quest_power_status |= (1 << 14);
-						trap->SendServerCommand( -1, "chat \"^5Guardian of Light: ^7Light Power!\"");
-					}
-
 					if (ent->client->pers.guardian_timer < level.time)
 					{
 						lightning_dome(ent, 70);
@@ -15630,13 +15605,6 @@ void G_RunFrame( int levelTime ) {
 				}
 				else if (ent->client->pers.guardian_mode == 9 || (ent->client->pers.guardian_mode == 18 && Q_stricmp(ent->NPC_type, "guardian_of_darkness") == 0))
 				{ // zyk: Guardian of Darkness
-					if (ent->client->pers.hunter_quest_messages == 0 && ent->health < (ent->client->ps.stats[STAT_MAX_HEALTH]))
-					{ // zyk: after losing half HP, uses his special ability
-						ent->client->pers.hunter_quest_messages = 1;
-						ent->client->pers.quest_power_status |= (1 << 15);
-						trap->SendServerCommand( -1, "chat \"^1Guardian of Darkness: ^7Dark Power!\"");
-					}
-
 					if (ent->client->pers.guardian_timer < level.time)
 					{
 						magic_explosion(ent, 320, 130, 900);
@@ -15653,13 +15621,6 @@ void G_RunFrame( int levelTime ) {
 				}
 				else if (ent->client->pers.guardian_mode == 10 || (ent->client->pers.guardian_mode == 18 && Q_stricmp(ent->NPC_type, "guardian_of_eternity") == 0))
 				{ // zyk: Guardian of Eternity
-					if (ent->client->pers.hunter_quest_messages == 0 && ent->health < (ent->client->ps.stats[STAT_MAX_HEALTH]))
-					{ // zyk: after losing half HP, uses his special ability
-						ent->client->pers.hunter_quest_messages = 1;
-						ent->client->pers.quest_power_status |= (1 << 16);
-						trap->SendServerCommand( -1, "chat \"^3Guardian of Eternity: ^7Eternity Power!\"");
-					}
-
 					if (ent->client->pers.guardian_timer < level.time)
 					{
 						healing_area(ent,2,5000);
@@ -15780,13 +15741,6 @@ void G_RunFrame( int levelTime ) {
 						}
 
 						ent->client->pers.guardian_timer = level.time + 35000;
-					}
-
-					if (ent->health < (ent->client->ps.stats[STAT_MAX_HEALTH]/2) && ent->client->pers.light_quest_messages == 0)
-					{
-						ent->client->pers.light_quest_messages = 1;
-						ent->client->pers.quest_power_status |= (1 << 13);
-						trap->SendServerCommand( -1, "chat \"^2Guardian of Universe: ^7Universe Power!\"");
 					}
 
 					if (ent->client->pers.light_quest_timer < level.time)
@@ -16033,26 +15987,18 @@ void G_RunFrame( int levelTime ) {
 						else if (ent->client->pers.light_quest_messages == 1)
 						{
 							ent->client->pers.light_quest_messages = 2;
-							ent->client->pers.quest_power_status |= (1 << 14);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Light Power!\"");
 						}
 						else if (ent->client->pers.light_quest_messages == 2)
 						{
 							ent->client->pers.light_quest_messages = 3;
-							ent->client->pers.quest_power_status |= (1 << 15);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Dark Power!\"");
 						}
 						else if (ent->client->pers.light_quest_messages == 3)
 						{
 							ent->client->pers.light_quest_messages = 4;
-							ent->client->pers.quest_power_status |= (1 << 16);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Eternity Power!\"");
 						}
 						else if (ent->client->pers.light_quest_messages == 4)
 						{
 							ent->client->pers.light_quest_messages = 5;
-							ent->client->pers.quest_power_status |= (1 << 13);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Universe Power!\"");
 						}
 
 						ent->client->pers.light_quest_timer = level.time + 27000;
@@ -16424,9 +16370,6 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.light_quest_timer < level.time)
 					{ // zyk: using Crystal of Magic
 						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = level.time + 1000;
-
-						// zyk: Universe Power
-						ent->client->pers.quest_power_status |= (1 << 13);
 
 						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
 

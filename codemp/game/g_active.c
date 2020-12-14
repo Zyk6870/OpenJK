@@ -855,24 +855,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_TRIP_MINE);
 		}
 
-		if ((ent->NPC || client->sess.amrpgmode == 2) && client->pers.quest_power_status & (1 << 14) && ent->health > 0)
-		{ // zyk: Light Power
-			if (ent->NPC)
-			{ // zyk: bosses using it
-				if ((ent->health + 2) < client->ps.stats[STAT_MAX_HEALTH])
-					ent->health += 2;
-				else
-					ent->health = client->ps.stats[STAT_MAX_HEALTH];
-			}
-			else
-			{ // zyk: players using it
-				if (ent->health < client->pers.max_rpg_health)
-					ent->health += 1;
-				else if (client->ps.stats[STAT_ARMOR] < client->pers.max_rpg_shield)
-					client->ps.stats[STAT_ARMOR] += 1;
-			}
-		}
-
 		if (client->sess.amrpgmode == 2 && !(client->pers.quest_power_status & (1 << 2)))
 		{ // zyk: auto-healing abilities will only work if player is not hit by Time Power
 			if (client->pers.rpg_class == 4 && ent->health > 0)
