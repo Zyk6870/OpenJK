@@ -1715,8 +1715,7 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 					else if ( gent->s.NPC_class != CLASS_VEHICLE
 						|| (gent->m_pVehicle && gent->m_pVehicle->m_pVehicleInfo->type != VH_FIGHTER) )
 					{//don't do this to fighters
-						// zyk: Universe Power
-						if (myOwner->client->pers.quest_power_status & (1 << 13))
+						if (myOwner->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_LIGHTNING_DOME] > 1)
 							gent->client->ps.electrifyTime = level.time + Q_irand( 1000, 2000 );
 						else
 							gent->client->ps.electrifyTime = level.time + Q_irand( 300, 800 );

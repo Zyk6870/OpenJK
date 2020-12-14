@@ -13624,12 +13624,20 @@ int zyk_get_magic_cost(int magic_number)
 	return magic_costs[magic_number];
 }
 
-void zyk_cast_magic(gentity_t* ent, int magic_number)
+void zyk_cast_magic(gentity_t* ent, int skill_index, int magic_number)
 {
 	if (ent->client->pers.quest_power_usage_timer < level.time)
 	{
-		ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
-
+		// zyk: magic usage effect
+		if (ent->client->pers.skill_levels[skill_index] > 1)
+		{
+			ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = level.time + 1000;
+		}
+		else
+		{
+			ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
+		}
+		
 		if (ent->client->pers.magic_power >= zyk_get_magic_cost(magic_number))
 		{
 			if (magic_number == MAGIC_MAGIC_SENSE)
@@ -13803,7 +13811,7 @@ void zyk_cast_magic(gentity_t* ent, int magic_number)
 		}
 		else
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"You need %d mp to cast this magic.\n\"", zyk_get_magic_cost(magic_number)));
+			trap->SendServerCommand(ent->s.number, va("print \"You need %d mp to cast ^3%s\n\"", zyk_get_magic_cost(magic_number), zyk_skill_name(skill_index)));
 		}
 	}
 	else
@@ -13843,7 +13851,7 @@ void Cmd_Magic_f( gentity_t *ent ) {
 			return;
 		}
 
-		zyk_cast_magic(ent, (skill_index - (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS)));
+		zyk_cast_magic(ent, skill_index, (skill_index - (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS)));
 	}
 }
 

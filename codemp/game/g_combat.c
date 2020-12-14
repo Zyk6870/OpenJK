@@ -6921,8 +6921,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							int heal_amount = 8;
 							int shield_amount = 8;
 
-							// zyk: Universe Power
-							if (quest_power_user->client->pers.quest_power_status & (1 << 13))
+							if (quest_power_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_HEALING_AREA] > 1)
 							{
 								heal_amount += 2;
 								shield_amount += 2;
@@ -6968,8 +6967,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						{
 							int heal_amount = 6;
 
-							// zyk: Universe Power
-							if (quest_power_user->client->pers.quest_power_status & (1 << 13))
+							if (quest_power_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_HEALING_AREA] > 1)
 							{
 								heal_amount += 2;
 							}

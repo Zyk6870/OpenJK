@@ -4933,8 +4933,7 @@ void earthquake(gentity_t *ent, int stun_time, int strength, int distance)
 	int i = 0;
 	int targets_hit = 0;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_EARTHQUAKE] > 1)
 		distance += (distance/2);
 
 	for ( i = 0; i < level.num_entities; i++)
@@ -4973,8 +4972,7 @@ void earthquake(gentity_t *ent, int stun_time, int strength, int distance)
 // zyk: Flame Burst
 void flame_burst(gentity_t *ent, int duration)
 {
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_FLAME_BURST] > 1)
 	{
 		duration += 3000;
 	}
@@ -4989,8 +4987,7 @@ void blowing_wind(gentity_t *ent, int distance, int duration)
 	int i = 0;
 	int targets_hit = 0;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_BLOWING_WIND] > 1)
 	{
 		distance += 200;
 	}
@@ -5023,8 +5020,7 @@ void reverse_wind(gentity_t *ent, int distance, int duration)
 	int i = 0;
 	int targets_hit = 0;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_REVERSE_WIND] > 1)
 	{
 		distance += 200;
 	}
@@ -5057,8 +5053,7 @@ void poison_mushrooms(gentity_t *ent, int min_distance, int max_distance)
 	int i = 0;
 	int targets_hit = 0;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_POISON_MUSHROOMS] > 1)
 		min_distance = 0;
 
 	for (i = 0; i < level.num_entities; i++)
@@ -5127,8 +5122,8 @@ void chaos_power(gentity_t *ent, int distance, int duration)
 // zyk: Magic Sense
 void magic_sense(gentity_t *ent, int duration)
 {
-	if (ent->client->pers.quest_power_status & (1 << 13))
-	{ // zyk: Universe Power
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_MAGIC_SENSE] > 1)
+	{
 		duration += 1000;
 	}
 
@@ -5236,8 +5231,7 @@ void enemy_nerf(gentity_t *ent, int distance)
 	int targets_hit = 0;
 	int duration = 12000;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ENEMY_WEAKENING] > 1)
 	{
 		duration += 4000;
 	}
@@ -5640,8 +5634,7 @@ void sleeping_flowers(gentity_t *ent, int stun_time, int distance)
 	int i = 0;
 	int targets_hit = 0;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_SLEEPING_FLOWERS] > 1)
 	{
 		distance += 100;
 	}
@@ -5687,8 +5680,7 @@ void water_attack(gentity_t *ent, int distance, int damage)
 	int i = 0;
 	int targets_hit = 0;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_WATER_ATTACK] > 1)
 	{
 		damage += 10;
 	}
@@ -5714,8 +5706,7 @@ void shifting_sand(gentity_t *ent, int distance)
 	int enemy_dist = 0;
 	gentity_t *this_enemy = NULL;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_SHIFTING_SAND] > 1)
 	{
 		distance *= 1.5;
 		min_distance = distance;
@@ -5807,8 +5798,7 @@ void water_splash(gentity_t *ent, int distance, int damage)
 	int i = 0;
 	int targets_hit = 0;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_WATER_SPLASH] > 1)
 	{
 		damage += 5;
 	}
@@ -5832,8 +5822,7 @@ void rock_fall(gentity_t *ent, int distance, int damage)
 	int i = 0;
 	int targets_hit = 0;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ROCKFALL] > 1)
 	{
 		distance += (distance/2);
 	}
@@ -5855,8 +5844,7 @@ void dome_of_damage(gentity_t *ent, int distance, int damage)
 	int i = 0;
 	int targets_hit = 0;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_DOME_OF_DAMAGE] > 1)
 	{
 		distance += 100;
 		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_dome", "4", "env/dome", 1000, damage, 290, 8000);
@@ -5876,8 +5864,7 @@ void dome_of_damage(gentity_t *ent, int distance, int damage)
 // zyk: Magic Shield
 void magic_shield(gentity_t *ent, int duration)
 {
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_MAGIC_SHIELD] > 1)
 	{
 		duration += 1500;
 	}
@@ -5904,8 +5891,7 @@ void magic_disable(gentity_t *ent, int distance)
 	int targets_hit = 0;
 	int duration = 6000;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_MAGIC_DISABLE] > 1)
 	{
 		duration += 2000;
 	}
@@ -5950,8 +5936,7 @@ void ice_stalagmite(gentity_t *ent, int distance, int damage)
 	int targets_hit = 0;
 	int min_distance = 50;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ICE_STALAGMITE] > 1)
 	{
 		damage += 30;
 		min_distance = 0;
@@ -6011,8 +5996,7 @@ void zyk_spawn_ice_block(gentity_t *ent, int duration, int pitch, int yaw, int x
 // zyk: Ice Block
 void ice_block(gentity_t *ent, int duration)
 {
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ICE_BLOCK] > 1)
 	{
 		duration += 1000;
 	}
@@ -6039,8 +6023,7 @@ void ultra_drain(gentity_t *ent, int radius, int damage, int duration)
 // zyk: Magic Explosion
 void magic_explosion(gentity_t *ent, int radius, int damage, int duration)
 {
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_MAGIC_EXPLOSION] > 1)
 	{
 		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_explosion", "4", "explosions/hugeexplosion1", 1500, damage, radius, duration + 1000);
 	}
@@ -6060,8 +6043,7 @@ void magic_explosion(gentity_t *ent, int radius, int damage, int duration)
 // zyk: Healing Area
 void healing_area(gentity_t *ent, int damage, int duration)
 {
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_HEALING_AREA] > 1)
 	{
 		damage += 1;
 	}
@@ -6083,8 +6065,7 @@ void slow_motion(gentity_t *ent, int distance, int duration)
 	int i = 0;
 	int targets_hit = 0;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_SLOW_MOTION] > 1)
 	{
 		duration += 3000;
 	}
@@ -6106,8 +6087,7 @@ void slow_motion(gentity_t *ent, int distance, int duration)
 // zyk: Ultra Speed
 void ultra_speed(gentity_t *ent, int duration)
 {
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ULTRA_SPEED] > 1)
 	{
 		duration += 3000;
 	}
@@ -6151,8 +6131,7 @@ void ultra_flame(gentity_t *ent, int distance, int damage)
 	int i = 0;
 	int targets_hit = 0;
 
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ULTRA_FLAME] > 1)
 	{
 		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 200, damage, 35, 5000, 30, 30);
 		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 200, damage, 35, 5000, -30, 30);
@@ -6203,8 +6182,7 @@ void flaming_area_flames(gentity_t *ent, char *targetname, char *spawnflags, cha
 // zyk: Flaming Area
 void flaming_area(gentity_t *ent, int damage)
 {
-	// zyk: Universe Power
-	if (ent->client->pers.quest_power_status & (1 << 13))
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_FLAMING_AREA] > 1)
 	{
 		damage *= 1.4;
 	}
@@ -6442,8 +6420,8 @@ void quest_power_events(gentity_t *ent)
 					{
 						zyk_quest_effect_spawn(poison_mushrooms_user, ent, "zyk_quest_effect_poison", "0", "noghri_stick/gas_cloud", 0, 0, 0, 300);
 
-						// zyk: Universe Power
-						if (poison_mushrooms_user->client->pers.quest_power_status & (1 << 13))
+						
+						if (poison_mushrooms_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_POISON_MUSHROOMS] > 1)
 							G_Damage(ent,poison_mushrooms_user,poison_mushrooms_user,NULL,NULL,6,0,MOD_UNKNOWN);
 						else
 							G_Damage(ent,poison_mushrooms_user,poison_mushrooms_user,NULL,NULL,4,0,MOD_UNKNOWN);
@@ -6597,8 +6575,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						int heal_amount = 20;
 
-						// zyk: Universe Power
-						if (ent->client->pers.quest_power_status & (1 << 13))
+						if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_TREE_OF_LIFE] > 1)
 						{
 							heal_amount = 40;
 						}
@@ -6698,8 +6675,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						zyk_quest_effect_spawn(flaming_area_user, ent, "zyk_quest_effect_flaming_area_hit", "0", "env/fire", 0, 0, 0, 300);
 
-						// zyk: Universe Power
-						if (flaming_area_user->client->pers.quest_power_status & (1 << 13))
+						if (flaming_area_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_FLAMING_AREA] > 1)
 							G_Damage(ent, flaming_area_user, flaming_area_user, NULL, NULL, 3, 0, MOD_UNKNOWN);
 						else
 							G_Damage(ent, flaming_area_user, flaming_area_user, NULL, NULL, 2, 0, MOD_UNKNOWN);
@@ -12937,8 +12913,6 @@ void G_RunFrame( int levelTime ) {
 
 								save_account(ent, qtrue);
 
-								ent->client->pers.quest_power_status |= (1 << 13);
-
 								quest_get_new_player(ent);
 							}
 
@@ -16517,8 +16491,6 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.light_quest_timer < level.time)
 					{
 						int random_unique = Q_irand(0, 2);
-
-						ent->client->pers.quest_power_status |= (1 << 13);
 
 						if (random_unique == 0)
 						{
