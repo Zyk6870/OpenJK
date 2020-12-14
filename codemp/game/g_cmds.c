@@ -9741,15 +9741,6 @@ void Cmd_ChangePassword_f( gentity_t *ent ) {
 	trap->SendServerCommand( ent-g_entities, "print \"Your password was changed successfully.\n\"" );
 }
 
-void zyk_remove_configs(gentity_t *ent)
-{
-#if defined(__linux__)
-	system(va("rm -f zykmod/configs/%s_%s_freewarrior.txt zykmod/configs/%s_%s_forceuser.txt zykmod/configs/%s_%s_bountyhunter.txt zykmod/configs/%s_%s_armoredsoldier.txt zykmod/configs/%s_%s_monk.txt zykmod/configs/%s_%s_stealthattacker.txt zykmod/configs/%s_%s_duelist.txt zykmod/configs/%s_%s_forcegunner.txt zykmod/configs/%s_%s_magicmaster.txt zykmod/configs/%s_%s_forcetank.txt", ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar));
-#else
-	system(va("DEL /F \"zykmod\\configs\\%s_%s_freewarrior.txt\" \"zykmod\\configs\\%s_%s_forceuser.txt\" \"zykmod\\configs\\%s_%s_bountyhunter.txt\" \"zykmod\\configs\\%s_%s_armoredsoldier.txt\" \"zykmod\\configs\\%s_%s_monk.txt\" \"zykmod\\configs\\%s_%s_stealthattacker.txt\" \"zykmod\\configs\\%s_%s_duelist.txt\" \"zykmod\\configs\\%s_%s_forcegunner.txt\" \"zykmod\\configs\\%s_%s_magicmaster.txt\" \"zykmod\\configs\\%s_%s_forcetank.txt\"", ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, ent->client->sess.rpgchar));
-#endif
-}
-
 /*
 ==================
 Cmd_ResetAccount_f
@@ -9800,8 +9791,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 		ent->client->sess.magic_more_disabled_powers = 0;
 
 		save_account(ent, qtrue);
-
-		zyk_remove_configs(ent);
 
 		trap->SendServerCommand( ent-g_entities, "print \"Your entire account is reset.\n\"" );
 
@@ -9855,8 +9844,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 		ent->client->sess.magic_more_disabled_powers = 0;
 
 		save_account(ent, qtrue);
-
-		zyk_remove_configs(ent);
 
 		trap->SendServerCommand( ent-g_entities, "print \"Your levels are reset.\n\"" );
 
@@ -10698,167 +10685,6 @@ void Cmd_Settings_f( gentity_t *ent ) {
 	}
 }
 
-char *zyk_config_filename(gclient_t *client)
-{
-	if (client->pers.rpg_class == 0)
-		return va("zykmod/configs/%s_%s_freewarrior.txt", client->sess.filename, client->sess.rpgchar);
-	else if (client->pers.rpg_class == 1)
-		return va("zykmod/configs/%s_%s_forceuser.txt", client->sess.filename, client->sess.rpgchar);
-	else if (client->pers.rpg_class == 2)
-		return va("zykmod/configs/%s_%s_bountyhunter.txt", client->sess.filename, client->sess.rpgchar);
-	else if (client->pers.rpg_class == 3)
-		return va("zykmod/configs/%s_%s_armoredsoldier.txt", client->sess.filename, client->sess.rpgchar);
-	else if (client->pers.rpg_class == 4)
-		return va("zykmod/configs/%s_%s_monk.txt", client->sess.filename, client->sess.rpgchar);
-	else if (client->pers.rpg_class == 5)
-		return va("zykmod/configs/%s_%s_stealthattacker.txt", client->sess.filename, client->sess.rpgchar);
-	else if (client->pers.rpg_class == 6)
-		return va("zykmod/configs/%s_%s_duelist.txt", client->sess.filename, client->sess.rpgchar);
-	else if (client->pers.rpg_class == 7)
-		return va("zykmod/configs/%s_%s_forcegunner.txt", client->sess.filename, client->sess.rpgchar);
-	else if (client->pers.rpg_class == 8)
-		return va("zykmod/configs/%s_%s_magicmaster.txt", client->sess.filename, client->sess.rpgchar);
-	else if (client->pers.rpg_class == 9)
-		return va("zykmod/configs/%s_%s_forcetank.txt", client->sess.filename, client->sess.rpgchar);
-	else
-		return "";
-}
-
-char *zyk_legacy_config_filename(gclient_t *client)
-{
-	if (client->pers.rpg_class == 0)
-		return va("zykmod/configs/%s_freewarrior.txt", client->sess.filename);
-	else if (client->pers.rpg_class == 1)
-		return va("zykmod/configs/%s_forceuser.txt", client->sess.filename);
-	else if (client->pers.rpg_class == 2)
-		return va("zykmod/configs/%s_bountyhunter.txt", client->sess.filename);
-	else if (client->pers.rpg_class == 3)
-		return va("zykmod/configs/%s_armoredsoldier.txt", client->sess.filename);
-	else if (client->pers.rpg_class == 4)
-		return va("zykmod/configs/%s_monk.txt", client->sess.filename);
-	else if (client->pers.rpg_class == 5)
-		return va("zykmod/configs/%s_stealthattacker.txt", client->sess.filename);
-	else if (client->pers.rpg_class == 6)
-		return va("zykmod/configs/%s_duelist.txt", client->sess.filename);
-	else if (client->pers.rpg_class == 7)
-		return va("zykmod/configs/%s_forcegunner.txt", client->sess.filename);
-	else if (client->pers.rpg_class == 8)
-		return va("zykmod/configs/%s_magicmaster.txt", client->sess.filename);
-	else if (client->pers.rpg_class == 9)
-		return va("zykmod/configs/%s_forcetank.txt", client->sess.filename);
-	else
-		return "";
-}
-
-void load_config(gentity_t *ent)
-{
-	FILE *config_file = NULL;
-	gclient_t *client;
-	char content[32];
-	int value = 0;
-	int i = 0;
-	int unique_ability_flag = 0;
-
-	strcpy(content,"");
-	client = ent->client;
-
-	config_file = fopen(zyk_config_filename(client),"r");
-
-	if (config_file == NULL)
-	{ // zyk: if did not find file, try getting the legacy version
-		config_file = fopen(zyk_legacy_config_filename(client), "r");
-	}
-
-	if (config_file != NULL)
-	{
-		fscanf(config_file,"%s",content);
-		value = atoi(content);
-
-		if (client->pers.level >= value)
-		{ // zyk: only loads config if current level is at least the one read from the file
-		  // if the value is lower, it means the player reset his account. In this case, do not load anything
-			for (i = 1; i <= NUMBER_OF_SKILLS; i++)
-			{
-				fscanf(config_file,"%s",content);
-				value = atoi(content); // zyk: the skill levels the player has in this skill
-
-				while (value > 0)
-				{
-					rpg_upgrade_skill(ent, i, qtrue);
-					value--;
-				}
-			}
-
-			if (fscanf(config_file, "%s", content) != EOF)
-			{
-				unique_ability_flag = atoi(content);
-			}
-
-			// zyk: loading Unique Ability bought for this class
-			client->pers.secrets_found &= ~(1 << 2);
-			client->pers.secrets_found &= ~(1 << 3);
-			client->pers.secrets_found &= ~(1 << 4);
-			if (unique_ability_flag == 2)
-			{
-				client->pers.secrets_found |= (1 << 2);
-			}
-			else if (unique_ability_flag == 3)
-			{
-				client->pers.secrets_found |= (1 << 3);
-			}
-			else if (unique_ability_flag == 4)
-			{
-				client->pers.secrets_found |= (1 << 4);
-			}
-		}
-
-		fclose(config_file);
-	}
-}
-
-void save_config(gentity_t *ent)
-{
-	FILE *config_file = NULL;
-	gclient_t *client;
-	int unique_ability_flag = 0;
-	char content[MAX_STRING_CHARS];
-	int i = 0;
-
-	client = ent->client;
-
-	zyk_create_dir("configs");
-
-	config_file = fopen(zyk_config_filename(client),"w");
-
-	if (config_file != NULL)
-	{
-		// zyk: saving Unique Ability bought for this class
-		if (client->pers.secrets_found & (1 << 2))
-		{
-			unique_ability_flag = 2;
-		}
-		else if (client->pers.secrets_found & (1 << 3))
-		{
-			unique_ability_flag = 3;
-		}
-		else if (client->pers.secrets_found & (1 << 4))
-		{
-			unique_ability_flag = 4;
-		}
-
-		strcpy(content, "");
-
-		for (i = 0; i < NUMBER_OF_SKILLS; i++)
-		{
-			strcpy(content, va("%s%d\n", content, client->pers.skill_levels[i]));
-		}
-
-		fprintf(config_file,"%d\n%s%d\n", client->pers.level, content, unique_ability_flag);
-		
-		fclose(config_file);
-	}
-}
-
 void do_change_class(gentity_t *ent, int value)
 {
 	int i = 0;
@@ -10883,12 +10709,10 @@ void do_change_class(gentity_t *ent, int value)
 	if (validate_rpg_class(ent) == qfalse)
 	{
 		ent->client->pers.rpg_class = old_class;
+
+		trap->SendServerCommand(ent->s.number, va("print \"You are still a %s\n\"", zyk_rpg_class(ent)));
 		return;
 	}
-
-	ent->client->pers.rpg_class = old_class;
-
-	save_config(ent);
 
 	ent->client->pers.rpg_class = value;
 
@@ -10901,8 +10725,6 @@ void do_change_class(gentity_t *ent, int value)
 			ent->client->pers.skillpoints++;
 		}
 	}
-
-	load_config(ent);
 
 	save_account(ent, qtrue);
 
