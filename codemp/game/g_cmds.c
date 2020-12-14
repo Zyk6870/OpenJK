@@ -5423,6 +5423,7 @@ void rpg_score(gentity_t *ent)
 			send_message = 1;
 		}
 	}
+
 	save_account(ent, qtrue); // zyk: saves new score and credits in the account file
 
 	// zyk: cleaning the modifiers after they are applied
@@ -5431,14 +5432,7 @@ void rpg_score(gentity_t *ent)
 
 	if (send_message == 1)
 	{
-		if (ent->client->pers.level == zyk_rpg_max_level.integer)
-		{ // zyk: if this is the max level, show this message
-			trap->SendServerCommand( ent-g_entities, va("chat \"^7Congratulations, %s^7! You reached the max level %d!\n\"", ent->client->pers.netname, zyk_rpg_max_level.integer) );
-		}
-		else
-		{
-			trap->SendServerCommand( ent-g_entities, va("chat \"%s\"", message) );
-		}
+		trap->SendServerCommand( ent->s.number, va("chat \"%s\"", message));
 	}
 }
 
