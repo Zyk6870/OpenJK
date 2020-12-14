@@ -5948,8 +5948,15 @@ void ice_stalagmite(gentity_t *ent, int distance, int damage)
 
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, min_distance, distance, qfalse, &targets_hit) == qtrue)
 		{
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_ice_stalagmite", "0", "models/map_objects/hoth/stalagmite_small.md3", 0, 0, 0, 2000);
-
+			if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ICE_STALAGMITE] > 1)
+			{
+				zyk_quest_effect_spawn(ent, player_ent, "zyk_ice_stalagmite_2", "1", "models/map_objects/hoth/stalagmite_small.md3", 0, 0, 0, 2000);
+			}
+			else
+			{
+				zyk_quest_effect_spawn(ent, player_ent, "zyk_ice_stalagmite", "0", "models/map_objects/hoth/stalagmite_small.md3", 0, 0, 0, 2000);
+			}
+			
 			G_Damage(player_ent,ent,ent,NULL,player_ent->client->ps.origin,damage,DAMAGE_NO_PROTECTION,MOD_UNKNOWN);
 		}
 	}
