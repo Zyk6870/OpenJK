@@ -5287,9 +5287,7 @@ void load_account(gentity_t *ent)
 void save_account(gentity_t *ent, qboolean save_char_file)
 {
 	// zyk: used to prevent account save in map change time or before loading account after changing map
-	if (level.voteExecuteTime < level.time && ent->client->pers.connected == CON_CONNECTED && 
-		(ent->client->sess.amrpgmode == 1 || (ent->client->sess.amrpgmode == 2 && (zyk_rp_mode.integer != 1 || zyk_allow_saving_in_rp_mode.integer == 1)))
-		)
+	if (level.voteExecuteTime < level.time && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.amrpgmode > 0)
 	{ // zyk: players can only save things if server is not at RP Mode or if it is allowed in config
 		if (save_char_file == qtrue)
 		{  // zyk: save the RPG char
@@ -5387,17 +5385,12 @@ qboolean validate_rpg_class(gentity_t *ent)
 }
 
 // zyk: gives rpg score to the player
-void rpg_score(gentity_t *ent, qboolean admin_rp_mode)
+void rpg_score(gentity_t *ent)
 {
 	int send_message = 0; // zyk: if its 1, sends the message in player console
 	char message[128];
 
 	strcpy(message,"");
-
-	if (admin_rp_mode == qfalse && zyk_rp_mode.integer == 1)
-	{ // zyk: in RP Mode, only admins can give levels to RPG players
-		return;
-	}
 
 	if (validate_rpg_class(ent) == qfalse)
 		return;
@@ -5462,7 +5455,7 @@ void rpg_skill_counter(gentity_t *ent, int amount)
 			// zyk: skill counter does not give credits, only Level Up Score
 			ent->client->pers.credits_modifier = -10;
 
-			rpg_score(ent, qfalse);
+			rpg_score(ent);
 		}
 	}
 }
@@ -6912,9 +6905,6 @@ void quest_get_new_player(gentity_t *ent)
 	if (zyk_allow_quests.integer != 1)
 		return;
 
-	if (zyk_rp_mode.integer == 1)
-		return;
-
 	if (level.gametype != GT_FFA)
 	{ // zyk: quests can only be played at FFA gametype
 		return;
@@ -7550,12 +7540,6 @@ void Cmd_UpSkill_f( gentity_t *ent ) {
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	upgrade_value = atoi(arg1);
 
-	if (zyk_rp_mode.integer == 1)
-	{
-		trap->SendServerCommand( ent->s.number, "print \"You can't upgrade skill when RP Mode is activated by an admin.\n\"" );
-		return;
-	}
-
 	if (validate_rpg_class(ent) == qfalse)
 		return;
 
@@ -7624,12 +7608,6 @@ void Cmd_DownSkill_f( gentity_t *ent ) {
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	downgrade_value = atoi(arg1);
-
-	if (zyk_rp_mode.integer == 1)
-	{
-		trap->SendServerCommand( ent->s.number, "print \"You can't downgrade skill when RP Mode is activated by an admin.\n\"" );
-		return;
-	}
 
 	do_downgrade_skill(ent, downgrade_value);
 }
@@ -10754,12 +10732,6 @@ void Cmd_RpgClass_f( gentity_t *ent ) {
 	trap->Argv(1, arg1, sizeof( arg1 ));
 	value = atoi(arg1);
 
-	if (zyk_rp_mode.integer == 1)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"You can't change class when RP Mode is activated by an admin.\n\"" );
-		return;
-	}
-
 	do_change_class(ent, value);
 }
 
@@ -12509,146 +12481,137 @@ void zyk_show_admin_commands(gentity_t *ent, gentity_t *target_ent)
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_NPC))) 
 	{
-		strcpy(message_content[0],va("^3  %d ^7- NPC: ^2yes\n",ADM_NPC));
+		strcpy(message_content[ADM_NPC],va("^3  %d ^7- NPC: ^2yes\n",ADM_NPC));
 	}
 	else
 	{
-		strcpy(message_content[0],va("^3  %d ^7- NPC: ^1no\n",ADM_NPC));
+		strcpy(message_content[ADM_NPC],va("^3  %d ^7- NPC: ^1no\n",ADM_NPC));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_NOCLIP))) 
 	{
-		strcpy(message_content[1],va("^3  %d ^7- NoClip: ^2yes\n",ADM_NOCLIP));
+		strcpy(message_content[ADM_NOCLIP],va("^3  %d ^7- NoClip: ^2yes\n",ADM_NOCLIP));
 	}
 	else
 	{
-		strcpy(message_content[1],va("^3  %d ^7- NoClip: ^1no\n",ADM_NOCLIP));
+		strcpy(message_content[ADM_NOCLIP],va("^3  %d ^7- NoClip: ^1no\n",ADM_NOCLIP));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_GIVEADM))) 
 	{
-		strcpy(message_content[2],va("^3  %d ^7- GiveAdmin: ^2yes\n",ADM_GIVEADM));
+		strcpy(message_content[ADM_GIVEADM],va("^3  %d ^7- GiveAdmin: ^2yes\n",ADM_GIVEADM));
 	}
 	else
 	{
-		strcpy(message_content[2],va("^3  %d ^7- GiveAdmin: ^1no\n",ADM_GIVEADM));
+		strcpy(message_content[ADM_GIVEADM],va("^3  %d ^7- GiveAdmin: ^1no\n",ADM_GIVEADM));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_TELE))) 
 	{
-		strcpy(message_content[3],va("^3  %d ^7- Teleport: ^2yes\n",ADM_TELE));
+		strcpy(message_content[ADM_TELE],va("^3  %d ^7- Teleport: ^2yes\n",ADM_TELE));
 	}
 	else
 	{
-		strcpy(message_content[3],va("^3  %d ^7- Teleport: ^1no\n",ADM_TELE));
+		strcpy(message_content[ADM_TELE],va("^3  %d ^7- Teleport: ^1no\n",ADM_TELE));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_ADMPROTECT))) 
 	{
-		strcpy(message_content[4],va("^3  %d ^7- AdminProtect: ^2yes\n",ADM_ADMPROTECT));
+		strcpy(message_content[ADM_ADMPROTECT],va("^3  %d ^7- AdminProtect: ^2yes\n",ADM_ADMPROTECT));
 	}
 	else
 	{
-		strcpy(message_content[4],va("^3  %d ^7- AdminProtect: ^1no\n",ADM_ADMPROTECT));
+		strcpy(message_content[ADM_ADMPROTECT],va("^3  %d ^7- AdminProtect: ^1no\n",ADM_ADMPROTECT));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_ENTITYSYSTEM))) 
 	{
-		strcpy(message_content[5],va("^3  %d ^7- EntitySystem: ^2yes\n",ADM_ENTITYSYSTEM));
+		strcpy(message_content[ADM_ENTITYSYSTEM],va("^3  %d ^7- EntitySystem: ^2yes\n",ADM_ENTITYSYSTEM));
 	}
 	else
 	{
-		strcpy(message_content[5],va("^3  %d ^7- EntitySystem: ^1no\n",ADM_ENTITYSYSTEM));
+		strcpy(message_content[ADM_ENTITYSYSTEM],va("^3  %d ^7- EntitySystem: ^1no\n",ADM_ENTITYSYSTEM));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_SILENCE))) 
 	{
-		strcpy(message_content[6],va("^3  %d ^7- Silence: ^2yes\n",ADM_SILENCE));
+		strcpy(message_content[ADM_SILENCE],va("^3  %d ^7- Silence: ^2yes\n",ADM_SILENCE));
 	}
 	else
 	{
-		strcpy(message_content[6],va("^3  %d ^7- Silence: ^1no\n",ADM_SILENCE));
+		strcpy(message_content[ADM_SILENCE],va("^3  %d ^7- Silence: ^1no\n",ADM_SILENCE));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_CLIENTPRINT))) 
 	{
-		strcpy(message_content[7],va("^3  %d ^7- ClientPrint: ^2yes\n",ADM_CLIENTPRINT));
+		strcpy(message_content[ADM_CLIENTPRINT],va("^3  %d ^7- ClientPrint: ^2yes\n",ADM_CLIENTPRINT));
 	}
 	else
 	{
-		strcpy(message_content[7],va("^3  %d ^7- ClientPrint: ^1no\n",ADM_CLIENTPRINT));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_RPMODE))) 
-	{
-		strcpy(message_content[8],va("^3  %d ^7- RP Mode: ^2yes\n",ADM_RPMODE));
-	}
-	else
-	{
-		strcpy(message_content[8],va("^3  %d ^7- RP Mode: ^1no\n",ADM_RPMODE));
+		strcpy(message_content[ADM_CLIENTPRINT],va("^3  %d ^7- ClientPrint: ^1no\n",ADM_CLIENTPRINT));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_KICK))) 
 	{
-		strcpy(message_content[9],va("^3  %d ^7- Kick: ^2yes\n",ADM_KICK));
+		strcpy(message_content[ADM_KICK],va("^3  %d ^7- Kick: ^2yes\n",ADM_KICK));
 	}
 	else
 	{
-		strcpy(message_content[9],va("^3  %d ^7- Kick: ^1no\n",ADM_KICK));
+		strcpy(message_content[ADM_KICK],va("^3  %d ^7- Kick: ^1no\n",ADM_KICK));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_PARALYZE))) 
 	{
-		strcpy(message_content[10],va("^3 %d ^7- Paralyze: ^2yes\n",ADM_PARALYZE));
+		strcpy(message_content[ADM_PARALYZE],va("^3 %d ^7- Paralyze: ^2yes\n",ADM_PARALYZE));
 	}
 	else
 	{
-		strcpy(message_content[10],va("^3 %d ^7- Paralyze: ^1no\n",ADM_PARALYZE));
+		strcpy(message_content[ADM_PARALYZE],va("^3 %d ^7- Paralyze: ^1no\n",ADM_PARALYZE));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_GIVE))) 
 	{
-		strcpy(message_content[11],va("^3 %d ^7- Give: ^2yes\n",ADM_GIVE));
+		strcpy(message_content[ADM_GIVE],va("^3 %d ^7- Give: ^2yes\n",ADM_GIVE));
 	}
 	else
 	{
-		strcpy(message_content[11],va("^3 %d ^7- Give: ^1no\n",ADM_GIVE));
+		strcpy(message_content[ADM_GIVE],va("^3 %d ^7- Give: ^1no\n",ADM_GIVE));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_SCALE))) 
 	{
-		strcpy(message_content[12],va("^3 %d ^7- Scale: ^2yes\n",ADM_SCALE));
+		strcpy(message_content[ADM_SCALE],va("^3 %d ^7- Scale: ^2yes\n",ADM_SCALE));
 	}
 	else
 	{
-		strcpy(message_content[12],va("^3 %d ^7- Scale: ^1no\n",ADM_SCALE));
+		strcpy(message_content[ADM_SCALE],va("^3 %d ^7- Scale: ^1no\n",ADM_SCALE));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_PLAYERS))) 
 	{
-		strcpy(message_content[13],va("^3 %d ^7- Players: ^2yes\n",ADM_PLAYERS));
+		strcpy(message_content[ADM_PLAYERS],va("^3 %d ^7- Players: ^2yes\n",ADM_PLAYERS));
 	}
 	else
 	{
-		strcpy(message_content[13],va("^3 %d ^7- Players: ^1no\n",ADM_PLAYERS));
+		strcpy(message_content[ADM_PLAYERS],va("^3 %d ^7- Players: ^1no\n",ADM_PLAYERS));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_DUELARENA)))
 	{
-		strcpy(message_content[14], va("^3 %d ^7- DuelArena: ^2yes\n", ADM_DUELARENA));
+		strcpy(message_content[ADM_DUELARENA], va("^3 %d ^7- DuelArena: ^2yes\n", ADM_DUELARENA));
 	}
 	else
 	{
-		strcpy(message_content[14], va("^3 %d ^7- DuelArena: ^1no\n", ADM_DUELARENA));
+		strcpy(message_content[ADM_DUELARENA], va("^3 %d ^7- DuelArena: ^1no\n", ADM_DUELARENA));
 	}
 
 	if ((ent->client->pers.bitvalue & (1 << ADM_CUSTOMQUEST)))
 	{
-		strcpy(message_content[15], va("^3 %d ^7- Custom Quest: ^2yes\n", ADM_CUSTOMQUEST));
+		strcpy(message_content[ADM_CUSTOMQUEST], va("^3 %d ^7- Custom Quest: ^2yes\n", ADM_CUSTOMQUEST));
 	}
 	else
 	{
-		strcpy(message_content[15], va("^3 %d ^7- Custom Quest: ^1no\n", ADM_CUSTOMQUEST));
+		strcpy(message_content[ADM_CUSTOMQUEST], va("^3 %d ^7- Custom Quest: ^1no\n", ADM_CUSTOMQUEST));
 	}
 
 	for (i = 0; i < ADM_NUM_CMDS; i++)
@@ -12656,7 +12619,7 @@ void zyk_show_admin_commands(gentity_t *ent, gentity_t *target_ent)
 		strcpy(message,va("%s%s",message,message_content[i]));
 	}
 
-	trap->SendServerCommand( target_ent-g_entities, va("print \"\n%s^7\n%s\n^7Use ^3/adminlist <number> ^7to see command info\n\n\"", ent->client->pers.netname, message) );
+	trap->SendServerCommand( target_ent->s.number, va("print \"\n%s^7\n%s\n^7Use ^3/adminlist <number> ^7to see command info\n\n\"", ent->client->pers.netname, message) );
 }
 
 /*
@@ -12708,10 +12671,6 @@ void Cmd_AdminList_f( gentity_t *ent ) {
 		else if (command_number == ADM_CLIENTPRINT)
 		{
 			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/clientprint <player name or ID, or -1 to show to all players> <message> ^7to print a message in the screen\n\n\"" );
-		}
-		else if (command_number == ADM_RPMODE)
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/rpmode ^7to make all players not able to use ^3/rpgclass ^7and level up. Admins can give levels by using ^3/levelgive <player name or ID>^7\n\n\"" );
 		}
 		else if (command_number == ADM_KICK)
 		{
@@ -12900,221 +12859,6 @@ void Cmd_AdminDown_f( gentity_t *ent ) {
 	else
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"You can't use this command.\n\"" );
-	}
-}
-
-/*
-==================
-Cmd_RpMode_f
-==================
-*/
-void Cmd_RpMode_f( gentity_t *ent ) {
-	if (!(ent->client->pers.bitvalue & (1 << ADM_RPMODE)))
-	{ // zyk: admin command
-		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
-		return;
-	}
-
-	if (zyk_rp_mode.integer == 1)
-	{
-		int i = 0;
-
-		trap->Cvar_Set( "zyk_rp_mode", "0" );
-
-		for (i = 0; i < MAX_CLIENTS; i++)
-		{ // zyk: logout everyone in RPG Mode so they must reload their accounts
-			gentity_t *this_player = &g_entities[i];
-
-			if (this_player && this_player->client && this_player->client->sess.amrpgmode == 2)
-				this_player->client->sess.amrpgmode = 0;
-		}
-
-		trap->SendServerCommand( ent-g_entities, "print \"^3RPG System: ^7RP Mode ^1OFF^7\n\"" );
-	}
-	else
-	{
-		trap->Cvar_Set( "zyk_rp_mode", "1" );
-		trap->SendServerCommand( ent-g_entities, "print \"^3RPG System: ^7RP Mode ^2ON^7\n\"" );
-	}
-}
-
-/*
-==================
-Cmd_RpModeClass_f
-==================
-*/
-void Cmd_RpModeClass_f( gentity_t *ent ) {
-	char	arg1[MAX_STRING_CHARS];
-	char	arg2[MAX_STRING_CHARS];
-	int client_id = -1;
-
-	if (!(ent->client->pers.bitvalue & (1 << ADM_RPMODE)))
-	{ // zyk: admin command
-		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
-		return;
-	}
-
-	if ( trap->Argc() != 3 )
-	{ 
-		trap->SendServerCommand( ent-g_entities, "print \"You must write a player name or ID and the class number.\n\"" ); 
-		return; 
-	}
-
-	trap->Argv( 1,  arg1, sizeof( arg1 ) );
-	trap->Argv( 2,  arg2, sizeof( arg2 ) );
-	client_id = ClientNumberFromString( ent, arg1, qfalse ); 
-				
-	if (client_id == -1)
-	{
-		return;
-	}
-
-	if (g_entities[client_id].client->sess.amrpgmode != 2)
-	{
-		trap->SendServerCommand( ent-g_entities, va("print \"Player is not in RPG Mode\n\"") );
-		return;
-	}
-
-	do_change_class(&g_entities[client_id], atoi(arg2));
-	trap->SendServerCommand( ent-g_entities, va("print \"Changed target player class\n\"") );
-}
-
-/*
-==================
-Cmd_RpModeUp_f
-==================
-*/
-void Cmd_RpModeUp_f( gentity_t *ent ) {
-	char	arg1[MAX_STRING_CHARS];
-	char	arg2[MAX_STRING_CHARS];
-	int client_id = -1;
-
-	if (!(ent->client->pers.bitvalue & (1 << ADM_RPMODE)))
-	{ // zyk: admin command
-		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
-		return;
-	}
-
-	if ( trap->Argc() != 3 )
-	{ 
-		trap->SendServerCommand( ent-g_entities, "print \"You must write a player name or ID and the skill number.\n\"" ); 
-		return; 
-	}
-
-	trap->Argv( 1,  arg1, sizeof( arg1 ) );
-	trap->Argv( 2,  arg2, sizeof( arg2 ) );
-	client_id = ClientNumberFromString( ent, arg1, qfalse ); 
-				
-	if (client_id == -1)
-	{
-		return;
-	}
-
-	if (g_entities[client_id].client->sess.amrpgmode != 2)
-	{
-		trap->SendServerCommand( ent-g_entities, va("print \"Player is not in RPG Mode\n\"") );
-		return;
-	}
-
-	do_upgrade_skill(&g_entities[client_id], atoi(arg2), qfalse);
-	trap->SendServerCommand( ent-g_entities, va("print \"Upgraded target player skill\n\"") );
-}
-
-/*
-==================
-Cmd_RpModeDown_f
-==================
-*/
-void Cmd_RpModeDown_f( gentity_t *ent ) {
-	char	arg1[MAX_STRING_CHARS];
-	char	arg2[MAX_STRING_CHARS];
-	int client_id = -1;
-
-	if (!(ent->client->pers.bitvalue & (1 << ADM_RPMODE)))
-	{ // zyk: admin command
-		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
-		return;
-	}
-
-	if ( trap->Argc() != 3 )
-	{ 
-		trap->SendServerCommand( ent-g_entities, "print \"You must write a player name or ID and the skill number.\n\"" ); 
-		return; 
-	}
-
-	trap->Argv( 1,  arg1, sizeof( arg1 ) );
-	trap->Argv( 2,  arg2, sizeof( arg2 ) );
-	client_id = ClientNumberFromString( ent, arg1, qfalse ); 
-				
-	if (client_id == -1)
-	{
-		return;
-	}
-
-	if (g_entities[client_id].client->sess.amrpgmode != 2)
-	{
-		trap->SendServerCommand( ent-g_entities, va("print \"Player is not in RPG Mode\n\"") );
-		return;
-	}
-
-	do_downgrade_skill(&g_entities[client_id], atoi(arg2));
-	trap->SendServerCommand( ent-g_entities, va("print \"Downgraded target player skill\n\"") );
-}
-
-/*
-==================
-Cmd_LevelGive_f
-==================
-*/
-void Cmd_LevelGive_f( gentity_t *ent ) {
-	char arg1[MAX_STRING_CHARS];
-	int client_id = -1;
-
-	if (!(ent->client->pers.bitvalue & (1 << ADM_RPMODE)))
-	{ // zyk: admin command
-		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
-		return;
-	}
-   
-	if ( trap->Argc() != 2) 
-	{ 
-		trap->SendServerCommand( ent-g_entities, "print \"You must specify the player name or ID.\n\"" ); 
-		return;
-	}
-
-	trap->Argv( 1, arg1, sizeof( arg1 ) );
-
-	client_id = ClientNumberFromString( ent, arg1, qfalse );
-
-	if (client_id == -1)
-	{
-		return;
-	}
-
-	if (zyk_rp_mode.integer != 1)
-	{
-		trap->SendServerCommand( ent-g_entities, va("print \"The server is not at RP Mode\n\"") );
-		return;
-	}
-
-	if (g_entities[client_id].client->sess.amrpgmode == 2)
-	{
-		if (g_entities[client_id].client->pers.level < zyk_rpg_max_level.integer)
-		{
-			g_entities[client_id].client->pers.score_modifier = g_entities[client_id].client->pers.level;
-			g_entities[client_id].client->pers.credits_modifier = -10;
-			rpg_score(&g_entities[client_id], qtrue);
-
-			trap->SendServerCommand( ent-g_entities, va("print \"Target player leveled up\n\"") );
-		}
-		else
-		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Target player is at the max rpg level\n\"") );
-		}
-	}
-	else
-	{
-		trap->SendServerCommand( ent-g_entities, va("print \"The player must be in RPG Mode\n\"") );
 	}
 }
 
@@ -16840,7 +16584,6 @@ command_t commands[] = {
 	{ "kill",				Cmd_Kill_f,					CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "killother",			Cmd_KillOther_f,			CMD_CHEAT|CMD_NOINTERMISSION },
 //	{ "kylesmash",			TryGrapple,					0 },
-	{ "levelgive",			Cmd_LevelGive_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "levelshot",			Cmd_LevelShot_f,			CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "list",				Cmd_ListAccount_f,			CMD_NOINTERMISSION },
 	{ "listaccount",		Cmd_ListAccount_f,			CMD_NOINTERMISSION },
@@ -16872,10 +16615,6 @@ command_t commands[] = {
 	{ "rpgclass",			Cmd_RpgClass_f,				CMD_RPG|CMD_NOINTERMISSION },
 	{ "rpglmsmode",			Cmd_RpgLmsMode_f,			CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "rpglmstable",		Cmd_RpgLmsTable_f,			CMD_NOINTERMISSION },
-	{ "rpmode",				Cmd_RpMode_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
-	{ "rpmodeclass",		Cmd_RpModeClass_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
-	{ "rpmodedown",			Cmd_RpModeDown_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
-	{ "rpmodeup",			Cmd_RpModeUp_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "saber",				Cmd_Saber_f,				CMD_NOINTERMISSION },
 	{ "say",				Cmd_Say_f,					0 },
 	{ "say_team",			Cmd_SayTeam_f,				0 },
