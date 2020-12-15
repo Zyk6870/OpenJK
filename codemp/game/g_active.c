@@ -2707,6 +2707,11 @@ void ClientThink_real( gentity_t *ent ) {
 			client->ps.speed *= 2;
 		}
 
+		if (client->pers.quest_power_status & (1 << 3))
+		{ // zyk: using Flaming Rage. Increase speed
+			client->ps.speed *= 1.5;
+		}
+
 		if (client->pers.stun_baton_less_speed_timer > level.time)
 		{ // zyk: stun baton 3/3 decreases speed
 			client->ps.speed /= 2;
@@ -2758,6 +2763,11 @@ void ClientThink_real( gentity_t *ent ) {
 		if (client->pers.quest_power_status & (1 << 9))
 		{ // zyk: using Ultra Speed. Increase speed
 			zyk_player_speed *= 2;
+		}
+
+		if (client->pers.quest_power_status & (1 << 3))
+		{ // zyk: using Flaming Rage. Increase speed
+			zyk_player_speed *= 1.5;
 		}
 
 		if (client->pers.stun_baton_less_speed_timer > level.time)

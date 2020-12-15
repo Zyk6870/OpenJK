@@ -5252,6 +5252,19 @@ void enemy_nerf(gentity_t *ent, int distance)
 	}
 }
 
+// zyk: Flaming Rage
+void flaming_rage(gentity_t* ent, int duration)
+{
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_FLAMING_RAGE] > 1)
+	{
+		duration += 3000;
+	}
+
+	ent->client->pers.quest_power_status |= (1 << 3);
+	ent->client->pers.quest_power8_timer = level.time + duration;
+	ent->client->pers.quest_debounce2_timer = 0;
+}
+
 // zyk: used by Duelist Vertical DFA ability
 void zyk_vertical_dfa_effect(gentity_t *ent)
 {
@@ -6410,6 +6423,23 @@ void quest_power_events(gentity_t *ent)
 			if (ent->client->pers.quest_power_status & (1 << 2) && ent->client->pers.quest_target2_timer < level.time)
 			{ // zyk: Time Power. Remove it from target when duration ends
 				ent->client->pers.quest_power_status &= ~(1 << 2);
+			}
+
+			if (ent->client->pers.quest_power_status & (1 << 3))
+			{ // zyk: Flaming Rage. Spawns fire effects
+				if (ent->client->pers.quest_debounce2_timer < level.time)
+				{
+					zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_flaming_rage", "0", "env/fire", 0, 0, 0, 500);
+
+					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
+
+					ent->client->pers.quest_debounce2_timer = level.time + 500;
+				}
+
+				if (ent->client->pers.quest_power8_timer < level.time)
+				{
+					ent->client->pers.quest_power_status &= ~(1 << 3);
+				}
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << 4))

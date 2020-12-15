@@ -235,7 +235,7 @@ char* zyk_skill_name(int skill_index)
 // zy: returns the description of a RPG skill
 char* zyk_skill_description(int skill_index)
 {
-	char* skill_description[NUMBER_OF_SKILLS] = {
+	char* skill_description[NUMBER_OF_SKILLS + 1] = {
 		"makes you use the force to jump higher. Level 5 has no height limit, you can continue jumping up until you run out of force, and it also lets you jump out of water",
 		"pushes the opponent forward",
 		"pulls the opponent towards you",
@@ -291,7 +291,7 @@ char* zyk_skill_description(int skill_index)
 		"a powerful shield that protects you from enemy attacks, it can resist a lot against any weapon",
 		"makes you almost invisible to players and invisible to npcs. Can cloak your vehicle by pressing the Lightsaber Style key (default L) if you have the Holdable Items Upgrade",
 		"increases the max force power you have. Necessary to allow you to use force powers and force-based skills",
-		"\nFree Warrior ^7gets more damage and more resistance to damage\n^3Force User ^7gets more saber damage and force regens faster\n^3Bounty Hunter ^7gets more gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health\n^3Armored Soldier ^7gets more resistance to damage\n^3Monk ^7gets more run speed, melee damage and melee attack speed\n^3Stealth Attacker ^7gets more gun damage and more resistance to electric attacks\n^3Duelist ^7gets more saber and melee damage and faster force regen\n^3Force Gunner ^7gets more damage and more resistance to damage\n^3Magic Master ^7gets more Magic Points, new magic bolt types, new magic powers, recovers some jetpack fuel with Magic Points if it runs out and has less magic power cooldown\n^3Force Guardian ^7gets more resistance to damage"
+		"Free Warrior gets more damage and more resistance to damage, Force User gets more saber damage and force regens faster, Bounty Hunter gets more gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health, Armored Soldier gets more resistance to damage, Monk gets more run speed, melee damage and melee attack speed, Stealth Attacker gets more gun damage and more resistance to electric attacks, Duelist gets more saber and melee damage and faster force regen, Force Gunner gets more damage and more resistance to damage, Magic Master gets more Magic Points, new magic bolt types, new magic powers, recovers some jetpack fuel with Magic Points if it runs out and has less magic power cooldown, Force Guardian gets more resistance to damage"
 		"similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels",
 		"creates an energy area that heals you and your allies and damage enemies",
 		"creates an explosion that does a lot of damage",
@@ -307,7 +307,7 @@ char* zyk_skill_description(int skill_index)
 		"fires a flame burst for some seconds",
 		"a flame jet appears at the enemies and damages them",
 		"creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds",
-		"the power of the Fire element boots your strength, making you cause more damage with your attacks and making enemies catch fire if you get near them",
+		"the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed",
 		"blows people away for some seconds",
 		"makes people go towards you",
 		"increases your run speed",
@@ -323,7 +323,8 @@ char* zyk_skill_description(int skill_index)
 		"damages enemies in the area and recovers your hp",
 		"creates a big shining light around you, draining enemies mp and restoring your health, while slowing them down and confusing them",
 		"protects you from other magic powers for some seconds",
-		"paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed"
+		"paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed",
+		""
 	};
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
@@ -4298,6 +4299,7 @@ extern void flaming_area(gentity_t *ent, int damage);
 extern void reverse_wind(gentity_t *ent, int distance, int duration);
 extern void enemy_nerf(gentity_t *ent, int distance);
 extern void ice_block(gentity_t *ent, int duration);
+extern void flaming_rage(gentity_t* ent, int duration);
 qboolean TryGrapple(gentity_t *ent)
 {
 	if (ent->client->ps.weaponTime > 0)
@@ -13721,7 +13723,8 @@ void zyk_cast_magic(gentity_t* ent, int skill_index, int magic_number)
 			}
 			else if (magic_number == MAGIC_FLAMING_RAGE)
 			{
-
+				flaming_rage(ent, 5000);
+				zyk_set_magic_power_cooldown_time(ent, 15000);
 			}
 			else if (magic_number == MAGIC_BLOWING_WIND)
 			{

@@ -5438,6 +5438,16 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
+	if (attacker && attacker->client && attacker->client->pers.quest_power_status & (1 << 3))
+	{ // zyk: Flaming Rage increases damage
+		damage = (int)ceil(damage * 1.08);
+	}
+
+	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 3))
+	{ // zyk: Flaming Rage decreases damage taken
+		damage = (int)ceil(damage * 0.92);
+	}
+
 	if (targ && targ->client && targ->client->sess.amrpgmode == 2 && targ->client->pers.can_play_quest == 1 && 
 		targ->client->pers.universe_quest_counter & (1 << 29) && targ->client->pers.guardian_mode == 0)
 	{ // zyk: Challenge Mode increases damage taken from anything

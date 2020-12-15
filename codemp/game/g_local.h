@@ -950,7 +950,7 @@ typedef struct clientPersistant_s {
 	//  0 - using Immunity Power
 	//  1 - hit by Chaos Power
 	//  2 - hit by Time Power
-	//  3 - unused
+	//  3 - using Flaming Rage
 	//  4 - hit by Poison Mushrooms
 	//  5 - unused
 	//  6 - hit by Slow Motion
@@ -993,6 +993,7 @@ typedef struct clientPersistant_s {
 	int quest_power5_timer;
 	int quest_power6_timer;
 	int quest_power7_timer;
+	int quest_power8_timer;
 
 	// zyk: timers used by the quest powers hitting this player
 	int quest_target1_timer;
@@ -1009,6 +1010,7 @@ typedef struct clientPersistant_s {
 
 	// zyk: quest powers debounce timer, for example, like Wind powers
 	int quest_debounce1_timer;
+	int quest_debounce2_timer;
 
 	// zyk: player ids which are hitting the target player
 	int quest_power_user1_id;
