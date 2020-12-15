@@ -4927,6 +4927,51 @@ qboolean zyk_special_power_can_hit_target(gentity_t *attacker, gentity_t *target
 	return qfalse;
 }
 
+// zyk: similar to the function above, but for powers with which the effect/model itself must be tested
+qboolean zyk_magic_effect_can_hit_target(gentity_t* attacker, gentity_t* target, vec3_t effect_origin, int i, int min_distance, int max_distance, qboolean hit_breakable)
+{
+	if (attacker->s.number != i && target && target->client && target->health > 0 && zyk_can_hit_target(attacker, target) == qtrue &&
+		(i > MAX_CLIENTS || (target->client->pers.connected == CON_CONNECTED && target->client->sess.sessionTeam != TEAM_SPECTATOR &&
+			target->client->ps.duelInProgress == qfalse)))
+	{ // zyk: target is a player or npc that can be hit by the attacker
+		int player_distance = (int)Distance(effect_origin, target->client->ps.origin);
+
+		if (player_distance > min_distance && player_distance < max_distance)
+		{
+			int is_ally = 0;
+
+			if (i < level.maxclients && !attacker->NPC &&
+				zyk_is_ally(attacker, target) == qtrue)
+			{ // zyk: allies will not be hit by this power
+				is_ally = 1;
+			}
+
+			if (OnSameTeam(attacker, target) == qtrue || npcs_on_same_team(attacker, target) == qtrue)
+			{ // zyk: if one of them is npc, also check for allies
+				is_ally = 1;
+			}
+
+			if (is_ally == 0 && !(zyk_check_immunity_power(target)) &&
+				zyk_can_hit_boss_battle_target(attacker, target))
+			{ // zyk: Cannot hit target with Immunity Power. Players in bosses can only hit bosses and their helper npcs. Players not in boss battles
+			  // can only hit normal enemy npcs and npcs spawned by bosses but not the bosses themselves. Magic-using npcs can hit everyone that are not their allies
+				return qtrue;
+			}
+		}
+	}
+	else if (i >= MAX_CLIENTS && hit_breakable == qtrue && target && !target->client && target->health > 0 && target->takedamage == qtrue)
+	{
+		int entity_distance = (int)Distance(effect_origin, target->r.currentOrigin);
+
+		if (entity_distance > min_distance && entity_distance < max_distance)
+		{
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
 // zyk: Earthquake
 void earthquake(gentity_t *ent, int stun_time, int strength, int distance)
 {
@@ -5078,6 +5123,11 @@ void chaos_power(gentity_t *ent, int distance, int duration)
 {
 	int i = 0;
 	int targets_hit = 0;
+
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_CHAOS_POWER] > 1)
+	{
+		duration += 1000;
+	}
 
 	for (i = 0; i < level.num_entities; i++)
 	{
@@ -6037,7 +6087,58 @@ void ice_block(gentity_t *ent, int duration)
 // zyk: Ultra Drain
 void ultra_drain(gentity_t *ent, int radius, int damage, int duration)
 {
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ULTRA_DRAIN] > 1)
+	{
+		damage += 8;
+	}
+
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_drain", "4", "misc/possession", 1000, damage, radius, duration);
+}
+
+void zyk_spawn_black_hole_model(gentity_t* ent, int duration)
+{
+	gentity_t* new_ent = G_Spawn();
+
+	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
+	zyk_set_entity_field(new_ent, "spawnflags", "65536");
+	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->r.currentOrigin[0], (int)ent->r.currentOrigin[1], (int)ent->r.currentOrigin[2]));
+
+	zyk_set_entity_field(new_ent, "model", "models/map_objects/mp/sphere_1.md3");
+
+	zyk_set_entity_field(new_ent, "targetname", "zyk_black_hole");
+
+	zyk_set_entity_field(new_ent, "zykmodelscale", "150");
+
+	zyk_spawn_entity(new_ent);
+
+	level.special_power_effects[new_ent->s.number] = ent->s.number;
+	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+
+	VectorCopy(new_ent->s.origin, ent->client->pers.black_hole_origin);
+
+	// zyk: remaps the sphere for Black Hole textures
+	AddRemap("models/map_objects/mp/spheretwo", "textures/mp/black", level.time * 0.001);
+	trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+}
+
+// zyk: Black Hole
+void black_hole(gentity_t* ent, int radius, int damage, int duration)
+{
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_BLACK_HOLE] > 1)
+	{
+		damage += 20;
+		duration += 3000;
+	}
+
+	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_black_hole", "4", "ships/proton_impact", 500, damage, radius, duration);
+
+	zyk_spawn_black_hole_model(ent, duration);
+
+	ent->client->pers.black_hole_distance = radius;
+
+	ent->client->pers.quest_power_status |= (1 << 5);
+	ent->client->pers.quest_debounce3_timer = 0;
+	ent->client->pers.quest_power9_timer = level.time + duration;
 }
 
 // zyk: Magic Explosion
@@ -6470,6 +6571,71 @@ void quest_power_events(gentity_t *ent)
 				else if (ent->client->pers.quest_power_hit_counter == 0 && ent->client->pers.quest_target3_timer < level.time)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 4);
+				}
+			}
+
+			if (ent->client->pers.quest_power_status & (1 << 5))
+			{ // zyk: Black Hole
+				if (ent->client->pers.quest_power9_timer > level.time)
+				{
+					gentity_t* black_hole_target = NULL;
+					int zyk_it = 0;
+
+					if (ent->client->pers.quest_debounce3_timer < level.time)
+					{
+						ent->client->pers.quest_debounce3_timer = level.time + 50;
+
+						for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
+						{
+							black_hole_target = &g_entities[zyk_it];
+
+							if (black_hole_target && black_hole_target->client && ent != black_hole_target && 
+								zyk_magic_effect_can_hit_target(ent, black_hole_target, ent->client->pers.black_hole_origin, zyk_it, 0, ent->client->pers.black_hole_distance, qfalse))
+							{
+								vec3_t dir, forward;
+								float target_distance = Distance(ent->client->pers.black_hole_origin, black_hole_target->client->ps.origin);
+								float black_hole_suck_strength = 0.0;
+
+								if (target_distance > 0.0)
+								{
+									black_hole_suck_strength = ((ent->client->pers.black_hole_distance * 0.7) / target_distance);
+								}
+
+								VectorSubtract(ent->client->pers.black_hole_origin, black_hole_target->client->ps.origin, forward);
+								VectorNormalize(forward);
+
+								// zyk: increases strength with which target is sucked into the black hole the closer he is to it
+								if (black_hole_target->client->ps.groundEntityNum != ENTITYNUM_NONE)
+								{
+									black_hole_suck_strength *= 210.0;
+								}
+								else
+								{
+									black_hole_suck_strength *= 48.0;
+								}
+
+								// zyk: add a limit to the strength to prevent the target from being blown out of the black hole
+								if (black_hole_suck_strength > 500.0)
+								{
+									black_hole_suck_strength = 500.0;
+								}
+
+								if (target_distance < 64.0)
+								{ // zyk: very close to black hole center
+									VectorScale(black_hole_target->client->ps.velocity, 0.4, black_hole_target->client->ps.velocity);
+								}
+								else
+								{
+									VectorScale(forward, black_hole_suck_strength, dir);
+									VectorAdd(black_hole_target->client->ps.velocity, dir, black_hole_target->client->ps.velocity);
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					ent->client->pers.quest_power_status &= ~(1 << 5);
 				}
 			}
 

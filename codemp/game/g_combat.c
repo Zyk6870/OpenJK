@@ -7041,7 +7041,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						}
 					}
 
-					// zyk: target will not be knocked back by Rockfall, Dome of Damage, Ultra Flame, Ultra Drain, Water Splash, 
+					// zyk: target will not be knocked back by Rockfall, Dome of Damage, Ultra Flame, Ultra Drain, Black Hole, Water Splash, 
 					// Acid Water, Flaming Area, Healing Area, Vertical DFA and Force Storm
 					if (Q_stricmp(attacker->targetname, "zyk_quest_effect_rockfall") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_watersplash") == 0 ||
@@ -7050,6 +7050,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_flaming_area") == 0 ||
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_acid") == 0 ||
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_drain") == 0 ||
+						Q_stricmp(attacker->targetname, "zyk_quest_effect_black_hole") == 0 ||
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_vertical_dfa") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_force_storm") == 0 ||

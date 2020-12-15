@@ -4378,6 +4378,7 @@ extern void reverse_wind(gentity_t *ent, int distance, int duration);
 extern void enemy_nerf(gentity_t *ent, int distance);
 extern void ice_block(gentity_t *ent, int duration);
 extern void flaming_rage(gentity_t* ent, int duration);
+extern void black_hole(gentity_t* ent, int radius, int damage, int duration);
 qboolean TryGrapple(gentity_t *ent)
 {
 	if (ent->client->ps.weaponTime > 0)
@@ -13693,10 +13694,10 @@ int zyk_get_magic_cost(int magic_number)
 		18, // Enemy Weakening
 		25, // Sleeping Flowers
 		18, // Poison Mushrooms
-		30, // Black Hole
+		40, // Black Hole
 		30, // Chaos Power
 		30, // Ultra Drain
-		30, // Light of Judgement
+		40, // Light of Judgement
 		30, // Magic Immunity
 		30 // Time Stop
 	};
@@ -13856,21 +13857,22 @@ void zyk_cast_magic(gentity_t* ent, int skill_index, int magic_number)
 			}
 			else if (magic_number == MAGIC_BLACK_HOLE)
 			{
-
+				black_hole(ent, 540, 50, 7000);
+				zyk_set_magic_power_cooldown_time(ent, 48000);
 			}
 			else if (magic_number == MAGIC_CHAOS_POWER)
 			{
-				chaos_power(ent, 400, 4600);
+				chaos_power(ent, 400, 3000);
 				zyk_set_magic_power_cooldown_time(ent, 28000);
 			}
 			else if (magic_number == MAGIC_ULTRA_DRAIN)
 			{
-				ultra_drain(ent, 450, 30, 8000);
+				ultra_drain(ent, 450, 22, 8000);
 				zyk_set_magic_power_cooldown_time(ent, 28000);
 			}
 			else if (magic_number == MAGIC_LIGHT_OF_JUDGEMENT)
 			{
-
+				
 			}
 			else if (magic_number == MAGIC_MAGIC_IMMUNITY)
 			{
