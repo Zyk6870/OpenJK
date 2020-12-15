@@ -6958,30 +6958,99 @@ char *zyk_allowed_skill_color(int skill_index, int rpg_class)
 {
 	if (zyk_skill_allowed_for_class(skill_index, rpg_class) == qtrue)
 	{
-		if ((skill_index >= 0 && skill_index <= 4) || skill_index == 38)
-		{
-			return "^7";
-		}
-		else if ((skill_index >= 8 && skill_index <= 12) || skill_index == 54)
-		{
-			return "^5";
-		}
-		else if ((skill_index >= 13 && skill_index <= 17) || skill_index == 32)
-		{
-			return "^1";
-		}
-		else if (skill_index == 30 || skill_index == 31)
-		{
-			return "^2";
-		}
-		else if (skill_index >= 35 && skill_index <= 37)
-		{
-			return "^6";
-		}
-		else
-		{
-			return "^3";
-		}
+		char skill_colors[NUMBER_OF_SKILLS + 1][3] = {
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^3",
+			"^3",
+			"^3",
+			"^5",
+			"^5",
+			"^5",
+			"^5",
+			"^5",
+			"^1",
+			"^1",
+			"^1",
+			"^1",
+			"^1",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^2",
+			"^2",
+			"^1",
+			"^3",
+			"^3",
+			"^6",
+			"^6",
+			"^6",
+			"^7",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^5",
+			"^3",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^4",
+			"^4",
+			"^4",
+			"^4",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^1",
+			"^1",
+			"^1",
+			"^1",
+			"^2",
+			"^2",
+			"^2",
+			"^2",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^6",
+			"^6",
+			"^6",
+			"^5",
+			"^5",
+			"^5",
+			""
+		};
+
+		return G_NewString(skill_colors[skill_index]);
 	}
 	else
 	{
