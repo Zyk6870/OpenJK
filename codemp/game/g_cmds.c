@@ -7007,122 +7007,72 @@ char* zyk_add_whitespaces(int skill_index, int biggest_skill_name_length)
 	return G_NewString(result_text);
 }
 
-void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
+// zyk: lists skills from a specific category
+void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, int number_of_skills, int lowest_skill_index, int number_of_whitespaces)
 {
 	char message[1024];
-	char message_content[12][100];
+	char final_chars[32];
 	int i = 0;
 
-	strcpy(message,"");
-				
-	while (i < 11)
-	{
-		strcpy(message_content[i],"");
-		i++;
-	}
-	message_content[11][0] = '\0';
-	i = 0;
+	strcpy(message, "");
+	strcpy(final_chars, "");
 
-	if (Q_stricmp( arg1, "force" ) == 0)
+	for (i = 0; i < number_of_skills; i++)
 	{
-		int first_skill_index = 0;
-
-		for (i = 0; i < 9; i++)
+		if ((i % 2) == 0)
+		{ // zyk: adds whitespaces in first column
+			strcpy(final_chars, va("%s ", zyk_add_whitespaces(lowest_skill_index, number_of_whitespaces)));
+		}
+		else
 		{
-			strcpy(message_content[i], va("%s %d - %s: %d/%d%s ", 
-				zyk_allowed_skill_color(first_skill_index, ent->client->pers.rpg_class), (first_skill_index + 1), zyk_skill_name(first_skill_index), 
-				ent->client->pers.skill_levels[first_skill_index], max_skill_levels[first_skill_index], zyk_add_whitespaces(first_skill_index, 13)));
-
-			strcpy(message_content[i], va("%s%s%d - %s: %d/%d\n", message_content[i], zyk_allowed_skill_color((first_skill_index + 9), ent->client->pers.rpg_class), 
-				(first_skill_index + 10), zyk_skill_name(first_skill_index + 9), ent->client->pers.skill_levels[first_skill_index + 9], max_skill_levels[first_skill_index + 9]));
-
-			first_skill_index++;
-
-			strcpy(message, va("%s%s",message,message_content[i]));
+			strcpy(final_chars, "\n");
 		}
 
-		trap->SendServerCommand( target_ent->s.number, va("print \"%s\"", message) );
+		strcpy(message, va("%s%s%d - %s: %d/%d%s", message,
+			zyk_allowed_skill_color(lowest_skill_index, ent->client->pers.rpg_class), (lowest_skill_index + 1), zyk_skill_name(lowest_skill_index),
+			ent->client->pers.skill_levels[lowest_skill_index], max_skill_levels[lowest_skill_index], final_chars));
+
+		lowest_skill_index++;
+
+		if (lowest_skill_index == 39)
+		{ // zyk: category 'other' goes from skill index 39 to 54
+			lowest_skill_index = 54;
+		}
+	}
+
+	if ((i % 2) != 0)
+	{ // zyk: if this category has an odd number of skills, add a final line break
+		strcpy(message, va("%s\n", message));
+	}
+
+	trap->SendServerCommand(target_ent->s.number, va("print \"%s\"", message));
+}
+
+void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
+{
+	if (Q_stricmp( arg1, "force" ) == 0)
+	{
+		zyk_list_category_skills(ent, target_ent, 18, 0, 13);
 	}
 	else if (Q_stricmp( arg1, "weapons" ) == 0)
 	{
-		int first_skill_index = 18;
-
-		for (i = 0; i < 6; i++)
-		{
-			strcpy(message_content[i], va("%s %d - %s: %d/%d%s ",
-				zyk_allowed_skill_color(first_skill_index, ent->client->pers.rpg_class), (first_skill_index + 1), zyk_skill_name(first_skill_index),
-				ent->client->pers.skill_levels[first_skill_index], max_skill_levels[first_skill_index], zyk_add_whitespaces(first_skill_index, 17)));
-
-			strcpy(message_content[i], va("%s%s%d - %s: %d/%d\n", message_content[i], zyk_allowed_skill_color((first_skill_index + 6), ent->client->pers.rpg_class),
-				(first_skill_index + 7), zyk_skill_name(first_skill_index + 6), ent->client->pers.skill_levels[first_skill_index + 6], max_skill_levels[first_skill_index + 6]));
-
-			first_skill_index++;
-
-			strcpy(message, va("%s%s", message, message_content[i]));
-		}
-
-		trap->SendServerCommand( target_ent->s.number, va("print \"%s\"", message) );
+		zyk_list_category_skills(ent, target_ent, 12, 18, 17);
 	}
 	else if (Q_stricmp( arg1, "other" ) == 0)
 	{
-		int first_skill_index = 30;
-
-		for (i = 0; i < 11; i++)
-		{
-			if (i == 9)
-			{ // zyk: in this moment the next skill to be listed is at index 54
-				first_skill_index = 54;
-			}
-
-			strcpy(message, va("%s%s%d - %s: %d/%d\n", message, zyk_allowed_skill_color((first_skill_index), ent->client->pers.rpg_class), (first_skill_index + 1), 
-				zyk_skill_name(first_skill_index), ent->client->pers.skill_levels[first_skill_index], max_skill_levels[first_skill_index]));
-
-			first_skill_index++;
-		}
-
-		trap->SendServerCommand( target_ent->s.number, va("print \"%s\"", message) );
+		zyk_list_category_skills(ent, target_ent, 11, 30, 15);
 	}
 	else if (Q_stricmp( arg1, "ammo" ) == 0)
 	{
-		int first_skill_index = 39;
-
-		for (i = 0; i < 7; i++)
-		{
-			strcpy(message, va("%s%s%d - %s: %d/%d\n", message, zyk_allowed_skill_color((first_skill_index), ent->client->pers.rpg_class),
-				(first_skill_index + 1), zyk_skill_name(first_skill_index), ent->client->pers.skill_levels[first_skill_index], max_skill_levels[first_skill_index]));
-
-			first_skill_index++;
-		}
-
-		trap->SendServerCommand( target_ent->s.number, va("print \"%s\"", message) );
+		zyk_list_category_skills(ent, target_ent, 7, 39, 12);
 	}
 	else if (Q_stricmp( arg1, "items" ) == 0)
 	{
-		int first_skill_index = 46;
-
-		for (i = 0; i < 8; i++)
-		{
-			strcpy(message, va("%s%s%d - %s: %d/%d\n", message, zyk_allowed_skill_color((first_skill_index), ent->client->pers.rpg_class),
-				(first_skill_index + 1), zyk_skill_name(first_skill_index), ent->client->pers.skill_levels[first_skill_index], max_skill_levels[first_skill_index]));
-
-			first_skill_index++;
-		}
-
-		trap->SendServerCommand( target_ent->s.number, va("print \"%s\"", message) );
+		zyk_list_category_skills(ent, target_ent, 8, 46, 11);
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		int first_skill_index = 56;
-
-		for (i = 0; i < MAX_MAGIC_POWERS; i++)
-		{
-			strcpy(message, va("%s%s%d - %s: %d/%d\n", message, zyk_allowed_skill_color((first_skill_index), ent->client->pers.rpg_class),
-				(first_skill_index + 1), zyk_skill_name(first_skill_index), ent->client->pers.skill_levels[first_skill_index], max_skill_levels[first_skill_index]));
-
-			first_skill_index++;
-		}
-
-		trap->SendServerCommand(target_ent->s.number, va("print \"%s\"", message));
+		zyk_list_category_skills(ent, target_ent, 32, 56, 16);
 	}
 }
 
