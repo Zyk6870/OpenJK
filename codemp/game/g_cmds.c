@@ -406,7 +406,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 84)
 		return "damages enemies in the area and recovers your hp";
 	if (skill_index == 85)
-		return "creates a big shining light around you, draining enemies mp and restoring your health, while slowing them down and confusing them";
+		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. You take less damage and the attacker gets 'judged by the Light Element' (knocked down)";
 	if (skill_index == 86)
 		return "protects you from other magic powers for some seconds";
 	if (skill_index == 87)
@@ -4379,6 +4379,7 @@ extern void enemy_nerf(gentity_t *ent, int distance);
 extern void ice_block(gentity_t *ent, int duration);
 extern void flaming_rage(gentity_t* ent, int duration);
 extern void black_hole(gentity_t* ent, int radius, int damage, int duration);
+extern void light_of_judgement(gentity_t* ent, int radius, int duration);
 qboolean TryGrapple(gentity_t *ent)
 {
 	if (ent->client->ps.weaponTime > 0)
@@ -13872,18 +13873,19 @@ void zyk_cast_magic(gentity_t* ent, int skill_index, int magic_number)
 			}
 			else if (magic_number == MAGIC_LIGHT_OF_JUDGEMENT)
 			{
-				
+				light_of_judgement(ent, 540, 7000);
+				zyk_set_magic_power_cooldown_time(ent, 48000);
 			}
 			else if (magic_number == MAGIC_MAGIC_IMMUNITY)
 			{
-				immunity_power(ent, 25000);
+				immunity_power(ent, 15000);
 				zyk_set_magic_power_cooldown_time(ent, 28000);
 
 				ent->client->pers.player_statuses |= (1 << 15);
 			}
 			else if (magic_number == MAGIC_TIME_STOP)
 			{
-				time_power(ent, 400, 4000);
+				time_power(ent, 400, 3000);
 				zyk_set_magic_power_cooldown_time(ent, 28000);
 			}
 

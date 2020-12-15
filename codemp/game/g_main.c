@@ -5260,9 +5260,14 @@ void lightning_dome(gentity_t *ent, int damage)
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 }
 
-// zyk: Immunity Power. Becomes immune against other special powers
+// zyk: Magic Immunity. Becomes immune against other magic powers
 void immunity_power(gentity_t *ent, int duration)
 {
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_MAGIC_IMMUNITY] > 1)
+	{
+		duration += 10000;
+	}
+
 	ent->client->pers.quest_power_status |= (1 << 0);
 	ent->client->pers.quest_power1_timer = level.time + duration;
 
@@ -5805,12 +5810,17 @@ void shifting_sand(gentity_t *ent, int distance)
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_sand", "0", "env/sand_spray", 0, 0, 0, time_to_teleport);
 }
 
-// zyk: Time Power
+// zyk: Time Stop
 extern void display_yellow_bar(gentity_t *ent, int duration);
 void time_power(gentity_t *ent, int distance, int duration)
 {
 	int i = 0;
 	int targets_hit = 0;
+
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_TIME_STOP] > 1)
+	{
+		duration += 1500;
+	}
 
 	for (i = 0; i < level.num_entities; i++)
 	{
@@ -6139,6 +6149,23 @@ void black_hole(gentity_t* ent, int radius, int damage, int duration)
 	ent->client->pers.quest_power_status |= (1 << 5);
 	ent->client->pers.quest_debounce3_timer = 0;
 	ent->client->pers.quest_power9_timer = level.time + duration;
+}
+
+// zyk: Light of Judgement
+void light_of_judgement(gentity_t* ent, int radius, int duration)
+{
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_LIGHT_OF_JUDGEMENT] > 1)
+	{
+		duration += 3000;
+	}
+
+	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_black_hole", "0", "ships/sd_exhaust", 500, 0, 0, duration);
+
+	ent->client->pers.light_of_judgement_distance = radius;
+
+	ent->client->pers.quest_power_status |= (1 << 7);
+	ent->client->pers.quest_debounce4_timer = 0;
+	ent->client->pers.quest_power10_timer = level.time + duration;
 }
 
 // zyk: Magic Explosion
@@ -6493,6 +6520,7 @@ void zyk_text_message(gentity_t *ent, char *filename, qboolean show_in_chat, qbo
 
 // zyk: controls the quest powers stuff
 extern void initialize_rpg_skills(gentity_t *ent);
+extern int zyk_max_magic_power(gentity_t* ent);
 void quest_power_events(gentity_t *ent)
 {
 	if (ent && ent->client)
@@ -6649,6 +6677,65 @@ void quest_power_events(gentity_t *ent)
 				if (ent->client->pers.quest_target5_timer < level.time)
 				{ // zyk: Slow Motion run out
 					ent->client->pers.quest_power_status &= ~(1 << 6);
+				}
+			}
+
+			if (ent->client->pers.quest_power_status & (1 << 7))
+			{ // zyk: Light of Judgement
+				if (ent->client->pers.quest_power10_timer > level.time)
+				{
+					gentity_t* light_of_judgement_target = NULL;
+					int zyk_it = 0;
+
+					if (ent->client->pers.quest_debounce4_timer < level.time)
+					{
+						ent->client->pers.quest_debounce4_timer = level.time + 50;
+
+						for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
+						{
+							light_of_judgement_target = &g_entities[zyk_it];
+
+							if (light_of_judgement_target && light_of_judgement_target->client && ent != light_of_judgement_target &&
+								zyk_magic_effect_can_hit_target(ent, light_of_judgement_target, ent->client->pers.light_of_judgement_origin, zyk_it, 0, ent->client->pers.light_of_judgement_distance, qfalse))
+							{
+								int mp_to_drain = 1;
+								int max_player_mp = zyk_max_magic_power(ent);
+
+								if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_LIGHT_OF_JUDGEMENT] > 1)
+								{
+									mp_to_drain = 2;
+								}
+
+								// zyk: drains mp from target
+								if (light_of_judgement_target->client->pers.magic_power >= mp_to_drain)
+								{
+									ent->client->pers.magic_power += mp_to_drain;
+									light_of_judgement_target->client->pers.magic_power -= mp_to_drain;
+								}
+								else if (light_of_judgement_target->client->pers.magic_power > 0)
+								{
+									ent->client->pers.magic_power += light_of_judgement_target->client->pers.magic_power;
+									light_of_judgement_target->client->pers.magic_power = 0;
+								}
+
+								if (ent->client->pers.magic_power > max_player_mp)
+								{
+									ent->client->pers.magic_power = max_player_mp;
+								}
+
+								send_rpg_events(2000);
+
+								// zyk: confuses the target
+								light_of_judgement_target->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+								light_of_judgement_target->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
+								light_of_judgement_target->client->ps.forceHandExtendTime = level.time + 2000;
+							}
+						}
+					}
+				}
+				else
+				{
+					ent->client->pers.quest_power_status &= ~(1 << 7);
 				}
 			}
 
@@ -8374,7 +8461,6 @@ extern void set_max_shield(gentity_t *ent);
 extern gentity_t *load_effect(int x,int y,int z, int spawnflags, char *fxFile);
 extern void duel_show_table(gentity_t *ent);
 extern void WP_DisruptorAltFire(gentity_t *ent);
-extern int zyk_max_magic_power(gentity_t *ent);
 extern void G_Kill( gentity_t *ent );
 extern void save_quest_file(int quest_number);
 extern void zyk_set_quest_npc_abilities(gentity_t *zyk_npc);

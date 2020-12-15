@@ -954,7 +954,7 @@ typedef struct clientPersistant_s {
 	//  4 - hit by Poison Mushrooms
 	//  5 - using Black Hole
 	//  6 - hit by Slow Motion
-	//  7 - unused
+	//  7 - using Light of Judgement
 	//  8 - hit by Blowing Wind
 	//  9 - using Ultra Speed
 	// 10 - using Resurrection Power
@@ -995,6 +995,7 @@ typedef struct clientPersistant_s {
 	int quest_power7_timer;
 	int quest_power8_timer;
 	int quest_power9_timer;
+	int quest_power10_timer;
 
 	// zyk: timers used by the quest powers hitting this player
 	int quest_target1_timer;
@@ -1013,6 +1014,7 @@ typedef struct clientPersistant_s {
 	int quest_debounce1_timer;
 	int quest_debounce2_timer;
 	int quest_debounce3_timer;
+	int quest_debounce4_timer;
 
 	// zyk: player ids which are hitting the target player
 	int quest_power_user1_id;
@@ -1030,7 +1032,10 @@ typedef struct clientPersistant_s {
 	float black_hole_distance;
 	vec3_t black_hole_origin;
 
-	// zyk: magic power, required to use Special Powers
+	float light_of_judgement_distance;
+	vec3_t light_of_judgement_origin;
+
+	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
 
 	// zyk: controls the timed events in Light Quest

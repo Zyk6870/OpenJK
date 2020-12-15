@@ -5448,6 +5448,40 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		damage = (int)ceil(damage * 0.92);
 	}
 
+	if (attacker && attacker->client && targ && targ->client && targ->client->pers.quest_power_status & (1 << 7))
+	{ // zyk: target is using Light of Judgement. Decreases damage taken and knocks down the attacker
+		int light_of_judgement_stun_time = 1000;
+
+		if (targ->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_LIGHT_OF_JUDGEMENT] > 1)
+		{
+			damage = (int)ceil(damage * 0.5);
+			light_of_judgement_stun_time = 2000;
+		}
+		else
+		{
+			damage = (int)ceil(damage * 0.75);
+		}
+
+		// zyk: removing emotes to prevent exploits
+		if (attacker->client->pers.player_statuses & (1 << 1))
+		{
+			attacker->client->pers.player_statuses &= ~(1 << 1);
+			attacker->client->ps.forceHandExtendTime = level.time;
+		}
+
+		// zyk: if using Meditate taunt, remove it
+		if (attacker->client->ps.legsAnim == BOTH_MEDITATE && attacker->client->ps.torsoAnim == BOTH_MEDITATE)
+		{
+			attacker->client->ps.legsAnim = attacker->client->ps.torsoAnim = BOTH_MEDITATE_END;
+		}
+
+		attacker->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
+		attacker->client->ps.forceHandExtendTime = level.time + light_of_judgement_stun_time;
+		attacker->client->ps.velocity[2] += 150;
+		attacker->client->ps.forceDodgeAnim = 0;
+		attacker->client->ps.quickerGetup = qtrue;
+	}
+
 	if (targ && targ->client && targ->client->sess.amrpgmode == 2 && targ->client->pers.can_play_quest == 1 && 
 		targ->client->pers.universe_quest_counter & (1 << 29) && targ->client->pers.guardian_mode == 0)
 	{ // zyk: Challenge Mode increases damage taken from anything
