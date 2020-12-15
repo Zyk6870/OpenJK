@@ -235,106 +235,184 @@ char* zyk_skill_name(int skill_index)
 // zy: returns the description of a RPG skill
 char* zyk_skill_description(int skill_index)
 {
-	char* skill_description[NUMBER_OF_SKILLS + 1] = {
-		"makes you use the force to jump higher. Level 5 has no height limit, you can continue jumping up until you run out of force, and it also lets you jump out of water",
-		"pushes the opponent forward",
-		"pulls the opponent towards you",
-		"increases your speed. Level 1 is 1.7 times normal speed. Level 2 is 2.1, level 3 is 2.5 times and level 4 is 2.9 times",
-		"allows you to see people through walls, invisible people or cloaked people and you can dodge disruptor shots. Represents your mind strength to resist Mind Control if your sense level is equal or higher than the enemy's mind trick level",
-		G_NewString(va("gives you the saber. If you are using Single Saber, gives you the saber styles. If using duals or staff, increases saber damage, which is increased by 20 per cent for each level. This server has a saber damage scale of %.2f", g_saberDamageScale.value)),
-		"increases your ability to block, parry enemy saber attacks or enemy shots",
-		G_NewString(va("throws your saber at enemy and gets it back. Each level increases max distance and saber throw speed. Has %d damage", zyk_saber_throw_damage.integer)),
-		"allows you to absorb force power attacks done to you",
-		"recover some Health. Level 1 restores 5 hp, level 2 restores 10 hp and level 3 restores 25 hp",
-		"decreases damage done to you by non-force power attacks. At level 4 decreases force consumption when receiving damage",
-		"makes yourself invisible to the players affected by this force power. Force User class can mind control a player or npc. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds",
-		"restores some health to players near you",
-		"attacks with a powerful electric attack at players near you. At level 4, does more damage and pushes the enemy back",
-		"attacks a player by holding and damaging him",
-		"drains force power from a player to restore your health",
-		"makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage. Force Guardian class, with Improvements skill at least on level 1, can regen some force when taking damage on health while Rage is active",
-		"restores some force power to players near you. If Improvements skill is at least at level 1, regens blaster pack and power cell ammo of the target players",
-		G_NewString(va("attacks someone with a small electric charge. Has %d damage multiplied by the stun baton level. Can fire the flame thrower when using alternate fire (does not work for Force User, Monk, Duelist or Magic Master). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer)),
-		G_NewString(va("the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged", zyk_blaster_pistol_damage.integer)),
-		G_NewString(va("the rifle used by the Storm Troopers. E11 shots do %d damage. Normal fire is a single shot, while the alternate fire is the rapid fire", zyk_e11_blaster_rifle_damage.integer)),
-		G_NewString(va("the sniper, used by the rodians ingame. Normal fire is a shot that causes %d damage, alternate fire allows zoom and a charged shot that when fully charged, causes %d damage", zyk_disruptor_damage.integer, zyk_disruptor_alt_damage.integer)),
-		G_NewString(va("the famous weapon used by Chewbacca. Normal fire can be charged to fire up to 5 shots at once. It does %d damage", zyk_bowcaster_damage.integer)),
-		G_NewString(va("a powerful weapon with a rapid fire and a plasma bomb. Normal fire shoots the rapid fire, and does %d damage. Alt fire fires the plasma bomb and does %d damage", zyk_repeater_damage.integer, zyk_repeater_alt_damage.integer)),
-		G_NewString(va("a very powerful weapon against machine npc and some vehicles, causing more damage to them and stunning them. Normal fire does %d damage and alt fire can be charged and does %d damage", zyk_demp2_damage.integer, zyk_demp2_alt_damage.integer)),
-		G_NewString(va("this weapon is similar to a shotgun. Normal fire causes %d damage. Alt fire shoots 2 bombs and causes %d damage", zyk_flechette_damage.integer, zyk_flechette_alt_damage.integer)),
-		G_NewString(va("a powerful explosive weapon. Normal fire shoots a rocket causing %d damage. Alt fire shoots a homing missile", zyk_rocket_damage.integer)),
-		G_NewString(va("it shoots a powerful shot that has a big damage area. Alt fire shoots a ray similar to disruptor shots, but it can go through force fields and can throw the enemy on the ground. Normal fire does %d damage and alt fire does %d damage", zyk_concussion_damage.integer, zyk_concussion_alt_damage.integer)),
-		G_NewString(va("very similar to the blaster pistol, but this one has a better fire rate with normal shot. Does %d damage", zyk_blaster_pistol_damage.integer)),
-		G_NewString(va("allows you to attack with your fists and legs. You can punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer)),
-		"The max shield (armor) the player can have. Each level increases 20 per cent of max shield the player can have",
-		"Each level increases your shield resistance by 7 per cent",
-		"Each level increases your health resistance by 7 per cent",
-		"When using Drain force power, and your health is full, restores some shield. It also makes Drain suck hp/shield from the enemy to restore your hp/shield",
-		"the jetpack, used by Boba Fett. Allows you to fly. To use it, jump and press the Use key (usually R) while in the middle of the jump. Each level uses less fuel, allowing you to fly for a longer time",
-		"allows you to see info about someone, including npcs. Level 1 shows current health. Level 2 shows name, health and shield. Level 3 shows name, health and max health, shield and max shield, force and max force, mp and max mp. To use it, when you are near a player or npc, use ^3Sense ^7force power",
-		G_NewString(va("recovers 4 shield at level 1, 8 shield at level 2 and 12 shield at level 3. To use it, use Heal force power when you have full HP. This skill uses %d force power", zyk_max_force_power.integer / 2)),
-		"recovers 3 shield at level 1, 6 shield at level 2 and 9 shield at level 3 to players near you. To use it, when near players, use Team Heal force power. It will heal their shield after they have full HP",
-		"Used by pressing Engage Duel key\nFree Warrior: recovers some hp, shield and mp\nForce User: creates a force shield around the player that greatly reduces damage and protects against force powers\nBounty Hunter: allows firing poison darts with melee by spending metal bolts ammo\nArmored Soldier: spends power cell ammo to increase auto-shield-heal rate\nMonk: increases auto-healing rate and disables enemy Grip\nStealth Attacker: spends power cell ammo to increase disruptor firerate\nDuelist: recovers some MP and disables jetpack, cloak, speed and force regen of enemies nearby\nForce Gunner: disarms enemies nearby\nMagic Master: increases magic bolts, Lightning Dome, Magic Explosion and Healing Area damage. Increases Magic Sense duration. Healing Area heals more\nForce Guardian: increases resistance to damage for some seconds",
-		G_NewString(va("used as ammo for Blaster Pistol, Bryar Pistol and E11 Blaster Rifle. You can carry up to %d ammo",zyk_max_blaster_pack_ammo.integer)),
-		G_NewString(va("used as ammo for Disruptor, Bowcaster and DEMP2. You can carry up to %d ammo",zyk_max_power_cell_ammo.integer)),
-		G_NewString(va("used as ammo for Repeater, Flechette and Concussion Rifle. You can carry up to %d ammo",zyk_max_metal_bolt_ammo.integer)),
-		G_NewString(va("used as ammo for Rocket Launcher. You can carry up to %d ammo",zyk_max_rocket_ammo.integer)),
-		G_NewString(va("the famous detonator used by Leia in Ep 6 at the Jabba Palace. Normal fire throws it, which explodes after some seconds. Alt fire throws it and it explodes as soon as it touches something. Thermals cause %d damage", zyk_thermal_damage.integer)),
-		G_NewString(va("a mine that can be planted somewhere. Normal fire plants a mine with a laser that when touched makes the mine explode, causing %d damage. Alt fire plants proximity mines", zyk_tripmine_damage.integer)),
-		G_NewString(va("a very powerful explosive, which you can detonate remotely with the alt fire button. Causes %d damage", zyk_detpack_damage.integer)),
-		"this item allows you to see distant things better with its zoom",
-		"allows you to recover 25 HP",
-		"after placed on the ground, shoots at any nearby enemy",
-		"a flying ball that flies around you, shooting anyone in its range",
-		"allows you to shoot at people with it, it has a good fire rate",
-		"allows you to recover 50 HP",
-		"a powerful shield that protects you from enemy attacks, it can resist a lot against any weapon",
-		"makes you almost invisible to players and invisible to npcs. Can cloak your vehicle by pressing the Lightsaber Style key (default L) if you have the Holdable Items Upgrade",
-		"increases the max force power you have. Necessary to allow you to use force powers and force-based skills",
-		"Free Warrior gets more damage and more resistance to damage, Force User gets more saber damage and force regens faster, Bounty Hunter gets more gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health, Armored Soldier gets more resistance to damage, Monk gets more run speed, melee damage and melee attack speed, Stealth Attacker gets more gun damage and more resistance to electric attacks, Duelist gets more saber and melee damage and faster force regen, Force Gunner gets more damage and more resistance to damage, Magic Master gets more Magic Points, new magic bolt types, new magic powers, recovers some jetpack fuel with Magic Points if it runs out and has less magic power cooldown, Force Guardian gets more resistance to damage"
-		"similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels",
-		"creates an energy area that heals you and your allies and damage enemies",
-		"creates an explosion that does a lot of damage",
-		"creates a dome that does lightning damage. Damage is based on player level",
-		"damages enemies, draining their hp and healing you",
-		"attacks enemies nearby with water, causing high damage",
-		"greatly damages enemies nearby with a stalagmite",
-		"creates a block of ice around you, protecting you from attacks and increasing your resistance to damage",
-		"knocks people down causing damage",
-		"rocks keep falling at the enemies, causing high damage",
-		"a shifting sand appears, sending you to your nearest enemy. Stand near the sand to be transported to the enemy",
-		"a big tree appears, protecting you from attacks and healing you",
-		"fires a flame burst for some seconds",
-		"a flame jet appears at the enemies and damages them",
-		"creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds",
-		"the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed",
-		"blows people away for some seconds",
-		"makes people go towards you",
-		"increases your run speed",
-		"decreases run speed of enemies nearby",
-		"an energy dome appears at enemies, damaging anyone inside it",
-		"creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers",
-		"makes enemies unable to use magic powers for some seconds. Not so effective against magic using npcs, like bosses",
-		"decreases damage and resistance of enemies nearby",
-		"knocks down enemies for some seconds",
-		"poisons enemies nearby, making them take damage for some seconds",
-		"creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive",
-		"damages, stuns, slowers and electrifies enemies",
-		"damages enemies in the area and recovers your hp",
-		"creates a big shining light around you, draining enemies mp and restoring your health, while slowing them down and confusing them",
-		"protects you from other magic powers for some seconds",
-		"paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed",
-		""
-	};
+	if (skill_index == 0)
+		return "increases force Jump. Level 5 has no height limit, and it lets you jump out of water";
+	if (skill_index == 1)
+		return "pushes the opponent forward";
+	if (skill_index == 2)
+		return "pulls the opponent towards you";
+	if (skill_index == 3)
+		return "increases your speed by 1.7 times at level 1 and +0.4 at other levels";
+	if (skill_index == 4)
+		return "See people through walls, invisible people or cloaked people. Dodge disruptor shots. Increases your mind strength to resist Mind Control if your sense level is equal or higher than the enemy's mind trick level";
+	if (skill_index == 5)
+		return va("gives you the saber. If you are using Single Saber, gives you the saber styles. If using duals or staff, increases saber damage, which is increased by 20 per cent for each level. Saber damage scale is %.2f", g_saberDamageScale.value);
+	if (skill_index == 6)
+		return "increases your ability to block, parry enemy saber attacks or enemy shots";
+	if (skill_index == 7)
+		return va("throws your saber at enemy and gets it back. Each level increases max distance and saber throw speed. Has %d damage", zyk_saber_throw_damage.integer);
+	if (skill_index == 8)
+		return "allows you to absorb force power attacks done to you";
+	if (skill_index == 9)
+		return "recover some Health. Level 1 restores 5 hp, level 2 restores 10 hp and level 3 restores 25 hp";
+	if (skill_index == 10)
+		return "decreases damage done to you by non-force power attacks. At level 4 decreases force consumption when receiving damage";
+	if (skill_index == 11)
+		return "makes yourself invisible to the players affected by this force power. Force User class can mind control a player or npc. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds";
+	if (skill_index == 12)
+		return "restores some health to players near you";
+	if (skill_index == 13)
+		return "attacks with a powerful electric attack at players near you. At level 4, does more damage and pushes the enemy back";
+	if (skill_index == 14)
+		return "attacks a player by holding and damaging him";
+	if (skill_index == 15)
+		return "drains force power from a player to restore your health";
+	if (skill_index == 16)
+		return "makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage. Force Guardian class, with Improvements skill at least on level 1, can regen some force when taking damage on health while Rage is active";
+	if (skill_index == 17)
+		return "restores some force power to players near you. If Improvements skill is at least at level 1, regens blaster pack and power cell ammo of the target players";
+	if (skill_index == 18)
+		return va("attacks someone with a small electric charge. Has %d damage multiplied by the stun baton level. Can fire the flame thrower when using alternate fire (does not work for Force User, Monk, Duelist or Magic Master). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
+	if (skill_index == 19)
+		return va("the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged", zyk_blaster_pistol_damage.integer);
+	if (skill_index == 20)
+		return va("the rifle used by the Storm Troopers. E11 shots do %d damage. Normal fire is a single shot, while the alternate fire is the rapid fire", zyk_e11_blaster_rifle_damage.integer);
+	if (skill_index == 21)
+		return va("the sniper, used by the rodians ingame. Normal fire is a shot that causes %d damage, alternate fire allows zoom and a charged shot that when fully charged, causes %d damage", zyk_disruptor_damage.integer, zyk_disruptor_alt_damage.integer);
+	if (skill_index == 22)
+		return va("the famous weapon used by Chewbacca. Normal fire can be charged to fire up to 5 shots at once. It does %d damage", zyk_bowcaster_damage.integer);
+	if (skill_index == 23)
+		return va("a powerful weapon with a rapid fire and a plasma bomb. Normal fire shoots the rapid fire, and does %d damage. Alt fire fires the plasma bomb and does %d damage", zyk_repeater_damage.integer, zyk_repeater_alt_damage.integer);
+	if (skill_index == 24)
+		return va("a very powerful weapon against machine npc and some vehicles, causing more damage to them and stunning them. Normal fire does %d damage and alt fire can be charged and does %d damage", zyk_demp2_damage.integer, zyk_demp2_alt_damage.integer);
+	if (skill_index == 25)
+		return va("this weapon is similar to a shotgun. Normal fire causes %d damage. Alt fire shoots 2 bombs and causes %d damage", zyk_flechette_damage.integer, zyk_flechette_alt_damage.integer);
+	if (skill_index == 26)
+		return va("a powerful explosive weapon. Normal fire shoots a rocket causing %d damage. Alt fire shoots a homing missile", zyk_rocket_damage.integer);
+	if (skill_index == 27)
+		return va("it shoots a powerful shot that has a big damage area. Alt fire shoots a ray similar to disruptor shots, but it can go through force fields and can throw the enemy on the ground. Normal fire does %d damage and alt fire does %d damage", zyk_concussion_damage.integer, zyk_concussion_alt_damage.integer);
+	if (skill_index == 28)
+		return va("very similar to the blaster pistol, but this one has a better fire rate with normal shot. Does %d damage", zyk_blaster_pistol_damage.integer);
+	if (skill_index == 29)
+		return va("allows you to attack with your fists and legs. You can punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
+	if (skill_index == 30)
+		return "The max shield (armor) the player can have. Each level increases 20 per cent of max shield the player can have";
+	if (skill_index == 31)
+		return "Each level increases your shield resistance by 7 per cent";
+	if (skill_index == 32)
+		return "Each level increases your health resistance by 7 per cent";
+	if (skill_index == 33)
+		return "When using Drain force power, and your health is full, restores some shield. It also makes Drain suck hp/shield from the enemy to restore your hp/shield";
+	if (skill_index == 34)
+		return "the jetpack, used by Boba Fett. Allows you to fly. To use it, jump and press the Use key (usually R) while in the middle of the jump. Each level uses less fuel, allowing you to fly for a longer time";
+	if (skill_index == 35)
+		return "allows you to see info about someone, including npcs. Level 1 shows current health. Level 2 shows name, health and shield. Level 3 shows name, health and max health, shield and max shield, force and max force, mp and max mp. To use it, when you are near a player or npc, use ^3Sense ^7force power";
+	if (skill_index == 36)
+		return va("recovers 4 shield at level 1, 8 shield at level 2 and 12 shield at level 3. To use it, use Heal force power when you have full HP. This skill uses %d force power", zyk_max_force_power.integer / 2);
+	if (skill_index == 37)
+		return "recovers 3 shield at level 1, 6 shield at level 2 and 9 shield at level 3 to players near you. To use it, when near players, use Team Heal force power. It will heal their shield after they have full HP";
+	if (skill_index == 38)
+		return "Used by pressing Engage Duel key\nFree Warrior: recovers some hp, shield and mp\nForce User: Force Shield. greatly reduces damage and protects against force powers\nBounty Hunter: fires poison darts with melee by spending metal bolts ammo\nArmored Soldier: increases auto-shield-heal rate\nMonk: increases auto-healing rate and stops Grip\nStealth Attacker: increases disruptor firerate\nDuelist: recovers some MP, disables jetpack, cloak, speed and force regen of enemies nearby\nForce Gunner: disarms enemies nearby\nMagic Master: increases magic bolts, Lightning Dome, Magic Explosion and Healing Area damage. Increases Magic Sense duration. Healing Area heals more\nForce Guardian: increases resistance to damage";
+	if (skill_index == 39)
+		return va("used as ammo for Blaster Pistol, Bryar Pistol and E11 Blaster Rifle. You can carry up to %d ammo", zyk_max_blaster_pack_ammo.integer);
+	if (skill_index == 40)
+		return va("used as ammo for Disruptor, Bowcaster and DEMP2. You can carry up to %d ammo", zyk_max_power_cell_ammo.integer);
+	if (skill_index == 41)
+		return va("used as ammo for Repeater, Flechette and Concussion Rifle. You can carry up to %d ammo", zyk_max_metal_bolt_ammo.integer);
+	if (skill_index == 42)
+		return va("used as ammo for Rocket Launcher. You can carry up to %d ammo", zyk_max_rocket_ammo.integer);
+	if (skill_index == 43)
+		return va("the famous detonator used by Leia in Ep 6 at the Jabba Palace. Normal fire throws it, which explodes after some seconds. Alt fire throws it and it explodes as soon as it touches something. Thermals cause %d damage", zyk_thermal_damage.integer);
+	if (skill_index == 44)
+		return va("a mine that can be planted somewhere. Normal fire plants a mine with a laser that when touched makes the mine explode, causing %d damage. Alt fire plants proximity mines", zyk_tripmine_damage.integer);
+	if (skill_index == 45)
+		return va("a very powerful explosive, which you can detonate remotely with the alt fire button. Causes %d damage", zyk_detpack_damage.integer);
+	if (skill_index == 46)
+		return "this item allows you to see distant things better with its zoom";
+	if (skill_index == 47)
+		return "allows you to recover 25 HP";
+	if (skill_index == 48)
+		return "after placed on the ground, shoots at any nearby enemy";
+	if (skill_index == 49)
+		return "a flying ball that flies around you, shooting anyone in its range";
+	if (skill_index == 50)
+		return "allows you to shoot at people with it, it has a good fire rate";
+	if (skill_index == 51)
+		return "allows you to recover 50 HP";
+	if (skill_index == 52)
+		return "a powerful shield that protects you from enemy attacks, it can resist a lot against any weapon";
+	if (skill_index == 53)
+		return "makes you almost invisible to players and invisible to npcs. Can cloak your vehicle by pressing the Lightsaber Style key (default L) if you have the Holdable Items Upgrade";
+	if (skill_index == 54)
+		return "increases the max force power you have. Necessary to allow you to use force powers and force-based skills";
+	if (skill_index == 55)
+		return "Free Warrior: +damage +resistance to damage, Force User: +saber damage and force regens faster, Bounty Hunter: +gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health, Armored Soldier: +resistance to damage, Monk: +run speed, melee damage and melee attack speed, Stealth Attacker: +gun damage +resistance to electric attacks, Duelist: +saber and melee damage and faster force regen, Force Gunner: +damage +resistance to damage, Magic Master: +max MP, new magic bolt types, new magic powers, recovers some jetpack fuel with MP if it runs out -magic power cooldown, Force Guardian: +resistance to damage";
+	if (skill_index == 56)
+		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels";
+	if (skill_index == 57)
+		return "creates an energy area that heals you and your allies and damage enemies";
+	if (skill_index == 58)
+		return "creates an explosion that does a lot of damage";
+	if (skill_index == 59)
+		return "creates a dome that does lightning damage. Damage is based on player level";
+	if (skill_index == 60)
+		return "damages enemies, draining their hp and healing you";
+	if (skill_index == 61)
+		return "attacks enemies nearby with water, causing high damage";
+	if (skill_index == 62)
+		return "greatly damages enemies nearby with a stalagmite";
+	if (skill_index == 63)
+		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
+	if (skill_index == 64)
+		return "knocks people down causing damage";
+	if (skill_index == 65)
+		return "rocks keep falling at the enemies, causing high damage";
+	if (skill_index == 66)
+		return "a shifting sand appears, sending you to your nearest enemy. Stand near the sand to be transported to the enemy";
+	if (skill_index == 67)
+		return "a big tree appears, protecting you from attacks and healing you";
+	if (skill_index == 68)
+		return "fires a flame burst for some seconds";
+	if (skill_index == 69)
+		return "a flame jet appears at the enemies and damages them";
+	if (skill_index == 70)
+		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
+	if (skill_index == 71)
+		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
+	if (skill_index == 72)
+		return "blows people away for some seconds";
+	if (skill_index == 73)
+		return "makes people go towards you";
+	if (skill_index == 74)
+		return "increases your run speed";
+	if (skill_index == 75)
+		return "decreases run speed of enemies nearby";
+	if (skill_index == 76)
+		return "an energy dome appears at enemies, damaging anyone inside it";
+	if (skill_index == 77)
+		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
+	if (skill_index == 78)
+		return "makes enemies unable to use magic powers for some seconds. Not so effective against magic using npcs, like bosses";
+	if (skill_index == 79)
+		return "decreases damage and resistance of enemies nearby";
+	if (skill_index == 80)
+		return "knocks down enemies for some seconds";
+	if (skill_index == 81)
+		return "poisons enemies nearby, making them take damage for some seconds";
+	if (skill_index == 82)
+		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
+	if (skill_index == 83)
+		return "damages, stuns, slowers and electrifies enemies";
+	if (skill_index == 84)
+		return "damages enemies in the area and recovers your hp";
+	if (skill_index == 85)
+		return "creates a big shining light around you, draining enemies mp and restoring your health, while slowing them down and confusing them";
+	if (skill_index == 86)
+		return "protects you from other magic powers for some seconds";
+	if (skill_index == 87)
+		return "paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed";
 
-	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
-	{
-		return G_NewString(skill_description[skill_index]);
-	}
-	else
-	{
-		return "";
-	}
+	return "";
 }
 
 /*
@@ -13723,8 +13801,8 @@ void zyk_cast_magic(gentity_t* ent, int skill_index, int magic_number)
 			}
 			else if (magic_number == MAGIC_FLAMING_RAGE)
 			{
-				flaming_rage(ent, 5000);
-				zyk_set_magic_power_cooldown_time(ent, 15000);
+				flaming_rage(ent, 7000);
+				zyk_set_magic_power_cooldown_time(ent, 16000);
 			}
 			else if (magic_number == MAGIC_BLOWING_WIND)
 			{
