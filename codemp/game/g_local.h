@@ -963,7 +963,7 @@ typedef struct clientPersistant_s {
 	// 10 - using Resurrection Power
 	// 11 - using Magic Shield
 	// 12 - using Flame Burst
-	// 13 - unused
+	// 13 - hit by Ultra Flame
 	// 14 - unused
 	// 15 - unused
 	// 16 - unused

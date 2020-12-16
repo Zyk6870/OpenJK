@@ -374,7 +374,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 68)
 		return "fires a flame burst for some seconds";
 	if (skill_index == 69)
-		return "a flame jet appears at the enemies and damages them";
+		return "a flame jet appears at the enemies and damages them. At level 2, if the flame hits the target, it will catch fire";
 	if (skill_index == 70)
 		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
 	if (skill_index == 71)
@@ -13782,7 +13782,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			}
 			else if (magic_number == MAGIC_WATER_ATTACK)
 			{
-				water_attack(ent, 500, 40);
+				water_attack(ent, 500, 45);
 				zyk_set_magic_power_cooldown_time(ent, 12000);
 			}
 			else if (magic_number == MAGIC_ICE_STALAGMITE)

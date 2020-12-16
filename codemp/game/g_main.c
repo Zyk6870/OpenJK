@@ -5762,7 +5762,7 @@ void water_attack(gentity_t *ent, int distance, int damage)
 
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
 		{
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_acid", "4", "env/water_impact", 200, damage, 40, 9000);
+			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_acid", "4", "env/water_impact", 200, damage, 40, 8000);
 		}
 	}
 }
@@ -5980,24 +5980,18 @@ void magic_disable(gentity_t *ent, int distance)
 		{
 			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_magic_disable", "0", "env/small_electricity2", 0, 0, 0, 1500);
 
-			if (i < MAX_CLIENTS)
-			{ // zyk: player hit by this power
-				if (player_ent->client->pers.quest_power_usage_timer < level.time)
-				{
-					player_ent->client->pers.quest_power_usage_timer = level.time + duration;
-				}
-				else
-				{ // zyk: already used a power, so increase the cooldown time
-					player_ent->client->pers.quest_power_usage_timer += duration;
-				}
-
-				display_yellow_bar(player_ent, (player_ent->client->pers.quest_power_usage_timer - level.time));
+			if (player_ent->client->pers.quest_power_usage_timer < level.time)
+			{
+				player_ent->client->pers.quest_power_usage_timer = level.time + duration;
 			}
 			else
-			{ // zyk: npc or boss dont get affected that much
-				player_ent->client->pers.light_quest_timer += (duration/2);
-				player_ent->client->pers.guardian_timer += (duration/2);
-				player_ent->client->pers.universe_quest_timer += (duration/2);
+			{ // zyk: already used a power, so increase the cooldown time
+				player_ent->client->pers.quest_power_usage_timer += duration;
+			}
+
+			if (i < MAX_CLIENTS)
+			{ // zyk: show the cooldown time bar only to players, not to npcs
+				display_yellow_bar(player_ent, (player_ent->client->pers.quest_power_usage_timer - level.time));
 			}
 
 			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh10.mp3"));
@@ -6014,8 +6008,7 @@ void ice_stalagmite(gentity_t *ent, int distance, int damage)
 
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ICE_STALAGMITE] > 1)
 	{
-		damage += 30;
-		min_distance = 0;
+		damage += 50;
 	}
 
 	for (i = 0; i < level.num_entities; i++)
@@ -6249,33 +6242,6 @@ void ultra_speed(gentity_t *ent, int duration)
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh1.mp3"));
 }
 
-// zyk: spawns the circle of fire around the player
-void ultra_flame_circle(gentity_t *ent, char *targetname, char *spawnflags, char *effect_path, int start_time, int damage, int radius, int duration, int xoffset, int yoffset)
-{
-	gentity_t *new_ent = G_Spawn();
-
-	zyk_set_entity_field(new_ent,"classname","fx_runner");
-	zyk_set_entity_field(new_ent,"spawnflags",spawnflags);
-	zyk_set_entity_field(new_ent,"targetname",targetname);
-	zyk_set_entity_field(new_ent,"origin",va("%d %d %d",(int)ent->r.currentOrigin[0] + xoffset,(int)ent->r.currentOrigin[1] + yoffset,(int)ent->r.currentOrigin[2]));
-
-	new_ent->s.modelindex = G_EffectIndex( effect_path );
-
-	zyk_spawn_entity(new_ent);
-
-	if (damage > 0)
-		new_ent->splashDamage = damage;
-
-	if (radius > 0)
-		new_ent->splashRadius = radius;
-
-	if (start_time > 0) 
-		new_ent->nextthink = level.time + start_time;
-
-	level.special_power_effects[new_ent->s.number] = ent->s.number;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
-}
-
 // zyk: Ultra Flame
 void ultra_flame(gentity_t *ent, int distance, int damage)
 {
@@ -6284,10 +6250,7 @@ void ultra_flame(gentity_t *ent, int distance, int damage)
 
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ULTRA_FLAME] > 1)
 	{
-		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 200, damage, 35, 5000, 30, 30);
-		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 200, damage, 35, 5000, -30, 30);
-		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 200, damage, 35, 5000, 30, -30);
-		ultra_flame_circle(ent,"zyk_quest_effect_flame","4", "env/flame_jet", 200, damage, 35, 5000, -30, -30);
+		damage += 5;
 	}
 
 	for (i = 0; i < level.num_entities; i++)
@@ -6296,7 +6259,7 @@ void ultra_flame(gentity_t *ent, int distance, int damage)
 
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
 		{
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_flame", "4", "env/flame_jet", 200, damage, 35, 20000);
+			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_flame", "4", "env/flame_jet", 200, damage, 35, 15000);
 		}
 	}
 }
@@ -6641,7 +6604,7 @@ void quest_power_events(gentity_t *ent)
 								}
 								else
 								{
-									black_hole_suck_strength *= 48.0;
+									black_hole_suck_strength *= 52.0;
 								}
 
 								// zyk: add a limit to the strength to prevent the target from being blown out of the black hole
@@ -6731,6 +6694,9 @@ void quest_power_events(gentity_t *ent)
 								light_of_judgement_target->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 								light_of_judgement_target->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
 								light_of_judgement_target->client->ps.forceHandExtendTime = level.time + 2000;
+
+								// zyk: target cant attack while confused
+								light_of_judgement_target->client->ps.weaponTime = 2000;
 							}
 						}
 					}
@@ -6807,6 +6773,36 @@ void quest_power_events(gentity_t *ent)
 				else if (ent->client->cloakDebReduce < level.time)
 				{ // zyk: fires the flame thrower
 					Player_FireFlameThrower(ent, qtrue);
+				}
+			}
+
+			if (ent->client->pers.quest_power_status & (1 << 13))
+			{ // zyk: hit by Ultra Flame
+				if (ent->client->pers.quest_power_status & (1 << 0))
+				{ // zyk: testing for Immunity Power in target player
+					ent->client->pers.quest_power_status &= ~(1 << 13);
+				}
+
+				if (ent->client->pers.magic_power_hit_counter[MAGIC_ULTRA_FLAME] > 0 && ent->client->pers.magic_power_target_timer[MAGIC_ULTRA_FLAME] < level.time)
+				{
+					gentity_t* ultra_flame_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_ULTRA_FLAME]];
+
+					if (ultra_flame_user && ultra_flame_user->client)
+					{
+						zyk_quest_effect_spawn(ultra_flame_user, ent, "zyk_quest_effect_flaming_area_hit", "0", "env/fire", 0, 0, 0, 300);
+
+						if (ultra_flame_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ULTRA_FLAME] > 1)
+							G_Damage(ent, ultra_flame_user, ultra_flame_user, NULL, NULL, 3, 0, MOD_UNKNOWN);
+						else
+							G_Damage(ent, ultra_flame_user, ultra_flame_user, NULL, NULL, 2, 0, MOD_UNKNOWN);
+					}
+
+					ent->client->pers.magic_power_hit_counter[MAGIC_ULTRA_FLAME]--;
+					ent->client->pers.magic_power_target_timer[MAGIC_ULTRA_FLAME] = level.time + 200;
+				}
+				else if (ent->client->pers.magic_power_hit_counter[MAGIC_ULTRA_FLAME] == 0 && ent->client->pers.magic_power_target_timer[MAGIC_ULTRA_FLAME] < level.time)
+				{
+					ent->client->pers.quest_power_status &= ~(1 << 13);
 				}
 			}
 
