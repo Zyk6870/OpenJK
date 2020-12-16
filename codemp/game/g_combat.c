@@ -5448,8 +5448,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		damage = (int)ceil(damage * 0.92);
 	}
 
-	if (attacker && attacker->client && targ && targ->client && targ->client->pers.quest_power_status & (1 << 7))
-	{ // zyk: target is using Light of Judgement. Decreases damage taken and knocks down the attacker
+	if (attacker && attacker->client && targ && targ->client && targ->client->pers.quest_power_status & (1 << 7) && 
+		Distance(targ->client->ps.origin, targ->client->pers.light_of_judgement_origin) < targ->client->pers.light_of_judgement_distance)
+	{ // zyk: target is using Light of Judgement. Decreases damage taken and knocks down the attacker if target is inside the light
 		int light_of_judgement_stun_time = 1000;
 
 		if (targ->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_LIGHT_OF_JUDGEMENT] > 1)

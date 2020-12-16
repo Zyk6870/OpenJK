@@ -406,7 +406,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 84)
 		return "damages enemies in the area and recovers your hp";
 	if (skill_index == 85)
-		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. You take less damage and the attacker gets 'judged by the Light Element' (knocked down)";
+		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
 	if (skill_index == 86)
 		return "protects you from other magic powers for some seconds";
 	if (skill_index == 87)

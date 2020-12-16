@@ -6656,6 +6656,25 @@ void quest_power_events(gentity_t *ent)
 					{
 						ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_OF_JUDGEMENT] = level.time + 50;
 
+						if (Distance(ent->client->ps.origin, ent->client->pers.light_of_judgement_origin) < ent->client->pers.light_of_judgement_distance)
+						{ // zyk: while inside the light, you slowly regen health
+							int heal_amount = 1;
+
+							if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_LIGHT_OF_JUDGEMENT] > 1)
+							{
+								heal_amount = 2;
+							}
+
+							if ((ent->health + heal_amount) < ent->client->pers.max_rpg_health)
+							{
+								ent->health += heal_amount;
+							}
+							else
+							{
+								ent->health = ent->client->pers.max_rpg_health;
+							}
+						}
+
 						for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 						{
 							light_of_judgement_target = &g_entities[zyk_it];
@@ -6691,12 +6710,15 @@ void quest_power_events(gentity_t *ent)
 								send_rpg_events(2000);
 
 								// zyk: confuses the target
-								light_of_judgement_target->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-								light_of_judgement_target->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
-								light_of_judgement_target->client->ps.forceHandExtendTime = level.time + 2000;
+								if (light_of_judgement_target->client->ps.forceDodgeAnim  != BOTH_SONICPAIN_END)
+								{
+									light_of_judgement_target->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+									light_of_judgement_target->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
+									light_of_judgement_target->client->ps.forceHandExtendTime = level.time + 2000;
 
-								// zyk: target cant attack while confused
-								light_of_judgement_target->client->ps.weaponTime = 2000;
+									// zyk: target cant attack while confused
+									light_of_judgement_target->client->ps.weaponTime = 1000;
+								}
 							}
 						}
 					}
