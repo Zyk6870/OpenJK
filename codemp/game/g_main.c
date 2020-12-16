@@ -8464,6 +8464,7 @@ extern void WP_DisruptorAltFire(gentity_t *ent);
 extern void G_Kill( gentity_t *ent );
 extern void save_quest_file(int quest_number);
 extern void zyk_set_quest_npc_abilities(gentity_t *zyk_npc);
+extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 
 void G_RunFrame( int levelTime ) {
 	int			i;
@@ -15494,134 +15495,31 @@ void G_RunFrame( int levelTime ) {
 			// zyk: abilities of custom quest npcs
 			if (ent->client->pers.player_statuses & (1 << 28) && ent->health > 0)
 			{
-				// zyk: magic powers
-				if (ent->client->pers.light_quest_timer < level.time)
+				if (ent->client->pers.quest_power_usage_timer < level.time)
 				{
-					int random_number = Q_irand(0, 29);
+					int random_magic = Q_irand(0, (MAX_MAGIC_POWERS - 1));
+					int first_magic_skill = NUMBER_OF_SKILLS - MAX_MAGIC_POWERS;
+					int current_magic_skill = first_magic_skill;
 
-					if (ent->client->sess.selected_left_special_power & (1 << MAGIC_WATER_SPLASH) && random_number == 1)
+					// zyk: adding all magic powers to this npc
+					while (current_magic_skill < NUMBER_OF_SKILLS)
 					{
-						water_splash(ent, 400, 15);
-					}
-					else if (ent->client->sess.selected_left_special_power & (1 << MAGIC_WATER_ATTACK) && random_number == 2)
-					{
-						water_attack(ent, 500, 40);
-					}
-					else if (ent->client->sess.selected_left_special_power & (1 << MAGIC_EARTHQUAKE) && random_number == 3)
-					{
-						earthquake(ent, 2000, 300, 500);
-					}
-					else if (ent->client->sess.selected_left_special_power & (1 << MAGIC_ROCKFALL) && random_number == 4)
-					{
-						rock_fall(ent, 500, 40);
-					}
-					else if (ent->client->sess.selected_left_special_power & (1 << MAGIC_SHIFTING_SAND) && random_number == 5)
-					{
-						shifting_sand(ent, 1000);
-					}
-					else if (ent->client->sess.selected_left_special_power & (1 << MAGIC_SLEEPING_FLOWERS) && random_number == 6)
-					{
-						sleeping_flowers(ent, 2500, 350);
-					}
-					else if (ent->client->sess.selected_left_special_power & (1 << MAGIC_POISON_MUSHROOMS) && random_number == 7)
-					{
-						poison_mushrooms(ent, 100, 600);
-					}
-					else if (ent->client->sess.selected_left_special_power & (1 << MAGIC_TREE_OF_LIFE) && random_number == 8)
-					{
-						tree_of_life(ent);
-					}
-					else if (ent->client->sess.selected_left_special_power & (1 << MAGIC_MAGIC_SHIELD) && random_number == 9)
-					{
-						magic_shield(ent, 6000);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_DOME_OF_DAMAGE) && random_number == 10)
-					{
-						dome_of_damage(ent, 500, 25);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_MAGIC_DISABLE) && random_number == 11)
-					{
-						magic_disable(ent, 450);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_ULTRA_SPEED) && random_number == 12)
-					{
-						ultra_speed(ent, 15000);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_SLOW_MOTION) && random_number == 13)
-					{
-						slow_motion(ent, 400, 15000);
-					}
-					if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_FLAME_BURST) && random_number == 15)
-					{
-						flame_burst(ent, 5000);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_ULTRA_FLAME) && random_number == 16)
-					{
-						ultra_flame(ent, 500, 35);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_FLAMING_AREA) && random_number == 17)
-					{
-						flaming_area(ent, 20);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_BLOWING_WIND) && random_number == 18)
-					{
-						blowing_wind(ent, 700, 5000);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_REVERSE_WIND) && random_number == 20)
-					{
-						reverse_wind(ent, 700, 5000);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_ENEMY_WEAKENING) && random_number == 23)
-					{
-						enemy_nerf(ent, 450);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_ICE_STALAGMITE) && random_number == 24)
-					{
-						ice_stalagmite(ent, 500, 130);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_ICE_BLOCK) && random_number == 26)
-					{
-						ice_block(ent, 3500);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_HEALING_AREA) && random_number == 27)
-					{
-						healing_area(ent, 2, 5000);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_MAGIC_EXPLOSION) && random_number == 28)
-					{
-						magic_explosion(ent, 320, 130, 900);
-					}
-					else if (ent->client->sess.selected_left_special_power  & (1 << MAGIC_LIGHTNING_DOME) && random_number == 29)
-					{
-						lightning_dome(ent, 70);
+						if (ent->client->sess.selected_left_special_power & (1 << random_magic) &&
+							ent->client->pers.skill_levels[current_magic_skill] < 1)
+						{
+							ent->client->pers.skill_levels[current_magic_skill] = 2;
+						}
+
+						current_magic_skill++;
 					}
 
-					ent->client->pers.light_quest_timer = level.time + ent->client->pers.light_quest_messages;
-				}
-
-				// zyk: ultimate magic and quest powers
-				if (ent->client->pers.hunter_quest_timer < level.time)
-				{
-					int random_number = Q_irand(0, 7);
-
-					if (ent->client->sess.selected_right_special_power  & (1 << 0) && random_number == 0)
+					// zyk: regen mp of this npc
+					if (ent->client->pers.magic_power < 20)
 					{
-						ultra_drain(ent, 450, 30, 8000);
-					}
-					else if (ent->client->sess.selected_right_special_power  & (1 << 1) && random_number == 1)
-					{
-						immunity_power(ent, 20000);
-					}
-					else if (ent->client->sess.selected_right_special_power  & (1 << 2) && random_number == 2)
-					{
-						chaos_power(ent, 400, 4600);
-					}
-					else if (ent->client->sess.selected_right_special_power  & (1 << 3) && random_number == 3)
-					{
-						time_power(ent, 400, 4000);
+						ent->client->pers.magic_power = 500;
 					}
 
-					ent->client->pers.hunter_quest_timer = level.time + ent->client->pers.hunter_quest_messages;
+					zyk_cast_magic(ent, first_magic_skill + random_magic);
 				}
 
 				// zyk: unique abilities
@@ -16858,96 +16756,30 @@ void G_RunFrame( int levelTime ) {
 					}
 				}
 			}
-			else if (ent->health > 0 && Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy && ent->client->pers.guardian_timer < level.time)
+			else if (ent->health > 0 && Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy && ent->client->pers.quest_power_usage_timer < level.time)
 			{ // zyk: powers used by the quest_mage npc
-				int random_magic = Q_irand(0, 26);
+				int random_magic = Q_irand(0, (MAX_MAGIC_POWERS - 1));
+				int first_magic_skill = NUMBER_OF_SKILLS - MAX_MAGIC_POWERS;
+				int current_magic_skill = first_magic_skill;
 
-				if (random_magic == 1)
+				// zyk: adding all magic powers to this npc
+				while (current_magic_skill < NUMBER_OF_SKILLS)
 				{
-					poison_mushrooms(ent, 100, 600);
-				}
-				else if (random_magic == 2)
-				{
-					water_splash(ent, 400, 15);
-				}
-				else if (random_magic == 3)
-				{
-					ultra_flame(ent, 500, 35);
-				}
-				else if (random_magic == 4)
-				{
-					rock_fall(ent, 500, 40);
-				}
-				else if (random_magic == 5)
-				{
-					dome_of_damage(ent, 500, 25);
-				}
-				else if (random_magic == 7)
-				{
-					slow_motion(ent, 400, 15000);
-				}
-				else if (random_magic == 9)
-				{
-					sleeping_flowers(ent, 2500, 350);
-				}
-				else if (random_magic == 11)
-				{
-					flame_burst(ent, 5000);
-				}
-				else if (random_magic == 12)
-				{
-					earthquake(ent, 2000, 300, 500);
-				}
-				else if (random_magic == 13)
-				{
-					magic_shield(ent, 6000);
-				}
-				else if (random_magic == 14)
-				{
-					blowing_wind(ent, 700, 5000);
-				}
-				else if (random_magic == 15)
-				{
-					ultra_speed(ent, 15000);
-				}
-				else if (random_magic == 16)
-				{
-					ice_stalagmite(ent, 500, 130);
-				}
-				else if (random_magic == 18)
-				{
-					water_attack(ent, 500, 40);
-				}
-				else if (random_magic == 19)
-				{
-					shifting_sand(ent, 1000);
-				}
-				else if (random_magic == 20)
-				{
-					tree_of_life(ent);
-				}
-				else if (random_magic == 21)
-				{
-					magic_disable(ent, 450);
-				}
-				else if (random_magic == 23)
-				{
-					flaming_area(ent, 20);
-				}
-				else if (random_magic == 24)
-				{
-					reverse_wind(ent, 700, 5000);
-				}
-				else if (random_magic == 25)
-				{
-					enemy_nerf(ent, 450);
-				}
-				else if (random_magic == 26)
-				{
-					ice_block(ent, 3500);
+					if (ent->client->pers.skill_levels[current_magic_skill] < 1)
+					{
+						ent->client->pers.skill_levels[current_magic_skill] = 2;
+					}
+
+					current_magic_skill++;
 				}
 
-				ent->client->pers.guardian_timer = level.time + Q_irand(3000, 6000);
+				// zyk: regen mp of this mage
+				if (ent->client->pers.magic_power < 20)
+				{
+					ent->client->pers.magic_power = 500;
+				}
+
+				zyk_cast_magic(ent, first_magic_skill + random_magic);
 			}
 			else if (ent->client->pers.universe_quest_messages == -10000 && ent->health > 0 && ent->enemy && Q_stricmp(ent->NPC_type, "ymir_boss") == 0)
 			{ // zyk: Ymir

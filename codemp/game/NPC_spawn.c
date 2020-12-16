@@ -1767,6 +1767,8 @@ finish:
 	// zyk: added some attributes initialization
 	if (newent && newent->client)
 	{
+		int zyk_it = 0;
+
 		newent->client->sess.amrpgmode = 0;
 		newent->client->pers.being_mind_controlled = -1;
 		newent->client->pers.mind_controlled1_id = -1;
@@ -1784,8 +1786,16 @@ finish:
 		newent->client->sess.ally1 = 0;
 		newent->client->sess.ally2 = 0;
 
-		// zyk: initializing Quest Power attributes
+		// zyk: initializing Magic Power attributes
 		newent->client->pers.quest_power_status = 0;
+		newent->client->pers.quest_power_usage_timer = 0;
+		newent->client->pers.magic_power = 0;
+
+		for (zyk_it = 0; zyk_it < NUMBER_OF_SKILLS; zyk_it++)
+		{
+			newent->client->pers.skill_levels[zyk_it] = 0;
+		}
+
 		newent->client->cloakDebReduce = 0;
 
 		// zyk: saboteur npcs start with cloak

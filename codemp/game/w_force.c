@@ -5616,6 +5616,8 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 		if (target->NPC)
 		{
 			strcpy(player_type, "NPC");
+
+			magic_power = target->client->pers.magic_power;
 		}
 		else if (target->client->sess.amrpgmode == 1)
 		{

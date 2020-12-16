@@ -13725,8 +13725,18 @@ int zyk_get_magic_cost(int magic_number)
 	return magic_costs[magic_number];
 }
 
-void zyk_cast_magic(gentity_t* ent, int skill_index, int magic_number)
+void zyk_cast_magic(gentity_t* ent, int skill_index)
 {
+	int magic_number = (skill_index - (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS));
+
+	if (ent->client->pers.skill_levels[skill_index] < 1)
+	{
+		if (ent->s.number < MAX_CLIENTS)
+			trap->SendServerCommand(ent->s.number, va("print \"You don't have %s.\n\"", zyk_skill_name(skill_index)));
+		
+		return;
+	}
+
 	if (ent->client->pers.quest_power_usage_timer < level.time)
 	{		
 		if (ent->client->pers.magic_power >= zyk_get_magic_cost(magic_number))
@@ -13911,20 +13921,23 @@ void zyk_cast_magic(gentity_t* ent, int skill_index, int magic_number)
 			// zyk: magic powers cost mp
 			ent->client->pers.magic_power -= zyk_get_magic_cost(magic_number);
 
-			zyk_show_magic_in_chat(ent, magic_number);
-
-			display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
-
-			send_rpg_events(2000);
+			if (ent->s.number < MAX_CLIENTS)
+			{
+				zyk_show_magic_in_chat(ent, magic_number);
+				display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
+				send_rpg_events(2000);
+			}
 		}
 		else
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"You need %d mp to cast ^3%s\n\"", zyk_get_magic_cost(magic_number), zyk_skill_name(skill_index)));
+			if (ent->s.number < MAX_CLIENTS)
+				trap->SendServerCommand(ent->s.number, va("print \"You need %d mp to cast ^3%s\n\"", zyk_get_magic_cost(magic_number), zyk_skill_name(skill_index)));
 		}
 	}
 	else
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"^3Magic Power: ^7%d seconds left!\"", ((ent->client->pers.quest_power_usage_timer - level.time) / 1000)));
+		if (ent->s.number < MAX_CLIENTS)
+			trap->SendServerCommand(ent->s.number, va("chat \"^3Magic Power: ^7%d seconds left!\"", ((ent->client->pers.quest_power_usage_timer - level.time) / 1000)));
 	}
 }
 
@@ -13953,13 +13966,7 @@ void Cmd_Magic_f( gentity_t *ent ) {
 			return;
 		}
 
-		if (ent->client->pers.skill_levels[skill_index] < 1)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"You don't have %s.\n\"", zyk_skill_name(skill_index)));
-			return;
-		}
-
-		zyk_cast_magic(ent, skill_index, (skill_index - (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS)));
+		zyk_cast_magic(ent, skill_index);
 	}
 }
 
