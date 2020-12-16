@@ -572,9 +572,6 @@ typedef enum {
 	MAX_MAGIC_POWERS
 } zyk_magic_t;
 
-// zyk: number of Universe Quest objectives
-#define NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES 22
-
 // zyk: number of RPG Mode skills
 #define NUMBER_OF_SKILLS 88
 
@@ -726,10 +723,10 @@ typedef struct clientPersistant_s {
 	// zyk: turn on or off features of this player in his account file. It is a bit value attribute
 	// Possible bit values are:
 	// 0 - RPG quests
-	// 1 - Light Power
-	// 2 - Dark Power
-	// 3 - Eternity Power
-	// 4 - Universe Power
+	// 1 - unused
+	// 2 - unused
+	// 3 - unused
+	// 4 - unused
 	// 5 - Custom Language
 	// 6 - Allow Force Powers from allies
 	// 7 - Show magic cast in chat
@@ -762,6 +759,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: this is the cooldown timer of the Unique Skill used by some RPG classes
 	int unique_skill_timer;
+
+	// zyk: used by Custom Quest npcs
+	int unique_skill_npc_timer_amount;
 
 	// zyk: used to set the duration that some unique skills or unique abilities are active
 	int unique_skill_duration;
@@ -857,56 +857,8 @@ typedef struct clientPersistant_s {
 	// zyk: Race Mode. Sets the initial position of this racer which is calculated in racemode command. Default 0. If greater than 0, player joined a race
 	int race_position;
 
-	// zyk: tests if this player can play a RPG Mode quest. Default 0. If 1, player can play a quest now
-	int can_play_quest;
-
 	// zyk: amount of skills used by the player. After a certain amount of uses, player gets 1 experience point (level up score)
 	int skill_counter;
-
-	// zyk: Universe Quest progress of this player
-	int universe_quest_progress;
-
-	// zyk: counter used in some missions of Universe Quest
-	// Possible bit values in artifacts objective:
-	// 0 - Unused
-	// 1 - Eternity Quest artifact got with the Sage of Eternity
-	// 2 - Unused
-	// 3 - Artifact in yavin1b
-	// 4 - Artifact in t1_danger
-	// 5 - Artifact in t1_fatal
-	// 6 - Artifact in t3_bounty
-	// 7 - Artifact in hoth3
-	// 8 - Artifact in yavin2
-	// 9 - Artifact in t2_dpred
-
-	// Possible bit values in amulets objective:
-	// 0 - Amulet of Light
-	// 1 - Amulet of Darkness
-	// 2 - Amulet of Eternity
-
-	// The choosing mission can have permanent bit values with these possible values:
-	// 0 - Player chose to allow the sages to get into the Sacred Dimension
-	// 1 - Player chose to allow the guardians to get into the Sacred Dimension
-	// 2 - Player chose to allow the Master of Evil to get into the Sacred Dimension
-	// 3 - Player chose to allow the Guardian of Time to get into the Sacred Dimension
-	
-	// Possible bit values in crystals objective:
-	// 0 - Player got the Crystal of Destiny
-	// 1 - Player got the Crystal of Truth
-	// 2 - Player got the Crystal of Time
-
-	// If player chose Challenge Mode in settings, sets a bit value 29
-	int universe_quest_counter;
-
-	// zyk: used to control some events in Universe Quest. In the quest_reborn_red npc, sets the player id who is playing the quest. In the player, sets how much quest_reborn_red npcs the player must kill to complete the first objective
-	int universe_quest_objective_control;
-
-	// zyk: used to set the npc who holds the artifact in the third objective of Universe Quest
-	int universe_quest_artifact_holder_id;
-
-	// zyk: controls the timed events in Universe Quest
-	int universe_quest_messages;
-	int universe_quest_timer;
 
 	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
 	// Possible values are:
@@ -971,38 +923,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
-
-	// zyk: this attribute sets the player as fighting a guardian
-	// the values of guardian_mode are:
-	// 0 - Player is not fighting a guardian
-	// 1 - Guardian of Water
-	// 2 - Guardian of Earth
-	// 3 - Guardian of Forest
-	// 4 - Guardian of Intelligence
-	// 5 - Guardian of Agility
-	// 6 - Guardian of Fire
-	// 7 - Guardian of Wind
-	// 8 - Guardian of Light
-	// 9 - Guardian of Darkness
-	// 10 - Guardian of Eternity
-	// 11 - Guardian of Resistance
-	// 12 - Master of Evil
-	// 13 - Guardian of Universe
-	// 14 - Guardian of Chaos
-	// 15 - Ymir and Thor
-	// 16 - Guardian of Ice
-	// 17 - Guardian Trials Bosses
-	// 18 - Guardian Trials Final Bosses
-	// 19 - Ymir
-	// 20 - Guardian of Time
-	// 21 - Soul of Sorrow
-	int guardian_mode; 
-
-	// zyk: used by the last guardians in quests for their special abilities
-	int guardian_timer;
-
-	// zyk: player id that is fighting this guardian
-	int guardian_invoked_by_id;
 } clientPersistant_t;
 
 typedef struct renderInfo_s
@@ -1606,23 +1526,6 @@ typedef struct level_locals_s {
 
 	// zyk: sets the map in which the player must complete a quest objective
 	int quest_map;
-
-	// zyk: has the quest crystal ids that a player must get. Default -1 for each position.
-	// crystal gets cleaned when the player gets the crystal
-	int quest_crystal_id[3];
-
-	// zyk: id of the note spawned in the fourth Universe Quest mission
-	int universe_quest_note_id;
-
-	// zyk: has the quest effect id of the fx_runner entity in the guardian area. Default -1.
-	// gets cleaned when the player arrives at it
-	int quest_effect_id;
-
-	// zyk: has the order of each quest item that must be used to solve a quest puzzle
-	int quest_puzzle_order[9];
-
-	// zyk: id of the portal effect entity at last universe quest mission, so players can go through the teleport
-	int chaos_portal_id;
 
 	// zyk: default map music. After a boss battle, resets music to this one
 	char default_map_music[128];

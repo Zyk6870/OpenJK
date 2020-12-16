@@ -2443,8 +2443,6 @@ void NPC_BSST_Attack( void )
 {
 	vec3_t	enemyDir, shootDir;
 	float dot;
-	qboolean enemy_is_armored_soldier = qfalse;
-	qboolean enemy_is_stealth_attacker = qfalse;
 
 	//Don't do anything if we're hurt
 	if ( NPCS.NPC->painDebounceTime > level.time )
@@ -2476,7 +2474,7 @@ void NPC_BSST_Attack( void )
 
 		if (NPCS.NPC->enemy && !NPC_ClearLOS4(NPCS.NPC->enemy) && NPCS.NPC->health > 0)
 		{ // zyk: if enemy cant be seen, try getting one later
-			if (NPCS.NPC->client && NPCS.NPC->client->pers.guardian_mode == 0)
+			if (NPCS.NPC->client)
 			{
 				NPCS.NPC->enemy = NULL;
 				if (NPCS.NPC->client->playerTeam == NPCTEAM_PLAYER)
@@ -2488,21 +2486,6 @@ void NPC_BSST_Attack( void )
 					NPC_BSST_Patrol();
 				}
 				return;
-			}
-			else if (NPCS.NPC->client)
-			{ // zyk: guardians have a different way to find enemies. He tries to find the quest player and his allies
-				int zyk_it = 0;
-
-				for (zyk_it = 0; zyk_it < level.maxclients; zyk_it++)
-				{
-					gentity_t *allied_player = &g_entities[zyk_it];
-
-					if (allied_player && allied_player->client && allied_player->client->pers.guardian_mode > 0 &&
-						NPC_ClearLOS4(allied_player))
-					{ // zyk: the quest player or one of his allies. If one of them is in line of sight, choose him as enemy
-						NPCS.NPC->enemy = allied_player;
-					}
-				}
 			}
 		}
 	}
@@ -2574,12 +2557,6 @@ void NPC_BSST_Attack( void )
 		enemyInFOV = qtrue;
 	}
 
-	// zyk: Guardian of Intelligence enemy is an Armored Soldier. He is smarter at choosing weapons against this class
-	if (NPCS.NPC->client->pers.guardian_mode == 4 && NPCS.NPC->enemy->client->sess.amrpgmode == 2 && NPCS.NPC->enemy->client->pers.rpg_class == 3)
-		enemy_is_armored_soldier = qtrue;
-	else if (NPCS.NPC->client->pers.guardian_mode == 2 && NPCS.NPC->enemy->client->sess.amrpgmode == 2 && NPCS.NPC->enemy->client->pers.rpg_class == 5 && NPCS.NPC->enemy->client->pers.secrets_found & (1 << 7))
-		enemy_is_stealth_attacker = qtrue; // zyk: if enemy is stealth attacker with upgrade, Guardian of Earth will not use demp2
-
 	if ( enemyDist < MIN_ROCKET_DIST_SQUARED )//128
 	{//enemy within 128
 		if (TIMER_Done( NPCS.NPC, "stormieChangeWeapon" ))
@@ -2592,7 +2569,7 @@ void NPC_BSST_Attack( void )
 					NPCS.NPCInfo->scriptFlags |= SCF_ALT_FIRE;
 				NPC_ChangeWeapon( WP_DEMP2 );
 			}
-			else if (HaveWeapon(WP_FLECHETTE) && enemy_is_armored_soldier == qfalse)
+			else if (HaveWeapon(WP_FLECHETTE))
 			{
 				NPCS.NPCInfo->scriptFlags &= ~SCF_ALT_FIRE;
 				NPC_ChangeWeapon( WP_FLECHETTE );
@@ -2604,14 +2581,10 @@ void NPC_BSST_Attack( void )
 			}
 			else if (HaveWeapon(WP_REPEATER))
 			{
-				if (enemy_is_armored_soldier == qfalse)
-					NPCS.NPCInfo->scriptFlags &= ~SCF_ALT_FIRE;
-				else
-					NPCS.NPCInfo->scriptFlags |= SCF_ALT_FIRE;
-
+				NPCS.NPCInfo->scriptFlags &= ~SCF_ALT_FIRE;
 				NPC_ChangeWeapon( WP_REPEATER );
 			}
-			else if (HaveWeapon(WP_BLASTER) && enemy_is_armored_soldier == qfalse)
+			else if (HaveWeapon(WP_BLASTER))
 			{
 				NPCS.NPCInfo->scriptFlags |= SCF_ALT_FIRE;
 				NPC_ChangeWeapon( WP_BLASTER );
@@ -2637,7 +2610,7 @@ void NPC_BSST_Attack( void )
 			else
 				NPCS.NPCInfo->scriptFlags |= SCF_ALT_FIRE;
 
-			if (HaveWeapon(WP_DEMP2) && NPCS.NPC->enemy && NPCS.NPC->enemy->client->jetPackOn && enemy_is_stealth_attacker == qfalse)
+			if (HaveWeapon(WP_DEMP2) && NPCS.NPC->enemy && NPCS.NPC->enemy->client->jetPackOn)
 			{ // zyk: use demp2 to try to disable enemy jetpack
 				NPC_ChangeWeapon( WP_DEMP2 );
 			}
@@ -2647,8 +2620,6 @@ void NPC_BSST_Attack( void )
 			}
 			else if (HaveWeapon(WP_REPEATER))
 			{
-				if (enemy_is_armored_soldier == qtrue)
-					NPCS.NPCInfo->scriptFlags |= SCF_ALT_FIRE;
 				NPC_ChangeWeapon( WP_REPEATER );
 			}
 			else if (HaveWeapon(WP_ROCKET_LAUNCHER))
@@ -2671,7 +2642,7 @@ void NPC_BSST_Attack( void )
 		// zyk: if he has disruptor, use it. Else, changes to some other weapon
 		if (TIMER_Done( NPCS.NPC, "stormieChangeWeapon" ))
 		{
-			if (HaveWeapon(WP_DEMP2) && NPCS.NPC->enemy && NPCS.NPC->enemy->client->jetPackOn && enemy_is_stealth_attacker == qfalse)
+			if (HaveWeapon(WP_DEMP2) && NPCS.NPC->enemy && NPCS.NPC->enemy->client->jetPackOn)
 			{ // zyk: use demp2 to try to disable enemy jetpack
 				if ( NPCS.NPCInfo->scriptFlags & SCF_ALT_FIRE )
 					NPCS.NPCInfo->scriptFlags &= ~SCF_ALT_FIRE;
@@ -2680,24 +2651,16 @@ void NPC_BSST_Attack( void )
 
 				NPC_ChangeWeapon( WP_DEMP2 );
 			}
-			else if (HaveWeapon(WP_DISRUPTOR) && enemy_is_armored_soldier == qfalse)
+			else if (HaveWeapon(WP_DISRUPTOR))
 			{
 				//reset fire-timing variables
 				NPCS.NPCInfo->scriptFlags |= SCF_ALT_FIRE;
 				NPC_ChangeWeapon( WP_DISRUPTOR );
 			}
-			else if (HaveWeapon(WP_FLECHETTE) && enemy_is_armored_soldier == qfalse)
+			else if (HaveWeapon(WP_FLECHETTE))
 			{
 				NPCS.NPCInfo->scriptFlags |= SCF_ALT_FIRE;
 				NPC_ChangeWeapon( WP_FLECHETTE );
-			}
-			else if (enemy_is_armored_soldier == qtrue)
-			{
-				if ( NPCS.NPCInfo->scriptFlags & SCF_ALT_FIRE )
-					NPCS.NPCInfo->scriptFlags &= ~SCF_ALT_FIRE;
-				else
-					NPCS.NPCInfo->scriptFlags |= SCF_ALT_FIRE;
-				NPC_ChangeWeapon( WP_CONCUSSION );
 			}
 			else 
 			{ // zyk: does not have disruptor, use another weapon

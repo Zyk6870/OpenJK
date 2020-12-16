@@ -105,9 +105,6 @@ qboolean Wampa_CheckRoar( gentity_t *self )
 		NPC_SetAnim( self, SETANIM_BOTH, Q_irand(BOTH_GESTURE1,BOTH_GESTURE2), (SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD) );
 		TIMER_Set( self, "rageTime", self->client->ps.legsTimer );
 
-		if (Q_stricmp(self->NPC_type, "guardian_boss_3") == 0) // zyk: executes sound of howler if this npc is the Guardian of Forest
-			G_Sound( self, CHAN_VOICE, G_SoundIndex( va("sound/chars/howler/howl.mp3") ) );
-
 		return qtrue;
 	}
 	return qfalse;
@@ -208,10 +205,6 @@ void Wampa_Slash( int boltIndex, qboolean backhand )
 	int			i;
 	vec3_t		boltOrg;
 	int			damage = (backhand)?Q_irand(10,15):Q_irand(20,30);
-
-	// zyk: Guardian of Forest damage
-	if (Q_stricmp(NPCS.NPC->NPC_type, "guardian_boss_3") == 0)
-		damage *= 2;
 
 	numEnts = NPC_GetEntsNearBolt( radiusEntNums, radius, boltIndex, boltOrg );
 
@@ -462,12 +455,6 @@ void NPC_Wampa_Pain( gentity_t *self, gentity_t *attacker, int damage )
 {
 	qboolean hitByWampa = qfalse;
 
-	// zyk: Guardian of Forest uses this AI, but bosses take no pain
-	if (Q_stricmp(self->NPC_type, "guardian_boss_3") == 0)
-	{
-		return;
-	}
-
 	if ( attacker&&attacker->client&&attacker->client->NPC_class==CLASS_WAMPA )
 	{
 		hitByWampa = qtrue;
@@ -574,10 +561,7 @@ void NPC_BSWampa_Default( void )
 		{
 			if ( TIMER_Done(NPCS.NPC,"angrynoise") )
 			{
-				if (Q_stricmp(NPCS.NPC->NPC_type, "guardian_boss_3") == 0) // zyk: sound of howler if this npc is the Guardian of Forest
-					G_Sound( NPCS.NPC, CHAN_VOICE, G_SoundIndex( va("sound/chars/howler/howl_talk%d.mp3", Q_irand(1, 5)) ) );
-				else
-					G_Sound( NPCS.NPC, CHAN_VOICE, G_SoundIndex( va("sound/chars/wampa/misc/anger%d.wav", Q_irand(1, 2)) ) );
+				G_Sound( NPCS.NPC, CHAN_VOICE, G_SoundIndex( va("sound/chars/wampa/misc/anger%d.wav", Q_irand(1, 2)) ) );
 
 				TIMER_Set( NPCS.NPC, "angrynoise", Q_irand( 5000, 10000 ) );
 			}
@@ -640,10 +624,7 @@ void NPC_BSWampa_Default( void )
 	{
 		if ( TIMER_Done(NPCS.NPC,"idlenoise") )
 		{
-			if (Q_stricmp(NPCS.NPC->NPC_type, "guardian_boss_3") == 0) // zyk: sound of howler if this is the Guardian of Forest
-				G_Sound( NPCS.NPC, CHAN_AUTO, G_SoundIndex( va("sound/chars/howler/idle_hiss%d.mp3", Q_irand(1, 2)) ) );
-			else
-				G_Sound( NPCS.NPC, CHAN_AUTO, G_SoundIndex( "sound/chars/wampa/misc/anger3.wav" ) );
+			G_Sound( NPCS.NPC, CHAN_AUTO, G_SoundIndex( "sound/chars/wampa/misc/anger3.wav" ) );
 
 			TIMER_Set( NPCS.NPC, "idlenoise", Q_irand( 2000, 4000 ) );
 		}

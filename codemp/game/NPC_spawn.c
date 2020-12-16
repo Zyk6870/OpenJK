@@ -1772,11 +1772,7 @@ finish:
 		newent->client->sess.amrpgmode = 0;
 		newent->client->pers.being_mind_controlled = -1;
 		newent->client->pers.mind_controlled1_id = -1;
-		newent->client->pers.guardian_invoked_by_id = -1;
-		newent->client->pers.guardian_mode = 0;
 		newent->client->pers.player_statuses = 0;
-		newent->client->pers.universe_quest_objective_control = -1;
-		newent->client->pers.universe_quest_artifact_holder_id = -1;
 		newent->client->pers.race_position = 0;
 		newent->client->pers.seller_invoked_by_id = -1;
 		newent->client->pers.stun_baton_less_speed_timer = 0;
@@ -4710,8 +4706,6 @@ qboolean	showBBoxes = qfalse;
 void Cmd_NPC_f( gentity_t *ent )
 {
 	char	cmd[1024];
-	int player_it = 0;
-	gentity_t *this_ent = NULL;
 
 	if (!(ent->client->pers.bitvalue & (1 << ADM_NPC)))
 	{ // zyk: npc admin command
@@ -4723,17 +4717,6 @@ void Cmd_NPC_f( gentity_t *ent )
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"NPC command not allowed in gametypes other than FFA.\n\"" );
 		return;
-	}
-
-	for (player_it = 0; player_it < level.maxclients; player_it++)
-	{ // zyk: cant spawn guardians if a player is in a guardian battle
-		this_ent = &g_entities[player_it];
-
-		if (this_ent && this_ent->client && this_ent->client->sess.amrpgmode == 2 && this_ent->client->pers.guardian_mode > 0)
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"Cannot spawn npcs while someone is in a guardian battle.\n\"" );
-			return;
-		}
 	}
 
 	trap->Argv( 1, cmd, 1024 );
@@ -4804,12 +4787,6 @@ void Cmd_NPC_f( gentity_t *ent )
 
 			if (thisent->NPC)
 			{
-				if (thisent->client && thisent->client->pers.guardian_invoked_by_id != -1)
-				{
-					trap->SendServerCommand( ent-g_entities, "print \"NPC team cannot be used in bosses.\n\"" );
-					return;
-				}
-
 				if (Q_stricmp(cmd2,"player") == 0)
 				{
 					thisent->client->playerTeam = NPCTEAM_PLAYER;

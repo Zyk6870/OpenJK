@@ -636,12 +636,6 @@ void Cmd_Emote_f( gentity_t *ent )
 		return;
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.guardian_mode > 0)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Cannot use emotes in boss battles\n\"" );
-		return;
-	}
-
 	if (ent->client->ps.forceHandExtend == HANDEXTEND_KNOCKDOWN)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Cannot use emotes while knocked down\n\"");
@@ -1043,18 +1037,6 @@ void Cmd_Scale_f( gentity_t *ent ) {
 	if (new_size < 20 || new_size > 500)
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"Size must be between 20 and 500.\n\"" );
-		return;
-	}
-
-	if (g_entities[client_id].client->sess.amrpgmode == 2 && g_entities[client_id].client->pers.can_play_quest == 1)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Cannot scale players in quests.\n\"" );
-		return;
-	}
-
-	if (g_entities[client_id].client->sess.amrpgmode == 2 && g_entities[client_id].client->pers.guardian_mode > 0)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Cannot scale players in boss battles.\n\"" );
 		return;
 	}
 
@@ -3010,8 +2992,6 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	char			arg1[MAX_CVAR_VALUE_STRING] = {0};
 	char			arg2[MAX_CVAR_VALUE_STRING] = {0};
 	voteString_t	*vote = NULL;
-	int player_it = 0;
-	gentity_t *player_ent = NULL;
 
 	// not allowed to vote at all
 	if ( !g_allowVote.integer ) {
@@ -3029,16 +3009,6 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	else if ( level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL && ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NOSPECVOTE" ) ) );
 		return;
-	}
-
-	for (player_it = 0; player_it < level.maxclients; player_it++)
-	{
-		player_ent = &g_entities[player_it];
-		if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.guardian_mode > 0)
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"You cannot vote while someone is in a guardian battle\n\"");
-			return;
-		}
 	}
 
 	// zyk: tests if this player can vote now
@@ -4702,16 +4672,6 @@ void load_account(gentity_t *ent)
 			fscanf(account_file, "%s", content);
 			ent->client->pers.secrets_found = atoi(content);
 
-			// zyk: make sure Challenge Mode settings flag and counter flag are correct
-			if (ent->client->pers.universe_quest_counter & (1 << 29))
-			{
-				ent->client->pers.player_settings |= (1 << 15);
-			}
-			else
-			{
-				ent->client->pers.player_settings &= ~(1 << 15);
-			}
-
 			// zyk: loading credits value
 			fscanf(account_file, "%s", content);
 			ent->client->pers.credits = atoi(content);
@@ -4953,57 +4913,6 @@ void rpg_skill_counter(gentity_t *ent, int amount)
 	}
 }
 
-// zyk: number of artifacts collected by the player in Universe Quest
-int number_of_artifacts(gentity_t *ent)
-{
-	int i = 0, collected_artifacts = 0;
-
-	if (ent->client->pers.universe_quest_progress == 2)
-	{
-		for (i = 0; i < 10; i++)
-		{
-			if (ent->client->pers.universe_quest_counter & (1 << i))
-			{
-				collected_artifacts++;
-			}
-		}
-	}
-
-	return collected_artifacts;
-}
-
-// zyk: amount of amulets got by the player in Amulets Mission of Universe Quest
-int number_of_amulets(gentity_t *ent)
-{
-	int i = 0, number_of_amulets = 0;
-
-	for (i = 0; i < 3; i++)
-	{
-		if (ent->client->pers.universe_quest_counter & (1 << i))
-		{
-			number_of_amulets++;
-		}
-	}
-
-	return number_of_amulets;
-}
-
-// zyk: amount of crystals got by the player in Crystals mission of Universe Quest
-int number_of_crystals(gentity_t *ent)
-{
-	int i = 0, number_of_crystals = 0;
-
-	for (i = 0; i < 3; i++)
-	{
-		if (ent->client->pers.universe_quest_counter & (1 << i))
-		{
-			number_of_crystals++;
-		}
-	}
-
-	return number_of_crystals;
-}
-
 // zyk: initialize RPG skills of this player
 void initialize_rpg_skills(gentity_t *ent)
 {
@@ -5022,13 +4931,6 @@ void initialize_rpg_skills(gentity_t *ent)
 				ent->client->pers.skill_levels[i]--;
 				ent->client->pers.skillpoints++;
 			}
-		}
-
-		// zyk: Challenge Mode player who changed to Normal after finishing old Universe Quest with 15 missions. Reset his settings to Challenge
-		if (ent->client->pers.universe_quest_progress == 15 && !(ent->client->pers.player_settings & (1 << 15)) && 
-			ent->client->pers.universe_quest_counter & (1 << 29))
-		{
-			ent->client->pers.player_settings |= (1 << 15);
 		}
 
 		// zyk: loading Jump value
@@ -5229,17 +5131,6 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->pers.buy_sell_timer = 0;
 		ent->client->pers.vertical_dfa_timer = 0;
 
-		// zyk: setting default value of can_play_quest
-		ent->client->pers.can_play_quest = 0;
-
-		ent->client->pers.guardian_mode = 0;
-		ent->client->pers.guardian_timer = 0;
-		ent->client->pers.guardian_invoked_by_id = -1;
-
-		ent->client->pers.universe_quest_artifact_holder_id = -1;
-		ent->client->pers.universe_quest_messages = 0;
-		ent->client->pers.universe_quest_timer = 0;
-
 		// zyk: loading initial RPG weapons
 		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)) && ent->client->pers.skill_levels[18] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
@@ -5437,8 +5328,6 @@ void add_new_char(gentity_t *ent)
 	}
 
 	ent->client->pers.secrets_found = 0;
-	ent->client->pers.universe_quest_progress = 0;
-	ent->client->pers.universe_quest_counter = 0;
 	ent->client->pers.credits = 100;
 	ent->client->pers.rpg_class = 0;
 	ent->client->sess.selected_special_power = MAGIC_MAGIC_SENSE;
@@ -5661,126 +5550,10 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 	}
 }
 
-// zyk: clean the guardian npcs
-void clean_guardians(gentity_t *ent)
-{
-	int i = 0;
-	gentity_t *this_ent = NULL;
-
-	for (i = MAX_CLIENTS; i < level.num_entities; i++)
-	{
-		this_ent = &g_entities[i];
-		if (this_ent && this_ent->client && this_ent->NPC && this_ent->client->pers.guardian_invoked_by_id != -1 && this_ent->client->pers.guardian_invoked_by_id == (ent-g_entities))
-		{
-			// zyk: if quest player dies in boss battle, makes the boss stop using force powers
-			int j = 0;
-
-			while (j < NUM_FORCE_POWERS)
-			{
-				if (this_ent->client->ps.fd.forcePowersActive & (1 << j))
-				{
-					WP_ForcePowerStop(this_ent, j);
-				}
-
-				j++;
-			}
-
-			G_FreeEntity(this_ent);
-		}
-	}
-}
-
 extern void zyk_set_entity_field(gentity_t *ent, char *key, char *value);
 extern void zyk_spawn_entity(gentity_t *ent);
 extern void zyk_main_set_entity_field(gentity_t *ent, char *key, char *value);
 extern void zyk_main_spawn_entity(gentity_t *ent);
-
-// zyk: loads the datapad md3 model for the Dark Quest notes
-void load_note_model(int x,int y,int z)
-{
-	gentity_t *new_ent = G_Spawn();
-
-	zyk_set_entity_field(new_ent,"classname","misc_model_breakable");
-	zyk_set_entity_field(new_ent,"origin",va("%d %d %d",x,y,z));
-	zyk_set_entity_field(new_ent,"angles","0 90 0");
-	zyk_set_entity_field(new_ent,"model","models/items/datapad.md3");
-
-	zyk_spawn_entity(new_ent);
-
-	level.universe_quest_note_id = new_ent->s.number;
-}
-
-// zyk: loads the crystal md3 model for the Universe Quest crystals
-gentity_t *load_crystal_model(int x,int y,int z, int yaw, int crystal_number)
-{
-	gentity_t *ent = G_Spawn();
-
-	zyk_set_entity_field(ent,"classname","misc_model_breakable");
-	zyk_set_entity_field(ent,"origin",va("%d %d %d",x,y,z));
-	zyk_set_entity_field(ent,"angles",va("0 %d 0",yaw));
-
-	if (crystal_number == 0)
-		zyk_set_entity_field(ent,"model","models/map_objects/mp/crystal_blue.md3");
-	else if (crystal_number == 1)
-		zyk_set_entity_field(ent,"model","models/map_objects/mp/crystal_red.md3");
-	else
-		zyk_set_entity_field(ent,"model","models/map_objects/mp/crystal_green.md3");
-
-	zyk_spawn_entity(ent);
-
-	level.quest_crystal_id[crystal_number] = ent->s.number;
-
-	return ent;
-}
-
-// zyk: load an effect used in quests
-gentity_t *load_effect(int x,int y,int z, int spawnflags, char *fxFile)
-{
-	gentity_t *ent = G_Spawn();
-
-	zyk_set_entity_field(ent,"classname","fx_runner");
-	zyk_set_entity_field(ent,"spawnflags",va("%d",spawnflags));
-	zyk_set_entity_field(ent,"origin",va("%d %d %d",x,y,z));
-
-	ent->s.modelindex = G_EffectIndex( fxFile );
-
-	zyk_spawn_entity(ent);
-
-	level.quest_effect_id = ent->s.number;
-
-	return ent;
-}
-
-// zyk: cleans the crystal model if player gets it
-void clean_crystal_model(int crystal_number)
-{
-	if (level.quest_crystal_id[crystal_number] != -1)
-	{
-		G_FreeEntity(&g_entities[level.quest_crystal_id[crystal_number]]);
-		level.quest_crystal_id[crystal_number] = -1;
-	}
-}
-
-// zyk: cleans the effect if player reaches it
-void clean_effect()
-{
-	if (level.quest_effect_id != -1)
-	{
-		G_FreeEntity(&g_entities[level.quest_effect_id]);
-		level.quest_effect_id = -1;
-	}
-}
-
-// zyk: tests if player got all 3 amulets in Amulets Mission of Universe Quest
-void got_all_amulets(gentity_t *ent)
-{
-	if (number_of_amulets(ent) == 3)
-	{
-		ent->client->pers.universe_quest_objective_control = -6;
-		ent->client->pers.universe_quest_timer = level.time + 3000;
-		ent->client->pers.universe_quest_messages = 199;
-	}
-}
 
 // zyk: tests if the race must be finished
 void try_finishing_race()
@@ -5847,22 +5620,8 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 		return;
 	}
 
-	// zyk: if player was fighting a guardian, allow other players to fight the guardian now
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.guardian_mode > 0)
-	{
-		clean_guardians(ent);
-		ent->client->pers.guardian_mode = 0;
-	}
-
 	// zyk: saving the not logged player mode in session
 	ent->client->sess.amrpgmode = 0;
-
-	// zyk: if this player was playing a quest, find a new one to play quests in this map
-	if (ent->client->pers.can_play_quest == 1)
-	{
-		// zyk: if this is the quest player, reset the boss battle music
-		level.boss_battle_music_reset_timer = level.time + 1000;
-	}
 
 	ent->client->pers.bitvalue = 0;
 
@@ -6040,9 +5799,8 @@ char *zyk_get_settings_values(gentity_t *ent)
 Cmd_ZykMod_f
 ==================
 */
+// zyk: sends info to the client-side menu if player has the client-side plugin
 void Cmd_ZykMod_f( gentity_t *ent ) {
-	// zyk: sends info to the client-side menu if player has the client-side plugin
-	int universe_quest_counter_value = 0;
 
 	if (Q_stricmp(ent->client->pers.guid, "NOGUID") == 0)
 	{
@@ -6052,22 +5810,10 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 	if (ent->client->sess.amrpgmode == 2)
 	{
 		int i = 0;
-		int quest_player_id = MAX_CLIENTS;
 		char content[1024];
 		int unique_duration = 0;
 
 		strcpy(content,"");
-
-		for (i = 0; i < level.maxclients; i++)
-		{
-			gentity_t *player_ent = &g_entities[i];
-
-			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.can_play_quest == 1)
-			{ // zyk: found the quest player
-				quest_player_id = i;
-				break;
-			}
-		}
 
 		for (i = 0; i < NUMBER_OF_SKILLS; i++)
 		{
@@ -6076,33 +5822,12 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 
 		strcpy(content, va("%s%s", content, zyk_get_settings_values(ent)));
 
-		if (ent->client->pers.universe_quest_progress == 2)
-		{
-			universe_quest_counter_value = number_of_artifacts(ent);
-		}
-		else if (ent->client->pers.universe_quest_progress == 5)
-		{
-			universe_quest_counter_value = number_of_amulets(ent);
-		}
-		else if (ent->client->pers.universe_quest_progress == 8)
-		{
-			universe_quest_counter_value = ent->client->pers.universe_quest_counter;
-		}
-		else if (ent->client->pers.universe_quest_progress == 9)
-		{
-			universe_quest_counter_value = number_of_crystals(ent);
-		}
-		else if (ent->client->pers.universe_quest_progress > 14)
-		{
-			universe_quest_counter_value = ent->client->pers.universe_quest_counter;
-		}
-
 		if (ent->client->pers.unique_skill_duration > level.time)
 		{
 			unique_duration = ent->client->pers.unique_skill_duration - level.time;
 		}
 
-		strcpy(content,va("%s%d-%d-%d-%d-%d-", content, ent->client->pers.secrets_found, ent->client->pers.universe_quest_progress, universe_quest_counter_value, quest_player_id, unique_duration));
+		strcpy(content, va("%s%d-%d-", content, ent->client->pers.secrets_found, unique_duration));
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-%s-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,zyk_rpg_class(ent),content));
 	}
@@ -6794,168 +6519,16 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					{
 						gentity_t *player = &g_entities[j];
 
-						if (player && player->client && player->client->sess.amrpgmode == 2 && player->client->pers.can_play_quest == 1)
-						{
-							strcpy(quest_player, va("%s", player->client->pers.netname));
-						}
 						if (player && player->client && player->client->sess.amrpgmode == 2 && level.bounty_quest_choose_target == qfalse && player->s.number == level.bounty_quest_target_id)
 						{
 							strcpy(target_player, va("%s", player->client->pers.netname));
 						}
 					}
 
-					trap->SendServerCommand(ent->s.number, va("print \"\n^3RPG Mode Quests\n\n^2/list universe: ^7Universe Quest (Main Quest)\n\n^3/list bounty: ^7The Bounty Hunter quest\n^3/list custom: ^7lists custom quests\n\n^3Quest Player: ^7%s\n^3Bounty Quest Target: ^7%s^7\n\n\"", quest_player, target_player));
+					trap->SendServerCommand(ent->s.number, va("print \"\n^3RPG Mode Quests\n\n^3/list bounty: ^7The Bounty Hunter quest\n^3/list custom: ^7lists custom quests\n\n^3Quest Player: ^7%s\n^3Bounty Quest Target: ^7%s^7\n\n\"", quest_player, target_player));
 				}
 				else
 					trap->SendServerCommand(ent->s.number, "print \"\n^3RPG Mode Quests\n\n^1Quests are not allowed in this server^7\n\n\"");
-			}
-			else if (Q_stricmp( arg1, "universe" ) == 0)
-			{
-				char universe_message[MAX_STRING_CHARS];
-				strcpy(universe_message, "");
-
-				if (ent->client->pers.universe_quest_progress < NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES)
-				{
-					if (ent->client->pers.universe_quest_progress == 0)
-						strcpy(universe_message, "^3\n1. The Hero's Quest Begins\n\n^7Go to ^3kor1 ^7to save the Guardian Sages.");
-					else if (ent->client->pers.universe_quest_progress == 1)
-						strcpy(universe_message, "^3\n2. The Rise of an Evil Force\n\n^7Talk to the sages at ^3kor1 ^7to know more about your quest.");
-					else if (ent->client->pers.universe_quest_progress == 2)
-						strcpy(universe_message, va("^3\n3. The Life-Force Artifacts\n\n^7Find the 8 artifacts in SP maps. One of them is with the sages at ^3yavin1b^7.\nCollected artifacts: ^3%d^7",number_of_artifacts(ent)));
-					else if (ent->client->pers.universe_quest_progress == 3)
-						strcpy(universe_message, "^3\n4. In Search for Answers\n\n^7Go to ^3yavin1b ^7to talk to the sages about the mysterious voice you heard at the beginning of the quest.");
-					else if (ent->client->pers.universe_quest_progress == 4)
-						strcpy(universe_message, "^3\n5. The Hidden Sage\n\n^7Find the Sage of Universe at ^3t3_hevil^7.");
-					else if (ent->client->pers.universe_quest_progress == 5)
-						strcpy(universe_message, va("^3\n6. The Guardian Amulets\n\n^7Find the three guardian amulets at the City of the Merchants in ^3mp/siege_desert^7. Amulets collected: ^3%d^7.", number_of_amulets(ent)));
-					else if (ent->client->pers.universe_quest_progress == 6)
-						strcpy(universe_message, "^3\n7. The Decisive Battle\n\n^7Defeat the ^1Master of Evil ^7at ^3taspir1^7.");
-					else if (ent->client->pers.universe_quest_progress == 7)
-						strcpy(universe_message, "^3\n8. The Guardian of Universe\n\n^7Defeat the ^2Guardian of Universe ^7at ^3mp/siege_korriban^7.");
-					else if (ent->client->pers.universe_quest_progress == 8)
-					{
-						strcpy(universe_message, "^3\n9. Revelations\n\n^7You had a strange vision of someone calling you from a sacred place. You must talk to the sages and guardians about it, and you also have to go there.\n");
-
-						if (ent->client->pers.universe_quest_counter & (1 << 1))
-							strcpy(universe_message, va("%s\n^3Guardians and Sages - ^7Go to ^3mp/siege_korriban ^7and speak to the guardians and the sages - ^2yes",universe_message));
-						else
-							strcpy(universe_message, va("%s\n^3Guardians and Sages - ^7Go to ^3mp/siege_korriban ^7and speak to the guardians and the sages - ^1no",universe_message));
-
-						if (ent->client->pers.universe_quest_counter & (1 << 2))
-							strcpy(universe_message, va("%s\n^3Sacred Monument - ^7Go to ^3t2_trip ^7, at the sacred obelisk, to find out the meaning of the vision - ^2yes",universe_message));
-						else
-							strcpy(universe_message, va("%s\n^3Sacred Monument - ^7Go to ^3t2_trip ^7, at the sacred obelisk, to find out the meaning of the vision - ^1no",universe_message));
-					}
-					else if (ent->client->pers.universe_quest_progress == 9)
-					{
-						strcpy(universe_message, va("^3\n10. The Sacred Crystals\n\n^7Find the sacred crystals in ^3t2_trip^7. You need them to free the Guardian of Time. Crystals: %d\n", number_of_crystals(ent)));
-					}
-					else if (ent->client->pers.universe_quest_progress == 10)
-					{
-						strcpy(universe_message, "^3\n11. Finally Free\n\n^7You have the sacred crystals.\nGo to ^3t2_trip ^7and free the Guardian of Time.");
-					}
-					else if (ent->client->pers.universe_quest_progress == 11)
-					{
-						strcpy(universe_message, va("^3\n12. Battle for the Temple\n\n^7Master of Evil sent his entire army to the temple.\nDefeat all of them with the help of your allies.\nEnemies: ^3%d^7", ent->client->pers.universe_quest_objective_control));
-					}
-					else if (ent->client->pers.universe_quest_progress == 12)
-					{
-						strcpy(universe_message, "^3\n13. Unpleasant Revelation\n\n^7Listen to the revelation that will be decisive to the fate of the Universe.");
-					}
-					else if (ent->client->pers.universe_quest_progress == 13)
-					{
-						strcpy(universe_message, "^3\n14. The Hero's Choice\n\n^7Listen to the sages, guardians, Guardian of Time and the Master of Evil.\nAfter that, press the Use key on the one you choose.");
-					}
-					else if (ent->client->pers.universe_quest_progress == 14)
-					{
-						strcpy(universe_message, "^3\n15. The Fate of the Universe\n\n^7Go to the Sacred Dimension in ^3t2_trip^7 to fight the ^1Guardian of Chaos^7.");
-					}
-					else if (ent->client->pers.universe_quest_progress == 15)
-					{
-						if (ent->client->pers.universe_quest_counter & (1 << 0))
-							strcpy(universe_message, "^3\n16. Sages Sequel: The Ancient Threat\n\n^7Sage of Universe telepathically asks you to talk to the sages at the sacred monument in ^3yavin2^7.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 1))
-							strcpy(universe_message, "^3\n16. Guardians Sequel: A Smart Move\n\n^7Guardian of Universe telepathically asks you to talk to the guardians at the central area in ^3mp/siege_korriban^7.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 2))
-							strcpy(universe_message, "^3\n16. Thor Sequel: The Betrayal\n\n^7Thor (Master of Evil) telepathically asks you to go to ^3t3_bounty^7.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 3))
-							strcpy(universe_message, "^3\n16. Time Sequel: The Most Important Task\n\n^7Guardian of Time telepathically asks you to go to ^3mp/siege_korriban^7.");
-					}
-					else if (ent->client->pers.universe_quest_progress == 16)
-					{
-						if (ent->client->pers.universe_quest_counter & (1 << 0))
-							strcpy(universe_message, "^3\n17. Sages Sequel: Save the City!\n\n^7Go to ^3mp/siege_desert^7 and defeat all mages with the help from some citizens.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 1))
-							strcpy(universe_message, "^3\n17. Guardians Sequel: The Confrontation\n\n^7Go to ^3t3_bounty^7 and defeat Ymir and Thor.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 2))
-							strcpy(universe_message, "^3\n17. Thor Sequel: Survival of the Strongest\n\n^7Defeat Ymir in ^3t3_bounty^7 water arena.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 3))
-							strcpy(universe_message, "^3\n17. Time Sequel: The Well of Truth\n\n^7'The Well of truth, surrounded by the forest and the sacred monument...shall contain the answers to the Universe salvation'.");
-					}
-					else if (ent->client->pers.universe_quest_progress == 17)
-					{
-						if (ent->client->pers.universe_quest_counter & (1 << 0))
-							strcpy(universe_message, "^3\n18. Sages Sequel: The Terrible Truth\n\n^7Talk to the sages inside the mayor's house in ^3mp/siege_desert^7.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 1))
-							strcpy(universe_message, "^3\n18. Guardians Sequel: The Hero's Destiny\n\n^7Go to ^3mp/siege_korriban^7 and talk to the guardians in the blue crystal room.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 2))
-							strcpy(universe_message, "^3\n18. Thor Sequel: The New Leader\n\n^7Talk to Thor in ^3t3_bounty^7 water arena.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 3))
-							strcpy(universe_message, "^3\n18. Time Sequel: The Legendary Puzzle\n\n^7'The hero shall stand in the buried deep sanctuary...and solve the puzzle to enter the Realm of Souls'.");
-					}
-					else if (ent->client->pers.universe_quest_progress == 18)
-					{
-						if (ent->client->pers.universe_quest_counter & (1 << 0))
-							strcpy(universe_message, "^3\n19. Sages Sequel: To Settle the Score\n\n^7Go to ^3t3_bounty^7 and find Ymir.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 1))
-							strcpy(universe_message, "^3\n19. Guardians Sequel: The Guardian Trials\n\n^7Go to ^3mp/siege_korriban^7 and win the Guardian Trials battle.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 2))
-							strcpy(universe_message, "^3\n19. Thor Sequel: War at the City\n\n^7Defeat the citizens, sages and guardians in ^3mp/siege_desert^7.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 3))
-							strcpy(universe_message, "^3\n19. Time Sequel: The Realm of Souls\n\n^7Go through the gate in ^3t3_rift^7 sanctuary, which leads to the Realm of Souls.");
-					}
-					else if (ent->client->pers.universe_quest_progress == 19)
-					{
-						if (ent->client->pers.universe_quest_counter & (1 << 0))
-							strcpy(universe_message, "^3\n20. Sages Sequel: The Crystal of Magic\n\n^7Go to ^3t3_bounty^7 and talk to the sages and guardians where Ymir was");
-						else if (ent->client->pers.universe_quest_counter & (1 << 1))
-							strcpy(universe_message, "^3\n20. Guardians Sequel: The Great Moment\n\n^7Go to ^3mp/siege_korriban^7 and talk to the guardians in the blue crystal room.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 2))
-							strcpy(universe_message, "^3\n20. Thor Sequel: The Path of Evil\n\n^7Go to the rancor arena in ^3mp/siege_desert^7.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 3))
-							strcpy(universe_message, "^3\n20. Time Sequel: The Soul of Sorrow\n\n^7Speak to the Soul of Sorrow in the Realm of Souls in ^3t3_rift^7.");
-					}
-					else if (ent->client->pers.universe_quest_progress == 20)
-					{
-						if (ent->client->pers.universe_quest_counter & (1 << 0))
-							strcpy(universe_message, "^3\n21. Sages Sequel: Wrath of the Mages\n\n^7Go to ^3t3_bounty^7 and defeat Ymir and Thor in water arena");
-						else if (ent->client->pers.universe_quest_counter & (1 << 1))
-							strcpy(universe_message, "^3\n21. Guardians Sequel: The Final Challenge\n\n^7Go to ^3mp/siege_korriban^7 and win the battle.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 2))
-							strcpy(universe_message, "^3\n21. Thor Sequel: Victory!\n\n^7Defeat the Guardian of Time in the rancor arena in ^3mp/siege_desert^7.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 3))
-							strcpy(universe_message, "^3\n21. Time Sequel: The Hero's Test\n\n^7Defeat the Soul of Sorrow in the Realm of Souls in ^3t3_rift^7.");
-					}
-					else if (ent->client->pers.universe_quest_progress == 21)
-					{
-						if (ent->client->pers.universe_quest_counter & (1 << 0))
-							strcpy(universe_message, "^3\n22. Sages Sequel: A New Prosperous Age\n\n^7Go to ^3t3_bounty^7 and talk to the sages and guardians in water arena");
-						else if (ent->client->pers.universe_quest_counter & (1 << 1))
-							strcpy(universe_message, "^3\n22. Guardians Sequel: The Guardian of Peace\n\n^7Go to ^3mp/siege_korriban^7 and talk to the guardians in the blue crystal room.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 2))
-							strcpy(universe_message, "^3\n22. Thor Sequel: Full Power\n\n^7Go to the rancor arena in ^3mp/siege_desert^7 and talk to Thor.");
-						else if (ent->client->pers.universe_quest_counter & (1 << 3))
-							strcpy(universe_message, "^3\n22. Time Sequel: Salvation of the Universe\n\n^7Speak to the Soul of Sorrow in the Realm of Souls in ^3t3_rift^7.");
-					}
-				}
-				else
-				{
-					strcpy(universe_message, "^7Completed!");
-				}
-
-				strcpy(message, va("\n^2Universe Quest\n%s\n\n", universe_message));
-
-				trap->SendServerCommand( ent->s.number, va("print \"%s\"", message) );
 			}
 			else if (Q_stricmp( arg1, "bounty" ) == 0)
 			{
@@ -8300,13 +7873,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 		ent->client->pers.max_rpg_shield = 0;
 		ent->client->pers.secrets_found = 0;
 
-		ent->client->pers.universe_quest_progress = 0;
-		ent->client->pers.universe_quest_counter = 0;
-
-		// zyk: Challenge Mode, must keep the flag
-		if (ent->client->pers.player_settings & (1 << 15))
-			ent->client->pers.universe_quest_counter |= (1 << 29);
-
 		ent->client->pers.level = 1;
 		ent->client->pers.level_up_score = 0;
 		ent->client->pers.skillpoints = 1;
@@ -8329,13 +7895,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 	}
 	else if (Q_stricmp( arg1, "quests") == 0)
 	{
-		ent->client->pers.universe_quest_progress = 0;
-		ent->client->pers.universe_quest_counter = 0;
-
-		// zyk: Challenge Mode, must keep the flag
-		if (ent->client->pers.player_settings & (1 << 15))
-			ent->client->pers.universe_quest_counter |= (1 << 29);
-
 		save_account(ent, qtrue);
 
 		trap->SendServerCommand( ent->s.number, "print \"Your quests are reset.\n\"" );
@@ -8407,12 +7966,6 @@ void Cmd_Teleport_f( gentity_t *ent )
 		return;
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.guardian_mode > 0)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Cannot teleport while in a guardian battle.\n\"" );
-		return;
-	}
-
 	if (trap->Argc() == 1)
 	{
 		zyk_TeleportPlayer(ent,ent->client->pers.teleport_point,ent->client->pers.teleport_angles);
@@ -8447,12 +8000,6 @@ void Cmd_Teleport_f( gentity_t *ent )
 				return;
 			}
 
-			if (g_entities[client_id].client->sess.amrpgmode == 2 && g_entities[client_id].client->pers.guardian_mode > 0)
-			{
-				trap->SendServerCommand( ent-g_entities, "print \"Cannot teleport to a player in a guardian battle.\n\"" );
-				return;
-			}
-
 			VectorCopy(g_entities[client_id].client->ps.origin,target_origin);
 			target_origin[2] = target_origin[2] + 100;
 
@@ -8484,12 +8031,6 @@ void Cmd_Teleport_f( gentity_t *ent )
 			return;
 		}
 
-		if (g_entities[client1_id].client->sess.amrpgmode == 2 && g_entities[client1_id].client->pers.guardian_mode > 0)
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"Cannot teleport to a player in a guardian battle.\n\"" );
-			return;
-		}
-
 		if (client2_id == -1)
 		{
 			return;
@@ -8498,12 +8039,6 @@ void Cmd_Teleport_f( gentity_t *ent )
 		if (g_entities[client2_id].client->sess.amrpgmode > 0 && g_entities[client2_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client2_id].client->pers.player_settings & (1 << 13)))
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
-			return;
-		}
-
-		if (g_entities[client2_id].client->sess.amrpgmode == 2 && g_entities[client2_id].client->pers.guardian_mode > 0)
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"Cannot teleport to a player in a guardian battle.\n\"" );
 			return;
 		}
 
@@ -8543,12 +8078,6 @@ void Cmd_Teleport_f( gentity_t *ent )
 		if (g_entities[client_id].client->sess.amrpgmode > 0 && g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << 13)))
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
-			return;
-		}
-
-		if (g_entities[client_id].client->sess.amrpgmode == 2 && g_entities[client_id].client->pers.guardian_mode > 0)
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"Cannot teleport a player in a guardian battle.\n\"" );
 			return;
 		}
 
@@ -8702,12 +8231,6 @@ void Cmd_AllyAdd_f( gentity_t *ent ) {
 	{
 		char arg1[MAX_STRING_CHARS];
 		int client_id = -1;
-
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.guardian_mode > 0)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"You cannot add allies during a boss battle.\n\"") );
-			return;
-		}
 
 		if (level.duel_tournament_mode > 0 && level.duel_players[ent->s.number] != -1)
 		{ // zyk: cant add allies while in Duel Tournament
@@ -9017,15 +8540,13 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		}
 		else if (value == 15)
 		{
-			if (!(ent->client->pers.player_settings & (1 << value)) && ent->client->pers.can_play_quest == 0)
-			{ // zyk: player can only activate Challenge Mode if he did not complete any quest mission
+			if (!(ent->client->pers.player_settings & (1 << value)))
+			{
 				ent->client->pers.player_settings |= (1 << value);
-				ent->client->pers.universe_quest_counter |= (1 << 29);
 			}
-			else if (ent->client->pers.universe_quest_progress < NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES)
-			{ // zyk: setting Normal Mode removes the Challenge Mode flag. Cannot change after completing all quests
+			else
+			{
 				ent->client->pers.player_settings &= ~(1 << value);
-				ent->client->pers.universe_quest_counter &= ~(1 << 29);
 			}
 
 			if (ent->client->pers.player_settings & (1 << value))
@@ -9462,16 +8983,6 @@ void Cmd_RaceMode_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand(ent->s.number, "print \"Race has already started. Try again at the next race!\n\"");
 			return;
-		}
-
-		for (j = 0; j < MAX_CLIENTS; j++)
-		{ // zyk: if race already started, this player cant join anymore
-			this_ent = &g_entities[j];
-			if (this_ent && this_ent->client && this_ent->inuse && this_ent->health > 0 && this_ent->client->sess.amrpgmode == 2 && this_ent->client->pers.guardian_mode > 0)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"You can't start a race while someone is in a Guardian Battle!\n\"");
-				return;
-			}
 		}
 
 		// zyk: getting the map name
@@ -11621,12 +11132,6 @@ void Cmd_Saber_f( gentity_t *ent ) {
 	if (zyk_allow_saber_command.integer > 1 && level.duel_tournament_mode == 4 && duel_tournament_is_duelist(ent) == qtrue)
 	{
 		trap->SendServerCommand(ent - g_entities, "print \"Cannot use this command while duelling in Duel Tournament.\n\"");
-		return;
-	}
-
-	if (zyk_allow_saber_command.integer > 1 && ent->client->sess.amrpgmode == 2 && ent->client->pers.guardian_mode > 0)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Cannot use this command in boss battles.\n\"" );
 		return;
 	}
 
@@ -13784,12 +13289,6 @@ void Cmd_RpgLmsMode_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.guardian_mode > 0)
-	{
-		trap->SendServerCommand(ent->s.number, "print \"Cannot play RPG LMS while in boss battles\n\"");
-		return;
-	}
-
 	if (ent->client->pers.player_statuses & (1 << 26))
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Cannot join RPG LMS while being in nofight mode\n\"");
@@ -13908,153 +13407,6 @@ void Cmd_Tutorial_f(gentity_t *ent) {
 	else
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Tutorial file does not exist\n\"");
-	}
-}
-
-/*
-==================
-Cmd_QuestSkip_f
-==================
-*/
-void Cmd_QuestSkip_f(gentity_t *ent) {
-	if (ent->client->pers.can_play_quest == 1)
-	{
-		if (ent->client->pers.universe_quest_progress == 1 && ent->client->pers.universe_quest_messages > 4)
-		{
-			ent->client->pers.universe_quest_messages = 35;
-			ent->client->pers.universe_quest_timer = level.time;
-		}
-		else if (ent->client->pers.universe_quest_progress == 3 && ent->client->pers.universe_quest_messages > 0)
-		{
-			ent->client->pers.universe_quest_messages = 16;
-			ent->client->pers.universe_quest_timer = level.time;
-		}
-		else if (ent->client->pers.universe_quest_progress == 4 && ent->client->pers.universe_quest_messages > 5)
-		{
-			ent->client->pers.universe_quest_messages = 18;
-			ent->client->pers.universe_quest_timer = level.time;
-		}
-		else if (ent->client->pers.universe_quest_progress == 5 && number_of_amulets(ent) == 3 && ent->client->pers.universe_quest_messages > 205)
-		{
-			ent->client->pers.universe_quest_messages = 223;
-			ent->client->pers.universe_quest_timer = level.time;
-		}
-		else if (ent->client->pers.universe_quest_progress == 8 && ent->client->pers.universe_quest_messages > 1)
-		{
-			ent->client->pers.universe_quest_messages = 20;
-			ent->client->pers.universe_quest_timer = level.time;
-		}
-		else if (ent->client->pers.universe_quest_progress == 10 && ent->client->pers.universe_quest_messages > 1)
-		{
-			ent->client->pers.universe_quest_messages = 18;
-			ent->client->pers.universe_quest_timer = level.time;
-		}
-		else if (ent->client->pers.universe_quest_progress == 12 && ent->client->pers.universe_quest_messages > 1)
-		{
-			ent->client->pers.universe_quest_messages = 24;
-			ent->client->pers.universe_quest_timer = level.time;
-		}
-		else if (ent->client->pers.universe_quest_progress == 13 && ent->client->pers.universe_quest_messages > 1)
-		{
-			ent->client->pers.universe_quest_messages = 27;
-			ent->client->pers.universe_quest_timer = level.time;
-		}
-		else if (ent->client->pers.universe_quest_progress == 15)
-		{
-			if (ent->client->pers.universe_quest_counter & (1 << 0) && ent->client->pers.universe_quest_messages >= 1)
-			{ // zyk: Sages Sequel
-				ent->client->pers.universe_quest_messages = 30;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 1) && ent->client->pers.universe_quest_messages >= 1)
-			{ // zyk: Guardians Sequel
-				ent->client->pers.universe_quest_messages = 19;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 2) && ent->client->pers.universe_quest_messages >= 24)
-			{ // zyk: Thor Sequel
-				ent->client->pers.universe_quest_messages = 34;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 3) && ent->client->pers.universe_quest_messages >= 1)
-			{ // zyk: Time Sequel
-				ent->client->pers.universe_quest_messages = 35;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-		}
-		else if (ent->client->pers.universe_quest_progress == 17)
-		{
-			if (ent->client->pers.universe_quest_counter & (1 << 0) && ent->client->pers.universe_quest_messages >= 1)
-			{ // zyk: Sages Sequel
-				ent->client->pers.universe_quest_messages = 28;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 1) && ent->client->pers.universe_quest_messages >= 1)
-			{ // zyk: Guardians Sequel
-				ent->client->pers.universe_quest_messages = 9;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 2) && ent->client->pers.universe_quest_messages >= 1)
-			{ // zyk: Thor Sequel
-				ent->client->pers.universe_quest_messages = 15;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 3) && ent->client->pers.universe_quest_messages >= 14)
-			{ // zyk: Time Sequel
-				ent->client->pers.universe_quest_messages = 21;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-		}
-		else if (ent->client->pers.universe_quest_progress == 19)
-		{
-			if (ent->client->pers.universe_quest_counter & (1 << 0) && ent->client->pers.universe_quest_messages >= 10)
-			{ // zyk: Sages Sequel
-				ent->client->pers.universe_quest_messages = 26;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 1) && ent->client->pers.universe_quest_messages >= 1)
-			{ // zyk: Guardians Sequel
-				ent->client->pers.universe_quest_messages = 8;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 2) && ent->client->pers.universe_quest_messages >= 1)
-			{ // zyk: Thor Sequel
-				ent->client->pers.universe_quest_messages = 13;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 3) && ent->client->pers.universe_quest_messages >= 53)
-			{ // zyk: Time Sequel
-				ent->client->pers.universe_quest_messages = 64;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-		}
-		else if (ent->client->pers.universe_quest_progress == 21)
-		{
-			if (ent->client->pers.universe_quest_counter & (1 << 0) && ent->client->pers.universe_quest_messages >= 10)
-			{ // zyk: Sages Sequel
-				ent->client->pers.universe_quest_messages = 30;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 1) && ent->client->pers.universe_quest_messages >= 1)
-			{ // zyk: Guardians Sequel
-				ent->client->pers.universe_quest_messages = 12;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 2) && ent->client->pers.universe_quest_messages >= 1)
-			{ // zyk: Thor Sequel
-				ent->client->pers.universe_quest_messages = 10;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-			else if (ent->client->pers.universe_quest_counter & (1 << 3) && ent->client->pers.universe_quest_messages >= 53)
-			{ // zyk: Time Sequel
-				ent->client->pers.universe_quest_messages = 70;
-				ent->client->pers.universe_quest_timer = level.time;
-			}
-		}
-	}
-	else
-	{
-		trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7Must be in a quest to use this command\"");
 	}
 }
 
@@ -14504,6 +13856,7 @@ void zyk_set_quest_npc_abilities(gentity_t *zyk_npc)
 
 	// zyk: setting the timers
 	zyk_npc->client->pers.quest_power_usage_timer = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcfirsttimer%d", level.zyk_custom_quest_counter)));
+	zyk_npc->client->pers.unique_skill_npc_timer_amount = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcsecondtimer%d", level.zyk_custom_quest_counter)));
 
 	// zyk: setting default values of these timers
 	if (zyk_npc->client->pers.quest_power_usage_timer <= 0)
@@ -15181,7 +14534,6 @@ command_t commands[] = {
 	{ "paralyze",			Cmd_Paralyze_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "playermode",			Cmd_PlayerMode_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "players",			Cmd_Players_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
-	{ "questskip",			Cmd_QuestSkip_f,			CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "racemode",			Cmd_RaceMode_f,				CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "remap",				Cmd_Remap_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "remapdeletefile",	Cmd_RemapDeleteFile_f,		CMD_LOGGEDIN|CMD_NOINTERMISSION },

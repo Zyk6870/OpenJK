@@ -514,11 +514,6 @@ void TossClientWeapon(gentity_t *self, vec3_t direction, float speed)
 		return;
 	}
 
-	if (self && self->client && self->NPC && self->client->pers.guardian_invoked_by_id != -1)
-	{ // zyk: guardians cant lose their guns
-		return;
-	}
-
 	// find the item type for this weapon
 	item = BG_FindItemForWeapon( weapon );
 
@@ -672,13 +667,6 @@ void TossClientItems( gentity_t *self ) {
 				drop->count = ( self->client->ps.powerups[ i ] - level.time ) / 1000;
 				if ( drop->count < 1 ) {
 					drop->count = 1;
-				}
-
-				// zyk: artifact holder npc died. Set a targetname in this artifact
-				if (self->NPC && self->client->pers.universe_quest_artifact_holder_id != -1 && 
-					drop->item->giType == IT_POWERUP && drop->item->giTag == PW_FORCE_BOON)
-				{
-					drop->targetname = "zyk_quest_artifact";
 				}
 
 				angle += 45;
@@ -2140,7 +2128,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	qboolean	wasJediMaster = qfalse;
 	int			sPMType = 0;
 	char		buf[512] = {0};
-	gentity_t	*quest_player = NULL;
 
 	if ( self->client->ps.pm_type == PM_DEAD ) {
 		return;
@@ -2164,30 +2151,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	self->client->pers.player_statuses &= ~(1 << 22);
 	self->client->pers.player_statuses &= ~(1 << 23);
 
-	// zyk: resetting boss battle music to default one if needed
-	if (self->client->pers.guardian_invoked_by_id != -1 && self->client->pers.guardian_mode != 15 && self->client->pers.guardian_mode != 17 && self->client->pers.guardian_mode != 18)
-	{
-		level.boss_battle_music_reset_timer = level.time + 1000;
-	}
-	else if (self->client->sess.amrpgmode == 2 && self->client->pers.guardian_mode > 0 && self->client->pers.can_play_quest == 1)
-	{ // zyk: quest player died. Reset boss battle music and guardian_mode of his allies
-		int ally_it = 0;
-
-		level.boss_battle_music_reset_timer = level.time + 1000;
-
-		for (ally_it = 0; ally_it < level.maxclients; ally_it++)
-		{
-			gentity_t *this_ent = &g_entities[ally_it];
-
-			if (zyk_is_ally(self,this_ent) == qtrue)
-			{
-				this_ent->client->pers.guardian_mode = 0;
-			}
-		}
-	}
-
 	if (self->client->pers.player_statuses & (1 << 28))
-	{// zyk: custom quest npc defeated
+	{ // zyk: custom quest npc defeated
 		if (self->client->playerTeam == NPCTEAM_PLAYER)
 		{
 			level.zyk_quest_ally_npc_count--;
@@ -2307,169 +2272,9 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		self->client->pers.mind_controlled1_id = -1;
 		controlled_ent->client->pers.being_mind_controlled = -1;
 	}
-
-	if (self->client->pers.guardian_invoked_by_id != -1)
-	{ // zyk: rpg mode boss. Getting the quest player
-		quest_player = &g_entities[self->client->pers.guardian_invoked_by_id];
-
-		if (quest_player && quest_player->client && quest_player->client->pers.guardian_mode == 0)
-		{ // zyk: player died before. Do not give anything to quest_player
-			quest_player = NULL;
-		}
-	}
-
-	if (self->client->pers.universe_quest_messages == -10000 && self->NPC)
-	{ // zyk: Ymir or Thor defeated
-		int j = 0;
-		qboolean still_has_boss = qfalse;
-		quest_player = &g_entities[self->client->pers.universe_quest_objective_control];
-
-		if (Q_stricmp(self->NPC_type, "guardian_of_universe") == 0)
-		{ // zyk: failed mission
-			zyk_text_message(quest_player, "universe/mission_16_guardians/mission_16_guardians_fail", qtrue, qfalse, quest_player->client->pers.netname);
-		}
-		else
-		{
-			for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
-			{
-				gentity_t *old_boss = &g_entities[j];
-
-				if (old_boss && old_boss->NPC && old_boss->health > 0 && old_boss->client && old_boss->client->pers.universe_quest_messages == -10000 && 
-					Q_stricmp(old_boss->NPC_type, "guardian_of_universe") != 0)
-				{
-					if (Q_stricmp(old_boss->NPC_type, "ymir_boss") == 0)
-					{
-						zyk_text_message(quest_player, "universe/mission_16_guardians/mission_16_guardians_ymir", qtrue, qfalse);
-					}
-					else
-					{
-						zyk_text_message(quest_player, "universe/mission_16_guardians/mission_16_guardians_thor", qtrue, qfalse);
-					}
-
-					still_has_boss = qtrue;
-				}
-			}
-
-			if (still_has_boss == qfalse)
-			{
-				for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
-				{
-					gentity_t *old_npc = &g_entities[j];
-
-					if (old_npc && old_npc->NPC && old_npc->health > 0 && old_npc->client && Q_stricmp(old_npc->NPC_type, "quest_mage") == 0 && old_npc->die)
-					{ // zyk: killing the remaining mages
-						old_npc->health = 0;
-						old_npc->client->ps.stats[STAT_HEALTH] = 0;
-						old_npc->die(old_npc, old_npc, old_npc, 100, MOD_UNKNOWN);
-					}
-				}
-
-				quest_player->client->pers.universe_quest_messages = 6;
-				quest_player->client->pers.universe_quest_timer = level.time + 3000;
-			}
-		}
-	}
-	else if (self->client->pers.universe_quest_artifact_holder_id != -1 && self->NPC)
-	{ // zyk: artifact holder of Universe Quest, set the player universe_quest_artifact_holder_id to -2 so he can get the artifact when he touches the force boon item
-		if (Q_stricmp( self->NPC_type, "quest_ragnos" ) == 0) // zyk: quest_ragnos npc has a different way to get the artifact
-		{
-			gentity_t *player_ent = &g_entities[self->client->pers.universe_quest_artifact_holder_id];
-
-			zyk_text_message(player_ent, "universe/mission_2/mission_2_artifact_guardian_fail", qtrue, qfalse);
-			player_ent->client->pers.universe_quest_artifact_holder_id = -1;
-		}
-	}
-	else if (quest_player && quest_player->client->pers.guardian_mode == 12)
-	{ // zyk: defeated the Master of Evil
-		quest_player->client->pers.universe_quest_messages = 12;
-		quest_player->client->pers.universe_quest_timer = level.time + 2000;
-		quest_player->client->pers.guardian_mode = 0;
-
-		zyk_text_message(quest_player, "universe/mission_6/mission_6_boss_defeated", qtrue, qfalse);
-	}
-	else if (quest_player && quest_player->client->pers.guardian_mode == 13)
-	{ // zyk: defeated the Guardian of Universe
-		quest_player->client->pers.universe_quest_messages = 5;
-		quest_player->client->pers.universe_quest_timer = level.time + 2000;
-		quest_player->client->pers.guardian_mode = 0;
-	}
-	else if (quest_player && quest_player->client->pers.guardian_mode == 14)
-	{ // zyk: defeated the Guardian of Chaos
-		quest_player->client->pers.universe_quest_messages = 20;
-		quest_player->client->pers.universe_quest_timer = level.time + 8000;
-		quest_player->client->pers.guardian_mode = 0;
-		G_Sound(self, CHAN_VOICE, G_SoundIndex("sound/chars/ragnos/misc/death3.mp3"));
-	}
-	else if (quest_player && quest_player->client->pers.guardian_mode == 15)
-	{ // zyk: defeated either Ymir or Thor
-		int j = 0;
-		qboolean still_has_boss = qfalse;
-
-		G_Sound(self, CHAN_VOICE, G_SoundIndex("sound/chars/ragnos/misc/death3.mp3"));
-
-		for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
-		{
-			gentity_t *old_boss = &g_entities[j];
-
-			if (old_boss && old_boss->NPC && old_boss->health > 0 && old_boss->client && old_boss->client->pers.guardian_mode == 15)
-			{
-				if (Q_stricmp(old_boss->NPC_type, "ymir_boss") == 0)
-				{
-					zyk_text_message(quest_player, "universe/mission_20_sages/mission_20_sages_thor_defeated", qtrue, qfalse);
-				}
-				else
-				{
-					zyk_text_message(quest_player, "universe/mission_20_sages/mission_20_sages_ymir_defeated", qtrue, qfalse);
-				}
-
-				// zyk: wrath of the remaining boss makes him stronger
-				old_boss->spawnflags |= 131072;
-				old_boss->client->pers.quest_power_status |= (1 << 13);
-
-				still_has_boss = qtrue;
-			}
-		}
-
-		if (still_has_boss == qfalse)
-		{
-			level.boss_battle_music_reset_timer = level.time + 1000;
-
-			quest_player->client->pers.universe_quest_messages = 7;
-			quest_player->client->pers.universe_quest_timer = level.time + 5000;
-			quest_player->client->pers.guardian_mode = 0;
-		}
-	}
-	else if (quest_player && quest_player->client->pers.guardian_mode == 19)
-	{ // zyk: defeated Ymir
-		quest_player->client->pers.universe_quest_messages = 3;
-		quest_player->client->pers.universe_quest_timer = level.time + 2000;
-		quest_player->client->pers.guardian_mode = 0;
-		G_Sound(self, CHAN_VOICE, G_SoundIndex("sound/chars/ragnos/misc/death3.mp3"));
-	}
-	else if (quest_player && quest_player->client->pers.guardian_mode == 20)
-	{ // zyk: defeated the Guardian of Time
-		quest_player->client->pers.universe_quest_messages = 3;
-		quest_player->client->pers.universe_quest_timer = level.time + 3000;
-		quest_player->client->pers.guardian_mode = 0;
-
-		zyk_text_message(quest_player, "universe/mission_20_thor/mission_20_thor_boss_defeated", qtrue, qfalse);
-	}
-	else if (quest_player && quest_player->client->pers.guardian_mode == 21)
-	{ // zyk: defeated the Soul of Sorrow
-		quest_player->client->pers.universe_quest_messages = 54;
-		quest_player->client->pers.universe_quest_timer = level.time + 3000;
-		quest_player->client->pers.guardian_mode = 0;
-
-		zyk_text_message(quest_player, "universe/mission_20_time/mission_20_time_boss_defeated", qtrue, qfalse);
-	}
 	
 	if (self->client->sess.amrpgmode == 2)
 	{ 
-		if (self->client->pers.guardian_mode > 0)
-		{ // zyk: player lost to a guardian
-			self->client->pers.guardian_mode = 0;
-		}
-
 		// zyk: removing the armors from the player
 		self->client->pers.player_statuses &= ~(1 << 8);
 		self->client->pers.player_statuses &= ~(1 << 9);
@@ -2867,12 +2672,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			{ // zyk: force users give more score
 				attacker->client->pers.score_modifier += 1;
 				attacker->client->pers.credits_modifier += 10;
-			}
-
-			if (self->client->pers.guardian_mode > 0)
-			{
-				attacker->client->pers.score_modifier += 10;
-				attacker->client->pers.credits_modifier += 500;
 			}
 
 			// zyk: also give bonus score and credits based on npc health
@@ -5119,49 +4918,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		damage = (int)ceil(damage*zyk_scale_siege_damage.value);
 	}
 
-	if (attacker && attacker->client && attacker->NPC && attacker->client->pers.guardian_invoked_by_id != -1)
-	{ // zyk: attacker is a RPG boss. Increase damage based in the number of allies of the quest player
-		gentity_t *quest_player_ent = &g_entities[attacker->client->pers.guardian_invoked_by_id];
-
-		if (quest_player_ent && quest_player_ent->client && quest_player_ent->client->sess.amrpgmode == 2 && 
-			quest_player_ent->client->pers.universe_quest_counter & (1 << 29))
-		{ // zyk: Challenge Mode increases more damage
-			damage += ((int)ceil(damage * 0.08 * (1 + zyk_number_of_allies(quest_player_ent, qtrue))));
-		}
-		else
-		{
-			damage += ((int)ceil(damage * 0.04 * zyk_number_of_allies(quest_player_ent, qtrue)));
-		}
-	}
-
-	if (targ && targ->client && targ->NPC && targ->client->pers.guardian_invoked_by_id != -1)
-	{ // zyk: targ is a RPG mode boss
-		// zyk: chaos power, map entities and telefrag cannot hit the boss
-		if (!attacker || !attacker->client || mod == MOD_TELEFRAG)
-			return;
-
-		if (targ->client->pers.guardian_invoked_by_id != (attacker-g_entities))
-		{			
-			if (attacker->client->sess.amrpgmode != 2 || attacker->client->pers.guardian_mode == 0)
-				return;
-		}
-
-		// zyk: guardians remove cloak of the player when hit by him
-		if (attacker->client->ps.powerups[PW_CLOAKED])
-		{
-			Jedi_Decloak(attacker);
-			attacker->client->cloakToggleTime = level.time + Q_irand( 5000, 10000 );
-		}
-	}
-
-	if (targ && targ->client && targ->NPC)
-	{
-		if (targ->client->pers.universe_quest_messages == -2000)
-		{ // zyk: special npcs spawned in the Universe Quest that cannot be killed
-			return;
-		}
-	}
-
 	if (attacker && attacker->client && attacker->client->pers.quest_power_status & (1 << 3))
 	{ // zyk: Flaming Rage increases damage
 		damage = (int)ceil(damage * 1.08);
@@ -5205,12 +4961,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		attacker->client->ps.velocity[2] += 150;
 		attacker->client->ps.forceDodgeAnim = 0;
 		attacker->client->ps.quickerGetup = qtrue;
-	}
-
-	if (targ && targ->client && targ->client->sess.amrpgmode == 2 && targ->client->pers.can_play_quest == 1 && 
-		targ->client->pers.universe_quest_counter & (1 << 29) && targ->client->pers.guardian_mode == 0)
-	{ // zyk: Challenge Mode increases damage taken from anything
-		damage = (int)ceil(damage*1.15);
 	}
 
 	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 21))
@@ -5558,16 +5308,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			new_knockback -= knockback * 0.15;
 
 		knockback = new_knockback;
-	}
-
-	// zyk: these npcs will not have knockback
-	if (targ && targ->client && targ->NPC && (targ->client->pers.guardian_mode == 2 || (targ->client->pers.guardian_mode == 17 && Q_stricmp(targ->NPC_type, "guardian_boss_2") == 0) ||
-		targ->client->pers.guardian_mode == 3 || (targ->client->pers.guardian_mode == 17 && Q_stricmp(targ->NPC_type, "guardian_boss_3") == 0) ||
-		targ->client->pers.guardian_mode == 7 || (targ->client->pers.guardian_mode == 17 && Q_stricmp(targ->NPC_type, "guardian_boss_7") == 0) ||
-		targ->client->pers.guardian_mode == 11 || (targ->client->pers.guardian_mode == 17 && Q_stricmp(targ->NPC_type, "guardian_boss_8") == 0) ||
-		targ->client->pers.guardian_mode == 21))
-	{
-		knockback = 0;
 	}
 
 	// figure momentum add, even if the damage won't be taken
@@ -6147,9 +5887,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 							client->NPC_class == CLASS_ATST )
 				{
 					// DEMP2 does way more damage to these guys.
-					// zyk: Guardian of Wind takes less DEMP2 damage
-					if (!(client->pers.guardian_mode == 7 || (client->pers.guardian_mode == 17 && Q_stricmp(targ->NPC_type, "guardian_boss_7") == 0)))
-						take *= 4; // zyk: changed from 5 to 4
+					take *= 4; // zyk: changed from 5 to 4
 				}
 				else
 				{
@@ -6679,8 +6417,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					// zyk: if the power user and the target are allies (player or npc), or the target is the quest power user himself, heal him
 					if (quest_power_user && quest_power_user->client && ent && ent->client && ent->health > 0 && 
 						(level.special_power_effects[attacker->s.number] == ent->s.number || OnSameTeam(quest_power_user, ent) == qtrue || 
-						npcs_on_same_team(quest_power_user, ent) == qtrue || zyk_is_ally(quest_power_user,ent) == qtrue) && 
-						quest_power_user->client->pers.guardian_mode == ent->client->pers.guardian_mode)
+						npcs_on_same_team(quest_power_user, ent) == qtrue || zyk_is_ally(quest_power_user,ent) == qtrue))
 					{
 						if (quest_power_user->client->sess.amrpgmode == 2 && quest_power_user->client->pers.rpg_class == 8 && 
 							quest_power_user->client->pers.unique_skill_duration > level.time &&
@@ -6774,14 +6511,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 					if (zyk_is_ally(quest_power_user, ent) == qtrue)
 					{
-						continue;
-					}
-
-					if (quest_power_user && quest_power_user->client && ent && ent->client && 
-						quest_power_user->client->pers.guardian_mode != ent->client->pers.guardian_mode &&
-						!(quest_power_user->NPC && quest_power_user->client->pers.guardian_mode == 0) && 
-						!(!quest_power_user->NPC && quest_power_user->client->pers.guardian_mode > 0 && ent->NPC))
-					{ // zyk: validating boss battles
 						continue;
 					}
 

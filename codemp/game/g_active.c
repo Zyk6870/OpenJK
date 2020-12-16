@@ -1555,15 +1555,6 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			ent->client->idleTime = level.time;
 		}
 
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.can_play_quest == 1 && 
-			(actionPressed || ucmd->forwardmove || ucmd->rightmove || ucmd->upmove ||
-			!G_StandingAnim(ent->client->ps.legsAnim) || (ent->client->ps.weaponstate != WEAPON_READY && ent->client->ps.weapon != WP_SABER) || 
-			(ent->client->ps.weaponTime > 0 && ent->client->ps.weapon == WP_SABER) || 
-			 ent->client->ps.weaponstate == WEAPON_CHARGING || ent->client->ps.weaponstate == WEAPON_CHARGING_ALT))
-		{ // zyk: in these situations, player in rpg is no longer afk
-			ent->client->pers.quest_afk_timer = level.time + zyk_quest_afk_timer.integer;
-		}
-
 		if (brokeOut &&
 			(ent->client->ps.weaponstate == WEAPON_CHARGING || ent->client->ps.weaponstate == WEAPON_CHARGING_ALT))
 		{
@@ -2172,7 +2163,6 @@ extern void TossClientWeapon(gentity_t *self, vec3_t direction, float speed);
 extern qboolean saberKnockOutOfHand(gentity_t *saberent, gentity_t *saberOwner, vec3_t velocity);
 extern qboolean zyk_can_use_unique(gentity_t *ent);
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
-extern qboolean zyk_can_hit_boss_battle_target(gentity_t *attacker, gentity_t *target);
 void ClientThink_real( gentity_t *ent ) {
 	gclient_t	*client;
 	pmove_t		pmove;
@@ -3763,7 +3753,7 @@ void ClientThink_real( gentity_t *ent ) {
 												found = 1;
 											}
 
-											if (found == 0 && ent->client->pers.guardian_mode == player_ent->client->pers.guardian_mode)
+											if (found == 0)
 											{
 												if (!player_ent->NPC)
 												{ //disable jetpack temporarily
@@ -3858,8 +3848,7 @@ void ClientThink_real( gentity_t *ent ) {
 												found = 1;
 											}
 
-											if (found == 0 && ent->client->pers.guardian_mode == this_ent->client->pers.guardian_mode && 
-												this_ent->client->pers.custom_quest_boss_npc == 0)
+											if (found == 0 && this_ent->client->pers.custom_quest_boss_npc == 0)
 											{
 												if (this_ent->client->ps.weapon == WP_SABER)
 												{
@@ -4290,7 +4279,7 @@ void ClientThink_real( gentity_t *ent ) {
 		if (faceKicked && faceKicked->client && (!OnSameTeam(ent, faceKicked) || g_friendlyFire.integer) &&
 			(!faceKicked->client->ps.duelInProgress || faceKicked->client->ps.duelIndex == ent->s.number) &&
 			(!ent->client->ps.duelInProgress || ent->client->ps.duelIndex == faceKicked->s.number) &&
-			zyk_can_hit_target(ent, faceKicked) && zyk_can_hit_boss_battle_target(ent, faceKicked))
+			zyk_can_hit_target(ent, faceKicked))
 		{ // zyk: also validates if we can hit this target
 			if ( faceKicked && faceKicked->client && faceKicked->health && faceKicked->takedamage )
 			{//push them away and do pain

@@ -229,12 +229,6 @@ void NPC_ChoosePainAnimation( gentity_t *self, gentity_t *other, vec3_t point, i
 		return;
 	}
 
-	// zyk: guardians resist attack, they just take the damage but will not have pain anim
-	if (self->client && self->client->pers.guardian_mode > 0)
-	{
-		return;
-	}
-
 	// zyk: Custom Quest boss will not have pain anim
 	if (self->client && self->client->pers.custom_quest_boss_npc > 0)
 	{

@@ -806,13 +806,10 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			{
 				if (other->client->sess.amrpgmode < 2 || other->client->pers.rpg_class != 5)
 				{ // zyk: Stealth Attacker cloak does not decloak by DEMP2 attack
-					if (!ent->parent || !ent->parent->client || ent->parent->client->pers.guardian_mode == other->client->pers.guardian_mode)
-					{
-						Jedi_Decloak( other );
-						// zyk: now always temp disable
-						//temp disable
-						other->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
-					}
+					Jedi_Decloak( other );
+					// zyk: now always temp disable
+					//temp disable
+					other->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
 				}
 			}
 		}

@@ -118,11 +118,6 @@ qboolean G_CanBeEnemy( gentity_t *self, gentity_t *enemy )
 		return qfalse;
 	}
 
-	if (self->client->pers.guardian_mode == 0 && enemy->client->pers.guardian_mode > 0)
-	{ // zyk: cannot grab quest player or bosses if self is not in quest
-		return qfalse;
-	}
-
 	if (level.gametype < GT_TEAM)
 		return qtrue;
 
@@ -6721,10 +6716,6 @@ qboolean saberKnockOutOfHand(gentity_t *saberent, gentity_t *saberOwner, vec3_t 
 	if (saberOwner->client->sess.amrpgmode == 2 && saberOwner->client->pers.rpg_class == 9 && saberOwner->client->pers.secrets_found & (1 << 19))
 		return qfalse;
 
-	// zyk: guardians cannot lose saber
-	if (saberOwner->NPC && saberOwner->client->pers.guardian_invoked_by_id != -1)
-		return qfalse;
-
 	saberOwner->client->ps.saberInFlight = qtrue;
 	saberOwner->client->ps.saberEntityState = 1;
 
@@ -7609,8 +7600,7 @@ static void G_TossTheMofo(gentity_t *ent, vec3_t tossDir, float tossStr)
 	ent->client->ps.velocity[2] = 200;
 	if (ent->health > 0 && ent->client->ps.forceHandExtend != HANDEXTEND_KNOCKDOWN &&
 		BG_KnockDownable(&ent->client->ps) &&
-		G_KickDownable(ent) && 
-		!(ent->client->pers.guardian_mode == 11 || (ent->client->pers.guardian_mode == 17 && Q_stricmp(ent->NPC_type, "guardian_boss_8") == 0))) // zyk: added Guardian of Resistance condition. This guardian cant be knocked down by melee kick
+		G_KickDownable(ent))
 	{ //if they are alive, knock them down I suppose
 		ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
 		ent->client->ps.forceHandExtendTime = level.time + 700;

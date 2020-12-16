@@ -1449,8 +1449,7 @@ void DEMP2_AltRadiusDamage( gentity_t *ent )
 				}
 				if ( gent->client->ps.powerups[PW_CLOAKED] )
 				{//disable cloak temporarily
-					if (myOwner->client->pers.guardian_mode == gent->client->pers.guardian_mode && 
-						(gent->client->sess.amrpgmode < 2 || gent->client->pers.rpg_class != 5))
+					if (gent->client->sess.amrpgmode < 2 || gent->client->pers.rpg_class != 5)
 					{ // zyk: Stealth Attacker cloak does not decloak by DEMP2 attack. Also, non-quest players cant decloak quest players in boss battle and vice-versa
 						Jedi_Decloak( gent );
 						gent->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
@@ -1723,9 +1722,8 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 				}
 				if ( gent->client->ps.powerups[PW_CLOAKED] )
 				{//disable cloak temporarily
-					if (myOwner->client->pers.guardian_mode == gent->client->pers.guardian_mode && 
-						(gent->client->sess.amrpgmode < 2 || gent->client->pers.rpg_class != 5))
-					{ // zyk: Stealth Attacker cloak does not decloak by DEMP2 attack. Also, non-quest players cant decloak quest players in boss battle and vice-versa
+					if (gent->client->sess.amrpgmode < 2 || gent->client->pers.rpg_class != 5)
+					{ // zyk: Stealth Attacker cloak does not decloak by DEMP2 attack
 						Jedi_Decloak( gent );
 						gent->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
 					}
@@ -3679,12 +3677,6 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 						ent->client->accuracy_hits++;
 					}
 
-					if (traceEnt->client && ent->client->pers.guardian_mode != traceEnt->client->pers.guardian_mode &&
-						!(ent->client->pers.guardian_mode > 0 && traceEnt->NPC && traceEnt->client->pers.guardian_mode == 0))
-					{ // zyk: non quest player cant hit quest players in boss battles and vice-versa
-						break;
-					}
-
 					noKnockBack = (traceEnt->flags&FL_NO_KNOCKBACK);//will be set if they die, I want to know if it was on *before* they died
 					if ( traceEnt && traceEnt->client && traceEnt->client->NPC_class == CLASS_GALAKMECH )
 					{//hehe
@@ -3994,19 +3986,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 			{
 				tr_ent->client->ps.electrifyTime = level.time + 700;
 
-				if (ent->client->pers.guardian_mode != tr_ent->client->pers.guardian_mode)
-				{ // zyk: non quest players cant hit quest players and vice-versa
-					if (!((ent->client->pers.guardian_mode == 12 || ent->client->pers.guardian_mode == 13) && tr_ent->NPC && 
-							(Q_stricmp(tr_ent->NPC_type, "guardian_of_universe") || Q_stricmp(tr_ent->NPC_type, "quest_reborn") || 
-							Q_stricmp(tr_ent->NPC_type, "quest_reborn_blue") || Q_stricmp(tr_ent->NPC_type, "quest_reborn_red") || 
-							Q_stricmp(tr_ent->NPC_type, "quest_reborn_boss")))
-						)
-					{
-						return;
-					}
-				}
-
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 15) && (tr_ent->client->sess.amrpgmode < 2 || tr_ent->client->pers.rpg_class != 5) && tr_ent->client->ps.powerups[PW_CLOAKED])
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 15) && 
+					(tr_ent->client->sess.amrpgmode < 2 || tr_ent->client->pers.rpg_class != 5) && tr_ent->client->ps.powerups[PW_CLOAKED])
 				{ // zyk: stun baton upgrade decloaks players except Stealth Attacker
 					Jedi_Decloak(tr_ent);
 				}
@@ -4016,12 +3997,6 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 				{
 					// zyk: allies cant be hit by it
 					if (zyk_is_ally(ent,tr_ent) == qtrue)
-					{
-						return;
-					}
-
-					// zyk: guardians cant be hit by it
-					if (tr_ent->client->pers.guardian_invoked_by_id != -1)
 					{
 						return;
 					}
@@ -4289,12 +4264,6 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 							}
 
 							noKnockBack = (traceEnt->flags&FL_NO_KNOCKBACK);//will be set if they die, I want to know if it was on *before* they died
-
-							if (traceEnt->client && ent->client->pers.guardian_mode != traceEnt->client->pers.guardian_mode &&
-								!(ent->client->pers.guardian_mode > 0 && traceEnt->NPC && traceEnt->client->pers.guardian_mode == 0))
-							{ // zyk: non quest player cant hit quest players in boss battles and vice-versa
-								break;
-							}
 
 							G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, MOD_MELEE );
 

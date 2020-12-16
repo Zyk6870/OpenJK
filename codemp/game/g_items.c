@@ -703,12 +703,6 @@ static qboolean pas_find_enemies( gentity_t *self )
 				continue;
 			}
 
-			if (self->parent && self->parent->client && self->parent->client->pers.guardian_mode != target->client->pers.guardian_mode && 
-				!target->NPC)
-			{ // zyk: sentry of players in boss battle can only hit the boss and his npcs, and players outside boss battle cannot hit players in boss battle
-				continue;
-			}
-
 			VectorCopy( target->client->ps.origin, org );
 		}
 		else
@@ -2646,7 +2640,6 @@ Touch_Item
 ===============
 */
 extern void save_account(gentity_t *ent, qboolean save_char_file);
-extern void universe_quest_artifacts_checker(gentity_t *ent);
 void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	int			respawn;
 	qboolean	predict;
@@ -2682,49 +2675,9 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	if (other->health < 1)
 		return;		// dead people can't pickup
 
-	if (Q_stricmp(ent->targetname, "zyk_quest_artifact") == 0 && ent->item->giType == IT_POWERUP && ent->item->giTag == PW_FORCE_BOON)
-	{ // zyk: an Universe Quest artifact
-		if (other->client->sess.amrpgmode == 2 && other->client->pers.can_play_quest == 1 && other->client->pers.guardian_mode == 0 &&
-			other->client->pers.universe_quest_artifact_holder_id != -1)
-		{ // zyk: player got the artifact in Universe Quest
-			zyk_text_message(other, "universe/mission_2/mission_2_got_artifact", qtrue, qfalse, other->client->pers.netname);
-			other->client->pers.universe_quest_counter |= (1 << other->client->pers.universe_quest_artifact_holder_id);
-			other->client->pers.universe_quest_artifact_holder_id = -1;
-			save_account(other, qtrue);
-
-			universe_quest_artifacts_checker(other);
-
-			ent->targetname = NULL; // zyk: nullify so in this case the quest system does not free this entity
-		}
-		else
-		{ // zyk: this is not the quest player. Only the quest player can get the artifact
-
-			// zyk: if he is in a guardian battle and tries to get artifact, do not allow it
-			if (other->client->pers.guardian_mode > 0)
-				ent->targetname = NULL;
-
-			return;
-		}
-	}
-
 	// zyk: Some RPG classes cant pickup some items
 	if (other->client->sess.amrpgmode == 2)
 	{
-		if (ent->spawnflags & 131072)
-		{
-			if (other->client->pers.can_play_quest == 1 && other->client->pers.universe_quest_messages < 6)
-			{ // zyk: player got the key to the prison door in first Universe Quest mission
-				other->client->pers.universe_quest_messages = 6;
-
-				zyk_text_message(other, "universe/mission_0/mission_0_key", qtrue, qfalse, other->client->pers.netname);
-
-				ent->think = G_FreeEntity;
-				ent->nextthink = level.time;
-			}
-
-			return;
-		}
-
 		if (ent->spawnflags & 262144)
 		{ // zyk: custom quest item
 			// zyk: remove touch function to avoid getting it again

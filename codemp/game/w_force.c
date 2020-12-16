@@ -571,13 +571,6 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 		return 0;
 	}
 
-	// zyk: players that are not in boss battle cannot hit a boss
-	if (attacker && attacker->client && other && other->client && other->NPC && other->client->pers.guardian_invoked_by_id != -1 &&
-		(attacker->client->sess.amrpgmode != 2 || attacker->client->pers.guardian_mode == 0))
-	{
-		return 0;
-	}
-
 	if (other && other->client && (other->NPC || other->client->sess.amrpgmode == 2) && 
 		(forcePower == FP_PUSH || forcePower == FP_PULL || forcePower == FP_GRIP) && 
 		other->client->pers.quest_power_status & (1 << 11))
@@ -609,11 +602,6 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 		((attacker->client->pers.race_position > 0) || 
 		 (attacker->client->pers.race_position == 0 && other->client->pers.race_position > 0)))
 	{ // zyk: Race Mode. Cannot use force powers on targets waiting for race to start 
-		return 0;
-	}
-
-	if (other && other->client && other->NPC && other->client->pers.universe_quest_messages == -2000)
-	{ // zyk: special quest npcs that cannot be hit by force
 		return 0;
 	}
 
@@ -1366,7 +1354,7 @@ void ForceTeamHeal( gentity_t *self )
 
 		if (ent && ent->client && self != ent && 
 			((!ent->NPC && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR) || 
-			 (ent->client->playerTeam != NPCTEAM_ENEMY && ent->client->pers.guardian_invoked_by_id == -1 && ent->s.NPC_class != CLASS_VEHICLE)) && 
+			 (ent->client->playerTeam != NPCTEAM_ENEMY && ent->s.NPC_class != CLASS_VEHICLE)) && 
 			 (ent->client->ps.stats[STAT_HEALTH] < ent->client->ps.stats[STAT_MAX_HEALTH] || 
 			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[37] > 0 && 
 			 !ent->NPC && ent->client->ps.stats[STAT_HEALTH] >= ent->client->ps.stats[STAT_MAX_HEALTH] && 
@@ -1649,13 +1637,6 @@ void ForceGrip( gentity_t *self )
 			g_entities[tr.entityNum].client->ps.powerups[PW_YSALAMIRI] < level.time && Q_irand(0,4) < 2)
 		{
 			g_entities[tr.entityNum].client->ps.powerups[PW_YSALAMIRI] = level.time + 1500;
-			return;
-		}
-
-		// zyk: bosses cannot be gripped by players who are not in the boss battle
-		if (g_entities[tr.entityNum].client && g_entities[tr.entityNum].NPC && g_entities[tr.entityNum].client->pers.guardian_invoked_by_id != -1 &&
-			(self->client->sess.amrpgmode != 2 || self->client->pers.guardian_mode == 0))
-		{
 			return;
 		}
 
@@ -2743,15 +2724,6 @@ qboolean ForceTelepathyCheckDirectNPCTarget( gentity_t *self, trace_t *tr, qbool
 
 	traceEnt = &g_entities[tr->entityNum];
 
-	if (traceEnt && traceEnt->client && traceEnt->NPC)
-	{
-		// zyk: cant use Mind trick on guardians of RPG Mode
-		if (traceEnt->client->pers.guardian_invoked_by_id != -1)
-		{
-			return qfalse;
-		}
-	}
-
 	return qtrue; // zyk: now always returns here
 
 	if( traceEnt->NPC
@@ -3013,12 +2985,6 @@ void ForceTelepathy(gentity_t *self)
 
 			tricked_entity = &g_entities[tr.entityNum];
 
-			// zyk: cant use Mind trick on guardians of RPG Mode
-			if (tricked_entity && tricked_entity->client && tricked_entity->client->pers.guardian_invoked_by_id != -1)
-			{
-				return;
-			}
-
 			// zyk: Armored Soldier Upgrade has a chance of setting ysalamiri and resist the force power
 			if (tricked_entity && tricked_entity->client && tricked_entity->client->sess.amrpgmode == 2 && 
 				tricked_entity->client->pers.rpg_class == 3 && tricked_entity->client->pers.secrets_found & (1 << 16) && 
@@ -3121,12 +3087,6 @@ void ForceTelepathy(gentity_t *self)
 			if (ent && ent != self && ent->client)
 			{
 				gotatleastone = qtrue;
-
-				// zyk: cant use Mind trick on guardians of RPG Mode
-				if (ent && ent->client && ent->client->pers.guardian_invoked_by_id != -1)
-				{
-					return;
-				}
 
 				// zyk: Armored Soldier Upgrade has a chance of setting ysalamiri and resist the force power
 				if (ent && ent->client && ent->client->sess.amrpgmode == 2 && 
@@ -3915,11 +3875,6 @@ void ForceThrow( gentity_t *self, qboolean pull )
 							canPullWeapon = qfalse;
 						}
 
-						if (push_list[x]->NPC && push_list[x]->client->pers.guardian_invoked_by_id != -1)
-						{ // zyk: guardians cannot have their weapon pulled from them
-							canPullWeapon = qfalse;
-						}
-
 						if (push_list[x]->NPC && push_list[x]->client->pers.custom_quest_boss_npc > 0)
 						{ // zyk: Custom Quest bosses cannot have their weapon pulled from them
 							canPullWeapon = qfalse;
@@ -3963,13 +3918,10 @@ void ForceThrow( gentity_t *self, qboolean pull )
 							if (push_list[x]->client->sess.amrpgmode != 2 || push_list[x]->client->pers.rpg_class != 3 || 
 								!(push_list[x]->client->pers.secrets_found & (1 << 16)))
 							{
-								if (!(push_list[x]->NPC && push_list[x]->client->pers.guardian_invoked_by_id != -1 && Q_irand(0,4) > 0))
-								{ // zyk: bosses have a small chance of getting knockdown
-									push_list[x]->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-									push_list[x]->client->ps.forceHandExtendTime = level.time + 700;
-									push_list[x]->client->ps.forceDodgeAnim = 0; //this toggles between 1 and 0, when it's 1 we should play the get up anim
-									push_list[x]->client->ps.quickerGetup = qtrue;
-								}
+								push_list[x]->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
+								push_list[x]->client->ps.forceHandExtendTime = level.time + 700;
+								push_list[x]->client->ps.forceDodgeAnim = 0; //this toggles between 1 and 0, when it's 1 we should play the get up anim
+								push_list[x]->client->ps.quickerGetup = qtrue;
 							}
 						}
 						else if (push_list[x]->s.number < MAX_CLIENTS && push_list[x]->client->ps.m_iVehicleNum &&

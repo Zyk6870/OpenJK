@@ -2680,10 +2680,8 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	ent->playerState = &ent->client->ps;
 
 	// zyk: initializing attributes used in RPG mode
-	client->pers.guardian_mode = 0;
 	client->pers.being_mind_controlled = -1;
 	client->pers.mind_controlled1_id = -1;
-	client->pers.guardian_invoked_by_id = -1;
 
 	// zyk: cooldown time between magic powers
 	client->pers.quest_power_usage_timer = 0;
@@ -3166,7 +3164,6 @@ Initializes all non-persistant parts of playerState
 ============
 */
 extern qboolean WP_HasForcePowers( const playerState_t *ps );
-extern void clean_guardians(gentity_t *ent);
 extern void zyk_add_force_powers( gentity_t *ent );
 extern void zyk_add_guns( gentity_t *ent );
 extern void zyk_remove_force_powers( gentity_t *ent );
@@ -3833,9 +3830,6 @@ void ClientSpawn(gentity_t *ent) {
 	G_SetOrigin( ent, spawn_origin );
 	VectorCopy( spawn_origin, client->ps.origin );
 
-	// zyk: initializing universe_quest_objective_control value
-	ent->client->pers.universe_quest_objective_control = -1;
-
 	// zyk: initializing mind control attributes on spawn time
 	ent->client->pers.being_mind_controlled = -1;
 	ent->client->pers.mind_controlled1_id = -1;
@@ -3862,8 +3856,6 @@ void ClientSpawn(gentity_t *ent) {
 	// zyk: if player is logged at spawn, load his skills
 	if (ent->client->sess.amrpgmode == 2)
 	{
-		clean_guardians(ent);
-
 		initialize_rpg_skills(ent);
 	}
 	else if (ent->client->pers.player_statuses & (1 << 12))
@@ -4247,15 +4239,6 @@ void ClientDisconnect( int clientNum ) {
 	// zyk: logout player from account
 	ent->client->sess.amrpgmode = 0;
 
-	// zyk: if this player was playing a quest, find a new one to play quests in this map
-	ent->client->pers.guardian_mode = 0;
-
-	if (ent->client->pers.can_play_quest == 1)
-	{
-		clean_guardians(ent);
-		level.boss_battle_music_reset_timer = level.time + 1000;
-	}
-
 	trap->UnlinkEntity ((sharedEntity_t *)ent);
 	ent->s.modelindex = 0;
 	ent->inuse = qfalse;
@@ -4266,8 +4249,6 @@ void ClientDisconnect( int clientNum ) {
 	ent->r.contents = 0;
 
 	level.read_screen_message[ent->s.number] = qfalse;
-
-	ent->client->pers.universe_quest_objective_control = -1;
 
 	// zyk: if this player is being mind controlled, stops mind control on him
 	if (ent->client->pers.being_mind_controlled != -1)
