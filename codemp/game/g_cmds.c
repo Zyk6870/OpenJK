@@ -2244,54 +2244,6 @@ void Cmd_FollowPrev_f( gentity_t *ent ) {
 }
 
 extern void save_account(gentity_t *ent, qboolean save_char_file);
-qboolean zyk_answer(gentity_t *ent, char *arg1)
-{
-	if (ent->client->sess.amrpgmode == 2)
-	{
-		if (level.quest_map == 10 && ent->client->pers.can_play_quest == 1 && 
-			ent->client->pers.eternity_quest_progress < (NUMBER_OF_ETERNITY_QUEST_OBJECTIVES - 1) && (int) ent->client->ps.origin[0] > -676 && 
-			(int) ent->client->ps.origin[0] < -296 && (int) ent->client->ps.origin[1] > 1283 && (int) ent->client->ps.origin[1] < 1663 && 
-			(int) ent->client->ps.origin[2] > 60 && (int) ent->client->ps.origin[2] < 120)
-		{ // zyk: Eternity Quest
-			char *answers[11] = { "key", "clock", "sword", "sun", "fire", "water", "time", "star", "nature", "love", NULL };
-
-			// zyk: removing color chars which could not allow the correct answer
-			Q_StripColor(arg1);
-
-			if (Q_stricmp(arg1, answers[ent->client->pers.eternity_quest_progress]) == 0)
-			{
-				ent->client->pers.eternity_quest_progress++;
-				save_account(ent, qtrue);
-
-				zyk_text_message(ent, va("eternity/answered_%d", ent->client->pers.eternity_quest_progress - 1), qtrue, qtrue, ent->client->pers.netname);
-				return qtrue;
-			}
-			else
-			{
-				return qfalse;
-			}
-		}
-		else if (level.quest_map == 24 && ent->client->pers.can_play_quest == 1 && 
-				 ent->client->pers.universe_quest_progress == 5 && ent->client->pers.universe_quest_messages == 101)
-		{ // zyk: amulets mission of Universe Quest
-		  // zyk: removing color chars which could not allow the correct answer
-			Q_StripColor(arg1);
-
-			if (Q_stricmp( arg1, "samir" ) == 0)
-			{
-				ent->client->pers.universe_quest_messages = 102;
-			}
-			else
-			{
-				ent->client->pers.universe_quest_messages = 103;
-			}
-
-			return qfalse;
-		}
-	}
-
-	return qfalse;
-}
 
 /*
 ==================
@@ -2383,11 +2335,6 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		// zyk: if player is silenced by an admin, he cannot say anything
 		if (ent->client->pers.player_statuses & (1 << 0))
 			return;
-
-		if (zyk_answer(ent, text) == qtrue)
-		{ // zyk: if it is a riddle answer, do not say it
-			return;
-		}
 
 		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, text );
 		Com_sprintf (name, sizeof(name), "%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
@@ -5289,8 +5236,6 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->pers.guardian_timer = 0;
 		ent->client->pers.guardian_invoked_by_id = -1;
 
-		ent->client->pers.eternity_quest_timer = 0;
-
 		ent->client->pers.universe_quest_artifact_holder_id = -1;
 		ent->client->pers.universe_quest_messages = 0;
 		ent->client->pers.universe_quest_timer = 0;
@@ -5491,7 +5436,6 @@ void add_new_char(gentity_t *ent)
 		ent->client->pers.skill_levels[i] = 0;
 	}
 
-	ent->client->pers.eternity_quest_progress = 0;
 	ent->client->pers.secrets_found = 0;
 	ent->client->pers.universe_quest_progress = 0;
 	ent->client->pers.universe_quest_counter = 0;
@@ -5838,17 +5782,6 @@ void got_all_amulets(gentity_t *ent)
 	}
 }
 
-// zyk: tests how many side quests completed by the player
-int zyk_number_of_completed_quests(gentity_t *ent)
-{
-	int number_of_completed_quests = 0;
-
-	if (ent->client->pers.eternity_quest_progress == NUMBER_OF_ETERNITY_QUEST_OBJECTIVES)
-		number_of_completed_quests++;
-
-	return number_of_completed_quests;
-}
-
 // zyk: tests if the race must be finished
 void try_finishing_race()
 {
@@ -6169,8 +6102,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 			unique_duration = ent->client->pers.unique_skill_duration - level.time;
 		}
 
-		strcpy(content,va("%s%d-%d-%d-%d-%d-%d-",content,ent->client->pers.secrets_found,ent->client->pers.eternity_quest_progress,
-			ent->client->pers.universe_quest_progress,universe_quest_counter_value,quest_player_id,unique_duration));
+		strcpy(content,va("%s%d-%d-%d-%d-%d-", content, ent->client->pers.secrets_found, ent->client->pers.universe_quest_progress, universe_quest_counter_value, quest_player_id, unique_duration));
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-%s-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,zyk_rpg_class(ent),content));
 	}
@@ -6872,31 +6804,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 					}
 
-					trap->SendServerCommand(ent->s.number, va("print \"\n^3RPG Mode Quests\n\n^2/list universe: ^7Universe Quest (Main Quest)\n\n^2/list eternity: ^7Eternity Quest\n\n^3/list bounty: ^7The Bounty Hunter quest\n^3/list custom: ^7lists custom quests\n\n^3Quest Player: ^7%s\n^3Bounty Quest Target: ^7%s^7\n\n\"", quest_player, target_player));
+					trap->SendServerCommand(ent->s.number, va("print \"\n^3RPG Mode Quests\n\n^2/list universe: ^7Universe Quest (Main Quest)\n\n^3/list bounty: ^7The Bounty Hunter quest\n^3/list custom: ^7lists custom quests\n\n^3Quest Player: ^7%s\n^3Bounty Quest Target: ^7%s^7\n\n\"", quest_player, target_player));
 				}
 				else
 					trap->SendServerCommand(ent->s.number, "print \"\n^3RPG Mode Quests\n\n^1Quests are not allowed in this server^7\n\n\"");
-			}
-			else if (Q_stricmp( arg1, "eternity" ) == 0)
-			{
-				char eternity_message[512];
-				strcpy(eternity_message, "");
-
-				if (ent->client->pers.eternity_quest_progress < NUMBER_OF_ETERNITY_QUEST_OBJECTIVES)
-				{
-					if (ent->client->pers.eternity_quest_progress < 10)
-						strcpy(eternity_message, va("^3\n1 - Riddles\n\n^7Find the ^3riddles ^7near the waterfall in ^3yavin2^7. Use chat to answer the riddle.\nAnswered riddles: ^3%d^7.",ent->client->pers.eternity_quest_progress));
-					else if (ent->client->pers.eternity_quest_progress == 10)
-						strcpy(eternity_message, "^3\n2 - Guardian of Eternity\n\n^7Defeat the ^3Guardian of Eternity ^7near the waterfall in ^3yavin2^7.");
-				}
-				else
-				{
-					strcpy(eternity_message, "^7Completed!");
-				}
-
-				strcpy(message, va("\n^3Eternity Quest\n^7%s\n\n", eternity_message));
-
-				trap->SendServerCommand( ent->s.number, va("print \"%s\"", message) );
 			}
 			else if (Q_stricmp( arg1, "universe" ) == 0)
 			{
@@ -6957,10 +6868,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					}
 					else if (ent->client->pers.universe_quest_progress == 14)
 					{
-						if (zyk_number_of_completed_quests(ent) == 3)
-							strcpy(universe_message, "^3\n15. The Fate of the Universe\n\n^7Go to the Sacred Dimension in ^3t2_trip^7 to fight the ^1Guardian of Chaos^7.");
-						else
-							strcpy(universe_message, "^3\nRequirements\n\n^7Complete Light, Dark and Eternity quests.");
+						strcpy(universe_message, "^3\n15. The Fate of the Universe\n\n^7Go to the Sacred Dimension in ^3t2_trip^7 to fight the ^1Guardian of Chaos^7.");
 					}
 					else if (ent->client->pers.universe_quest_progress == 15)
 					{
@@ -8392,7 +8300,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 		ent->client->pers.max_rpg_shield = 0;
 		ent->client->pers.secrets_found = 0;
 
-		ent->client->pers.eternity_quest_progress = 0;
 		ent->client->pers.universe_quest_progress = 0;
 		ent->client->pers.universe_quest_counter = 0;
 
@@ -8422,7 +8329,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 	}
 	else if (Q_stricmp( arg1, "quests") == 0)
 	{
-		ent->client->pers.eternity_quest_progress = 0;
 		ent->client->pers.universe_quest_progress = 0;
 		ent->client->pers.universe_quest_counter = 0;
 

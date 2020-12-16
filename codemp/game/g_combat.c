@@ -2379,21 +2379,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			player_ent->client->pers.universe_quest_artifact_holder_id = -1;
 		}
 	}
-	else if (quest_player && quest_player->client->pers.guardian_mode == 10)
-	{ // zyk: Eternity Quest. Defeated the Guardian of Eternity
-		quest_player->client->pers.guardian_mode = 0;
-		quest_player->client->pers.eternity_quest_progress = NUMBER_OF_ETERNITY_QUEST_OBJECTIVES;
-
-		save_account(quest_player, qtrue);
-
-		if (quest_player->client->pers.magic_power > 0)
-		{
-			quest_player->client->pers.magic_power--;
-			quest_player->client->pers.quest_power_status |= (1 << 16);
-		}
-
-		zyk_text_message(quest_player, "eternity/boss_defeated", qtrue, qfalse);
-	}
 	else if (quest_player && quest_player->client->pers.guardian_mode == 12)
 	{ // zyk: defeated the Master of Evil
 		quest_player->client->pers.universe_quest_messages = 12;

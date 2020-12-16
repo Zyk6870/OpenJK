@@ -572,9 +572,6 @@ typedef enum {
 	MAX_MAGIC_POWERS
 } zyk_magic_t;
 
-// zyk: number of Eternity Quest objectives
-#define NUMBER_OF_ETERNITY_QUEST_OBJECTIVES 11
-
 // zyk: number of Universe Quest objectives
 #define NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES 22
 
@@ -866,9 +863,6 @@ typedef struct clientPersistant_s {
 	// zyk: amount of skills used by the player. After a certain amount of uses, player gets 1 experience point (level up score)
 	int skill_counter;
 
-	// zyk: number of objectives completed in Eternity Quest
-	int eternity_quest_progress;
-
 	// zyk: Universe Quest progress of this player
 	int universe_quest_progress;
 
@@ -977,9 +971,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
-
-	// zyk: used to show the riddles from time to time
-	int eternity_quest_timer;
 
 	// zyk: this attribute sets the player as fighting a guardian
 	// the values of guardian_mode are:
