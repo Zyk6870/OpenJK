@@ -2123,7 +2123,6 @@ extern qboolean g_endPDuel;
 extern qboolean g_noPDuelCheck;
 extern void saberReactivate(gentity_t *saberent, gentity_t *saberOwner);
 extern void saberBackToOwner(gentity_t *saberent);
-extern void quest_get_new_player(gentity_t *ent);
 extern void try_finishing_race();
 extern void save_account(gentity_t *ent, qboolean save_char_file);
 extern void remove_credits(gentity_t *ent, int credits);
@@ -2328,8 +2327,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		if (Q_stricmp(self->NPC_type, "guardian_of_universe") == 0)
 		{ // zyk: failed mission
 			zyk_text_message(quest_player, "universe/mission_16_guardians/mission_16_guardians_fail", qtrue, qfalse, quest_player->client->pers.netname);
-
-			quest_get_new_player(quest_player);
 		}
 		else
 		{
@@ -2380,10 +2377,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 			zyk_text_message(player_ent, "universe/mission_2/mission_2_artifact_guardian_fail", qtrue, qfalse);
 			player_ent->client->pers.universe_quest_artifact_holder_id = -1;
-
-			// zyk: fixed bug in which a boss battle would kill this npc and pass quest turn
-			if (player_ent->client->pers.guardian_mode == 0)
-				quest_get_new_player(player_ent);
 		}
 	}
 	else if (self->client->pers.universe_quest_objective_control > -1 && self->NPC)
@@ -2435,8 +2428,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		else if (Q_stricmp( self->NPC_type, "sage_of_universe" ) == 0 && the_old_player->client->sess.amrpgmode == 2 && the_old_player->client->pers.universe_quest_objective_control == 5 && the_old_player->client->pers.universe_quest_progress == 4)
 		{ // zyk: Sage of Universe died in the fifth Universe Quest objective, pass turn to another player
 			zyk_text_message(the_old_player, "universe/mission_4/mission_4_fail", qtrue, qfalse, the_old_player->client->pers.netname);
-
-			quest_get_new_player(the_old_player);
 		}
 		else if (the_old_player->client->pers.universe_quest_progress == 11)
 		{ // zyk: Battle for the Temple, soldier was defeated by the player
@@ -2523,80 +2514,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			}
 		}
 	}
-	else if (quest_player && (quest_player->client->pers.guardian_mode <= 8 || quest_player->client->pers.guardian_mode == 11 || quest_player->client->pers.guardian_mode == 16))
-	{ // zyk: Light Quest. If guardian was defeated by the invoker, increase the defeated_guardians value
-		if (quest_player->client->pers.guardian_mode == 8)
-		{ // zyk: defeated the Guardian of Light
-			quest_player->client->pers.defeated_guardians = NUMBER_OF_GUARDIANS;
-
-			if (quest_player->client->pers.magic_power > 0)
-			{
-				quest_player->client->pers.magic_power--;
-				quest_player->client->pers.quest_power_status |= (1 << 14);
-			}
-
-			zyk_text_message(quest_player, "light/boss_defeated", qtrue, qfalse);
-		}
-		else
-		{
-			int light_quest_bitvalue = quest_player->client->pers.guardian_mode + 3;
-			if (quest_player->client->pers.guardian_mode == 11)
-			{
-				light_quest_bitvalue = 11;
-			}
-			else if (quest_player->client->pers.guardian_mode == 16)
-			{
-				light_quest_bitvalue = 12;
-			}
-
-			quest_player->client->pers.defeated_guardians |= (1 << light_quest_bitvalue);
-
-			// zyk: make the chat message for each guardian the player defeats
-			if (light_quest_bitvalue == 4)
-			{
-				zyk_text_message(quest_player, "light/guardian_of_water_defeated", qtrue, qfalse);
-			}
-			else if (light_quest_bitvalue == 5)
-			{
-				zyk_text_message(quest_player, "light/guardian_of_earth_defeated", qtrue, qfalse);
-			}
-			else if (light_quest_bitvalue == 6)
-			{
-				zyk_text_message(quest_player, "light/guardian_of_forest_defeated", qtrue, qfalse);
-			}
-			else if (light_quest_bitvalue == 7)
-			{
-				zyk_text_message(quest_player, "light/guardian_of_intelligence_defeated", qtrue, qfalse);
-			}
-			else if (light_quest_bitvalue == 8)
-			{
-				zyk_text_message(quest_player, "light/guardian_of_agility_defeated", qtrue, qfalse);
-			}
-			else if (light_quest_bitvalue == 9)
-			{
-				zyk_text_message(quest_player, "light/guardian_of_fire_defeated", qtrue, qfalse);
-			}
-			else if (light_quest_bitvalue == 10)
-			{
-				zyk_text_message(quest_player, "light/guardian_of_wind_defeated", qtrue, qfalse);
-			}
-			else if (light_quest_bitvalue == 11)
-			{
-				zyk_text_message(quest_player, "light/guardian_of_resistance_defeated", qtrue, qfalse);
-			}
-			else if (light_quest_bitvalue == 12)
-			{
-				zyk_text_message(quest_player, "light/guardian_of_ice_defeated", qtrue, qfalse);
-			}
-		}
-
-		quest_player->client->pers.guardian_mode = 0;
-		quest_player->client->pers.light_quest_messages = 0;
-
-		save_account(quest_player, qtrue);
-
-		quest_get_new_player(quest_player);
-	}
 	else if (quest_player && quest_player->client->pers.guardian_mode == 9)
 	{ // zyk: Dark Quest. Defeated the Guardian of Darkness
 		quest_player->client->pers.guardian_mode = 0;
@@ -2611,8 +2528,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		}
 
 		zyk_text_message(quest_player, "dark/boss_defeated", qtrue, qfalse);
-
-		quest_get_new_player(quest_player);
 	}
 	else if (quest_player && quest_player->client->pers.guardian_mode == 10)
 	{ // zyk: Eternity Quest. Defeated the Guardian of Eternity
@@ -2628,8 +2543,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		}
 
 		zyk_text_message(quest_player, "eternity/boss_defeated", qtrue, qfalse);
-
-		quest_get_new_player(quest_player);
 	}
 	else if (quest_player && quest_player->client->pers.guardian_mode == 12)
 	{ // zyk: defeated the Master of Evil
@@ -2689,31 +2602,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			quest_player->client->pers.universe_quest_messages = 7;
 			quest_player->client->pers.universe_quest_timer = level.time + 5000;
 			quest_player->client->pers.guardian_mode = 0;
-		}
-	}
-	else if (quest_player && quest_player->client->pers.guardian_mode == 17)
-	{ // zyk: defeated a boss in Guardian Trials
-		quest_player->client->pers.light_quest_messages++;
-		quest_player->client->pers.hunter_quest_messages--;
-
-		if (quest_player->client->pers.light_quest_messages == 9)
-		{ // zyk: defeated all bosses
-			level.boss_battle_music_reset_timer = level.time + 1000;
-
-			quest_player->client->pers.universe_quest_messages = 11;
-			quest_player->client->pers.universe_quest_timer = level.time + 3000;
-		}
-	}
-	else if (quest_player && quest_player->client->pers.guardian_mode == 18)
-	{ // zyk: defeated a boss in The Final Challenge (Guardians Sequel)
-		quest_player->client->pers.light_quest_messages++;
-
-		if (quest_player->client->pers.light_quest_messages == 4)
-		{ // zyk: defeated all bosses
-			level.boss_battle_music_reset_timer = level.time + 1000;
-
-			quest_player->client->pers.universe_quest_messages = 6;
-			quest_player->client->pers.universe_quest_timer = level.time + 3000;
 		}
 	}
 	else if (quest_player && quest_player->client->pers.guardian_mode == 19)

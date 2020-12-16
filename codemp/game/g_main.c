@@ -4636,8 +4636,6 @@ void spawn_boss(gentity_t *ent,int x,int y,int z,int yaw,char *boss_name,int gx,
 
 		npc_ent->client->pers.guardian_invoked_by_id = ent-g_entities;
 		npc_ent->client->pers.hunter_quest_messages = 0;
-		npc_ent->client->pers.light_quest_messages = 0;
-		npc_ent->client->pers.light_quest_timer = level.time + 7000;
 		npc_ent->client->pers.guardian_timer = level.time + 5000;
 		npc_ent->client->pers.universe_quest_timer = level.time + 11000;
 		npc_ent->client->pers.guardian_mode = guardian_mode;
@@ -4650,7 +4648,6 @@ void spawn_boss(gentity_t *ent,int x,int y,int z,int yaw,char *boss_name,int gx,
 		if (ent->client->pers.universe_quest_counter & (1 << 29))
 		{ // zyk: if quest player is in Challenge Mode, do these
 			// zyk: bosses start using magic a bit earlier
-			npc_ent->client->pers.light_quest_timer = level.time + 5000;
 			npc_ent->client->pers.guardian_timer = level.time + 3000;
 			npc_ent->client->pers.universe_quest_timer = level.time + 9000;
 		}
@@ -5834,24 +5831,19 @@ void time_power(gentity_t *ent, int distance, int duration)
 			player_ent->client->pers.quest_power_status |= (1 << 2);
 			player_ent->client->pers.magic_power_target_timer[MAGIC_TIME_STOP] = level.time + duration;
 
-			if (i < MAX_CLIENTS)
-			{ // zyk: player hit by this power
-				if (player_ent->client->pers.quest_power_usage_timer < level.time)
-				{
-					player_ent->client->pers.quest_power_usage_timer = level.time + duration;
-				}
-				else
-				{ // zyk: already used a power, so increase the cooldown time
-					player_ent->client->pers.quest_power_usage_timer += duration;
-				}
-
-				display_yellow_bar(player_ent, (player_ent->client->pers.quest_power_usage_timer - level.time));
+			// zyk: target wont be able to use magic for some time
+			if (player_ent->client->pers.quest_power_usage_timer < level.time)
+			{
+				player_ent->client->pers.quest_power_usage_timer = level.time + duration;
 			}
-			else if (player_ent->NPC)
-			{ // zyk: npc or boss must also not be able to use magic
-				player_ent->client->pers.light_quest_timer += duration;
-				player_ent->client->pers.guardian_timer += duration;
-				player_ent->client->pers.universe_quest_timer += duration;
+			else
+			{ // zyk: already used a power, so increase the cooldown time
+				player_ent->client->pers.quest_power_usage_timer += duration;
+			}
+
+			if (i < MAX_CLIENTS)
+			{
+				display_yellow_bar(player_ent, (player_ent->client->pers.quest_power_usage_timer - level.time));
 			}
 
 			player_ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
@@ -7325,7 +7317,6 @@ void universe_quest_artifacts_checker(gentity_t *ent)
 
 // zyk: checks if the player got all crystals
 extern int number_of_crystals(gentity_t *ent);
-extern void quest_get_new_player(gentity_t *ent);
 void universe_crystals_check(gentity_t *ent)
 {
 	if (number_of_crystals(ent) == 3)
@@ -7340,7 +7331,6 @@ void universe_crystals_check(gentity_t *ent)
 			ent->client->pers.universe_quest_counter = 0;
 
 		save_account(ent, qtrue);
-		quest_get_new_player(ent);
 	}
 	else
 	{
@@ -7359,7 +7349,6 @@ void zyk_try_get_dark_quest_note(gentity_t *ent, int note_bitvalue)
 		ent->client->pers.hunter_quest_progress |= (1 << note_bitvalue);
 		clean_note_model();
 		save_account(ent, qtrue);
-		quest_get_new_player(ent);
 	}
 }
 
@@ -8477,7 +8466,6 @@ extern void try_finishing_race();
 extern gentity_t *load_crystal_model(int x,int y,int z, int yaw, int crystal_number);
 extern void clean_crystal_model(int crystal_number);
 extern qboolean dark_quest_collected_notes(gentity_t *ent);
-extern qboolean light_quest_defeated_guardians(gentity_t *ent);
 extern void set_max_health(gentity_t *ent);
 extern void set_max_shield(gentity_t *ent);
 extern gentity_t *load_effect(int x,int y,int z, int spawnflags, char *fxFile);
@@ -10095,23 +10083,6 @@ void G_RunFrame( int levelTime ) {
 					{
 						zyk_try_get_dark_quest_note(ent, 4);
 
-						if (ent->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(ent->client->pers.defeated_guardians & (1 << 4)) && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->r.currentOrigin[0] > 1962 && (int) ent->r.currentOrigin[0] < 2162 && (int) ent->r.currentOrigin[1] > 3989 && (int) ent->r.currentOrigin[1] < 4189 && (int) ent->r.currentOrigin[2] >= 360 && (int) ent->r.currentOrigin[2] <= 369)
-						{
-							if (ent->client->pers.light_quest_timer < level.time)
-							{
-								if (ent->client->pers.light_quest_messages == 0)
-								{
-									zyk_text_message(ent, "light/guardian_of_water", qtrue, qfalse, ent->client->pers.netname);
-								}
-								else if (ent->client->pers.light_quest_messages == 1)
-								{
-									spawn_boss(ent,2062,4089,361,90,"guardian_boss_1",2062,4189,500,90,1);
-								}
-								ent->client->pers.light_quest_messages++;
-								ent->client->pers.light_quest_timer = level.time + 3000;
-							}
-						}
-
 						if (ent->client->pers.universe_quest_progress == 3 && ent->client->pers.can_play_quest == 1 && ent->client->pers.universe_quest_objective_control == 4 && 
 							ent->client->pers.universe_quest_timer < level.time && (int) ent->client->ps.origin[0] > 2720 && (int) ent->client->ps.origin[0] < 2840 && 
 							(int) ent->client->ps.origin[1] > 3944 && (int) ent->client->ps.origin[1] < 3988 && (int) ent->client->ps.origin[2] == 1432)
@@ -10142,7 +10113,6 @@ void G_RunFrame( int levelTime ) {
 								ent->client->pers.universe_quest_progress = 4;
 								clean_note_model();
 								save_account(ent, qtrue);
-								quest_get_new_player(ent);
 							}
 						}
 
@@ -10213,9 +10183,6 @@ void G_RunFrame( int levelTime ) {
 								ent->client->pers.universe_quest_messages = 15;
 
 							ent->client->pers.universe_quest_timer = level.time + 1000;
-
-							if (change_player == 1)
-								quest_get_new_player(ent);
 						}
 					}
 					else if (level.quest_map == 2)
@@ -10392,8 +10359,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 18;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (npc_ent)
@@ -10691,8 +10656,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 19;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (npc_ent)
@@ -10788,8 +10751,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 20;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (npc_ent)
@@ -10877,8 +10838,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 21;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -10984,8 +10943,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 22;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (npc_ent)
@@ -11024,23 +10981,6 @@ void G_RunFrame( int levelTime ) {
 							{
 								ent->client->pers.universe_quest_messages++;
 								ent->client->pers.universe_quest_timer = level.time + 5000;
-							}
-						}
-
-						if (ent->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(ent->client->pers.defeated_guardians & (1 << 12)) && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->r.currentOrigin[0] > -5648 && (int) ent->r.currentOrigin[0] < -5448 && (int) ent->r.currentOrigin[1] > 11448 && (int) ent->r.currentOrigin[1] < 11648 && (int) ent->r.currentOrigin[2] >= 980 && (int) ent->r.currentOrigin[2] <= 1000)
-						{
-							if (ent->client->pers.light_quest_timer < level.time)
-							{
-								if (ent->client->pers.light_quest_messages == 0)
-								{
-									zyk_text_message(ent, "light/guardian_of_ice", qtrue, qfalse, ent->client->pers.netname);
-								}
-								else if (ent->client->pers.light_quest_messages == 1)
-								{
-									spawn_boss(ent,-4652,11607,991,179,"guardian_boss_10",-5623,11598,991,0,16);
-								}
-								ent->client->pers.light_quest_messages++;
-								ent->client->pers.light_quest_timer = level.time + 3000;
 							}
 						}
 					}
@@ -11247,8 +11187,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 19;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_messages < 16 && npc_ent)
@@ -11411,8 +11349,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 20;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_messages > 0 && npc_ent)
@@ -11544,8 +11480,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 21;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_messages > 0 && npc_ent)
@@ -11637,8 +11571,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 22;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_messages > 0 && npc_ent)
@@ -11737,8 +11669,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 17;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_messages < 2 && npc_ent)
@@ -11868,8 +11798,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 16;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_messages < 18 && npc_ent)
@@ -11961,8 +11889,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 17;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_messages == 1 || ent->client->pers.universe_quest_messages == 3)
@@ -12025,8 +11951,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 18;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -12034,23 +11958,6 @@ void G_RunFrame( int levelTime ) {
 					else if (level.quest_map == 7)
 					{
 						zyk_try_get_dark_quest_note(ent, 10);
-
-						if (ent->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(ent->client->pers.defeated_guardians & (1 << 7)) && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->client->ps.origin[0] > 1820 && (int) ent->client->ps.origin[0] < 2020 && (int) ent->client->ps.origin[1] > 1968 && (int) ent->client->ps.origin[1] < 2168 && (int) ent->client->ps.origin[2] == 728)
-						{
-							if (ent->client->pers.light_quest_timer < level.time)
-							{
-								if (ent->client->pers.light_quest_messages == 0)
-								{
-									zyk_text_message(ent, "light/guardian_of_intelligence", qtrue, qfalse, ent->client->pers.netname);
-								}
-								else if (ent->client->pers.light_quest_messages == 1)
-								{
-									spawn_boss(ent,1920,2068,729,-90,"guardian_boss_4",1920,982,729,90,4);
-								}
-								ent->client->pers.light_quest_messages++;
-								ent->client->pers.light_quest_timer = level.time + 3000;
-							}
-						}
 					}
 					else if (level.quest_map == 8)
 					{
@@ -12096,8 +12003,6 @@ void G_RunFrame( int levelTime ) {
 								ent->client->pers.universe_quest_messages = 0;
 
 								save_account(ent, qtrue);
-
-								quest_get_new_player(ent);
 							}
 
 							if (npc_ent)
@@ -12154,17 +12059,7 @@ void G_RunFrame( int levelTime ) {
 							}
 							else if (ent->client->pers.universe_quest_messages == 10)
 							{ // zyk: battle against the red reborns
-								if (ent->client->pers.light_quest_messages > 1)
-								{
-									npc_ent = Zyk_NPC_SpawnType("quest_reborn_red", 2467, -318 + (50 * ent->client->pers.light_quest_messages), -3800, 0);
-									ent->client->pers.light_quest_messages--;
-								}
-								else if (ent->client->pers.light_quest_messages == 1 && ent->client->pers.universe_quest_objective_control == 1)
-								{
-									ent->client->pers.universe_quest_messages = 9;
-									ent->client->pers.light_quest_messages = 0;
-									npc_ent = Zyk_NPC_SpawnType("quest_reborn_boss", 2467, -68, -3800, 0);
-								}
+
 							}
 							else if (ent->client->pers.universe_quest_messages == 12)
 							{
@@ -12174,11 +12069,6 @@ void G_RunFrame( int levelTime ) {
 							{
 								ent->client->pers.universe_quest_progress = 1;
 								save_account(ent, qtrue);
-								quest_get_new_player(ent);
-							}
-							else if (ent->client->pers.universe_quest_messages == 14)
-							{ // zyk: player failed mission
-								quest_get_new_player(ent);
 							}
 
 							if (ent->client->pers.universe_quest_progress == 0)
@@ -12280,8 +12170,6 @@ void G_RunFrame( int levelTime ) {
 								ent->client->pers.universe_quest_progress = 2;
 								
 								save_account(ent, qtrue);
-
-								quest_get_new_player(ent);
 							}
 
 							if (npc_ent)
@@ -12307,26 +12195,7 @@ void G_RunFrame( int levelTime ) {
 						}
 					}
 					else if (level.quest_map == 10)
-					{   
-						// zyk: battle against the Guardian of Light
-						if (ent->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && light_quest_defeated_guardians(ent) == qtrue && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->client->ps.origin[0] > -1350 && (int) ent->client->ps.origin[0] < -630 && (int) ent->client->ps.origin[1] > -1900 && (int) ent->client->ps.origin[1] < -1400 && (int) ent->client->ps.origin[2] > 5 && (int) ent->client->ps.origin[2] < 56)
-						{
-							if (ent->client->pers.light_quest_timer < level.time)
-							{
-								if (ent->client->pers.light_quest_messages < 3)
-								{
-									zyk_text_message(ent, va("light/guardian_%d", ent->client->pers.light_quest_messages), qtrue, qfalse);
-								}
-								else if (ent->client->pers.light_quest_messages == 3)
-								{
-									spawn_boss(ent,-992,-1802,25,90,"guardian_boss_9",0,0,0,0,8);
-								}
-
-								ent->client->pers.light_quest_messages++;
-								ent->client->pers.light_quest_timer = level.time + 3000;
-							}
-						}
-
+					{
 						// zyk: battle against the Guardian of Darkness
 						if (ent->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES && dark_quest_collected_notes(ent) == qtrue && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->client->ps.origin[0] > -200 && (int) ent->client->ps.origin[0] < 100 && (int) ent->client->ps.origin[1] > 252 && (int) ent->client->ps.origin[1] < 552 && (int) ent->client->ps.origin[2] == -231)
 						{
@@ -12342,23 +12211,6 @@ void G_RunFrame( int levelTime ) {
 								}
 								ent->client->pers.hunter_quest_messages++;
 								ent->client->pers.hunter_quest_timer = level.time + 3000;
-							}
-						}
-
-						if (ent->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(ent->client->pers.defeated_guardians & (1 << 6)) && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->client->ps.origin[0] > 412 && (int) ent->client->ps.origin[0] < 612 && (int) ent->client->ps.origin[1] > 4729 && (int) ent->client->ps.origin[1] < 4929 && (int) ent->client->ps.origin[2] >= 55 && (int) ent->client->ps.origin[2] <= 64)
-						{
-							if (ent->client->pers.light_quest_timer < level.time)
-							{
-								if (ent->client->pers.light_quest_messages == 0)
-								{
-									zyk_text_message(ent, "light/guardian_of_forest", qtrue, qfalse, ent->client->pers.netname);
-								}
-								else if (ent->client->pers.light_quest_messages == 1)
-								{
-									spawn_boss(ent,119,4819,33,0,"guardian_boss_3",512,4829,62,179,3);
-								}
-								ent->client->pers.light_quest_messages++;
-								ent->client->pers.light_quest_timer = level.time + 3000;
 							}
 						}
 
@@ -12477,8 +12329,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 16;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -12573,8 +12423,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 17;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (npc_ent)
@@ -12593,8 +12441,6 @@ void G_RunFrame( int levelTime ) {
 							zyk_text_message(ent, "universe/mission_2/mission_2_artifact_guardian_end", qtrue, qfalse, ent->client->pers.netname);
 
 							universe_quest_artifacts_checker(ent);
-
-							quest_get_new_player(ent);
 						}
 						else if (ent->client->pers.universe_quest_artifact_holder_id > -1 && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && ent->client->ps.hasLookTarget == qtrue && ent->client->ps.lookTarget == ent->client->pers.universe_quest_artifact_holder_id)
 						{ // zyk: found quest_ragnos npc, set artifact effect on player
@@ -12606,25 +12452,6 @@ void G_RunFrame( int levelTime ) {
 							ent->client->pers.universe_quest_artifact_holder_id = -3;
 
 							zyk_text_message(ent, "universe/mission_2/mission_2_artifact_guardian_found", qtrue, qfalse, ent->client->pers.netname);
-						}
-					}
-					else if (level.quest_map == 11)
-					{   
-						if (ent->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(ent->client->pers.defeated_guardians & (1 << 9)) && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->client->ps.origin[0] > -100 && (int) ent->client->ps.origin[0] < 100 && (int) ent->client->ps.origin[1] > -95 && (int) ent->client->ps.origin[1] < 105 && (int) ent->client->ps.origin[2] == -375)
-						{
-							if (ent->client->pers.light_quest_timer < level.time)
-							{
-								if (ent->client->pers.light_quest_messages == 0)
-								{
-									zyk_text_message(ent, "light/guardian_of_fire", qtrue, qfalse, ent->client->pers.netname);
-								}
-								else if (ent->client->pers.light_quest_messages == 1)
-								{
-									spawn_boss(ent,0,5,-374,-90,"guardian_boss_6",0,-269,-374,90,6);
-								}
-								ent->client->pers.light_quest_messages++;
-								ent->client->pers.light_quest_timer = level.time + 3000;
-							}
 						}
 					}
 					else if (level.quest_map == 12)
@@ -12695,7 +12522,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_counter |= (1 << 1);
 									first_second_act_objective(ent);
 									save_account(ent, qtrue);
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -12759,8 +12585,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 16;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -12822,103 +12646,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 18;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
-								}
-							}
-						}
-						else if (ent->client->pers.universe_quest_progress == 18 && ent->client->pers.can_play_quest == 1 && ent->client->pers.universe_quest_counter & (1 << 1))
-						{ // zyk: Universe Quest, boss battle against light quest bosses in Guardians Sequel
-							if (ent->client->pers.universe_quest_timer < level.time)
-							{
-								vec3_t zyk_quest_point;
-								int amount_of_bosses_in_map = 1;
-
-								VectorSet(zyk_quest_point, -4070, 4884, -6);
-
-								if (ent->client->pers.universe_quest_counter & (1 << 29))
-								{ // zyk: Challenge Mode requires fighting more than one at once
-									amount_of_bosses_in_map = 2;
-								}
-
-								if (ent->client->pers.universe_quest_messages == 0 && Distance(ent->client->ps.origin, zyk_quest_point) < 200)
-								{
-									ent->client->pers.hunter_quest_messages = 0;
-									ent->client->pers.universe_quest_messages++;
-									ent->client->pers.universe_quest_timer = level.time + 5000;
-								}
-								else if (ent->client->pers.universe_quest_messages > 0 && ent->client->pers.universe_quest_messages < 10 && 
-										 ent->client->pers.hunter_quest_messages < amount_of_bosses_in_map)
-								{
-									ent->client->pers.universe_quest_messages++;
-									ent->client->pers.universe_quest_timer = level.time + 5000;
-								}
-
-								if (ent->client->pers.universe_quest_messages == 1 && ent->client->pers.hunter_quest_messages < amount_of_bosses_in_map)
-								{ // zyk: closing the passage from where the player came so he cannot exit the trials room
-									zyk_trial_room_models();
-
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_boss_1", -4270, 4884, 150, 0, 17);
-
-									// zyk: counts how many bosses defeated
-									ent->client->pers.light_quest_messages = 0;
-
-									// zyk: counts how many bosses in the map
-									ent->client->pers.hunter_quest_messages = 1;
-								}
-								else if (ent->client->pers.universe_quest_messages == 2 && ent->client->pers.hunter_quest_messages < amount_of_bosses_in_map)
-								{
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_boss_2", -4270, 4884, 150, 0, 17);
-									ent->client->pers.hunter_quest_messages++;
-								}
-								else if (ent->client->pers.universe_quest_messages == 3 && ent->client->pers.hunter_quest_messages < amount_of_bosses_in_map)
-								{
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_boss_3", -4270, 4884, 150, 0, 17);
-									ent->client->pers.hunter_quest_messages++;
-								}
-								else if (ent->client->pers.universe_quest_messages == 4 && ent->client->pers.hunter_quest_messages < amount_of_bosses_in_map)
-								{
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_boss_4", -4270, 4884, 150, 0, 17);
-									ent->client->pers.hunter_quest_messages++;
-								}
-								else if (ent->client->pers.universe_quest_messages == 5 && ent->client->pers.hunter_quest_messages < amount_of_bosses_in_map)
-								{
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_boss_5", -4270, 4884, 150, 0, 17);
-									ent->client->pers.hunter_quest_messages++;
-								}
-								else if (ent->client->pers.universe_quest_messages == 6 && ent->client->pers.hunter_quest_messages < amount_of_bosses_in_map)
-								{
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_boss_6", -4270, 4884, 150, 0, 17);
-									ent->client->pers.hunter_quest_messages++;
-								}
-								else if (ent->client->pers.universe_quest_messages == 7 && ent->client->pers.hunter_quest_messages < amount_of_bosses_in_map)
-								{
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_boss_7", -4270, 4884, 150, 0, 17);
-									ent->client->pers.hunter_quest_messages++;
-								}
-								else if (ent->client->pers.universe_quest_messages == 8 && ent->client->pers.hunter_quest_messages < amount_of_bosses_in_map)
-								{
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_boss_8", -4270, 4884, 150, 0, 17);
-									ent->client->pers.hunter_quest_messages++;
-								}
-								else if (ent->client->pers.universe_quest_messages == 9 && ent->client->pers.hunter_quest_messages < amount_of_bosses_in_map)
-								{
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_boss_10", -4270, 4884, 150, 0, 17);
-									ent->client->pers.hunter_quest_messages++;
-								}
-								else if (ent->client->pers.universe_quest_messages == 11)
-								{
-									ent->client->pers.universe_quest_messages++;
-									ent->client->pers.universe_quest_timer = level.time + 2000;
-									zyk_text_message(ent, "universe/mission_18_guardians/mission_18_guardians_win", qtrue, qfalse, ent->client->pers.netname);
-								}
-								else if (ent->client->pers.universe_quest_messages == 12)
-								{
-									ent->client->pers.universe_quest_progress = 19;
-
-									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -12981,64 +12708,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 20;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
-								}
-							}
-						}
-						else if (ent->client->pers.universe_quest_progress == 20 && ent->client->pers.can_play_quest == 1 && ent->client->pers.universe_quest_counter & (1 << 1))
-						{ // zyk: Universe Quest, final boss battle in Guardians Sequel
-							if (ent->client->pers.universe_quest_timer < level.time)
-							{
-								vec3_t zyk_quest_point;
-
-								VectorSet(zyk_quest_point, -4070, 4884, -6);
-
-								if (ent->client->pers.universe_quest_messages == 0 && Distance(ent->client->ps.origin, zyk_quest_point) < 200)
-								{
-									ent->client->pers.universe_quest_messages++;
-									ent->client->pers.universe_quest_timer = level.time + 500;
-								}
-								else if (ent->client->pers.universe_quest_messages > 0 && ent->client->pers.universe_quest_messages < 5)
-								{
-									ent->client->pers.universe_quest_messages++;
-									ent->client->pers.universe_quest_timer = level.time + 500;
-								}
-
-								if (ent->client->pers.universe_quest_messages == 1)
-								{ // zyk: closing the passage from where the player came so he cannot exit the trials room
-									zyk_trial_room_models();
-
-									spawn_boss(ent, -3970, 4884, -5, 179, "guardian_of_universe", -4270, 4884, 150, 0, 18);
-
-									// zyk: counts how many bosses defeated
-									ent->client->pers.light_quest_messages = 0;
-								}
-								else if (ent->client->pers.universe_quest_messages == 2)
-								{
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_boss_9", -4270, 4784, 150, 0, 18);
-								}
-								else if (ent->client->pers.universe_quest_messages == 3)
-								{
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_of_darkness", -4270, 4984, 150, 0, 18);
-								}
-								else if (ent->client->pers.universe_quest_messages == 4)
-								{
-									spawn_boss(ent, -4070, 4884, -5, 179, "guardian_of_eternity", -4170, 4884, 150, 0, 18);
-								}
-								else if (ent->client->pers.universe_quest_messages == 6)
-								{
-									ent->client->pers.universe_quest_messages++;
-									ent->client->pers.universe_quest_timer = level.time + 2000;
-									zyk_text_message(ent, "universe/mission_20_guardians/mission_20_guardians_win", qtrue, qfalse, ent->client->pers.netname);
-								}
-								else if (ent->client->pers.universe_quest_messages == 7)
-								{
-									ent->client->pers.universe_quest_progress = 21;
-
-									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -13101,8 +12770,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 22;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -13175,8 +12842,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 16;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -13224,8 +12889,6 @@ void G_RunFrame( int levelTime ) {
 								ent->client->pers.universe_quest_messages = 0;
 
 								save_account(ent, qtrue);
-
-								quest_get_new_player(ent);
 							}
 
 							if (ent->client->pers.universe_quest_messages > 4 && ent->client->pers.universe_quest_messages < 8)
@@ -13237,23 +12900,6 @@ void G_RunFrame( int levelTime ) {
 					}
 					else if (level.quest_map == 13)
 					{
-						if (ent->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(ent->client->pers.defeated_guardians & (1 << 5)) && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->client->ps.origin[0] > -2249 && (int) ent->client->ps.origin[0] < -2049 && (int) ent->client->ps.origin[1] > -4287 && (int) ent->client->ps.origin[1] < -4087 && (int) ent->client->ps.origin[2] == 3644)
-						{
-							if (ent->client->pers.light_quest_timer < level.time)
-							{
-								if (ent->client->pers.light_quest_messages == 0)
-								{
-									zyk_text_message(ent, "light/guardian_of_earth", qtrue, qfalse, ent->client->pers.netname);
-								}
-								else if (ent->client->pers.light_quest_messages == 1)
-								{
-									spawn_boss(ent,-2149,-4387,3645,90,"guardian_boss_2",-2149,-4037,3645,-90,2);
-								}
-								ent->client->pers.light_quest_messages++;
-								ent->client->pers.light_quest_timer = level.time + 3000;
-							}
-						}
-
 						if (ent->client->pers.universe_quest_progress == 2 && ent->client->pers.can_play_quest == 1 && ent->client->pers.universe_quest_objective_control == 3 && ent->client->pers.universe_quest_timer < level.time && ent->client->pers.universe_quest_messages < 1 && !(ent->client->pers.universe_quest_counter & (1 << 5)))
 						{
 							gentity_t *npc_ent = NULL;
@@ -13269,44 +12915,6 @@ void G_RunFrame( int levelTime ) {
 						
 							ent->client->pers.universe_quest_messages++;
 							ent->client->pers.universe_quest_timer = level.time + 5000;
-						}
-					}
-					else if (level.quest_map == 14)
-					{
-						if (ent->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(ent->client->pers.defeated_guardians & (1 << 11)) && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->client->ps.origin[0] > -100 && (int) ent->client->ps.origin[0] < 100 && (int) ent->client->ps.origin[1] > 1035 && (int) ent->client->ps.origin[1] < 1235 && (int) ent->client->ps.origin[2] == 24)
-						{
-							if (ent->client->pers.light_quest_timer < level.time)
-							{
-								if (ent->client->pers.light_quest_messages == 0)
-								{
-									zyk_text_message(ent, "light/guardian_of_resistance", qtrue, qfalse, ent->client->pers.netname);
-								}
-								else if (ent->client->pers.light_quest_messages == 1)
-								{
-									spawn_boss(ent,0,1135,25,-90,"guardian_boss_8",0,905,25,90,11);
-								}
-								ent->client->pers.light_quest_messages++;
-								ent->client->pers.light_quest_timer = level.time + 3000;
-							}
-						}
-					}
-					else if (level.quest_map == 15)
-					{
-						if (ent->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(ent->client->pers.defeated_guardians & (1 << 10)) && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->client->ps.origin[0] > -253 && (int) ent->client->ps.origin[0] < -53 && (int) ent->client->ps.origin[1] > -555 && (int) ent->client->ps.origin[1] < -355 && (int) ent->client->ps.origin[2] == 216)
-						{
-							if (ent->client->pers.light_quest_timer < level.time)
-							{
-								if (ent->client->pers.light_quest_messages == 0)
-								{
-									zyk_text_message(ent, "light/guardian_of_wind", qtrue, qfalse, ent->client->pers.netname);
-								}
-								else if (ent->client->pers.light_quest_messages == 1)
-								{
-									spawn_boss(ent,-156,-298,217,-90,"guardian_boss_7",-156,-584,300,90,7);
-								}
-								ent->client->pers.light_quest_messages++;
-								ent->client->pers.light_quest_timer = level.time + 3000;
-							}
 						}
 					}
 					else if (level.quest_map == 17)
@@ -13331,7 +12939,6 @@ void G_RunFrame( int levelTime ) {
 								ent->client->pers.universe_quest_counter |= (1 << 2);
 								first_second_act_objective(ent);
 								save_account(ent, qtrue);
-								quest_get_new_player(ent);
 							}
 
 							if (ent->client->pers.universe_quest_messages < 20)
@@ -13474,7 +13081,6 @@ void G_RunFrame( int levelTime ) {
 
 								ent->client->pers.universe_quest_progress = 11;
 								save_account(ent, qtrue);
-								quest_get_new_player(ent);
 							}
 							
 							if (ent->client->pers.universe_quest_progress == 10 && ent->client->pers.universe_quest_messages < 18)
@@ -13632,11 +13238,6 @@ void G_RunFrame( int levelTime ) {
 								{ // zyk: completed the mission
 									ent->client->pers.universe_quest_progress = 12;
 									save_account(ent, qtrue);
-									quest_get_new_player(ent);
-								}
-								else if (ent->client->pers.hunter_quest_messages == 50)
-								{ // zyk: failed the mission
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -13661,7 +13262,6 @@ void G_RunFrame( int levelTime ) {
 								{
 									ent->client->pers.universe_quest_progress = 13;
 									save_account(ent, qtrue);
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_progress == 12 && ent->client->pers.universe_quest_messages < 26)
@@ -13761,7 +13361,6 @@ void G_RunFrame( int levelTime ) {
 								{ // zyk: completed the mission
 									ent->client->pers.universe_quest_progress = 14;
 									save_account(ent, qtrue);
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_progress == 13 && ent->client->pers.universe_quest_messages < 28)
@@ -14022,7 +13621,6 @@ void G_RunFrame( int levelTime ) {
 
 									ent->client->pers.universe_quest_progress = 15;
 									save_account(ent, qtrue);
-									quest_get_new_player(ent);
 								}
 
 								if (new_ent)
@@ -14229,24 +13827,6 @@ void G_RunFrame( int levelTime ) {
 					}
 					else if (level.quest_map == 20)
 					{
-						// zyk: Guardian of Agility
-						if (ent->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(ent->client->pers.defeated_guardians & (1 << 8)) && ent->client->pers.can_play_quest == 1 && ent->client->pers.guardian_mode == 0 && (int) ent->client->ps.origin[0] > 8374 && (int) ent->client->ps.origin[0] < 8574 && (int) ent->client->ps.origin[1] > -1422 && (int) ent->client->ps.origin[1] < -1222 && (int) ent->client->ps.origin[2] > -165 && (int) ent->client->ps.origin[2] < -160)
-						{
-							if (ent->client->pers.light_quest_timer < level.time)
-							{
-								if (ent->client->pers.light_quest_messages == 0)
-								{
-									zyk_text_message(ent, "light/guardian_of_agility", qtrue, qfalse, ent->client->pers.netname);
-								}
-								else if (ent->client->pers.light_quest_messages == 1)
-								{
-									spawn_boss(ent,9773,-1779,-162,90,"guardian_boss_5",9773,-1199,-162,90,5);
-								}
-								ent->client->pers.light_quest_messages++;
-								ent->client->pers.light_quest_timer = level.time + 3000;
-							}
-						}
-
 						// zyk: Universe Quest artifact
 						if (ent->client->pers.universe_quest_progress == 2 && ent->client->pers.can_play_quest == 1 && ent->client->pers.universe_quest_objective_control == 3 && !(ent->client->pers.universe_quest_counter & (1 << 7)) && ent->client->pers.universe_quest_timer < level.time)
 						{
@@ -14431,8 +14011,6 @@ void G_RunFrame( int levelTime ) {
 								ent->client->pers.universe_quest_objective_control = -1;
 
 								save_account(ent, qtrue);
-
-								quest_get_new_player(ent);
 							}
 
 							if (ent->client->pers.universe_quest_messages < 40 && npc_ent)
@@ -14627,8 +14205,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 17;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_messages < 56 && npc_ent)
@@ -14730,8 +14306,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 18;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_messages > 0)
@@ -14938,8 +14512,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 19;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 
 								if (ent->client->pers.universe_quest_messages < 56 && npc_ent)
@@ -15026,8 +14598,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 20;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -15057,8 +14627,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 21;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -15116,8 +14684,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_progress = 22;
 
 									save_account(ent, qtrue);
-
-									quest_get_new_player(ent);
 								}
 							}
 						}
@@ -15180,8 +14746,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.universe_quest_counter = 0;
 
 								save_account(ent, qtrue);
-
-								quest_get_new_player(ent);
 							}
 
 							if (ent->client->pers.universe_quest_messages < 1)
@@ -15584,1201 +15148,7 @@ void G_RunFrame( int levelTime ) {
 				}
 			}
 
-			// zyk: quest guardians special abilities
-			if (ent->client->pers.guardian_invoked_by_id != -1 && ent->health > 0)
-			{
-				if (ent->client->pers.guardian_mode == 1 || (ent->client->pers.guardian_mode == 17 && Q_stricmp(ent->NPC_type, "guardian_boss_1") == 0))
-				{ // zyk: Guardian of Water
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						water_splash(ent,400,15);
-						trap->SendServerCommand( -1, "chat \"^4Guardian of Water: ^7Water Splash!\"");
-
-						ent->client->pers.guardian_timer = level.time + 14000;
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						water_attack(ent, 2500, 40);
-						trap->SendServerCommand(-1, "chat \"^4Guardian of Water: ^7Water Attack!\"");
-						ent->client->pers.light_quest_timer = level.time + 11000;
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 2 || (ent->client->pers.guardian_mode == 17 && Q_stricmp(ent->NPC_type, "guardian_boss_2") == 0))
-				{ // zyk: Guardian of Earth
-					if (ent->client->pers.guardian_timer < level.time)
-					{ // zyk: uses earthquake ability
-						earthquake(ent,2000,350,3000);
-						ent->client->pers.guardian_timer = level.time + 3000 + ent->health;
-						trap->SendServerCommand( -1, "chat \"^3Guardian of Earth: ^7Earthquake!\"");
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						rock_fall(ent, 2000, 40);
-						ent->client->pers.light_quest_timer = level.time + 10000;
-						trap->SendServerCommand( -1, "chat \"^3Guardian of Earth: ^7Rockfall!\"");
-					}
-
-					if (ent->client->pers.universe_quest_timer < level.time)
-					{
-						shifting_sand(ent, 5500);
-						ent->client->pers.universe_quest_timer = level.time + 11000;
-						trap->SendServerCommand(-1, "chat \"^3Guardian of Earth: ^7Shifting Sand!\"");
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 3 || (ent->client->pers.guardian_mode == 17 && Q_stricmp(ent->NPC_type, "guardian_boss_3") == 0))
-				{ // zyk: Guardian of Forest
-					if (ent->client->pers.guardian_timer < level.time)
-					{ // zyk: uses sleeping flowers or poison mushrooms
-						if (Q_irand(0,3) != 0)
-						{
-							sleeping_flowers(ent,2500,1500);
-							trap->SendServerCommand( -1, "chat \"^2Guardian of Forest: ^7Sleeping Flowers!\"");
-							ent->client->pers.guardian_timer = level.time + 12000;
-						}
-						else
-						{
-							poison_mushrooms(ent,100,3000);
-							trap->SendServerCommand( -1, va("chat \"^2Guardian of Forest: ^7Poison Mushrooms!\""));
-							ent->client->pers.guardian_timer = level.time + 12000;
-						}
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						tree_of_life(ent);
-						ent->client->pers.light_quest_timer = level.time + 15000;
-						trap->SendServerCommand(-1, va("chat \"^2Guardian of Forest: ^7Tree of Life!\""));
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 4 || (ent->client->pers.guardian_mode == 17 && Q_stricmp(ent->NPC_type, "guardian_boss_4") == 0))
-				{ // zyk: Guardian of Intelligence
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						if (ent->client->pers.light_quest_messages == 0)
-						{
-							dome_of_damage(ent, 1700, 25);
-							ent->client->pers.light_quest_messages = 1;
-							trap->SendServerCommand( -1, "chat \"^5Guardian of Intelligence: ^7Dome of Damage!\"");
-						}
-						else
-						{
-							magic_shield(ent, 6000);
-							ent->client->pers.light_quest_messages = 0;
-							trap->SendServerCommand( -1, "chat \"^5Guardian of Intelligence: ^7Magic Shield!\"");
-						}
-
-						ent->client->pers.guardian_timer = level.time + ent->health + 8000;
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						magic_disable(ent, 500);
-						ent->client->pers.light_quest_timer = level.time + 14000;
-						trap->SendServerCommand(-1, "chat \"^5Guardian of Intelligence: ^7Magic Disable!\"");
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 5 || (ent->client->pers.guardian_mode == 17 && Q_stricmp(ent->NPC_type, "guardian_boss_5") == 0))
-				{ // zyk: Guardian of Agility
-					// zyk: adding jetpack to this boss
-					ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{ // zyk: after losing half HP, uses his special ability
-						ultra_speed(ent,10000);
-						trap->SendServerCommand( -1, "chat \"^6Guardian of Agility: ^7Ultra Speed!\"");
-						ent->client->pers.light_quest_timer = level.time + 12000;
-					}
-
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						slow_motion(ent,600,12000);
-						trap->SendServerCommand( -1, "chat \"^6Guardian of Agility: ^7Slow Motion!\"");
-						ent->client->pers.guardian_timer = level.time + 14000;
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 6 || (ent->client->pers.guardian_mode == 17 && Q_stricmp(ent->NPC_type, "guardian_boss_6") == 0))
-				{ // zyk: Guardian of Fire
-					// zyk: take him back if he falls
-					if (ent->client->ps.origin[2] < -600)
-					{
-						vec3_t origin;
-						vec3_t yaw;
-
-						origin[0] = 0.0f;
-						origin[1] = -269.0f;
-						origin[2] = -374.0f;
-						yaw[0] = 0.0f;
-						yaw[1] = 90.0f;
-						yaw[2] = 0.0f;
-						zyk_TeleportPlayer( ent, origin, yaw );
-					}
-
-					if (ent->client->pers.guardian_timer < level.time)
-					{ // zyk: fire ability
-						flame_burst(ent, 5000);
-						trap->SendServerCommand( -1, "chat \"^1Guardian of Fire: ^7Flame Burst!\"");
-						ent->client->pers.guardian_timer = level.time + 18000;
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						ultra_flame(ent, 4000, 35);
-						trap->SendServerCommand( -1, "chat \"^1Guardian of Fire: ^7Ultra Flame!\"");
-						ent->client->pers.light_quest_timer = level.time + 16000;
-					}
-
-					if (ent->client->pers.universe_quest_timer < level.time)
-					{
-						flaming_area(ent, 20);
-						ent->client->pers.universe_quest_timer = level.time + 19000;
-						trap->SendServerCommand(-1, "chat \"^1Guardian of Fire: ^7Flaming Area!\"");
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 7 || (ent->client->pers.guardian_mode == 17 && Q_stricmp(ent->NPC_type, "guardian_boss_7") == 0))
-				{ // zyk: Guardian of Wind
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						if (!Q_irand(0,1))
-						{ // zyk: randomly choose between Blowing Wind and Reverse Wind
-							blowing_wind(ent, 2500, 5000);
-							trap->SendServerCommand(-1, "chat \"^7Guardian of Wind: ^7Blowing Wind!\"");
-						}
-						else
-						{
-							reverse_wind(ent, 2500, 5000);
-							trap->SendServerCommand(-1, "chat \"^7Guardian of Wind: ^7Reverse Wind!\"");
-						}
-
-						ent->client->pers.guardian_timer = level.time + 12000;
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 16 || (ent->client->pers.guardian_mode == 17 && Q_stricmp(ent->NPC_type, "guardian_boss_10") == 0))
-				{ // zyk: Guardian of Ice
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						ice_stalagmite(ent, 500, 130);
-						ent->client->pers.guardian_timer = level.time + 16000;
-						trap->SendServerCommand( -1, "chat \"^5Guardian of Ice: ^7Ice Stalagmite!\"");
-					}
-
-					if (ent->client->pers.universe_quest_timer < level.time)
-					{
-						ice_block(ent, 3500);
-						ent->client->pers.universe_quest_timer = level.time + 16000;
-						trap->SendServerCommand(-1, "chat \"^5Guardian of Ice: ^7Ice Block!\"");
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 8 || (ent->client->pers.guardian_mode == 18 && Q_stricmp(ent->NPC_type, "guardian_boss_9") == 0))
-				{ // zyk: Guardian of Light
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						lightning_dome(ent, 70);
-						trap->SendServerCommand( -1, "chat \"^5Guardian of Light: ^7Lightning Dome!\"");
-						ent->client->pers.guardian_timer = level.time + 15000;
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						water_attack(ent, 4000, 40);
-						trap->SendServerCommand(-1, "chat \"^5Guardian of Light: ^7Water Attack!\"");
-						ent->client->pers.light_quest_timer = level.time + 19000;
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 9 || (ent->client->pers.guardian_mode == 18 && Q_stricmp(ent->NPC_type, "guardian_of_darkness") == 0))
-				{ // zyk: Guardian of Darkness
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						magic_explosion(ent, 320, 130, 900);
-						trap->SendServerCommand(-1, "chat \"^1Guardian of Darkness: ^7Magic Explosion!\"");
-						ent->client->pers.guardian_timer = level.time + 17000;
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						earthquake(ent, 2000, 300, 1000);
-						trap->SendServerCommand(-1, "chat \"^1Guardian of Darkness: ^7Earthquake!\"");
-						ent->client->pers.light_quest_timer = level.time + 19000;
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 10 || (ent->client->pers.guardian_mode == 18 && Q_stricmp(ent->NPC_type, "guardian_of_eternity") == 0))
-				{ // zyk: Guardian of Eternity
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						healing_area(ent,2,5000);
-						trap->SendServerCommand( -1, "chat \"^3Guardian of Eternity: ^7Healing Area!\"");
-						ent->client->pers.guardian_timer = level.time + 15000;
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						magic_shield(ent, 6000);
-						trap->SendServerCommand(-1, "chat \"^3Guardian of Eternity: ^7Magic Shield!\"");
-						ent->client->pers.light_quest_timer = level.time + 19000;
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 11 || (ent->client->pers.guardian_mode == 17 && Q_stricmp(ent->NPC_type, "guardian_boss_8") == 0))
-				{ // zyk: Guardian of Resistance
-					if (ent->client->pers.universe_quest_timer < level.time)
-					{
-						enemy_nerf(ent, 1000);
-						ent->client->pers.universe_quest_timer = level.time + 12000;
-						trap->SendServerCommand(-1, "chat \"^3Guardian of Resistance: ^7Enemy Weakening!\"");
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 12)
-				{ // zyk: Master of Evil
-					// zyk: adding jetpack to this boss
-					ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
-
-					// zyk: take him back if he falls
-					if (ent->client->ps.origin[0] < 400 || ent->client->ps.origin[0] > 3600 || ent->client->ps.origin[1] < -4450 || ent->client->ps.origin[1] > -1250 || ent->client->ps.origin[2] < 2500 || ent->client->ps.origin[2] > 4000)
-					{
-						vec3_t origin;
-						vec3_t yaw;
-
-						origin[0] = 2135.0f;
-						origin[1] = -2857.0f;
-						origin[2] = 2800.0f;
-						yaw[0] = 0.0f;
-						yaw[1] = -90.0f;
-						yaw[2] = 0.0f;
-						zyk_TeleportPlayer( ent, origin, yaw );
-					}
-
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						if (ent->client->NPC_class == CLASS_REBORN)
-							ent->client->NPC_class = CLASS_BOBAFETT;
-						else
-							ent->client->NPC_class = CLASS_REBORN;
-						
-						if (ent->health < (ent->client->ps.stats[STAT_MAX_HEALTH] / 5))
-							Zyk_NPC_SpawnType("quest_mage", 2135, -2857, 2800, 90);
-						else if (ent->health < ((ent->client->ps.stats[STAT_MAX_HEALTH]/5) * 2))
-							Zyk_NPC_SpawnType("quest_reborn_boss",2135,-2857,2800,90);
-						else if (ent->health < ((ent->client->ps.stats[STAT_MAX_HEALTH]/5) * 3))
-							Zyk_NPC_SpawnType("quest_reborn_red",2135,-2857,2800,90);
-						else if (ent->health < ((ent->client->ps.stats[STAT_MAX_HEALTH]/5) * 4))
-							Zyk_NPC_SpawnType("quest_reborn_blue",2135,-2857,2800,90);
-						else if (ent->health < ent->client->ps.stats[STAT_MAX_HEALTH])
-							Zyk_NPC_SpawnType("quest_reborn",2135,-2857,2800,-90);
-
-						if (!ent->client->ps.powerups[PW_CLOAKED])
-							Jedi_Cloak(ent);
-
-						ultra_drain(ent, 450, 30, 8000);
-						trap->SendServerCommand( -1, "chat \"^1Master of Evil: ^7Ultra Drain!\"");
-
-						ent->client->pers.guardian_timer = level.time + 30000;
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						ultra_flame(ent, 4000, 35);
-						trap->SendServerCommand(-1, "chat \"^1Master of Evil: ^7Ultra Flame!\"");
-						ent->client->pers.light_quest_timer = level.time + 29000;
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 13 || (ent->client->pers.guardian_mode == 18 && Q_stricmp(ent->NPC_type, "guardian_of_universe") == 0))
-				{ // zyk: Guardian of Universe
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						gentity_t *player_ent = &g_entities[ent->client->pers.guardian_invoked_by_id];
-						gentity_t *npc_ent = NULL;
-						vec3_t origin;
-						vec3_t yaw;
-
-						origin[0] = player_ent->client->ps.origin[0];
-						origin[1] = player_ent->client->ps.origin[1];
-						origin[2] = player_ent->client->ps.origin[2] + 200;
-
-						yaw[0] = 0.0f;
-						yaw[1] = -179.0f;
-						yaw[2] = 0.0f;
-
-						zyk_TeleportPlayer( ent, origin, yaw );
-
-						if (ent->health < ent->client->ps.stats[STAT_MAX_HEALTH] && ent->client->pers.hunter_quest_messages < 15)
-						{ // zyk: she can spawn up to 15 clones
-							ent->client->pers.hunter_quest_messages++;
-							npc_ent = NPC_SpawnType(player_ent, "guardian_of_universe",NULL,qfalse);
-						}
-
-						if (npc_ent)
-						{
-							npc_ent->health = ent->client->ps.stats[STAT_MAX_HEALTH]/10;
-							npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->health;
-						}
-
-						if (ent->client->pers.guardian_mode == 18 && Q_irand(0, 1) == 0)
-						{
-							ultra_drain(ent, 450, 30, 8000);
-							trap->SendServerCommand(-1, "chat \"^2Guardian of Universe: ^7Ultra Drain!\"");
-						}
-						else
-						{
-							immunity_power(ent, 20000);
-							trap->SendServerCommand(-1, "chat \"^2Guardian of Universe: ^7Immunity Power!\"");
-						}
-
-						ent->client->pers.guardian_timer = level.time + 35000;
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						if (ent->client->pers.guardian_mode == 18)
-						{ // zyk: unique
-							ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
-
-							ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-							ent->client->ps.forceDodgeAnim = BOTH_FORCE_DRAIN_START;
-							ent->client->ps.forceHandExtendTime = level.time + 2000;
-
-							zyk_super_beam(ent, ent->client->ps.viewangles[1]);
-						}
-
-						magic_explosion(ent, 320, 130, 900);
-						trap->SendServerCommand( -1, "chat \"^2Guardian of Universe: ^7Magic Explosion!\"");
-						ent->client->pers.light_quest_timer = level.time + 16000;
-					}
-
-					if (ent->client->pers.universe_quest_timer < level.time)
-					{
-						magic_shield(ent, 6000);
-						ent->client->pers.universe_quest_timer = level.time + 29000;
-						trap->SendServerCommand(-1, "chat \"^2Guardian of Universe: ^7Magic Shield!\"");
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 14)
-				{ // zyk: Guardian of Chaos
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						if (ent->client->pers.hunter_quest_messages == 0)
-						{
-							if (!ent->client->ps.powerups[PW_CLOAKED])
-								Jedi_Cloak(ent);
-
-							magic_shield(ent,6000);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Magic Shield!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 1)
-						{
-							blowing_wind(ent,3000,5000);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Blowing Wind!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 2)
-						{
-							ice_block(ent, 3500);
-							trap->SendServerCommand(-1, "chat \"^1Guardian of Chaos: ^7Ice Block!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 3)
-						{
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 4)
-						{
-							immunity_power(ent,20000);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Immunity Power!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 5)
-						{
-							sleeping_flowers(ent, 2500, 1000);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Sleeping Flowers!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 6)
-						{
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 7)
-						{
-							ultra_drain(ent, 450, 30, 8000);
-							trap->SendServerCommand( -1, va("chat \"^1Guardian of Chaos: ^7Ultra Drain!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 8)
-						{
-							ice_stalagmite(ent, 2000, 130);
-							trap->SendServerCommand( -1, va("chat \"^1Guardian of Chaos: ^7Ice Stalagmite!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 9)
-						{
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 10)
-						{
-							water_attack(ent, 1600, 40);
-							trap->SendServerCommand(-1, va("chat \"^1Guardian of Chaos: ^7Water Attack!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 11)
-						{
-							poison_mushrooms(ent,100,1800);
-							trap->SendServerCommand( -1, va("chat \"^1Guardian of Chaos: ^7Poison Mushrooms!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 12)
-						{
-							ultra_speed(ent,15000);
-							trap->SendServerCommand( -1, va("chat \"^1Guardian of Chaos: ^7Ultra Speed!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 13)
-						{
-							slow_motion(ent,1000,10000);
-							trap->SendServerCommand( -1, va("chat \"^1Guardian of Chaos: ^7Slow Motion!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 14)
-						{
-							water_splash(ent,1400,15);
-							trap->SendServerCommand( -1, va("chat \"^1Guardian of Chaos: ^7Water Splash!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 15)
-						{
-							rock_fall(ent, 1600, 40);
-							trap->SendServerCommand( -1, va("chat \"^1Guardian of Chaos: ^7Rockfall!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 16)
-						{
-							ultra_flame(ent, 2200, 35);
-							trap->SendServerCommand( -1, va("chat \"^1Guardian of Chaos: ^7Ultra Flame!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 17)
-						{
-							magic_disable(ent, 2200);
-							trap->SendServerCommand(-1, va("chat \"^1Guardian of Chaos: ^7Magic Disable!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 18)
-						{
-							dome_of_damage(ent, 2000, 25);
-							trap->SendServerCommand( -1, va("chat \"^1Guardian of Chaos: ^7Dome of Damage!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 19)
-						{
-							shifting_sand(ent, 2500);
-							trap->SendServerCommand(-1, va("chat \"^1Guardian of Chaos: ^7Shifting Sand!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 20)
-						{
-							flame_burst(ent, 5000);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Flame Burst!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 21)
-						{
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 22)
-						{
-							flaming_area(ent, 20);
-							trap->SendServerCommand(-1, "chat \"^1Guardian of Chaos: ^7Flaming Area!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 23)
-						{
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 24)
-						{
-							enemy_nerf(ent, 2000);
-							trap->SendServerCommand(-1, "chat \"^1Guardian of Chaos: ^7Enemy Weakening!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 25)
-						{
-							lightning_dome(ent, 70);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Lightning Dome!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 26)
-						{
-							earthquake(ent,2000,300,3000);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Earthquake!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 27)
-						{
-							time_power(ent,1600, 4000);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Time Power!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 28)
-						{
-							healing_area(ent,2,5000);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Healing Area!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 29)
-						{
-							tree_of_life(ent);
-							trap->SendServerCommand(-1, "chat \"^1Guardian of Chaos: ^7Tree of Life!\"");
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 30)
-						{
-							vec3_t origin, angles;
-
-							VectorSet(origin,-2836,-26946,500);
-							VectorSet(angles,0,0,0);
-
-							zyk_TeleportPlayer(ent,origin,angles);
-
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 31)
-						{
-							reverse_wind(ent, 2500, 5000);
-							trap->SendServerCommand(-1, va("chat \"^1Guardian of Chaos: ^7Reverse Wind!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 32)
-						{
-							magic_explosion(ent, 320, 130, 900);
-							trap->SendServerCommand( -1, va("chat \"^1Guardian of Chaos: ^7Magic Explosion!\""));
-							ent->client->pers.hunter_quest_messages++;
-						}
-						else if (ent->client->pers.hunter_quest_messages == 33)
-						{
-							chaos_power(ent,1600, 4600);
-							trap->SendServerCommand( -1, "chat \"^1Guardian of Chaos: ^7Chaos Power!\"");
-							ent->client->pers.hunter_quest_messages = 0;
-						}
-
-						ent->client->pers.guardian_timer = level.time + (ent->health/2) + 5000;
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						if (ent->client->pers.light_quest_messages == 0)
-						{
-							ent->client->pers.light_quest_messages = 1;
-						}
-						else if (ent->client->pers.light_quest_messages == 1)
-						{
-							ent->client->pers.light_quest_messages = 2;
-						}
-						else if (ent->client->pers.light_quest_messages == 2)
-						{
-							ent->client->pers.light_quest_messages = 3;
-						}
-						else if (ent->client->pers.light_quest_messages == 3)
-						{
-							ent->client->pers.light_quest_messages = 4;
-						}
-						else if (ent->client->pers.light_quest_messages == 4)
-						{
-							ent->client->pers.light_quest_messages = 5;
-						}
-
-						ent->client->pers.light_quest_timer = level.time + 27000;
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 15 && Q_stricmp(ent->NPC_type, "ymir_boss") == 0)
-				{ // zyk: Ymir
-				  // zyk: adding jetpack to this boss
-					ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
-
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						int random_magic = Q_irand(0, 25);
-
-						if (random_magic == 1)
-						{
-							poison_mushrooms(ent, 100, 600);
-						}
-						else if (random_magic == 2)
-						{
-							water_splash(ent, 400, 15);
-						}
-						else if (random_magic == 3)
-						{
-							ultra_flame(ent, 500, 35);
-						}
-						else if (random_magic == 4)
-						{
-							rock_fall(ent, 500, 40);
-						}
-						else if (random_magic == 5)
-						{
-							dome_of_damage(ent, 500, 25);
-						}
-						else if (random_magic == 7)
-						{
-							slow_motion(ent, 400, 15000);
-						}
-						if (random_magic == 9)
-						{
-							sleeping_flowers(ent, 2500, 350);
-						}
-						else if (random_magic == 11)
-						{
-							flame_burst(ent, 5000);
-						}
-						else if (random_magic == 12)
-						{
-							earthquake(ent, 2000, 300, 500);
-						}
-						else if (random_magic == 13)
-						{
-							magic_shield(ent, 6000);
-						}
-						else if (random_magic == 14)
-						{
-							blowing_wind(ent, 700, 5000);
-						}
-						else if (random_magic == 15)
-						{
-							ultra_speed(ent, 15000);
-						}
-						else if (random_magic == 16)
-						{
-							ice_stalagmite(ent, 500, 130);
-						}
-						else if (random_magic == 18)
-						{
-							water_attack(ent, 500, 40);
-						}
-						else if (random_magic == 19)
-						{
-							tree_of_life(ent);
-						}
-						else if (random_magic == 20)
-						{
-							magic_disable(ent, 450);
-						}
-						else if (random_magic == 22)
-						{
-							flaming_area(ent, 20);
-						}
-						else if (random_magic == 23)
-						{
-							reverse_wind(ent, 700, 5000);
-						}
-						else if (random_magic == 24)
-						{
-							enemy_nerf(ent, 450);
-						}
-						else if (random_magic == 25)
-						{
-							ice_block(ent, 3500);
-						}
-
-						ent->client->pers.guardian_timer = level.time + Q_irand(7000, 10000);
-
-						if (ent->spawnflags & 131072)
-						{ // zyk: boss is stronger now
-							ent->client->pers.guardian_timer -= 1000;
-						}
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{ // zyk: using Crystal of Magic
-						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = level.time + 1000;
-
-						ent->health += 100;
-						ent->client->ps.stats[STAT_ARMOR] += 100;
-
-						if (ent->health > ent->client->ps.stats[STAT_MAX_HEALTH])
-							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-						if (ent->client->ps.stats[STAT_ARMOR] > ent->client->ps.stats[STAT_MAX_HEALTH])
-							ent->client->ps.stats[STAT_ARMOR] = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-						if (ent->client->NPC_class == CLASS_REBORN)
-							ent->client->NPC_class = CLASS_BOBAFETT;
-						else
-							ent->client->NPC_class = CLASS_REBORN;
-
-						ent->client->pers.light_quest_timer = level.time + Q_irand(11000, 14000);
-
-						if (ent->spawnflags & 131072)
-						{ // zyk: boss is stronger now
-							int random_unique = Q_irand(0, 1);
-
-							if (random_unique == 0)
-							{
-								ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-
-								elemental_attack(ent);
-							}
-							else
-							{
-								ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-
-								zyk_no_attack(ent);
-							}
-						}
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 15 && Q_stricmp(ent->NPC_type, "thor_boss") == 0)
-				{ // zyk: Thor
-				  // zyk: adding jetpack to this boss
-					ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
-
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						int random_magic = Q_irand(0, 6);
-
-						if (random_magic == 0)
-						{
-							ultra_drain(ent, 450, 30, 8000);
-						}
-						else if (random_magic == 1)
-						{
-							immunity_power(ent, 20000);
-						}
-						else if (random_magic == 2)
-						{
-							chaos_power(ent, 400, 4600);
-						}
-						else if (random_magic == 3)
-						{
-							time_power(ent, 400, 4000);
-						}
-						else if (random_magic == 4)
-						{
-							healing_area(ent, 2, 5000);
-						}
-						else if (random_magic == 5)
-						{
-							magic_explosion(ent, 320, 130, 900);
-						}
-						else if (random_magic == 6)
-						{
-							lightning_dome(ent, 70);
-						}
-
-						ent->client->pers.guardian_timer = level.time + Q_irand(8000, 12000);
-
-						if (ent->spawnflags & 131072)
-						{ // zyk: boss is stronger now
-							ent->client->pers.guardian_timer -= 1000;
-						}
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{ // zyk: using Crystal of Magic
-						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = level.time + 1000;
-
-						ent->health += 100;
-						ent->client->ps.stats[STAT_ARMOR] += 100;
-
-						if (ent->health > ent->client->ps.stats[STAT_MAX_HEALTH])
-							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-						if (ent->client->ps.stats[STAT_ARMOR] > ent->client->ps.stats[STAT_MAX_HEALTH])
-							ent->client->ps.stats[STAT_ARMOR] = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-						if (ent->client->NPC_class == CLASS_REBORN)
-							ent->client->NPC_class = CLASS_BOBAFETT;
-						else
-							ent->client->NPC_class = CLASS_REBORN;
-
-						ent->client->pers.light_quest_timer = level.time + Q_irand(10000, 12000);
-
-						if (ent->spawnflags & 131072)
-						{ // zyk: boss is stronger now
-							ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
-
-							ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-							ent->client->ps.forceDodgeAnim = BOTH_FORCE_DRAIN_START;
-							ent->client->ps.forceHandExtendTime = level.time + 2000;
-
-							zyk_super_beam(ent, ent->client->ps.viewangles[1]);
-
-							ent->client->pers.light_quest_timer -= 1000;
-						}
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 19)
-				{ // zyk: Ymir
-					// zyk: adding jetpack to this boss
-					ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
-
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						int random_magic = Q_irand(0, 25);
-
-						if (random_magic == 1)
-						{
-							poison_mushrooms(ent, 100, 600);
-						}
-						else if (random_magic == 2)
-						{
-							water_splash(ent, 400, 15);
-						}
-						else if (random_magic == 3)
-						{
-							ultra_flame(ent, 500, 35);
-						}
-						else if (random_magic == 4)
-						{
-							rock_fall(ent, 500, 40);
-						}
-						else if (random_magic == 5)
-						{
-							dome_of_damage(ent, 500, 25);
-						}
-						else if (random_magic == 7)
-						{
-							slow_motion(ent, 400, 15000);
-						}
-						else if (random_magic == 9)
-						{
-							sleeping_flowers(ent, 2500, 350);
-						}
-						else if (random_magic == 11)
-						{
-							flame_burst(ent, 5000);
-						}
-						else if (random_magic == 12)
-						{
-							earthquake(ent, 2000, 300, 500);
-						}
-						else if (random_magic == 13)
-						{
-							magic_shield(ent, 6000);
-						}
-						else if (random_magic == 14)
-						{
-							blowing_wind(ent, 700, 5000);
-						}
-						else if (random_magic == 15)
-						{
-							ultra_speed(ent, 15000);
-						}
-						else if (random_magic == 16)
-						{
-							ice_stalagmite(ent, 500, 130);
-						}
-						else if (random_magic == 18)
-						{
-							water_attack(ent, 500, 40);
-						}
-						else if (random_magic == 19)
-						{
-							tree_of_life(ent);
-						}
-						else if (random_magic == 20)
-						{
-							magic_disable(ent, 450);
-						}
-						else if (random_magic == 22)
-						{
-							flaming_area(ent, 20);
-						}
-						else if (random_magic == 23)
-						{
-							reverse_wind(ent, 700, 5000);
-						}
-						else if (random_magic == 24)
-						{
-							enemy_nerf(ent, 450);
-						}
-						else if (random_magic == 25)
-						{
-							ice_block(ent, 3500);
-						}
-
-						ent->client->pers.guardian_timer = level.time + Q_irand(7000, 10000);
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{ // zyk: spawning mages to help
-						int random_unique = Q_irand(0, 1);
-
-						if (ent->client->NPC_class == CLASS_REBORN)
-							ent->client->NPC_class = CLASS_BOBAFETT;
-						else
-							ent->client->NPC_class = CLASS_REBORN;
-
-						if (random_unique == 0)
-						{
-							ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-
-							elemental_attack(ent);
-						}
-						else
-						{
-							ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-
-							zyk_no_attack(ent);
-						}
-
-						Zyk_NPC_SpawnType("quest_mage", -6049, 1438, 57, 0);
-
-						ent->client->pers.light_quest_timer = level.time + Q_irand(12000, 14000);
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 20)
-				{ // zyk: Guardian of Time
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						int random_magic = Q_irand(0, 4);
-
-						if (random_magic == 0)
-						{
-							dome_of_damage(ent, 20000, 25);
-						}
-						else if (random_magic == 1)
-						{
-							shifting_sand(ent, 20000);
-						}
-						else if (random_magic == 2)
-						{
-							time_power(ent, 20000, 4000);
-						}
-						else if (random_magic == 4)
-						{
-							magic_disable(ent, 20000);
-						}
-
-						ent->client->pers.guardian_timer = level.time + Q_irand(8000, 11000);
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{ // zyk: using Crystal of Magic
-						ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = level.time + 1000;
-
-						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
-
-						ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-						ent->client->ps.forceDodgeAnim = BOTH_FORCE_DRAIN_START;
-						ent->client->ps.forceHandExtendTime = level.time + 2000;
-
-						zyk_super_beam(ent, ent->client->ps.viewangles[1]);
-
-						ent->client->pers.light_quest_timer = level.time + ((ent->health + ent->client->ps.stats[STAT_ARMOR]) / 2) + 7000;
-					}
-				}
-				else if (ent->client->pers.guardian_mode == 21)
-				{ // zyk: Soul of Sorrow
-					if ((int)ent->client->ps.origin[2] < -10200)
-					{ // zyk: bring him back if he falls
-						vec3_t origin;
-						vec3_t yaw;
-
-						origin[0] = 2336.0f;
-						origin[1] = 3425.0f;
-						origin[2] = -9800.0f;
-						yaw[0] = 0.0f;
-						yaw[1] = 179.0f;
-						yaw[2] = 0.0f;
-						zyk_TeleportPlayer(ent, origin, yaw);
-					}
-
-					if (ent->client->pers.guardian_timer < level.time)
-					{
-						int random_magic = Q_irand(0, 25);
-						gentity_t *player_ent = &g_entities[ent->client->pers.guardian_invoked_by_id];
-						int distance = (int)Distance(ent->client->ps.origin, player_ent->client->ps.origin);
-
-						// zyk: using powers in a smarter way
-						if (distance < 300)
-						{ // zyk: close range makes boss use close range powers more frequently
-							random_magic = Q_irand(0, 12);
-						}
-						else
-						{ // zyk: long range makes boss use long range powers more frequently
-							random_magic = Q_irand(13, 25);
-						}
-
-						if (random_magic == 0)
-						{
-							immunity_power(ent, 20000);
-						}
-						else if (random_magic == 1)
-						{
-							lightning_dome(ent, 70);
-						}
-						else if (random_magic == 2)
-						{
-							ultra_drain(ent, 450, 30, 8000);
-						}
-						else if (random_magic == 3)
-						{
-							magic_explosion(ent, 320, 130, 900);
-						}
-						else if (random_magic == 4)
-						{
-							flaming_area(ent, 20);
-						}
-						else if (random_magic == 5)
-						{
-							slow_motion(ent, 5000, 15000);
-						}
-						else if (random_magic == 6)
-						{
-							sleeping_flowers(ent, 2500, 5000);
-						}
-						else if (random_magic == 7)
-						{
-							blowing_wind(ent, 5000, 1800);
-						}
-						else if (random_magic == 8)
-						{
-							flame_burst(ent, 5000);
-						}
-						else if (random_magic == 9)
-						{
-							magic_shield(ent, 6000);
-						}
-						else if (random_magic == 11)
-						{
-							healing_area(ent, 2, 5000);
-						}
-						else if (random_magic == 12)
-						{
-							enemy_nerf(ent, 5000);
-						}
-						else if (random_magic == 13)
-						{
-							water_attack(ent, 5000, 40);
-						}
-						else if (random_magic == 14)
-						{
-							shifting_sand(ent, 5000);
-						}
-						else if (random_magic == 15)
-						{
-							magic_disable(ent, 5000);
-						}
-						else if (random_magic == 16)
-						{
-							chaos_power(ent, 5000, 4600);
-						}
-						else if (random_magic == 17)
-						{
-							dome_of_damage(ent, 5000, 25);
-						}
-						else if (random_magic == 18)
-						{
-							reverse_wind(ent, 5000, 1800);
-						}
-						else if (random_magic == 20)
-						{
-							time_power(ent, 5000, 4000);
-						}
-						else if (random_magic == 21)
-						{
-							ice_stalagmite(ent, 5000, 130);
-						}
-						else if (random_magic == 22)
-						{
-							rock_fall(ent, 5000, 40);
-						}
-						else if (random_magic == 23)
-						{
-							poison_mushrooms(ent, 100, 5000);
-						}
-						else if (random_magic == 24)
-						{
-							ultra_flame(ent, 5000, 35);
-						}
-						else if (random_magic == 25)
-						{
-							ice_block(ent, 3500);
-						}
-
-						ent->client->pers.guardian_timer = level.time + Q_irand(8000, 10000);
-					}
-
-					if (ent->client->pers.light_quest_timer < level.time)
-					{
-						int random_unique = Q_irand(0, 2);
-
-						if (random_unique == 0)
-						{
-							ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
-
-							ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-							ent->client->ps.forceDodgeAnim = BOTH_FORCE_DRAIN_START;
-							ent->client->ps.forceHandExtendTime = level.time + 2000;
-
-							zyk_super_beam(ent, ent->client->ps.viewangles[1]);
-						}
-						else if (random_unique == 1)
-						{
-							ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-
-							zyk_no_attack(ent);
-						}
-						else if (random_unique == 2)
-						{
-							ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-
-							force_scream(ent);
-						}
-
-						ent->client->pers.light_quest_timer = level.time + ((ent->health + ent->client->ps.stats[STAT_ARMOR]) / 2) + 3000;
-					}
-
-					if (ent->client->pers.universe_quest_timer < level.time)
-					{ // zyk: destroys tiles from the background
-						int k = 0;
-						int tile_count = 0;
-						int zyk_chosen_tile = Q_irand(0, (47 - ent->client->pers.hunter_quest_messages));
-						vec3_t origin;
-						vec3_t yaw;
-
-						for (k = (MAX_CLIENTS + BODY_QUEUE_SIZE); k < level.num_entities; k++)
-						{
-							gentity_t *zyk_tile_ent = &g_entities[k];
-
-							if (zyk_tile_ent && Q_stricmp(zyk_tile_ent->targetname, "zyk_quest_models") == 0 && Q_stricmp(zyk_tile_ent->classname, "misc_model_breakable") == 0 && 
-								((int)zyk_tile_ent->s.origin[0] != 2336 || (int)zyk_tile_ent->s.origin[1] != 3425))
-							{ // zyk: do not drop the central tile
-								if (tile_count == zyk_chosen_tile)
-								{
-									gentity_t *effect_ent = zyk_quest_item("env/lbolt1", zyk_tile_ent->s.origin[0], zyk_tile_ent->s.origin[1], -9960, "", "");
-
-									if (effect_ent)
-									{
-										level.special_power_effects[effect_ent->s.number] = ent->s.number;
-										level.special_power_effects_timer[effect_ent->s.number] = level.time + 1000;
-
-										G_Sound(effect_ent, CHAN_AUTO, G_SoundIndex("sound/effects/tram_boost.mp3"));
-
-										G_FreeEntity(zyk_tile_ent);
-
-										ent->client->pers.hunter_quest_messages++;
-									}
-
-									break;
-								}
-
-								tile_count++;
-							}
-						}
-
-						// zyk: send him back to his original catwalk
-						origin[0] = 2336.0f;
-						origin[1] = 3425.0f;
-						origin[2] = -9800.0f;
-						yaw[0] = 0.0f;
-						yaw[1] = 179.0f;
-						yaw[2] = 0.0f;
-						zyk_TeleportPlayer(ent, origin, yaw);
-
-						ent->client->pers.universe_quest_timer = level.time + ((ent->health + ent->client->ps.stats[STAT_ARMOR]) / 2) + 1000;
-					}
-				}
-			}
-			else if (ent->health > 0 && Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy && ent->client->pers.quest_power_usage_timer < level.time)
+			if (ent->health > 0 && Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy && ent->client->pers.quest_power_usage_timer < level.time)
 			{ // zyk: powers used by the quest_mage npc
 				int random_magic = Q_irand(0, (MAX_MAGIC_POWERS - 1));
 				int first_magic_skill = NUMBER_OF_SKILLS - MAX_MAGIC_POWERS;
@@ -16802,160 +15172,6 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				zyk_cast_magic(ent, first_magic_skill + random_magic);
-			}
-			else if (ent->client->pers.universe_quest_messages == -10000 && ent->health > 0 && ent->enemy && Q_stricmp(ent->NPC_type, "ymir_boss") == 0)
-			{ // zyk: Ymir
-				if (ent->client->pers.guardian_timer < level.time)
-				{
-					int random_magic = Q_irand(0, 26);
-
-					if (random_magic == 1)
-					{
-						poison_mushrooms(ent, 100, 600);
-					}
-					else if (random_magic == 2)
-					{
-						water_splash(ent, 400, 15);
-					}
-					else if (random_magic == 3)
-					{
-						ultra_flame(ent, 500, 35);
-					}
-					else if (random_magic == 4)
-					{
-						rock_fall(ent, 500, 40);
-					}
-					else if (random_magic == 5)
-					{
-						dome_of_damage(ent, 500, 25);
-					}
-					else if (random_magic == 7)
-					{
-						slow_motion(ent, 400, 15000);
-					}
-					else if (random_magic == 9)
-					{
-						sleeping_flowers(ent, 2500, 350);
-					}
-					else if (random_magic == 11)
-					{
-						flame_burst(ent, 5000);
-					}
-					else if (random_magic == 12)
-					{
-						earthquake(ent, 2000, 300, 500);
-					}
-					else if (random_magic == 13)
-					{
-						magic_shield(ent, 6000);
-					}
-					else if (random_magic == 14)
-					{
-						blowing_wind(ent, 700, 5000);
-					}
-					else if (random_magic == 15)
-					{
-						ultra_speed(ent, 15000);
-					}
-					else if (random_magic == 16)
-					{
-						ice_stalagmite(ent, 500, 130);
-					}
-					else if (random_magic == 18)
-					{
-						water_attack(ent, 500, 40);
-					}
-					else if (random_magic == 19)
-					{
-						shifting_sand(ent, 1000);
-					}
-					else if (random_magic == 20)
-					{
-						tree_of_life(ent);
-					}
-					else if (random_magic == 21)
-					{
-						magic_disable(ent, 450);
-					}
-					else if (random_magic == 23)
-					{
-						flaming_area(ent, 20);
-					}
-					else if (random_magic == 24)
-					{
-						reverse_wind(ent, 700, 5000);
-					}
-					else if (random_magic == 25)
-					{
-						enemy_nerf(ent, 450);
-					}
-					else if (random_magic == 26)
-					{
-						ice_block(ent, 3500);
-					}
-
-					ent->client->pers.guardian_timer = level.time + Q_irand(6000, 10000);
-				}
-
-				if (ent->client->pers.light_quest_timer < level.time)
-				{ // zyk: unique
-					ent->client->pers.light_quest_timer = level.time + Q_irand(8000, 10000);
-
-					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-
-					zyk_no_attack(ent);
-				}
-			}
-			else if (ent->client->pers.universe_quest_messages == -10000 && ent->health > 0 && ent->enemy && Q_stricmp(ent->NPC_type, "thor_boss") == 0)
-			{ // zyk: Thor
-				if (ent->client->pers.guardian_timer < level.time)
-				{
-					int random_magic = Q_irand(0, 6);
-
-					if (random_magic == 0)
-					{
-						ultra_drain(ent, 450, 30, 8000);
-					}
-					else if (random_magic == 1)
-					{
-						immunity_power(ent, 20000);
-					}
-					else if (random_magic == 2)
-					{
-						chaos_power(ent, 400, 4600);
-					}
-					else if (random_magic == 3)
-					{
-						time_power(ent, 400, 4000);
-					}
-					else if (random_magic == 4)
-					{
-						healing_area(ent, 2, 5000);
-					}
-					else if (random_magic == 5)
-					{
-						magic_explosion(ent, 320, 130, 900);
-					}
-					else if (random_magic == 6)
-					{
-						lightning_dome(ent, 70);
-					}
-
-					ent->client->pers.guardian_timer = level.time + Q_irand(7000, 12000);
-				}
-
-				if (ent->client->pers.light_quest_timer < level.time)
-				{ // zyk: unique
-					ent->client->pers.light_quest_timer = level.time + Q_irand(8000, 10000);
-
-					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
-
-					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-					ent->client->ps.forceDodgeAnim = BOTH_FORCE_DRAIN_START;
-					ent->client->ps.forceHandExtendTime = level.time + 2000;
-
-					zyk_super_beam(ent, ent->client->ps.viewangles[1]);
-				}
 			}
 		}
 

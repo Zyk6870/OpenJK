@@ -572,9 +572,6 @@ typedef enum {
 	MAX_MAGIC_POWERS
 } zyk_magic_t;
 
-// zyk: number of Light Quest guardians to be defeated 
-#define NUMBER_OF_GUARDIANS 10
-
 // zyk: number of Dark Quest objectives
 #define NUMBER_OF_OBJECTIVES 10
 
@@ -872,20 +869,6 @@ typedef struct clientPersistant_s {
 	// zyk: amount of skills used by the player. After a certain amount of uses, player gets 1 experience point (level up score)
 	int skill_counter;
 
-	// zyk: number of guardians the player already defeated
-	// the value will be NUMBER_OF_GUARDIANS after completing the quest
-	// before that, has bitvalue of each defeated guardian. Possible bitvalues are:
-	// 4 - Guardian of Water
-	// 5 - Guardian of Earth
-	// 6 - Guardian of Forest
-	// 7 - Guardian of Intelligence
-	// 8 - Guardian of Agility
-	// 9 - Guardian of Fire
-	// 10 - Guardian of Wind
-	// 11 - Guardian of Resistance
-	// 12 - Guardian of Ice
-	int defeated_guardians; 
-
 	// zyk: number of notes collected in Dark Quest
 	// the value will be NUMBER_OF_OBJECTIVES after completing the quest
 	// before that, has bitvalue of each collected note. Possible bitvalues are:
@@ -1011,10 +994,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
-
-	// zyk: controls the timed events in Light Quest
-	int light_quest_messages;
-	int light_quest_timer;
 
 	// zyk: controls the timed events in Dark Quest
 	int hunter_quest_timer;

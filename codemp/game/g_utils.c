@@ -1618,7 +1618,6 @@ Try and use an entity in the world, directly ahead of us
 
 extern void Touch_Button(gentity_t *ent, gentity_t *other, trace_t *trace );
 extern qboolean gSiegeRoundBegun;
-extern void quest_get_new_player(gentity_t *ent);
 extern void save_account(gentity_t *ent, qboolean save_char_file);
 extern void got_all_amulets(gentity_t *ent);
 extern void NPC_BSDefault( void );

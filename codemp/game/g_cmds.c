@@ -2244,7 +2244,6 @@ void Cmd_FollowPrev_f( gentity_t *ent ) {
 }
 
 extern void save_account(gentity_t *ent, qboolean save_char_file);
-extern void quest_get_new_player(gentity_t *ent);
 qboolean zyk_answer(gentity_t *ent, char *arg1)
 {
 	if (ent->client->sess.amrpgmode == 2)
@@ -2263,8 +2262,6 @@ qboolean zyk_answer(gentity_t *ent, char *arg1)
 			{
 				ent->client->pers.eternity_quest_progress++;
 				save_account(ent, qtrue);
-
-				quest_get_new_player(ent);
 
 				zyk_text_message(ent, va("eternity/answered_%d", ent->client->pers.eternity_quest_progress - 1), qtrue, qtrue, ent->client->pers.netname);
 				return qtrue;
@@ -4753,13 +4750,6 @@ void load_account(gentity_t *ent)
 			}
 
 			// zyk: Other RPG attributes
-			// zyk: loading Light Quest Defeated Guardians number value
-			fscanf(account_file, "%s", content);
-			ent->client->pers.defeated_guardians = atoi(content);
-
-			// zyk: compability with old mod versions, in which the players who completed the quest had a value of 9
-			if (ent->client->pers.defeated_guardians == 9)
-				ent->client->pers.defeated_guardians = NUMBER_OF_GUARDIANS;
 
 			// zyk: loading Dark Quest completed objectives value
 			fscanf(account_file, "%s", content);
@@ -4852,13 +4842,13 @@ void load_account(gentity_t *ent)
 			fclose(account_file);
 		}
 		else
-		{ // zyk: char file caould not be loaded
-			trap->SendServerCommand(ent - g_entities, "print \"Char file could not be loaded!\n\"");
+		{ // zyk: char file could not be loaded
+			trap->SendServerCommand(ent->s.number, "print \"Char file could not be loaded!\n\"");
 		}
 	}
 	else
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"There is no account with this login or password.\n\"" ); 
+		trap->SendServerCommand(ent->s.number, "print \"There is no account with this login or password.\n\"" );
 	}
 }
 
@@ -4885,10 +4875,10 @@ void save_account(gentity_t *ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt",ent->client->sess.filename, ent->client->sess.rpgchar),"w");
 
-			fprintf(account_file,"%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-			client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.defeated_guardians, client->pers.hunter_quest_progress
-			, client->pers.eternity_quest_progress, client->pers.secrets_found, client->pers.universe_quest_progress, client->pers.universe_quest_counter, client->pers.credits
-			, client->pers.rpg_class, client->sess.magic_fist_selection, client->sess.selected_special_power, client->sess.selected_left_special_power, client->sess.selected_right_special_power);
+			fprintf(account_file,"%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.hunter_quest_progress, client->pers.eternity_quest_progress, 
+				client->pers.secrets_found, client->pers.universe_quest_progress, client->pers.universe_quest_counter, client->pers.credits, client->pers.rpg_class, 
+				client->sess.magic_fist_selection, client->sess.selected_special_power, client->sess.selected_left_special_power, client->sess.selected_right_special_power);
 
 			fclose(account_file);
 		}
@@ -5322,9 +5312,6 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->pers.universe_quest_messages = 0;
 		ent->client->pers.universe_quest_timer = 0;
 
-		ent->client->pers.light_quest_timer = 0;
-		ent->client->pers.light_quest_messages = 0;
-
 		ent->client->pers.hunter_quest_timer = 0;
 		ent->client->pers.hunter_quest_messages = 0;
 
@@ -5524,7 +5511,6 @@ void add_new_char(gentity_t *ent)
 		ent->client->pers.skill_levels[i] = 0;
 	}
 
-	ent->client->pers.defeated_guardians = 0;
 	ent->client->pers.hunter_quest_progress = 0;
 	ent->client->pers.eternity_quest_progress = 0;
 	ent->client->pers.secrets_found = 0;
@@ -5781,25 +5767,6 @@ void clean_guardians(gentity_t *ent)
 	}
 }
 
-// zyk: tests if the player has beaten the guardians before the Guardian of Light in Light Quest
-qboolean light_quest_defeated_guardians(gentity_t *ent)
-{
-	int j = 0, number_of_guardians_defeated = 0;
-
-	for (j = 4; j <= 12; j++)
-	{
-		if (ent->client->pers.defeated_guardians & (1 << j))
-		{
-			number_of_guardians_defeated++;
-		}
-	}
-
-	if (number_of_guardians_defeated == (NUMBER_OF_GUARDIANS - 1))
-		return qtrue;
-	else
-		return qfalse;
-}
-
 // zyk: tests if the player has collected the 9 notes before the Guardian of Darkness in Dark Quest
 qboolean dark_quest_collected_notes(gentity_t *ent)
 {
@@ -5929,351 +5896,12 @@ int zyk_number_of_completed_quests(gentity_t *ent)
 {
 	int number_of_completed_quests = 0;
 
-	if (ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS)
-		number_of_completed_quests++;
 	if (ent->client->pers.hunter_quest_progress == NUMBER_OF_OBJECTIVES)
 		number_of_completed_quests++;
 	if (ent->client->pers.eternity_quest_progress == NUMBER_OF_ETERNITY_QUEST_OBJECTIVES)
 		number_of_completed_quests++;
 
 	return number_of_completed_quests;
-}
-
-// zyk: used by the quest_get_new_player function to actually get the new player based on his quest settings
-void choose_new_player(gentity_t *next_player)
-{
-	int found = 0;
-	if (next_player && next_player->client && next_player->client->sess.amrpgmode == 2 && !(next_player->client->pers.player_settings & (1 << 0)) && next_player->client->pers.can_play_quest == 0 && next_player->client->pers.connected == CON_CONNECTED && next_player->client->sess.sessionTeam != TEAM_SPECTATOR && next_player->inuse == qtrue)
-	{
-		if (level.quest_map == 1 && ((next_player->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(next_player->client->pers.defeated_guardians & (1 << 4))) || (next_player->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES && !(next_player->client->pers.hunter_quest_progress & (1 << 4))) || (next_player->client->pers.universe_quest_progress == 2 && (!(next_player->client->pers.universe_quest_counter & (1 << 1)) || !(next_player->client->pers.universe_quest_counter & (1 << 3)))) || next_player->client->pers.universe_quest_progress == 3))
-			found = 1;
-		else if (level.quest_map == 2 && next_player->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES && !(next_player->client->pers.hunter_quest_progress & (1 << 5)))
-			found = 1;
-		else if (level.quest_map == 3 && next_player->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES && !(next_player->client->pers.hunter_quest_progress & (1 << 6)))
-			found = 1;
-		else if (level.quest_map == 4 && (
-			(next_player->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES && !(next_player->client->pers.hunter_quest_progress & (1 << 7))) || 
-			(next_player->client->pers.universe_quest_progress >= 17 && next_player->client->pers.universe_quest_progress < NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES &&
-			 next_player->client->pers.universe_quest_counter & (1 << 3))))
-			found = 1;
-		else if (level.quest_map == 5 && ((next_player->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(next_player->client->pers.defeated_guardians & (1 << 12))) || (next_player->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES && !(next_player->client->pers.hunter_quest_progress & (1 << 8))) || (next_player->client->pers.universe_quest_progress == 2 && !(next_player->client->pers.universe_quest_counter & (1 << 9)))))
-			found = 1;
-		else if (level.quest_map == 6 && (
-			(next_player->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES && !(next_player->client->pers.hunter_quest_progress & (1 << 9))) ||
-			(next_player->client->pers.universe_quest_progress == 2 && !(next_player->client->pers.universe_quest_counter & (1 << 6))) ||
-			(next_player->client->pers.universe_quest_progress >= 18 && next_player->client->pers.universe_quest_progress < NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && 
-			 next_player->client->pers.universe_quest_counter & (1 << 0)) || 
-			(next_player->client->pers.universe_quest_progress == 16 && next_player->client->pers.universe_quest_counter & (1 << 1)) || 
-			(next_player->client->pers.universe_quest_progress >= 15 && next_player->client->pers.universe_quest_progress <= 17 && next_player->client->pers.universe_quest_counter & (1 << 2))))
-		{
-			found = 1;
-		}
-		else if (level.quest_map == 7 && ((next_player->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(next_player->client->pers.defeated_guardians & (1 << 7))) || (next_player->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES && !(next_player->client->pers.hunter_quest_progress & (1 << 10)))))
-			found = 1;
-		else if (level.quest_map == 8 && next_player->client->pers.universe_quest_progress == 4)
-			found = 1;
-		else if (level.quest_map == 9 && (next_player->client->pers.universe_quest_progress < 2 || (next_player->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES && !(next_player->client->pers.hunter_quest_progress & (1 << 12)))))
-			found = 1;
-		else if (level.quest_map == 10 && ((next_player->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(next_player->client->pers.defeated_guardians & (1 << 6))) || 
-				 light_quest_defeated_guardians(next_player) == qtrue || dark_quest_collected_notes(next_player) == qtrue || 
-				 next_player->client->pers.eternity_quest_progress < NUMBER_OF_ETERNITY_QUEST_OBJECTIVES || 
-				(next_player->client->pers.universe_quest_progress == 2 && !(next_player->client->pers.universe_quest_counter & (1 << 8))) || 
-				(next_player->client->pers.universe_quest_progress == 15 && next_player->client->pers.universe_quest_counter & (1 << 0)) || 
-				(next_player->client->pers.universe_quest_progress == 16 && next_player->client->pers.universe_quest_counter & (1 << 3))))
-		{
-			found = 1;
-		}
-		else if (level.quest_map == 11 && next_player->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(next_player->client->pers.defeated_guardians & (1 << 9)))
-			found = 1;
-		else if (level.quest_map == 12 && (next_player->client->pers.universe_quest_progress == 7 ||
-				(next_player->client->pers.universe_quest_progress == 8 && !(next_player->client->pers.universe_quest_counter & (1 << 1))) || 
-				(next_player->client->pers.universe_quest_progress == 15 && next_player->client->pers.universe_quest_counter & (1 << 1)) || 
-				(next_player->client->pers.universe_quest_progress >= 17 && next_player->client->pers.universe_quest_progress < NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && 
-				 next_player->client->pers.universe_quest_counter & (1 << 1)) || 
-				(next_player->client->pers.universe_quest_progress == 15 && next_player->client->pers.universe_quest_counter & (1 << 3))))
-		{
-			found = 1;
-		}
-		else if (level.quest_map == 13 && ((next_player->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(next_player->client->pers.defeated_guardians & (1 << 5))) || (next_player->client->pers.universe_quest_progress == 2 && !(next_player->client->pers.universe_quest_counter & (1 << 5)))))
-			found = 1;
-		else if (level.quest_map == 14 && next_player->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(next_player->client->pers.defeated_guardians & (1 << 11)))
-			found = 1;
-		else if (level.quest_map == 15 && next_player->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(next_player->client->pers.defeated_guardians & (1 << 10)))
-			found = 1;
-		else if (level.quest_map == 17 && ((next_player->client->pers.universe_quest_progress == 8 && !(next_player->client->pers.universe_quest_counter & (1 << 2))) || (next_player->client->pers.universe_quest_progress == 9 && (!(next_player->client->pers.universe_quest_counter & (1 << 0)) || !(next_player->client->pers.universe_quest_counter & (1 << 1)) || !(next_player->client->pers.universe_quest_counter & (1 << 2)))) || (next_player->client->pers.universe_quest_progress >= 10 && next_player->client->pers.universe_quest_progress < 14) || (next_player->client->pers.universe_quest_progress == 14 && zyk_number_of_completed_quests(next_player) == 3)))
-			found = 1;
-		else if (level.quest_map == 18 && ((next_player->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES && !(next_player->client->pers.hunter_quest_progress & (1 << 11))) || (next_player->client->pers.universe_quest_progress == 2 && !(next_player->client->pers.universe_quest_counter & (1 << 4)))))
-			found = 1;
-		else if (level.quest_map == 20 && ((next_player->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS && !(next_player->client->pers.defeated_guardians & (1 << 8))) || (next_player->client->pers.universe_quest_progress == 2 && !(next_player->client->pers.universe_quest_counter & (1 << 7)))))
-			found = 1;
-		else if (level.quest_map == 24 && (next_player->client->pers.universe_quest_progress == 5 ||
-				(next_player->client->pers.universe_quest_progress == 16 && next_player->client->pers.universe_quest_counter & (1 << 0)) || 
-				(next_player->client->pers.universe_quest_progress == 17 && next_player->client->pers.universe_quest_counter & (1 << 0)) || 
-				(next_player->client->pers.universe_quest_progress >= 18 && next_player->client->pers.universe_quest_progress < NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && 
-				 next_player->client->pers.universe_quest_counter & (1 << 2))))
-		{
-			found = 1;
-		}
-		else if (level.quest_map == 25 && next_player->client->pers.universe_quest_progress == 6)
-			found = 1;
-	}
-
-	if (found == 1)
-	{ // zyk: clean quest npcs of this map
-		int j = 0;
-		for (j = MAX_CLIENTS; j < level.num_entities; j++)
-		{
-			if (&g_entities[j] && g_entities[j].NPC && g_entities[j].health > 0 && (Q_stricmp(g_entities[j].NPC_type, "ymir_boss") == 0 || Q_stricmp(g_entities[j].NPC_type, "thor_boss") == 0 || 
-				Q_stricmp( g_entities[j].NPC_type, "quest_ragnos" ) == 0 || Q_stricmp( g_entities[j].NPC_type, "quest_jawa" ) == 0 || Q_stricmp(g_entities[j].NPC_type, "quest_mage") == 0 || 
-				Q_stricmp( g_entities[j].NPC_type, "quest_protocol_imp" ) == 0 || Q_stricmp( g_entities[j].NPC_type, "quest_sand_raider_green" ) == 0 || 
-				Q_stricmp( g_entities[j].NPC_type, "quest_sand_raider_brown" ) == 0 || Q_stricmp( g_entities[j].NPC_type, "quest_sand_raider_blue" ) == 0 || 
-				Q_stricmp( g_entities[j].NPC_type, "quest_sand_raider_red" ) == 0 || Q_stricmp( g_entities[j].NPC_type, "quest_reborn" ) == 0 || 
-				Q_stricmp( g_entities[j].NPC_type, "quest_reborn_blue" ) == 0 || Q_stricmp( g_entities[j].NPC_type, "quest_reborn_boss" ) == 0 || 
-				Q_stricmp( g_entities[j].NPC_type, "quest_reborn_red" ) == 0 || Q_stricmp( g_entities[j].NPC_type, "sage_of_light" ) == 0 || 
-				Q_stricmp( g_entities[j].NPC_type, "sage_of_darkness" ) == 0 || Q_stricmp( g_entities[j].NPC_type, "sage_of_eternity" ) == 0 || 
-				Q_stricmp( g_entities[j].NPC_type, "sage_of_universe" ) == 0 || Q_stricmp( g_entities[j].NPC_type, "quest_super_soldier" ) == 0 || 
-				Q_stricmp( g_entities[j].NPC_type, "guardian_of_time" ) == 0 || Q_stricmp( g_entities[j].NPC_type, "guardian_boss_9" ) == 0 || 
-				Q_stricmp( g_entities[j].NPC_type, "guardian_of_darkness" ) == 0 || Q_stricmp( g_entities[j].NPC_type, "guardian_of_eternity" ) == 0 || 
-				Q_stricmp( g_entities[j].NPC_type, "guardian_of_universe" ) == 0 || Q_stricmp( g_entities[j].NPC_type, "master_of_evil" ) == 0 || 
-				Q_stricmp(g_entities[j].NPC_type, "soul_of_sorrow") == 0 || Q_stricmp(g_entities[j].NPC_type, "quest_citizen_warrior") == 0))
-			{
-				G_FreeEntity(&g_entities[j]);
-			}
-			else if (&g_entities[j] && (Q_stricmp(g_entities[j].targetname, "zyk_quest_models") == 0 || Q_stricmp(g_entities[j].targetname, "zyk_quest_artifact") == 0 || 
-					 Q_stricmp(g_entities[j].targetname, "zyk_sage_prison") == 0 || g_entities[j].spawnflags & 131072))
-			{ // zyk: cleans the models/effects/items spawned in quests
-				G_FreeEntity(&g_entities[j]);
-			}
-		}
-
-		// zyk: setting the attributes depending on the quests this player must complete in this map
-		next_player->client->pers.guardian_mode = 0;
-		next_player->client->pers.guardian_timer = 0;
-
-		next_player->client->pers.universe_quest_artifact_holder_id = -1;
-		next_player->client->pers.universe_quest_messages = 0;
-
-		// zyk: give some seconds to the new player to start his quest
-		next_player->client->pers.universe_quest_timer = level.time + 3000;
-
-		next_player->client->pers.hunter_quest_timer = level.time + 3000;
-		next_player->client->pers.hunter_quest_messages = 0;
-
-		next_player->client->pers.light_quest_timer = level.time + 3000;
-		next_player->client->pers.light_quest_messages = 0;
-
-		if (next_player->client->pers.eternity_quest_progress < (NUMBER_OF_ETERNITY_QUEST_OBJECTIVES - 1))
-		{ // zyk: give some time before the riddle appears to the quest player
-			next_player->client->pers.eternity_quest_timer = level.time + 1000;
-		}
-		else
-		{ 
-			next_player->client->pers.eternity_quest_timer = 0;
-		}
-
-		// zyk: must clean here too so in yavin1b the correct note is spawned for this player
-		if (level.quest_map == 1)
-			clean_note_model();
-
-		if (level.quest_map == 9 && next_player->client->pers.universe_quest_progress == 0) 
-		{ // zyk: first Universe Quest objective
-			next_player->client->pers.universe_quest_objective_control = 8; // zyk: player must kill quest reborn npcs to complete the first objective
-			next_player->client->pers.light_quest_messages = 9;
-		}
-		else if (level.quest_map == 9 && next_player->client->pers.universe_quest_progress == 1)
-		{ // zyk: second Universe Quest objective
-			next_player->client->pers.universe_quest_objective_control = 2; // zyk: sets this player as playing the second objective of Universe Quest
-		}
-		else if (next_player->client->pers.universe_quest_progress == 2)
-		{ // zyk: third Universe Quest objective
-			next_player->client->pers.universe_quest_objective_control = 3; // zyk: sets this player as playing the third objective of Universe Quest
-		}
-		else if (level.quest_map == 1 && next_player->client->pers.universe_quest_progress == 3)
-		{
-			if (level.universe_quest_note_id == -1)
-				load_note_model(2780,3966,1411);
-
-			next_player->client->pers.universe_quest_objective_control = 4; // zyk: fourth Universe Quest objective
-		}
-		else if (level.quest_map == 8 && next_player->client->pers.universe_quest_progress == 4)
-		{ // zyk: fifth Universe Quest objective
-			next_player->client->pers.universe_quest_objective_control = 5;
-			next_player->client->pers.universe_quest_timer = level.time + 2000;
-		}
-		else if (level.quest_map == 24 && next_player->client->pers.universe_quest_progress == 5)
-		{
-			next_player->client->pers.universe_quest_objective_control = -6;
-			got_all_amulets(next_player);
-		}
-		else if (level.quest_map == 25 && next_player->client->pers.universe_quest_progress == 6)
-		{ // zyk: seventh Universe Quest objective
-			next_player->client->pers.universe_quest_timer = level.time + 3000;
-			next_player->client->pers.universe_quest_objective_control = -7;
-		}
-		else if (level.quest_map == 17)
-		{ // zyk: Universe Quest
-			if (next_player->client->pers.universe_quest_progress == 9)
-			{ // zyk: cleaning crystals that were in the map
-				int zyk_it = 0;
-
-				for (zyk_it = 0; zyk_it < 3; zyk_it++)
-				{
-					clean_crystal_model(zyk_it);
-				}
-			}
-
-			if (next_player->client->pers.universe_quest_progress == 11)
-			{ // zyk: player must defeat this quantity of quest_super_soldier npcs in this mission
-				next_player->client->pers.universe_quest_timer = level.time + 3000;
-				next_player->client->pers.universe_quest_objective_control = 20;
-			}
-		}
-
-		// zyk: loading note models if player must find a Dark Quest note
-		if (level.quest_note_id == -1 && next_player->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES)
-		{
-			if (level.quest_map == 1 && !(next_player->client->pers.hunter_quest_progress & (1 << 4)))
-			{
-				load_note_model(2375,4600,1810);
-			}
-			else if (level.quest_map == 2 && !(next_player->client->pers.hunter_quest_progress & (1 << 5)))
-			{
-				load_note_model(7500,-755,2);
-			}
-			else if (level.quest_map == 3 && !(next_player->client->pers.hunter_quest_progress & (1 << 6)))
-			{
-				load_note_model(-765,4790,196);
-			}
-			else if (level.quest_map == 4 && !(next_player->client->pers.hunter_quest_progress & (1 << 7)))
-			{
-				load_note_model(2400,2990,-2093);
-			}
-			else if (level.quest_map == 5 && !(next_player->client->pers.hunter_quest_progress & (1 << 8)))
-			{
-				load_note_model(-500,-4690,928);
-			}
-			else if (level.quest_map == 6 && !(next_player->client->pers.hunter_quest_progress & (1 << 9)))
-			{
-				load_note_model(-9838,-1547,2);
-			}
-			else if (level.quest_map == 7 && !(next_player->client->pers.hunter_quest_progress & (1 << 10)))
-			{
-				load_note_model(1905,1180,706);
-			}
-			else if (level.quest_map == 18 && !(next_player->client->pers.hunter_quest_progress & (1 << 11)))
-			{
-				load_note_model(-1148,-1458,593);
-			}
-			else if (level.quest_map == 9 && !(next_player->client->pers.hunter_quest_progress & (1 << 12)))
-			{
-				load_note_model(-1963,2633,-3005);
-			}
-		}
-
-		// zyk: loading effects in guardian area
-		if (level.quest_effect_id == -1 && next_player->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS)
-		{
-			if (level.quest_map == 1 && !(next_player->client->pers.defeated_guardians & (1 << 4)))
-			{ // zyk: Guardian of Water
-				load_effect(2062,4089,351,0,"env/btend");
-			}
-			else if (level.quest_map == 13 && !(next_player->client->pers.defeated_guardians & (1 << 5)))
-			{ // zyk: Guardian of Earth
-				load_effect(-2149,-4187,3645,0,"env/btend");
-			}
-			else if (level.quest_map == 10 && !(next_player->client->pers.defeated_guardians & (1 << 6)))
-			{ // zyk: Guardian of Forest
-				load_effect(512,4829,62,0,"env/btend");
-			}
-			else if (level.quest_map == 7 && !(next_player->client->pers.defeated_guardians & (1 << 7)))
-			{ // zyk: Guardian of Intelligence
-				load_effect(1920, 2068, 720,0,"env/btend");
-			}
-			else if (level.quest_map == 20 && !(next_player->client->pers.defeated_guardians & (1 << 8)))
-			{ // zyk: Guardian of Agility
-				load_effect(8474,-1322,-159,0,"env/btend");
-			}
-			else if (level.quest_map == 11 && !(next_player->client->pers.defeated_guardians & (1 << 9)))
-			{ // zyk: Guardian of Fire
-				load_effect(0,5,-375,0,"env/btend");
-			}
-			else if (level.quest_map == 15 && !(next_player->client->pers.defeated_guardians & (1 << 10)))
-			{ // zyk: Guardian of Wind
-				load_effect(-153,-455,216,0,"env/btend");
-			}
-			else if (level.quest_map == 14 && !(next_player->client->pers.defeated_guardians & (1 << 11)))
-			{ // zyk: Guardian of Resistance
-				load_effect(0,1135,9,0,"env/btend");
-			}
-			else if (level.quest_map == 5 && !(next_player->client->pers.defeated_guardians & (1 << 12)))
-			{ // zyk: Guardian of Ice
-				load_effect(-5548,11548,990,0,"env/btend");
-			}
-		}
-
-		next_player->client->pers.quest_afk_timer = level.time + zyk_quest_afk_timer.integer;
-		next_player->client->pers.can_play_quest = 1;
-
-		do_scale(next_player, 100);
-
-		trap->SendServerCommand( -1, va("chat \"^3Quest System: ^7%s ^7turn.\"",next_player->client->pers.netname));
-	}
-}
-
-// zyk: searches for a new player to play a quest if he died or failed
-void quest_get_new_player(gentity_t *ent)
-{
-	int i = 0;
-	gentity_t *next_player = NULL;
-
-	ent->client->pers.can_play_quest = 0;
-
-	if (zyk_allow_quests.integer != 1)
-		return;
-
-	if (level.gametype != GT_FFA)
-	{ // zyk: quests can only be played at FFA gametype
-		return;
-	}
-
-	for (i = 0; i < level.maxclients; i++)
-	{ // zyk: verify if there is someone who is already playing a quest and is not in spectator mode
-		next_player = &g_entities[i];
-		if (next_player && next_player->client && next_player->client->sess.amrpgmode == 2 && next_player->client->pers.can_play_quest == 1 && next_player->client->sess.sessionTeam != TEAM_SPECTATOR)
-			return;
-	}
-
-	for (i = 0; i < level.maxclients; i++)
-	{ // zyk: remove guardian_mode from all players that were fighting a boss battle
-		next_player = &g_entities[i];
-		if (next_player && next_player->client && next_player->client->sess.amrpgmode == 2 && next_player->client->pers.guardian_mode != 0)
-			next_player->client->pers.guardian_mode = 0;
-	}
-
-	// zyk: no one is already playing the quest, so choose a new player
-
-	for (i = ((ent-g_entities) + 1); i < level.maxclients; i++)
-	{
-		next_player = &g_entities[i];
-
-		choose_new_player(next_player);
-
-		if (next_player && next_player->client && next_player->client->sess.amrpgmode == 2 && next_player->client->pers.can_play_quest == 1) // zyk: found the player
-			return;
-	}
-
-	for (i = 0; i < (ent-g_entities); i++)
-	{
-		next_player = &g_entities[i];
-
-		choose_new_player(next_player);
-
-		if (next_player && next_player->client && next_player->client->sess.amrpgmode == 2 && next_player->client->pers.can_play_quest == 1) // zyk: found the player
-			return;
-	}
-
-	// zyk: didnt find anyone to play this quest, so choose the same player again if he still needs to play a quest in this map
-	choose_new_player(ent);
 }
 
 // zyk: tests if the race must be finished
@@ -6356,7 +5984,6 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 	{
 		// zyk: if this is the quest player, reset the boss battle music
 		level.boss_battle_music_reset_timer = level.time + 1000;
-		quest_get_new_player(ent);
 	}
 
 	ent->client->pers.bitvalue = 0;
@@ -6597,7 +6224,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 			unique_duration = ent->client->pers.unique_skill_duration - level.time;
 		}
 
-		strcpy(content,va("%s%d-%d-%d-%d-%d-%d-%d-%d-",content,ent->client->pers.secrets_found,ent->client->pers.defeated_guardians,ent->client->pers.hunter_quest_progress,
+		strcpy(content,va("%s%d-%d-%d-%d-%d-%d-%d-",content,ent->client->pers.secrets_found,ent->client->pers.hunter_quest_progress,
 			ent->client->pers.eternity_quest_progress,ent->client->pers.universe_quest_progress,universe_quest_counter_value,quest_player_id,unique_duration));
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-%s-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,zyk_rpg_class(ent),content));
@@ -7268,93 +6895,12 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 			if (Q_stricmp( arg1, "rpg" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list ammo: ^7lists ammo skills\n^2/list items: ^7lists holdable items skills\n^2/list magic: ^7lists magic skills\n^2/list special: ^7list special powers got in quests\n^2/list [skill number]: ^7lists info about a skill\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list classes: ^7lists the RPG classes\n^2/list stuff: ^7lists upgrades bought from sellers\n\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list ammo: ^7lists ammo skills\n^2/list items: ^7lists holdable items skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list classes: ^7lists the RPG classes\n^2/list stuff: ^7lists upgrades bought from sellers\n\n\"");
 			}
 			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || Q_stricmp( arg1, "other" ) == 0 || 
 					 Q_stricmp( arg1, "ammo" ) == 0 || Q_stricmp( arg1, "items" ) == 0 || Q_stricmp(arg1, "magic") == 0)
 			{
 				zyk_list_player_skills(ent, ent, G_NewString(arg1));
-			}
-			else if (Q_stricmp(arg1, "special") == 0)
-			{
-				char message_content[8][100];
-
-				while (i < 7)
-				{
-					strcpy(message_content[i], "");
-					i++;
-				}
-				message_content[7][0] = '\0';
-				i = 0;
-
-				if (ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS)
-					strcpy(message_content[0], va("%s^3l  ^7- Light Power: ^2yes\n", message_content[0]));
-				else
-					strcpy(message_content[0], va("%s^3l  ^7- Light Power: ^1no\n", message_content[0]));
-
-				if (ent->client->pers.hunter_quest_progress == NUMBER_OF_OBJECTIVES)
-					strcpy(message_content[1], va("%s^3d  ^1- Dark Power: ^2yes\n", message_content[1]));
-				else
-					strcpy(message_content[1], va("%s^3d  ^1- Dark Power: ^1no\n", message_content[1]));
-
-				if (ent->client->pers.eternity_quest_progress == NUMBER_OF_ETERNITY_QUEST_OBJECTIVES)
-					strcpy(message_content[2], va("%s^3e  - Eternity Power: ^2yes\n", message_content[2]));
-				else
-					strcpy(message_content[2], va("%s^3e  - Eternity Power: ^1no\n", message_content[2]));
-
-				if (ent->client->pers.universe_quest_progress >= 8)
-					strcpy(message_content[3], va("%s^3u  ^2- Universe Power: ^2yes\n", message_content[3]));
-				else
-					strcpy(message_content[3], va("%s^3u  ^2- Universe Power: ^1no\n", message_content[3]));
-
-				if (ent->client->pers.universe_quest_progress >= 14)
-					strcpy(message_content[4], va("%s^3!  ^5- Ultimate Power: ^2yes\n", message_content[4]));
-				else
-					strcpy(message_content[4], va("%s^3!  ^5- Ultimate Power: ^1no\n", message_content[4]));
-
-				if (ent->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES)
-					strcpy(message_content[5], va("%s^3r  ^4- Final Power: ^2yes\n", message_content[5]));
-				else
-					strcpy(message_content[5], va("%s^3r  ^4- Final Power: ^1no\n", message_content[5]));
-
-				if (ent->client->pers.rpg_class == 0 && (ent->client->pers.defeated_guardians & (1 << 11) ||
-					ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-					strcpy(message_content[6], va("%s^3s  ^6- Magic Powers: ^2yes\n", message_content[6]));
-				else if (ent->client->pers.rpg_class == 1 && (ent->client->pers.defeated_guardians & (1 << 6) ||
-					ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-					strcpy(message_content[6], va("%s^3s  ^6- Magic Powers: ^2yes\n", message_content[6]));
-				else if (ent->client->pers.rpg_class == 5 && (ent->client->pers.defeated_guardians & (1 << 4) ||
-					ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-					strcpy(message_content[6], va("%s^3s  ^6- Magic Powers: ^2yes\n", message_content[6]));
-				else if (ent->client->pers.rpg_class == 4 && (ent->client->pers.defeated_guardians & (1 << 9) ||
-					ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-					strcpy(message_content[6], va("%s^3s  ^6- Magic Powers: ^2yes\n", message_content[6]));
-				else if (ent->client->pers.rpg_class == 3 && (ent->client->pers.defeated_guardians & (1 << 5) ||
-					ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-					strcpy(message_content[6], va("%s^3s  ^6- Magic Powers: ^2yes\n", message_content[6]));
-				else if (ent->client->pers.rpg_class == 6 && (ent->client->pers.defeated_guardians & (1 << 7) ||
-					ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-					strcpy(message_content[6], va("%s^3s  ^6- Magic Powers: ^2yes\n", message_content[6]));
-				else if (ent->client->pers.rpg_class == 2 && (ent->client->pers.defeated_guardians & (1 << 10) ||
-					ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-					strcpy(message_content[6], va("%s^3s  ^6- Magic Powers: ^2yes\n", message_content[6]));
-				else if (ent->client->pers.rpg_class == 7 && (ent->client->pers.defeated_guardians & (1 << 8) ||
-					ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-					strcpy(message_content[6], va("%s^3s  ^6- Magic Powers: ^2yes\n", message_content[6]));
-				else if (ent->client->pers.rpg_class == 9 && (ent->client->pers.defeated_guardians & (1 << 12) ||
-					ent->client->pers.defeated_guardians == NUMBER_OF_GUARDIANS))
-					strcpy(message_content[6], va("%s^3s  ^6- Magic Powers: ^2yes\n", message_content[6]));
-				else if (ent->client->pers.rpg_class == 8)
-					strcpy(message_content[6], va("%s^3s  ^6- Magic Powers: ^2yes\n", message_content[6]));
-				else
-					strcpy(message_content[6], va("%s^3s  ^6- Magic Powers: ^1no\n", message_content[6]));
-
-				for (i = 0; i < 7; i++)
-				{
-					strcpy(message, va("%s%s", message, message_content[i]));
-				}
-
-				trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", message));
 			}
 			else if (Q_stricmp( arg1, "quests" ) == 0)
 			{
@@ -7381,80 +6927,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 					}
 
-					trap->SendServerCommand(ent-g_entities, va("print \"\n^3RPG Mode Quests\n\n^2/list universe: ^7Universe Quest (Main Quest)\n\n^2/list light: ^7Light Quest\n^2/list dark: ^7Dark Quest\n^2/list eternity: ^7Eternity Quest\n\n^3/list bounty: ^7The Bounty Hunter quest\n^3/list guardian: ^7The Guardian Quest\n^3/list custom: ^7lists custom quests\n\n^3Quest Player: ^7%s\n^3Bounty Quest Target: ^7%s^7\n\n\"", quest_player, target_player));
+					trap->SendServerCommand(ent->s.number, va("print \"\n^3RPG Mode Quests\n\n^2/list universe: ^7Universe Quest (Main Quest)\n\n^2/list dark: ^7Dark Quest\n^2/list eternity: ^7Eternity Quest\n\n^3/list bounty: ^7The Bounty Hunter quest\n^3/list custom: ^7lists custom quests\n\n^3Quest Player: ^7%s\n^3Bounty Quest Target: ^7%s^7\n\n\"", quest_player, target_player));
 				}
 				else
-					trap->SendServerCommand(ent-g_entities, "print \"\n^3RPG Mode Quests\n\n^1Quests are not allowed in this server^7\n\n\"");
-			}
-			else if (Q_stricmp( arg1, "light" ) == 0)
-			{
-				char guardian_message[MAX_STRING_CHARS];
-				strcpy(guardian_message, "");
-
-				if (ent->client->pers.defeated_guardians != NUMBER_OF_GUARDIANS)
-				{
-					if (light_quest_defeated_guardians(ent) == qtrue)
-					{
-						strcpy(guardian_message, "^3\n2 - Guardian of Light\n\n^7Go to the sacred monument in ^3yavin2^7 and defeat the Guardian of Light.");
-					}
-					else
-					{
-						strcpy(guardian_message, "^3\n1 - The Guardians\n\n^7Defeat the guardians in their respective maps\n");
-
-						if (ent->client->pers.defeated_guardians & (1 << 4))
-							strcpy(guardian_message, va("%s\n^4Guardian of Water ^7(yavin1b) - ^2yes",guardian_message));
-						else
-							strcpy(guardian_message, va("%s\n^4Guardian of Water ^7(yavin1b) - ^1no",guardian_message));
-
-						if (ent->client->pers.defeated_guardians & (1 << 5))
-							strcpy(guardian_message, va("%s\n^3Guardian of Earth ^7(t1_fatal) - ^2yes",guardian_message));
-						else
-							strcpy(guardian_message, va("%s\n^3Guardian of Earth ^7(t1_fatal) - ^1no",guardian_message));
-
-						if (ent->client->pers.defeated_guardians & (1 << 6))
-							strcpy(guardian_message, va("%s\n^2Guardian of Forest ^7(yavin2) - ^2yes",guardian_message));
-						else
-							strcpy(guardian_message, va("%s\n^2Guardian of Forest ^7(yavin2) - ^1no",guardian_message));
-
-						if (ent->client->pers.defeated_guardians & (1 << 7))
-							strcpy(guardian_message, va("%s\n^5Guardian of Intelligence ^7(t2_rogue) - ^2yes",guardian_message));
-						else
-							strcpy(guardian_message, va("%s\n^5Guardian of Intelligence ^7(t2_rogue) - ^1no",guardian_message));
-
-						if (ent->client->pers.defeated_guardians & (1 << 8))
-							strcpy(guardian_message, va("%s\n^6Guardian of Agility ^7(hoth3) - ^2yes",guardian_message));
-						else
-							strcpy(guardian_message, va("%s\n^6Guardian of Agility ^7(hoth3) - ^1no",guardian_message));
-
-						if (ent->client->pers.defeated_guardians & (1 << 9))
-							strcpy(guardian_message, va("%s\n^1Guardian of Fire ^7(mp/duel5) - ^2yes",guardian_message));
-						else
-							strcpy(guardian_message, va("%s\n^1Guardian of Fire ^7(mp/duel5) - ^1no",guardian_message));
-
-						if (ent->client->pers.defeated_guardians & (1 << 10))
-							strcpy(guardian_message, va("%s\n^7Guardian of Wind ^7(mp/duel9) - ^2yes",guardian_message));
-						else
-							strcpy(guardian_message, va("%s\n^7Guardian of Wind ^7(mp/duel9) - ^1no",guardian_message));
-
-						if (ent->client->pers.defeated_guardians & (1 << 11))
-							strcpy(guardian_message, va("%s\n^3Guardian of Resistance ^7(mp/duel8) - ^2yes",guardian_message));
-						else
-							strcpy(guardian_message, va("%s\n^3Guardian of Resistance ^7(mp/duel8) - ^1no",guardian_message));
-
-						if (ent->client->pers.defeated_guardians & (1 << 12))
-							strcpy(guardian_message, va("%s\n^5Guardian of Ice ^7(hoth2) - ^2yes",guardian_message));
-						else
-							strcpy(guardian_message, va("%s\n^5Guardian of Ice ^7(hoth2) - ^1no",guardian_message));
-					}
-				}
-				else
-				{
-					strcpy(guardian_message, "^7Completed!");
-				}
-
-				strcpy(message, va("\n^5Light Quest\n%s^7\n\n", guardian_message));
-
-				trap->SendServerCommand( ent->s.number, va("print \"%s\"", message) );
+					trap->SendServerCommand(ent->s.number, "print \"\n^3RPG Mode Quests\n\n^1Quests are not allowed in this server^7\n\n\"");
 			}
 			else if (Q_stricmp( arg1, "dark" ) == 0)
 			{
@@ -9041,7 +8517,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 		ent->client->pers.max_rpg_shield = 0;
 		ent->client->pers.secrets_found = 0;
 
-		ent->client->pers.defeated_guardians = 0;
 		ent->client->pers.hunter_quest_progress = 0;
 		ent->client->pers.eternity_quest_progress = 0;
 		ent->client->pers.universe_quest_progress = 0;
@@ -9073,7 +8548,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 	}
 	else if (Q_stricmp( arg1, "quests") == 0)
 	{
-		ent->client->pers.defeated_guardians = 0;
 		ent->client->pers.hunter_quest_progress = 0;
 		ent->client->pers.eternity_quest_progress = 0;
 		ent->client->pers.universe_quest_progress = 0;
@@ -9580,42 +9054,6 @@ void Cmd_Settings_f( gentity_t *ent ) {
 			strcpy(message,"\n^3 0 - RPG quests - ^2ON");
 		}
 
-		if (ent->client->pers.player_settings & (1 << 1))
-		{
-			strcpy(message, va("%s\n^3 1 - Light Power - ^1OFF", message));
-		}
-		else
-		{
-			strcpy(message, va("%s\n^3 1 - Light Power - ^2ON", message));
-		}
-
-		if (ent->client->pers.player_settings & (1 << 2))
-		{
-			strcpy(message, va("%s\n^3 2 - Dark Power - ^1OFF", message));
-		}
-		else
-		{
-			strcpy(message, va("%s\n^3 2 - Dark Power - ^2ON", message));
-		}
-
-		if (ent->client->pers.player_settings & (1 << 3))
-		{
-			strcpy(message, va("%s\n^3 3 - Eternity Power - ^1OFF", message));
-		}
-		else
-		{
-			strcpy(message, va("%s\n^3 3 - Eternity Power - ^2ON", message));
-		}
-
-		if (ent->client->pers.player_settings & (1 << 4))
-		{
-			strcpy(message, va("%s\n^3 4 - Universe Power - ^1OFF", message));
-		}
-		else
-		{
-			strcpy(message, va("%s\n^3 4 - Universe Power - ^2ON", message));
-		}
-
 		if (ent->client->pers.player_settings & (1 << 5))
 		{
 			strcpy(message, va("%s\n^3 5 - Language - ^1Custom", message));
@@ -9800,7 +9238,7 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		}
 		else if (value == 15)
 		{
-			if (!(ent->client->pers.player_settings & (1 << value)) && ent->client->pers.defeated_guardians == 0 && 
+			if (!(ent->client->pers.player_settings & (1 << value)) && 
 				ent->client->pers.hunter_quest_progress == 0 && ent->client->pers.eternity_quest_progress == 0 && 
 				ent->client->pers.universe_quest_progress == 0 && ent->client->pers.can_play_quest == 0)
 			{ // zyk: player can only activate Challenge Mode if he did not complete any quest mission
@@ -9859,22 +9297,6 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		if (value == 0)
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Quests %s\n\"", new_status) );
-		}
-		else if (value == 1)
-		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Light Power %s\n\"", new_status) );
-		}
-		else if (value == 2)
-		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Dark Power %s\n\"", new_status) );
-		}
-		else if (value == 3)
-		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Eternity Power %s\n\"", new_status) );
-		}
-		else if (value == 4)
-		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Universe Power %s\n\"", new_status) );
 		}
 		else if (value == 5)
 		{
@@ -15304,29 +14726,17 @@ void zyk_set_quest_npc_abilities(gentity_t *zyk_npc)
 	zyk_npc->client->sess.selected_special_power = 0;
 
 	// zyk: setting the timers
-	zyk_npc->client->pers.light_quest_messages = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcfirsttimer%d", level.zyk_custom_quest_counter)));
-	zyk_npc->client->pers.hunter_quest_messages = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcsecondtimer%d", level.zyk_custom_quest_counter)));
-	zyk_npc->client->pers.universe_quest_messages = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcthirdtimer%d", level.zyk_custom_quest_counter)));
+	zyk_npc->client->pers.quest_power_usage_timer = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcfirsttimer%d", level.zyk_custom_quest_counter)));
 
 	// zyk: setting default values of these timers
-	if (zyk_npc->client->pers.light_quest_messages <= 0)
+	if (zyk_npc->client->pers.quest_power_usage_timer <= 0)
 	{
-		zyk_npc->client->pers.light_quest_messages = 5000;
+		zyk_npc->client->pers.quest_power_usage_timer = level.time + 5000;
 	}
-
-	if (zyk_npc->client->pers.hunter_quest_messages <= 0)
+	else
 	{
-		zyk_npc->client->pers.hunter_quest_messages = 7000;
+		zyk_npc->client->pers.quest_power_usage_timer = level.time + zyk_npc->client->pers.quest_power_usage_timer;
 	}
-
-	if (zyk_npc->client->pers.universe_quest_messages <= 0)
-	{
-		zyk_npc->client->pers.universe_quest_messages = 9000;
-	}
-
-	zyk_npc->client->pers.light_quest_timer = level.time + zyk_npc->client->pers.light_quest_messages;
-	zyk_npc->client->pers.hunter_quest_timer = level.time + zyk_npc->client->pers.hunter_quest_messages;
-	zyk_npc->client->pers.universe_quest_timer = level.time + zyk_npc->client->pers.universe_quest_messages;
 
 	for (j = 0; j < 256; j++)
 	{

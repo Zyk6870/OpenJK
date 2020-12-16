@@ -4525,7 +4525,6 @@ void NPC_Spawn_f( gentity_t *ent )
 {
 	char	npc_type[1024];
 	char	targetname[1024];
-	int i = 0;
 	qboolean	isVehicle = qfalse;
 
 	trap->Argv(2, npc_type, 1024);
@@ -4541,12 +4540,6 @@ void NPC_Spawn_f( gentity_t *ent )
 	}
 
 	// zyk: guardian npcs cant be spawned by players, quest npcs also cant be spawned
-
-	for (i = 0; i < NUMBER_OF_GUARDIANS; i++)
-	{
-		if (Q_stricmp(va("guardian_boss_%d", (i+1)), npc_type) == 0)
-			return;
-	}
 
 	if (Q_stricmp("guardian_of_darkness", npc_type) == 0)
 		return;
@@ -4710,16 +4703,7 @@ void NPC_Kill_f( void )
 
 		if (player && player->NPC && player->client)
 		{
-			int i = 0; // zyk: used to test the guardian npcs
 			int found = 0; // zyk: will be set to 1 when found a guardian npc
-
-			for (i = 1; i <= NUMBER_OF_GUARDIANS; i++)
-			{
-				if (Q_stricmp( player->NPC_type, va("guardian_boss_%d",i) ) == 0)
-				{
-					found = 1;
-				}
-			}
 
 			if (Q_stricmp( player->NPC_type, "guardian_of_darkness" ) == 0)
 			{

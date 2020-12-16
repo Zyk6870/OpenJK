@@ -2647,7 +2647,6 @@ Touch_Item
 */
 extern void save_account(gentity_t *ent, qboolean save_char_file);
 extern void universe_quest_artifacts_checker(gentity_t *ent);
-extern void quest_get_new_player(gentity_t *ent);
 void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	int			respawn;
 	qboolean	predict;
@@ -2696,8 +2695,6 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 			universe_quest_artifacts_checker(other);
 
 			ent->targetname = NULL; // zyk: nullify so in this case the quest system does not free this entity
-
-			quest_get_new_player(other);
 		}
 		else
 		{ // zyk: this is not the quest player. Only the quest player can get the artifact

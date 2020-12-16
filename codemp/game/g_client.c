@@ -3166,7 +3166,6 @@ Initializes all non-persistant parts of playerState
 ============
 */
 extern qboolean WP_HasForcePowers( const playerState_t *ps );
-extern void quest_get_new_player(gentity_t *ent);
 extern void clean_guardians(gentity_t *ent);
 extern void zyk_add_force_powers( gentity_t *ent );
 extern void zyk_add_guns( gentity_t *ent );
@@ -3866,9 +3865,6 @@ void ClientSpawn(gentity_t *ent) {
 		clean_guardians(ent);
 
 		initialize_rpg_skills(ent);
-
-		// zyk: getting the player who can play a quest in this map
-		quest_get_new_player(ent);
 	}
 	else if (ent->client->pers.player_statuses & (1 << 12))
 	{ // zyk: player received force powers from admin
@@ -4258,7 +4254,6 @@ void ClientDisconnect( int clientNum ) {
 	{
 		clean_guardians(ent);
 		level.boss_battle_music_reset_timer = level.time + 1000;
-		quest_get_new_player(ent);
 	}
 
 	trap->UnlinkEntity ((sharedEntity_t *)ent);
