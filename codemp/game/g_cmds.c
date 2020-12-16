@@ -5020,6 +5020,7 @@ void rpg_skill_counter(gentity_t *ent, int amount)
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.level < zyk_rpg_max_level.integer)
 	{ // zyk: now RPG mode increases level up score after a certain amount of attacks
 		ent->client->pers.skill_counter += amount;
+
 		if (ent->client->pers.skill_counter >= zyk_max_skill_counter.integer)
 		{
 			ent->client->pers.skill_counter = 0;
@@ -13967,6 +13968,8 @@ void Cmd_Magic_f( gentity_t *ent ) {
 		}
 
 		zyk_cast_magic(ent, skill_index);
+
+		rpg_skill_counter(ent, 200);
 	}
 }
 
