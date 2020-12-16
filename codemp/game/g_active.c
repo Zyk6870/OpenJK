@@ -2808,7 +2808,7 @@ void ClientThink_real( gentity_t *ent ) {
 					VectorClear(client->ps.velocity);
 					client->ps.gravity = 1.0f;
 				}
-				else if (client->pers.quest_power_status & (1 << 2) && client->pers.quest_target2_timer > level.time)
+				else if (client->pers.quest_power_status & (1 << 2) && client->pers.magic_power_target_timer[MAGIC_TIME_STOP] > level.time)
 				{ // zyk: hit by Time Power
 					VectorClear(client->ps.velocity);
 					client->ps.gravity = 1.0f;

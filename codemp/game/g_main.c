@@ -5037,7 +5037,7 @@ void blowing_wind(gentity_t *ent, int distance, int duration)
 		distance += 200;
 	}
 
-	ent->client->pers.quest_debounce1_timer = 0;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_BLOWING_WIND] = 0;
 
 	for ( i = 0; i < level.num_entities; i++)
 	{
@@ -5045,9 +5045,9 @@ void blowing_wind(gentity_t *ent, int distance, int duration)
 
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
 		{
-			player_ent->client->pers.quest_power_user3_id = ent->s.number;
+			player_ent->client->pers.magic_power_user_id[MAGIC_BLOWING_WIND] = ent->s.number;
 			player_ent->client->pers.quest_power_status |= (1 << 8);
-			player_ent->client->pers.quest_target6_timer = level.time + duration;
+			player_ent->client->pers.magic_power_target_timer[MAGIC_BLOWING_WIND] = level.time + duration;
 
 			// zyk: gives fall kill to the owner of this power
 			player_ent->client->ps.otherKiller = ent->s.number;
@@ -5070,7 +5070,7 @@ void reverse_wind(gentity_t *ent, int distance, int duration)
 		distance += 200;
 	}
 
-	ent->client->pers.quest_debounce1_timer = 0;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_REVERSE_WIND] = 0;
 
 	for (i = 0; i < level.num_entities; i++)
 	{
@@ -5078,9 +5078,9 @@ void reverse_wind(gentity_t *ent, int distance, int duration)
 
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
 		{
-			player_ent->client->pers.quest_power_user3_id = ent->s.number;
+			player_ent->client->pers.magic_power_user_id[MAGIC_REVERSE_WIND] = ent->s.number;
 			player_ent->client->pers.quest_power_status |= (1 << 20);
-			player_ent->client->pers.quest_target6_timer = level.time + duration;
+			player_ent->client->pers.magic_power_target_timer[MAGIC_REVERSE_WIND] = level.time + duration;
 
 			// zyk: gives fall kill to the owner of this power
 			player_ent->client->ps.otherKiller = ent->s.number;
@@ -5099,7 +5099,9 @@ void poison_mushrooms(gentity_t *ent, int min_distance, int max_distance)
 	int targets_hit = 0;
 
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_POISON_MUSHROOMS] > 1)
+	{
 		min_distance = 0;
+	}
 
 	for (i = 0; i < level.num_entities; i++)
 	{
@@ -5108,10 +5110,10 @@ void poison_mushrooms(gentity_t *ent, int min_distance, int max_distance)
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, min_distance, max_distance, qfalse, &targets_hit) == qtrue && 
 			(i < MAX_CLIENTS || player_ent->client->NPC_class != CLASS_VEHICLE))
 		{
-			player_ent->client->pers.quest_power_user2_id = ent->s.number;
+			player_ent->client->pers.magic_power_user_id[MAGIC_POISON_MUSHROOMS] = ent->s.number;
 			player_ent->client->pers.quest_power_status |= (1 << 4);
-			player_ent->client->pers.quest_target3_timer = level.time + 200;
-			player_ent->client->pers.quest_power_hit_counter = 40;
+			player_ent->client->pers.magic_power_debounce_timer[MAGIC_POISON_MUSHROOMS] = level.time + 200;
+			player_ent->client->pers.magic_power_hit_counter[MAGIC_POISON_MUSHROOMS] = 40;
 
 			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/air_burst.mp3"));
 		}
@@ -5135,10 +5137,10 @@ void chaos_power(gentity_t *ent, int distance, int duration)
 					
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
 		{
-			player_ent->client->pers.quest_power_user1_id = ent->s.number;
+			player_ent->client->pers.magic_power_user_id[MAGIC_CHAOS_POWER] = ent->s.number;
 			player_ent->client->pers.quest_power_status |= (1 << 1);
-			player_ent->client->pers.quest_power_hit3_counter = duration/200;
-			player_ent->client->pers.quest_target1_timer = level.time + 200;
+			player_ent->client->pers.magic_power_hit_counter[MAGIC_CHAOS_POWER] = duration/200;
+			player_ent->client->pers.magic_power_target_timer[MAGIC_CHAOS_POWER] = level.time + 200;
 
 			// zyk: removing emotes to prevent exploits
 			if (player_ent->client->pers.player_statuses & (1 << 1))
@@ -5269,7 +5271,7 @@ void immunity_power(gentity_t *ent, int duration)
 	}
 
 	ent->client->pers.quest_power_status |= (1 << 0);
-	ent->client->pers.quest_power1_timer = level.time + duration;
+	ent->client->pers.magic_power_timer[MAGIC_MAGIC_IMMUNITY] = level.time + duration;
 
 	ent->client->pers.immunity_power_effect_cooldown = level.time + 500;
 
@@ -5297,7 +5299,7 @@ void enemy_nerf(gentity_t *ent, int distance)
 
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
 		{
-			player_ent->client->pers.quest_target7_timer = level.time + duration;
+			player_ent->client->pers.magic_power_target_timer[MAGIC_ENEMY_WEAKENING] = level.time + duration;
 			player_ent->client->pers.quest_power_status |= (1 << 21);
 
 			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_enemy_nerf", "0", "force/kothos_beam", 0, 0, 0, 1000);
@@ -5316,8 +5318,8 @@ void flaming_rage(gentity_t* ent, int duration)
 	}
 
 	ent->client->pers.quest_power_status |= (1 << 3);
-	ent->client->pers.quest_power8_timer = level.time + duration;
-	ent->client->pers.quest_debounce2_timer = 0;
+	ent->client->pers.magic_power_timer[MAGIC_FLAMING_RAGE] = level.time + duration;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_FLAMING_RAGE] = 0;
 }
 
 // zyk: used by Duelist Vertical DFA ability
@@ -5559,13 +5561,14 @@ void elemental_attack(gentity_t *ent)
 			zyk_quest_effect_spawn(ent, player_ent, "zyk_elemental_earth", "4", "env/rock_smash", 2500, 2.5 * damage, 35, 4000);
 
 			// zyk: fourth element, Wind
-			player_ent->client->pers.quest_power_status |= (1 << 5);
-			player_ent->client->pers.quest_power_hit_counter = -179;
-			player_ent->client->pers.quest_target4_timer = level.time + 7000;
+			ent->client->pers.magic_power_debounce_timer[MAGIC_BLOWING_WIND] = 0;
+			player_ent->client->pers.magic_power_user_id[MAGIC_BLOWING_WIND] = ent->s.number;
+			player_ent->client->pers.quest_power_status |= (1 << 8);
+			player_ent->client->pers.magic_power_target_timer[MAGIC_BLOWING_WIND] = level.time + 7000;
 
 			// zyk: target is hit by the Ice element for 4 seconds
 			player_ent->client->pers.quest_power_status |= (1 << 26);
-			player_ent->client->pers.quest_target11_timer = level.time + 4000;
+			player_ent->client->pers.elemental_attack_timer = level.time + 4000;
 
 			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
 		}
@@ -5733,7 +5736,7 @@ void sleeping_flowers(gentity_t *ent, int stun_time, int distance)
 			player_ent->client->ps.quickerGetup = qtrue;
 
 			player_ent->client->pers.quest_power_status |= (1 << 24);
-			player_ent->client->pers.quest_target9_timer = level.time + stun_time;
+			player_ent->client->pers.magic_power_target_timer[MAGIC_SLEEPING_FLOWERS] = level.time + stun_time;
 
 			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_sleeping", "0", "force/heal2", 0, 0, 0, 800);
 
@@ -5800,13 +5803,13 @@ void shifting_sand(gentity_t *ent, int distance)
 	{ // zyk: found an enemy
 		ent->client->pers.quest_power_status |= (1 << 17);
 
-		ent->client->pers.quest_power_user4_id = this_enemy->s.number;
+		ent->client->pers.magic_power_user_id[MAGIC_SHIFTING_SAND] = this_enemy->s.number;
 
 		// zyk: used to bring the player back if he gets stuck
 		VectorCopy(ent->client->ps.origin, ent->client->pers.teleport_angles);
 	}
 
-	ent->client->pers.quest_power5_timer = level.time + time_to_teleport;
+	ent->client->pers.magic_power_timer[MAGIC_SHIFTING_SAND] = level.time + time_to_teleport;
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_sand", "0", "env/sand_spray", 0, 0, 0, time_to_teleport);
 }
 
@@ -5829,7 +5832,7 @@ void time_power(gentity_t *ent, int distance, int duration)
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
 		{
 			player_ent->client->pers.quest_power_status |= (1 << 2);
-			player_ent->client->pers.quest_target2_timer = level.time + duration;
+			player_ent->client->pers.magic_power_target_timer[MAGIC_TIME_STOP] = level.time + duration;
 
 			if (i < MAX_CLIENTS)
 			{ // zyk: player hit by this power
@@ -5943,7 +5946,7 @@ void magic_shield(gentity_t *ent, int duration)
 	}
 
 	ent->client->pers.quest_power_status |= (1 << 11);
-	ent->client->pers.quest_power4_timer = level.time + duration;
+	ent->client->pers.magic_power_timer[MAGIC_MAGIC_SHIELD] = level.time + duration;
 	ent->client->invulnerableTimer = level.time + duration;
 }
 
@@ -5951,8 +5954,8 @@ void magic_shield(gentity_t *ent, int duration)
 void tree_of_life(gentity_t *ent)
 {
 	ent->client->pers.quest_power_status |= (1 << 19);
-	ent->client->pers.quest_power6_timer = level.time;
-	ent->client->pers.quest_power_hit2_counter = 4;
+	ent->client->pers.magic_power_timer[MAGIC_TREE_OF_LIFE] = level.time;
+	ent->client->pers.magic_power_hit_counter[MAGIC_TREE_OF_LIFE] = 4;
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_tree_of_life", "1", "models/map_objects/yavin/tree10_b.md3", 0, 0, 0, 4000);
 }
@@ -6022,7 +6025,7 @@ void ice_stalagmite(gentity_t *ent, int distance, int damage)
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, min_distance, distance, qfalse, &targets_hit) == qtrue)
 		{
 			if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ICE_STALAGMITE] > 1)
-			{
+			{ // zyk: spawns a solid model that traps the enemy
 				zyk_quest_effect_spawn(ent, player_ent, "zyk_ice_stalagmite_2", "1", "models/map_objects/hoth/stalagmite_small.md3", 0, 0, 0, 2000);
 			}
 			else
@@ -6089,7 +6092,7 @@ void ice_block(gentity_t *ent, int duration)
 	zyk_spawn_ice_block(ent, duration, -90, 0, 0, 0, 140);
 
 	ent->client->pers.quest_power_status |= (1 << 22);
-	ent->client->pers.quest_power7_timer = level.time + duration;
+	ent->client->pers.magic_power_timer[MAGIC_ICE_BLOCK] = level.time + duration;
 
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
 }
@@ -6147,8 +6150,8 @@ void black_hole(gentity_t* ent, int radius, int damage, int duration)
 	ent->client->pers.black_hole_distance = radius;
 
 	ent->client->pers.quest_power_status |= (1 << 5);
-	ent->client->pers.quest_debounce3_timer = 0;
-	ent->client->pers.quest_power9_timer = level.time + duration;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_BLACK_HOLE] = 0;
+	ent->client->pers.magic_power_timer[MAGIC_BLACK_HOLE] = level.time + duration;
 }
 
 // zyk: Light of Judgement
@@ -6164,8 +6167,8 @@ void light_of_judgement(gentity_t* ent, int radius, int duration)
 	ent->client->pers.light_of_judgement_distance = radius;
 
 	ent->client->pers.quest_power_status |= (1 << 7);
-	ent->client->pers.quest_debounce4_timer = 0;
-	ent->client->pers.quest_power10_timer = level.time + duration;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_OF_JUDGEMENT] = 0;
+	ent->client->pers.magic_power_timer[MAGIC_LIGHT_OF_JUDGEMENT] = level.time + duration;
 }
 
 // zyk: Magic Explosion
@@ -6225,7 +6228,7 @@ void slow_motion(gentity_t *ent, int distance, int duration)
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
 		{
 			player_ent->client->pers.quest_power_status |= (1 << 6);
-			player_ent->client->pers.quest_target5_timer = level.time + duration;
+			player_ent->client->pers.magic_power_target_timer[MAGIC_SLOW_MOTION] = level.time + duration;
 
 			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh10.mp3"));
 		}
@@ -6241,7 +6244,7 @@ void ultra_speed(gentity_t *ent, int duration)
 	}
 
 	ent->client->pers.quest_power_status |= (1 << 9);
-	ent->client->pers.quest_power3_timer = level.time + duration;
+	ent->client->pers.magic_power_timer[MAGIC_ULTRA_SPEED] = level.time + duration;
 
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh1.mp3"));
 }
@@ -6347,7 +6350,7 @@ void flaming_area(gentity_t *ent, int damage)
 }
 
 // zyk: fires the Boba Fett flame thrower
-void Player_FireFlameThrower( gentity_t *self )
+void Player_FireFlameThrower( gentity_t *self, qboolean is_magic)
 {
 	trace_t		tr;
 	gentity_t	*traceEnt = NULL;
@@ -6369,7 +6372,7 @@ void Player_FireFlameThrower( gentity_t *self )
 	self->client->cloakDebReduce = level.time + zyk_flame_thrower_cooldown.integer;
 
 	// zyk: Flame Burst magic power has more damage
-	if (self->client->pers.quest_power_status & (1 << 12))
+	if (is_magic == qtrue)
 	{
 		damage += 2;
 	}
@@ -6434,8 +6437,7 @@ void Player_FireFlameThrower( gentity_t *self )
 			{ //only bother with arc rules if the victim is a client
 				entityList[e] = ENTITYNUM_NONE;
 			}
-			else if (traceEnt->client && (traceEnt->client->sess.amrpgmode == 2 || traceEnt->NPC) && 
-					 self->client->pers.quest_power_status & (1 << 12) && zyk_check_immunity_power(traceEnt))
+			else if (traceEnt->client && (traceEnt->client->sess.amrpgmode == 2 || traceEnt->NPC) && is_magic == qtrue && zyk_check_immunity_power(traceEnt))
 			{ // zyk: Immunity Power protects from Flame Burst
 				entityList[e] = ENTITYNUM_NONE;
 			}
@@ -6527,45 +6529,45 @@ void quest_power_events(gentity_t *ent)
 	{
 		if (ent->health > 0)
 		{
-			if (ent->client->pers.quest_power_status & (1 << 0) && ent->client->pers.quest_power1_timer < level.time)
+			if (ent->client->pers.quest_power_status & (1 << 0) && ent->client->pers.magic_power_timer[MAGIC_MAGIC_IMMUNITY] < level.time)
 			{ // zyk: Immunity Power
 				ent->client->pers.quest_power_status &= ~(1 << 0);
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << 1))
 			{ // zyk: Chaos Power
-				if (ent->client->pers.quest_power_hit3_counter > 0 && ent->client->pers.quest_target1_timer < level.time)
+				if (ent->client->pers.magic_power_hit_counter[MAGIC_CHAOS_POWER] > 0 && ent->client->pers.magic_power_target_timer[MAGIC_CHAOS_POWER] < level.time)
 				{ // zyk: Chaos Power hit
-					gentity_t *chaos_user = &g_entities[ent->client->pers.quest_power_user1_id];
+					gentity_t *chaos_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_CHAOS_POWER]];
 
 					G_Damage(ent, chaos_user, chaos_user, NULL, NULL, 8, 0, MOD_UNKNOWN);
-					ent->client->pers.quest_power_hit3_counter--;
-					ent->client->pers.quest_target1_timer = level.time + 200;
+					ent->client->pers.magic_power_hit_counter[MAGIC_CHAOS_POWER]--;
+					ent->client->pers.magic_power_target_timer[MAGIC_CHAOS_POWER] = level.time + 200;
 				}
 				
-				if (ent->client->pers.quest_power_hit3_counter == 0)
+				if (ent->client->pers.magic_power_hit_counter[MAGIC_CHAOS_POWER] == 0)
 				{ // zyk: end of Chaos Power
 					ent->client->pers.quest_power_status &= ~(1 << 1);
 				}
 			}
 
-			if (ent->client->pers.quest_power_status & (1 << 2) && ent->client->pers.quest_target2_timer < level.time)
+			if (ent->client->pers.quest_power_status & (1 << 2) && ent->client->pers.magic_power_target_timer[MAGIC_TIME_STOP] < level.time)
 			{ // zyk: Time Power. Remove it from target when duration ends
 				ent->client->pers.quest_power_status &= ~(1 << 2);
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << 3))
 			{ // zyk: Flaming Rage. Spawns fire effects
-				if (ent->client->pers.quest_debounce2_timer < level.time)
+				if (ent->client->pers.magic_power_debounce_timer[MAGIC_FLAMING_RAGE] < level.time)
 				{
 					zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_flaming_rage", "0", "env/fire", 0, 0, 0, 500);
 
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
 
-					ent->client->pers.quest_debounce2_timer = level.time + 500;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_FLAMING_RAGE] = level.time + 500;
 				}
 
-				if (ent->client->pers.quest_power8_timer < level.time)
+				if (ent->client->pers.magic_power_timer[MAGIC_FLAMING_RAGE] < level.time)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 3);
 				}
@@ -6578,9 +6580,9 @@ void quest_power_events(gentity_t *ent)
 					ent->client->pers.quest_power_status &= ~(1 << 4);
 				}
 
-				if (ent->client->pers.quest_power_hit_counter > 0 && ent->client->pers.quest_target3_timer < level.time)
+				if (ent->client->pers.magic_power_hit_counter[MAGIC_POISON_MUSHROOMS] > 0 && ent->client->pers.magic_power_debounce_timer[MAGIC_POISON_MUSHROOMS] < level.time)
 				{
-					gentity_t *poison_mushrooms_user = &g_entities[ent->client->pers.quest_power_user2_id];
+					gentity_t *poison_mushrooms_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_POISON_MUSHROOMS]];
 
 					if (poison_mushrooms_user && poison_mushrooms_user->client)
 					{
@@ -6593,10 +6595,10 @@ void quest_power_events(gentity_t *ent)
 							G_Damage(ent,poison_mushrooms_user,poison_mushrooms_user,NULL,NULL,4,0,MOD_UNKNOWN);
 					}
 
-					ent->client->pers.quest_power_hit_counter--;
-					ent->client->pers.quest_target3_timer = level.time + 200;
+					ent->client->pers.magic_power_hit_counter[MAGIC_POISON_MUSHROOMS]--;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_POISON_MUSHROOMS] = level.time + 200;
 				}
-				else if (ent->client->pers.quest_power_hit_counter == 0 && ent->client->pers.quest_target3_timer < level.time)
+				else if (ent->client->pers.magic_power_hit_counter[MAGIC_POISON_MUSHROOMS] == 0 && ent->client->pers.magic_power_debounce_timer[MAGIC_POISON_MUSHROOMS] < level.time)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 4);
 				}
@@ -6604,14 +6606,14 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << 5))
 			{ // zyk: Black Hole
-				if (ent->client->pers.quest_power9_timer > level.time)
+				if (ent->client->pers.magic_power_timer[MAGIC_BLACK_HOLE] > level.time)
 				{
 					gentity_t* black_hole_target = NULL;
 					int zyk_it = 0;
 
-					if (ent->client->pers.quest_debounce3_timer < level.time)
+					if (ent->client->pers.magic_power_debounce_timer[MAGIC_BLACK_HOLE] < level.time)
 					{
-						ent->client->pers.quest_debounce3_timer = level.time + 50;
+						ent->client->pers.magic_power_debounce_timer[MAGIC_BLACK_HOLE] = level.time + 50;
 
 						for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 						{
@@ -6674,7 +6676,7 @@ void quest_power_events(gentity_t *ent)
 					ent->client->pers.quest_power_status &= ~(1 << 6);
 				}
 
-				if (ent->client->pers.quest_target5_timer < level.time)
+				if (ent->client->pers.magic_power_target_timer[MAGIC_SLOW_MOTION] < level.time)
 				{ // zyk: Slow Motion run out
 					ent->client->pers.quest_power_status &= ~(1 << 6);
 				}
@@ -6682,14 +6684,14 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << 7))
 			{ // zyk: Light of Judgement
-				if (ent->client->pers.quest_power10_timer > level.time)
+				if (ent->client->pers.magic_power_timer[MAGIC_LIGHT_OF_JUDGEMENT] > level.time)
 				{
 					gentity_t* light_of_judgement_target = NULL;
 					int zyk_it = 0;
 
-					if (ent->client->pers.quest_debounce4_timer < level.time)
+					if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_OF_JUDGEMENT] < level.time)
 					{
-						ent->client->pers.quest_debounce4_timer = level.time + 50;
+						ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_OF_JUDGEMENT] = level.time + 50;
 
 						for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 						{
@@ -6746,13 +6748,13 @@ void quest_power_events(gentity_t *ent)
 					ent->client->pers.quest_power_status &= ~(1 << 8);
 				}
 
-				if (ent->client->pers.quest_target6_timer > level.time)
+				if (ent->client->pers.magic_power_target_timer[MAGIC_BLOWING_WIND] > level.time)
 				{
-					gentity_t *blowing_wind_user = &g_entities[ent->client->pers.quest_power_user3_id];
+					gentity_t *blowing_wind_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_BLOWING_WIND]];
 
-					if (ent->client->pers.quest_debounce1_timer < level.time)
+					if (ent->client->pers.magic_power_debounce_timer[MAGIC_BLOWING_WIND] < level.time)
 					{
-						ent->client->pers.quest_debounce1_timer = level.time + 50;
+						ent->client->pers.magic_power_debounce_timer[MAGIC_BLOWING_WIND] = level.time + 50;
 
 						if (blowing_wind_user && blowing_wind_user->client)
 						{
@@ -6778,21 +6780,21 @@ void quest_power_events(gentity_t *ent)
 				}
 			}
 
-			if (ent->client->pers.quest_power_status & (1 << 9) && ent->client->pers.quest_power3_timer < level.time)
+			if (ent->client->pers.quest_power_status & (1 << 9) && ent->client->pers.magic_power_timer[MAGIC_ULTRA_SPEED] < level.time)
 			{ // zyk: Ultra Speed
 				ent->client->pers.quest_power_status &= ~(1 << 9);
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << 11))
 			{ // zyk: Magic Shield
-				if (ent->client->pers.quest_power4_timer < level.time)
+				if (ent->client->pers.magic_power_timer[MAGIC_MAGIC_SHIELD] < level.time)
 				{ // zyk: Magic Shield run out
 					ent->client->pers.quest_power_status &= ~(1 << 11);
 				}
 				else
 				{
 					ent->client->ps.eFlags |= EF_INVULNERABLE;
-					ent->client->invulnerableTimer = ent->client->pers.quest_power4_timer;
+					ent->client->invulnerableTimer = ent->client->pers.magic_power_timer[MAGIC_MAGIC_SHIELD];
 				}
 			}
 
@@ -6804,13 +6806,13 @@ void quest_power_events(gentity_t *ent)
 				}
 				else if (ent->client->cloakDebReduce < level.time)
 				{ // zyk: fires the flame thrower
-					Player_FireFlameThrower(ent);
+					Player_FireFlameThrower(ent, qtrue);
 				}
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << 17))
 			{ // zyk: Shifting Sand
-				if (ent->client->pers.quest_power5_timer < level.time)
+				if (ent->client->pers.magic_power_timer[MAGIC_SHIFTING_SAND] < level.time)
 				{ // zyk: after this time, teleports to the new location and add effect there too
 					if (Distance(ent->client->ps.origin, g_entities[ent->client->pers.quest_power_effect1_id].s.origin) < 100)
 					{ // zyk: only teleports if the player is near the effect
@@ -6823,7 +6825,7 @@ void quest_power_events(gentity_t *ent)
 						if (random_y == 0)
 							random_y = -1;
 
-						gentity_t *this_enemy = &g_entities[ent->client->pers.quest_power_user4_id];
+						gentity_t *this_enemy = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_SHIFTING_SAND]];
 
 						origin[0] = this_enemy->client->ps.origin[0] + (Q_irand(70, 100) * random_x);
 						origin[1] = this_enemy->client->ps.origin[1] + (Q_irand(70, 100) * random_y);
@@ -6837,14 +6839,14 @@ void quest_power_events(gentity_t *ent)
 					ent->client->pers.quest_power_status &= ~(1 << 17);
 					ent->client->pers.quest_power_status |= (1 << 18);
 
-					ent->client->pers.quest_power5_timer = level.time + 4000;
+					ent->client->pers.magic_power_timer[MAGIC_SHIFTING_SAND] = level.time + 4000;
 					zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_sand", "0", "env/sand_spray", 0, 0, 0, 2000);
 				}
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << 18))
 			{ // zyk: Shifting Sand after the teleport, validating if player is not suck
-				if (ent->client->pers.quest_power5_timer < level.time)
+				if (ent->client->pers.magic_power_timer[MAGIC_SHIFTING_SAND] < level.time)
 				{
 					if (VectorCompare(ent->client->ps.origin, ent->client->pers.teleport_point) == qtrue)
 					{ // zyk: stuck, teleport back
@@ -6859,9 +6861,9 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << 19))
 			{ // zyk: Tree of Life
-				if (ent->client->pers.quest_power_hit2_counter > 0)
+				if (ent->client->pers.magic_power_hit_counter[MAGIC_TREE_OF_LIFE] > 0)
 				{
-					if (ent->client->pers.quest_power6_timer < level.time)
+					if (ent->client->pers.magic_power_timer[MAGIC_TREE_OF_LIFE] < level.time)
 					{
 						int heal_amount = 20;
 
@@ -6875,8 +6877,8 @@ void quest_power_events(gentity_t *ent)
 						else
 							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
 
-						ent->client->pers.quest_power_hit2_counter--;
-						ent->client->pers.quest_power6_timer = level.time + 1000;
+						ent->client->pers.magic_power_hit_counter[MAGIC_TREE_OF_LIFE]--;
+						ent->client->pers.magic_power_timer[MAGIC_TREE_OF_LIFE] = level.time + 1000;
 
 						G_Sound(ent, CHAN_ITEM, G_SoundIndex("sound/weapons/force/heal.wav"));
 					}
@@ -6894,13 +6896,13 @@ void quest_power_events(gentity_t *ent)
 					ent->client->pers.quest_power_status &= ~(1 << 20);
 				}
 
-				if (ent->client->pers.quest_target6_timer > level.time)
+				if (ent->client->pers.magic_power_target_timer[MAGIC_REVERSE_WIND] > level.time)
 				{
-					gentity_t *reverse_wind_user = &g_entities[ent->client->pers.quest_power_user3_id];
+					gentity_t *reverse_wind_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_REVERSE_WIND]];
 
-					if (ent->client->pers.quest_debounce1_timer < level.time)
+					if (ent->client->pers.magic_power_debounce_timer[MAGIC_REVERSE_WIND] < level.time)
 					{
-						ent->client->pers.quest_debounce1_timer = level.time + 50;
+						ent->client->pers.magic_power_debounce_timer[MAGIC_REVERSE_WIND] = level.time + 50;
 
 						if (reverse_wind_user && reverse_wind_user->client)
 						{
@@ -6931,7 +6933,7 @@ void quest_power_events(gentity_t *ent)
 					ent->client->pers.quest_power_status &= ~(1 << 21);
 				}
 
-				if (ent->client->pers.quest_target7_timer < level.time)
+				if (ent->client->pers.magic_power_target_timer[MAGIC_ENEMY_WEAKENING] < level.time)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 21);
 				}
@@ -6944,7 +6946,7 @@ void quest_power_events(gentity_t *ent)
 					ent->client->pers.quest_power_status &= ~(1 << 22);
 				}
 
-				if (ent->client->pers.quest_power7_timer < level.time)
+				if (ent->client->pers.magic_power_timer[MAGIC_ICE_BLOCK] < level.time)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 22);
 				}
@@ -6957,9 +6959,9 @@ void quest_power_events(gentity_t *ent)
 					ent->client->pers.quest_power_status &= ~(1 << 23);
 				}
 
-				if (ent->client->pers.quest_power_hit4_counter > 0 && ent->client->pers.quest_target8_timer < level.time)
+				if (ent->client->pers.magic_power_hit_counter[MAGIC_FLAMING_AREA] > 0 && ent->client->pers.magic_power_target_timer[MAGIC_FLAMING_AREA] < level.time)
 				{
-					gentity_t *flaming_area_user = &g_entities[ent->client->pers.quest_power_user5_id];
+					gentity_t *flaming_area_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_FLAMING_AREA]];
 
 					if (flaming_area_user && flaming_area_user->client)
 					{
@@ -6971,25 +6973,26 @@ void quest_power_events(gentity_t *ent)
 							G_Damage(ent, flaming_area_user, flaming_area_user, NULL, NULL, 2, 0, MOD_UNKNOWN);
 					}
 
-					ent->client->pers.quest_power_hit4_counter--;
-					ent->client->pers.quest_target8_timer = level.time + 200;
+					ent->client->pers.magic_power_hit_counter[MAGIC_FLAMING_AREA]--;
+					ent->client->pers.magic_power_target_timer[MAGIC_FLAMING_AREA] = level.time + 200;
 				}
-				else if (ent->client->pers.quest_power_hit4_counter == 0 && ent->client->pers.quest_target8_timer < level.time)
+				else if (ent->client->pers.magic_power_hit_counter[MAGIC_FLAMING_AREA] == 0 && ent->client->pers.magic_power_target_timer[MAGIC_FLAMING_AREA] < level.time)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 23);
 				}
 			}
 
-			if (ent->client->pers.quest_power_status & (1 << 24) && ent->client->pers.quest_target9_timer < level.time)
+			if (ent->client->pers.quest_power_status & (1 << 24) && ent->client->pers.magic_power_target_timer[MAGIC_SLEEPING_FLOWERS] < level.time)
 			{ // zyk: hit by Sleeping Flowers
 				ent->client->pers.quest_power_status &= ~(1 << 24);
 			}
 
-			if (ent->client->pers.quest_power_status & (1 << 26) && ent->client->pers.quest_target11_timer < level.time)
+			if (ent->client->pers.quest_power_status & (1 << 26) && ent->client->pers.elemental_attack_timer < level.time)
 			{ // zyk: hit by Elemental Attack
 				ent->client->pers.quest_power_status &= ~(1 << 26);
 			}
 		}
+		/*
 		else if (!ent->NPC && ent->client->pers.quest_power_status & (1 << 10) && ent->client->pers.quest_power1_timer < level.time && 
 				!(ent->client->ps.eFlags & EF_DISINTEGRATION)) 
 		{ // zyk: Resurrection Power
@@ -7007,6 +7010,7 @@ void quest_power_events(gentity_t *ent)
 			ent->client->ps.cloakFuel = 100;
 			ent->client->pers.quest_power_status &= ~(1 << 10);
 		}
+		*/
 	}
 }
 
@@ -7451,7 +7455,7 @@ void duel_tournament_prepare(gentity_t *ent)
 
 	// zyk: setting Immunity Power so every status power on the duelist will be cancelled
 	ent->client->pers.quest_power_status |= (1 << 0);
-	ent->client->pers.quest_power1_timer = level.duel_tournament_timer;
+	ent->client->pers.magic_power_timer[MAGIC_MAGIC_IMMUNITY] = level.duel_tournament_timer;
 
 	// zyk: reset hp and shield of duelist
 	ent->health = 100;
@@ -9889,7 +9893,7 @@ void G_RunFrame( int levelTime ) {
 
 				if (ent->client->pers.flame_thrower > level.time && ent->client->cloakDebReduce < level.time)
 				{ // zyk: fires the flame thrower
-					Player_FireFlameThrower(ent);
+					Player_FireFlameThrower(ent, qfalse);
 				}
 
 				if (ent->client->pers.rpg_class == 2)

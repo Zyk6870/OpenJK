@@ -802,6 +802,9 @@ typedef struct clientPersistant_s {
 	// zyk: timer to keep this player stunned by No Attack ability
 	int no_attack_timer;
 
+	// zyk: timer used for the target of Elemental Attack ability
+	int elemental_attack_timer;
+
 	// zyk: RPG skills
 	int skill_levels[NUMBER_OF_SKILLS];
 
@@ -945,7 +948,7 @@ typedef struct clientPersistant_s {
 	int universe_quest_messages;
 	int universe_quest_timer;
 
-	// zyk: bitvalue. Sets the power this player is using or the power that is affecting this player
+	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
 	// Possible values are:
 	//  0 - using Immunity Power
 	//  1 - hit by Chaos Power
@@ -980,48 +983,19 @@ typedef struct clientPersistant_s {
 	int quest_power_usage_timer;
 
 	// zyk: powers that hits the target player more than once need a hit counter
-	int quest_power_hit_counter;
-	int quest_power_hit2_counter;
-	int quest_power_hit3_counter;
-	int quest_power_hit4_counter;
+	int magic_power_hit_counter[MAX_MAGIC_POWERS];
 
-	// zyk: timers of the quest powers used by this player
-	int quest_power1_timer;
-	int quest_power2_timer;
-	int quest_power3_timer;
-	int quest_power4_timer;
-	int quest_power5_timer;
-	int quest_power6_timer;
-	int quest_power7_timer;
-	int quest_power8_timer;
-	int quest_power9_timer;
-	int quest_power10_timer;
+	// zyk: timers of the magic powers used by this player
+	int magic_power_timer[MAX_MAGIC_POWERS];
 
-	// zyk: timers used by the quest powers hitting this player
-	int quest_target1_timer;
-	int quest_target2_timer;
-	int quest_target3_timer;
-	int quest_target4_timer;
-	int quest_target5_timer;
-	int quest_target6_timer;
-	int quest_target7_timer;
-	int quest_target8_timer;
-	int quest_target9_timer;
-	int quest_target10_timer;
-	int quest_target11_timer;
+	// zyk: timers used by the magic powers hitting this player
+	int magic_power_target_timer[MAX_MAGIC_POWERS];
 
-	// zyk: quest powers debounce timer, for example, like Wind powers
-	int quest_debounce1_timer;
-	int quest_debounce2_timer;
-	int quest_debounce3_timer;
-	int quest_debounce4_timer;
+	// zyk: magic powers debounce timer, for example, like Wind powers
+	int magic_power_debounce_timer[MAX_MAGIC_POWERS];
 
-	// zyk: player ids which are hitting the target player
-	int quest_power_user1_id;
-	int quest_power_user2_id;
-	int quest_power_user3_id;
-	int quest_power_user4_id;
-	int quest_power_user5_id;
+	// zyk: player ids which are hitting the target player with magic
+	int magic_power_user_id[MAX_MAGIC_POWERS];
 
 	// zyk: sets the id of the effect of the magic used by this player
 	int quest_power_effect1_id;

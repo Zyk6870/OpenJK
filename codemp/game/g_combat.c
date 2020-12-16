@@ -5518,7 +5518,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 24))
 	{ // zyk: target hit by Sleeping Flowers. if he takes damage, he can get up
 		targ->client->ps.forceHandExtendTime = level.time;
-		targ->client->pers.quest_target9_timer = 0;
+		targ->client->pers.magic_power_target_timer[MAGIC_SLEEPING_FLOWERS] = 0;
 	}
 
 	if (targ && targ->client && targ->client->sess.amrpgmode == 2)
@@ -7094,9 +7094,9 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						if (Q_stricmp(attacker->targetname, "zyk_quest_effect_flaming_area") == 0 && quest_power_user && quest_power_user != ent && ent->client)
 						{ // zyk: if player touches the flame, will keep catching fire for some seconds
 							ent->client->pers.quest_power_status |= (1 << 23);
-							ent->client->pers.quest_power_user5_id = quest_power_user->s.number;
-							ent->client->pers.quest_power_hit4_counter = 15;
-							ent->client->pers.quest_target8_timer = level.time + 200;
+							ent->client->pers.magic_power_user_id[MAGIC_FLAMING_AREA] = quest_power_user->s.number;
+							ent->client->pers.magic_power_hit_counter[MAGIC_FLAMING_AREA] = 15;
+							ent->client->pers.magic_power_target_timer[MAGIC_FLAMING_AREA] = level.time + 200;
 						}
 						else if (Q_stricmp(attacker->targetname, "zyk_effect_scream") == 0 && ent->client && Q_irand(0, 3) == 0 && 
 							zyk_unique_ability_can_hit_target(quest_power_user, ent) == qtrue)
