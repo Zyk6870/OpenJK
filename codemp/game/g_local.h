@@ -572,9 +572,6 @@ typedef enum {
 	MAX_MAGIC_POWERS
 } zyk_magic_t;
 
-// zyk: number of Dark Quest objectives
-#define NUMBER_OF_OBJECTIVES 10
-
 // zyk: number of Eternity Quest objectives
 #define NUMBER_OF_ETERNITY_QUEST_OBJECTIVES 11
 
@@ -869,20 +866,6 @@ typedef struct clientPersistant_s {
 	// zyk: amount of skills used by the player. After a certain amount of uses, player gets 1 experience point (level up score)
 	int skill_counter;
 
-	// zyk: number of notes collected in Dark Quest
-	// the value will be NUMBER_OF_OBJECTIVES after completing the quest
-	// before that, has bitvalue of each collected note. Possible bitvalues are:
-	// 4 - Note at yavin1b
-	// 5 - Note at t1_sour
-	// 6 - Note at t1_surprise
-	// 7 - Note at t3_rift
-	// 8 - Note at hoth2
-	// 9 - Note at t3_bounty
-	// 10 - Note at t2_rogue
-	// 11 - Note at t1_danger
-	// 12 - Note at mp/duel6
-	int hunter_quest_progress;
-
 	// zyk: number of objectives completed in Eternity Quest
 	int eternity_quest_progress;
 
@@ -994,10 +977,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
-
-	// zyk: controls the timed events in Dark Quest
-	int hunter_quest_timer;
-	int hunter_quest_messages; // zyk: also used by the Guardian of Universe to know she already spawned the other guardians
 
 	// zyk: used to show the riddles from time to time
 	int eternity_quest_timer;
@@ -1640,10 +1619,6 @@ typedef struct level_locals_s {
 	// zyk: has the quest crystal ids that a player must get. Default -1 for each position.
 	// crystal gets cleaned when the player gets the crystal
 	int quest_crystal_id[3];
-
-	// zyk: has the quest note id that a player must get. Default -1.
-	// gets cleaned when the player gets the note
-	int quest_note_id;
 
 	// zyk: id of the note spawned in the fourth Universe Quest mission
 	int universe_quest_note_id;

@@ -4751,25 +4751,9 @@ void load_account(gentity_t *ent)
 
 			// zyk: Other RPG attributes
 
-			// zyk: loading Dark Quest completed objectives value
-			fscanf(account_file, "%s", content);
-			ent->client->pers.hunter_quest_progress = atoi(content);
-
-			// zyk: loading Eternity Quest progress value
-			fscanf(account_file, "%s", content);
-			ent->client->pers.eternity_quest_progress = atoi(content);
-
 			// zyk: loading secrets found value
 			fscanf(account_file, "%s", content);
 			ent->client->pers.secrets_found = atoi(content);
-
-			// zyk: loading Universe Quest Progress value
-			fscanf(account_file, "%s", content);
-			ent->client->pers.universe_quest_progress = atoi(content);
-
-			// zyk: loading Universe Quest Counter value
-			fscanf(account_file, "%s", content);
-			ent->client->pers.universe_quest_counter = atoi(content);
 
 			// zyk: make sure Challenge Mode settings flag and counter flag are correct
 			if (ent->client->pers.universe_quest_counter & (1 << 29))
@@ -4875,9 +4859,8 @@ void save_account(gentity_t *ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt",ent->client->sess.filename, ent->client->sess.rpgchar),"w");
 
-			fprintf(account_file,"%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.hunter_quest_progress, client->pers.eternity_quest_progress, 
-				client->pers.secrets_found, client->pers.universe_quest_progress, client->pers.universe_quest_counter, client->pers.credits, client->pers.rpg_class, 
+			fprintf(account_file,"%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.secrets_found, client->pers.credits, client->pers.rpg_class, 
 				client->sess.magic_fist_selection, client->sess.selected_special_power, client->sess.selected_left_special_power, client->sess.selected_right_special_power);
 
 			fclose(account_file);
@@ -5312,9 +5295,6 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->pers.universe_quest_messages = 0;
 		ent->client->pers.universe_quest_timer = 0;
 
-		ent->client->pers.hunter_quest_timer = 0;
-		ent->client->pers.hunter_quest_messages = 0;
-
 		// zyk: loading initial RPG weapons
 		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)) && ent->client->pers.skill_levels[18] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
@@ -5511,7 +5491,6 @@ void add_new_char(gentity_t *ent)
 		ent->client->pers.skill_levels[i] = 0;
 	}
 
-	ent->client->pers.hunter_quest_progress = 0;
 	ent->client->pers.eternity_quest_progress = 0;
 	ent->client->pers.secrets_found = 0;
 	ent->client->pers.universe_quest_progress = 0;
@@ -5767,19 +5746,6 @@ void clean_guardians(gentity_t *ent)
 	}
 }
 
-// zyk: tests if the player has collected the 9 notes before the Guardian of Darkness in Dark Quest
-qboolean dark_quest_collected_notes(gentity_t *ent)
-{
-	if (ent->client->pers.hunter_quest_progress & (1 << 4) && ent->client->pers.hunter_quest_progress & (1 << 5) && ent->client->pers.hunter_quest_progress & (1 << 6) && ent->client->pers.hunter_quest_progress & (1 << 7) && ent->client->pers.hunter_quest_progress & (1 << 8) && ent->client->pers.hunter_quest_progress & (1 << 9) && ent->client->pers.hunter_quest_progress & (1 << 10) && ent->client->pers.hunter_quest_progress & (1 << 11) && ent->client->pers.hunter_quest_progress & (1 << 12))
-	{
-		return qtrue;
-	}
-	else
-	{
-		return qfalse;
-	}
-}
-
 extern void zyk_set_entity_field(gentity_t *ent, char *key, char *value);
 extern void zyk_spawn_entity(gentity_t *ent);
 extern void zyk_main_set_entity_field(gentity_t *ent, char *key, char *value);
@@ -5797,10 +5763,7 @@ void load_note_model(int x,int y,int z)
 
 	zyk_spawn_entity(new_ent);
 
-	if (x == 2780 && y == 3966 && z == 1411)
-		level.universe_quest_note_id = new_ent->s.number;
-	else
-		level.quest_note_id = new_ent->s.number;
+	level.universe_quest_note_id = new_ent->s.number;
 }
 
 // zyk: loads the crystal md3 model for the Universe Quest crystals
@@ -5844,22 +5807,6 @@ gentity_t *load_effect(int x,int y,int z, int spawnflags, char *fxFile)
 	return ent;
 }
 
-// zyk: cleans the note model if player gets it
-void clean_note_model()
-{
-	if (level.quest_note_id != -1)
-	{
-		G_FreeEntity(&g_entities[level.quest_note_id]);
-		level.quest_note_id = -1;
-	}
-
-	if (level.universe_quest_note_id != -1)
-	{
-		G_FreeEntity(&g_entities[level.universe_quest_note_id]);
-		level.universe_quest_note_id = -1;
-	}
-}
-
 // zyk: cleans the crystal model if player gets it
 void clean_crystal_model(int crystal_number)
 {
@@ -5896,8 +5843,6 @@ int zyk_number_of_completed_quests(gentity_t *ent)
 {
 	int number_of_completed_quests = 0;
 
-	if (ent->client->pers.hunter_quest_progress == NUMBER_OF_OBJECTIVES)
-		number_of_completed_quests++;
 	if (ent->client->pers.eternity_quest_progress == NUMBER_OF_ETERNITY_QUEST_OBJECTIVES)
 		number_of_completed_quests++;
 
@@ -6224,8 +6169,8 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 			unique_duration = ent->client->pers.unique_skill_duration - level.time;
 		}
 
-		strcpy(content,va("%s%d-%d-%d-%d-%d-%d-%d-",content,ent->client->pers.secrets_found,ent->client->pers.hunter_quest_progress,
-			ent->client->pers.eternity_quest_progress,ent->client->pers.universe_quest_progress,universe_quest_counter_value,quest_player_id,unique_duration));
+		strcpy(content,va("%s%d-%d-%d-%d-%d-%d-",content,ent->client->pers.secrets_found,ent->client->pers.eternity_quest_progress,
+			ent->client->pers.universe_quest_progress,universe_quest_counter_value,quest_player_id,unique_duration));
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-%s-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,zyk_rpg_class(ent),content));
 	}
@@ -6927,80 +6872,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 					}
 
-					trap->SendServerCommand(ent->s.number, va("print \"\n^3RPG Mode Quests\n\n^2/list universe: ^7Universe Quest (Main Quest)\n\n^2/list dark: ^7Dark Quest\n^2/list eternity: ^7Eternity Quest\n\n^3/list bounty: ^7The Bounty Hunter quest\n^3/list custom: ^7lists custom quests\n\n^3Quest Player: ^7%s\n^3Bounty Quest Target: ^7%s^7\n\n\"", quest_player, target_player));
+					trap->SendServerCommand(ent->s.number, va("print \"\n^3RPG Mode Quests\n\n^2/list universe: ^7Universe Quest (Main Quest)\n\n^2/list eternity: ^7Eternity Quest\n\n^3/list bounty: ^7The Bounty Hunter quest\n^3/list custom: ^7lists custom quests\n\n^3Quest Player: ^7%s\n^3Bounty Quest Target: ^7%s^7\n\n\"", quest_player, target_player));
 				}
 				else
 					trap->SendServerCommand(ent->s.number, "print \"\n^3RPG Mode Quests\n\n^1Quests are not allowed in this server^7\n\n\"");
-			}
-			else if (Q_stricmp( arg1, "dark" ) == 0)
-			{
-				char dark_quest_message[MAX_STRING_CHARS];
-				strcpy(dark_quest_message, "");
-
-				if (ent->client->pers.hunter_quest_progress != NUMBER_OF_OBJECTIVES)
-				{
-					if (dark_quest_collected_notes(ent) == qtrue)
-					{
-						strcpy(dark_quest_message, "^3\n2 - Guardian of Darkness\n\n^7Defeat the Guardian of Darkness in the dark room in ^3yavin2^7.");
-					}
-					else
-					{
-						strcpy(dark_quest_message, "^3\n1 - The Notes\n\n^7Find the notes in their respective maps\n");
-
-						if (ent->client->pers.hunter_quest_progress & (1 << 4))
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in the temple of the forest - ^2yes",dark_quest_message));
-						else
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in the temple of the forest - ^1no",dark_quest_message));
-
-						if (ent->client->pers.hunter_quest_progress & (1 << 5))
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in a spaceport of a desert planet - ^2yes",dark_quest_message));
-						else
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in a spaceport of a desert planet - ^1no",dark_quest_message));
-
-						if (ent->client->pers.hunter_quest_progress & (1 << 6))
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in the desert with the sand people - ^2yes",dark_quest_message));
-						else
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in the desert with the sand people - ^1no",dark_quest_message));
-
-						if (ent->client->pers.hunter_quest_progress & (1 << 7))
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in a very deep burial location - ^2yes",dark_quest_message));
-						else
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in a very deep burial location - ^1no",dark_quest_message));
-
-						if (ent->client->pers.hunter_quest_progress & (1 << 8))
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in a very cold place - ^2yes",dark_quest_message));
-						else
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in a very cold place - ^1no",dark_quest_message));
-
-						if (ent->client->pers.hunter_quest_progress & (1 << 9))
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in an abandoned and forgotten city - ^2yes",dark_quest_message));
-						else
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in an abandoned and forgotten city - ^1no",dark_quest_message));
-
-						if (ent->client->pers.hunter_quest_progress & (1 << 10))
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in the office of a crime lord - ^2yes",dark_quest_message));
-						else
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in the office of a crime lord - ^1no",dark_quest_message));
-
-						if (ent->client->pers.hunter_quest_progress & (1 << 11))
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in the sand worm desert - ^2yes",dark_quest_message));
-						else
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in the sand worm desert - ^1no",dark_quest_message));
-
-						if (ent->client->pers.hunter_quest_progress & (1 << 12))
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in the sith tombs - ^2yes",dark_quest_message));
-						else
-							strcpy(dark_quest_message, va("%s\n^7Note ^3in the sith tombs - ^1no",dark_quest_message));
-					}
-				}
-				else
-				{
-					strcpy(dark_quest_message, "^7Completed!");
-				}
-
-				strcpy(message, va("\n^1Dark Quest\n^7%s\n\n", dark_quest_message));
-
-				trap->SendServerCommand( ent->s.number, va("print \"%s\"", message) );
 			}
 			else if (Q_stricmp( arg1, "eternity" ) == 0)
 			{
@@ -8517,7 +8392,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 		ent->client->pers.max_rpg_shield = 0;
 		ent->client->pers.secrets_found = 0;
 
-		ent->client->pers.hunter_quest_progress = 0;
 		ent->client->pers.eternity_quest_progress = 0;
 		ent->client->pers.universe_quest_progress = 0;
 		ent->client->pers.universe_quest_counter = 0;
@@ -8548,7 +8422,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 	}
 	else if (Q_stricmp( arg1, "quests") == 0)
 	{
-		ent->client->pers.hunter_quest_progress = 0;
 		ent->client->pers.eternity_quest_progress = 0;
 		ent->client->pers.universe_quest_progress = 0;
 		ent->client->pers.universe_quest_counter = 0;
@@ -9238,9 +9111,7 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		}
 		else if (value == 15)
 		{
-			if (!(ent->client->pers.player_settings & (1 << value)) && 
-				ent->client->pers.hunter_quest_progress == 0 && ent->client->pers.eternity_quest_progress == 0 && 
-				ent->client->pers.universe_quest_progress == 0 && ent->client->pers.can_play_quest == 0)
+			if (!(ent->client->pers.player_settings & (1 << value)) && ent->client->pers.can_play_quest == 0)
 			{ // zyk: player can only activate Challenge Mode if he did not complete any quest mission
 				ent->client->pers.player_settings |= (1 << value);
 				ent->client->pers.universe_quest_counter |= (1 << 29);
