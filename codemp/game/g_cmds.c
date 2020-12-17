@@ -346,7 +346,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 54)
 		return "increases the max force power you have. Necessary to allow you to use force powers and force-based skills";
 	if (skill_index == 55)
-		return "Free Warrior: +damage +resistance to damage, Force User: +saber damage and force regens faster, Bounty Hunter: +gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health, Armored Soldier: +resistance to damage, Monk: +run speed, melee damage and melee attack speed, Stealth Attacker: +gun damage +resistance to electric attacks, Duelist: +saber and melee damage and faster force regen, Force Gunner: +damage +resistance to damage, Magic Master: +max MP, new magic bolt types, new magic powers, recovers some jetpack fuel with MP if it runs out -magic power cooldown, Force Guardian: +resistance to damage";
+		return "Free Warrior: +damage +resistance to damage, Force User: +saber damage and force regens faster, Bounty Hunter: +gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health, Armored Soldier: +resistance to damage, Monk: +run speed, melee damage and melee attack speed, Stealth Attacker: +gun damage +resistance to electric attacks, Duelist: +saber and melee damage and faster force regen, Force Gunner: +damage +resistance to damage, Magic Master: +max MP, new magic bolt types, recovers some jetpack fuel with MP if it runs out, -magic power cooldown, Force Guardian: +resistance to damage";
 	if (skill_index == 56)
 		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels";
 	if (skill_index == 57)
