@@ -689,7 +689,8 @@ qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int 
 	{
 		drain = (zyk_max_force_power.integer/2);
 	}
-	else if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1)
+	
+	if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1)
 	{ // zyk: Force User class. He spends less force power
 		drain *= 0.75;
 	}
@@ -1214,6 +1215,11 @@ void ForceHeal( gentity_t *self )
 		return;
 	}
 
+	if (self->client->ps.fd.forceHealTime > level.time)
+	{ // zyk: Heal will have a cooldown time
+		return;
+	}
+
 	if ( self->health >= self->client->ps.stats[STAT_MAX_HEALTH])
 	{
 		// zyk: Shield Heal skill. Done when player has full HP
@@ -1272,7 +1278,14 @@ void ForceHeal( gentity_t *self )
 	//NOTE: Decided to make all levels instant.
 
 	// zyk: now heal force power requires force based on the force power max cvar
-	self->client->ps.fd.forcePower -= (zyk_max_force_power.integer/2);
+	// zyk: Force User class spends less force
+	if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1)
+		self->client->ps.fd.forcePower -= ((zyk_max_force_power.integer / 2) * 0.75);
+	else
+		self->client->ps.fd.forcePower -= (zyk_max_force_power.integer/2);
+
+	// zyk: Heal will have a cooldown time
+	self->client->ps.fd.forceHealTime = level.time + 500;
 
 	rpg_skill_counter(self, 100);
 
