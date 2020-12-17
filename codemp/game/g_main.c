@@ -5956,7 +5956,7 @@ void black_hole(gentity_t* ent, int radius, int damage, int duration)
 {
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_BLACK_HOLE] > 1)
 	{
-		damage += 20;
+		damage += 10;
 		duration += 3000;
 	}
 
@@ -6424,7 +6424,7 @@ void quest_power_events(gentity_t *ent)
 								// zyk: increases strength with which target is sucked into the black hole the closer he is to it
 								if (black_hole_target->client->ps.groundEntityNum != ENTITYNUM_NONE)
 								{
-									black_hole_suck_strength *= 210.0;
+									black_hole_suck_strength *= 215.0;
 								}
 								else
 								{
@@ -9943,7 +9943,7 @@ void G_RunFrame( int levelTime ) {
 				zyk_cast_magic(ent, first_magic_skill + random_magic);
 
 				// zyk: decreasing npc cooldown based on his level
-				ent->client->pers.quest_power_usage_timer -= Q_irand(1 * ent->client->pers.level, 10 * ent->client->pers.level);
+				ent->client->pers.quest_power_usage_timer -= Q_irand(1 * ent->client->pers.level, 20 * ent->client->pers.level);
 			}
 		}
 
