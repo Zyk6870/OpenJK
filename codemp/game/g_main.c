@@ -5915,18 +5915,7 @@ void ice_block(gentity_t *ent, int duration)
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
 }
 
-// zyk: Ultra Drain
-void ultra_drain(gentity_t *ent, int radius, int damage, int duration)
-{
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ULTRA_DRAIN] > 1)
-	{
-		damage += 8;
-	}
-
-	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_drain", "4", "misc/possession", 1000, damage, radius, duration);
-}
-
-void zyk_spawn_black_hole_model(gentity_t* ent, int duration)
+void zyk_spawn_black_hole_model(gentity_t* ent, int duration, int model_scale)
 {
 	gentity_t* new_ent = G_Spawn();
 
@@ -5938,7 +5927,7 @@ void zyk_spawn_black_hole_model(gentity_t* ent, int duration)
 
 	zyk_set_entity_field(new_ent, "targetname", "zyk_black_hole");
 
-	zyk_set_entity_field(new_ent, "zykmodelscale", "150");
+	zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
 
 	zyk_spawn_entity(new_ent);
 
@@ -5952,6 +5941,19 @@ void zyk_spawn_black_hole_model(gentity_t* ent, int duration)
 	trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
 }
 
+// zyk: Ultra Drain
+void ultra_drain(gentity_t *ent, int radius, int damage, int duration)
+{
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ULTRA_DRAIN] > 1)
+	{
+		damage += 8;
+	}
+
+	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_drain", "4", "misc/possession", 500, damage, radius, duration);
+
+	zyk_spawn_black_hole_model(ent, duration, 100);
+}
+
 // zyk: Black Hole
 void black_hole(gentity_t* ent, int radius, int damage, int duration)
 {
@@ -5963,7 +5965,7 @@ void black_hole(gentity_t* ent, int radius, int damage, int duration)
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_black_hole", "4", "ships/proton_impact", 500, damage, radius, duration);
 
-	zyk_spawn_black_hole_model(ent, duration);
+	zyk_spawn_black_hole_model(ent, duration, 150);
 
 	ent->client->pers.black_hole_distance = radius;
 
