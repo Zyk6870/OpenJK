@@ -4531,9 +4531,6 @@ void zyk_start_boss_battle_music(gentity_t *ent)
 		trap->SetConfigstring( CS_MUSIC, "music/hoth2/hoth2_action.mp3" );
 }
 
-// zyk: spawns a RPG quest boss and set his HP based in the quantity of allies the quest player has now
-extern gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboolean isVehicle ); // zyk: used in boss battles
-
 // zyk: tests if this player is one of the Duel Tournament duelists
 qboolean duel_tournament_is_duelist(gentity_t *ent)
 {
@@ -7939,110 +7936,6 @@ void melee_battle_winner()
 	{
 		trap->SendServerCommand(-1, "chat \"^3Melee Battle: ^7No one is the winner!\"");
 	}
-}
-
-gentity_t *zyk_quest_item(char *item_path, int x, int y, int z, char *mins, char *maxs)
-{
-	gentity_t *new_ent = G_Spawn();
-
-	if (!strstr(item_path, ".md3"))
-	{// zyk: effect
-		zyk_set_entity_field(new_ent, "classname", "fx_runner");
-		zyk_set_entity_field(new_ent, "targetname", "zyk_quest_models");
-		zyk_set_entity_field(new_ent, "origin", va("%d %d %d", x, y, z));
-
-		new_ent->s.modelindex = G_EffectIndex(item_path);
-
-		zyk_spawn_entity(new_ent);
-	}
-	else
-	{ // zyk: model
-		zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
-		zyk_set_entity_field(new_ent, "targetname", "zyk_quest_models");
-		zyk_set_entity_field(new_ent, "origin", va("%d %d %d", x, y, z));
-
-		if (Q_stricmp(mins, "") != 0 && Q_stricmp(maxs, "") != 0)
-		{
-			zyk_set_entity_field(new_ent, "spawnflags", "65537");
-			zyk_set_entity_field(new_ent, "mins", mins);
-			zyk_set_entity_field(new_ent, "maxs", maxs);
-		}
-
-		if (z == -10000)
-		{ // zyk: catwalk in t3_rift quest missions. Must scale it
-			zyk_set_entity_field(new_ent, "zykmodelscale", "150");
-		}
-
-		zyk_set_entity_field(new_ent, "model", item_path);
-
-		zyk_spawn_entity(new_ent);
-	}
-
-	return new_ent;
-}
-
-// zyk: remaps quest items to the values passed as args
-void zyk_remap_quest_item(char *old_remap, char *new_remap)
-{
-	float f = level.time * 0.001;
-
-	AddRemap(old_remap, new_remap, f);
-	trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
-}
-
-void zyk_trial_room_models()
-{
-	gentity_t *new_ent = G_Spawn();
-
-	// zyk: catwalk to block entrance
-	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
-	zyk_set_entity_field(new_ent, "spawnflags", "65537");
-	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", -3770, 4884, 120));
-
-	zyk_set_entity_field(new_ent, "angles", va("%d %d 0", 90, 0));
-
-	zyk_set_entity_field(new_ent, "mins", "-24 -192 -192");
-	zyk_set_entity_field(new_ent, "maxs", "24 192 192");
-	zyk_set_entity_field(new_ent, "zykmodelscale", "300");
-
-	zyk_set_entity_field(new_ent, "model", "models/map_objects/factory/catw2_b.md3");
-
-	zyk_set_entity_field(new_ent, "targetname", "zyk_quest_models");
-
-	zyk_spawn_entity(new_ent);
-
-	// zyk: adding catwalks to block the central lava
-	new_ent = G_Spawn();
-
-	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
-	zyk_set_entity_field(new_ent, "spawnflags", "65537");
-	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", -4470, 4628, -65));
-
-	zyk_set_entity_field(new_ent, "mins", "-256 -256 -32");
-	zyk_set_entity_field(new_ent, "maxs", "256 256 32");
-	zyk_set_entity_field(new_ent, "zykmodelscale", "400");
-
-	zyk_set_entity_field(new_ent, "model", "models/map_objects/factory/catw2_b.md3");
-
-	zyk_set_entity_field(new_ent, "targetname", "zyk_quest_models");
-
-	zyk_spawn_entity(new_ent);
-
-	new_ent = G_Spawn();
-
-	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
-	zyk_set_entity_field(new_ent, "spawnflags", "65537");
-	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", -4470, 5140, -65));
-
-	zyk_set_entity_field(new_ent, "mins", "-256 -256 -32");
-	zyk_set_entity_field(new_ent, "maxs", "256 256 32");
-	zyk_set_entity_field(new_ent, "zykmodelscale", "400");
-
-	zyk_set_entity_field(new_ent, "model", "models/map_objects/factory/catw2_b.md3");
-
-	zyk_set_entity_field(new_ent, "targetname", "zyk_quest_models");
-
-	zyk_spawn_entity(new_ent);
 }
 
 
