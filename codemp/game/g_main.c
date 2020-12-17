@@ -10040,13 +10040,17 @@ void G_RunFrame( int levelTime ) {
 					current_magic_skill++;
 				}
 
-				// zyk: regen mp of this mage
+				// zyk: regen mp and level of this mage
 				if (ent->client->pers.magic_power < 20)
 				{
-					ent->client->pers.magic_power = 500;
+					ent->client->pers.level = 200;
+					ent->client->pers.magic_power = zyk_max_magic_power(ent);
 				}
 
 				zyk_cast_magic(ent, first_magic_skill + random_magic);
+
+				// zyk: decreasing npc cooldown based on his level
+				ent->client->pers.quest_power_usage_timer -= Q_irand(1 * ent->client->pers.level, 10 * ent->client->pers.level);
 			}
 		}
 
