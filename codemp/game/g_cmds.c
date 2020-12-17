@@ -6019,7 +6019,7 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 	}
 
 	// zyk: players can only have up to 3 Magic Powers, except Magic Master class
-	if (ent->client->pers.rpg_class != 8)
+	if (ent->client->pers.rpg_class != 8 && upgrade_value > (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS))
 	{
 		int i = 0;
 		int number_of_magic_skills = 0;
