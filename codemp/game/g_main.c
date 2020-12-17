@@ -5948,7 +5948,7 @@ void ultra_drain(gentity_t *ent, int radius, int damage, int duration)
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_drain", "4", "misc/possession", 500, damage, radius, duration);
 
-	zyk_spawn_black_hole_model(ent, duration, 100);
+	zyk_spawn_black_hole_model(ent, duration, 50);
 }
 
 // zyk: Black Hole
@@ -5979,7 +5979,7 @@ void light_of_judgement(gentity_t* ent, int radius, int duration)
 		duration += 3000;
 	}
 
-	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_black_hole", "0", "ships/sd_exhaust", 500, 0, 0, duration);
+	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_light_of_judgement", "0", "ships/sd_exhaust", 500, 0, 0, duration);
 
 	ent->client->pers.light_of_judgement_distance = radius;
 
