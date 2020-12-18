@@ -13498,7 +13498,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 	if (argc == 1)
 	{ // zyk: lists the chars and commands
-		trap->SendServerCommand(ent->s.number, va("print \"\n^7Using %s\n\n^7%s\n^3/rpgchar new <charname>: ^7creates a new char\n^3/rpgchar rename <new name>: ^7renames current char\n^3/rpgchar duplicate: ^7creates a copy of the current char in use\n^3/rpgchar use <charname>: ^7uses this char\n^3/rpgchar delete <charname>: ^7removes this char\n^3/rpgchar migrate <charname> <login> <password>: ^7moves char to account with this login and password\n\"", ent->client->sess.rpgchar, zyk_get_rpg_chars(ent, "\n")));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^7Using %s\n\n^7%s\n^3/rpgchar new <charname>: ^7creates a new char\n^3/rpgchar rename <new name>: ^7renames current char\n^3/rpgchar use <charname>: ^7uses this char\n^3/rpgchar delete <charname>: ^7removes this char\n^3/rpgchar migrate <charname> <login> <password>: ^7moves char to account with this login and password\n\"", ent->client->sess.rpgchar, zyk_get_rpg_chars(ent, "\n")));
 	}
 	else
 	{
@@ -13509,16 +13509,13 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 		trap->Argv(1, arg1, sizeof(arg1));
 
-		if (argc == 2 && Q_stricmp(arg1, "duplicate") != 0)
+		if (argc == 2)
 		{
 			trap->SendServerCommand(ent->s.number, "print \"This command requires at least one more argument\n\"");
 			return;
 		}
 
-		if (Q_stricmp(arg1, "duplicate") != 0)
-		{
-			trap->Argv(2, arg2, sizeof(arg2));
-		}
+		trap->Argv(2, arg2, sizeof(arg2));
 
 		if (Q_stricmp(arg1, "new") == 0)
 		{
@@ -13596,46 +13593,6 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 			save_account(ent, qfalse);
 
 			trap->SendServerCommand(ent->s.number, va("print \"Renamed to %s^7\n\"", ent->client->sess.rpgchar));
-		}
-		else if (Q_stricmp(arg1, "duplicate") == 0)
-		{
-			char new_char_name[32];
-
-			if (zyk_char_count(ent) >= MAX_RPG_CHARS)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"Reached the max limit of chars\n\"");
-				return;
-			}
-
-			if (strlen(ent->client->sess.rpgchar) < MAX_ACC_NAME_SIZE - 4)
-			{
-				strcpy(new_char_name, va("dup_%s", ent->client->sess.rpgchar));
-			}
-			else
-			{ // zyk: cannot go over the max, so remove the last chars
-				strcpy(new_char_name, va("%s", ent->client->sess.rpgchar));
-
-				new_char_name[0] = 'd';
-				new_char_name[1] = 'u';
-				new_char_name[2] = 'p';
-				new_char_name[3] = '_';
-			}
-
-			chars_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, new_char_name), "r");
-			if (chars_file != NULL)
-			{
-				fclose(chars_file);
-				trap->SendServerCommand(ent->s.number, "print \"Cannot overwrite existing duplicate\n\"");
-				return;
-			}
-
-#if defined(__linux__)
-			system(va("cp zykmod/accounts/%s_%s.txt zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, new_char_name));
-#else
-			system(va("cd \"zykmod/accounts\" & COPY %s_%s.txt %s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->sess.filename, new_char_name));
-#endif
-
-			trap->SendServerCommand(ent->s.number, va("print \"Char %s ^7duplicated!\n\"", ent->client->sess.rpgchar));
 		}
 		else if (Q_stricmp(arg1, "use") == 0)
 		{
