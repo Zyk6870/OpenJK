@@ -5625,7 +5625,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (targ->client->pers.rpg_class == 2 && targ->client->pers.secrets_found & (1 << 1))
 				bounty_hunter_shield_resistance = 0.07;
 
-			scaled_damage = (int)ceil(take * (1.0 - bounty_hunter_shield_resistance - (0.07 * targ->client->pers.skill_levels[31])));
+			scaled_damage = (int)ceil(take * (1.0 - bounty_hunter_shield_resistance - (0.05 * targ->client->pers.skill_levels[31])));
 		}
 
 		if (targ->client->ps.stats[STAT_ARMOR] >= scaled_damage)
@@ -6065,7 +6065,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (targ->client->pers.rpg_class == 2 && targ->client->pers.secrets_found & (1 << 1))
 				bonus_resistance = 0.07;
 
-			take = (int)ceil(take * (1.0 - bonus_resistance - (0.07 * targ->client->pers.skill_levels[32])));
+			take = (int)ceil(take * (1.0 - bonus_resistance - (0.05 * targ->client->pers.skill_levels[32])));
 
 			// zyk: Improvements skill makes Force Guardian regen some force with Rage when taking damage
 			if (targ->client->pers.rpg_class == 9 && targ->client->pers.skill_levels[55] > 0 && 

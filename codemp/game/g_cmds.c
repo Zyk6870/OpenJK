@@ -69,8 +69,8 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	3, // Bryar Pistol
 	3, // Melee
 	5, // Max Shield
-	4, // Shield Strength
-	4, // Health Strength
+	5, // Shield Strength
+	5, // Health Strength
 	1, // Drain Shield
 	3, // Jetpack
 	3, // Sense Health
@@ -519,9 +519,9 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 30)
 		return "The max shield (armor) the player can have. Each level increases 20 per cent of max shield the player can have";
 	if (skill_index == 31)
-		return "Each level increases your shield resistance by 7 per cent";
+		return "Each level increases your shield resistance by 5 per cent";
 	if (skill_index == 32)
-		return "Each level increases your health resistance by 7 per cent";
+		return "Each level increases your health resistance by 5 per cent";
 	if (skill_index == 33)
 		return "When using Drain force power, and your health is full, restores some shield. It also makes Drain suck hp/shield from the enemy to restore your hp/shield";
 	if (skill_index == 34)
