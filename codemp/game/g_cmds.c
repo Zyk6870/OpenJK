@@ -4334,6 +4334,10 @@ void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Flaming Area!\"", ent->client->pers.netname));
 	}
+	else if (magic_power == MAGIC_FLAMING_RAGE)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Flaming Rage!\"", ent->client->pers.netname));
+	}
 	else if (magic_power == MAGIC_REVERSE_WIND)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Reverse Wind!\"", ent->client->pers.netname));
@@ -4346,9 +4350,17 @@ void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Ice Block!\"", ent->client->pers.netname));
 	}
+	else if (magic_power == MAGIC_BLACK_HOLE)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Black Hole!\"", ent->client->pers.netname));
+	}
 	else if (magic_power == MAGIC_ULTRA_DRAIN)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Ultra Drain!\"", ent->client->pers.netname));
+	}
+	else if (magic_power == MAGIC_LIGHT_OF_JUDGEMENT)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Light of Judgement!\"", ent->client->pers.netname));
 	}
 	else if (magic_power == MAGIC_MAGIC_IMMUNITY)
 	{
