@@ -573,7 +573,7 @@ typedef enum {
 } zyk_magic_t;
 
 // zyk: number of RPG Mode skills
-#define NUMBER_OF_SKILLS 88
+#define NUMBER_OF_SKILLS 89
 
 // zyk: damage bonus of weapon skills
 #define RPG_WEAPON_DMG_BONUS 0.05

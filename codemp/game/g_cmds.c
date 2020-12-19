@@ -94,6 +94,7 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	1, // Cloak Item
 	5, // Force Power
 	4, // Improvements
+	5, // Max MP
 	2, // Magic Sense
 	2, // Healing Area
 	2, // Magic Explosion
@@ -188,6 +189,7 @@ char* zyk_skill_name(int skill_index)
 		"Cloak Item",
 		"Force Power",
 		"Improvements",
+		"Max MP",
 		"Magic Sense",
 		"Healing Area",
 		"Magic Explosion",
@@ -229,6 +231,225 @@ char* zyk_skill_name(int skill_index)
 	else
 	{
 		return "";
+	}
+}
+
+// zyk: tests which skills are allowed for each class
+qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
+{
+	int i = 0;
+
+	int classes_allowed_for_skills[NUMBER_OF_SKILLS][11] = { // zyk: each index is a skill, and contains an array of allowed RPG classes
+		{0, 1, 4, 6, 7, 9, -1}, // Jump
+		{0, 1, 4, 6, 7, 9, -1}, // Push
+		{0, 1, 4, 6, 7, 9, -1}, // Pull
+		{0, 1, 6, -1}, // Speed
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Sense
+		{0, 1, 6, 9, -1}, // Saber Attack
+		{0, 1, 6, 9, -1}, // Saber Defense
+		{0, 1, 6, 9, -1}, // Saber Throw
+		{0, 1, 6, 7, 9, -1}, // Absorb
+		{0, 1, 4, 6, 7, -1}, // Heal
+		{0, 1, 6, 9, -1}, // Protect
+		{0, 1, 4, -1}, // Mind Trick
+		{0, 1, 4, 7, -1}, // Team Heal
+		{0, 1, 6, 7, -1}, // Lightning
+		{0, 1, 4, 6, 9, -1}, // Grip
+		{0, 1, 4, 6, 7, -1}, // Drain
+		{0, 1, 9, -1}, // Rage
+		{0, 1, 4, 7, -1}, // Team Energize
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Stun Baton
+		{0, 2, 3, -1}, // Blaster Pistol
+		{0, 2, 3, 7, 9, -1}, // E11 Blaster Rifle
+		{0, 2, 3, 5, 7, -1}, // Disruptor
+		{0, 2, 3, -1}, // Bowcaster
+		{0, 2, 3, 5, 7, -1}, // Repeater
+		{0, 2, 3, 5, -1}, // DEMP2
+		{0, 2, 3, -1}, // Flechette
+		{0, 2, 3, 7, -1}, // Rocket Launcher
+		{0, 2, 3, 5, -1}, // Concussion Rifle
+		{0, 2, 3, -1}, // Bryar Pistol
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Melee
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Max Shield
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Shield Strength
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Health Strength
+		{0, 1, 4, 6, 7, -1}, // Drain Shield
+		{0, 2, 3, 5, 7, 8, -1}, // Jetpack
+		{0, 1, 4, 6, 7, 8, -1}, // Sense Health
+		{0, 1, 4, 6, 7, -1}, // Shield Heal
+		{0, 1, 4, 7, -1}, // Team Shield Heal
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill
+		{0, 2, 3, 7, 9, -1}, // Blaster Pack
+		{0, 2, 3, 5, 7, -1}, // Powercell
+		{0, 2, 3, 5, 7, -1}, // Metal Bolts
+		{0, 2, 3, 7, -1}, // Rockets
+		{0, 2, 3, 7, -1}, // Thermals
+		{0, 2, 3, 5, -1}, // Trip Mines
+		{0, 2, 3, 5, -1}, // Detpacks
+		{0, 2, 3, 5, 7, -1}, // Binoculars
+		{0, 2, 3, 8, -1}, // Bacta Canister
+		{0, 2, 7, -1}, // Sentry Gun
+		{0, 2, 3, 5, 7, -1}, // Seeker Drone
+		{0, 2, 3, -1}, // E-Web
+		{0, 2, 7, 9, -1}, // Big Bacta
+		{0, 2, -1}, // Force Field
+		{0, 2, 5, -1}, // Cloak Item
+		{0, 1, 4, 6, 7, 9, -1}, // Force Power
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Improvements
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Max MP
+		{8, -1},
+		{8, -1},
+		{8, -1},
+		{8, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}
+	};
+
+	for (i = 0; i < 10; i++)
+	{
+		if (classes_allowed_for_skills[skill_index][i] == -1)
+		{ // zyk: end of classes array, stops the loop
+			break;
+		}
+
+		if (classes_allowed_for_skills[skill_index][i] == rpg_class)
+		{ // zyk: skill is allowed for this class
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
+// zyk: returns the special jka color chars for RPG skills
+char* zyk_allowed_skill_color(int skill_index, int rpg_class)
+{
+	if (zyk_skill_allowed_for_class(skill_index, rpg_class) == qtrue)
+	{
+		char skill_colors[NUMBER_OF_SKILLS + 1][3] = {
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^3",
+			"^3",
+			"^3",
+			"^5",
+			"^5",
+			"^5",
+			"^5",
+			"^5",
+			"^1",
+			"^1",
+			"^1",
+			"^1",
+			"^1",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^2",
+			"^2",
+			"^1",
+			"^3",
+			"^3",
+			"^6",
+			"^6",
+			"^6",
+			"^7",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^5",
+			"^3",
+			"^3",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^4",
+			"^4",
+			"^4",
+			"^4",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^1",
+			"^1",
+			"^1",
+			"^1",
+			"^2",
+			"^2",
+			"^2",
+			"^2",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^6",
+			"^6",
+			"^6",
+			"^5",
+			"^5",
+			"^5",
+			""
+		};
+
+		return G_NewString(skill_colors[skill_index]);
+	}
+	else
+	{
+		return "^0";
 	}
 }
 
@@ -348,68 +569,70 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 55)
 		return "Free Warrior: +damage +resistance to damage, Force User: +saber damage and force regens faster, Bounty Hunter: +gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health, Armored Soldier: +resistance to damage, Monk: +run speed, melee damage and melee attack speed, Stealth Attacker: +gun damage +resistance to electric attacks, Duelist: +saber and melee damage and faster force regen, Force Gunner: +damage +resistance to damage, Magic Master: +max MP, new magic bolt types, recovers some jetpack fuel with MP if it runs out, -magic power cooldown, Force Guardian: +resistance to damage";
 	if (skill_index == 56)
-		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels";
+		return "increases the max amount of Magic Points the player can have. It is based on the current player level";
 	if (skill_index == 57)
-		return "creates an energy area that heals you and your allies and damage enemies";
+		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels";
 	if (skill_index == 58)
-		return "creates an explosion that does a lot of damage";
+		return "creates an energy area that heals you and your allies and damage enemies";
 	if (skill_index == 59)
-		return "creates a dome that does lightning damage. Damage is based on player level";
+		return "creates an explosion that does a lot of damage";
 	if (skill_index == 60)
-		return "damages enemies, draining their hp and healing you";
+		return "creates a dome that does lightning damage. Damage is based on player level";
 	if (skill_index == 61)
-		return "attacks enemies nearby with water, causing high damage";
+		return "damages enemies, draining their hp and healing you";
 	if (skill_index == 62)
-		return "greatly damages enemies nearby with a stalagmite";
+		return "attacks enemies nearby with water, causing high damage";
 	if (skill_index == 63)
-		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
+		return "greatly damages enemies nearby with a stalagmite";
 	if (skill_index == 64)
-		return "knocks people down causing damage";
+		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
 	if (skill_index == 65)
-		return "rocks keep falling at the enemies, causing high damage";
+		return "knocks people down causing damage";
 	if (skill_index == 66)
-		return "a shifting sand appears, sending you to your nearest enemy. Stand near the sand to be transported to the enemy";
+		return "rocks keep falling at the enemies, causing high damage";
 	if (skill_index == 67)
-		return "a big tree appears, protecting you from attacks and healing you";
+		return "a shifting sand appears, sending you to your nearest enemy. Stand near the sand to be transported to the enemy";
 	if (skill_index == 68)
-		return "fires a flame burst for some seconds";
+		return "a big tree appears, protecting you from attacks and healing you";
 	if (skill_index == 69)
-		return "a flame jet appears at the enemies and damages them. At level 2, if the flame hits the target, it will catch fire";
+		return "fires a flame burst for some seconds";
 	if (skill_index == 70)
-		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
+		return "a flame jet appears at the enemies and damages them. At level 2, if the flame hits the target, it will catch fire";
 	if (skill_index == 71)
-		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
+		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
 	if (skill_index == 72)
-		return "blows people away for some seconds";
+		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
 	if (skill_index == 73)
-		return "makes people go towards you";
+		return "blows people away for some seconds";
 	if (skill_index == 74)
-		return "increases your run speed";
+		return "makes people go towards you";
 	if (skill_index == 75)
-		return "decreases run speed of enemies nearby";
+		return "increases your run speed";
 	if (skill_index == 76)
-		return "an energy dome appears at enemies, damaging anyone inside it";
+		return "decreases run speed of enemies nearby";
 	if (skill_index == 77)
-		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
+		return "an energy dome appears at enemies, damaging anyone inside it";
 	if (skill_index == 78)
-		return "makes enemies unable to use magic powers for some seconds. Not so effective against magic using npcs, like bosses";
+		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
 	if (skill_index == 79)
-		return "decreases damage and resistance of enemies nearby";
+		return "makes enemies unable to use magic powers for some seconds. Not so effective against magic using npcs, like bosses";
 	if (skill_index == 80)
-		return "knocks down enemies for some seconds";
+		return "decreases damage and resistance of enemies nearby";
 	if (skill_index == 81)
-		return "poisons enemies nearby, making them take damage for some seconds";
+		return "knocks down enemies for some seconds";
 	if (skill_index == 82)
-		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
+		return "poisons enemies nearby, making them take damage for some seconds";
 	if (skill_index == 83)
-		return "damages, stuns, slowers and electrifies enemies";
+		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
 	if (skill_index == 84)
-		return "damages enemies in the area and recovers your hp";
+		return "damages, stuns, slowers and electrifies enemies";
 	if (skill_index == 85)
-		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
+		return "damages enemies in the area and recovers your hp";
 	if (skill_index == 86)
-		return "protects you from other magic powers for some seconds";
+		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
 	if (skill_index == 87)
+		return "protects you from other magic powers for some seconds";
+	if (skill_index == 88)
 		return "paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed";
 
 	return "";
@@ -763,118 +986,6 @@ void zyk_add_guns( gentity_t *ent )
 	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
 	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_CLOAK);
 	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
-}
-
-// zyk: tests which skills are allowed for each class
-qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
-{
-	int i = 0;
-
-	int classes_allowed_for_skills[NUMBER_OF_SKILLS][11] = { // zyk: each index is a skill, and contains an array of allowed RPG classes
-		{0, 1, 4, 6, 7, 9, -1}, // Jump
-		{0, 1, 4, 6, 7, 9, -1}, // Push
-		{0, 1, 4, 6, 7, 9, -1}, // Pull
-		{0, 1, 6, -1}, // Speed
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Sense
-		{0, 1, 6, 9, -1}, // Saber Attack
-		{0, 1, 6, 9, -1}, // Saber Defense
-		{0, 1, 6, 9, -1}, // Saber Throw
-		{0, 1, 6, 7, 9, -1}, // Absorb
-		{0, 1, 4, 6, 7, -1}, // Heal
-		{0, 1, 6, 9, -1}, // Protect
-		{0, 1, 4, -1}, // Mind Trick
-		{0, 1, 4, 7, -1}, // Team Heal
-		{0, 1, 6, 7, -1}, // Lightning
-		{0, 1, 4, 6, 9, -1}, // Grip
-		{0, 1, 4, 6, 7, -1}, // Drain
-		{0, 1, 9, -1}, // Rage
-		{0, 1, 4, 7, -1}, // Team Energize
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Stun Baton
-		{0, 2, 3, -1}, // Blaster Pistol
-		{0, 2, 3, 7, 9, -1}, // E11 Blaster Rifle
-		{0, 2, 3, 5, 7, -1}, // Disruptor
-		{0, 2, 3, -1}, // Bowcaster
-		{0, 2, 3, 5, 7, -1}, // Repeater
-		{0, 2, 3, 5, -1}, // DEMP2
-		{0, 2, 3, -1}, // Flechette
-		{0, 2, 3, 7, -1}, // Rocket Launcher
-		{0, 2, 3, 5, -1}, // Concussion Rifle
-		{0, 2, 3, -1}, // Bryar Pistol
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Melee
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Max Shield
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Shield Strength
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Health Strength
-		{0, 1, 4, 6, 7, -1}, // Drain Shield
-		{0, 2, 3, 5, 7, 8, -1}, // Jetpack
-		{0, 1, 4, 6, 7, 8, -1}, // Sense Health
-		{0, 1, 4, 6, 7, -1}, // Shield Heal
-		{0, 1, 4, 7, -1}, // Team Shield Heal
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill
-		{0, 2, 3, 7, 9, -1}, // Blaster Pack
-		{0, 2, 3, 5, 7, -1}, // Powercell
-		{0, 2, 3, 5, 7, -1}, // Metal Bolts
-		{0, 2, 3, 7, -1}, // Rockets
-		{0, 2, 3, 7, -1}, // Thermals
-		{0, 2, 3, 5, -1}, // Trip Mines
-		{0, 2, 3, 5, -1}, // Detpacks
-		{0, 2, 3, 5, 7, -1}, // Binoculars
-		{0, 2, 3, 8, -1}, // Bacta Canister
-		{0, 2, 7, -1}, // Sentry Gun
-		{0, 2, 3, 5, 7, -1}, // Seeker Drone
-		{0, 2, 3, -1}, // E-Web
-		{0, 2, 7, 9, -1}, // Big Bacta
-		{0, 2, -1}, // Force Field
-		{0, 2, 5, -1}, // Cloak Item
-		{0, 1, 4, 6, 7, 9, -1}, // Force Power
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Improvements
-		{8, -1}, 
-		{8, -1},
-		{8, -1},
-		{8, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}
-	};
-
-	for (i = 0; i < 10; i++)
-	{
-		if (classes_allowed_for_skills[skill_index][i] == -1)
-		{ // zyk: end of classes array, stops the loop
-			break;
-		}
-
-		if (classes_allowed_for_skills[skill_index][i] == rpg_class)
-		{ // zyk: skill is allowed for this class
-			return qtrue;
-		}
-	}
-
-	return qfalse;
 }
 
 void Cmd_Give_f( gentity_t *ent )
@@ -4117,11 +4228,11 @@ void display_yellow_bar(gentity_t *ent, int duration)
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = ent->client->pers.level * 3;
+	int max_mp = ((ent->client->pers.level * 3)/5) * ent->client->pers.skill_levels[56];
 
 	if (ent->client->pers.rpg_class == 8) // zyk: Magic Master has more Magic Power
 	{
-		max_mp = ent->client->pers.level * 4;
+		max_mp = ((ent->client->pers.level * 4) / 5) * ent->client->pers.skill_levels[56];
 		return (max_mp + (40 * (ent->client->pers.skill_levels[55] + 1)));
 	}
 
@@ -6112,111 +6223,6 @@ void Cmd_DownSkill_f( gentity_t *ent ) {
 	do_downgrade_skill(ent, downgrade_value);
 }
 
-// zyk: returns the special jka color chars for RPG skills
-char *zyk_allowed_skill_color(int skill_index, int rpg_class)
-{
-	if (zyk_skill_allowed_for_class(skill_index, rpg_class) == qtrue)
-	{
-		char skill_colors[NUMBER_OF_SKILLS + 1][3] = {
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^3",
-			"^3",
-			"^3",
-			"^5",
-			"^5",
-			"^5",
-			"^5",
-			"^5",
-			"^1",
-			"^1",
-			"^1",
-			"^1",
-			"^1",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^2",
-			"^2",
-			"^1",
-			"^3",
-			"^3",
-			"^6",
-			"^6",
-			"^6",
-			"^7",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^5",
-			"^3",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^4",
-			"^4",
-			"^4",
-			"^4",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^1",
-			"^1",
-			"^1",
-			"^1",
-			"^2",
-			"^2",
-			"^2",
-			"^2",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^6",
-			"^6",
-			"^6",
-			"^5",
-			"^5",
-			"^5",
-			""
-		};
-
-		return G_NewString(skill_colors[skill_index]);
-	}
-	else
-	{
-		return "^0";
-	}
-}
-
 // zyk: used to format text when player wants to list skills
 char* zyk_add_whitespaces(int skill_index, int biggest_skill_name_length)
 {
@@ -6288,7 +6294,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp( arg1, "other" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 11, 30, 15);
+		zyk_list_category_skills(ent, target_ent, 12, 30, 15);
 	}
 	else if (Q_stricmp( arg1, "ammo" ) == 0)
 	{
@@ -6300,7 +6306,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 32, 56, 16);
+		zyk_list_category_skills(ent, target_ent, 32, 57, 16);
 	}
 }
 
