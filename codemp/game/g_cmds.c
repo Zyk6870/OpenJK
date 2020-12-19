@@ -77,10 +77,10 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	3, // Shield Heal
 	3, // Team Shield Heal
 	1, // Unique Skill
-	3, // Blaster Pack
-	3, // Powercell
-	3, // Metal Bolts
-	3, // Rockets
+	4, // Blaster Pack
+	4, // Powercell
+	4, // Metal Bolts
+	4, // Rockets
 	3, // Thermals
 	3, // Trip Mines
 	3, // Detpacks
@@ -5193,10 +5193,10 @@ void initialize_rpg_skills(gentity_t *ent)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_DET_PACK);
 
 		// zyk: loading initial RPG ammo at spawn
-		ent->client->ps.ammo[AMMO_BLASTER] = ((int)ceil(zyk_max_blaster_pack_ammo.value/3.0) * ent->client->pers.skill_levels[39]);
-		ent->client->ps.ammo[AMMO_POWERCELL] = ((int)ceil(zyk_max_power_cell_ammo.value/3.0) * ent->client->pers.skill_levels[40]);
-		ent->client->ps.ammo[AMMO_METAL_BOLTS] = ((int)ceil(zyk_max_metal_bolt_ammo.value/3.0) * ent->client->pers.skill_levels[41]);
-		ent->client->ps.ammo[AMMO_ROCKETS] = ((int)ceil(zyk_max_rocket_ammo.value/3.0) * ent->client->pers.skill_levels[42]);
+		ent->client->ps.ammo[AMMO_BLASTER] = ((int)ceil(zyk_max_blaster_pack_ammo.value/ max_skill_levels[39]) * ent->client->pers.skill_levels[39]);
+		ent->client->ps.ammo[AMMO_POWERCELL] = ((int)ceil(zyk_max_power_cell_ammo.value/ max_skill_levels[40]) * ent->client->pers.skill_levels[40]);
+		ent->client->ps.ammo[AMMO_METAL_BOLTS] = ((int)ceil(zyk_max_metal_bolt_ammo.value/ max_skill_levels[41]) * ent->client->pers.skill_levels[41]);
+		ent->client->ps.ammo[AMMO_ROCKETS] = ((int)ceil(zyk_max_rocket_ammo.value/ max_skill_levels[42]) * ent->client->pers.skill_levels[42]);
 		ent->client->ps.ammo[AMMO_THERMAL] = ((int)ceil(zyk_max_thermal_ammo.value/3.0) * ent->client->pers.skill_levels[43]);
 		ent->client->ps.ammo[AMMO_TRIPMINE] = ((int)ceil(zyk_max_tripmine_ammo.value/3.0) * ent->client->pers.skill_levels[44]);
 		ent->client->ps.ammo[AMMO_DETPACK] = ((int)ceil(zyk_max_detpack_ammo.value/3.0) * ent->client->pers.skill_levels[45]);
