@@ -9352,17 +9352,22 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.weaponTime = (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4;
 				}
 
+				if (ent->client->ps.weapon == WP_BRYAR_OLD && ent->client->pers.secrets_found & (1 << 12) && ent->client->ps.weaponTime > (weaponData[WP_BRYAR_OLD].fireTime * 0.6))
+				{
+					ent->client->ps.weaponTime = weaponData[WP_BRYAR_OLD].fireTime * 0.6;
+				}
+
+				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.secrets_found & (1 << 13) && ent->client->ps.weaponTime > weaponData[WP_REPEATER].altFireTime / 2)
+				{
+					ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime / 2;
+				}
+
 				// zyk: Stealth Attacker using his Unique Skill, increase firerate of disruptor
 				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_class == 5 && ent->client->pers.skill_levels[38] > 0 && 
 					ent->client->pers.unique_skill_duration > level.time && !(ent->client->pers.player_statuses & (1 << 21)) && 
 					ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/3.0)
 				{
 					ent->client->ps.weaponTime = (weaponData[WP_DISRUPTOR].fireTime * 1.0)/3.0;
-				}
-
-				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.secrets_found & (1 << 13) && ent->client->ps.weaponTime > weaponData[WP_REPEATER].altFireTime/2)
-				{
-					ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime/2;
 				}
 
 				// zyk: Monk class has a faster melee fireTime

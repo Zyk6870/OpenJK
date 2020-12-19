@@ -6616,7 +6616,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 26)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Blaster Pack Weapons Upgrade: ^7E11 Blaster Rifle altfire has less spread\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Blaster Pack Weapons Upgrade: ^7E11 Blaster Rifle altfire has less spread. Increases Bryar Pistol firerate\n\n\"");
 		}
 		else if (i == 27)
 		{
