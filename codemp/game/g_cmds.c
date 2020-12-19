@@ -4241,139 +4241,15 @@ int zyk_max_magic_power(gentity_t *ent)
 
 void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
 {
+	int skill_index = (magic_power + (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS));
+
 	if (ent->client->pers.player_settings & (1 << 7))
 	{ // zyk: do not show magic cast in chat
 		return;
 	}
 
-	if (magic_power == MAGIC_MAGIC_SENSE)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Magic Sense!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_POISON_MUSHROOMS)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Poison Mushrooms!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_WATER_SPLASH)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Water Splash!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_ULTRA_FLAME)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Ultra Flame!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_ROCKFALL)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Rockfall!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_DOME_OF_DAMAGE)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Dome of Damage!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_SLOW_MOTION)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Slow Motion!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_SLEEPING_FLOWERS)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Sleeping Flowers!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_FLAME_BURST)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Flame Burst!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_EARTHQUAKE)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Earthquake!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_MAGIC_SHIELD)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Magic Shield!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_BLOWING_WIND)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Blowing Wind!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_ULTRA_SPEED)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Ultra Speed!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_ICE_STALAGMITE)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Ice Stalagmite!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_HEALING_AREA)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Healing Area!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_MAGIC_EXPLOSION)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Magic Explosion!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_LIGHTNING_DOME)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Lightning Dome!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_WATER_ATTACK)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Water Attack!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_SHIFTING_SAND)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Shifting Sand!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_TREE_OF_LIFE)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Tree of Life!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_MAGIC_DISABLE)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Magic Disable!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_FLAMING_AREA)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Flaming Area!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_FLAMING_RAGE)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Flaming Rage!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_REVERSE_WIND)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Reverse Wind!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_ENEMY_WEAKENING)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Enemy Weakening!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_ICE_BLOCK)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Ice Block!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_BLACK_HOLE)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Black Hole!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_ULTRA_DRAIN)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Ultra Drain!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_LIGHT_OF_JUDGEMENT)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Light of Judgement!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_MAGIC_IMMUNITY)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Magic Immunity!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_CHAOS_POWER)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Chaos Power!\"", ent->client->pers.netname));
-	}
-	else if (magic_power == MAGIC_TIME_STOP)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^7Time Stop!\"", ent->client->pers.netname));
-	}
+	trap->SendServerCommand(ent->s.number, va("chat \"%s^7: %s%s!\"", 
+		ent->client->pers.netname, zyk_allowed_skill_color(skill_index, ent->client->pers.rpg_class), zyk_skill_name(skill_index)));
 }
 
 void zyk_set_magic_power_cooldown_time(gentity_t *ent, int duration)
