@@ -6631,19 +6631,19 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 25)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Power Cell Weapons Upgrade: ^7increases damage by 12 percent and other features of weapons that use power cell ammo\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Power Cell Weapons Upgrade: ^7increases firerate of Disruptor. Bowcaster main fire can do up to 9 shots when charged. Bowcaster altfire bolt can bounce more times\n\n\"");
 		}
 		else if (i == 26)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Blaster Pack Weapons Upgrade: ^7increases damage by 12 percent and other features of weapons that use blaster pack ammo\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Blaster Pack Weapons Upgrade: ^7E11 Blaster Rifle altfire has less spread\n\n\"");
 		}
 		else if (i == 27)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Metal Bolts Weapons Upgrade: ^7increases damage by 12 percent and other features of weapons that use metal bolts ammo. Concussion rifle can break saber-only damage objects and can move pushable/pullable objects\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Metal Bolts Weapons Upgrade: ^7increases firerate of Repeater altfire. Increases number of bolts shot by Flechette primary fire. Concussion rifle can break saber-only damage objects and can move pushable/pullable objects\n\n\"");
 		}
 		else if (i == 28)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Rocket Upgrade: ^7increases rocket launcher damage by 12 percent which uses rockets as ammo. Makes rockets and detpacks damage saber-only damage objects and move pushable/pullable objects\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Rocket Upgrade: ^7makes rockets and detpacks damage saber-only damage objects and move pushable/pullable objects\n\n\"");
 		}
 		else if (i == 29)
 		{
