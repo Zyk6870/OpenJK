@@ -6813,7 +6813,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 44)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Magic Potion: ^7recovers all Magic Power\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Magic Potion: ^7recovers some MP\n\n\"");
 		}
 		else if (i == 45)
 		{
@@ -6981,6 +6981,21 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 			trap->SendServerCommand(ent - g_entities, "print \"\n^3Book of Riddles: ^7a legendary book that shows the answers to the riddles created by the Guardian of Eternity\n\n\"");
 		}
 	}
+}
+
+// zyk: adds some MP to the RPG player
+void zyk_add_mp(gentity_t* ent, int mp_amount)
+{
+	if ((ent->client->pers.magic_power + mp_amount) < zyk_max_magic_power(ent))
+	{
+		ent->client->pers.magic_power += mp_amount;
+	}
+	else
+	{
+		ent->client->pers.magic_power = zyk_max_magic_power(ent);
+	}
+
+	send_rpg_events(2000);
 }
 
 /*
@@ -7364,9 +7379,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == 44)
 		{
-			ent->client->pers.magic_power = zyk_max_magic_power(ent);
-
-			send_rpg_events(2000);
+			zyk_add_mp(ent, 100);
 		}
 		else if (value == 45)
 		{

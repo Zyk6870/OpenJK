@@ -1318,14 +1318,13 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
 }
 
-extern int zyk_max_magic_power(gentity_t *ent);
+extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 void ItemUse_MedPack(gentity_t *ent)
 {
-	// zyk: RPG Mode Bacta Canister. Recover 75 HP
+	// zyk: RPG Mode Bacta Canister. Recovers some mp
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 0))
 	{
-		ent->client->pers.magic_power = zyk_max_magic_power(ent);
-		send_rpg_events(2000);
+		zyk_add_mp(ent, 100);
 	}
 	
 	MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);
