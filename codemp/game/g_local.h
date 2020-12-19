@@ -480,15 +480,6 @@ typedef struct clientSession_s {
 	char filename[32]; // zyk: player account filename
 
 	char rpgchar[32]; // zyk: file name of the RPG char
-
-	// zyk: current power selected by Magic Master to use
-	int selected_special_power;
-
-	// zyk: same as above but selects power to be used with A + melee kata
-	int selected_left_special_power;
-
-	// zyk: same as above but selects power to be used with D + melee kata
-	int selected_right_special_power;
 	
 	// zyk: activates Magic Fist types
 	// Possible values are:
@@ -497,6 +488,7 @@ typedef struct clientSession_s {
 	// 2 - Instant-Hit Bolt
 	// 3 - Fire Bolt
 	// 4 - Ultra Bolt
+	// 5 - None
 	int magic_fist_selection;
 
 	// zyk: vote timer, used to avoid vote spam
@@ -926,6 +918,11 @@ typedef struct clientPersistant_s {
 
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
+
+	// zyk: used to set magic powers and abilities to custom quest npcs
+	int custom_quest_magic;
+	int custom_quest_more_magic;
+	int custom_quest_unique_abilities;
 } clientPersistant_t;
 
 typedef struct renderInfo_s

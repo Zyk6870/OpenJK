@@ -4693,15 +4693,6 @@ void load_account(gentity_t *ent)
 			fscanf(account_file, "%s", content);
 			ent->client->sess.magic_fist_selection = atoi(content);
 
-			fscanf(account_file, "%s", content);
-			ent->client->sess.selected_special_power = atoi(content);
-
-			fscanf(account_file, "%s", content);
-			ent->client->sess.selected_left_special_power = atoi(content);
-
-			fscanf(account_file, "%s", content);
-			ent->client->sess.selected_right_special_power = atoi(content);
-
 			if (ent->client->sess.amrpgmode == 1)
 			{
 				ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
@@ -4765,9 +4756,9 @@ void save_account(gentity_t *ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt",ent->client->sess.filename, ent->client->sess.rpgchar),"w");
 
-			fprintf(account_file,"%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.secrets_found, client->pers.credits, client->pers.rpg_class, 
-				client->sess.magic_fist_selection, client->sess.selected_special_power, client->sess.selected_left_special_power, client->sess.selected_right_special_power);
+			fprintf(account_file,"%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n",
+				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.secrets_found, client->pers.credits,
+				client->pers.rpg_class, client->sess.magic_fist_selection);
 
 			fclose(account_file);
 		}
@@ -5329,9 +5320,6 @@ void add_new_char(gentity_t *ent)
 	ent->client->pers.secrets_found = 0;
 	ent->client->pers.credits = 100;
 	ent->client->pers.rpg_class = 0;
-	ent->client->sess.selected_special_power = MAGIC_MAGIC_SENSE;
-	ent->client->sess.selected_left_special_power = MAGIC_MAGIC_SENSE;
-	ent->client->sess.selected_right_special_power = MAGIC_MAGIC_SENSE;
 	ent->client->sess.magic_fist_selection = 0;
 
 	// zyk: if creating new char, remove Challenge Mode flag from old one
@@ -6068,13 +6056,6 @@ void do_downgrade_skill(gentity_t *ent, int downgrade_value)
 	{
 		ent->client->pers.skill_levels[downgrade_value - 1]--;
 		ent->client->pers.skillpoints++;
-
-		if (ent->client->pers.rpg_class == 8 && downgrade_value == 56)
-		{ // zyk: resetting selected powers if this is the Improvements skill for Magic Master class
-			ent->client->sess.selected_special_power = 1;
-			ent->client->sess.selected_left_special_power = 1;
-			ent->client->sess.selected_right_special_power = 1;
-		}
 	}
 	else
 	{
@@ -7698,9 +7679,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 
 		ent->client->pers.credits = 100;
 
-		ent->client->sess.selected_special_power = MAGIC_MAGIC_SENSE;
-		ent->client->sess.selected_left_special_power = MAGIC_MAGIC_SENSE;
-		ent->client->sess.selected_right_special_power = MAGIC_MAGIC_SENSE;
 		ent->client->sess.magic_fist_selection = 0;
 
 		save_account(ent, qtrue);
@@ -7739,9 +7717,6 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 
 		ent->client->pers.credits = 100;
 
-		ent->client->sess.selected_special_power = MAGIC_MAGIC_SENSE;
-		ent->client->sess.selected_left_special_power = MAGIC_MAGIC_SENSE;
-		ent->client->sess.selected_right_special_power = MAGIC_MAGIC_SENSE;
 		ent->client->sess.magic_fist_selection = 0;
 
 		save_account(ent, qtrue);
@@ -13622,13 +13597,13 @@ void zyk_set_quest_npc_abilities(gentity_t *zyk_npc)
 	char *zyk_magic = zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcmagic%d", level.zyk_custom_quest_counter));
 
 	// zyk: magic powers
-	zyk_npc->client->sess.selected_left_special_power = 0;
+	zyk_npc->client->pers.custom_quest_magic = 0;
 
 	// zyk: ultimate magic powers and quest powers
-	zyk_npc->client->sess.selected_right_special_power = 0;
+	zyk_npc->client->pers.custom_quest_more_magic = 0;
 
 	// zyk: unique abilities
-	zyk_npc->client->sess.selected_special_power = 0;
+	zyk_npc->client->pers.custom_quest_unique_abilities = 0;
 
 	// zyk: setting the timers
 	zyk_npc->client->pers.quest_power_usage_timer = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcfirsttimer%d", level.zyk_custom_quest_counter)));
@@ -13658,15 +13633,15 @@ void zyk_set_quest_npc_abilities(gentity_t *zyk_npc)
 
 			if (zyk_power < MAX_MAGIC_POWERS)
 			{
-				zyk_npc->client->sess.selected_left_special_power |= (1 << zyk_power);
+				zyk_npc->client->pers.custom_quest_magic |= (1 << zyk_power);
 			}
 			else if (zyk_power < MAX_MAGIC_POWERS + 8)
 			{
-				zyk_npc->client->sess.selected_right_special_power |= (1 << (zyk_power - MAX_MAGIC_POWERS));
+				zyk_npc->client->pers.custom_quest_more_magic |= (1 << (zyk_power - MAX_MAGIC_POWERS));
 			}
 			else if (zyk_power < MAX_MAGIC_POWERS + 13)
 			{
-				zyk_npc->client->sess.selected_special_power |= (1 << (zyk_power - MAX_MAGIC_POWERS - 8));
+				zyk_npc->client->pers.custom_quest_unique_abilities |= (1 << (zyk_power - MAX_MAGIC_POWERS - 8));
 			}
 
 			k = 0;

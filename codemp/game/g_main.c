@@ -9858,8 +9858,20 @@ void G_RunFrame( int levelTime ) {
 					// zyk: adding all magic powers to this npc
 					while (current_magic_skill < NUMBER_OF_SKILLS)
 					{
-						if (ent->client->sess.selected_left_special_power & (1 << random_magic) &&
-							ent->client->pers.skill_levels[current_magic_skill] < 1)
+						if (random_magic < 31 && ent->client->pers.custom_quest_magic & (1 << random_magic) && ent->client->pers.skill_levels[current_magic_skill] < 1)
+						{
+							ent->client->pers.skill_levels[current_magic_skill] = 2;
+						}
+
+						current_magic_skill++;
+					}
+
+					current_magic_skill = first_magic_skill + 31;
+
+					// zyk: adding all magic powers to this npc
+					while (current_magic_skill < NUMBER_OF_SKILLS)
+					{
+						if (random_magic >= 31 && ent->client->pers.custom_quest_more_magic & (1 << (random_magic - 31)) && ent->client->pers.skill_levels[current_magic_skill] < 1)
 						{
 							ent->client->pers.skill_levels[current_magic_skill] = 2;
 						}
@@ -9881,7 +9893,7 @@ void G_RunFrame( int levelTime ) {
 				{
 					int random_number = Q_irand(0, 4);
 
-					if (ent->client->sess.selected_special_power & (1 << 0) && random_number == 0)
+					if (ent->client->pers.custom_quest_unique_abilities & (1 << 0) && random_number == 0)
 					{
 						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
 
@@ -9891,22 +9903,22 @@ void G_RunFrame( int levelTime ) {
 
 						zyk_super_beam(ent, ent->client->ps.viewangles[1]);
 					}
-					else if (ent->client->sess.selected_special_power & (1 << 1) && random_number == 1)
+					else if (ent->client->pers.custom_quest_unique_abilities & (1 << 1) && random_number == 1)
 					{
 						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 						elemental_attack(ent);
 					}
-					else if (ent->client->sess.selected_special_power & (1 << 2) && random_number == 2)
+					else if (ent->client->pers.custom_quest_unique_abilities & (1 << 2) && random_number == 2)
 					{
 						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 						zyk_no_attack(ent);
 					}
-					else if (ent->client->sess.selected_special_power & (1 << 3) && random_number == 3)
+					else if (ent->client->pers.custom_quest_unique_abilities & (1 << 3) && random_number == 3)
 					{
 						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 						force_scream(ent);
 					}
-					else if (ent->client->sess.selected_special_power & (1 << 4) && random_number == 4)
+					else if (ent->client->pers.custom_quest_unique_abilities & (1 << 4) && random_number == 4)
 					{
 						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 						zyk_force_storm(ent);

@@ -5537,7 +5537,7 @@ void FireWeapon( gentity_t *ent, qboolean altFire ) {
 	}
 
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && 
-		ent->client->sess.selected_special_power == 0 && ent->s.weapon == WP_MELEE)
+		ent->client->sess.magic_fist_selection < 5 && ent->s.weapon == WP_MELEE)
 	{ // zyk: Magic Master can shoot from his hands
 		ent->client->accuracy_shots++;
 	}
