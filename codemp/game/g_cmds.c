@@ -57,16 +57,16 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	4, // Rage
 	3, // Team Energize
 	3, // Stun Baton
-	2, // Blaster Pistol
-	2, // E11 Blaster Rifle
-	2, // Disruptor
-	2, // Bowcaster
-	2, // Repeater
-	2, // DEMP2
-	2, // Flechette
-	2, // Rocket Launcher
-	2, // Concussion Rifle
-	2, // Bryar Pistol
+	3, // Blaster Pistol
+	3, // E11 Blaster Rifle
+	3, // Disruptor
+	3, // Bowcaster
+	3, // Repeater
+	3, // DEMP2
+	3, // Flechette
+	3, // Rocket Launcher
+	3, // Concussion Rifle
+	3, // Bryar Pistol
 	3, // Melee
 	5, // Max Shield
 	4, // Shield Strength
@@ -274,25 +274,25 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 18)
 		return va("attacks someone with a small electric charge. Has %d damage multiplied by the stun baton level. Can fire the flame thrower when using alternate fire (does not work for Force User, Monk, Duelist or Magic Master). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
 	if (skill_index == 19)
-		return va("the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged", zyk_blaster_pistol_damage.integer);
+		return va("the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged. Higher levels increase damage by 5 per cent", zyk_blaster_pistol_damage.integer);
 	if (skill_index == 20)
-		return va("the rifle used by the Storm Troopers. E11 shots do %d damage. Normal fire is a single shot, while the alternate fire is the rapid fire", zyk_e11_blaster_rifle_damage.integer);
+		return va("the rifle used by the Storm Troopers. E11 shots do %d damage. Normal fire is a single shot, while the alternate fire is the rapid fire. Higher levels increase damage by 5 per cent", zyk_e11_blaster_rifle_damage.integer);
 	if (skill_index == 21)
-		return va("the sniper, used by the rodians ingame. Normal fire is a shot that causes %d damage, alternate fire allows zoom and a charged shot that when fully charged, causes %d damage", zyk_disruptor_damage.integer, zyk_disruptor_alt_damage.integer);
+		return va("the sniper, used by the rodians ingame. Normal fire is a shot that causes %d damage, alternate fire allows zoom and a charged shot that when fully charged, causes %d damage. Higher levels increase damage by 5 per cent", zyk_disruptor_damage.integer, zyk_disruptor_alt_damage.integer);
 	if (skill_index == 22)
-		return va("the famous weapon used by Chewbacca. Normal fire can be charged to fire up to 5 shots at once. It does %d damage", zyk_bowcaster_damage.integer);
+		return va("the famous weapon used by Chewbacca. Normal fire can be charged to fire up to 5 shots at once. It does %d damage. Higher levels increase damage by 5 per cent", zyk_bowcaster_damage.integer);
 	if (skill_index == 23)
-		return va("a powerful weapon with a rapid fire and a plasma bomb. Normal fire shoots the rapid fire, and does %d damage. Alt fire fires the plasma bomb and does %d damage", zyk_repeater_damage.integer, zyk_repeater_alt_damage.integer);
+		return va("a powerful weapon with a rapid fire and a plasma bomb. Normal fire shoots the rapid fire, and does %d damage. Alt fire fires the plasma bomb and does %d damage. Higher levels increase damage by 5 per cent", zyk_repeater_damage.integer, zyk_repeater_alt_damage.integer);
 	if (skill_index == 24)
-		return va("a very powerful weapon against machine npc and some vehicles, causing more damage to them and stunning them. Normal fire does %d damage and alt fire can be charged and does %d damage", zyk_demp2_damage.integer, zyk_demp2_alt_damage.integer);
+		return va("a very powerful weapon against machine npc and some vehicles, causing more damage to them and stunning them. Normal fire does %d damage and alt fire can be charged and does %d damage. Higher levels increase damage by 5 per cent", zyk_demp2_damage.integer, zyk_demp2_alt_damage.integer);
 	if (skill_index == 25)
-		return va("this weapon is similar to a shotgun. Normal fire causes %d damage. Alt fire shoots 2 bombs and causes %d damage", zyk_flechette_damage.integer, zyk_flechette_alt_damage.integer);
+		return va("this weapon is similar to a shotgun. Normal fire causes %d damage. Alt fire shoots 2 bombs and causes %d damage. Higher levels increase damage by 5 per cent", zyk_flechette_damage.integer, zyk_flechette_alt_damage.integer);
 	if (skill_index == 26)
-		return va("a powerful explosive weapon. Normal fire shoots a rocket causing %d damage. Alt fire shoots a homing missile", zyk_rocket_damage.integer);
+		return va("a powerful explosive weapon. Normal fire shoots a rocket causing %d damage. Alt fire shoots a homing missile. Higher levels increase damage by 5 per cent", zyk_rocket_damage.integer);
 	if (skill_index == 27)
-		return va("it shoots a powerful shot that has a big damage area. Alt fire shoots a ray similar to disruptor shots, but it can go through force fields and can throw the enemy on the ground. Normal fire does %d damage and alt fire does %d damage", zyk_concussion_damage.integer, zyk_concussion_alt_damage.integer);
+		return va("it shoots a powerful shot that has a big damage area. Alt fire shoots a ray similar to disruptor shots, but it can go through force fields and can throw the enemy on the ground. Normal fire does %d damage and alt fire does %d damage. Higher levels increase damage by 5 per cent", zyk_concussion_damage.integer, zyk_concussion_alt_damage.integer);
 	if (skill_index == 28)
-		return va("very similar to the blaster pistol, but this one has a better fire rate with normal shot. Does %d damage", zyk_blaster_pistol_damage.integer);
+		return va("very similar to the blaster pistol, but this one has a better fire rate with normal shot. Does %d damage. Higher levels increase damage by 5 per cent", zyk_blaster_pistol_damage.integer);
 	if (skill_index == 29)
 		return va("allows you to attack with your fists and legs. You can punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	if (skill_index == 30)
@@ -5944,77 +5944,6 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 	{
 		if (dont_show_message == qfalse)
 			trap->SendServerCommand( ent->s.number, va("print \"%s class doesn't allow ^3%s ^7skill.\n\"", zyk_rpg_class(ent), zyk_skill_name(upgrade_value - 1)));
-		return qfalse;
-	}
-
-	// zyk: validation on skills that require certain conditions to be upgraded
-	if (upgrade_value == 20 && ent->client->pers.skill_levels[19] == 1 && !(ent->client->pers.secrets_found & (1 << 12)))
-	{
-		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"You must buy the Blaster Pack Weapons Upgrade to get 2/2 in Blaster Pistol.\n\"" );
-		return qfalse;
-	}
-
-	if (upgrade_value == 21 && ent->client->pers.skill_levels[20] == 1 && !(ent->client->pers.secrets_found & (1 << 12)))
-	{
-		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"You must buy the Blaster Pack Weapons Upgrade to get 2/2 in E11 Blaster Rifle.\n\"" );
-		return qfalse;
-	}
-
-	if (upgrade_value == 22 && ent->client->pers.skill_levels[21] == 1 && !(ent->client->pers.secrets_found & (1 << 11)))
-	{
-		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"You must buy the Power Cell Weapons Upgrade to get 2/2 in Disruptor.\n\"" );
-		return qfalse;
-	}
-
-	if (upgrade_value == 23 && ent->client->pers.skill_levels[22] == 1 && !(ent->client->pers.secrets_found & (1 << 11)))
-	{
-		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"You must buy the Power Cell Weapons Upgrade to get 2/2 in Bowcaster.\n\"" );
-		return qfalse;
-	}
-
-	if (upgrade_value == 24 && ent->client->pers.skill_levels[23] == 1 && !(ent->client->pers.secrets_found & (1 << 13)))
-	{
-		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"You must buy the Metal Bolts Weapons Upgrade to get 2/2 in Repeater.\n\"" );
-		return qfalse;
-	}
-
-	if (upgrade_value == 25 && ent->client->pers.skill_levels[24] == 1 && !(ent->client->pers.secrets_found & (1 << 11)))
-	{
-		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"You must buy the Power Cell Weapons Upgrade to get 2/2 in DEMP2.\n\"" );
-		return qfalse;
-	}
-
-	if (upgrade_value == 26 && ent->client->pers.skill_levels[25] == 1 && !(ent->client->pers.secrets_found & (1 << 13)))
-	{
-		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"You must buy the Metal Bolts Weapons Upgrade to get 2/2 in Flechette.\n\"" );
-		return qfalse;
-	}
-
-	if (upgrade_value == 27 && ent->client->pers.skill_levels[26] == 1 && !(ent->client->pers.secrets_found & (1 << 14)))
-	{
-		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"You must buy the Rocket Upgrade to get 2/2 in Rocket Launcher.\n\"" );
-		return qfalse;
-	}
-
-	if (upgrade_value == 28 && ent->client->pers.skill_levels[27] == 1 && !(ent->client->pers.secrets_found & (1 << 13)))
-	{
-		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"You must buy the Metal Bolts Weapons Upgrade to get 2/2 in Concussion Rifle.\n\"" );
-		return qfalse;
-	}
-
-	if (upgrade_value == 29 && ent->client->pers.skill_levels[28] == 1 && !(ent->client->pers.secrets_found & (1 << 12)))
-	{
-		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"You must buy the Blaster Pack Weapons Upgrade to get 2/2 in Bryar Pistol.\n\"" );
 		return qfalse;
 	}
 

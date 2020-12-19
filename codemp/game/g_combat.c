@@ -4677,12 +4677,12 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 	{
 		if ((mod == MOD_ROCKET || mod == MOD_ROCKET_HOMING || mod == MOD_ROCKET_SPLASH || mod == MOD_ROCKET_HOMING_SPLASH) && 
-			attacker->client->pers.skill_levels[26] == 2)
+			attacker->client->pers.secrets_found & (1 << 14))
 		{
 			return qtrue;
 		}
 	
-		if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && attacker->client->pers.skill_levels[27] == 2)
+		if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && attacker->client->pers.secrets_found & (1 << 13))
 		{
 			return qtrue;
 		}
@@ -4827,17 +4827,17 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 		}
-		else if (attacker->client->pers.skill_levels[24] == 2 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT))
+		else if (attacker->client->pers.skill_levels[24] > 1 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT))
 		{ // zyk: DEMP2 2/2 in RPG Mode causes more damage
-			damage = (int)ceil(damage * 1.12);
+			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[24] - 1))));
 		}
-		else if (attacker->client->pers.skill_levels[25] == 2 && (mod == MOD_FLECHETTE || mod == MOD_FLECHETTE_ALT_SPLASH))
+		else if (attacker->client->pers.skill_levels[25] > 1 && (mod == MOD_FLECHETTE || mod == MOD_FLECHETTE_ALT_SPLASH))
 		{ // zyk: Flechette 2/2 in RPG Mode causes more damage
-			damage = (int)ceil(damage * 1.12);
+			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[25] - 1))));
 		}
-		else if (attacker->client->pers.skill_levels[27] == 2 && (mod == MOD_CONC || mod == MOD_CONC_ALT))
+		else if (attacker->client->pers.skill_levels[27] > 1 && (mod == MOD_CONC || mod == MOD_CONC_ALT))
 		{ // zyk: Concussion Rifle 2/2 in RPG Mode causes more damage
-			damage = (int)ceil(damage * 1.12);
+			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[27] - 1))));
 		}
 		else if (mod == MOD_MELEE)
 		{ // zyk: setting melee damage in RPG Mode

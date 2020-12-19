@@ -575,6 +575,9 @@ typedef enum {
 // zyk: number of RPG Mode skills
 #define NUMBER_OF_SKILLS 88
 
+// zyk: damage bonus of weapon skills
+#define RPG_WEAPON_DMG_BONUS 0.05
+
 // zyk: max sentries a Bounty Hunter can have if he has the Upgrade
 #define MAX_BOUNTY_HUNTER_SENTRIES 5
 

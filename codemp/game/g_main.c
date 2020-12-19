@@ -9347,7 +9347,7 @@ void G_RunFrame( int levelTime ) {
 			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
 				// zyk: Weapon Upgrades
-				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.skill_levels[21] == 2 && ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4)
+				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.secrets_found & (1 << 11) && ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4)
 				{
 					ent->client->ps.weaponTime = (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4;
 				}
@@ -9360,7 +9360,7 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.weaponTime = (weaponData[WP_DISRUPTOR].fireTime * 1.0)/3.0;
 				}
 
-				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.skill_levels[23] == 2 && ent->client->ps.weaponTime > weaponData[WP_REPEATER].altFireTime/2)
+				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.secrets_found & (1 << 13) && ent->client->ps.weaponTime > weaponData[WP_REPEATER].altFireTime/2)
 				{
 					ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime/2;
 				}
