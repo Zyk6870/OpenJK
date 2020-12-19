@@ -2653,12 +2653,12 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		else if (self->NPC && self->client->NPC_class != CLASS_VEHICLE)
 		{ // zyk: score given by defeating npcs. Vehicles will only give the default 1 score and 10 credits
 			int enemy_health_bonus_score = 0;
-			int last_result = self->client->ps.stats[STAT_MAX_HEALTH];
+			int last_result = 200;
 
 			// zyk: bonus score based on enemy max health
-			while (last_result >= 15)
+			while (last_result <= self->client->ps.stats[STAT_MAX_HEALTH])
 			{
-				last_result = last_result / 15;
+				last_result *= 2;
 				enemy_health_bonus_score++;
 			}
 
