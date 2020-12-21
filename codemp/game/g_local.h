@@ -919,6 +919,9 @@ typedef struct clientPersistant_s {
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
 
+	// zyk: has bitvalue of each Main Quest task completed
+	int main_quest_progress;
+
 	// zyk: used to set magic powers and abilities to custom quest npcs
 	int custom_quest_magic;
 	int custom_quest_more_magic;

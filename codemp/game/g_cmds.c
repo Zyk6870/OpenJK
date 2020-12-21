@@ -2540,6 +2540,10 @@ void load_account(gentity_t* ent)
 			fscanf(account_file, "%s", content);
 			ent->client->sess.magic_fist_selection = atoi(content);
 
+			// zyk: Main Quest progress
+			fscanf(account_file, "%s", content);
+			ent->client->pers.main_quest_progress = atoi(content);
+
 			if (ent->client->sess.amrpgmode == 1)
 			{
 				ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
@@ -2603,9 +2607,9 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n",
+			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n",
 				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.secrets_found, client->pers.credits,
-				client->pers.rpg_class, client->sess.magic_fist_selection);
+				client->pers.rpg_class, client->sess.magic_fist_selection, client->pers.main_quest_progress);
 
 			fclose(account_file);
 		}
