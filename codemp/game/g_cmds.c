@@ -4559,6 +4559,116 @@ void zyk_load_common_settings(gentity_t *ent)
 	}
 }
 
+// zyk: validates user input to avoid malicious input
+qboolean zyk_check_user_input(char *user_input, int user_input_size)
+{
+	int i = 0;
+
+	char allowed_chars[63] = {
+		'A',
+		'B',
+		'C',
+		'D',
+		'E',
+		'F',
+		'G',
+		'H',
+		'I',
+		'J',
+		'K',
+		'L',
+		'M',
+		'N',
+		'O',
+		'P',
+		'Q',
+		'R',
+		'S',
+		'T',
+		'U',
+		'V',
+		'W',
+		'X',
+		'Y',
+		'Z',
+		'a',
+		'b',
+		'c',
+		'd',
+		'e',
+		'f',
+		'g',
+		'h',
+		'i',
+		'j',
+		'k',
+		'l',
+		'm',
+		'n',
+		'o',
+		'p',
+		'q',
+		'r',
+		's',
+		't',
+		'u',
+		'v',
+		'w',
+		'x',
+		'y',
+		'z',
+		'0',
+		'1',
+		'2',
+		'3',
+		'4',
+		'5',
+		'6',
+		'7',
+		'8',
+		'9',
+		'\0'
+	};
+
+	if (user_input_size > MAX_STRING_CHARS)
+	{ // zyk: somehow the string is bigger than the max
+		return qfalse;
+	}
+
+	if (user_input[0] == '\0')
+	{ // zyk: empty string
+		return qfalse;
+	}
+
+	while (user_input[i] != '\0' && i < user_input_size)
+	{
+		int j = 0;
+
+		while (j < 63)
+		{
+			if (allowed_chars[j] == user_input[i])
+			{ // zyk: char is an allowed one. Go to the next char
+				break;
+			}
+			else if (allowed_chars[j] == '\0')
+			{ // zyk: reached the NULL. It means the user input did not have any allowed char
+				return qfalse;
+			}
+
+			j++;
+		}
+
+		i++;
+	}
+
+	if (user_input[i] != '\0' && i == user_input_size)
+	{ // zyk: string did not terminate with NULL
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
 // zyk: loads the player account
 void load_account(gentity_t *ent)
 {
@@ -5229,13 +5339,13 @@ void initialize_rpg_skills(gentity_t *ent)
 					ent->client->pers.bounty_hunter_placed_sentries++;
 			}
 
-			ent->client->ps.ammo[AMMO_BLASTER] += ent->client->ps.ammo[AMMO_BLASTER]/8 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_POWERCELL] += ent->client->ps.ammo[AMMO_POWERCELL]/8 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_METAL_BOLTS] += ent->client->ps.ammo[AMMO_METAL_BOLTS]/8 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_ROCKETS] += ent->client->ps.ammo[AMMO_ROCKETS]/8 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_THERMAL] += ent->client->ps.ammo[AMMO_THERMAL]/8 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_TRIPMINE] += ent->client->ps.ammo[AMMO_TRIPMINE]/8 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_DETPACK] += ent->client->ps.ammo[AMMO_DETPACK]/8 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_BLASTER] += ent->client->ps.ammo[AMMO_BLASTER] / 8.0 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_POWERCELL] += ent->client->ps.ammo[AMMO_POWERCELL] / 8.0 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_METAL_BOLTS] += ent->client->ps.ammo[AMMO_METAL_BOLTS] / 8.0 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_ROCKETS] += ent->client->ps.ammo[AMMO_ROCKETS] / 8.0 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_THERMAL] += ent->client->ps.ammo[AMMO_THERMAL] / 8.0 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_TRIPMINE] += ent->client->ps.ammo[AMMO_TRIPMINE] / 8.0 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_DETPACK] += ent->client->ps.ammo[AMMO_DETPACK] / 8.0 * ent->client->pers.skill_levels[55];
 		}
 
 		// zyk: reseting initial holdable items of the player
@@ -5376,6 +5486,12 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 		return;
 	}
 
+	if (zyk_check_user_input(arg1, strlen(arg1)) == qfalse)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Invalid login. Only letters and numbers allowed.\n\"");
+		return;
+	}
+
 	// zyk: validating if this login already exists
 	zyk_create_dir("accounts");
 
@@ -5469,6 +5585,12 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 
 		trap->Argv(1, arg1, sizeof( arg1 ));
 		trap->Argv(2, arg2, sizeof( arg2 ));
+
+		if (zyk_check_user_input(arg1, strlen(arg1)) == qfalse)
+		{
+			trap->SendServerCommand(ent->s.number, "print \"Invalid login. Only letters and numbers allowed.\n\"");
+			return;
+		}
 
 		for (i = 0; i < level.maxclients; i++)
 		{
@@ -8683,9 +8805,9 @@ void Cmd_ZykFile_f(gentity_t *ent) {
 	trap->Argv(2, arg2, sizeof(arg2));
 	page = atoi(arg2);
 
-	if (strstr(arg1, "/") || strstr(arg1, "..") || strstr(arg1, "\\"))
-	{ // zyk: validating filename. Cannot contain / or .. so player cant search other folders
-		trap->SendServerCommand(ent->s.number, "print \"Filename cannot contain .. \\ / characters\n\"");
+	if (zyk_check_user_input(arg1, strlen(arg1)) == qfalse)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Invalid filename. Only letters and numbers allowed.\n\"");
 		return;
 	}
 
@@ -9166,23 +9288,36 @@ void Cmd_Remap_f( gentity_t *ent ) {
 
 	if (!(ent->client->pers.bitvalue & (1 << ADM_ENTITYSYSTEM)))
 	{ // zyk: admin command
-		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"You don't have this admin command.\n\"" );
 		return;
 	}
 
 	if ( number_of_args < 3)
 	{
-		trap->SendServerCommand( ent-g_entities, va("print \"You must specify the old shader and new shader. Ex: ^3/remap models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta^7\n\"") );
+		trap->SendServerCommand( ent->s.number, va("print \"You must specify the old shader and new shader. Ex: ^3/remap models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta^7\n\"") );
 		return;
 	}
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	trap->Argv( 2, arg2, sizeof( arg2 ) );
 
+	// zyk: validating the shader names size
+	if (strlen(arg1) >= MAX_QPATH)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Old shader name is too big.\n\"");
+		return;
+	}
+
+	if (strlen(arg2) >= MAX_QPATH)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"New shader name is too big.\n\"");
+		return;
+	}
+
 	AddRemap(G_NewString(arg1), G_NewString(arg2), f);
 	trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
 
-	trap->SendServerCommand( ent-g_entities, "print \"Shader remapped\n\"" );
+	trap->SendServerCommand( ent->s.number, "print \"Shader remapped\n\"" );
 }
 
 /*
@@ -9260,6 +9395,12 @@ void Cmd_RemapDeleteFile_f( gentity_t *ent ) {
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 
+	if (zyk_check_user_input(arg1, strlen(arg1)) == qfalse)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Invalid filename. Only letters and numbers allowed.\n\"");
+		return;
+	}
+
 	// zyk: getting mapname
 	trap->GetServerinfo( serverinfo, sizeof( serverinfo ) );
 	Q_strncpyz(zyk_mapname, Info_ValueForKey( serverinfo, "mapname" ), sizeof(zyk_mapname));
@@ -9308,6 +9449,12 @@ void Cmd_RemapSave_f( gentity_t *ent ) {
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 
+	if (zyk_check_user_input(arg1, strlen(arg1)) == qfalse)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Invalid filename. Only letters and numbers allowed.\n\"");
+		return;
+	}
+
 	// zyk: getting mapname
 	trap->GetServerinfo( serverinfo, sizeof( serverinfo ) );
 	Q_strncpyz(zyk_mapname, Info_ValueForKey( serverinfo, "mapname" ), sizeof(zyk_mapname));
@@ -9353,6 +9500,12 @@ void Cmd_RemapLoad_f( gentity_t *ent ) {
 	}
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
+
+	if (zyk_check_user_input(arg1, strlen(arg1)) == qfalse)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Invalid filename. Only letters and numbers allowed.\n\"");
+		return;
+	}
 
 	strcpy(old_shader,"");
 	strcpy(new_shader,"");
@@ -9684,6 +9837,12 @@ void Cmd_EntSave_f( gentity_t *ent ) {
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 
+	if (zyk_check_user_input(arg1, strlen(arg1)) == qfalse)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Invalid filename. Only letters and numbers allowed.\n\"");
+		return;
+	}
+
 	// zyk: getting mapname
 	trap->GetServerinfo( serverinfo, sizeof( serverinfo ) );
 	Q_strncpyz(zyk_mapname, Info_ValueForKey( serverinfo, "mapname" ), sizeof(zyk_mapname));
@@ -9747,6 +9906,12 @@ void Cmd_EntLoad_f( gentity_t *ent ) {
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 
+	if (zyk_check_user_input(arg1, strlen(arg1)) == qfalse)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Invalid filename. Only letters and numbers allowed.\n\"");
+		return;
+	}
+
 	// zyk: getting mapname
 	trap->GetServerinfo( serverinfo, sizeof( serverinfo ) );
 	Q_strncpyz(zyk_mapname, Info_ValueForKey( serverinfo, "mapname" ), sizeof(zyk_mapname));
@@ -9804,6 +9969,12 @@ void Cmd_EntDeleteFile_f( gentity_t *ent ) {
 	}
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
+
+	if (zyk_check_user_input(arg1, strlen(arg1)) == qfalse)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Invalid filename. Only letters and numbers allowed.\n\"");
+		return;
+	}
 
 	// zyk: getting mapname
 	trap->GetServerinfo( serverinfo, sizeof( serverinfo ) );
@@ -13336,6 +13507,12 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 				return;
 			}
 
+			if (zyk_check_user_input(arg2, strlen(arg2)) == qfalse)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Invalid charname. Only letters and numbers allowed.\n\"");
+				return;
+			}
+
 			chars_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, arg2), "r");
 			if (chars_file != NULL)
 			{
@@ -13379,6 +13556,12 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 				return;
 			}
 
+			if (zyk_check_user_input(arg2, strlen(arg2)) == qfalse)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Invalid charname. Only letters and numbers allowed.\n\"");
+				return;
+			}
+
 			chars_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, arg2), "r");
 			if (chars_file != NULL)
 			{
@@ -13410,6 +13593,12 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 			if (Q_stricmp(arg2, ent->client->sess.rpgchar) == 0)
 			{
 				trap->SendServerCommand(ent->s.number, "print \"You are already using this char\n\"");
+				return;
+			}
+
+			if (zyk_check_user_input(arg2, strlen(arg2)) == qfalse)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Invalid charname. Only letters and numbers allowed.\n\"");
 				return;
 			}
 
@@ -13450,6 +13639,12 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 				return;
 			}
 
+			if (zyk_check_user_input(arg2, strlen(arg2)) == qfalse)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Invalid charname. Only letters and numbers allowed.\n\"");
+				return;
+			}
+
 			chars_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, arg2), "r");
 			if (chars_file == NULL)
 			{
@@ -13472,6 +13667,18 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 			trap->Argv(3, arg3, sizeof(arg3));
 			trap->Argv(4, arg4, sizeof(arg4));
+
+			if (zyk_check_user_input(arg2, strlen(arg2)) == qfalse)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Invalid charname. Only letters and numbers allowed.\n\"");
+				return;
+			}
+
+			if (zyk_check_user_input(arg3, strlen(arg3)) == qfalse)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Invalid charname. Only letters and numbers allowed.\n\"");
+				return;
+			}
 
 			chars_file = fopen(va("zykmod/accounts/%s.txt", arg3), "r");
 			if (chars_file == NULL)
