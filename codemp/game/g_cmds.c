@@ -1040,7 +1040,7 @@ void Cmd_Give_f( gentity_t *ent )
 		return;
 	}
 
-	if (ent != &g_entities[client_id] && g_entities[client_id].client->sess.amrpgmode > 0 && g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << 13)))
+	if (ent != &g_entities[client_id] && g_entities[client_id].client->sess.amrpgmode > 0 && g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 	{
 		trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
 		return;
@@ -1152,7 +1152,7 @@ void Cmd_Scale_f( gentity_t *ent ) {
 	}
 
 	if (ent != &g_entities[client_id] && g_entities[client_id].client->sess.amrpgmode > 0 && 
-		g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << 13)))
+		g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 	{
 		trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
 		return;
@@ -2340,7 +2340,7 @@ void Cmd_FollowPrev_f( gentity_t *ent ) {
 void zyk_jetpack(gentity_t* ent)
 {
 	// zyk: player starts with jetpack if it is enabled in player settings, is not in Siege Mode, and does not have all force powers through /give command
-	if (!(ent->client->pers.player_settings & (1 << 12)) && zyk_allow_jetpack_command.integer &&
+	if (!(ent->client->pers.player_settings & (1 << SETTINGS_JETPACK)) && zyk_allow_jetpack_command.integer &&
 		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && level.gametype != GT_JEDIMASTER &&
 		!(ent->client->pers.player_statuses & (1 << 12)) &&
 		((ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[34] > 0) || ent->client->sess.amrpgmode == 1))
@@ -2361,7 +2361,7 @@ void zyk_jetpack(gentity_t* ent)
 void zyk_load_common_settings(gentity_t* ent)
 {
 	// zyk: loading the starting weapon based in player settings
-	if (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER) && !(ent->client->pers.player_settings & (1 << 11)))
+	if (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER) && !(ent->client->pers.player_settings & (1 << SETTINGS_SABER_START)))
 	{
 		ent->client->ps.weapon = WP_SABER;
 	}
@@ -2371,39 +2371,6 @@ void zyk_load_common_settings(gentity_t* ent)
 	}
 
 	zyk_jetpack(ent);
-
-	if (!(ent->client->saber[0].model[0] && ent->client->saber[1].model[0]) && !(ent->client->saber[0].saberFlags & SFL_TWO_HANDED))
-	{ // zyk: Single Saber
-		ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel = ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE];
-
-		if (ent->client->pers.player_settings & (1 << 26) &&
-			((ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[5] >= 2) ||
-				(ent->client->sess.amrpgmode == 1 && ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER))))
-		{
-			// ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel = SS_MEDIUM;
-			// ent->client->saberCycleQueue = ent->client->ps.fd.saberAnimLevel;
-			ent->client->ps.fd.saberAnimLevel = SS_MEDIUM;
-		}
-		else if (ent->client->pers.player_settings & (1 << 27) &&
-			((ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[5] >= 3) ||
-				(ent->client->sess.amrpgmode == 1 && ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER))))
-		{
-			ent->client->ps.fd.saberAnimLevel = SS_STRONG;
-		}
-		else if (ent->client->pers.player_settings & (1 << 28) && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[5] >= 4)
-		{
-			ent->client->ps.fd.saberAnimLevel = SS_DESANN;
-		}
-		else if (ent->client->pers.player_settings & (1 << 29) && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[5] == 5)
-		{
-			ent->client->ps.fd.saberAnimLevel = SS_TAVION;
-		}
-		else if (((ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[5] >= 1) ||
-			(ent->client->sess.amrpgmode == 1 && ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER))))
-		{
-			ent->client->ps.fd.saberAnimLevel = SS_FAST;
-		}
-	}
 }
 
 // zyk: loads the player account
@@ -4532,7 +4499,7 @@ void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
 {
 	int skill_index = (magic_power + (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS));
 
-	if (ent->client->pers.player_settings & (1 << 7))
+	if (ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_IN_CHAT))
 	{ // zyk: do not show magic cast in chat
 		return;
 	}
@@ -5433,9 +5400,6 @@ void add_new_char(gentity_t *ent)
 	ent->client->pers.credits = 100;
 	ent->client->pers.rpg_class = 0;
 	ent->client->sess.magic_fist_selection = 0;
-
-	// zyk: if creating new char, remove Challenge Mode flag from old one
-	ent->client->pers.player_settings &= ~(1 << 15);
 }
 
 // zyk: creates the directory correctly depending on the OS
@@ -5819,7 +5783,7 @@ char *zyk_get_settings_values(gentity_t *ent)
 
 	strcpy(content,"");
 
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < MAX_PLAYER_SETTINGS; i++)
 	{ // zyk: settings values
 		if (i != 5 && i != 8 && i != 14 && i != 15)
 		{
@@ -5832,75 +5796,7 @@ char *zyk_get_settings_values(gentity_t *ent)
 				strcpy(content,va("%sOFF-",content));
 			}
 		}
-		else if (i == 5)
-		{
-			if (!(ent->client->pers.player_settings & (1 << i)))
-			{
-				strcpy(content, va("%sEnglish-", content));
-			}
-			else
-			{
-				strcpy(content, va("%sCustom-", content));
-			}
-		}
-		else if (i == 14)
-		{
-			if (ent->client->pers.player_settings & (1 << 24))
-			{
-				strcpy(content,va("%sKorriban Action-",content));
-			}
-			else if (ent->client->pers.player_settings & (1 << 25))
-			{
-				strcpy(content,va("%sMP Duel-",content));
-			}
-			else if (ent->client->pers.player_settings & (1 << 14))
-			{
-				strcpy(content,va("%sCustom-",content));
-			}
-			else 
-			{
-				strcpy(content,va("%sHoth2 Action-",content));
-			}
-
-		}
-		else if (i == 15)
-		{
-			if (!(ent->client->pers.player_settings & (1 << i)))
-			{
-				strcpy(content,va("%sNormal-",content));
-			}
-			else
-			{
-				strcpy(content,va("%sChallenge-",content));
-			}
-		}
-		else
-		{ // zyk: starting saber style has its own handling code
-			if (ent->client->pers.player_settings & (1 << 27))
-			{
-				strcpy(content,va("%sRed-",content));
-			}
-			else if (ent->client->pers.player_settings & (1 << 28))
-			{
-				strcpy(content,va("%sDesann-",content));
-			}
-			else if (ent->client->pers.player_settings & (1 << 29))
-			{
-				strcpy(content,va("%sTavion-",content));
-			}
-			else if (ent->client->pers.player_settings & (1 << 26))
-			{
-				strcpy(content,va("%sYellow-",content));
-			}
-			else
-			{
-				strcpy(content,va("%sBlue-",content));
-			}
-		}
 	}
-
-	// zyk: for compability with older versions, keeping a 0 value here
-	strcpy(content, va("%sON-", content));
 
 	return G_NewString(content);
 }
@@ -7912,7 +7808,7 @@ void Cmd_Teleport_f( gentity_t *ent )
 				return;
 			}
 
-			if (g_entities[client_id].client->sess.amrpgmode > 0 && g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << 13)))
+			if (g_entities[client_id].client->sess.amrpgmode > 0 && g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 			{
 				trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
 				return;
@@ -7943,7 +7839,7 @@ void Cmd_Teleport_f( gentity_t *ent )
 			return;
 		}
 
-		if (g_entities[client1_id].client->sess.amrpgmode > 0 && g_entities[client1_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client1_id].client->pers.player_settings & (1 << 13)))
+		if (g_entities[client1_id].client->sess.amrpgmode > 0 && g_entities[client1_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client1_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
 			return;
@@ -7954,7 +7850,7 @@ void Cmd_Teleport_f( gentity_t *ent )
 			return;
 		}
 
-		if (g_entities[client2_id].client->sess.amrpgmode > 0 && g_entities[client2_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client2_id].client->pers.player_settings & (1 << 13)))
+		if (g_entities[client2_id].client->sess.amrpgmode > 0 && g_entities[client2_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client2_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
 			return;
@@ -7993,7 +7889,7 @@ void Cmd_Teleport_f( gentity_t *ent )
 			return;
 		}
 
-		if (g_entities[client_id].client->sess.amrpgmode > 0 && g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << 13)))
+		if (g_entities[client_id].client->sess.amrpgmode > 0 && g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
 			return;
@@ -8265,126 +8161,88 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		char message[1024];
 		strcpy(message,"");
 
-		if (ent->client->pers.player_settings & (1 << 0))
+		if (ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS))
 		{
-			strcpy(message,"\n^3 0 - RPG quests - ^1OFF");
+			strcpy(message, va("\n^3 %d - Quests - ^1OFF", SETTINGS_RPG_QUESTS));
 		}
 		else
 		{
-			strcpy(message,"\n^3 0 - RPG quests - ^2ON");
+			strcpy(message, va("\n^3 %d - Quests - ^2ON", SETTINGS_RPG_QUESTS));
 		}
 
-		if (ent->client->pers.player_settings & (1 << 5))
+		if (ent->client->pers.player_settings & (1 << SETTINGS_FORCE_FROM_ALLIES))
 		{
-			strcpy(message, va("%s\n^3 5 - Language - ^1Custom", message));
+			strcpy(message, va("%s\n^3 %d - Allow Force Powers from allies - ^1OFF", message, SETTINGS_FORCE_FROM_ALLIES));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^3 5 - Language - ^3English", message));
+			strcpy(message, va("%s\n^3 %d - Allow Force Powers from allies - ^2ON", message, SETTINGS_FORCE_FROM_ALLIES));
 		}
 
-		if (ent->client->pers.player_settings & (1 << 6))
+		if (ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_IN_CHAT))
 		{
-			strcpy(message, va("%s\n^3 6 - Allow Force Powers from allies - ^1OFF", message));
+			strcpy(message, va("%s\n^3 %d - Show magic cast in chat - ^1OFF", message, SETTINGS_MAGIC_IN_CHAT));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^3 6 - Allow Force Powers from allies - ^2ON", message));
+			strcpy(message, va("%s\n^3 %d - Show magic cast in chat - ^2ON", message, SETTINGS_MAGIC_IN_CHAT));
 		}
 
-		if (ent->client->pers.player_settings & (1 << 7))
+		if (ent->client->pers.player_settings & (1 << SETTINGS_SCREEN_MESSAGE))
 		{
-			strcpy(message, va("%s\n^3 7 - Show magic cast in chat - ^1OFF", message));
+			strcpy(message, va("%s\n^3 %d - Allow Screen Message - ^1OFF", message, SETTINGS_SCREEN_MESSAGE));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^3 7 - Show magic cast in chat - ^2ON", message));
+			strcpy(message, va("%s\n^3 %d - Allow Screen Message - ^2ON", message, SETTINGS_SCREEN_MESSAGE));
 		}
 
-		// zyk: Saber Style flags
-		if (ent->client->pers.player_settings & (1 << 26))
-			strcpy(message, va("%s\n^3 8 - Starting Single Saber Style - ^3Yellow", message));
-		else if (ent->client->pers.player_settings & (1 << 27))
-			strcpy(message, va("%s\n^3 8 - Starting Single Saber Style - ^1Red", message));
-		else if (ent->client->pers.player_settings & (1 << 28))
-			strcpy(message, va("%s\n^3 8 - Starting Single Saber Style - ^1Desann", message));
-		else if (ent->client->pers.player_settings & (1 << 29))
-			strcpy(message, va("%s\n^3 8 - Starting Single Saber Style - ^5Tavion", message));
-		else
-			strcpy(message, va("%s\n^3 8 - Starting Single Saber Style - ^5Blue", message));
-
-		if (ent->client->pers.player_settings & (1 << 9))
+		if (ent->client->pers.player_settings & (1 << SETTINGS_HEAL_ALLY))
 		{
-			strcpy(message, va("%s\n^3 9 - Allow Screen Message - ^1OFF", message));
+			strcpy(message, va("%s\n^3%d - Use healing force only at allied players - ^1OFF", message, SETTINGS_HEAL_ALLY));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^3 9 - Allow Screen Message - ^2ON", message));
+			strcpy(message, va("%s\n^3%d - Use healing force only at allied players - ^2ON", message, SETTINGS_HEAL_ALLY));
 		}
 
-		if (ent->client->pers.player_settings & (1 << 10))
+		if (ent->client->pers.player_settings & (1 << SETTINGS_SABER_START))
 		{
-			strcpy(message, va("%s\n^310 - Use healing force only at allied players - ^1OFF", message));
+			strcpy(message, va("%s\n^3%d - Start With Saber ^1OFF", message, SETTINGS_SABER_START));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^310 - Use healing force only at allied players - ^2ON", message));
+			strcpy(message, va("%s\n^3%d - Start With Saber ^2ON", message, SETTINGS_SABER_START));
 		}
 
-		if (ent->client->pers.player_settings & (1 << 11))
+		if (ent->client->pers.player_settings & (1 << SETTINGS_JETPACK))
 		{
-			strcpy(message, va("%s\n^311 - Start With Saber ^1OFF", message));
+			strcpy(message, va("%s\n^3%d - Jetpack ^1OFF", message, SETTINGS_JETPACK));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^311 - Start With Saber ^2ON", message));
+			strcpy(message, va("%s\n^3%d - Jetpack ^2ON", message, SETTINGS_JETPACK));
 		}
 
-		if (ent->client->pers.player_settings & (1 << 12))
+		if (ent->client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT))
 		{
-			strcpy(message, va("%s\n^312 - Jetpack ^1OFF", message));
+			strcpy(message, va("%s\n^3%d - Admin Protect ^1OFF", message, SETTINGS_ADMIN_PROTECT));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^312 - Jetpack ^2ON", message));
+			strcpy(message, va("%s\n^3%d - Admin Protect ^2ON", message, SETTINGS_ADMIN_PROTECT));
 		}
 
-		if (ent->client->pers.player_settings & (1 << 13))
+		if (ent->client->pers.player_settings & (1 << SETTINGS_BOSS_MUSIC))
 		{
-			strcpy(message, va("%s\n^313 - Admin Protect ^1OFF", message));
+			strcpy(message, va("%s\n^3%d - Boss Battle Music ^1OFF", message, SETTINGS_BOSS_MUSIC));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^313 - Admin Protect ^2ON", message));
+			strcpy(message, va("%s\n^3%d - Boss Battle Music ^7ON", message, SETTINGS_BOSS_MUSIC));
 		}
 
-		if (ent->client->pers.player_settings & (1 << 14))
-		{
-			strcpy(message, va("%s\n^314 - Boss Battle Music ^1Custom", message));
-		}
-		else if (ent->client->pers.player_settings & (1 << 24))
-		{
-			strcpy(message, va("%s\n^314 - Boss Battle Music ^7Korriban Action", message));
-		}
-		else if (ent->client->pers.player_settings & (1 << 25))
-		{
-			strcpy(message, va("%s\n^314 - Boss Battle Music ^3MP Duel", message));
-		}
-		else
-		{
-			strcpy(message, va("%s\n^314 - Boss Battle Music ^2Hoth2 Action", message));
-		}
-
-		if (ent->client->pers.player_settings & (1 << 15))
-		{
-			strcpy(message, va("%s\n^315 - Difficulty ^1Challenge", message));
-		}
-		else
-		{
-			strcpy(message, va("%s\n^315 - Difficulty ^2Normal", message));
-		}
-
-		trap->SendServerCommand( ent-g_entities, va("print \"%s\n\n^7Choose a setting above and use ^3/settings <number> ^7to turn it ^2ON ^7or ^1OFF^7\n\"", message) );
+		trap->SendServerCommand( ent->s.number, va("print \"%s\n\n^7Choose a setting above and use ^3/settings <number> ^7to turn it ^2ON ^7or ^1OFF^7\n\"", message) );
 	}
 	else
 	{
@@ -8395,173 +8253,63 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		trap->Argv(1, arg1, sizeof( arg1 ));
 		value = atoi(arg1);
 
-		if (value < 0 || value > 15)
+		if (value < 0 || value > MAX_PLAYER_SETTINGS)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"Invalid settings value.\n\"" );
+			trap->SendServerCommand( ent->s.number, "print \"Invalid settings value.\n\"" );
 			return;
 		}
 
-		if (value != 8 && value != 14 && value != 15)
+		if (ent->client->pers.player_settings & (1 << value))
 		{
-			if (ent->client->pers.player_settings & (1 << value))
-			{
-				ent->client->pers.player_settings &= ~(1 << value);
-
-				if (value == 5)
-					strcpy(new_status, "^3English^7");
-				else
-					strcpy(new_status,"^2ON^7");
-			}
-			else
-			{
-				ent->client->pers.player_settings |= (1 << value);
-
-				if (value == 1)
-					ent->client->pers.quest_power_status &= ~(1 << 14);
-				else if (value == 2)
-					ent->client->pers.quest_power_status &= ~(1 << 15);
-				else if (value == 3)
-					ent->client->pers.quest_power_status &= ~(1 << 16);
-				else if (value == 4)
-					ent->client->pers.quest_power_status &= ~(1 << 13);
-
-				if (value == 5)
-					strcpy(new_status, "^1Custom^7");
-				else
-					strcpy(new_status,"^1OFF^7");
-			}
-		}
-		else if (value == 14)
-		{
-			if (ent->client->pers.player_settings & (1 << 14))
-			{
-				ent->client->pers.player_settings &= ~(1 << 14);
-				ent->client->pers.player_settings |= (1 << 24);
-				strcpy(new_status,"^7Korriban Action^7");
-			}
-			else if (ent->client->pers.player_settings & (1 << 24))
-			{
-				ent->client->pers.player_settings &= ~(1 << 24);
-				ent->client->pers.player_settings |= (1 << 25);
-				strcpy(new_status,"^3MP Duel^7");
-			}
-			else if (ent->client->pers.player_settings & (1 << 25))
-			{
-				ent->client->pers.player_settings &= ~(1 << 25);
-				strcpy(new_status,"^2Hoth2 Action^7");
-			}
-			else
-			{
-				ent->client->pers.player_settings |= (1 << 14);
-				strcpy(new_status,"^1Custom^7");
-			}
-		}
-		else if (value == 15)
-		{
-			if (!(ent->client->pers.player_settings & (1 << value)))
-			{
-				ent->client->pers.player_settings |= (1 << value);
-			}
-			else
-			{
-				ent->client->pers.player_settings &= ~(1 << value);
-			}
-
-			if (ent->client->pers.player_settings & (1 << value))
-			{
-				strcpy(new_status, "^1Challenge^7");
-			}
-			else
-			{
-				strcpy(new_status, "^2Normal^7");
-			}
+			ent->client->pers.player_settings &= ~(1 << value);
+			strcpy(new_status,"^2ON^7");
 		}
 		else
-		{ // zyk: starting saber style has its own handling code
-			if (ent->client->pers.player_settings & (1 << 26))
-			{
-				ent->client->pers.player_settings &= ~(1 << 26);
-				ent->client->pers.player_settings |= (1 << 27);
-				strcpy(new_status,"^1Red^7");
-			}
-			else if (ent->client->pers.player_settings & (1 << 27))
-			{
-				ent->client->pers.player_settings &= ~(1 << 27);
-				ent->client->pers.player_settings |= (1 << 28);
-				strcpy(new_status,"^1Desann^7");
-			}
-			else if (ent->client->pers.player_settings & (1 << 28))
-			{
-				ent->client->pers.player_settings &= ~(1 << 28);
-				ent->client->pers.player_settings |= (1 << 29);
-				strcpy(new_status,"^5Tavion");
-			}
-			else if (ent->client->pers.player_settings & (1 << 29))
-			{
-				ent->client->pers.player_settings &= ~(1 << 29);
-				strcpy(new_status,"^5Blue^7");
-			}
-			else
-			{
-				ent->client->pers.player_settings |= (1 << 26);
-				strcpy(new_status,"^3Yellow^7");
-			}
+		{
+			ent->client->pers.player_settings |= (1 << value);
+			strcpy(new_status,"^1OFF^7");
 		}
 
 		save_account(ent, qfalse);
 
-		if (value == 0)
+		if (value == SETTINGS_RPG_QUESTS)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Quests %s\n\"", new_status) );
+			trap->SendServerCommand( ent->s.number, va("print \"Quests %s\n\"", new_status) );
 		}
-		else if (value == 5)
+		else if (value == SETTINGS_FORCE_FROM_ALLIES)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Language %s\n\"", new_status) );
+			trap->SendServerCommand( ent->s.number, va("print \"Allow Force Powers from allies %s\n\"", new_status) );
 		}
-		else if (value == 6)
+		else if (value == SETTINGS_MAGIC_IN_CHAT)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Allow Force Powers from allies %s\n\"", new_status) );
+			trap->SendServerCommand( ent->s.number, va("print \"Show magic cast in chat %s\n\"", new_status) );
 		}
-		else if (value == 7)
+		else if (value == SETTINGS_SCREEN_MESSAGE)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Show magic cast in chat %s\n\"", new_status) );
+			trap->SendServerCommand( ent->s.number, va("print \"Allow Screen Message %s\n\"", new_status) );
 		}
-		else if (value == 8)
+		else if (value == SETTINGS_HEAL_ALLY)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Starting Single Saber Style %s\n\"", new_status) );
+			trap->SendServerCommand( ent->s.number, va("print \"Use healing force only at allied players %s\n\"", new_status) );
 		}
-		else if (value == 9)
+		else if (value == SETTINGS_SABER_START)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Allow Screen Message %s\n\"", new_status) );
+			trap->SendServerCommand( ent->s.number, va("print \"Start With Saber %s\n\"", new_status) );
 		}
-		else if (value == 10)
+		else if (value == SETTINGS_JETPACK)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Use healing force only at allied players %s\n\"", new_status) );
+			trap->SendServerCommand( ent->s.number, va("print \"Jetpack %s\n\"", new_status) );
 		}
-		else if (value == 11)
+		else if (value == SETTINGS_ADMIN_PROTECT)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Start With Saber %s\n\"", new_status) );
+			trap->SendServerCommand( ent->s.number, va("print \"Admin Protect %s\n\"", new_status) );
 		}
-		else if (value == 12)
+		else if (value == SETTINGS_BOSS_MUSIC)
 		{
-			zyk_jetpack(ent);
-			trap->SendServerCommand( ent-g_entities, va("print \"Jetpack %s\n\"", new_status) );
-		}
-		else if (value == 13)
-		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Admin Protect %s\n\"", new_status) );
-		}
-		else if (value == 14)
-		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Boss Battle Music %s\n\"", new_status) );
-		}
-		else if (value == 15)
-		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Difficulty %s\n\"", new_status) );
-			save_account(ent, qtrue);
+			trap->SendServerCommand( ent->s.number, va("print \"Boss Battle Music %s\n\"", new_status) );
 		}
 
-		if (value == 0 && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)
+		if (value == SETTINGS_RPG_QUESTS && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)
 		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
 			G_Kill(ent);
 		}

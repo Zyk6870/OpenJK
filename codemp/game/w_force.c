@@ -592,7 +592,7 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 	}
 
 	if (forcePower != FP_TEAM_HEAL && forcePower != FP_TEAM_FORCE && attacker && attacker->client && other && other->client && 
-		attacker->client->sess.amrpgmode > 0 && other->client->sess.amrpgmode > 0 && other->client->pers.player_settings & (1 << 6) && 
+		attacker->client->sess.amrpgmode > 0 && other->client->sess.amrpgmode > 0 && other->client->pers.player_settings & (1 << SETTINGS_FORCE_FROM_ALLIES) &&
 		zyk_is_ally(attacker,other) == qtrue)
 	{ // zyk: allies wont be affected by force powers if they do not allow it
 		return 0;
@@ -1374,7 +1374,7 @@ void ForceTeamHeal( gentity_t *self )
 			 ((ent->client->sess.amrpgmode < 2 && ent->client->ps.stats[STAT_ARMOR] < 100) || (ent->client->sess.amrpgmode == 2 && 
 			 ent->client->ps.stats[STAT_ARMOR] < max_shield)))) && ent->client->ps.stats[STAT_HEALTH] > 0 && ForcePowerUsableOn(self, ent, FP_TEAM_HEAL) &&
 		 	trap->InPVS(self->client->ps.origin, ent->client->ps.origin) && 
-			(((self->client->sess.amrpgmode == 0 || self->client->pers.player_settings & (1 << 10) || zyk_is_ally(self, ent) == qtrue) && 
+			(((self->client->sess.amrpgmode == 0 || self->client->pers.player_settings & (1 << SETTINGS_HEAL_ALLY) || zyk_is_ally(self, ent) == qtrue) &&
 			 g_gametype.integer == GT_FFA) || OnSameTeam(self, ent)))
 		{ // zyk: Team Heal now can be used in FFA and in npcs. It will not heal enemy npcs
 			VectorSubtract(self->client->ps.origin, ent->client->ps.origin, a);
@@ -1523,7 +1523,7 @@ void ForceTeamForceReplenish( gentity_t *self )
 			) && 
 			ForcePowerUsableOn(self, ent, FP_TEAM_FORCE) &&
 			trap->InPVS(self->client->ps.origin, ent->client->ps.origin) && 
-			(((self->client->sess.amrpgmode == 0 || self->client->pers.player_settings & (1 << 10) || zyk_is_ally(self, ent) == qtrue) && 
+			(((self->client->sess.amrpgmode == 0 || self->client->pers.player_settings & (1 << SETTINGS_HEAL_ALLY) || zyk_is_ally(self, ent) == qtrue) &&
 			g_gametype.integer == GT_FFA) || OnSameTeam(self, ent)))
 		{
 			VectorSubtract(self->client->ps.origin, ent->client->ps.origin, a);

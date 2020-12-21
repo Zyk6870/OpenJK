@@ -564,6 +564,21 @@ typedef enum {
 	MAX_MAGIC_POWERS
 } zyk_magic_t;
 
+// zyk: settings values
+typedef enum {
+	SETTINGS_RPG_QUESTS, 
+	SETTINGS_FORCE_FROM_ALLIES,
+	SETTINGS_MAGIC_IN_CHAT,
+	SETTINGS_SCREEN_MESSAGE,
+	SETTINGS_HEAL_ALLY,
+	SETTINGS_SABER_START,
+	SETTINGS_JETPACK,
+	SETTINGS_ADMIN_PROTECT,
+	SETTINGS_DIFFICULTY,
+	SETTINGS_BOSS_MUSIC,
+	MAX_PLAYER_SETTINGS
+} zyk_settings_t;
+
 // zyk: number of RPG Mode skills
 #define NUMBER_OF_SKILLS 89
 
@@ -715,27 +730,7 @@ typedef struct clientPersistant_s {
 
 	char password[32]; // zyk: account password
 
-	// zyk: turn on or off features of this player in his account file. It is a bit value attribute
-	// Possible bit values are:
-	// 0 - RPG quests
-	// 1 - unused
-	// 2 - unused
-	// 3 - unused
-	// 4 - unused
-	// 5 - Custom Language
-	// 6 - Allow Force Powers from allies
-	// 7 - Show magic cast in chat
-	// 9 - Allow Screen Message
-	// 10 - Use healing force only at allied players
-	// 11 - Start With Saber
-	// 12 - Jetpack
-	// 13 - Admin Protect
-	// 14 - Boss Battle Music
-	// 15 - Difficulty
-	// 26 - Saber Starts with Single Yellow/Dual style
-	// 27 - Saber Starts with Single Red/Dual/Staff style
-	// 28 - Saber Starts with Desann/Dual/Staff style
-	// 29 - Saber Starts with Tavion/Dual/Staff style
+	// zyk: turn on or off features of this player in his account file. It is a bit value attribute that uses the zyk_settings_t enum values
 	int player_settings;
 
 	// zyk: used to set the player class in the RPG Mode

@@ -4433,14 +4433,10 @@ int zyk_number_of_allies(gentity_t *ent, qboolean in_rpg_mode)
 // zyk: starts the boss battle music
 void zyk_start_boss_battle_music(gentity_t *ent)
 {
-	if (ent->client->pers.player_settings & (1 << 14)) // Custom
-		trap->SetConfigstring( CS_MUSIC, "music/boss_custom.mp3" );
-	else if (ent->client->pers.player_settings & (1 << 24)) // Korriban Action
-		trap->SetConfigstring( CS_MUSIC, "music/kor_lite/korrib_action.mp3" );
-	else if (ent->client->pers.player_settings & (1 << 25)) // MP Duel
-		trap->SetConfigstring( CS_MUSIC, "music/mp/duel.mp3" );
-	else // Hoth2 Action
-		trap->SetConfigstring( CS_MUSIC, "music/hoth2/hoth2_action.mp3" );
+	if (!(ent->client->pers.player_settings & (1 << SETTINGS_BOSS_MUSIC)))
+	{
+		trap->SetConfigstring(CS_MUSIC, "music/kor_lite/korrib_action.mp3");
+	}
 }
 
 // zyk: tests if this player is one of the Duel Tournament duelists
@@ -6187,14 +6183,7 @@ void zyk_text_message(gentity_t *ent, char *filename, qboolean show_in_chat, qbo
 	if (show_in_chat == qtrue)
 		strcpy(console_cmd, "chat");
 
-	if (ent->client->pers.player_settings & (1 << 5))
-	{
-		strcpy(language, "custom");
-	}
-	else
-	{
-		strcpy(language, "english");
-	}
+	strcpy(language, "english");
 
 	text_file = fopen(va("zykmod/textfiles/%s/%s.txt", language, filename), "r");
 	if (text_file)
