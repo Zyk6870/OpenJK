@@ -2325,13 +2325,13 @@ void Add_Ammo (gentity_t *ent, int weapon, int count)
 	// zyk: Bounty Hunter class has more max ammo
 	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2)
 	{
-		max_blasterpack_ammo += max_blasterpack_ammo/8 * ent->client->pers.skill_levels[55];
-		max_powercell_ammo += max_powercell_ammo/8 * ent->client->pers.skill_levels[55];
-		max_metalbolt_ammo += max_metalbolt_ammo/8 * ent->client->pers.skill_levels[55];
-		max_rocket_ammo += max_rocket_ammo/8 * ent->client->pers.skill_levels[55];
-		max_thermal_ammo += max_thermal_ammo/8 * ent->client->pers.skill_levels[55];
-		max_tripmine_ammo += max_tripmine_ammo/8 * ent->client->pers.skill_levels[55];
-		max_detpack_ammo += max_detpack_ammo/8 * ent->client->pers.skill_levels[55];
+		max_blasterpack_ammo += max_blasterpack_ammo / 8.0 * ent->client->pers.skill_levels[55];
+		max_powercell_ammo += max_powercell_ammo / 8.0 * ent->client->pers.skill_levels[55];
+		max_metalbolt_ammo += max_metalbolt_ammo / 8.0 * ent->client->pers.skill_levels[55];
+		max_rocket_ammo += max_rocket_ammo / 8.0 * ent->client->pers.skill_levels[55];
+		max_thermal_ammo += max_thermal_ammo / 8.0 * ent->client->pers.skill_levels[55];
+		max_tripmine_ammo += max_tripmine_ammo / 8.0 * ent->client->pers.skill_levels[55];
+		max_detpack_ammo += max_detpack_ammo / 8.0 * ent->client->pers.skill_levels[55];
 	}
 
 	if (weapon == AMMO_BLASTER){

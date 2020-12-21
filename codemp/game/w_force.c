@@ -1503,8 +1503,8 @@ void ForceTeamForceReplenish( gentity_t *self )
 		// zyk: Bounty Hunter class has more max ammo
 		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2)
 		{
-			max_blasterpack_ammo = zyk_max_blaster_pack_ammo.integer + zyk_max_blaster_pack_ammo.integer/8 * ent->client->pers.skill_levels[55];
-			max_powercell_ammo = zyk_max_power_cell_ammo.integer + zyk_max_power_cell_ammo.integer/8 * ent->client->pers.skill_levels[55];
+			max_blasterpack_ammo = zyk_max_blaster_pack_ammo.integer + zyk_max_blaster_pack_ammo.integer / 8.0 * ent->client->pers.skill_levels[55];
+			max_powercell_ammo = zyk_max_power_cell_ammo.integer + zyk_max_power_cell_ammo.integer / 8.0 * ent->client->pers.skill_levels[55];
 		}
 		else
 		{
