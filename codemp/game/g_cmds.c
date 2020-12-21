@@ -11818,23 +11818,36 @@ void Cmd_Remap_f( gentity_t *ent ) {
 
 	if (!(ent->client->pers.bitvalue & (1 << ADM_ENTITYSYSTEM)))
 	{ // zyk: admin command
-		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"You don't have this admin command.\n\"" );
 		return;
 	}
 
 	if ( number_of_args < 3)
 	{
-		trap->SendServerCommand( ent-g_entities, va("print \"You must specify the old shader and new shader. Ex: ^3/remap models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta^7\n\"") );
+		trap->SendServerCommand( ent->s.number, va("print \"You must specify the old shader and new shader. Ex: ^3/remap models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta^7\n\"") );
 		return;
 	}
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	trap->Argv( 2, arg2, sizeof( arg2 ) );
 
+	// zyk: validating the shader names size
+	if (strlen(arg1) >= MAX_QPATH)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Old shader name is too big.\n\"");
+		return;
+	}
+
+	if (strlen(arg2) >= MAX_QPATH)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"New shader name is too big.\n\"");
+		return;
+	}
+
 	AddRemap(G_NewString(arg1), G_NewString(arg2), f);
 	trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
 
-	trap->SendServerCommand( ent-g_entities, "print \"Shader remapped\n\"" );
+	trap->SendServerCommand( ent->s.number, "print \"Shader remapped\n\"" );
 }
 
 /*
