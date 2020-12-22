@@ -1784,6 +1784,8 @@ finish:
 
 		newent->client->pers.level = 0;
 
+		newent->client->pers.quest_npc = qfalse;
+
 		// zyk: initializing Magic Power attributes
 		newent->client->pers.quest_power_status = 0;
 		newent->client->pers.quest_power_usage_timer = 0;

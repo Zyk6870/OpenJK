@@ -579,6 +579,12 @@ typedef enum {
 	MAX_PLAYER_SETTINGS
 } zyk_settings_t;
 
+// /zyk: 
+typedef enum {
+	QUEST_CITY_ARRIVAL,
+	MAX_QUEST_MISSIONS
+} zyk_quest_t;
+
 // zyk: number of RPG Mode skills
 #define NUMBER_OF_SKILLS 89
 
@@ -916,6 +922,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: has bitvalue of each Main Quest task completed
 	int main_quest_progress;
+
+	// zyk: if qtrue, this is a quest npc
+	qboolean quest_npc;
 
 	// zyk: used to set magic powers and abilities to custom quest npcs
 	int custom_quest_magic;
@@ -1642,6 +1651,9 @@ typedef struct level_locals_s {
 
 	// zyk: sets the interval between each quest event
 	int quest_debounce_timer;
+
+	// zyk: used to pass through each quest event
+	int quest_event_counter;
 
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];

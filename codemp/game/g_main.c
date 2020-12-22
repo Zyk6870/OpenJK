@@ -322,6 +322,39 @@ gentity_t *Zyk_NPC_SpawnType( char *npc_type, int x, int y, int z, int yaw )
 	return NULL;
 }
 
+void zyk_set_quest_npc_magic(gentity_t* npc_ent, int magic_powers_levels[MAX_MAGIC_POWERS])
+{
+	int i = 0;
+
+	// zyk: sets magic power levels to this npc
+	if (npc_ent && npc_ent->client)
+	{
+		for (i = 0; i < MAX_MAGIC_POWERS; i++)
+		{
+			npc_ent->client->pers.skill_levels[NUMBER_OF_SKILLS - MAX_MAGIC_POWERS] = magic_powers_levels[i];
+		}
+	}
+}
+
+// zyk: spawns a quest npc and sets additional stuff, like levels, etc
+gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int level)
+{
+	gentity_t* npc_ent = Zyk_NPC_SpawnType(npc_type, x, y, z, yaw);
+
+	if (npc_ent && npc_ent->client)
+	{
+		npc_ent->client->pers.quest_npc = qtrue;
+		npc_ent->client->pers.level = level;
+		npc_ent->client->pers.magic_power = level * 5;
+		npc_ent->client->ps.stats[STAT_MAX_HEALTH] += 10 * level;
+		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
+
+		return npc_ent;
+	}
+
+	return NULL;
+}
+
 void zyk_spawn_quest_door(float x, float y, float z, float yaw, char *targetname, char* message)
 {
 	int i = 0;
@@ -545,15 +578,20 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.quest_map = 0;
 	level.quest_debounce_timer = 0;
 	level.quest_door_print_debounce_timer = 0;
+	level.quest_event_counter = 0;
 
 	// zyk: making case sensitive comparing so only low case quest map names will be set to play quests. This allows building these maps without conflicting with quests
 	if (Q_strncmp(zyk_mapname, "t1_inter", 9) == 0)
 	{
 		level.quest_map = 1;
 	}
-	else if (Q_strncmp(zyk_mapname, "mp/siege_desert", 16) == 0 && g_gametype.integer == GT_FFA)
+	else if (Q_strncmp(zyk_mapname, "t1_surprise", 12) == 0)
 	{
 		level.quest_map = 2;
+	}
+	else if (Q_strncmp(zyk_mapname, "mp/siege_desert", 16) == 0 && g_gametype.integer == GT_FFA)
+	{
+		level.quest_map = 3;
 	}
 
 	// parse the key/value pairs and spawn gentities
@@ -1126,7 +1164,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 		if (level.quest_map == 1)
 		{ // zyk: loading quest stuff
-			zyk_spawn_quest_door(345, -28, 65, 0, "mp/siege_desert", "Ishtar City");
+			zyk_spawn_quest_door(345, -28, 65, 0, "t1_surprise", "Kalahari Desert");
 			zyk_spawn_quest_door(-473, -28, 65, 179, "t2_trip", "Foggy Way");
 		}
 	}
@@ -1197,6 +1235,12 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		}
 		zyk_create_info_player_deathmatch(1913,-6151,222,153);
 		zyk_create_info_player_deathmatch(1921,-5812,222,-179);
+
+		if (level.quest_map == 2)
+		{ // zyk: loading quest stuff
+			zyk_spawn_quest_door(2114, -5915, 200, 179, "t1_inter", "Hero's House");
+			zyk_spawn_quest_door(-1656, 3702, 192, -179, "mp/siege_desert", "Ishtar City");
+		}
 
 		if (level.gametype == GT_CTF)
 		{ // zyk: in CTF, add the team player spawns
@@ -1715,7 +1759,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			}
 		}
 
-		if (level.quest_map == 2)
+		if (level.quest_map == 3)
 		{ // zyk: loading quest stuff
 			zyk_create_info_player_deathmatch(12500, 32, -486, 179);
 			zyk_create_info_player_deathmatch(12500, -93, -486, 179);
@@ -1726,7 +1770,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			zyk_create_info_player_deathmatch(12500, -911, -486, 179);
 			zyk_create_info_player_deathmatch(12500, -1091, -486, 179);
 
-			zyk_spawn_quest_door(12677, -36, -507, 45, "t1_inter", "Hero's House");
+			zyk_spawn_quest_door(12677, -36, -507, 45, "t1_surprise", "Kalahari Desert");
 		}
 	}
 	else if (Q_stricmp(zyk_mapname, "mp/siege_destroyer") == 0 && g_gametype.integer == GT_FFA)
@@ -9548,9 +9592,16 @@ void G_RunFrame( int levelTime ) {
 						}
 					}
 
-					if (level.quest_map == 1)
-					{ // zyk: t1_inter
-						
+					if (level.quest_map == 2)
+					{ // zyk: main city
+
+						// zyk: spawning the citizens
+						if (level.quest_event_counter == 0)
+						{
+
+						}
+
+						level.quest_event_counter++;
 					}
 				}
 
