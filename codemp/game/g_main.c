@@ -322,7 +322,7 @@ gentity_t *Zyk_NPC_SpawnType( char *npc_type, int x, int y, int z, int yaw )
 	return NULL;
 }
 
-void zyk_spawn_quest_door(float x, float y, float z, float yaw, char *targetname)
+void zyk_spawn_quest_door(float x, float y, float z, float yaw, char *targetname, char* message)
 {
 	int i = 0;
 
@@ -334,6 +334,7 @@ void zyk_spawn_quest_door(float x, float y, float z, float yaw, char *targetname
 	zyk_set_entity_field(new_ent, "angles", va("0.0 %f 0.0", yaw));
 	zyk_set_entity_field(new_ent, "model", "models/map_objects/factory/f_door_b.md3");
 	zyk_set_entity_field(new_ent, "targetname", G_NewString(targetname));
+	zyk_set_entity_field(new_ent, "message", G_NewString(message));
 
 	zyk_spawn_entity(new_ent);
 
@@ -549,6 +550,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	if (Q_strncmp(zyk_mapname, "t1_inter", 9) == 0)
 	{
 		level.quest_map = 1;
+	}
+	else if (Q_strncmp(zyk_mapname, "mp/siege_desert", 16) == 0 && g_gametype.integer == GT_FFA)
+	{
+		level.quest_map = 2;
 	}
 
 	// parse the key/value pairs and spawn gentities
@@ -1121,8 +1126,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 		if (level.quest_map == 1)
 		{ // zyk: loading quest stuff
-			zyk_spawn_quest_door(345, -28, 65, 0, "mp/siege_desert");
-			zyk_spawn_quest_door(-473, -28, 65, 179, "t2_trip");
+			zyk_spawn_quest_door(345, -28, 65, 0, "mp/siege_desert", "Ishtar City");
+			zyk_spawn_quest_door(-473, -28, 65, 179, "t2_trip", "Foggy Way");
 		}
 	}
 	else if (Q_stricmp(zyk_mapname, "t1_rail") == 0)
@@ -1687,22 +1692,41 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		for (i = 0; i < level.num_entities; i++)
 		{
 			ent = &g_entities[i];
-			if (Q_stricmp( ent->targetname, "rebel_obj_2_doors") == 0)
+
+			if (Q_stricmp(ent->targetname, "rebel_obj_2_doors") == 0)
 			{
 				fix_sp_func_door(ent);
 			}
-			if (Q_stricmp( ent->targetname, "shield") == 0)
+			if (Q_stricmp(ent->targetname, "shield") == 0)
 			{
-				G_FreeEntity( ent );
+				G_FreeEntity(ent);
 			}
-			if (Q_stricmp( ent->targetname, "gatedestroy_doors") == 0)
+			if (Q_stricmp(ent->targetname, "gatedestroy_doors") == 0)
 			{
-				G_FreeEntity( ent );
+				G_FreeEntity(ent);
 			}
 			if (i >= 153 && i <= 160)
 			{
-				G_FreeEntity( ent );
+				G_FreeEntity(ent);
 			}
+			if (Q_stricmp(ent->classname, "info_player_deathmatch") == 0)
+			{
+				G_FreeEntity(ent);
+			}
+		}
+
+		if (level.quest_map == 2)
+		{ // zyk: loading quest stuff
+			zyk_create_info_player_deathmatch(12500, 32, -486, 179);
+			zyk_create_info_player_deathmatch(12500, -93, -486, 179);
+			zyk_create_info_player_deathmatch(12500, -235, -486, 179);
+			zyk_create_info_player_deathmatch(12500, -419, -486, 179);
+			zyk_create_info_player_deathmatch(12500, -599, -486, 179);
+			zyk_create_info_player_deathmatch(12500, -748, -486, 179);
+			zyk_create_info_player_deathmatch(12500, -911, -486, 179);
+			zyk_create_info_player_deathmatch(12500, -1091, -486, 179);
+
+			zyk_spawn_quest_door(12677, -36, -507, 45, "t1_inter", "Hero's House");
 		}
 	}
 	else if (Q_stricmp(zyk_mapname, "mp/siege_destroyer") == 0 && g_gametype.integer == GT_FFA)
@@ -9498,7 +9522,8 @@ void G_RunFrame( int levelTime ) {
 					zyk_vertical_dfa_effect(ent);
 				}
 
-				if (level.quest_map > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0 && level.quest_debounce_timer < level.time)
+				if (level.quest_map > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0 && level.quest_debounce_timer < level.time &&
+					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
 					int zyk_it = 0;
 					level.quest_debounce_timer = level.time + 100;
@@ -9514,11 +9539,11 @@ void G_RunFrame( int levelTime ) {
 							{
 								trap->SendConsoleCommand(EXEC_APPEND, va("map %s\n", level.quest_doors[zyk_it]->targetname));
 							}
-							else if (quest_door_dist < 200 && level.quest_door_print_debounce_timer < level.time)
+							else if (quest_door_dist < 150 && level.quest_door_print_debounce_timer < level.time)
 							{
 								level.quest_door_print_debounce_timer = level.time + 1000;
 
-								trap->SendServerCommand(ent->s.number, va("cp \"^7Go to ^3%s\"", level.quest_doors[zyk_it]->targetname));
+								trap->SendServerCommand(ent->s.number, va("cp \"%s\"", level.quest_doors[zyk_it]->message));
 							}
 						}
 					}
