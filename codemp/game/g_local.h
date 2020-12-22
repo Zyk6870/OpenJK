@@ -613,6 +613,9 @@ typedef enum {
 // zyk: duration of the duelists protection in Duel Tournament
 #define DUEL_TOURNAMENT_PROTECTION_TIME 2000
 
+// zyk: number of Quest Maps
+#define MAX_QUEST_MAPS 5
+
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
 typedef struct clientPersistant_s {

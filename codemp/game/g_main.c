@@ -355,7 +355,45 @@ gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int
 	return NULL;
 }
 
-void zyk_spawn_quest_door(float x, float y, float z, float yaw, char *targetname, char* message)
+// zyk: gets the map bspname based in the map_number which should correspond to level.quest_map
+char* zyk_get_door_map_name(int map_number)
+{
+	char* map_names[MAX_QUEST_MAPS] = {
+		"none",
+		"t1_inter",
+		"t1_surprise",
+		"mp/siege_desert",
+		"t2_trip"
+	};
+
+	if (map_number < 0 || map_number >= MAX_QUEST_MAPS)
+	{
+		return map_names[0];
+	}
+
+	return map_names[map_number];
+}
+
+// zyk: gets the map name based in the map_number which corresponds to level.quest_map
+char* zyk_get_door_map_title(int map_number)
+{
+	char* map_titles[MAX_QUEST_MAPS] = {
+		"None",
+		"Hero's House",
+		"Kalahari Desert",
+		"Capital City of Ishtar",
+		"Foggy Way"
+	};
+
+	if (map_number < 0 || map_number >= MAX_QUEST_MAPS)
+	{
+		return map_titles[0];
+	}
+
+	return map_titles[map_number];
+}
+
+void zyk_spawn_quest_door(float x, float y, float z, float yaw, int map_number)
 {
 	int i = 0;
 
@@ -366,8 +404,8 @@ void zyk_spawn_quest_door(float x, float y, float z, float yaw, char *targetname
 	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
 	zyk_set_entity_field(new_ent, "angles", va("0.0 %f 0.0", yaw));
 	zyk_set_entity_field(new_ent, "model", "models/map_objects/factory/f_door_b.md3");
-	zyk_set_entity_field(new_ent, "targetname", G_NewString(targetname));
-	zyk_set_entity_field(new_ent, "message", G_NewString(message));
+	zyk_set_entity_field(new_ent, "targetname", G_NewString(zyk_get_door_map_name(map_number)));
+	zyk_set_entity_field(new_ent, "message", G_NewString(zyk_get_door_map_title(map_number)));
 
 	zyk_spawn_entity(new_ent);
 
@@ -1164,8 +1202,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 		if (level.quest_map == 1)
 		{ // zyk: loading quest stuff
-			zyk_spawn_quest_door(345, -28, 65, 0, "t1_surprise", "Kalahari Desert");
-			zyk_spawn_quest_door(-473, -28, 65, 179, "t2_trip", "Foggy Way");
+			zyk_spawn_quest_door(345, -28, 65, 0, 2);
+			zyk_spawn_quest_door(-473, -28, 65, 179, 4);
 		}
 	}
 	else if (Q_stricmp(zyk_mapname, "t1_rail") == 0)
@@ -1238,8 +1276,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 		if (level.quest_map == 2)
 		{ // zyk: loading quest stuff
-			zyk_spawn_quest_door(2114, -5915, 200, 179, "t1_inter", "Hero's House");
-			zyk_spawn_quest_door(-1656, 3702, 192, -179, "mp/siege_desert", "Ishtar City");
+			zyk_spawn_quest_door(2114, -5915, 200, 179, 1);
+			zyk_spawn_quest_door(-1656, 3702, 192, -179, 3);
 		}
 
 		if (level.gametype == GT_CTF)
@@ -1770,7 +1808,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			zyk_create_info_player_deathmatch(12500, -911, -486, 179);
 			zyk_create_info_player_deathmatch(12500, -1091, -486, 179);
 
-			zyk_spawn_quest_door(12677, -36, -507, 45, "t1_surprise", "Kalahari Desert");
+			zyk_spawn_quest_door(12677, -36, -507, 45, 2);
 		}
 	}
 	else if (Q_stricmp(zyk_mapname, "mp/siege_destroyer") == 0 && g_gametype.integer == GT_FFA)
