@@ -1308,6 +1308,9 @@ typedef struct {
 // zyk: max fields a custom quest mission can have
 #define MAX_CUSTOM_QUEST_FIELDS 512
 
+// zyk: max quest doors a map can have
+#define MAX_QUEST_DOORS 4
+
 typedef struct level_locals_s {
 	struct gclient_s	*clients;		// [maxclients]
 
@@ -1632,6 +1635,13 @@ typedef struct level_locals_s {
 
 	// zyk: current map name without the path from maps folder
 	char zykmapname[128];
+
+	gentity_t* quest_doors[MAX_QUEST_DOORS];
+
+	int quest_door_print_debounce_timer;
+
+	// zyk: sets the interval between each quest event
+	int quest_debounce_timer;
 
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];

@@ -322,6 +322,35 @@ gentity_t *Zyk_NPC_SpawnType( char *npc_type, int x, int y, int z, int yaw )
 	return NULL;
 }
 
+void zyk_spawn_quest_door(float x, float y, float z, float yaw, char *targetname)
+{
+	int i = 0;
+
+	gentity_t* new_ent = G_Spawn();
+
+	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
+	zyk_set_entity_field(new_ent, "spawnflags", "0");
+	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
+	zyk_set_entity_field(new_ent, "angles", va("0.0 %f 0.0", yaw));
+	zyk_set_entity_field(new_ent, "model", "models/map_objects/factory/f_door_b.md3");
+	zyk_set_entity_field(new_ent, "targetname", G_NewString(targetname));
+
+	zyk_spawn_entity(new_ent);
+
+	for (i = 0; i < MAX_QUEST_DOORS; i++)
+	{
+		if (level.quest_doors[i] == NULL)
+		{
+			// zyk: sets which door is this one
+			new_ent->count = i;
+
+			level.quest_doors[i] = new_ent;
+
+			return;
+		}
+	}
+}
+
 /*
 ============
 G_InitGame
@@ -513,6 +542,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	}
 
 	level.quest_map = 0;
+	level.quest_debounce_timer = 0;
+	level.quest_door_print_debounce_timer = 0;
 
 	// zyk: making case sensitive comparing so only low case quest map names will be set to play quests. This allows building these maps without conflicting with quests
 	if (Q_strncmp(zyk_mapname, "t1_inter", 9) == 0)
@@ -764,6 +795,11 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		for (zyk_iterator = 0; zyk_iterator < MAX_RACERS; zyk_iterator++)
 		{ // zyk: initializing race vehicle ids
 			level.race_mode_vehicle[zyk_iterator] = -1;
+		}
+
+		for (zyk_iterator = 0; zyk_iterator < MAX_QUEST_DOORS; zyk_iterator++)
+		{ // zyk: initializing quest doors
+			level.quest_doors[zyk_iterator] = NULL;
 		}
 
 		for (zyk_iterator = 0; zyk_iterator < ENTITYNUM_MAX_NORMAL; zyk_iterator++)
@@ -1076,6 +1112,18 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	{
 		zyk_create_info_player_deathmatch(-65,-686,89,90);
 		zyk_create_info_player_deathmatch(56,-686,89,90);
+		zyk_create_info_player_deathmatch(-329, -686, 89, 90);
+		zyk_create_info_player_deathmatch(202, -686, 89, 90);
+		zyk_create_info_player_deathmatch(-411, -491, 89, 0);
+		zyk_create_info_player_deathmatch(280, -491, 89, 179);
+		zyk_create_info_player_deathmatch(-411, -252, 89, 0);
+		zyk_create_info_player_deathmatch(280, -252, 89, 179);
+
+		if (level.quest_map == 1)
+		{ // zyk: loading quest stuff
+			zyk_spawn_quest_door(345, -28, 65, 0, "mp/siege_desert");
+			zyk_spawn_quest_door(-473, -28, 65, 179, "t2_trip");
+		}
 	}
 	else if (Q_stricmp(zyk_mapname, "t1_rail") == 0)
 	{
@@ -9450,9 +9498,35 @@ void G_RunFrame( int levelTime ) {
 					zyk_vertical_dfa_effect(ent);
 				}
 
-				if (level.quest_map > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0)
+				if (level.quest_map > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0 && level.quest_debounce_timer < level.time)
 				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
-					
+					int zyk_it = 0;
+					level.quest_debounce_timer = level.time + 100;
+
+					// zyk: verify the distance to a quest door. If near enough, call vote for map change
+					for (zyk_it = 0; zyk_it < MAX_QUEST_DOORS; zyk_it++)
+					{
+						if (level.quest_doors[zyk_it])
+						{ // zyk: found a quest door. Verify distance to it to either print destination or actually go there
+							float quest_door_dist = Distance(ent->client->ps.origin, level.quest_doors[zyk_it]->s.origin);
+
+							if (quest_door_dist < 50)
+							{
+								trap->SendConsoleCommand(EXEC_APPEND, va("map %s\n", level.quest_doors[zyk_it]->targetname));
+							}
+							else if (quest_door_dist < 200 && level.quest_door_print_debounce_timer < level.time)
+							{
+								level.quest_door_print_debounce_timer = level.time + 1000;
+
+								trap->SendServerCommand(ent->s.number, va("cp \"^7Go to ^3%s\"", level.quest_doors[zyk_it]->targetname));
+							}
+						}
+					}
+
+					if (level.quest_map == 1)
+					{ // zyk: t1_inter
+						
+					}
 				}
 
 				if (level.custom_quest_map > -1 && level.zyk_custom_quest_timer < level.time && ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
