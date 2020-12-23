@@ -10043,6 +10043,7 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.magic_power < 20)
 				{
 					ent->client->pers.level = 200;
+					ent->client->pers.skill_levels[56] = 5;
 					ent->client->pers.magic_power = zyk_max_magic_power(ent);
 				}
 
