@@ -926,8 +926,8 @@ typedef struct clientPersistant_s {
 	// zyk: has bitvalue of each Main Quest task completed
 	int main_quest_progress;
 
-	// zyk: if qtrue, this is a quest npc
-	qboolean quest_npc;
+	// zyk: if > 0, this is a quest npc
+	int quest_npc;
 
 	// zyk: used to set magic powers and abilities to custom quest npcs
 	int custom_quest_magic;

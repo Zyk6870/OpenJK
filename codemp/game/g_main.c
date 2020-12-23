@@ -337,13 +337,13 @@ void zyk_set_quest_npc_magic(gentity_t* npc_ent, int magic_powers_levels[MAX_MAG
 }
 
 // zyk: spawns a quest npc and sets additional stuff, like levels, etc
-gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int level)
+gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int level, int quest_npc_number)
 {
 	gentity_t* npc_ent = Zyk_NPC_SpawnType(npc_type, x, y, z, yaw);
 
 	if (npc_ent && npc_ent->client)
 	{
-		npc_ent->client->pers.quest_npc = qtrue;
+		npc_ent->client->pers.quest_npc = quest_npc_number;
 		npc_ent->client->pers.level = level;
 		npc_ent->client->pers.magic_power = level * 5;
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] += 10 * level;
