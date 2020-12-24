@@ -6069,6 +6069,8 @@ void light_of_judgement(gentity_t* ent, int radius, int duration)
 
 	ent->client->pers.light_of_judgement_distance = radius;
 
+	VectorCopy(ent->client->ps.origin, ent->client->pers.light_of_judgement_origin);
+
 	ent->client->pers.quest_power_status |= (1 << 7);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_OF_JUDGEMENT] = 0;
 	ent->client->pers.magic_power_timer[MAGIC_LIGHT_OF_JUDGEMENT] = level.time + duration;
