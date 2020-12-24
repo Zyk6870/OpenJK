@@ -6024,7 +6024,7 @@ void black_hole(gentity_t* ent, int radius, int damage, int duration)
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_black_hole", "4", "ships/proton_impact", 500, damage, radius, duration);
 
-	zyk_spawn_black_hole_model(ent, duration, 150);
+	zyk_spawn_black_hole_model(ent, duration, 140);
 
 	ent->client->pers.black_hole_distance = radius;
 
