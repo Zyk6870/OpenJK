@@ -616,6 +616,9 @@ typedef enum {
 // zyk: number of Quest Maps
 #define MAX_QUEST_MAPS 5
 
+// zyk: max quest npc events each npc can have
+#define MAX_QUEST_NPC_EVENTS 8
+
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
 typedef struct clientPersistant_s {
@@ -928,6 +931,18 @@ typedef struct clientPersistant_s {
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;
+
+	// zyk: quest npc events
+	int quest_npc_anims[MAX_QUEST_NPC_EVENTS];
+
+	// zyk: duration in mliseconds of each quest npc anim
+	int quest_npc_anim_duration[MAX_QUEST_NPC_EVENTS];
+
+	// zyk: interval time between each event
+	int quest_npc_interval_timer[MAX_QUEST_NPC_EVENTS];
+
+	int quest_npc_current_event;
+	int quest_npc_timer;
 
 	// zyk: used to set magic powers and abilities to custom quest npcs
 	int custom_quest_magic;

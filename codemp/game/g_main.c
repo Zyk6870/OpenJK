@@ -322,6 +322,30 @@ gentity_t *Zyk_NPC_SpawnType( char *npc_type, int x, int y, int z, int yaw )
 	return NULL;
 }
 
+void zyk_set_quest_npc_events(gentity_t* npc_ent)
+{
+	if (npc_ent && npc_ent->client)
+	{
+		int i = 0;
+
+		npc_ent->client->pers.quest_npc_timer = 0;
+		npc_ent->client->pers.quest_npc_current_event = 0;
+
+		if (level.quest_map == 3)
+		{ // zyk: main city
+			if (npc_ent->client->pers.quest_npc == 1)
+			{
+				for (i = 0; i < MAX_QUEST_NPC_EVENTS; i++)
+				{
+					npc_ent->client->pers.quest_npc_anims[i] = BOTH_WALK1TALKCOMM1 + i;
+					npc_ent->client->pers.quest_npc_anim_duration[i] = 2000;
+					npc_ent->client->pers.quest_npc_interval_timer[i] = 3000;
+				}
+			}
+		}
+	}
+}
+
 void zyk_set_quest_npc_magic(gentity_t* npc_ent, int magic_powers_levels[MAX_MAGIC_POWERS])
 {
 	int i = 0;
@@ -9630,13 +9654,14 @@ void G_RunFrame( int levelTime ) {
 						}
 					}
 
-					if (level.quest_map == 2)
+					if (level.quest_map == 3)
 					{ // zyk: main city
 
 						// zyk: spawning the citizens
-						if (level.quest_event_counter == 0)
+						if (level.quest_event_counter == 1)
 						{
-
+							gentity_t *npc_ent = zyk_spawn_quest_npc("jedi", 12253, -454, -486, 45, 0, level.quest_event_counter);
+							zyk_set_quest_npc_events(npc_ent);
 						}
 
 						level.quest_event_counter++;
@@ -9937,6 +9962,20 @@ void G_RunFrame( int levelTime ) {
 				if (ent->die)
 				{
 					ent->die(ent, ent, ent, 100, MOD_UNKNOWN);
+				}
+			}
+
+			// zyk: quest npc events
+			if (ent->client->pers.quest_npc > 0 && ent->health > 0)
+			{
+				if (ent->client->pers.quest_npc_timer < level.time && ent->client->pers.quest_npc_current_event < MAX_QUEST_NPC_EVENTS)
+				{
+					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+					ent->client->ps.forceDodgeAnim = ent->client->pers.quest_npc_anims[ent->client->pers.quest_npc_current_event];
+					ent->client->ps.forceHandExtendTime = level.time + ent->client->pers.quest_npc_anim_duration[ent->client->pers.quest_npc_current_event];
+
+					ent->client->pers.quest_npc_timer = level.time + ent->client->pers.quest_npc_interval_timer[ent->client->pers.quest_npc_current_event];
+					ent->client->pers.quest_npc_current_event++;
 				}
 			}
 
