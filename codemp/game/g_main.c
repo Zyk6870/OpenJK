@@ -9662,7 +9662,7 @@ void G_RunFrame( int levelTime ) {
 						// zyk: spawning the citizens
 						if (level.quest_event_counter == 1)
 						{
-							gentity_t *npc_ent = zyk_spawn_quest_npc("jedi", 12253, -454, -486, 45, 0, level.quest_event_counter);
+							gentity_t *npc_ent = zyk_spawn_quest_npc("quest_jawa", 12253, -454, -486, 45, 0, level.quest_event_counter);
 							zyk_set_quest_npc_events(npc_ent);
 						}
 
@@ -9972,12 +9972,19 @@ void G_RunFrame( int levelTime ) {
 			{
 				if (ent->client->pers.quest_npc_timer < level.time && ent->client->pers.quest_npc_current_event < MAX_QUEST_NPC_EVENTS)
 				{
-					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-					ent->client->ps.forceDodgeAnim = ent->client->pers.quest_npc_anims[ent->client->pers.quest_npc_current_event];
-					ent->client->ps.forceHandExtendTime = level.time + ent->client->pers.quest_npc_anim_duration[ent->client->pers.quest_npc_current_event];
+					G_SetAnim(ent, NULL, SETANIM_BOTH, ent->client->pers.quest_npc_anims[ent->client->pers.quest_npc_current_event], SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+					ent->client->ps.torsoTimer = ent->client->pers.quest_npc_anim_duration[ent->client->pers.quest_npc_current_event];
+					ent->client->ps.legsTimer = ent->client->ps.torsoTimer;
 
 					ent->client->pers.quest_npc_timer = level.time + ent->client->pers.quest_npc_interval_timer[ent->client->pers.quest_npc_current_event];
 					ent->client->pers.quest_npc_current_event++;
+
+					if (ent->client->pers.quest_npc_current_event == 1)
+					{
+						VectorSet(ent->NPC->tempGoal->r.currentOrigin, ent->client->ps.origin[0] + 100, ent->client->ps.origin[1] + 100, -486);
+						ent->NPC->goalEntity = ent->NPC->tempGoal;
+						ent->NPC->tempBehavior = BS_INVESTIGATE;
+					}
 				}
 			}
 
