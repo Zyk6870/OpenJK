@@ -5752,26 +5752,16 @@ qboolean rpg_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont_show
 
 char *zyk_rpg_class(gentity_t *ent)
 {
-	if (ent->client->pers.rpg_class == 0)
+	if (ent->client->pers.rpg_class == RPGCLASS_CIVILIAN)
+		return "Civilian";
+	else if (ent->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR)
 		return "Free Warrior";
-	else if (ent->client->pers.rpg_class == 1)
+	else if (ent->client->pers.rpg_class == RPGCLASS_FORCE_USER)
 		return "Force User";
-	else if (ent->client->pers.rpg_class == 2)
-		return "Bounty Hunter";
-	else if (ent->client->pers.rpg_class == 3)
-		return "Armored Soldier";
-	else if (ent->client->pers.rpg_class == 4)
-		return "Monk";
-	else if (ent->client->pers.rpg_class == 5)
-		return "Stealth Attacker";
-	else if (ent->client->pers.rpg_class == 6)
-		return "Duelist";
-	else if (ent->client->pers.rpg_class == 7)
-		return "Force Gunner";
-	else if (ent->client->pers.rpg_class == 8)
-		return "Magic Master";
-	else if (ent->client->pers.rpg_class == 9)
-		return "Force Guardian";
+	else if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
+		return "Gunner";
+	else if (ent->client->pers.rpg_class == RPGCLASS_MAGICIAN)
+		return "Magician";
 	else
 		return "";
 }

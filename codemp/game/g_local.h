@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Zyk Open-World RPG Mod v1.0.0"
+#define	GAMEVERSION	"Zyk New RPG Mod Beta v0.1"
 
 #define SECURITY_LOG "security.log"
 
@@ -526,6 +526,16 @@ typedef enum {
 	ADM_CUSTOMQUEST,
 	ADM_NUM_CMDS
 } zyk_admin_t;
+
+// zyk: RPG Classes
+typedef enum {
+	RPGCLASS_CIVILIAN,
+	RPGCLASS_FREE_WARRIOR,
+	RPGCLASS_FORCE_USER,
+	RPGCLASS_GUNNER,
+	RPGCLASS_MAGICIAN,
+	NUM_RPG_CLASSES
+} zyk_rpgclass_t;
 
 // zyk: magic powers values
 typedef enum {
@@ -1335,9 +1345,6 @@ typedef struct {
 // zyk: max fields a custom quest mission can have
 #define MAX_CUSTOM_QUEST_FIELDS 512
 
-// zyk: max quest doors a map can have
-#define MAX_QUEST_DOORS 4
-
 typedef struct level_locals_s {
 	struct gclient_s	*clients;		// [maxclients]
 
@@ -1662,10 +1669,6 @@ typedef struct level_locals_s {
 
 	// zyk: current map name without the path from maps folder
 	char zykmapname[128];
-
-	gentity_t* quest_doors[MAX_QUEST_DOORS];
-
-	int quest_door_print_debounce_timer;
 
 	// zyk: sets the interval between each quest event
 	int quest_debounce_timer;

@@ -418,36 +418,6 @@ char* zyk_get_door_map_title(int map_number)
 	return map_titles[map_number];
 }
 
-void zyk_spawn_quest_door(float x, float y, float z, float yaw, int map_number)
-{
-	int i = 0;
-
-	gentity_t* new_ent = G_Spawn();
-
-	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
-	zyk_set_entity_field(new_ent, "spawnflags", "0");
-	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
-	zyk_set_entity_field(new_ent, "angles", va("0.0 %f 0.0", yaw));
-	zyk_set_entity_field(new_ent, "model", "models/map_objects/factory/f_door_b.md3");
-	zyk_set_entity_field(new_ent, "targetname", G_NewString(zyk_get_door_map_name(map_number)));
-	zyk_set_entity_field(new_ent, "message", G_NewString(zyk_get_door_map_title(map_number)));
-
-	zyk_spawn_entity(new_ent);
-
-	for (i = 0; i < MAX_QUEST_DOORS; i++)
-	{
-		if (level.quest_doors[i] == NULL)
-		{
-			// zyk: sets which door is this one
-			new_ent->count = i;
-
-			level.quest_doors[i] = new_ent;
-
-			return;
-		}
-	}
-}
-
 /*
 ============
 G_InitGame
@@ -640,7 +610,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	level.quest_map = 0;
 	level.quest_debounce_timer = 0;
-	level.quest_door_print_debounce_timer = 0;
 	level.quest_event_counter = 0;
 
 	// zyk: making case sensitive comparing so only low case quest map names will be set to play quests. This allows building these maps without conflicting with quests
@@ -901,11 +870,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		for (zyk_iterator = 0; zyk_iterator < MAX_RACERS; zyk_iterator++)
 		{ // zyk: initializing race vehicle ids
 			level.race_mode_vehicle[zyk_iterator] = -1;
-		}
-
-		for (zyk_iterator = 0; zyk_iterator < MAX_QUEST_DOORS; zyk_iterator++)
-		{ // zyk: initializing quest doors
-			level.quest_doors[zyk_iterator] = NULL;
 		}
 
 		for (zyk_iterator = 0; zyk_iterator < ENTITYNUM_MAX_NORMAL; zyk_iterator++)
@@ -1224,12 +1188,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		zyk_create_info_player_deathmatch(280, -491, 89, 179);
 		zyk_create_info_player_deathmatch(-411, -252, 89, 0);
 		zyk_create_info_player_deathmatch(280, -252, 89, 179);
-
-		if (level.quest_map == 1)
-		{ // zyk: loading quest stuff
-			zyk_spawn_quest_door(345, -28, 65, 0, 2);
-			zyk_spawn_quest_door(-473, -28, 65, 179, 4);
-		}
 	}
 	else if (Q_stricmp(zyk_mapname, "t1_rail") == 0)
 	{
@@ -1298,12 +1256,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		}
 		zyk_create_info_player_deathmatch(1913,-6151,222,153);
 		zyk_create_info_player_deathmatch(1921,-5812,222,-179);
-
-		if (level.quest_map == 2)
-		{ // zyk: loading quest stuff
-			zyk_spawn_quest_door(2114, -5915, 200, 179, 1);
-			zyk_spawn_quest_door(-1656, 3702, 192, -179, 3);
-		}
 
 		if (level.gametype == GT_CTF)
 		{ // zyk: in CTF, add the team player spawns
@@ -1832,8 +1784,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			zyk_create_info_player_deathmatch(12500, -748, -486, 179);
 			zyk_create_info_player_deathmatch(12500, -911, -486, 179);
 			zyk_create_info_player_deathmatch(12500, -1091, -486, 179);
-
-			zyk_spawn_quest_door(12677, -36, -507, 45, 2);
 		}
 	}
 	else if (Q_stricmp(zyk_mapname, "mp/siege_destroyer") == 0 && g_gametype.integer == GT_FFA)
@@ -9636,26 +9586,6 @@ void G_RunFrame( int levelTime ) {
 				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
 					int zyk_it = 0;
 					level.quest_debounce_timer = level.time + 100;
-
-					// zyk: verify the distance to a quest door. If near enough, call vote for map change
-					for (zyk_it = 0; zyk_it < MAX_QUEST_DOORS; zyk_it++)
-					{
-						if (level.quest_doors[zyk_it])
-						{ // zyk: found a quest door. Verify distance to it to either print destination or actually go there
-							float quest_door_dist = Distance(ent->client->ps.origin, level.quest_doors[zyk_it]->s.origin);
-
-							if (quest_door_dist < 50)
-							{
-								trap->SendConsoleCommand(EXEC_APPEND, va("map %s\n", level.quest_doors[zyk_it]->targetname));
-							}
-							else if (quest_door_dist < 150 && level.quest_door_print_debounce_timer < level.time)
-							{
-								level.quest_door_print_debounce_timer = level.time + 1000;
-
-								trap->SendServerCommand(ent->s.number, va("cp \"%s\"", level.quest_doors[zyk_it]->message));
-							}
-						}
-					}
 
 					if (level.quest_map == 3)
 					{ // zyk: main city
