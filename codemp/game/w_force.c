@@ -946,12 +946,6 @@ void WP_ForcePowerRegenerate( gentity_t *self, int overrideAmt )
 		return;
 	}
 
-	// zyk: if hit by the Duelist Unique Skill, cannot regen force
-	if (self->client->ps.powerups[PW_QUAD] > level.time)
-	{
-		return;
-	}
-
 	if (self->client->pers.quest_power_status & (1 << 2))
 	{ // zyk: hit by Time Power. Cannot regen force
 		return;

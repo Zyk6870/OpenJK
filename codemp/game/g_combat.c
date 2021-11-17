@@ -6429,15 +6429,8 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 							if (quest_power_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_HEALING_AREA] > 1)
 							{
-								heal_amount += 2;
-								shield_amount += 2;
-							}
-
-							// zyk: Magic Master Healing Improvement unique ability. Increases healing
-							if (quest_power_user->client->pers.player_statuses & (1 << 23))
-							{
-								heal_amount *= 2;
-								shield_amount *= 2;
+								heal_amount += 4;
+								shield_amount += 4;
 
 								// zyk: restores force too
 								if (ent->client->ps.fd.forcePower < ent->client->ps.fd.forcePowerMax)
