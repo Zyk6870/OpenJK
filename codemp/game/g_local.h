@@ -827,7 +827,7 @@ typedef struct clientPersistant_s {
 	// 0 - Holdable Items Upgrade
 	// 1 - Swimming Upgrade
 	// 2 - Gunner Radar
-	// 3 - unused
+	// 3 - Thermal Vision
 	// 4 - unused
 	// 5 - unused
 	// 6 - unused

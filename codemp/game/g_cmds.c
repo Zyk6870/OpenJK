@@ -6185,6 +6185,11 @@ void zyk_list_stuff(gentity_t *ent, gentity_t *target_ent)
 	else
 		strcpy(stuff_message, va("%s^3\nGunner Radar - ^1no\n", stuff_message));
 
+	if (ent->client->pers.secrets_found & (1 << 3))
+		strcpy(stuff_message, va("%s^3\nThermal Vision - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3\nThermal Vision - ^1no\n", stuff_message));
+
 	if (ent->client->pers.secrets_found & (1 << 8))
 		strcpy(stuff_message, va("%s^3\nGunner Items Upgrade - ^2yes\n", stuff_message));
 	else
@@ -6473,7 +6478,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^38 - Gunner Radar: ^7Buy: 4000\n\n^315 - Impact Reducer: ^7Buy: 4000\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1800\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2200\n^328 - Rocket Upgrade: ^7Buy: 2500\n^329 - Swimming Upgrade: ^7Buy: 2000\n^333 - Stun Baton Upgrade: ^7Buy: 1500\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^345 - Gunner Items Upgrade: ^7Buy: 3000\n^346 - Jetpack Upgrade: ^7Buy: 10000\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^38 - Gunner Radar: ^7Buy: 4000\n\n^315 - Impact Reducer: ^7Buy: 4000\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1800\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2200\n^328 - Rocket Upgrade: ^7Buy: 2500\n^329 - Swimming Upgrade: ^7Buy: 2000\n^333 - Stun Baton Upgrade: ^7Buy: 1500\n^339 - Thermal Vision: ^7Buy: 2500\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^345 - Gunner Items Upgrade: ^7Buy: 3000\n^346 - Jetpack Upgrade: ^7Buy: 10000\n\n\"");
 		}
 		else if (i == 1)
 		{
@@ -6629,7 +6634,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 39)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\nThermal Vision: makes binoculars detect enemies through a thermal vision system\n\n\"");
 		}
 		else if (i == 40)
 		{
@@ -6710,7 +6715,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	int value = 0;
 	int found = 0;
-	int item_costs[NUMBER_OF_SELLER_ITEMS] = {15,20,25,40,80,120,150,4000,150,170,180,200,300,200,4000,3000,100,120,150,200,110,90,170,300,2000,1800,2200,2500,2000,200,200,20,1500,100,150,150,90,10,5000,3000,50,50,200,50,3000,10000,5000,700,2000,2000,2000,2000};
+	int item_costs[NUMBER_OF_SELLER_ITEMS] = {15,20,25,40,80,120,150,4000,150,170,180,200,300,200,4000,3000,100,120,150,200,110,90,170,300,2000,1800,2200,2500,2000,200,200,20,1500,100,150,150,90,10,2500,3000,50,50,200,50,3000,10000,5000,700,2000,2000,2000,2000};
 
 	if (trap->Argc() == 1)
 	{
@@ -6820,6 +6825,11 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	else if (value == 33 && ent->client->pers.secrets_found & (1 << 15))
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"You already have the Stun Baton Upgrade.\n\"" );
+		return;
+	}
+	else if (value == 39 && ent->client->pers.secrets_found & (1 << 3))
+	{
+		trap->SendServerCommand(ent - g_entities, "print \"You already have the Thermal Vision.\n\"");
 		return;
 	}
 	else if (value == 40 && ent->client->pers.secrets_found & (1 << 0))
@@ -7013,7 +7023,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == 39)
 		{
-			ent->client->pers.secrets_found |= (1 << 16);
+			ent->client->pers.secrets_found |= (1 << 3);
 		}
 		else if (value == 40)
 		{

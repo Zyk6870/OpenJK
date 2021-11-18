@@ -9188,22 +9188,7 @@ void G_RunFrame( int levelTime ) {
 						ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
 
 					if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
-					{ // zyk: if Gunner stops using sniper scope, stop the Thermal Detector
-						ent->client->pers.thermal_vision = qfalse;
-						ent->client->ps.fd.forcePowersActive &= ~(1 << FP_SEE);
-						ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
-						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_0;
-					}
-					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 1 && ent->client->pers.secrets_found & (1 << 7))
-					{ // zyk: Gunner with upgrade, activate the Thermal Detector
-						ent->client->pers.thermal_vision = qtrue;
-						ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
-						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_1;
-						ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
-					}
-
-					if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
-					{ // zyk: if the bounty hunter stops using binoculars, stop the Thermal Vision
+					{ // zyk: if Gunner stops using sniper scope or binoculars, stop the Thermal Vision
 						ent->client->pers.thermal_vision = qfalse;
 						ent->client->ps.fd.forcePowersActive &= ~(1 << FP_SEE);
 						ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
@@ -9211,8 +9196,15 @@ void G_RunFrame( int levelTime ) {
 
 						ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 					}
-					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 2 && ent->client->pers.secrets_found & (1 << 1))
-					{ // zyk: Bounty Hunter with Upgrade, activate the Thermal Vision
+					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 1 && ent->client->pers.secrets_found & (1 << 3))
+					{ // zyk: Gunner with upgrade, activate the Thermal Detector
+						ent->client->pers.thermal_vision = qtrue;
+						ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
+						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_1;
+						ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
+					}
+					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 2 && ent->client->pers.secrets_found & (1 << 3))
+					{ // zyk: Gunner with Thermal Vision Upgrade, activate the Thermal Vision
 						ent->client->pers.thermal_vision = qtrue;
 						ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
 						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_3;
@@ -9222,11 +9214,6 @@ void G_RunFrame( int levelTime ) {
 						ent->client->ps.forceAllowDeactivateTime = level.time + 300;
 
 						ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
-					}
-
-					if (ent->client->pers.secrets_found & (1 << 1) && ent->client->ps.weapon == WP_BRYAR_PISTOL && ent->client->ps.weaponTime > (weaponData[WP_BRYAR_PISTOL].fireTime * 0.3))
-					{ // zyk: Bounty Hunter Upgrade makes his pistol shoot faster
-						ent->client->ps.weaponTime = weaponData[WP_BRYAR_PISTOL].fireTime * 0.3;
 					}
 
 					if (ent->client->pers.active_unique_skill == 6 && ent->client->pers.aimed_shot_timer < level.time)
