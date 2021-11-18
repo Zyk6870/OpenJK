@@ -1495,11 +1495,11 @@ void ForceTeamForceReplenish( gentity_t *self )
 	{
 		ent = &g_entities[i];
 
-		// zyk: Bounty Hunter class has more max ammo
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2)
+		// zyk: Gunner class has more max ammo
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
 		{
-			max_blasterpack_ammo = zyk_max_blaster_pack_ammo.integer + zyk_max_blaster_pack_ammo.integer / 8.0 * ent->client->pers.skill_levels[55];
-			max_powercell_ammo = zyk_max_power_cell_ammo.integer + zyk_max_power_cell_ammo.integer / 8.0 * ent->client->pers.skill_levels[55];
+			max_blasterpack_ammo = zyk_max_blaster_pack_ammo.integer + zyk_max_blaster_pack_ammo.integer / 8.0 * ent->client->pers.skill_levels[38];
+			max_powercell_ammo = zyk_max_power_cell_ammo.integer + zyk_max_power_cell_ammo.integer / 8.0 * ent->client->pers.skill_levels[38];
 		}
 		else
 		{
@@ -1507,10 +1507,10 @@ void ForceTeamForceReplenish( gentity_t *self )
 			max_powercell_ammo = zyk_max_power_cell_ammo.integer;
 		}
 
-		// zyk: created new condition so we can use Team Energize in FFA. Also added skill_levels[55] condition to restore ammo of the target
+		// zyk: created new condition so we can use Team Energize in FFA. Also added Improvements skill condition to restore ammo of the target
 		if (ent && ent->client && self != ent && 
 			(ent->client->ps.fd.forcePower < ent->client->ps.fd.forcePowerMax || 
-			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[55] > 0 && !ent->NPC && 
+			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[38] > 0 && !ent->NPC && 
 			  ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
 			  (ent->client->ps.ammo[AMMO_BLASTER] < max_blasterpack_ammo || ent->client->ps.ammo[AMMO_POWERCELL] < max_powercell_ammo)
 			 )
@@ -1559,10 +1559,10 @@ void ForceTeamForceReplenish( gentity_t *self )
 	while (i < numpl)
 	{
 		// zyk: Team Energize now can recover ammo if the player has full force and improvements skill
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[55] > 0 && !g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.fd.forcePower == g_entities[pl[i]].client->ps.fd.forcePowerMax)
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[38] > 0 && !g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.fd.forcePower == g_entities[pl[i]].client->ps.fd.forcePowerMax)
 		{
-			Add_Ammo(&g_entities[pl[i]], AMMO_BLASTER, (self->client->pers.skill_levels[55] * 5));
-			Add_Ammo(&g_entities[pl[i]], AMMO_POWERCELL, (self->client->pers.skill_levels[55] * 5));
+			Add_Ammo(&g_entities[pl[i]], AMMO_BLASTER, (self->client->pers.skill_levels[38] * 5));
+			Add_Ammo(&g_entities[pl[i]], AMMO_POWERCELL, (self->client->pers.skill_levels[38] * 5));
 			G_Sound(&g_entities[pl[i]], CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 		}
 		else
@@ -1974,16 +1974,7 @@ void ForceLightningDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec
 				if (dmg)
 				{
 					//rww - Shields can now absorb lightning too.
-					if (traceEnt && traceEnt->client && traceEnt->client->sess.amrpgmode == 2 && traceEnt->client->pers.rpg_class == 5)
-					{ // zyk: Stealth Attacker absorbs electric damage
-						if (!(traceEnt->client->pers.secrets_found & (1 << 7)))
-						{ // zyk: only takes damage if he does not have the upgrade
-							dmg = (int)ceil(dmg * (1 - (0.2 * traceEnt->client->pers.skill_levels[55])));
-							G_Damage( traceEnt, self, self, dir, impactPoint, dmg, 0, MOD_FORCE_DARK );
-						}
-					}
-					else
-						G_Damage( traceEnt, self, self, dir, impactPoint, dmg, 0, MOD_FORCE_DARK );
+					G_Damage( traceEnt, self, self, dir, impactPoint, dmg, 0, MOD_FORCE_DARK );
 				}
 				if ( traceEnt->client )
 				{
@@ -6064,10 +6055,8 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 					WP_ForcePowerRegenerate(self, 6); // zyk: Meditation Strength
 				else if ( self->client->ps.isJediMaster && level.gametype == GT_JEDIMASTER )
 					WP_ForcePowerRegenerate( self, 4 ); //jedi master regenerates 4 times as fast
-				else if (self->client->sess.amrpgmode == 2 && (self->client->pers.rpg_class == 1 || self->client->pers.rpg_class == 6))
-					WP_ForcePowerRegenerate( self, self->client->pers.skill_levels[55] ); // zyk: Force User and Duelist classes regen force faster
-				else if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 7 && self->client->pers.secrets_found & (1 << 8))
-					WP_ForcePowerRegenerate( self, 2); // zyk: Force Gunner with Upgrade regens force a bit faster
+				else if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER)
+					WP_ForcePowerRegenerate( self, self->client->pers.skill_levels[38] ); // zyk: Force User can regen force faster
 				else
 					WP_ForcePowerRegenerate( self, 0 );
 			}

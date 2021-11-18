@@ -2685,8 +2685,8 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		}
 
 		if (attacker->client->pers.rpg_class == 2)
-		{ // zyk: Bounty Hunter class receives more credits
-			attacker->client->pers.credits_modifier += 4 * (attacker->client->pers.skill_levels[55] + 1);
+		{ // zyk: Gunner class receives more credits
+			attacker->client->pers.credits_modifier += 4 * (attacker->client->pers.skill_levels[38] + 1);
 		}
 
 		// zyk: Bounty Quest manager
@@ -4863,46 +4863,20 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 	{ // zyk: bonus damage of each RPG class
-		if (attacker->client->pers.rpg_class == 0)
+		if (attacker->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR)
 		{ // zyk: Free Warrior
-			damage = (int)ceil(damage * (1.0 + (0.025 * attacker->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (1.0 + (0.025 * attacker->client->pers.skill_levels[38])));
 		}
-		else if (attacker->client->pers.rpg_class == 1 && (mod == MOD_SABER || mod == MOD_FORCE_DARK))
+		else if (attacker->client->pers.rpg_class == RPGCLASS_FORCE_USER && (mod == MOD_SABER || mod == MOD_FORCE_DARK))
 		{ // zyk: Force User
-			damage = (int)ceil(damage * (1.0 + (0.04 * attacker->client->pers.skill_levels[55])));
+			damage = (int)ceil(damage * (1.0 + (0.04 * attacker->client->pers.skill_levels[38])));
 		}
-		else if (attacker->client->pers.rpg_class == 2 && mod != MOD_SABER && mod != MOD_MELEE && mod != MOD_FORCE_DARK)
-		{ // zyk: Bounty Hunter
-			damage = (int)ceil(damage * (1.0 + (0.04 * attacker->client->pers.skill_levels[55])));
+		else if (attacker->client->pers.rpg_class == RPGCLASS_GUNNER && mod != MOD_SABER && mod != MOD_MELEE && mod != MOD_FORCE_DARK)
+		{ // zyk: Gunner
+			damage = (int)ceil(damage * (1.0 + (0.04 * attacker->client->pers.skill_levels[38])));
 		}
-		else if (attacker->client->pers.rpg_class == 4 && mod == MOD_MELEE)
-		{ // zyk: Monk
-			damage = damage * (1.0 + (attacker->client->pers.skill_levels[55]*0.4));
-			can_damage_heavy_things = qtrue;
-		}
-		else if (attacker->client->pers.rpg_class == 5 && (mod == MOD_STUN_BATON || mod == MOD_DISRUPTOR || mod == MOD_DISRUPTOR_SNIPER || 
-			     mod == MOD_REPEATER || mod == MOD_REPEATER_ALT || mod == MOD_REPEATER_ALT_SPLASH || mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT || 
-				 mod == MOD_LAVA || mod == MOD_TRIP_MINE_SPLASH || mod == MOD_TIMED_MINE_SPLASH || mod == MOD_DET_PACK_SPLASH || 
-				 mod == MOD_CONC || mod == MOD_CONC_ALT || mod == MOD_DISRUPTOR_SPLASH))
-		{ // zyk: Stealth Attacker has more gun damage
-			float stealth_attacker_bonus_damage = 0.0;
-
-			// zyk: Stealth Attacker Upgrade increases damage
-			if (attacker->client->pers.secrets_found & (1 << 7))
-				stealth_attacker_bonus_damage = 0.2;
-
-			damage = (int)ceil(damage * (1.06 + (0.11 * attacker->client->pers.skill_levels[55]) + stealth_attacker_bonus_damage));
-		}
-		else if (attacker->client->pers.rpg_class == 6 && (mod == MOD_SABER || mod == MOD_MELEE))
-		{ // zyk: Duelist has higher damage in saber and melee
-			damage = (int)ceil(damage * (1.2 + (0.15 * attacker->client->pers.skill_levels[55])));
-		}
-		else if (attacker->client->pers.rpg_class == 7)
-		{ // zyk: Force Gunner bonus damage
-			damage = (int)ceil(damage * (1.0 + (0.04 * attacker->client->pers.skill_levels[55])));
-		}
-		else if (attacker->client->pers.rpg_class == 8 && mod == MOD_MELEE)
-		{ // zyk: Magic Master bolts can damage heavy things
+		else if (attacker->client->pers.rpg_class == RPGCLASS_WIZARD && mod == MOD_MELEE)
+		{ // zyk: Magic bolts can damage heavy things
 			if (inflictor && (inflictor->s.weapon == WP_BOWCASTER || inflictor->s.weapon == WP_DEMP2 || inflictor->s.weapon == WP_CONCUSSION))
 				can_damage_heavy_things = qtrue;
 		}
@@ -5003,7 +4977,23 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			damage = (int)ceil(damage * 0.85);
 		}
 
-		if (targ->client->pers.rpg_class == RPGCLASS_FORCE_USER && targ->client->pers.active_unique_skill == 1 && 
+		if (targ->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR) // zyk: Free Warrior damage resistance
+		{
+			// zyk: Free Warrior Mimic Damage ability. Deals half of the damage taken back to the enemy
+			if (attacker && attacker != targ && (!attacker->NPC ||
+				(attacker->client && (attacker->client->NPC_class != CLASS_RANCOR || !(targ->client->ps.eFlags2 & EF2_HELD_BY_MONSTER)))) &&
+				targ->client->pers.unique_skill_duration > level.time && targ->client->pers.active_unique_skill == 1)
+			{
+				if (!(attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR &&
+					attacker->client->pers.unique_skill_duration > level.time && attacker->client->pers.active_unique_skill == 1))
+				{ // zyk: Mimic Damage will not work if attacker pointer is also a Free Warrior using Mimic Damage
+					G_Damage(attacker, targ, targ, NULL, NULL, (int)ceil(damage * 0.5), 0, MOD_UNKNOWN);
+				}
+			}
+
+			damage = (int)ceil(damage * (1.0 - (0.025 * targ->client->pers.skill_levels[38])));
+		}
+		else if (targ->client->pers.rpg_class == RPGCLASS_FORCE_USER && targ->client->pers.active_unique_skill == 1 && 
 			targ->client->pers.unique_skill_duration > level.time)
 		{ // zyk: Force Shield
 			damage = (int)ceil(damage * 0.25);
@@ -5018,57 +5008,13 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				bonus_resistance += 0.25;
 			}
 			
-			damage = (int)ceil(damage * (0.9 - ((0.04 * targ->client->pers.skill_levels[55]) + bonus_resistance)));
+			damage = (int)ceil(damage * (0.9 - ((0.04 * targ->client->pers.skill_levels[38]) + bonus_resistance)));
 		}
 		else if (targ->client->pers.rpg_class == RPGCLASS_WIZARD &&
 				 targ->client->ps.legsAnim == BOTH_MEDITATE)
 		{ // zyk: Meditation Strength and Meditation Drain increases resistance to damage
 			if (targ->client->pers.active_unique_skill == 3 || targ->client->pers.active_unique_skill == 4)
 				damage = (int)ceil(damage * (0.5));
-		}
-		else if (targ->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR) // zyk: Free Warrior damage resistance
-		{
-			// zyk: Free Warrior Mimic Damage ability. Deals half of the damage taken back to the enemy
-			if (attacker && attacker != targ && (!attacker->NPC || 
-				(attacker->client && (attacker->client->NPC_class != CLASS_RANCOR || !(targ->client->ps.eFlags2 & EF2_HELD_BY_MONSTER)))) &&
-				targ->client->pers.unique_skill_duration > level.time && targ->client->pers.active_unique_skill == 1)
-			{
-				if (!(attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR &&
-					attacker->client->pers.unique_skill_duration > level.time && attacker->client->pers.active_unique_skill == 1))
-				{ // zyk: Mimic Damage will not work if attacker pointer is also a Free Warrior using Mimic Damage
-					G_Damage(attacker, targ, targ, NULL, NULL, (int)ceil(damage * 0.5), 0, MOD_UNKNOWN);
-				}
-			}
-
-			damage = (int)ceil(damage * (1.0 - (0.025 * targ->client->pers.skill_levels[55])));
-		}
-		else if (targ->client->pers.rpg_class == 5 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT))
-		{ // zyk: Stealth Attacker damage resistance against DEMP2
-			// zyk: only takes damage if he does not have the upgrade
-			if (targ->client->pers.secrets_found & (1 << 7))
-				return;
-
-			damage = (int)ceil(damage * (1 - (0.2 * targ->client->pers.skill_levels[55])));
-		}
-		else if (targ->client->pers.rpg_class == 7)
-		{ // zyk: Force Gunner damage resistance
-			damage = (int)ceil(damage * (1.0 - (0.04 * targ->client->pers.skill_levels[55])));
-		}
-		else if (targ->client->pers.rpg_class == 9)
-		{ // zyk: Force Guardian damage resistance
-			float force_tank_bonus_resistance = 0.0;
-
-			if (targ->client->pers.secrets_found & (1 << 19))
-			{ // zyk: Force Guardian Upgrade increases damage resistance
-				force_tank_bonus_resistance += 0.1;
-			}
-
-			if (targ->client->pers.unique_skill_duration > level.time)
-			{ // zyk: Force Guardian Unique Skill increases damage resistance
-				force_tank_bonus_resistance += 0.15;
-			}
-
-			damage = (int)ceil(damage * (0.9 - force_tank_bonus_resistance - (0.075 * targ->client->pers.skill_levels[55])));
 		}
 	}
 
@@ -6051,23 +5997,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (!targ->NPC && targ->client && targ->client->sess.amrpgmode == 2)
 		{ // zyk: Health Strength skill decreases damage taken
-			float bonus_resistance = 0.0;
-
-			// zyk: if player is a Bounty Hunter and has the Bounty Hunter Upgrade, absorbs some damage taken
-			if (targ->client->pers.rpg_class == 2 && targ->client->pers.secrets_found & (1 << 1))
-				bonus_resistance = 0.07;
-
-			take = (int)ceil(take * (1.0 - bonus_resistance - (0.05 * targ->client->pers.skill_levels[32])));
-
-			// zyk: Improvements skill makes Force Guardian regen some force with Rage when taking damage
-			if (targ->client->pers.rpg_class == 9 && targ->client->pers.skill_levels[55] > 0 && 
-				(targ->client->ps.fd.forcePowersActive & (1 << FP_RAGE)) && (inflictor->client || attacker->client))
-			{
-				targ->client->ps.fd.forcePower += (int)ceil((take * 0.1 * targ->client->pers.skill_levels[55]));
-
-				if (targ->client->ps.fd.forcePower > targ->client->ps.fd.forcePowerMax)
-					targ->client->ps.fd.forcePower = targ->client->ps.fd.forcePowerMax;
-			}
+			take = (int)ceil(take * (1.0 - (0.05 * targ->client->pers.skill_levels[32])));
 		}
 
 		targ->health = targ->health - take;

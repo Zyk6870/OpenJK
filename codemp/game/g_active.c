@@ -2663,13 +2663,6 @@ void ClientThink_real( gentity_t *ent ) {
 		float zyk_player_speed = g_speed.value;
 
 		// set speed
-		if (client->sess.amrpgmode == 2)
-		{ 
-			if (client->pers.rpg_class == 4) // zyk: each Improvements level increases the Monk speed
-				zyk_player_speed *= (client->pers.skill_levels[55] * 0.225 + 1);
-			else if (client->pers.rpg_class == 7 && client->pers.secrets_found & (1 << 8)) // zyk: Force Gunner with Upgrade has more run speed
-				zyk_player_speed *= 1.2;
-		}
 
 		//Check for a siege class speed multiplier
 		if (level.gametype == GT_SIEGE &&
@@ -3525,7 +3518,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 				if (pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE)
 				{ 
-					if (ent->client->pers.rpg_class == 2 && ent->client->pers.secrets_found & (1 << 1) && 
+					if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.secrets_found & (1 << 1) &&
 						ent->client->ps.droneExistTime >= (level.time + 5000))
 					{ // zyk: Bounty Hunter Upgrade allows getting seeker drone back with saber style key
 						ent->client->ps.droneExistTime = 0;
@@ -3535,9 +3528,9 @@ void ClientThink_real( gentity_t *ent ) {
 
 						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));
 					}
-					else if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.rpg_class == 8)
+					else if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.rpg_class == RPGCLASS_WIZARD)
 					{ // zyk: Magic Master Fist attacks
-						if (ent->client->sess.magic_fist_selection < 5 && ent->client->sess.magic_fist_selection < ent->client->pers.skill_levels[55])
+						if (ent->client->sess.magic_fist_selection < 5 && ent->client->sess.magic_fist_selection < ent->client->pers.skill_levels[38])
 							ent->client->sess.magic_fist_selection++;
 						else if (ent->client->sess.magic_fist_selection == 5)
 							ent->client->sess.magic_fist_selection = 0;

@@ -76,7 +76,7 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	3, // Sense Health
 	3, // Shield Heal
 	3, // Team Shield Heal
-	1, // Unique Skill
+	4, // Improvements
 	4, // Blaster Pack
 	4, // Powercell
 	4, // Metal Bolts
@@ -93,8 +93,13 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	1, // Force Field
 	1, // Cloak Item
 	5, // Force Power
-	4, // Improvements
 	5, // Max MP
+	1, // Unique Skill 1
+	1, // Unique Skill 2
+	1, // Unique Skill 3
+	1, // Unique Skill 4
+	1, // Unique Skill 5
+	1, // Unique Skill 6
 	2, // Magic Sense
 	2, // Healing Area
 	2, // Magic Explosion
@@ -169,7 +174,7 @@ char* zyk_skill_name(int skill_index)
 		"Sense Health",
 		"Shield Heal",
 		"Team Shield Heal",
-		"Unique Skill",
+		"Improvements",
 		"Blaster Pack",
 		"Powercell",
 		"Metal Bolts",
@@ -186,8 +191,13 @@ char* zyk_skill_name(int skill_index)
 		"Force Field",
 		"Cloak Item",
 		"Force Power",
-		"Improvements",
 		"Max MP",
+		"Unique Skill 1",
+		"Unique Skill 2",
+		"Unique Skill 3",
+		"Unique Skill 4",
+		"Unique Skill 5",
+		"Unique Skill 6",
 		"Magic Sense",
 		"Healing Area",
 		"Magic Explosion",
@@ -274,7 +284,7 @@ qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
 		{0, 1, 4, 6, 7, 8, -1}, // Sense Health
 		{0, 1, 4, 6, 7, -1}, // Shield Heal
 		{0, 1, 4, 7, -1}, // Team Shield Heal
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Improvements
 		{0, 2, 3, 7, 9, -1}, // Blaster Pack
 		{0, 2, 3, 5, 7, -1}, // Powercell
 		{0, 2, 3, 5, 7, -1}, // Metal Bolts
@@ -291,8 +301,13 @@ qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
 		{0, 2, -1}, // Force Field
 		{0, 2, 5, -1}, // Cloak Item
 		{0, 1, 4, 6, 7, 9, -1}, // Force Power
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Improvements
 		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Max MP
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill 1
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill 2
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill 3
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill 4
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill 5
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill
 		{8, -1},
 		{8, -1},
 		{8, -1},
@@ -4472,12 +4487,12 @@ void display_yellow_bar(gentity_t *ent, int duration)
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = ((ent->client->pers.level * 3)/5) * ent->client->pers.skill_levels[56];
+	int max_mp = ((ent->client->pers.level * 3)/5) * ent->client->pers.skill_levels[55];
 
-	if (ent->client->pers.rpg_class == 8) // zyk: Magic Master has more Magic Power
+	if (ent->client->pers.rpg_class == RPGCLASS_WIZARD) // zyk: Wizard has more Magic Power
 	{
-		max_mp = ((ent->client->pers.level * 4) / 5) * ent->client->pers.skill_levels[56];
-		return (max_mp + (40 * (ent->client->pers.skill_levels[55] + 1)));
+		max_mp = ((ent->client->pers.level * 4) / 5) * ent->client->pers.skill_levels[55];
+		return (max_mp + (40 * (ent->client->pers.skill_levels[38] + 1)));
 	}
 
 	return max_mp;
@@ -4498,9 +4513,9 @@ void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
 
 void zyk_set_magic_power_cooldown_time(gentity_t *ent, int duration)
 {
-	// zyk: Magic Master has less cooldown time after casting magic powers
-	if (ent->client->pers.rpg_class == 8)
-		ent->client->pers.quest_power_usage_timer = level.time + (duration * (1.0 - (ent->client->pers.skill_levels[55] * 0.15)));
+	// zyk: Wizard has less cooldown time after casting magic powers
+	if (ent->client->pers.rpg_class == RPGCLASS_WIZARD)
+		ent->client->pers.quest_power_usage_timer = level.time + (duration * (1.0 - (ent->client->pers.skill_levels[38] * 0.15)));
 	else
 		ent->client->pers.quest_power_usage_timer = level.time + duration;
 }
@@ -5295,13 +5310,13 @@ void initialize_rpg_skills(gentity_t *ent)
 					ent->client->pers.bounty_hunter_placed_sentries++;
 			}
 
-			ent->client->ps.ammo[AMMO_BLASTER] += ent->client->ps.ammo[AMMO_BLASTER] / 8.0 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_POWERCELL] += ent->client->ps.ammo[AMMO_POWERCELL] / 8.0 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_METAL_BOLTS] += ent->client->ps.ammo[AMMO_METAL_BOLTS] / 8.0 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_ROCKETS] += ent->client->ps.ammo[AMMO_ROCKETS] / 8.0 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_THERMAL] += ent->client->ps.ammo[AMMO_THERMAL] / 8.0 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_TRIPMINE] += ent->client->ps.ammo[AMMO_TRIPMINE] / 8.0 * ent->client->pers.skill_levels[55];
-			ent->client->ps.ammo[AMMO_DETPACK] += ent->client->ps.ammo[AMMO_DETPACK] / 8.0 * ent->client->pers.skill_levels[55];
+			ent->client->ps.ammo[AMMO_BLASTER] += ent->client->ps.ammo[AMMO_BLASTER] / 8.0 * ent->client->pers.skill_levels[38];
+			ent->client->ps.ammo[AMMO_POWERCELL] += ent->client->ps.ammo[AMMO_POWERCELL] / 8.0 * ent->client->pers.skill_levels[38];
+			ent->client->ps.ammo[AMMO_METAL_BOLTS] += ent->client->ps.ammo[AMMO_METAL_BOLTS] / 8.0 * ent->client->pers.skill_levels[38];
+			ent->client->ps.ammo[AMMO_ROCKETS] += ent->client->ps.ammo[AMMO_ROCKETS] / 8.0 * ent->client->pers.skill_levels[38];
+			ent->client->ps.ammo[AMMO_THERMAL] += ent->client->ps.ammo[AMMO_THERMAL] / 8.0 * ent->client->pers.skill_levels[38];
+			ent->client->ps.ammo[AMMO_TRIPMINE] += ent->client->ps.ammo[AMMO_TRIPMINE] / 8.0 * ent->client->pers.skill_levels[38];
+			ent->client->ps.ammo[AMMO_DETPACK] += ent->client->ps.ammo[AMMO_DETPACK] / 8.0 * ent->client->pers.skill_levels[38];
 		}
 
 		// zyk: reseting initial holdable items of the player
@@ -6160,7 +6175,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp( arg1, "other" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 12, 30, 15);
+		zyk_list_category_skills(ent, target_ent, 17, 30, 15);
 	}
 	else if (Q_stricmp( arg1, "ammo" ) == 0)
 	{
@@ -6172,7 +6187,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 32, 57, 16);
+		zyk_list_category_skills(ent, target_ent, 32, 62, 16);
 	}
 }
 
@@ -11015,7 +11030,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->pers.skill_levels[54 + unique_skill_number] < 1)
+	if (ent->client->pers.skill_levels[55 + unique_skill_number] < 1)
 	{ // zyk: player did not upgrade the unique skill he is trying to use
 		trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7you don't have this Unique Skill\"");
 		return;

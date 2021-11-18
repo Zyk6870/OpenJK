@@ -1231,9 +1231,9 @@ void ItemUse_Sentry( gentity_t *ent )
 	SP_PAS( sentry );
 
 	// zyk: Bounty Hunter sentry gun has more HP and with the Upgrade, player can place more sentry guns
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
 	{
-		sentry->health = 40 * (ent->client->pers.skill_levels[55] + 1);
+		sentry->health = 40 * (ent->client->pers.skill_levels[38] + 1);
 
 		// zyk: validating quantity of sentry guns that the Bounty Hunter can place
 		ent->client->pers.bounty_hunter_placed_sentries++;
@@ -1389,9 +1389,9 @@ void ItemUse_Jetpack( gentity_t *ent )
 	if (!ent->client->jetPackOn &&
 		// ent->client->ps.jetpackFuel < 5
 		ent->client->pers.jetpack_fuel < JETPACK_SCALE && 
-		(ent->client->sess.amrpgmode != 2 || ent->client->pers.rpg_class != 8 || ent->client->pers.magic_power < 10 || ent->client->pers.skill_levels[55] == 0))
+		(ent->client->sess.amrpgmode != 2 || ent->client->pers.rpg_class != RPGCLASS_WIZARD || ent->client->pers.magic_power < 10 || ent->client->pers.skill_levels[38] == 0))
 	{ //too low on fuel to start it up
-		// zyk: Magic Master can use magic to restore fuel so allow him to activate jetpack
+		// zyk: Wizard can use magic to restore fuel so allow him to activate jetpack
 		return;
 	}
 
@@ -2103,9 +2103,9 @@ gentity_t *EWeb_Create(gentity_t *spawner)
 	ent->takedamage = qtrue;
 
 	// zyk: Bounty Hunter EWeb has more health
-	if (spawner->client->sess.amrpgmode == 2 && spawner->client->pers.rpg_class == 2)
+	if (spawner->client->sess.amrpgmode == 2 && spawner->client->pers.rpg_class == RPGCLASS_GUNNER)
 	{
-		eweb_health = eweb_health * (spawner->client->pers.skill_levels[55] + 1);
+		eweb_health = eweb_health * (spawner->client->pers.skill_levels[38] + 1);
 	}
 
 	if (spawner->client->ewebHealth <= 0)
@@ -2316,15 +2316,15 @@ void Add_Ammo (gentity_t *ent, int weapon, int count)
 	int max_detpack_ammo = zyk_max_detpack_ammo.integer;
 
 	// zyk: Bounty Hunter class has more max ammo
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
 	{
-		max_blasterpack_ammo += max_blasterpack_ammo / 8.0 * ent->client->pers.skill_levels[55];
-		max_powercell_ammo += max_powercell_ammo / 8.0 * ent->client->pers.skill_levels[55];
-		max_metalbolt_ammo += max_metalbolt_ammo / 8.0 * ent->client->pers.skill_levels[55];
-		max_rocket_ammo += max_rocket_ammo / 8.0 * ent->client->pers.skill_levels[55];
-		max_thermal_ammo += max_thermal_ammo / 8.0 * ent->client->pers.skill_levels[55];
-		max_tripmine_ammo += max_tripmine_ammo / 8.0 * ent->client->pers.skill_levels[55];
-		max_detpack_ammo += max_detpack_ammo / 8.0 * ent->client->pers.skill_levels[55];
+		max_blasterpack_ammo += max_blasterpack_ammo / 8.0 * ent->client->pers.skill_levels[38];
+		max_powercell_ammo += max_powercell_ammo / 8.0 * ent->client->pers.skill_levels[38];
+		max_metalbolt_ammo += max_metalbolt_ammo / 8.0 * ent->client->pers.skill_levels[38];
+		max_rocket_ammo += max_rocket_ammo / 8.0 * ent->client->pers.skill_levels[38];
+		max_thermal_ammo += max_thermal_ammo / 8.0 * ent->client->pers.skill_levels[38];
+		max_tripmine_ammo += max_tripmine_ammo / 8.0 * ent->client->pers.skill_levels[38];
+		max_detpack_ammo += max_detpack_ammo / 8.0 * ent->client->pers.skill_levels[38];
 	}
 
 	if (weapon == AMMO_BLASTER){

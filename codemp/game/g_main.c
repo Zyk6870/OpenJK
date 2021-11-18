@@ -5032,7 +5032,7 @@ void magic_sense(gentity_t *ent, int duration)
 	duration += (ent->client->pers.skill_levels[4] * 1000);
 
 	// zyk: Magic Sense gets more duration based on Improvements skill level
-	duration += (ent->client->pers.skill_levels[55] * 1000);
+	duration += (ent->client->pers.skill_levels[38] * 1000);
 
 	ent->client->ps.forceAllowDeactivateTime = level.time + duration;
 	ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[4];
@@ -8893,9 +8893,9 @@ void G_RunFrame( int levelTime ) {
 
 				if (ent->client->sess.amrpgmode == 2)
 				{ // zyk: RPG Mode jetpack skill. Each level decreases fuel debounce
-					if (ent->client->pers.rpg_class == 2)
-					{ // zyk: Bounty Hunter can have a more efficient jetpack
-						jetpack_debounce_amount -= ((ent->client->pers.skill_levels[34] * 2) + (ent->client->pers.skill_levels[55]));
+					if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
+					{ // zyk: Gunner can have a more efficient jetpack
+						jetpack_debounce_amount -= ((ent->client->pers.skill_levels[34] * 2) + (ent->client->pers.skill_levels[38]));
 					}
 					else
 					{
@@ -8913,10 +8913,10 @@ void G_RunFrame( int levelTime ) {
 
 				ent->client->pers.jetpack_fuel -= jetpack_debounce_amount;
 
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->pers.jetpack_fuel <= 0 && 
-					ent->client->pers.magic_power >= 10 && ent->client->pers.skill_levels[55] > 0)
-				{ // zyk: Magic Master Improvements skill allows recovering jetpack fuel with magic
-					ent->client->pers.jetpack_fuel = (100 * ent->client->pers.skill_levels[55]);
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD && ent->client->pers.jetpack_fuel <= 0 && 
+					ent->client->pers.magic_power >= 10 && ent->client->pers.skill_levels[38] > 0)
+				{ // zyk: Wizard Improvements skill allows recovering jetpack fuel with magic
+					ent->client->pers.jetpack_fuel = (100 * ent->client->pers.skill_levels[38]);
 					ent->client->pers.magic_power -= 10;
 					send_rpg_events(2000);
 				}
@@ -9169,21 +9169,8 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime / 2;
 				}
 
-				// zyk: Stealth Attacker using his Unique Skill, increase firerate of disruptor
-				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_class == 5 && ent->client->pers.skill_levels[38] > 0 && 
-					ent->client->pers.unique_skill_duration > level.time && !(ent->client->pers.player_statuses & (1 << 21)) && 
-					ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/3.0)
-				{
-					ent->client->ps.weaponTime = (weaponData[WP_DISRUPTOR].fireTime * 1.0)/3.0;
-				}
-
-				// zyk: Monk class has a faster melee fireTime
-				if (ent->client->pers.rpg_class == 4 && ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[55] > 0 && 
-					ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * 2.25)/(ent->client->pers.skill_levels[55] + 1))
-				{
-					ent->client->ps.weaponTime = (weaponData[WP_MELEE].fireTime * 2.25)/(ent->client->pers.skill_levels[55] + 1);
-				}
-				else if (ent->client->pers.rpg_class == 8 && ent->client->pers.unique_skill_duration > level.time && ent->client->pers.player_statuses & (1 << 21) &&
+				if (ent->client->pers.rpg_class == RPGCLASS_WIZARD && 
+					ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 2 &&
 					ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * 0.8))
 				{ // zyk: Magic Master Faster Bolt ability makes melee faster to shoot bolts faster
 					ent->client->ps.weaponTime = weaponData[WP_MELEE].fireTime * 0.8;
