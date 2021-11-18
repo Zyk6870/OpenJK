@@ -4922,7 +4922,14 @@ void rpg_score(gentity_t *ent)
 	strcpy(message,"");
 
 	if (validate_rpg_class(ent) == qfalse)
+	{
 		return;
+	}
+
+	if (ent->client->pers.rpg_class == RPGCLASS_CIVILIAN)
+	{ // zyk: the starting class cannot get levels
+		return;
+	}
 
 	add_credits(ent, (10 + ent->client->pers.credits_modifier));
 
