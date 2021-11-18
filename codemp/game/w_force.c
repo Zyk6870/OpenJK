@@ -4228,14 +4228,14 @@ void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower )
 		{
 			G_MuteSound(self->client->ps.fd.killSoundEntIndex[TRACK_CHANNEL_5-50], CHAN_VOICE);
 
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 2 && self->client->pers.secrets_found & (1 << 1) && 
+			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.secrets_found & (1 << 8) && 
 				self->client->ps.zoomMode == 2)
-			{ // zyk: Bounty Hunter with Upgrade that stops Thermal Vision. In this case, stop binoculars
+			{ // zyk: Gunner Items Upgrade that stops Thermal Vision. In this case, stop binoculars
 				self->client->ps.zoomMode = 0;
 				self->client->ps.zoomTime = level.time;
 			}
 
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 8)
+			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_WIZARD)
 			{ // zyk: removing Sense level so he can use holdable items with force keys again
 				self->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_0;
 			}
@@ -5264,16 +5264,16 @@ void SeekerDroneUpdate(gentity_t *self)
 				VectorNormalize(endir);
 
 				// zyk: changed shot speed from 2000 to 4000
-				// zyk: changed damage when a Bounty Hunter uses the seeker drone
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 2 && self->client->pers.secrets_found & (1 << 1))
+				// zyk: changed damage when a Gunner uses the seeker drone
+				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.secrets_found & (1 << 8))
 					WP_FireGenericBlasterMissile(self, org, endir, qfalse, 20, 4000, MOD_BLASTER);
 				else
 					WP_FireGenericBlasterMissile(self, org, endir, qfalse, 15, 4000, MOD_BLASTER);
 
 				G_SoundAtLoc( org, CHAN_WEAPON, G_SoundIndex("sound/weapons/bryar/fire.wav") );
 
-				// zyk: Bounty Hunter Upgrade has fast-shooting seeker drone
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 2 && self->client->pers.secrets_found & (1 << 1))
+				// zyk: Gunner has fast-shooting seeker drone
+				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.secrets_found & (1 << 8))
 					self->client->ps.droneFireTime = level.time + Q_irand(200, 300);
 				else
 					self->client->ps.droneFireTime = level.time + Q_irand(400, 700);

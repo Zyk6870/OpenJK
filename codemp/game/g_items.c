@@ -545,7 +545,7 @@ void ItemUse_Binoculars(gentity_t *ent)
 	*/
 
 	// zyk: with Thermal Vision, sets the cooldown between activating and deactivating Binoculars to avoid problem in which it gets instantly on and off
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2 && ent->client->pers.secrets_found & (1 << 1) && 
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.secrets_found & (1 << 8) && 
 		ent->client->pers.thermal_vision_cooldown_time > level.time)
 	{
 		return;
@@ -606,8 +606,9 @@ void pas_fire( gentity_t *ent )
 	myOrg[2] += fwd[2]*16;
 
 	// zyk: changed sentry gun shotspeed from 2300 to 2800
-	// zyk: Bounty Hunter Upgrade makes sentry gun have more damage
-	if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_class == 2 && ent->parent->client->pers.secrets_found & (1 << 1))
+	// zyk: Gunner Items Upgrade makes sentry gun have more damage
+	if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && 
+		ent->parent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->parent->client->pers.secrets_found & (1 << 8))
 		WP_FireTurretMissile(&g_entities[ent->genericValue3], myOrg, fwd, qfalse, 12, 2800, MOD_SENTRY, ent );
 	else
 		WP_FireTurretMissile(&g_entities[ent->genericValue3], myOrg, fwd, qfalse, 10, 2800, MOD_SENTRY, ent );
@@ -643,9 +644,9 @@ static qboolean pas_find_enemies( gentity_t *self )
 
 	VectorCopy(self->s.pos.trBase, org2);
 
-	// zyk: Bounty Hunter Upgrade allows it to find enemies in a greater distance
+	// zyk: Gunner Items Upgrade allows it to find enemies in a greater distance
 	if (self->parent && self->parent->client && self->parent->client->sess.amrpgmode == 2 && 
-		self->parent->client->pers.rpg_class == 2 && self->parent->client->pers.secrets_found & (1 << 1))
+		self->parent->client->pers.rpg_class == RPGCLASS_GUNNER && self->parent->client->pers.secrets_found & (1 << 8))
 	{
 		distance_to_find_enemies *= 2;
 		bestDist = distance_to_find_enemies*distance_to_find_enemies;
@@ -1235,11 +1236,11 @@ void ItemUse_Sentry( gentity_t *ent )
 	{
 		sentry->health = 40 * (ent->client->pers.skill_levels[38] + 1);
 
-		// zyk: validating quantity of sentry guns that the Bounty Hunter can place
+		// zyk: validating quantity of sentry guns that the Gunner can place
 		ent->client->pers.bounty_hunter_placed_sentries++;
 		ent->client->pers.bounty_hunter_sentries--;
 
-		if (ent->client->pers.secrets_found & (1 << 1) && ent->client->pers.bounty_hunter_placed_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
+		if (ent->client->pers.secrets_found & (1 << 8) && ent->client->pers.bounty_hunter_placed_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
 		{
 			ent->client->ps.fd.sentryDeployed = qfalse;
 		}
@@ -1274,7 +1275,7 @@ void ItemUse_Seeker(gentity_t *ent)
 	{
 		ent->client->ps.eFlags |= EF_SEEKERDRONE;
 		// zyk: Bounty Hunter Upgrade increases seeker drone lifetime
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2 && ent->client->pers.secrets_found & (1 << 1))
+		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.secrets_found & (1 << 8))
 			ent->client->ps.droneExistTime = level.time + 80000;
 		else
 			ent->client->ps.droneExistTime = level.time + 60000; // zyk: the seeker drone lifetime, changed from 30000 to 60000
@@ -1822,8 +1823,9 @@ void EWebFire(gentity_t *owner, gentity_t *eweb)
 	missile->classname = "generic_proj";
 	missile->s.weapon = WP_TURRET;
 
-	// zyk: Bounty Hunter EWeb has more damage
-	if (owner && owner->client && owner->client->sess.amrpgmode == 2 && owner->client->pers.rpg_class == 2 && owner->client->pers.secrets_found & (1 << 1))
+	// zyk: Gunner Items Upgrade makes EWeb have more damage
+	if (owner && owner->client && owner->client->sess.amrpgmode == 2 && 
+		owner->client->pers.rpg_class == RPGCLASS_GUNNER && owner->client->pers.secrets_found & (1 << 8))
 		missile->damage = EWEB_MISSILE_DAMAGE + 5;
 	else
 		missile->damage = EWEB_MISSILE_DAMAGE;
@@ -2762,9 +2764,9 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		}
 	}
 
-	if (other->client->sess.amrpgmode == 2 && other->client->pers.rpg_class == 2 && 
+	if (other->client->sess.amrpgmode == 2 && other->client->pers.rpg_class == RPGCLASS_GUNNER && 
 		ent->item->giType == IT_HOLDABLE && ent->item->giTag == HI_SENTRY_GUN && 
-		other->client->pers.secrets_found & (1 << 1) && other->client->pers.bounty_hunter_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
+		other->client->pers.secrets_found & (1 << 8) && other->client->pers.bounty_hunter_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
 	{ // zyk: Bounty Hunter can grab more sentries when he has the Bounty Hunter Upgrade
 		other->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SENTRY_GUN);
 		other->client->pers.bounty_hunter_sentries++;

@@ -6463,7 +6463,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^315 - Impact Reducer: ^7Buy: 4000\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1800\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2200\n^328 - Rocket Upgrade: ^7Buy: 2500\n^329 - Swimming Upgrade: ^7Buy: 2000\n^333 - Stun Baton Upgrade: ^7Buy: 1500\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^346 - Jetpack Upgrade: ^7Buy: 10000\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^38 - Gunner Items Upgrade: ^7Buy: 3000\n^315 - Impact Reducer: ^7Buy: 4000\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1800\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2200\n^328 - Rocket Upgrade: ^7Buy: 2500\n^329 - Swimming Upgrade: ^7Buy: 2000\n^333 - Stun Baton Upgrade: ^7Buy: 1500\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^346 - Jetpack Upgrade: ^7Buy: 10000\n\n\"");
 		}
 		else if (i == 1)
 		{
@@ -6495,7 +6495,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 8)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Gunner Items Upgrade: makes sentry gun, seeker drone and e-web stronger\n\n\"");
 		}
 		else if (i == 9)
 		{
