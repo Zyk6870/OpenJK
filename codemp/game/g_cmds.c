@@ -102,6 +102,8 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	1, // Unique Skill 6
 	2, // Magic Sense
 	2, // Healing Area
+	2, // Magic Disable
+	2, // Enemy Weakening
 	2, // Magic Explosion
 	2, // Lightning Dome
 	2, // Water Splash
@@ -120,8 +122,6 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	2, // Reverse Wind
 	2, // Ultra Speed
 	2, // Slow Motion
-	2, // Magic Disable
-	2, // Enemy Weakening
 	2, // Black Hole
 	2, // Dome of Damage
 	2, // Chaos Power
@@ -200,6 +200,8 @@ char* zyk_skill_name(int skill_index)
 		"Unique Skill 6",
 		"Magic Sense",
 		"Healing Area",
+		"Magic Disable",
+		"Enemy Weakening",
 		"Magic Explosion",
 		"Lightning Dome",
 		"Water Splash",
@@ -218,8 +220,6 @@ char* zyk_skill_name(int skill_index)
 		"Reverse Wind",
 		"Ultra Speed",
 		"Slow Motion",
-		"Magic Disable",
-		"Enemy Weakening",
 		"Black Hole",
 		"Chaos Power",
 		"Dome of Damage",
@@ -312,8 +312,8 @@ qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
 		{RPGCLASS_WIZARD, -1},
 		{RPGCLASS_WIZARD, -1},
 		{RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_WIZARD, -1},
+		{RPGCLASS_WIZARD, -1},
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
@@ -423,24 +423,24 @@ char* zyk_allowed_skill_color(int skill_index, int rpg_class)
 			"^7",
 			"^7",
 			"^7",
-			"^4",
-			"^4",
-			"^4",
-			"^4",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^1",
-			"^1",
-			"^1",
-			"^1",
-			"^2",
-			"^2",
-			"^2",
-			"^2",
 			"^7",
 			"^7",
+			"^4",
+			"^4",
+			"^4",
+			"^4",
+			"^3",
+			"^3",
+			"^3",
+			"^3",
+			"^1",
+			"^1",
+			"^1",
+			"^1",
+			"^2",
+			"^2",
+			"^2",
+			"^2",
 			"^6",
 			"^6",
 			"^6",
@@ -592,45 +592,45 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 63)
 		return "creates an energy area that heals you and your allies and damage enemies";
 	if (skill_index == 64)
-		return "creates an explosion that does a lot of damage";
-	if (skill_index == 65)
-		return "creates a dome that does lightning damage. Damage is based on player level";
-	if (skill_index == 66)
-		return "damages enemies, draining their hp and healing you";
-	if (skill_index == 67)
-		return "attacks enemies nearby with water, causing high damage";
-	if (skill_index == 68)
-		return "greatly damages enemies nearby with a stalagmite";
-	if (skill_index == 69)
-		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
-	if (skill_index == 70)
-		return "knocks people down causing damage";
-	if (skill_index == 71)
-		return "rocks keep falling at the enemies, causing high damage";
-	if (skill_index == 72)
-		return "a shifting sand appears, sending you to your nearest enemy. Stand near the sand to be transported to the enemy";
-	if (skill_index == 73)
-		return "a big tree appears, protecting you from attacks and healing you";
-	if (skill_index == 74)
-		return "fires a flame burst for some seconds";
-	if (skill_index == 75)
-		return "a flame jet appears at the enemies and damages them. At level 2, if the flame hits the target, it will catch fire";
-	if (skill_index == 76)
-		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
-	if (skill_index == 77)
-		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
-	if (skill_index == 78)
-		return "blows people away for some seconds";
-	if (skill_index == 79)
-		return "makes people go towards you";
-	if (skill_index == 80)
-		return "increases your run speed";
-	if (skill_index == 81)
-		return "decreases run speed of enemies nearby";
-	if (skill_index == 82)
 		return "makes enemies unable to use magic powers for some seconds. Not so effective against magic using npcs, like bosses";
-	if (skill_index == 83)
+	if (skill_index == 65)
 		return "decreases damage and resistance of enemies nearby";
+	if (skill_index == 66)
+		return "creates an explosion that does a lot of damage";
+	if (skill_index == 67)
+		return "creates a dome that does lightning damage. Damage is based on player level";
+	if (skill_index == 68)
+		return "damages enemies, draining their hp and healing you";
+	if (skill_index == 69)
+		return "attacks enemies nearby with water, causing high damage";
+	if (skill_index == 70)
+		return "greatly damages enemies nearby with a stalagmite";
+	if (skill_index == 71)
+		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
+	if (skill_index == 72)
+		return "knocks people down causing damage";
+	if (skill_index == 73)
+		return "rocks keep falling at the enemies, causing high damage";
+	if (skill_index == 74)
+		return "a shifting sand appears, sending you to your nearest enemy. Stand near the sand to be transported to the enemy";
+	if (skill_index == 75)
+		return "a big tree appears, protecting you from attacks and healing you";
+	if (skill_index == 76)
+		return "fires a flame burst for some seconds";
+	if (skill_index == 77)
+		return "a flame jet appears at the enemies and damages them. At level 2, if the flame hits the target, it will catch fire";
+	if (skill_index == 78)
+		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
+	if (skill_index == 79)
+		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
+	if (skill_index == 80)
+		return "blows people away for some seconds";
+	if (skill_index == 81)
+		return "makes people go towards you";
+	if (skill_index == 82)
+		return "increases your run speed";
+	if (skill_index == 83)
+		return "decreases run speed of enemies nearby";
 	if (skill_index == 84)
 		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
 	if (skill_index == 85)
@@ -11562,6 +11562,8 @@ int zyk_get_magic_cost(int magic_number)
 	int magic_costs[MAX_MAGIC_POWERS] = {
 		5, // Magic Sense
 		5, // Healing Area
+		18, // Magic Disable
+		18, // Enemy Weakening
 		10, // Magic Explosion
 		15, // Lightning Dome
 		20, // Water Splash
@@ -11580,14 +11582,12 @@ int zyk_get_magic_cost(int magic_number)
 		23, // Reverse Wind
 		17, // Ultra Speed
 		17, // Slow Motion
-		22, // Dome of Damage
-		25, // Magic Shield
-		18, // Magic Disable
-		18, // Enemy Weakening
 		40, // Black Hole
+		22, // Dome of Damage
 		30, // Chaos Power
 		30, // Ultra Drain
 		40, // Light of Judgement
+		25, // Magic Shield
 		30, // Magic Immunity
 		30 // Time Stop
 	};
@@ -11634,6 +11634,16 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			{
 				healing_area(ent, 2, 5000);
 				zyk_set_magic_power_cooldown_time(ent, 20000);
+			}
+			else if (magic_number == MAGIC_MAGIC_DISABLE)
+			{
+				magic_disable(ent, 450);
+				zyk_set_magic_power_cooldown_time(ent, 6000);
+			}
+			else if (magic_number == MAGIC_ENEMY_WEAKENING)
+			{
+				enemy_nerf(ent, 450);
+				zyk_set_magic_power_cooldown_time(ent, 12000);
 			}
 			else if (magic_number == MAGIC_MAGIC_EXPLOSION)
 			{
@@ -11724,16 +11734,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			{
 				slow_motion(ent, 400, 15000);
 				zyk_set_magic_power_cooldown_time(ent, 9000);
-			}
-			else if (magic_number == MAGIC_MAGIC_DISABLE)
-			{
-				magic_disable(ent, 450);
-				zyk_set_magic_power_cooldown_time(ent, 6000);
-			}
-			else if (magic_number == MAGIC_ENEMY_WEAKENING)
-			{
-				enemy_nerf(ent, 450);
-				zyk_set_magic_power_cooldown_time(ent, 12000);
 			}
 			else if (magic_number == MAGIC_BLACK_HOLE)
 			{
