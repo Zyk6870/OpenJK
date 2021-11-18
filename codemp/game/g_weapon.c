@@ -3924,13 +3924,10 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 		ent->client->pers.secrets_found & (1 << 10) && ent->client->ps.cloakFuel > 0 && ent->waterlevel < 3)
 	{ // zyk: do not use flame thrower when underwater
 		int flame_thrower_fuel_usage = 2;
+
 		G_Sound( ent, CHAN_WEAPON, G_SoundIndex("sound/effects/fireout.mp3") );
 
 		ent->client->pers.flame_thrower = level.time + 1500;
-		
-		// zyk: Armored Soldier Upgrade spends less flame thrower fuel
-		if (ent->client->pers.rpg_class == 3 && ent->client->pers.secrets_found & (1 << 16))
-			flame_thrower_fuel_usage = 1;
 
 		ent->client->ps.cloakFuel -= flame_thrower_fuel_usage;
 	}

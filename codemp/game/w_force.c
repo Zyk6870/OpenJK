@@ -1638,15 +1638,6 @@ void ForceGrip( gentity_t *self )
 		ForcePowerUsableOn(self, &g_entities[tr.entityNum], FP_GRIP) &&
 		(g_friendlyFire.integer || !OnSameTeam(self, &g_entities[tr.entityNum])) ) //don't grip someone who's still crippled
 	{
-		// zyk: Armored Soldier Upgrade has a chance of setting ysalamiri and resist the force power
-		if (g_entities[tr.entityNum].client && g_entities[tr.entityNum].client->sess.amrpgmode == 2 && 
-			g_entities[tr.entityNum].client->pers.rpg_class == 3 && g_entities[tr.entityNum].client->pers.secrets_found & (1 << 16) && 
-			g_entities[tr.entityNum].client->ps.powerups[PW_YSALAMIRI] < level.time && Q_irand(0,4) < 2)
-		{
-			g_entities[tr.entityNum].client->ps.powerups[PW_YSALAMIRI] = level.time + 1500;
-			return;
-		}
-
 		if (g_entities[tr.entityNum].s.number < MAX_CLIENTS && g_entities[tr.entityNum].client->ps.m_iVehicleNum)
 		{ //a player on a vehicle
 			gentity_t *vehEnt = &g_entities[g_entities[tr.entityNum].client->ps.m_iVehicleNum];
@@ -1989,33 +1980,18 @@ void ForceLightningDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec
 					}
 					if ( traceEnt->client->ps.powerups[PW_CLOAKED] )
 					{//disable cloak temporarily
-						if (traceEnt->client->sess.amrpgmode < 2 || traceEnt->client->pers.rpg_class != 5)
-						{ // zyk: Stealth Attacker cloak does not decloak by lightning attack
-							Jedi_Decloak( traceEnt );
-							traceEnt->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
-						}
+						Jedi_Decloak( traceEnt );
+						traceEnt->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
 					}
 
-					// zyk: Armored Soldier Upgrade has a chance of setting ysalamiri and resist the force power
-					if (traceEnt->client->sess.amrpgmode == 2 && traceEnt->client->pers.rpg_class == 3 && 
-						traceEnt->client->pers.secrets_found & (1 << 16) && traceEnt->client->ps.powerups[PW_YSALAMIRI] < level.time && Q_irand(0,10) == 0)
-					{
-						traceEnt->client->ps.powerups[PW_YSALAMIRI] = level.time + 1500;
+					if (!traceEnt->NPC && traceEnt->client->jetPackOn)
+					{ //disable jetpack temporarily
+						Jetpack_Off(traceEnt);
+						traceEnt->client->jetPackToggleTime = level.time + Q_irand(3000, 10000);
 					}
-					else
-					{
-						if (!traceEnt->NPC && traceEnt->client->jetPackOn)
-						{ //disable jetpack temporarily
-							if (traceEnt->client->sess.amrpgmode != 2 || traceEnt->client->pers.rpg_class != 5 || !(traceEnt->client->pers.secrets_found & (1 << 7)))
-							{ // zyk: do not disable jetpack of Stealth Attacker with Upgrade
-								Jetpack_Off(traceEnt);
-								traceEnt->client->jetPackToggleTime = level.time + Q_irand(3000, 10000);
-							}
-						}
-						else if (traceEnt->NPC && traceEnt->client->NPC_class == CLASS_BOBAFETT)
-						{ // zyk: also disables npc jetpack
-							Boba_FlyStop(traceEnt);
-						}
+					else if (traceEnt->NPC && traceEnt->client->NPC_class == CLASS_BOBAFETT)
+					{ // zyk: also disables npc jetpack
+						Boba_FlyStop(traceEnt);
 					}
 				}
 			}
@@ -2204,14 +2180,6 @@ void ForceDrainDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec3_t 
 				{
 					traceEnt->s.genericenemyindex = level.time + 2000;
 				}
-			}
-
-			// zyk: Armored Soldier Upgrade has a chance of setting ysalamiri and resist the force power
-			if (traceEnt->client && traceEnt->client->sess.amrpgmode == 2 && traceEnt->client->pers.rpg_class == 3 &&
-				traceEnt->client->pers.secrets_found & (1 << 16) && traceEnt->client->ps.powerups[PW_YSALAMIRI] < level.time && 
-				Q_irand(0, 10) == 0)
-			{
-				traceEnt->client->ps.powerups[PW_YSALAMIRI] = level.time + 1500;
 			}
 
 			if (ForcePowerUsableOn(self, traceEnt, FP_DRAIN))
@@ -2983,15 +2951,6 @@ void ForceTelepathy(gentity_t *self)
 
 			tricked_entity = &g_entities[tr.entityNum];
 
-			// zyk: Armored Soldier Upgrade has a chance of setting ysalamiri and resist the force power
-			if (tricked_entity && tricked_entity->client && tricked_entity->client->sess.amrpgmode == 2 && 
-				tricked_entity->client->pers.rpg_class == 3 && tricked_entity->client->pers.secrets_found & (1 << 16) && 
-				tricked_entity->client->ps.powerups[PW_YSALAMIRI] < level.time && Q_irand(0,4) < 2)
-			{
-				tricked_entity->client->ps.powerups[PW_YSALAMIRI] = level.time + 1500;
-				return;
-			}
-
 			if (!ForcePowerUsableOn(self, tricked_entity, FP_TELEPATHY))
 			{
 				return;
@@ -3085,15 +3044,6 @@ void ForceTelepathy(gentity_t *self)
 			if (ent && ent != self && ent->client)
 			{
 				gotatleastone = qtrue;
-
-				// zyk: Armored Soldier Upgrade has a chance of setting ysalamiri and resist the force power
-				if (ent && ent->client && ent->client->sess.amrpgmode == 2 && 
-					ent->client->pers.rpg_class == 3 && ent->client->pers.secrets_found & (1 << 16) && 
-					ent->client->ps.powerups[PW_YSALAMIRI] < level.time && Q_irand(0,4) < 2)
-				{
-					ent->client->ps.powerups[PW_YSALAMIRI] = level.time + 1500;
-					return;
-				}
 
 				if (!ent->NPC) // zyk: NPCs wont have the glowing head effect of mind trick because of how the game handles the tricked entities
 					WP_AddAsMindtricked(&self->client->ps.fd, ent->s.number);
@@ -3597,14 +3547,6 @@ void ForceThrow( gentity_t *self, qboolean pull )
 			continue;
 		}
 
-		// zyk: Armored Soldier Upgrade has a chance of setting ysalamiri and resist the force power
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 3 && 
-			ent->client->pers.secrets_found & (1 << 16) && ent->client->ps.powerups[PW_YSALAMIRI] < level.time && Q_irand(0,3) == 0)
-		{
-			ent->client->ps.powerups[PW_YSALAMIRI] = level.time + 1500;
-			continue;
-		}
-
 		if ( ent->s.eType != ET_MISSILE )
 		{
 			if ( ent->s.eType != ET_ITEM )
@@ -3769,13 +3711,6 @@ void ForceThrow( gentity_t *self, qboolean pull )
 					}
 				}
 
-				// zyk: Armored Soldier can resist Push and Pull if he has the Upgrade
-				if (push_list[x]->client->sess.amrpgmode == 2 && push_list[x]->client->pers.rpg_class == 3 && 
-					push_list[x]->client->pers.secrets_found & (1 << 16) && Q_irand(0,3) == 0)
-				{
-					canPullWeapon = qfalse;
-				}
-
 				pushPowerMod = pushPower;
 
 				if (push_list[x]->client->pers.cmd.forwardmove ||
@@ -3867,12 +3802,6 @@ void ForceThrow( gentity_t *self, qboolean pull )
 							randfact = 10;
 						}
 
-						// zyk: Stealth Attacker Upgrade protects from losing weapon to force pull
-						if (push_list[x]->client->sess.amrpgmode == 2 && push_list[x]->client->pers.rpg_class == 5 && push_list[x]->client->pers.secrets_found & (1 << 7))
-						{
-							canPullWeapon = qfalse;
-						}
-
 						if (push_list[x]->NPC && push_list[x]->client->pers.custom_quest_boss_npc > 0)
 						{ // zyk: Custom Quest bosses cannot have their weapon pulled from them
 							canPullWeapon = qfalse;
@@ -3912,15 +3841,10 @@ void ForceThrow( gentity_t *self, qboolean pull )
 						if (BG_KnockDownable(&push_list[x]->client->ps) &&
 							dirLen <= (64*((modPowerLevel - otherPushPower)-1)))
 						{ //can only do a knockdown if fairly close
-							// zyk: Armored Soldier will not be knocked down if he has the Upgrade
-							if (push_list[x]->client->sess.amrpgmode != 2 || push_list[x]->client->pers.rpg_class != 3 || 
-								!(push_list[x]->client->pers.secrets_found & (1 << 16)))
-							{
-								push_list[x]->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-								push_list[x]->client->ps.forceHandExtendTime = level.time + 700;
-								push_list[x]->client->ps.forceDodgeAnim = 0; //this toggles between 1 and 0, when it's 1 we should play the get up anim
-								push_list[x]->client->ps.quickerGetup = qtrue;
-							}
+							push_list[x]->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
+							push_list[x]->client->ps.forceHandExtendTime = level.time + 700;
+							push_list[x]->client->ps.forceDodgeAnim = 0; //this toggles between 1 and 0, when it's 1 we should play the get up anim
+							push_list[x]->client->ps.quickerGetup = qtrue;
 						}
 						else if (push_list[x]->s.number < MAX_CLIENTS && push_list[x]->client->ps.m_iVehicleNum &&
 							dirLen <= 128.0f )

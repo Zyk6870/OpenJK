@@ -580,7 +580,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 57)
 		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Thermal Throw, which throws 3 thermal detonators with higher damage. Spends 3 thermals and 3 power cell ammo\nForce User: Force Maelstrom, which grips enemies nearby, damages them, sets force shield and uses lightning if player has the force power. Spends 50 force\nGunner: Homing Rocket, which shoots a powerful rocket that automatically goes after the nearest target. Spends 2 rockets and 2 power cell ammo\nWizard: Faster Bolts, which increases speed and firerate of magic bolts";
 	if (skill_index == 58)
-		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Vertical DFA, which makes him jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force\nForce User: Force Repulse, which damages and pushes everyone away from you. Spends 50 force\nGunner: Lightning Shield, which increases resistance to damage and does a bit of damage to enemies nearby. Using /unique again will release a small lightning dome. Spends 5 power cell ammo\nWizard: Meditation Strength, which increases auto-healing, force regen, and his own resistance is heavily increased. Spends 5 mp";
+		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Vertical DFA, which makes him jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force\nForce User: Force Repulse, which damages and pushes everyone away from you. Spends 50 force\nGunner: Lightning Shield, which increases resistance to damage, does a bit of damage to enemies nearby and deflects some weapon shots. Using /unique again will release a small lightning dome. Spends 5 power cell ammo\nWizard: Meditation Strength, which increases auto-healing, force regen, and his own resistance is heavily increased. Spends 5 mp";
 	if (skill_index == 59)
 		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: No Attack, which makes the nearby enemies not able to attack for some seconds. Spends 50 force\nForce User: Force Scream, which sets the resistance shield during 6 seconds. Player makes a scream that damages nearby enemies and may cause stun anim on them. Spends 50 force\nGunner: Wrist Shot, which allows shooting up to five powerful blaster shots. Spends 5 blaster pack ammo and 5 more per shot\nWizard: Meditation Drain, which heavily increases resistance and drains shield and health from enemies nearby to restore health and shield. Spends 5 mp";
 	if (skill_index == 60)
@@ -10700,16 +10700,10 @@ qboolean zyk_can_deflect_shots(gentity_t *ent)
 {
 	if (ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		if (ent->client->pers.rpg_class == 3 && ent->client->pers.secrets_found & (1 << 16) && ent->client->pers.unique_skill_duration > level.time && 
-			!(ent->client->pers.player_statuses & (1 << 21)) &&
-			!(ent->client->pers.player_statuses & (1 << 22)) && 
-			!(ent->client->pers.player_statuses & (1 << 23))
-			)
-		{ // zyk: Armored Soldier unique skill with Armored Soldier Upgrade deflects shots
-			return qtrue;
-		}
-		else if (ent->client->pers.rpg_class == 9 && ent->client->pers.player_statuses & (1 << 21))
-		{ // zyk: Force Armor unique ability deflects shots
+		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && 
+			ent->client->pers.unique_skill_duration > level.time && 
+			ent->client->pers.active_unique_skill == 3)
+		{ // zyk: Gunner Lightning Shield deflects shots
 			return qtrue;
 		}
 	}

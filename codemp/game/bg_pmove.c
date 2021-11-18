@@ -8092,17 +8092,6 @@ static void PM_Weapon( void )
 				PM_AddEvent( EV_ALT_FIRE );
 			}
 			addTime = weaponData[pm->ps->weapon].altFireTime;
-
-#if defined (_GAME)
-			gentity_t *player_ent = &g_entities[pm->ps->clientNum];
-
-			// zyk: Armored Soldier using Unique Ability 3. Decreases altfiretime
-			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.rpg_class == 3 &&
-				player_ent->client->pers.player_statuses & (1 << 23) && pm->ps->weapon == WP_BLASTER)
-			{
-				addTime -= 40;
-			}
-#endif
 		}
 	}
 	else {
