@@ -246,98 +246,98 @@ qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
 	int i = 0;
 
 	int classes_allowed_for_skills[NUMBER_OF_SKILLS][11] = { // zyk: each index is a skill, and contains an array of allowed RPG classes
-		{0, 1, 4, 6, 7, 9, -1}, // Jump
-		{0, 1, 4, 6, 7, 9, -1}, // Push
-		{0, 1, 4, 6, 7, 9, -1}, // Pull
-		{0, 1, 6, -1}, // Speed
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Sense
-		{0, 1, 6, 9, -1}, // Saber Attack
-		{0, 1, 6, 9, -1}, // Saber Defense
-		{0, 1, 6, 9, -1}, // Saber Throw
-		{0, 1, 6, 7, 9, -1}, // Absorb
-		{0, 1, 4, 6, 7, -1}, // Heal
-		{0, 1, 6, 9, -1}, // Protect
-		{0, 1, 4, -1}, // Mind Trick
-		{0, 1, 4, 7, -1}, // Team Heal
-		{0, 1, 6, 7, -1}, // Lightning
-		{0, 1, 4, 6, 9, -1}, // Grip
-		{0, 1, 4, 6, 7, -1}, // Drain
-		{0, 1, 9, -1}, // Rage
-		{0, 1, 4, 7, -1}, // Team Energize
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Stun Baton
-		{0, 2, 3, -1}, // Blaster Pistol
-		{0, 2, 3, 7, 9, -1}, // E11 Blaster Rifle
-		{0, 2, 3, 5, 7, -1}, // Disruptor
-		{0, 2, 3, -1}, // Bowcaster
-		{0, 2, 3, 5, 7, -1}, // Repeater
-		{0, 2, 3, 5, -1}, // DEMP2
-		{0, 2, 3, -1}, // Flechette
-		{0, 2, 3, 7, -1}, // Rocket Launcher
-		{0, 2, 3, 5, -1}, // Concussion Rifle
-		{0, 2, 3, -1}, // Bryar Pistol
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Melee
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Max Shield
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Shield Strength
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Health Strength
-		{0, 1, 4, 6, 7, -1}, // Drain Shield
-		{0, 2, 3, 5, 7, 8, -1}, // Jetpack
-		{0, 1, 4, 6, 7, 8, -1}, // Sense Health
-		{0, 1, 4, 6, 7, -1}, // Shield Heal
-		{0, 1, 4, 7, -1}, // Team Shield Heal
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Improvements
-		{0, 2, 3, 7, 9, -1}, // Blaster Pack
-		{0, 2, 3, 5, 7, -1}, // Powercell
-		{0, 2, 3, 5, 7, -1}, // Metal Bolts
-		{0, 2, 3, 7, -1}, // Rockets
-		{0, 2, 3, 7, -1}, // Thermals
-		{0, 2, 3, 5, -1}, // Trip Mines
-		{0, 2, 3, 5, -1}, // Detpacks
-		{0, 2, 3, 5, 7, -1}, // Binoculars
-		{0, 2, 3, 8, -1}, // Bacta Canister
-		{0, 2, 7, -1}, // Sentry Gun
-		{0, 2, 3, 5, 7, -1}, // Seeker Drone
-		{0, 2, 3, -1}, // E-Web
-		{0, 2, 7, 9, -1}, // Big Bacta
-		{0, 2, -1}, // Force Field
-		{0, 2, 5, -1}, // Cloak Item
-		{0, 1, 4, 6, 7, 9, -1}, // Force Power
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Max MP
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill 1
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill 2
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill 3
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill 4
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill 5
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}, // Unique Skill
-		{8, -1},
-		{8, -1},
-		{8, -1},
-		{8, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1}
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Jump
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Push
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Pull
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Speed
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_WIZARD, -1}, // Sense
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Saber Attack
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Saber Defense
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Saber Throw
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Absorb
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Heal
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Protect
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Mind Trick
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Team Heal
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Lightning
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Grip
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Drain
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Rage
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Team Energize
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Stun Baton
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Blaster Pistol
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // E11 Blaster Rifle
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Disruptor
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Bowcaster
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Repeater
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // DEMP2
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Flechette
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Rocket Launcher
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Concussion Rifle
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Bryar Pistol
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Melee
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Max Shield
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Shield Strength
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Health Strength
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Drain Shield
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Jetpack
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_WIZARD, -1}, // Sense Health
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Shield Heal
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Team Shield Heal
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Improvements
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Blaster Pack
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Powercell
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Metal Bolts
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Rockets
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Thermals
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Trip Mines
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Detpacks
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Binoculars
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Bacta Canister
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Sentry Gun
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Seeker Drone
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // E-Web
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Big Bacta
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Force Field
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Cloak Item
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Force Power
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Max MP
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 1
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 2
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 3
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 4
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 5
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 6
+		{RPGCLASS_WIZARD, -1},
+		{RPGCLASS_WIZARD, -1},
+		{RPGCLASS_WIZARD, -1},
+		{RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}
 	};
 
 	for (i = 0; i < 10; i++)
@@ -540,7 +540,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 37)
 		return "recovers 3 shield at level 1, 6 shield at level 2 and 9 shield at level 3 to players near you. To use it, when near players, use Team Heal force power. It will heal their shield after they have full HP";
 	if (skill_index == 38)
-		return "Used by pressing Engage Duel key\nFree Warrior: recovers some hp, shield and mp\nForce User: Force Shield. greatly reduces damage and protects against force powers\nBounty Hunter: fires poison darts with melee by spending metal bolts ammo\nArmored Soldier: increases auto-shield-heal rate\nMonk: increases auto-healing rate and stops Grip\nStealth Attacker: increases disruptor firerate\nDuelist: recovers some MP, disables jetpack, cloak, speed and force regen of enemies nearby\nForce Gunner: disarms enemies nearby\nMagic Master: increases magic bolts, Lightning Dome, Magic Explosion and Healing Area damage. Increases Magic Sense duration. Healing Area heals more\nForce Guardian: increases resistance to damage";
+		return "Free Warrior: +damage +resistance to damage, Force User: +saber damage and force regens faster, Gunner: +gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health, Wizard: +max MP, new magic bolt types, recovers some jetpack fuel with MP if it runs out, -magic power cooldown";
 	if (skill_index == 39)
 		return va("used as ammo for Blaster Pistol, Bryar Pistol and E11 Blaster Rifle. You can carry up to %d ammo", zyk_max_blaster_pack_ammo.integer);
 	if (skill_index == 40)
@@ -574,68 +574,78 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 54)
 		return "increases the max force power you have. Necessary to allow you to use force powers and force-based skills";
 	if (skill_index == 55)
-		return "Free Warrior: +damage +resistance to damage, Force User: +saber damage and force regens faster, Bounty Hunter: +gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health, Armored Soldier: +resistance to damage, Monk: +run speed, melee damage and melee attack speed, Stealth Attacker: +gun damage +resistance to electric attacks, Duelist: +saber and melee damage and faster force regen, Force Gunner: +damage +resistance to damage, Magic Master: +max MP, new magic bolt types, recovers some jetpack fuel with MP if it runs out, -magic power cooldown, Force Guardian: +resistance to damage";
-	if (skill_index == 56)
 		return "increases the max amount of Magic Points the player can have. It is based on the current player level";
+	if (skill_index == 56)
+		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Mimic Damage. If you take damage, does part of the damage back to the enemy. Spends 50 force and 25 mp\nForce User: Force Shield. Greatly reduces damage and protects against force powers\nGunner: Poison Darts. Fires poison darts with melee by spending metal bolts ammo\nWizard: Magic Buff. Increases magic bolts, Lightning Dome, Magic Explosion and Healing Area damage. Increases Magic Sense duration. Healing Area heals more";
 	if (skill_index == 57)
-		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels";
+		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Thermal Throw, which throws 3 thermal detonators with higher damage. Spends 3 thermals and 3 power cell ammo\nForce User: Force Maelstrom, which grips enemies nearby, damages them, sets force shield and uses lightning if player has the force power. Spends 50 force\nGunner: Homing Rocket, which shoots a powerful rocket that automatically goes after the nearest target. Spends 2 rockets and 2 power cell ammo\nWizard: Faster Bolts, which increases speed and firerate of magic bolts";
 	if (skill_index == 58)
-		return "creates an energy area that heals you and your allies and damage enemies";
+		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Vertical DFA, which makes him jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force\nForce User: Force Repulse, which damages and pushes everyone away from you. Spends 50 force\nGunner: Lightning Shield, which increases resistance to damage and does a bit of damage to enemies nearby. Using /unique again will release a small lightning dome. Spends 5 power cell ammo\nWizard: Meditation Strength, which increases auto-healing, force regen, and his own resistance is heavily increased. Spends 5 mp";
 	if (skill_index == 59)
-		return "creates an explosion that does a lot of damage";
+		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: No Attack, which makes the nearby enemies not able to attack for some seconds. Spends 50 force\nForce User: Force Scream, which sets the resistance shield during 6 seconds. Player makes a scream that damages nearby enemies and may cause stun anim on them. Spends 50 force\nGunner: Wrist Shot, which allows shooting up to five powerful blaster shots. Spends 5 blaster pack ammo and 5 more per shot\nWizard: Meditation Drain, which heavily increases resistance and drains shield and health from enemies nearby to restore health and shield. Spends 5 mp";
 	if (skill_index == 60)
-		return "creates a dome that does lightning damage. Damage is based on player level";
+		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Fast Dash, which makes him do a dash towards where he is looking at. If he hits someone, damages and knocks the target down. Spends 50 force and 10 mp\nForce User: Force Storm, which protects you with Force Shield and attacks enemies nearby with powerful lightning strikes. The strikes slows down enemies and disable jetpack and cloak item. Spends 50 force\nGunner: Timed Bomb, which places a powerful bomb that explodes after some seconds. Spends 5 power cell ammo and 5 metal bolts ammo\nWizard: Elemental Attack, a magic power that hits enemies with the power of the elements. Spends 20 mp";
 	if (skill_index == 61)
-		return "damages enemies, draining their hp and healing you";
+		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Spin Throw, which spins the saber and does a slash attack, doing a lot of damage. If used again during the first spin slash move, does a spin throw attack. Spends 50 force\nForce User: Force Attraction, which damages and pulls enemies towards the user. Spends 50 force\nGunner: Aimed Shot, in which he aims with the disruptor rifle and fires a charged shot with 100 per cent accuracy. Spends 30 power cell ammo\nWizard: Super Beam, a powerful beam with high damage. Spends 25 mp";
 	if (skill_index == 62)
-		return "attacks enemies nearby with water, causing high damage";
+		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels";
 	if (skill_index == 63)
-		return "greatly damages enemies nearby with a stalagmite";
+		return "creates an energy area that heals you and your allies and damage enemies";
 	if (skill_index == 64)
-		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
+		return "creates an explosion that does a lot of damage";
 	if (skill_index == 65)
-		return "knocks people down causing damage";
+		return "creates a dome that does lightning damage. Damage is based on player level";
 	if (skill_index == 66)
-		return "rocks keep falling at the enemies, causing high damage";
+		return "damages enemies, draining their hp and healing you";
 	if (skill_index == 67)
-		return "a shifting sand appears, sending you to your nearest enemy. Stand near the sand to be transported to the enemy";
+		return "attacks enemies nearby with water, causing high damage";
 	if (skill_index == 68)
-		return "a big tree appears, protecting you from attacks and healing you";
+		return "greatly damages enemies nearby with a stalagmite";
 	if (skill_index == 69)
-		return "fires a flame burst for some seconds";
+		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
 	if (skill_index == 70)
-		return "a flame jet appears at the enemies and damages them. At level 2, if the flame hits the target, it will catch fire";
+		return "knocks people down causing damage";
 	if (skill_index == 71)
-		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
+		return "rocks keep falling at the enemies, causing high damage";
 	if (skill_index == 72)
-		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
+		return "a shifting sand appears, sending you to your nearest enemy. Stand near the sand to be transported to the enemy";
 	if (skill_index == 73)
-		return "blows people away for some seconds";
+		return "a big tree appears, protecting you from attacks and healing you";
 	if (skill_index == 74)
-		return "makes people go towards you";
+		return "fires a flame burst for some seconds";
 	if (skill_index == 75)
-		return "increases your run speed";
+		return "a flame jet appears at the enemies and damages them. At level 2, if the flame hits the target, it will catch fire";
 	if (skill_index == 76)
-		return "decreases run speed of enemies nearby";
+		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
 	if (skill_index == 77)
-		return "makes enemies unable to use magic powers for some seconds. Not so effective against magic using npcs, like bosses";
+		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
 	if (skill_index == 78)
-		return "decreases damage and resistance of enemies nearby";
+		return "blows people away for some seconds";
 	if (skill_index == 79)
-		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
+		return "makes people go towards you";
 	if (skill_index == 80)
-		return "an energy dome appears at enemies, damaging anyone inside it";
+		return "increases your run speed";
 	if (skill_index == 81)
-		return "damages, stuns, slowers and electrifies enemies";
+		return "decreases run speed of enemies nearby";
 	if (skill_index == 82)
-		return "damages enemies in the area and recovers your hp";
+		return "makes enemies unable to use magic powers for some seconds. Not so effective against magic using npcs, like bosses";
 	if (skill_index == 83)
-		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
+		return "decreases damage and resistance of enemies nearby";
 	if (skill_index == 84)
-		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
+		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
 	if (skill_index == 85)
-		return "protects you from other magic powers for some seconds";
+		return "an energy dome appears at enemies, damaging anyone inside it";
 	if (skill_index == 86)
+		return "damages, stuns, slowers and electrifies enemies";
+	if (skill_index == 87)
+		return "damages enemies in the area and recovers your hp";
+	if (skill_index == 88)
+		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
+	if (skill_index == 89)
+		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
+	if (skill_index == 90)
+		return "protects you from other magic powers for some seconds";
+	if (skill_index == 91)
 		return "paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed";
 
 	return "";
