@@ -1798,10 +1798,10 @@ void TryUse( gentity_t *ent )
 
 		return;
 	}
-	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2 && ent->client->pers.secrets_found & (1 << 1) &&
+	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.secrets_found & (1 << 8) &&
 			target && Q_stricmp(target->classname, "sentryGun") == 0 && target->parent && target->parent == ent &&
 			 ent->client->pers.bounty_hunter_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
-	{ // zyk: Bounty Hunter Upgrade allows recovering sentry guns
+	{ // zyk: Gunner Items Upgrade allows recovering sentry guns
 		ent->client->pers.bounty_hunter_sentries++;
 		ent->client->pers.bounty_hunter_placed_sentries--;
 		ent->client->ps.fd.sentryDeployed = qfalse;
@@ -1809,9 +1809,9 @@ void TryUse( gentity_t *ent )
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));
 		return;
 	}
-	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2 && ent->client->pers.secrets_found & (1 << 1) &&
+	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.secrets_found & (1 << 8) &&
 			target && target->s.eType == ET_SPECIAL && target->s.modelindex == HI_SHIELD && target->parent && target->parent == ent)
-	{ // zyk: Bounty Hunter Upgrade allows recovering force fields
+	{ // zyk: Gunner Items Upgrade allows recovering force fields
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
 		G_FreeEntity(target);
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));

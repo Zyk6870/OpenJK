@@ -6634,7 +6634,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 39)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nThermal Vision: makes binoculars detect enemies through a thermal vision system\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\nThermal Vision: makes binoculars and disruptor rifle detect enemies through a thermal vision system\n\n\"");
 		}
 		else if (i == 40)
 		{
@@ -6658,7 +6658,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 45)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Gunner Items Upgrade: makes sentry gun, seeker drone and e-web stronger\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Gunner Items Upgrade: makes sentry gun, seeker drone and e-web stronger. Can get sentry guns and force fields back by pressing Use Key near them\n\n\"");
 		}
 		else if (i == 46)
 		{
