@@ -6176,34 +6176,9 @@ void zyk_list_stuff(gentity_t *ent, gentity_t *target_ent)
 		strcpy(stuff_message, va("%s^3\nHoldable Items Upgrade - ^1no\n", stuff_message));
 
 	if (ent->client->pers.secrets_found & (1 << 1))
-		strcpy(stuff_message, va("%s^3Bounty Hunter Upgrade - ^2yes\n", stuff_message));
+		strcpy(stuff_message, va("%s^3Swimming Upgrade - ^2yes\n", stuff_message));
 	else
-		strcpy(stuff_message, va("%s^3Bounty Hunter Upgrade - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 2))
-		strcpy(stuff_message, va("%s^3Unique Ability 1 - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Unique Ability 1 - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 3))
-		strcpy(stuff_message, va("%s^3Unique Ability 2 - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Unique Ability 2 - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 4))
-		strcpy(stuff_message, va("%s^3Unique Ability 3 - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Unique Ability 3 - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 7))
-		strcpy(stuff_message, va("%s^3Stealth Attacker Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Stealth Attacker Upgrade - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 8))
-		strcpy(stuff_message, va("%s^3Force Gunner Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Force Gunner Upgrade - ^1no\n", stuff_message));
+		strcpy(stuff_message, va("%s^3Swimming Upgrade - ^1no\n", stuff_message));
 
 	if (ent->client->pers.secrets_found & (1 << 9))
 		strcpy(stuff_message, va("%s^3Impact Reducer - ^2yes\n", stuff_message));
@@ -6240,22 +6215,12 @@ void zyk_list_stuff(gentity_t *ent, gentity_t *target_ent)
 	else
 		strcpy(stuff_message, va("%s^3Stun Baton Upgrade - ^1no\n", stuff_message));
 
-	if (ent->client->pers.secrets_found & (1 << 16))
-		strcpy(stuff_message, va("%s^3Armored Soldier Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Armored Soldier Upgrade - ^1no\n", stuff_message));
-
 	if (ent->client->pers.secrets_found & (1 << 17))
 		strcpy(stuff_message, va("%s^3Jetpack Upgrade - ^2yes\n", stuff_message));
 	else
 		strcpy(stuff_message, va("%s^3Jetpack Upgrade - ^1no\n", stuff_message));
 
-	if (ent->client->pers.secrets_found & (1 << 19))
-		strcpy(stuff_message, va("%s^3Force Guardian Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Force Guardian Upgrade - ^1no\n", stuff_message));
-
-	trap->SendServerCommand(target_ent - g_entities, va("print \"%s\n\"", stuff_message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"%s\n\"", stuff_message));
 }
 
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
@@ -6490,7 +6455,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "misc") == 0)
 		{
-			trap->SendServerCommand(ent - g_entities, "print \"\n^314 - Ysalamiri: ^7Buy: 200 - Sell: 50\n^331 - Jetpack Fuel: ^7Buy: 200 - Sell: ^1no\n^343 - Force Boon: ^7Buy: 200 - Sell: 50\n^344 - Magic Potion: ^7Buy: 50 - Sell: ^1no\n^349 - Saber Armor: ^7Buy: 2000 - Sell: ^1no\n^350 - Gun Armor: ^7Buy: 2000 - Sell: ^1no\n^351 - Healing Crystal: ^7Buy: 2000 - Sell: ^1no\n^352 - Energy Crystal: ^7Buy: 2000 - Sell: ^1no\n^356 - Book of Riddles: ^7Buy: 100000 - Sell: ^1no^7\n\n\"");
+			trap->SendServerCommand(ent - g_entities, "print \"\n^314 - Ysalamiri: ^7Buy: 200 - Sell: 50\n^331 - Jetpack Fuel: ^7Buy: 200 - Sell: ^1no\n^343 - Force Boon: ^7Buy: 200 - Sell: 50\n^344 - Magic Potion: ^7Buy: 50 - Sell: ^1no\n^349 - Saber Armor: ^7Buy: 2000 - Sell: ^1no\n^350 - Gun Armor: ^7Buy: 2000 - Sell: ^1no\n^351 - Healing Crystal: ^7Buy: 2000 - Sell: ^1no\n^352 - Energy Crystal: ^7Buy: 2000 - Sell: ^1no^7\n\n\"");
 		}
 		else if (Q_stricmp(arg1, "weapons" ) == 0)
 		{
@@ -6498,7 +6463,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^38 - Stealth Attacker Upgrade: ^7Buy: 5000\n^315 - Impact Reducer: ^7Buy: 4000\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1800\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2200\n^328 - Rocket Upgrade: ^7Buy: 2500\n^329 - Bounty Hunter Upgrade: ^7Buy: 5000\n^333 - Stun Baton Upgrade: ^7Buy: 1500\n^339 - Armored Soldier Upgrade: ^7Buy: 5000\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^345 - Force Gunner Upgrade: ^7Buy: 5000\n^346 - Jetpack Upgrade: ^7Buy: 10000\n^347 - Force Guardian Upgrade: ^7Buy: 5000\n^353 - Unique Ability 1: ^7Buy: 7000\n^354 - Unique Ability 2: ^7Buy: 7000\n^355 - Unique Ability 3: ^7Buy: 7000\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^315 - Impact Reducer: ^7Buy: 4000\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1800\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2200\n^328 - Rocket Upgrade: ^7Buy: 2500\n^329 - Swimming Upgrade: ^7Buy: 2000\n^333 - Stun Baton Upgrade: ^7Buy: 1500\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^346 - Jetpack Upgrade: ^7Buy: 10000\n\n\"");
 		}
 		else if (i == 1)
 		{
@@ -6530,7 +6495,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 8)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Stealth Attacker Upgrade: ^7Stealth Attacker will be invulnerable to electric attacks and will have 20 per cent more damage in his starting weapons. Protects from stun baton speed decrease and also from losing guns to force pull. Adds the thermal detector in his disruptor scope. Makes him invisible to the Bounty Hunter Upgrade Radar\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3\n\n\"");
 		}
 		else if (i == 9)
 		{
@@ -6614,7 +6579,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 29)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Bounty Hunter Upgrade: ^7increases Bounty Hunter resistance to damage by 7 per cent. Seeker Drone lasts 20 seconds more, has fast shooting rate and more damage. Allows getting seeker drone back with Saber Style key. Sentry Gun has more damage and range. Allows placing more sentry guns and recovering them by pressing Use key on each one. Allows recovering force fields by pressing Use key on them. Gives the Thermal Vision, used with Binoculars. Gives the Radar (requires Zyk OpenJK Client installed)\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Swimming Upgrade: ^7prevents drowning when using Gunner class\n\n\"");
 		}
 		else if (i == 30)
 		{
@@ -6654,7 +6619,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 39)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Armored Soldier Upgrade: ^7increases damage resistance by 5 per cent, makes unique skill deflect some gun shots, cuts flame thrower fuel usage by half, has less chance of losing gun to force pull, has a chance of setting ysalamiri for some seconds if attacked by force powers. It also protects from drowning\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n\n\n\"");
 		}
 		else if (i == 40)
 		{
@@ -6678,7 +6643,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 45)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Force Gunner Upgrade: ^7increases run speed by 20 per cent. Force power regens 2x faster. Unique Skill will restore 25 shield\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n\n\n\"");
 		}
 		else if (i == 46)
 		{
@@ -6686,7 +6651,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 47)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Force Guardian Upgrade: ^7increases damage resistance. Saber can no longer be dropped out of hand. Decreases knockback a bit\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n\n\n\"");
 		}
 		else if (i == 48)
 		{
@@ -6707,139 +6672,6 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		else if (i == 52)
 		{
 			trap->SendServerCommand( ent-g_entities, "print \"\n^3Energy Crystal: ^7regens shield, blaster pack ammo and power cell ammo. If the player dies, he loses the crystal\n\n\"");
-		}
-		else if (i == 53)
-		{
-			if (ent->client->pers.rpg_class == 0)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Free Warrior gets Mimic Damage. If you take damage, does part of the damage back to the enemy. Spends 50 force and 25 mp\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 1)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Force User gets Force Maelstrom, which grips enemies nearby, damages them, sets force shield and uses lightning if player has the force power. Spends 50 force\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 2)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Bounty Hunter gets Homing Rocket, which shoots a powerful rocket that automatically goes after the nearest target. Spends 2 rockets and 2 power cell ammo\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 3)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Armored Soldier gets the Lightning Shield, which increases resistance to damage and does a bit of damage to enemies nearby. Using /unique again will release a small lightning dome. Spends 5 power cell ammo\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 4)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Monk gets Meditation Strength, which increases auto-healing, force regen, and his own resistance is heavily increased. Spends 50 force\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 5)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Stealth Attacker gets Ultra Cloak, which makes him completely invisible. Spends 5 power cell ammo\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 6)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Duelist gets Impale Stab, which hits the enemy with his saber doing a lot of damage. Spends 50 force\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 7)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Force Gunner gets Thermal Throw, which throws 3 thermal detonators with higher damage. Spends 3 thermals and 3 power cell ammo\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 8)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Magic Master gets Faster Bolts, which increases speed and firerate of magic bolts\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 9)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 1: ^7used with /unique command. You can only have one Unique Ability at a time. Force Guardian gets Force Armor, which activates his resistance shield, with damage resistance, gun shot deflection, and ability to resist force powers. Spends 50 force\n\n\"");
-			}
-		}
-		else if (i == 54)
-		{
-			if (ent->client->pers.rpg_class == 0)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Free Warrior gets Super Beam, a powerful beam with high damage. Spends 100 force and 25 mp\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 1)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Force User gets Force Repulse, which damages and pushes everyone away from you. Spends 50 force\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 2)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Bounty Hunter gets Wrist Shot, which allows shooting up to five powerful blaster shots. Spends 5 blaster pack ammo and 5 more per shot\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 3)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Armored Soldier gets Shield to Ammo, which recovers some ammo by spending his shield. Spends 20 shield\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 4)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Monk gets Spin Kick ability. Kicks everyone around the Monk with very high damage. Spends 50 force\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 5)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Stealth Attacker gets Timed Bomb, which places a powerful bomb that explodes after some seconds. Spends 5 power cell ammo and 5 metal bolts ammo\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 6)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Duelist gets Vertical DFA, which makes him jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 7)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Force Gunner gets No Attack, which makes the nearby enemies not able to attack for some seconds. Spends 50 force\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 8)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Magic Master gets Elemental Attack, a magic power that hits enemies with the power of the elements. Spends 20 mp\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 9)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 2: ^7used with /unique command. You can only have one Unique Ability at a time. Force Guardian gets Force Scream, which sets the resistance shield during 6 seconds. Player makes a scream that damages nearby enemies and may cause stun anim on them. Spends 50 force\n\n\"");
-			}
-		}
-		else if (i == 55)
-		{
-			if (ent->client->pers.rpg_class == 0)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Free Warrior gets Flee to Safety, which sets an area in the map to where the player will be transported to after using /unique again. Spends 50 force and 20 mp\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 1)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Force User gets Force Storm, which protects you with Force Shield and attacks enemies nearby with powerful lightning strikes. The strikes slows down enemies and disable jetpack and cloak item. Spends 50 force\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 2)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Bounty Hunter gets Ice Bomb, which places a bomb in the map, which is detonated by using /unique again. The bomb then spills ice on the ground, making enemies stuck in it. Spends 1 det pack and 10 power cell ammo\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 3)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Armored Soldier gets Faster E11, which makes E11 Blaster Rifle have a faster alt firerate. Spends 5 blaster pack ammo\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 4)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Monk gets Meditation Drain, which heavily increases resistance and drains shield and health from enemies nearby to restore health and shield. Spends 50 force\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 5)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Stealth Attacker gets Aimed Shot, in which he aims with the disruptor rifle and fires a charged shot with 100 per cent accuracy. Spends 30 power cell ammo\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 6)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Duelist gets Spin Throw, which spins the saber and does a slash attack, doing a lot of damage. If used again during the first spin slash move, does a spin throw attack. Spends 50 force\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 7)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Force Gunner gets Fast Dash, which makes him do a dash towards where he is looking at. If he hits someone, damages and knocks the target down. Spends 50 force and 10 mp\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 8)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Magic Master gets Healing Improvement, which makes Healing Area restore more hp, shield, force, has more damage, and longer duration. Spends 15 mp\n\n\"");
-			}
-			else if (ent->client->pers.rpg_class == 9)
-			{
-				trap->SendServerCommand(ent - g_entities, "print \"\n^3Unique Ability 3: ^7used with /unique command. You can only have one Unique Ability at a time. Force Guardian gets Force Attraction, which damages and pulls enemies towards the user. Spends 50 force\n\n\"");
-			}
-		}
-		else if (i == 56)
-		{
-			trap->SendServerCommand(ent - g_entities, "print \"\n^3Book of Riddles: ^7a legendary book that shows the answers to the riddles created by the Guardian of Eternity\n\n\"");
 		}
 	}
 }
@@ -6868,7 +6700,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	int value = 0;
 	int found = 0;
-	int item_costs[NUMBER_OF_SELLER_ITEMS] = {15,20,25,40,80,120,150,5000,150,170,180,200,300,200,4000,3000,100,120,150,200,110,90,170,300,2000,1800,2200,2500,5000,200,200,20,1500,100,150,150,90,10,5000,3000,50,50,200,50,5000,10000,5000,700,2000,2000,2000,2000,7000,7000,7000,100000};
+	int item_costs[NUMBER_OF_SELLER_ITEMS] = {15,20,25,40,80,120,150,5000,150,170,180,200,300,200,4000,3000,100,120,150,200,110,90,170,300,2000,1800,2200,2500,2000,200,200,20,1500,100,150,150,90,10,5000,3000,50,50,200,50,5000,10000,5000,700,2000,2000,2000,2000};
 
 	if (trap->Argc() == 1)
 	{
@@ -6921,44 +6753,21 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	}
 
 	// zyk: class validations. Some items require certain conditions to be bought
-	if (ent->client->pers.rpg_class == 1 && ((value >= 1 && value <= 7) || (value >= 10 && value <= 13) || 
+	if (ent->client->pers.rpg_class == RPGCLASS_FORCE_USER && ((value >= 1 && value <= 7) || (value >= 10 && value <= 13) || 
 		(value >= 17 && value <= 24) || (value >= 34 && value <= 38) || (value >= 41 && value <= 42) || value == 48))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"%s can't buy this item.\n\"", zyk_rpg_class(ent)));
 		return;
 	}
-	else if (ent->client->pers.rpg_class == 4 && ((value >= 1 && value <= 7) || (value >= 10 && value <= 13) || 
-			(value >= 17 && value <= 24) || (value >= 34 && value <= 38) || (value >= 41 && value <= 42) || value == 48))
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"%s can't buy this item.\n\"", zyk_rpg_class(ent)));
-		return;
-	}
-	else if (ent->client->pers.rpg_class == 6 && ((value >= 1 && value <= 7) || (value >= 10 && value <= 13) || 
-			(value >= 17 && value <= 24) || (value >= 34 && value <= 38) || (value >= 41 && value <= 42) || value == 48))
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"%s can't buy this item.\n\"", zyk_rpg_class(ent)));
-		return;
-	}
-	else if (ent->client->pers.rpg_class == 8 && ((value >= 1 && value <= 7) || (value >= 10 && value <= 13) || 
+	else if (ent->client->pers.rpg_class == RPGCLASS_WIZARD && ((value >= 1 && value <= 7) || (value >= 10 && value <= 13) || 
 			(value >= 17 && value <= 24) || (value >= 35 && value <= 38) || value == 48))
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"%s can't buy this item.\n\"", zyk_rpg_class(ent)));
-		return;
-	}
-	else if (ent->client->pers.rpg_class == 9 && ((value >= 2 && value <= 7) || (value >= 10 && value <= 11) || value == 13 ||
-		(value >= 18 && value <= 24) || (value >= 34 && value <= 38) || value == 48))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"%s can't buy this item.\n\"", zyk_rpg_class(ent)));
 		return;
 	}
 
 	// zyk: general validations. Some items require certain conditions to be bought
-	if (value == 8 && ent->client->pers.secrets_found & (1 << 7))
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Stealth Attacker Upgrade.\n\"" );
-		return;
-	}
-	else if (value == 15 && ent->client->pers.secrets_found & (1 << 9))
+	if (value == 15 && ent->client->pers.secrets_found & (1 << 9))
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"You already have the Impact Reducer.\n\"" );
 		return;
@@ -6990,7 +6799,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	}
 	else if (value == 29 && ent->client->pers.secrets_found & (1 << 1))
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Bounty Hunter Upgrade.\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \"You already have the Swimming Upgrade.\n\"" );
 		return;
 	}
 	else if (value == 33 && ent->client->pers.secrets_found & (1 << 15))
@@ -6998,44 +6807,14 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		trap->SendServerCommand( ent-g_entities, "print \"You already have the Stun Baton Upgrade.\n\"" );
 		return;
 	}
-	else if (value == 39 && ent->client->pers.secrets_found & (1 << 16))
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Armored Soldier Upgrade.\n\"" );
-		return;
-	}
 	else if (value == 40 && ent->client->pers.secrets_found & (1 << 0))
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"You already have the Holdable Items Upgrade.\n\"" );
 		return;
 	}
-	else if (value == 45 && ent->client->pers.secrets_found & (1 << 8))
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Force Gunner Upgrade.\n\"" );
-		return;
-	}
 	else if (value == 46 && ent->client->pers.secrets_found & (1 << 17))
 	{
 		trap->SendServerCommand(ent - g_entities, "print \"You already have the Jetpack Upgrade.\n\"");
-		return;
-	}
-	else if (value == 47 && ent->client->pers.secrets_found & (1 << 19))
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Force Guardian Upgrade.\n\"" );
-		return;
-	}
-	else if (value == 53 && ent->client->pers.secrets_found & (1 << 2))
-	{
-		trap->SendServerCommand(ent - g_entities, "print \"You already have the Unique Ability 1.\n\"");
-		return;
-	}
-	else if (value == 54 && ent->client->pers.secrets_found & (1 << 3))
-	{
-		trap->SendServerCommand(ent - g_entities, "print \"You already have the Unique Ability 2.\n\"");
-		return;
-	}
-	else if (value == 55 && ent->client->pers.secrets_found & (1 << 4))
-	{
-		trap->SendServerCommand(ent - g_entities, "print \"You already have the Unique Ability 3.\n\"");
 		return;
 	}
 
@@ -7174,9 +6953,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == 29)
 		{
 			ent->client->pers.secrets_found |= (1 << 1);
-
-			// zyk: update the rpg stuff info at the client-side game
-			send_rpg_events(10000);
 		}
 		else if (value == 30)
 		{
@@ -7294,28 +7070,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		{
 			ent->client->pers.player_statuses |= (1 << 11);
 		}
-		else if (value == 53)
-		{
-			ent->client->pers.secrets_found |= (1 << 2);
-			ent->client->pers.secrets_found &= ~(1 << 3);
-			ent->client->pers.secrets_found &= ~(1 << 4);
-		}
-		else if (value == 54)
-		{
-			ent->client->pers.secrets_found &= ~(1 << 2);
-			ent->client->pers.secrets_found |= (1 << 3);
-			ent->client->pers.secrets_found &= ~(1 << 4);
-		}
-		else if (value == 55)
-		{
-			ent->client->pers.secrets_found &= ~(1 << 2);
-			ent->client->pers.secrets_found &= ~(1 << 3);
-			ent->client->pers.secrets_found |= (1 << 4);
-		}
-		else if (value == 56)
-		{
-			trap->SendServerCommand(ent - g_entities, "chat \"^3Book of Riddles: ^7key clock sword sun fire water time star nature\n\"");
-		}
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
@@ -7362,7 +7116,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	int value = 0;
 	int found = 0;
 	int sold = 0;
-	int items_costs[NUMBER_OF_SELLER_ITEMS] = {10,15,20,30,35,40,45,0,0,60,65,70,80,50,0,0,50,60,70,100,50,45,90,150,0,0,0,0,0,0,0,10,0,20,30,90,45,5,0,0,0,20,50,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	int items_costs[NUMBER_OF_SELLER_ITEMS] = {10,15,20,30,35,40,45,0,0,60,65,70,80,50,0,0,50,60,70,100,50,45,90,150,0,0,0,0,0,0,0,10,0,20,30,90,45,5,0,0,0,20,50,0,0,0,0,0,0,0,0,0};
 
 	if (trap->Argc() == 1)
 	{

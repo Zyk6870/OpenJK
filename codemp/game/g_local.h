@@ -613,7 +613,7 @@ typedef enum {
 #define JETPACK_SCALE 100 // zyk: used to scale the MAX_JETPACK_FUEL to set the jetpackFuel attribute. Dividing MAX_JETPACK_FUEL per JETPACK_SCALE must result in 100
 
 // zyk: quantity of items at the jawa seller
-#define NUMBER_OF_SELLER_ITEMS 56
+#define NUMBER_OF_SELLER_ITEMS 52
 
 // zyk: default size of the globe model used as the Duel Tournament arena
 #define DUEL_TOURNAMENT_ARENA_SIZE 64
@@ -825,7 +825,7 @@ typedef struct clientPersistant_s {
 	// zyk: bit flag, loaded in load_account()
 	// Possible bit values (1 << bit_value) are:
 	// 0 - Holdable Items Upgrade
-	// 1 - unused
+	// 1 - Swimming Upgrade
 	// 2 - unused
 	// 3 - unused
 	// 4 - unused

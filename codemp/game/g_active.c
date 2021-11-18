@@ -175,8 +175,8 @@ void P_WorldEffects( gentity_t *ent ) {
 			// drown!
 			ent->client->airOutTime += 1000;
 			if ( ent->health > 0 && ent->client->tempSpectate < level.time && 
-				!(ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 3 && ent->client->pers.secrets_found & (1 << 16))) 
-			{ // zyk: Armored Soldier Upgrade protects from drowning
+				!(ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.secrets_found & (1 << 1))) 
+			{ // zyk: Swimming Upgrade Upgrade protects Gunner from drowning
 				// take more damage the longer underwater
 				ent->damage += 2;
 				if (ent->damage > 15)
@@ -3518,9 +3518,9 @@ void ClientThink_real( gentity_t *ent ) {
 
 				if (pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE)
 				{ 
-					if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.secrets_found & (1 << 1) &&
+					if (ent->client->pers.rpg_class == RPGCLASS_GUNNER &&
 						ent->client->ps.droneExistTime >= (level.time + 5000))
-					{ // zyk: Bounty Hunter Upgrade allows getting seeker drone back with saber style key
+					{ // zyk: Gunner can get seeker drone back with saber style key
 						ent->client->ps.droneExistTime = 0;
 						ent->client->ps.eFlags &= ~EF_SEEKERDRONE;
 						ent->client->ps.genericEnemyIndex = -1;
