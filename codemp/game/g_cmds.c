@@ -250,7 +250,7 @@ qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Push
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Pull
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Speed
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_WIZARD, -1}, // Sense
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Sense
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Saber Attack
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Saber Defense
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Saber Throw
@@ -4866,56 +4866,47 @@ qboolean zyk_check_user_input(char *user_input, int user_input_size)
 	return qtrue;
 }
 
+char* zyk_get_class_name(zyk_rpgclass_t class_number)
+{
+	if (class_number == RPGCLASS_CIVILIAN)
+		return "Civilian";
+	else if (class_number == RPGCLASS_FREE_WARRIOR)
+		return "Free Warrior";
+	else if (class_number == RPGCLASS_FORCE_USER)
+		return "Force User";
+	else if (class_number == RPGCLASS_GUNNER)
+		return "Gunner";
+	else if (class_number == RPGCLASS_WIZARD)
+		return "Wizard";
+	else
+		return "";
+}
+
+char* zyk_rpg_class(gentity_t* ent)
+{
+	return zyk_get_class_name(ent->client->pers.rpg_class);
+}
+
 qboolean validate_rpg_class(gentity_t *ent)
 {
-	if (ent->client->pers.rpg_class == 0 && zyk_allow_free_warrior.integer == 0)
+	if (ent->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR && zyk_allow_free_warrior.integer == 0)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"Free Warrior not allowed in this server\n\"" );
+		trap->SendServerCommand( ent->s.number, va("print \"%s not allowed in this server\n\"", zyk_rpg_class(ent)));
 		return qfalse;
 	}
-	else if (ent->client->pers.rpg_class == 1 && zyk_allow_force_user.integer == 0)
+	else if (ent->client->pers.rpg_class == RPGCLASS_FORCE_USER && zyk_allow_force_user.integer == 0)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"Force User not allowed in this server\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"%s not allowed in this server\n\"", zyk_rpg_class(ent)));
 		return qfalse;
 	}
-	else if (ent->client->pers.rpg_class == 2 && zyk_allow_bounty_hunter.integer == 0)
+	else if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && zyk_allow_gunner.integer == 0)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"Bounty Hunter not allowed in this server\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"%s not allowed in this server\n\"", zyk_rpg_class(ent)));
 		return qfalse;
 	}
-	else if (ent->client->pers.rpg_class == 3 && zyk_allow_armored_soldier.integer == 0)
+	else if (ent->client->pers.rpg_class == RPGCLASS_WIZARD && zyk_allow_wizard.integer == 0)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"Armored Soldier not allowed in this server\n\"" );
-		return qfalse;
-	}
-	else if (ent->client->pers.rpg_class == 4 && zyk_allow_monk.integer == 0)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Monk not allowed in this server\n\"" );
-		return qfalse;
-	}
-	else if (ent->client->pers.rpg_class == 5 && zyk_allow_stealth_attacker.integer == 0)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Stealth Attacker not allowed in this server\n\"" );
-		return qfalse;
-	}
-	else if (ent->client->pers.rpg_class == 6 && zyk_allow_duelist.integer == 0)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Duelist not allowed in this server\n\"" );
-		return qfalse;
-	}
-	else if (ent->client->pers.rpg_class == 7 && zyk_allow_force_gunner.integer == 0)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Force Gunner not allowed in this server\n\"" );
-		return qfalse;
-	}
-	else if (ent->client->pers.rpg_class == 8 && zyk_allow_magic_master.integer == 0)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Magic Master not allowed in this server\n\"" );
-		return qfalse;
-	}
-	else if (ent->client->pers.rpg_class == 9 && zyk_allow_force_tank.integer == 0)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Force Guardian not allowed in this server\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"%s not allowed in this server\n\"", zyk_rpg_class(ent)));
 		return qfalse;
 	}
 
@@ -5292,7 +5283,7 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->ps.ammo[AMMO_TRIPMINE] = ((int)ceil(zyk_max_tripmine_ammo.value/3.0) * ent->client->pers.skill_levels[44]);
 		ent->client->ps.ammo[AMMO_DETPACK] = ((int)ceil(zyk_max_detpack_ammo.value/3.0) * ent->client->pers.skill_levels[45]);
 		
-		if (ent->client->pers.rpg_class == 2)
+		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
 		{ // zyk: modifying max ammo if the player is a Bounty Hunter
 			gentity_t *this_ent = NULL;
 			int sentry_guns_iterator = 0;
@@ -5364,17 +5355,6 @@ void initialize_rpg_skills(gentity_t *ent)
 		// zyk: loading initial shield of the player
 		set_max_shield(ent);
 		ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
-
-		// zyk: the player can have only one of the Unique Abilities. If for some reason he has more, remove all of them
-		if ((ent->client->pers.secrets_found & (1 << 2) && ent->client->pers.secrets_found & (1 << 3)) || 
-			(ent->client->pers.secrets_found & (1 << 2) && ent->client->pers.secrets_found & (1 << 4)) || 
-			(ent->client->pers.secrets_found & (1 << 3) && ent->client->pers.secrets_found & (1 << 4)) || 
-			(ent->client->pers.secrets_found & (1 << 2) && ent->client->pers.secrets_found & (1 << 3) && ent->client->pers.secrets_found & (1 << 4)))
-		{
-			ent->client->pers.secrets_found &= ~(1 << 2);
-			ent->client->pers.secrets_found &= ~(1 << 3);
-			ent->client->pers.secrets_found &= ~(1 << 4);
-		}
 
 		// zyk: update the rpg stuff info at the client-side game
 		send_rpg_events(10000);
@@ -5762,22 +5742,6 @@ qboolean rpg_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont_show
 	return qtrue;
 }
 
-char *zyk_rpg_class(gentity_t *ent)
-{
-	if (ent->client->pers.rpg_class == RPGCLASS_CIVILIAN)
-		return "Civilian";
-	else if (ent->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR)
-		return "Free Warrior";
-	else if (ent->client->pers.rpg_class == RPGCLASS_FORCE_USER)
-		return "Force User";
-	else if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
-		return "Gunner";
-	else if (ent->client->pers.rpg_class == RPGCLASS_WIZARD)
-		return "Wizard";
-	else
-		return "";
-}
-
 char *zyk_get_settings_values(gentity_t *ent)
 {
 	int i = 0;
@@ -5957,7 +5921,7 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 	}
 
 	// zyk: players can only have up to 3 Magic Powers, except Magic Master class
-	if (ent->client->pers.rpg_class != 8 && upgrade_value > (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS))
+	if (ent->client->pers.rpg_class != RPGCLASS_WIZARD && upgrade_value > (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS))
 	{
 		int i = 0;
 		int number_of_magic_skills = 0;
@@ -6414,11 +6378,11 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			}
 			else if (Q_stricmp( arg1, "commands" ) == 0)
 			{
-				trap->SendServerCommand( ent-g_entities, "print \"\n^2RPG Mode commands\n\n^3/new [login] [password]: ^7creates a new account.\n^3/login [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill. Passing ^3all ^7as parameter upgrades all skills.\n^3/down [skill number]: ^7downgrades a skill.\n^3/resetaccount: ^7resets account stuff of the player.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/callseller: ^7calls the jawa seller.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/logout: ^7logs out the account.\n\n\"" );
+				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/new [login] [password]: ^7creates a new account.\n^3/login [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill. Passing ^3all ^7as parameter upgrades all skills.\n^3/down [skill number]: ^7downgrades a skill.\n^3/resetaccount: ^7resets account stuff of the player.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/callseller: ^7calls the jawa seller.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/logout: ^7logs out the account.\n\n\"" );
 			}
 			else if (Q_stricmp( arg1, "classes" ) == 0)
 			{
-				trap->SendServerCommand( ent-g_entities, "print \"\n^30 - Free Warrior\n^7 Can have all 56 skills. All-round class\n^31 - Force User\n^7 Saber/force class. Force powers use less force. Regens force faster\n^32 - Bounty Hunter\n^7 Gun class. Higher max ammo, stronger items and more credits in battles\n^33 - Armored Soldier\n^7 Gun class. High resistance to damage, shot deflection and auto-shield-heal\n^34 - Monk\n^7 Force class. Highest melee damage and faster run speed. Has auto-hp-heal\n^35 - Stealth Attacker\n^7 Gun class. Highest gun damage. Resistant to electric attacks\n^36 - Duelist\n^7 Saber/force class. Highest saber damage. Regens force faster\n^37 - Force Gunner\n^7 Gun/force class. Can do acrobatic moves (like wall run) while holding guns and shooting\n^38 - Magic Master\n^7 Has no saber/force/guns. Shoots magic bolts from melee. Learns all magic powers\n^39 - Force Guardian\n^7 Saber/force class. High resistance to damage. Can grab some guns and items on map\n\n^3/rpgclass <class number>\n\"" );
+				trap->SendServerCommand(ent->s.number, va("print \"\n^3%d - %s\n^7 Starting class. Change to one of the other classes as soon as possible\n^3%d - %s\n^7 Can have almost all skills. All-round class\n^3%d - %s\n^7 Saber/force class. Force powers use less force. Regens force faster\n^3%d - %s\n^7 Gun class. Higher max ammo, stronger items and more credits in battles\n^3%d - %s\n^7 Magic-based class. Shoots magic bolts from melee. Learns all magic powers\n\n^3/rpgclass <class number>\n\"", RPGCLASS_CIVILIAN, zyk_get_class_name(RPGCLASS_CIVILIAN), RPGCLASS_FREE_WARRIOR, zyk_get_class_name(RPGCLASS_FREE_WARRIOR), RPGCLASS_FORCE_USER, zyk_get_class_name(RPGCLASS_FORCE_USER), RPGCLASS_GUNNER, zyk_get_class_name(RPGCLASS_GUNNER), RPGCLASS_WIZARD, zyk_get_class_name(RPGCLASS_WIZARD)));
 			}
 			else if (Q_stricmp( arg1, "stuff" ) == 0)
 			{

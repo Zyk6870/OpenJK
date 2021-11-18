@@ -9172,7 +9172,7 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.rpg_class == RPGCLASS_WIZARD && 
 					ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 2 &&
 					ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * 0.8))
-				{ // zyk: Magic Master Faster Bolt ability makes melee faster to shoot bolts faster
+				{ // zyk: Wizard Faster Bolt ability makes melee faster to shoot bolts faster
 					ent->client->ps.weaponTime = weaponData[WP_MELEE].fireTime * 0.8;
 				}
 
