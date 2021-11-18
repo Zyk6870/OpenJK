@@ -10806,14 +10806,14 @@ void PmoveSingle (pmove_t *pmove) {
 		qboolean stop_meditate_anim = qtrue;
 
 #if defined( _GAME )
-		if (rpg_class == 4 &&
-			player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.player_statuses & (1 << 21))
-		{ // zyk: Monk Meditation Strength ability does not allow stop the meditate anim
+		if (rpg_class == RPGCLASS_WIZARD && player_ent && player_ent->client &&
+			player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 3)
+		{ // zyk: Meditation Strength ability does not allow stop the meditate anim
 			stop_meditate_anim = qfalse;
 		}
-		else if (rpg_class == 4 &&
-				 player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.player_statuses & (1 << 23))
-		{ // zyk: Monk Meditation Drain ability does not allow stop the meditate anim
+		else if (rpg_class == RPGCLASS_WIZARD && player_ent && player_ent->client &&
+				 player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 4)
+		{ // zyk: Meditation Drain ability does not allow stop the meditate anim
 			stop_meditate_anim = qfalse;
 		}
 #endif
@@ -10966,38 +10966,34 @@ void PmoveSingle (pmove_t *pmove) {
 	*/
 
 #if defined( _GAME )
-	if (rpg_class == 0 &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.player_statuses & (1 << 22))
-	{ // zyk: Free Warrior Super Beam ability does not allow him to move
+	if (rpg_class == RPGCLASS_WIZARD && player_ent && player_ent->client &&
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 6)
+	{ // zyk: Super Beam ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
-	else if (rpg_class == 1 &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.player_statuses & (1 << 21))
-	{ // zyk: Force User Force Maelstrom ability does not allow him to move
+	else if (rpg_class == RPGCLASS_FORCE_USER && player_ent && player_ent->client &&
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 2)
+	{ // zyk: Force Maelstrom ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
-	else if (rpg_class == 1 &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.player_statuses & (1 << 23))
-	{ // zyk: Force User Force Storm ability does not allow him to move
+	else if (rpg_class == RPGCLASS_FORCE_USER && player_ent && player_ent->client &&
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 5)
+	{ // zyk: Force Storm ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
-	else if (rpg_class == 4 &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.player_statuses & (1 << 21))
+	else if (rpg_class == RPGCLASS_WIZARD && player_ent && player_ent->client &&
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 3)
 	{ // zyk: Monk Meditation Strength ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
-	else if (rpg_class == 4 &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.player_statuses & (1 << 23))
+	else if (rpg_class == RPGCLASS_WIZARD && player_ent && player_ent->client &&
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 4)
 	{ // zyk: Monk Meditation Drain ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
-	else if (rpg_class == 9 &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.player_statuses & (1 << 22))
-	{ // zyk: Force Guardian Force Scream ability does not allow him to move
-		stiffenedUp = qtrue;
-	}
-	else if (player_ent->client->pers.player_statuses & (1 << 24))
-	{ // zyk: hit by Ice Bomb
+	else if (rpg_class == RPGCLASS_FORCE_USER && player_ent && player_ent->client &&
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 4)
+	{ // zyk: Force Scream ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
 	else if (level.duel_tournament_mode == 4 && player_ent && player_ent->s.number < MAX_CLIENTS && duel_tournament_is_duelist(player_ent) == qtrue && 

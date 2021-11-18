@@ -5175,8 +5175,9 @@ void initialize_rpg_skills(gentity_t *ent)
 
 		ent->client->pers.magic_power = zyk_max_magic_power(ent);
 
-		ent->client->pers.monk_unique_timer = 0;
+		ent->client->pers.meditation_drain_timer = 0;
 		ent->client->pers.unique_skill_duration = 0;
+		ent->client->pers.active_unique_skill = 0;
 
 		ent->client->pers.lightning_shield_timer = 0;
 
@@ -5746,8 +5747,8 @@ char *zyk_rpg_class(gentity_t *ent)
 		return "Force User";
 	else if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
 		return "Gunner";
-	else if (ent->client->pers.rpg_class == RPGCLASS_MAGICIAN)
-		return "Magician";
+	else if (ent->client->pers.rpg_class == RPGCLASS_WIZARD)
+		return "Wizard";
 	else
 		return "";
 }
@@ -11020,7 +11021,22 @@ void Cmd_Unique_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->ps.powerups[PW_SHIELDHIT] > level.time)
+	if (ent->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR && ent->client->pers.active_unique_skill == 6)
+	{ // zyk: Spin Throw second move, the throw
+		if (ent->client->ps.torsoAnim == BOTH_ALORA_SPIN_SLASH)
+		{
+			ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 3800;
+			ent->client->pers.unique_skill_duration = level.time + 3800;
+
+			ent->client->ps.weaponTime = 2800;
+
+			G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_ALORA_SPIN_THROW, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+		}
+
+		return;
+	}
+
+	if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.unique_skill_duration > level.time)
 	{ // zyk: releasing the small lightning dome
 		ent->client->ps.powerups[PW_SHIELDHIT] = 0;
 
@@ -11032,7 +11048,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.player_statuses & (1 << 22))
+	if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.active_unique_skill == 4)
 	{ // zyk: Bounty Hunter Wrist Shot ability
 		if (ent->client->ps.ammo[AMMO_BLASTER] >= 5 && ent->client->pers.wrist_shot_counter > 0)
 		{
@@ -11052,21 +11068,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->pers.rpg_class == 6 && ent->client->pers.player_statuses & (1 << 23))
-	{ // zyk: Spin Throw second move, the throw
-		if (ent->client->ps.torsoAnim == BOTH_ALORA_SPIN_SLASH)
-		{
-			ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 3800;
-			ent->client->pers.unique_skill_duration = level.time + 3800;
-
-			ent->client->ps.weaponTime = 2800;
-
-			G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_ALORA_SPIN_THROW, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-		}
-
-		return;
-	}
-
 	if (ent->client->pers.unique_skill_timer < level.time)
 	{
 		if (ent->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR)
@@ -11081,7 +11082,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 8000;
 					ent->client->pers.unique_skill_duration = level.time + 8000;
 
-					ent->client->pers.player_statuses |= (1 << 21);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					send_rpg_events(2000);
 
@@ -11139,7 +11140,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 					ent->client->pers.vertical_dfa_timer = level.time + 1000;
 
-					ent->client->pers.player_statuses |= (1 << 22);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					rpg_skill_counter(ent, 200);
 				}
@@ -11175,7 +11176,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 1700;
 					ent->client->pers.unique_skill_duration = level.time + 1700;
 
-					ent->client->pers.player_statuses |= (1 << 23);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					zyk_force_dash(ent);
 
@@ -11201,7 +11202,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 					G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_ALORA_SPIN_SLASH, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
 
-					ent->client->pers.player_statuses |= (1 << 23);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					rpg_skill_counter(ent, 200);
 				}
@@ -11221,6 +11222,8 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 10000;
 					ent->client->pers.unique_skill_duration = level.time + 10000;
+
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					rpg_skill_counter(ent, 200);
 				}
@@ -11263,7 +11266,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 4000;
 					ent->client->pers.unique_skill_duration = level.time + 4000;
 
-					ent->client->pers.player_statuses |= (1 << 21);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					rpg_skill_counter(ent, 200);
 				}
@@ -11351,7 +11354,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 6000;
 					ent->client->pers.unique_skill_duration = level.time + 6000;
 
-					ent->client->pers.player_statuses |= (1 << 22);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					rpg_skill_counter(ent, 200);
 				}
@@ -11369,7 +11372,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 3000;
 					ent->client->pers.unique_skill_duration = level.time + 3000;
 
-					ent->client->pers.player_statuses |= (1 << 23);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 					ent->client->ps.forceDodgeAnim = BOTH_FORCE_RAGE;
@@ -11428,8 +11431,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 					ent->client->pers.unique_skill_duration = level.time + 500;
 
-					ent->client->pers.player_statuses |= (1 << 23);
-
 					G_Sound(ent, CHAN_BODY, G_SoundIndex("sound/weapons/force/pull.wav"));
 					if (ent->client->ps.forceHandExtend == HANDEXTEND_NONE)
 					{
@@ -11457,6 +11458,8 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 					ent->client->pers.unique_skill_duration = level.time + 25000;
+
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					rpg_skill_counter(ent, 200);
 				}
@@ -11505,7 +11508,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 					ent->client->pers.unique_skill_duration = level.time + 500;
 
-					ent->client->pers.player_statuses |= (1 << 21);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					rpg_skill_counter(ent, 200);
 				}
@@ -11527,7 +11530,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 					ent->client->pers.lightning_shield_timer = level.time + 200;
 
-					ent->client->pers.player_statuses |= (1 << 21);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					rpg_skill_counter(ent, 200);
 				}
@@ -11545,7 +11548,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 					ent->client->pers.unique_skill_duration = level.time + 25000;
 
-					ent->client->pers.player_statuses |= (1 << 22);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					// zyk: can shoot 5 times
 					ent->client->pers.wrist_shot_counter = 5;
@@ -11619,9 +11622,9 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 1500;
 					ent->client->pers.unique_skill_duration = level.time + 1500;
 
-					ent->client->pers.player_statuses |= (1 << 23);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
-					ent->client->pers.monk_unique_timer = level.time + 750;
+					ent->client->pers.aimed_shot_timer = level.time + 750;
 
 					rpg_skill_counter(ent, 200);
 				}
@@ -11631,7 +11634,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				}
 			}
 		}
-		else if (ent->client->pers.rpg_class == RPGCLASS_MAGICIAN)
+		else if (ent->client->pers.rpg_class == RPGCLASS_WIZARD)
 		{
 			if (unique_skill_number == 1)
 			{ // zyk: Magic Buff
@@ -11641,6 +11644,8 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 15000;
 					ent->client->pers.unique_skill_duration = level.time + 15000;
+
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					send_rpg_events(2000);
 
@@ -11660,7 +11665,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 15000;
 					ent->client->pers.unique_skill_duration = level.time + 15000;
 
-					ent->client->pers.player_statuses |= (1 << 21);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					send_rpg_events(2000);
 
@@ -11673,9 +11678,9 @@ void Cmd_Unique_f(gentity_t *ent) {
 			}
 			else if (unique_skill_number == 3)
 			{ // zyk: Meditation Strength
-				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
+				if (ent->client->pers.magic_power >= 5)
 				{
-					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
+					ent->client->pers.magic_power -= 5;
 
 					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 					ent->client->ps.forceDodgeAnim = BOTH_MEDITATE;
@@ -11684,20 +11689,20 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 3500;
 					ent->client->pers.unique_skill_duration = level.time + 3500;
 
-					ent->client->pers.player_statuses |= (1 << 21);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					rpg_skill_counter(ent, 200);
 				}
 				else
 				{
-					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
+					trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs at least 5 MP to use it\"");
 				}
 			}
 			else if (unique_skill_number == 4)
 			{ // zyk: Meditation Drain
-				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
+				if (ent->client->pers.magic_power >= 5)
 				{
-					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
+					ent->client->pers.magic_power -= 5;
 
 					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 					ent->client->ps.forceDodgeAnim = BOTH_MEDITATE;
@@ -11706,13 +11711,13 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 3000;
 					ent->client->pers.unique_skill_duration = level.time + 3000;
 
-					ent->client->pers.player_statuses |= (1 << 23);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					rpg_skill_counter(ent, 200);
 				}
 				else
 				{
-					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
+					trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs at least 5 MP to use it\"");
 				}
 			}
 			else if (unique_skill_number == 5)
@@ -11724,7 +11729,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 					ent->client->pers.unique_skill_duration = level.time + 500;
 
-					ent->client->pers.player_statuses |= (1 << 22);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					elemental_attack(ent);
 
@@ -11743,15 +11748,14 @@ void Cmd_Unique_f(gentity_t *ent) {
 			}
 			else if (unique_skill_number == 6)
 			{ // zyk: Super Beam
-				if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 2) && ent->client->pers.magic_power >= 25)
+				if (ent->client->pers.magic_power >= 25)
 				{
-					ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 2);
 					ent->client->pers.magic_power -= 25;
 
 					ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
 					ent->client->pers.unique_skill_duration = level.time + 2000;
 
-					ent->client->pers.player_statuses |= (1 << 22);
+					ent->client->pers.active_unique_skill = unique_skill_number;
 
 					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 					ent->client->ps.forceDodgeAnim = BOTH_FORCE_DRAIN_START;
@@ -11765,7 +11769,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				}
 				else
 				{
-					trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force and 25 mp to use it\"", (zyk_max_force_power.integer / 2)));
+					trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs 25 mp to use it\"");
 				}
 			}
 		}

@@ -533,7 +533,7 @@ typedef enum {
 	RPGCLASS_FREE_WARRIOR,
 	RPGCLASS_FORCE_USER,
 	RPGCLASS_GUNNER,
-	RPGCLASS_MAGICIAN,
+	RPGCLASS_WIZARD,
 	NUM_RPG_CLASSES
 } zyk_rpgclass_t;
 
@@ -676,10 +676,10 @@ typedef struct clientPersistant_s {
 	// 18 - NPC has the guard order
 	// 19 - NPC has the cover order
 	// 20 - hit by poison dart
-	// 21 - Unique Ability 1
-	// 22 - Unique Ability 2
-	// 23 - Unique Ability 3
-	// 24 - hit by Ice Bomb
+	// 21 - unused
+	// 22 - unused
+	// 23 - unused
+	// 24 - unused
 	// 25 - RPG Mode tutorial
 	// 26 - Using nofight command
 	// 27 - Has just lost his duel in Duel Tournament
@@ -762,14 +762,20 @@ typedef struct clientPersistant_s {
 	// zyk: this is the cooldown timer of the Unique Skill used by some RPG classes
 	int unique_skill_timer;
 
+	// zyk: sets the Unique Skill number (between 1 and 6) of the current Unique Skill in use by the player
+	int active_unique_skill;
+
 	// zyk: used by Custom Quest npcs
 	int unique_skill_npc_timer_amount;
 
 	// zyk: used to set the duration that some unique skills or unique abilities are active
 	int unique_skill_duration;
 
-	// zyk: Monk Spin Kick ability interval between hits. Also used by Monk Meditation Drain ability as interval between hits
-	int monk_unique_timer;
+	// zyk: used by Monk Meditation Drain ability as interval between hits
+	int meditation_drain_timer;
+
+	// zyk: Aimed Shot unique skill timer
+	int aimed_shot_timer;
 
 	// zyk: Lightning Shield timer to hit targets near the Armored Soldier
 	int lightning_shield_timer;

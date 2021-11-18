@@ -6060,8 +6060,8 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 			{
 				if ( self->client->ps.powerups[PW_FORCE_BOON] )
 					WP_ForcePowerRegenerate( self, 6 );
-				else if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 4 && self->client->pers.player_statuses & (1 << 21) && self->client->ps.legsAnim == BOTH_MEDITATE)
-					WP_ForcePowerRegenerate(self, 6); // zyk: Monk Meditation Strength makes him regen force faster
+				else if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_WIZARD && self->client->pers.active_unique_skill == 3 && self->client->ps.legsAnim == BOTH_MEDITATE)
+					WP_ForcePowerRegenerate(self, 6); // zyk: Meditation Strength
 				else if ( self->client->ps.isJediMaster && level.gametype == GT_JEDIMASTER )
 					WP_ForcePowerRegenerate( self, 4 ); //jedi master regenerates 4 times as fast
 				else if (self->client->sess.amrpgmode == 2 && (self->client->pers.rpg_class == 1 || self->client->pers.rpg_class == 6))

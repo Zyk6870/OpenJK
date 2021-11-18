@@ -820,24 +820,8 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 	client->timeResidual += msec;
 
 	if (client->sess.amrpgmode == 2 && client->pers.unique_skill_duration < level.time)
-	{ // zyk: Unique Ability run out. Remove the flags
-		if (client->pers.player_statuses & (1 << 21))
-		{
-			client->pers.player_statuses &= ~(1 << 21);
-		}
-		else if (client->pers.player_statuses & (1 << 22))
-		{
-			client->pers.player_statuses &= ~(1 << 22);
-		}
-		else if (client->pers.player_statuses & (1 << 23))
-		{
-			client->pers.player_statuses &= ~(1 << 23);
-		}
-	}
-	
-	if (client->pers.player_statuses & (1 << 24) && client->pers.stun_baton_less_speed_timer < level.time)
-	{ // zyk: remove the Ice Bomb hit flag
-		client->pers.player_statuses &= ~(1 << 24);
+	{ // zyk: Unique Ability run out
+		client->pers.active_unique_skill = 0;
 	}
 
 	while ( client->timeResidual >= 1000 )
@@ -856,27 +840,19 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		}
 
 		if (client->sess.amrpgmode == 2 && !(client->pers.quest_power_status & (1 << 2)))
-		{ // zyk: auto-healing abilities will only work if player is not hit by Time Power
-			if (client->pers.rpg_class == 4 && ent->health > 0)
-			{ // zyk: Monk auto-healing ability
-				if (client->pers.unique_skill_duration > level.time && !(client->pers.player_statuses & (1 << 22)) &&
-					!(client->pers.player_statuses & (1 << 23)))
-				{ // zyk: Monk Unique Skill
-					int heal_amount = 4;
+		{ // zyk: healing abilities will only work if player is not hit by Time Power
+			if (client->pers.rpg_class == RPGCLASS_WIZARD && ent->health > 0 && client->ps.legsAnim == BOTH_MEDITATE &&
+				client->pers.unique_skill_duration > level.time && client->pers.active_unique_skill == 3)
+			{ // zyk: Meditation Strength
+				int heal_amount = 60;
 
-					if (client->pers.player_statuses & (1 << 21) && client->ps.legsAnim == BOTH_MEDITATE)
-					{ // zyk: Meditation Strength
-						heal_amount = 60;
-					}
-
-					if ((ent->health + heal_amount) < client->pers.max_rpg_health)
-					{
-						ent->health += heal_amount;
-					}
-					else
-					{
-						ent->health = client->pers.max_rpg_health;
-					}
+				if ((ent->health + heal_amount) < client->pers.max_rpg_health)
+				{
+					ent->health += heal_amount;
+				}
+				else
+				{
+					ent->health = client->pers.max_rpg_health;
 				}
 			}
 
@@ -2740,7 +2716,7 @@ void ClientThink_real( gentity_t *ent ) {
 		client->ps.speed = zyk_player_speed;
 		client->ps.basespeed = zyk_player_speed;
 
-		if (client->sess.amrpgmode == 2 && client->pers.rpg_class == 7 && client->pers.player_statuses & (1 << 23))
+		if (client->sess.amrpgmode == 2 && client->pers.rpg_class == RPGCLASS_FREE_WARRIOR && client->pers.active_unique_skill == 5)
 		{ // zyk: using Force Dash
 			zyk_do_force_dash(ent);
 		}

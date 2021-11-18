@@ -5003,40 +5003,38 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			damage = (int)ceil(damage * 0.85);
 		}
 
-		if (targ->client->pers.rpg_class == 1 && targ->client->pers.unique_skill_duration > level.time) // zyk: Force User damage resistance
-		{ // zyk: Unique Skill of Force User
+		if (targ->client->pers.rpg_class == RPGCLASS_FORCE_USER && targ->client->pers.active_unique_skill == 1 && 
+			targ->client->pers.unique_skill_duration > level.time)
+		{ // zyk: Force Shield
 			damage = (int)ceil(damage * 0.25);
 		}
-		else if (targ->client->pers.rpg_class == 3) // zyk: Armored Soldier damage resistance
+		else if (targ->client->pers.rpg_class == RPGCLASS_GUNNER)
 		{
-			float armored_soldier_bonus_resistance = 0.0;
-			// zyk: Armored Soldier Upgrade increases damage resistance
-			if (targ->client->pers.secrets_found & (1 << 16))
-				armored_soldier_bonus_resistance = 0.05;
+			float bonus_resistance = 0.0;
 
-			// zyk: Armored Soldier Lightning Shield reduces damage
-			if (targ->client->ps.powerups[PW_SHIELDHIT] > level.time)
+			// zyk: Lightning Shield reduces damage
+			if (targ->client->pers.active_unique_skill == 3 && targ->client->pers.unique_skill_duration > level.time)
 			{
-				armored_soldier_bonus_resistance += 0.25;
+				bonus_resistance += 0.25;
 			}
 			
-			damage = (int)ceil(damage * (0.9 - ((0.04 * targ->client->pers.skill_levels[55]) + armored_soldier_bonus_resistance)));
+			damage = (int)ceil(damage * (0.9 - ((0.04 * targ->client->pers.skill_levels[55]) + bonus_resistance)));
 		}
-		else if (targ->client->pers.rpg_class == 4 && 
+		else if (targ->client->pers.rpg_class == RPGCLASS_WIZARD &&
 				 targ->client->ps.legsAnim == BOTH_MEDITATE)
-		{ // zyk: Monk Meditation Strength and Meditation Drain increases resistance to damage of Monk
-			if (targ->client->pers.player_statuses & (1 << 21) || targ->client->pers.player_statuses & (1 << 23))
+		{ // zyk: Meditation Strength and Meditation Drain increases resistance to damage
+			if (targ->client->pers.active_unique_skill == 3 || targ->client->pers.active_unique_skill == 4)
 				damage = (int)ceil(damage * (0.5));
 		}
-		else if (targ->client->pers.rpg_class == 0) // zyk: Free Warrior damage resistance
+		else if (targ->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR) // zyk: Free Warrior damage resistance
 		{
 			// zyk: Free Warrior Mimic Damage ability. Deals half of the damage taken back to the enemy
 			if (attacker && attacker != targ && (!attacker->NPC || 
 				(attacker->client && (attacker->client->NPC_class != CLASS_RANCOR || !(targ->client->ps.eFlags2 & EF2_HELD_BY_MONSTER)))) &&
-				targ->client->pers.unique_skill_duration > level.time && targ->client->pers.player_statuses & (1 << 21))
+				targ->client->pers.unique_skill_duration > level.time && targ->client->pers.active_unique_skill == 1)
 			{
-				if (!(attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.rpg_class == 0 && 
-					attacker->client->pers.unique_skill_duration > level.time && attacker->client->pers.player_statuses & (1 << 21)))
+				if (!(attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR &&
+					attacker->client->pers.unique_skill_duration > level.time && attacker->client->pers.active_unique_skill == 1))
 				{ // zyk: Mimic Damage will not work if attacker pointer is also a Free Warrior using Mimic Damage
 					G_Damage(attacker, targ, targ, NULL, NULL, (int)ceil(damage * 0.5), 0, MOD_UNKNOWN);
 				}
@@ -6413,11 +6411,10 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						(level.special_power_effects[attacker->s.number] == ent->s.number || OnSameTeam(quest_power_user, ent) == qtrue || 
 						npcs_on_same_team(quest_power_user, ent) == qtrue || zyk_is_ally(quest_power_user,ent) == qtrue))
 					{
-						if (quest_power_user->client->sess.amrpgmode == 2 && quest_power_user->client->pers.rpg_class == 8 && 
+						if (quest_power_user->client->sess.amrpgmode == 2 && quest_power_user->client->pers.rpg_class == RPGCLASS_WIZARD &&
 							quest_power_user->client->pers.unique_skill_duration > level.time &&
-							!(quest_power_user->client->pers.player_statuses & (1 << 21)) && 
-							!(quest_power_user->client->pers.player_statuses & (1 << 22)))
-						{ // zyk: Magic Master Unique Skill increases amount of health recovered
+							quest_power_user->client->pers.active_unique_skill == 1)
+						{ // zyk: Magic Buff increases amount of health recovered
 							int heal_amount = 8;
 							int shield_amount = 8;
 
@@ -6437,7 +6434,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
 
 							if (ent->health == ent->client->ps.stats[STAT_MAX_HEALTH])
-							{ // zyk: Unique Skill makes it possible to heal shield too, if hp is full
+							{ // zyk: Magic Buff makes it possible to heal shield too, if hp is full
 								int max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
 
 								if (ent->client->sess.amrpgmode == 2)

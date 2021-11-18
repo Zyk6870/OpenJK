@@ -5022,10 +5022,9 @@ void magic_sense(gentity_t *ent, int duration)
 		duration += 1000;
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 &&
-		ent->client->pers.unique_skill_duration > level.time && !(ent->client->pers.player_statuses & (1 << 21)) &&
-		!(ent->client->pers.player_statuses & (1 << 22)) && !(ent->client->pers.player_statuses & (1 << 23)))
-	{ // zyk: Magic Master Unique Skill
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD &&
+		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
+	{ // zyk: Magic Buff
 		duration += 1000;
 	}
 
@@ -5063,7 +5062,7 @@ void lightning_dome(gentity_t *ent, int damage)
 
 	VectorCopy( tr.plane.normal, missile->pos1 );
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 3) // zyk: Armored Soldier Lightning Shield has less radius
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER) // zyk: Lightning Shield has less radius
 		missile->count = 6;
 	else
 		missile->count = 9;
@@ -5077,10 +5076,9 @@ void lightning_dome(gentity_t *ent, int damage)
 	// zyk: damage is level based
 	damage = (int)ceil(damage * (0.5 + ((ent->client->pers.level * 1.0) / 200.0)));
 
-	// zyk: Magic Master Unique Skill increases damage
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->pers.unique_skill_duration > level.time &&
-		!(ent->client->pers.player_statuses & (1 << 21)) && !(ent->client->pers.player_statuses & (1 << 22)) && 
-		!(ent->client->pers.player_statuses & (1 << 23)))
+	// zyk: Magic Buff increases damage
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD && 
+		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
 	{
 		damage *= 2;
 	}
@@ -5088,7 +5086,7 @@ void lightning_dome(gentity_t *ent, int damage)
 	missile->splashDamage = missile->damage = damage;
 	missile->splashMethodOfDeath = missile->methodOfDeath = MOD_DEMP2;
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 3) // zyk: Armored Soldier Lightning Shield has less radius
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER) // zyk: Lightning Shield has less radius
 		missile->splashRadius = 512;
 	else
 		missile->splashRadius = 768;
@@ -5849,10 +5847,9 @@ void magic_explosion(gentity_t *ent, int radius, int damage, int duration)
 		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_explosion", "4", "explosions/hugeexplosion1", 1500, damage, radius, duration + 1000);
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->pers.unique_skill_duration > level.time &&
-		!(ent->client->pers.player_statuses & (1 << 21)) && !(ent->client->pers.player_statuses & (1 << 22)) && 
-		!(ent->client->pers.player_statuses & (1 << 23)))
-	{ // zyk: Magic Master Unique Skill increases damage
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD && 
+		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
+	{ // zyk: Magic Buff increases damage
 		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_explosion", "4", "explosions/hugeexplosion1", 500, damage * 2, radius, duration);
 	}
 	else
@@ -5869,9 +5866,9 @@ void healing_area(gentity_t *ent, int damage, int duration)
 		damage += 1;
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && ent->client->pers.unique_skill_duration > level.time &&
-		!(ent->client->pers.player_statuses & (1 << 21)) && !(ent->client->pers.player_statuses & (1 << 22)))
-	{ // zyk: Magic Master Unique Skill increases damage
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD && 
+		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
+	{ // zyk: Magic Buff increases damage
 		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_healing", "4", "env/red_cyc", 0, damage * 2, 228, duration);
 	}
 	else
@@ -9197,11 +9194,26 @@ void G_RunFrame( int levelTime ) {
 					Player_FireFlameThrower(ent, qfalse);
 				}
 
-				if (ent->client->pers.rpg_class == 2)
+				if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
 				{
 					// zyk: if the bounty hunter still has sentries, give the item to him
 					if (ent->client->pers.bounty_hunter_sentries > 0)
 						ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
+
+					if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
+					{ // zyk: if Gunner stops using sniper scope, stop the Thermal Detector
+						ent->client->pers.thermal_vision = qfalse;
+						ent->client->ps.fd.forcePowersActive &= ~(1 << FP_SEE);
+						ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
+						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_0;
+					}
+					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 1 && ent->client->pers.secrets_found & (1 << 7))
+					{ // zyk: Gunner with upgrade, activate the Thermal Detector
+						ent->client->pers.thermal_vision = qtrue;
+						ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
+						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_1;
+						ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
+					}
 
 					if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
 					{ // zyk: if the bounty hunter stops using binoculars, stop the Thermal Vision
@@ -9229,9 +9241,20 @@ void G_RunFrame( int levelTime ) {
 					{ // zyk: Bounty Hunter Upgrade makes his pistol shoot faster
 						ent->client->ps.weaponTime = weaponData[WP_BRYAR_PISTOL].fireTime * 0.3;
 					}
+
+					if (ent->client->pers.active_unique_skill == 6 && ent->client->pers.aimed_shot_timer < level.time)
+					{ // zyk: Aimed Shot ability. Fires the full charged sniper shot
+						if (ent->health > 0)
+						{
+							WP_DisruptorAltFire(ent);
+						}
+
+						ent->client->pers.aimed_shot_timer = level.time + 2000;
+					}
 				}
-				else if (ent->client->pers.rpg_class == 3 && ent->client->pers.player_statuses & (1 << 21) && ent->client->pers.lightning_shield_timer < level.time)
-				{ // zyk: Armored Soldier Lightning Shield damage to enemies nearby
+				else if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && 
+						ent->client->pers.active_unique_skill == 3 && ent->client->pers.lightning_shield_timer < level.time)
+				{ // zyk: Lightning Shield damage to enemies nearby
 					int player_it = 0;
 
 					for (player_it = 0; player_it < level.num_entities; player_it++)
@@ -9249,10 +9272,10 @@ void G_RunFrame( int levelTime ) {
 
 					ent->client->pers.lightning_shield_timer = level.time + 200;
 				}
-				else if (ent->client->pers.rpg_class == 4 && 
-						(ent->client->pers.player_statuses & (1 << 22) || ent->client->pers.player_statuses & (1 << 23)) &&
-						 ent->client->pers.monk_unique_timer < level.time)
-				{ // zyk: Monk unique abilities
+				else if (ent->client->pers.rpg_class == RPGCLASS_WIZARD &&
+						 ent->client->pers.active_unique_skill == 4 &&
+						 ent->client->pers.meditation_drain_timer < level.time)
+				{ // zyk: Meditation Drain
 					int player_it = 0;
 					int push_scale = 100;
 
@@ -9263,10 +9286,8 @@ void G_RunFrame( int levelTime ) {
 						if (player_ent && player_ent->client && ent != player_ent &&
 							zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue)
 						{ // zyk: can only hit the target if he is not knocked down yet
-							if (ent->client->pers.player_statuses & (1 << 23) && 
-									 ent->health > 0 && 
-									 Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 300)
-							{ // zyk: Meditation Drain
+							if (ent->health > 0 && Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 300)
+							{ 
 								int heal_amount = 8;
 
 								G_Damage(player_ent, ent, ent, NULL, NULL, heal_amount/3, 0, MOD_MELEE);
@@ -9293,38 +9314,12 @@ void G_RunFrame( int levelTime ) {
 						}
 					}
 
-					ent->client->pers.monk_unique_timer = level.time + 200;
+					ent->client->pers.meditation_drain_timer = level.time + 200;
 				}
-				else if (ent->client->pers.rpg_class == 5)
-				{ // zyk: Stealth Attacker abilities
-					if (ent->client->pers.player_statuses & (1 << 23) && ent->client->pers.monk_unique_timer < level.time)
-					{ // zyk: Aimed Shot ability. Fires the full charged sniper shot
-						if (ent->health > 0)
-						{
-							WP_DisruptorAltFire(ent);
-						}
-
-						ent->client->pers.monk_unique_timer = level.time + 2000;
-					}
-
-					if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
-					{ // zyk: if the stealth attacker stops using sniper scope, stop the Thermal Detector
-						ent->client->pers.thermal_vision = qfalse;
-						ent->client->ps.fd.forcePowersActive &= ~(1 << FP_SEE);
-						ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
-						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_0;
-					}
-					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 1 && ent->client->pers.secrets_found & (1 << 7))
-					{ // zyk: Stealth Attacker with Upgrade, activate the Thermal Detector
-						ent->client->pers.thermal_vision = qtrue;
-						ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
-						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_1;
-						ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
-					}
-				}
-				else if (ent->client->pers.rpg_class == 6 && ent->client->pers.player_statuses & (1 << 22) && ent->client->pers.vertical_dfa_timer > 0 &&
-						ent->client->pers.vertical_dfa_timer < level.time && ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-				{ // zyk: Duelist abilities. Vertical DFA should appear when player hits the ground
+				else if (ent->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR && ent->client->pers.active_unique_skill == 3 &&
+						ent->client->pers.vertical_dfa_timer > 0 && ent->client->pers.vertical_dfa_timer < level.time && 
+						ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
+				{ // zyk: Vertical DFA should appear when player hits the ground
 					ent->client->pers.vertical_dfa_timer = 0;
 
 					zyk_vertical_dfa_effect(ent);

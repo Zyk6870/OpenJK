@@ -739,8 +739,8 @@ void WP_DisruptorAltFire( gentity_t *ent )
 
 	//VectorCopy( muzzle, muzzle2 ); // making a backup copy
 
-	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 5 && ent->client->pers.player_statuses & (1 << 23))
-	{ // zyk: Stealth Attacker Aimed Shot ability
+	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.active_unique_skill == 6)
+	{ // zyk: Aimed Shot ability
 		if (ent->client->pers.unique_skill_user_id > -1)
 		{ // zyk: if we have a target, shoot at him
 			gentity_t *target_ent = &g_entities[ent->client->pers.unique_skill_user_id];
@@ -4034,8 +4034,8 @@ int magic_fist_velocity(gentity_t *ent)
 	int magic_bolt_speed = zyk_magic_fist_velocity.integer;
 
 	if (ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 8) &&
-		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.player_statuses & (1 << 21))
-	{ // zyk: Magic Master Unique Ability 1 increases speed of magic bolt shots
+		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 2)
+	{ // zyk: Faster Bolts skill increases speed of magic bolt shots
 		magic_bolt_speed += (magic_bolt_speed * 0.2);
 	}
 
@@ -4075,7 +4075,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 	}
 	else
 	{
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8)
+		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD)
 		{ // zyk: Magic Master fist attacks
 			if (ent->client->sess.magic_fist_selection == 0 && ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
 			{ // zyk: Magic Bolt
@@ -4099,9 +4099,8 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				VectorSet(missile->r.maxs, BOWCASTER_SIZE, BOWCASTER_SIZE, BOWCASTER_SIZE);
 				VectorScale(missile->r.maxs, -1, missile->r.mins);
 
-				if (ent->client->pers.unique_skill_duration > level.time && !(ent->client->pers.player_statuses & (1 << 21)) &&
-					!(ent->client->pers.player_statuses & (1 << 22)) && !(ent->client->pers.player_statuses & (1 << 23)))
-				{// zyk: Unique Skill increases damage
+				if (ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
+				{// zyk: Magic Buff increases damage
 					missile->damage = zyk_magic_fist_damage.integer * 2;
 				}
 				else
@@ -4148,9 +4147,8 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				VectorSet(missile->r.maxs, 2, 2, 2);
 				VectorScale(missile->r.maxs, -1, missile->r.mins);
 
-				if (ent->client->pers.unique_skill_duration > level.time && !(ent->client->pers.player_statuses & (1 << 21)) &&
-					!(ent->client->pers.player_statuses & (1 << 22)) && !(ent->client->pers.player_statuses & (1 << 23)))
-				{ // zyk: Unique Skill increases damage
+				if (ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
+				{ // zyk: Magic Buff increases damage
 					missile->damage = fist_damage * 2;
 				}
 				else
@@ -4185,9 +4183,8 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				int			i;
 				int damage = zyk_magic_fist_damage.integer * 1.2;
 
-				if (ent->client->pers.unique_skill_duration > level.time && !(ent->client->pers.player_statuses & (1 << 21)) &&
-					!(ent->client->pers.player_statuses & (1 << 22)) && !(ent->client->pers.player_statuses & (1 << 23)))
-				{// zyk: Unique Skill increases damage
+				if (ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
+				{// zyk: Magic Buff increases damage
 					damage *= 2;
 				}
 
@@ -4292,11 +4289,6 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 									// zyk: allies cant be knocked back
 									if (zyk_is_ally(ent,traceEnt) == qtrue)
 									{
-										break;
-									}
-
-									if (traceEnt->client->sess.amrpgmode == 2 && traceEnt->client->pers.rpg_class == 9)
-									{ // zyk Force Guardian cannot be knocked down
 										break;
 									}
 
@@ -4410,9 +4402,8 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				VectorSet(missile->r.mins, -3.0f, -3.0f, -3.0f);
 				VectorSet(missile->r.maxs, 3.0f, 3.0f, 3.0f);
 
-				if (ent->client->pers.unique_skill_duration > level.time && !(ent->client->pers.player_statuses & (1 << 21)) &&
-					!(ent->client->pers.player_statuses & (1 << 22)) && !(ent->client->pers.player_statuses & (1 << 23)))
-				{ // zyk: Unique Skill increases damage
+				if (ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
+				{ // zyk: Magic Buff increases damage
 					fist_damage *= 2;
 				}
 
@@ -4466,9 +4457,8 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				VectorSet( missile->r.maxs, ROCKET_SIZE, ROCKET_SIZE, ROCKET_SIZE );
 				VectorScale( missile->r.maxs, -1, missile->r.mins );
 
-				if (ent->client->pers.unique_skill_duration > level.time && !(ent->client->pers.player_statuses & (1 << 21)) &&
-					!(ent->client->pers.player_statuses & (1 << 22)) && !(ent->client->pers.player_statuses & (1 << 23)))
-				{ // zyk: Unique Skill increases damage
+				if (ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
+				{ // zyk: Magic Buff increases damage
 					fist_damage *= 2;
 				}
 
@@ -4494,13 +4484,11 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				send_rpg_events(2000);
 			}
 		}
-		else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2 && 
+		else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER &&
 				 ent->client->pers.unique_skill_duration > level.time &&
-				 !(ent->client->pers.player_statuses & (1 << 21)) && 
-				 !(ent->client->pers.player_statuses & (1 << 22)) && 
-				 !(ent->client->pers.player_statuses & (1 << 23)) &&
+				 ent->client->pers.active_unique_skill == 1 &&
 				 ent->client->ps.ammo[AMMO_METAL_BOLTS] > 0)
-		{ // zyk: Bounty Hunter Unique Skill, fire poison darts
+		{ // zyk: Poison Darts
 			vec3_t		fwd, dir, origin;
 			gentity_t	*missile;
 

@@ -4338,7 +4338,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 		}
 
 		// zyk: Free Warrior saber Unique Skills. Heavily increases saber damage
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 6 && 
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR &&
 			self->client->pers.unique_skill_duration > level.time)
 		{
 			if (self->client->ps.torsoAnim == BOTH_FORCELEAP2_T__B_) // zyk: Vertical DFA
