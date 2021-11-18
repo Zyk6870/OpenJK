@@ -714,9 +714,6 @@ typedef struct clientPersistant_s {
 	// zyk: used by Wrist Shot ability
 	int wrist_shot_counter;
 
-	// zyk: used by Ice Bomb ability
-	int ice_bomb_counter;
-
 	// zyk: cooldown time to buy or sell
 	int buy_sell_timer;
 
@@ -755,16 +752,11 @@ typedef struct clientPersistant_s {
 
 	// zyk: used to set the player class in the RPG Mode
 	// Possible values are:
-	// 0 - Free Warrior (default)
-	// 1 - Force User
-	// 2 - Bounty Hunter
-	// 3 - Armored Soldier
-	// 4 - Monk
-	// 5 - Stealth Attacker
-	// 6 - Duelist
-	// 7 - Force Gunner
-	// 8 - Magic Master
-	// 9 - Force Guardian
+	// 0 - Civilian (default)
+	// 1 - Free Warrior
+	// 2 - Force User
+	// 3 - Gunner
+	// 4 - Magician
 	int rpg_class;
 
 	// zyk: this is the cooldown timer of the Unique Skill used by some RPG classes
@@ -788,7 +780,7 @@ typedef struct clientPersistant_s {
 	// zyk: used by Aimed Shot ability
 	int unique_skill_user_id;
 
-	// zyk: stun baton 3/3 timer. This entity has less run speed during this time
+	// zyk: stun baton timer. This entity has less run speed during this time
 	int stun_baton_less_speed_timer;
 
 	// zyk: when a bounty hunter is using the thermal vision, it is set to qtrue
@@ -827,14 +819,14 @@ typedef struct clientPersistant_s {
 	// zyk: bit flag, loaded in load_account()
 	// Possible bit values (1 << bit_value) are:
 	// 0 - Holdable Items Upgrade
-	// 1 - Bounty Hunter Upgrade
-	// 2 - Unique Ability 1
-	// 3 - Unique Ability 2
-	// 4 - Unique Ability 3
-	// 5 - Unused
-	// 6 - Unused
-	// 7 - Stealth Attacker Upgrade
-	// 8 - Force Gunner Upgrade
+	// 1 - unused
+	// 2 - unused
+	// 3 - unused
+	// 4 - unused
+	// 5 - unused
+	// 6 - unused
+	// 7 - unused
+	// 8 - unused
 	// 9 - Impact Reducer
 	// 10 - Flame Thrower
 	// 11 - Power Cell Weapons Upgrade
@@ -842,10 +834,8 @@ typedef struct clientPersistant_s {
 	// 13 - Metal Bolts Weapons Upgrade
 	// 14 - Rocket Upgrade
 	// 15 - Stun Baton Upgrade
-	// 16 - Armored Soldier Upgrade
+	// 16 - unused
 	// 17 - Jetpack Upgrade
-	// 18 - Unused
-	// 19 - Force Guardian Upgrade
 	int secrets_found;
 
 	// zyk: amount of sentries the Bounty Hunter starts with

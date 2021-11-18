@@ -4337,13 +4337,11 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 				dmg = 0;
 		}
 
-		// zyk: Duelist Unique Abilities. Heavily increases saber damage
+		// zyk: Free Warrior saber Unique Skills. Heavily increases saber damage
 		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 6 && 
 			self->client->pers.unique_skill_duration > level.time)
 		{
-			if (self->client->ps.torsoAnim == BOTH_PULL_IMPALE_STAB) // zyk: Impale Stab
-				dmg = 70;
-			else if (self->client->ps.torsoAnim == BOTH_FORCELEAP2_T__B_) // zyk: Vertical DFA
+			if (self->client->ps.torsoAnim == BOTH_FORCELEAP2_T__B_) // zyk: Vertical DFA
 				dmg = 28;
 			else if (self->client->ps.torsoAnim == BOTH_ALORA_SPIN_SLASH || self->client->ps.torsoAnim == BOTH_ALORA_SPIN_THROW) // zyk: Spin Throw
 				dmg = 55;
@@ -6712,10 +6710,6 @@ qboolean saberKnockOutOfHand(gentity_t *saberent, gentity_t *saberOwner, vec3_t 
 		return qfalse;
 	}
 
-	// zyk: Force Guardian with Upgrade cannot lose saber
-	if (saberOwner->client->sess.amrpgmode == 2 && saberOwner->client->pers.rpg_class == 9 && saberOwner->client->pers.secrets_found & (1 << 19))
-		return qfalse;
-
 	saberOwner->client->ps.saberInFlight = qtrue;
 	saberOwner->client->ps.saberEntityState = 1;
 
@@ -7743,12 +7737,6 @@ static void G_KickSomeMofos(gentity_t *ent)
 	VectorSet(kickDir, 0.0f, 0.0f, 0.0f);
 	VectorSet(kickEnd, 0.0f, 0.0f, 0.0f);
 	VectorSet(fwdAngs, 0.0f, ent->client->ps.viewangles[YAW], 0.0f);
-
-	// zyk: Monk class in RPG Mode causes more kick damage
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 4)
-	{
-		kickDamage = kickDamage * 2.5;
-	}
 
 	//HMM... or maybe trace from origin to footRBolt/footLBolt?  Which one?  G2 trace?  Will do hitLoc, if so...
 	if ( ent->client->ps.torsoAnim == BOTH_A7_HILT )
