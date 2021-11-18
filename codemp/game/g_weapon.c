@@ -1459,11 +1459,8 @@ void DEMP2_AltRadiusDamage( gentity_t *ent )
 				}
 				if ( gent->client->ps.powerups[PW_CLOAKED] )
 				{//disable cloak temporarily
-					if (gent->client->sess.amrpgmode < 2 || gent->client->pers.rpg_class != 5)
-					{ // zyk: Stealth Attacker cloak does not decloak by DEMP2 attack. Also, non-quest players cant decloak quest players in boss battle and vice-versa
-						Jedi_Decloak( gent );
-						gent->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
-					}
+					Jedi_Decloak( gent );
+					gent->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
 				}
 			}
 		}
@@ -1700,7 +1697,7 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 
 		if (gent != myOwner)
 		{
-			if (gent->client && myOwner->client->pers.rpg_class != 3 && zyk_check_immunity_power(gent))
+			if (gent->client && myOwner->client->pers.rpg_class != RPGCLASS_GUNNER && zyk_check_immunity_power(gent))
 			{ // zyk: Immunity Power users cannot be hit by Lightning Dome, but can be hit by Lightning Shield discharge
 				continue;
 			}
@@ -1732,11 +1729,8 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 				}
 				if ( gent->client->ps.powerups[PW_CLOAKED] )
 				{//disable cloak temporarily
-					if (gent->client->sess.amrpgmode < 2 || gent->client->pers.rpg_class != 5)
-					{ // zyk: Stealth Attacker cloak does not decloak by DEMP2 attack
-						Jedi_Decloak( gent );
-						gent->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
-					}
+					Jedi_Decloak( gent );
+					gent->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
 				}
 			}
 		}
@@ -3718,11 +3712,6 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 								break;
 							}
 
-							if (traceEnt->client->sess.amrpgmode == 2 && traceEnt->client->pers.rpg_class == 9)
-							{ // zyk: Force Guardian cannot be knocked down
-								break;
-							}
-
 							if (traceEnt->client->ps.duelInProgress == qtrue)
 							{ // zyk: players in private duels cannot be knocked down
 								break;
@@ -3919,8 +3908,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	trap->Trace ( &tr, muzzleStun, mins, maxs, end, ent->s.number, MASK_SHOT, qfalse, 0, 0 );
 
 	// zyk: starts flame thrower
-	if (ent->client && ent->client->sess.amrpgmode == 2 && alt_fire == qtrue && ent->client->pers.rpg_class != 1 && ent->client->pers.rpg_class != 4 && 
-		ent->client->pers.rpg_class != 6 && ent->client->pers.rpg_class != 8 && ent->client->pers.rpg_class != 9 && 
+	if (ent->client && ent->client->sess.amrpgmode == 2 && alt_fire == qtrue && 
+		ent->client->pers.rpg_class != RPGCLASS_FORCE_USER && ent->client->pers.rpg_class != RPGCLASS_WIZARD &&
 		ent->client->pers.secrets_found & (1 << 10) && ent->client->ps.cloakFuel > 0 && ent->waterlevel < 3)
 	{ // zyk: do not use flame thrower when underwater
 		int flame_thrower_fuel_usage = 2;
@@ -3994,8 +3983,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 				tr_ent->client->ps.electrifyTime = level.time + 700;
 
 				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 15) && 
-					(tr_ent->client->sess.amrpgmode < 2 || tr_ent->client->pers.rpg_class != 5) && tr_ent->client->ps.powerups[PW_CLOAKED])
-				{ // zyk: stun baton upgrade decloaks players except Stealth Attacker
+					tr_ent->client->ps.powerups[PW_CLOAKED])
+				{ // zyk: stun baton upgrade decloaks players
 					Jedi_Decloak(tr_ent);
 				}
 
@@ -4004,12 +3993,6 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 				{
 					// zyk: allies cant be hit by it
 					if (zyk_is_ally(ent,tr_ent) == qtrue)
-					{
-						return;
-					}
-
-					// zyk: Stealth Attacker Upgrade protects against it
-					if (tr_ent->client->sess.amrpgmode == 2 && tr_ent->client->pers.rpg_class == 5 && tr_ent->client->pers.secrets_found & (1 << 7))
 					{
 						return;
 					}
@@ -5521,7 +5504,7 @@ void FireWeapon( gentity_t *ent, qboolean altFire ) {
 		}
 	}
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 8 && 
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD && 
 		ent->client->sess.magic_fist_selection < 5 && ent->s.weapon == WP_MELEE)
 	{ // zyk: Magic Master can shoot from his hands
 		ent->client->accuracy_shots++;

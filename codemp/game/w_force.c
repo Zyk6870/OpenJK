@@ -459,7 +459,7 @@ void WP_SpawnInitForcePowers( gentity_t *ent )
 	ent->client->ps.fd.forceMindtrickTargetIndex4 = 0;
 
 	// zyk: remove mind control from these players or npcs
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 1 && ent->client->pers.mind_controlled1_id != -1)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_FORCE_USER && ent->client->pers.mind_controlled1_id != -1)
 	{
 		gentity_t *tricked_entity = &g_entities[ent->client->pers.mind_controlled1_id];
 		ent->client->pers.mind_controlled1_id = -1;
@@ -579,15 +579,9 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 	}
 
 	if (other && other->client && other->client->sess.amrpgmode == 2 && 
-		other->client->pers.rpg_class == 1 && other->client->pers.unique_skill_duration > level.time)
-	{ // zyk: Force User Unique Skill protects against force powers
-		return 0;
-	}
-
-	if (other && other->client && other->client->sess.amrpgmode == 2 &&
-		other->client->pers.rpg_class == 9 && other->client->pers.unique_skill_duration > level.time &&
-		other->client->pers.player_statuses & (1 << 21))
-	{ // zyk: Force Guardian Force Armor protects against force powers
+		other->client->pers.rpg_class == RPGCLASS_FORCE_USER && other->client->pers.unique_skill_duration > level.time && 
+		other->client->pers.active_unique_skill == 1)
+	{ // zyk: Force Shield protects against force powers
 		return 0;
 	}
 
@@ -690,7 +684,7 @@ qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int 
 		drain = (zyk_max_force_power.integer/2);
 	}
 	
-	if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1)
+	if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER)
 	{ // zyk: Force User class. He spends less force power
 		drain *= 0.75;
 	}
@@ -1182,7 +1176,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 	if ((int)forcePower == FP_SPEED && overrideAmt)
 	{
 		// zyk: Force User class spends less force
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1)
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER)
 			overrideAmt = forcePowerNeeded[self->client->ps.fd.forcePowerLevel[forcePower]][forcePower] * 0.75;
 
 		BG_ForcePowerDrain( &self->client->ps, forcePower, overrideAmt*0.025 );
@@ -1190,7 +1184,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 	else if ((int)forcePower != FP_GRIP && (int)forcePower != FP_DRAIN)
 	{ //grip and drain drain as damage is done
 		// zyk: Force User class spends less force
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1)
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER)
 			overrideAmt = forcePowerNeeded[self->client->ps.fd.forcePowerLevel[forcePower]][forcePower] * 0.75;
 
 		BG_ForcePowerDrain( &self->client->ps, forcePower, overrideAmt );
@@ -1273,7 +1267,7 @@ void ForceHeal( gentity_t *self )
 
 	// zyk: now heal force power requires force based on the force power max cvar
 	// zyk: Force User class spends less force
-	if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1)
+	if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER)
 		self->client->ps.fd.forcePower -= ((zyk_max_force_power.integer / 2) * 0.75);
 	else
 		self->client->ps.fd.forcePower -= (zyk_max_force_power.integer/2);
@@ -2960,7 +2954,7 @@ void ForceTelepathy(gentity_t *self)
 				WP_AddAsMindtricked(&self->client->ps.fd, tr.entityNum);
 
 			// zyk: mind control this player, if he is not being mind controlled by someone else
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1 && 
+			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && 
 				(tricked_entity->NPC || (tricked_entity->client->sess.sessionTeam != TEAM_SPECTATOR && tricked_entity->inuse == qtrue)) && 
 				tricked_entity->s.NPC_class != CLASS_VEHICLE && tricked_entity->client->pers.being_mind_controlled == -1 && 
 				self->client->pers.being_mind_controlled == -1 && 
@@ -3049,7 +3043,7 @@ void ForceTelepathy(gentity_t *self)
 					WP_AddAsMindtricked(&self->client->ps.fd, ent->s.number);
 
 				// zyk: mind control this player, if he is not being mind controlled by someone else
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1 && 
+				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && 
 					(ent->NPC || (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->inuse == qtrue)) && ent->s.NPC_class != CLASS_VEHICLE && 
 					ent->client->pers.being_mind_controlled == -1 && self->client->pers.being_mind_controlled == -1 && 
 					((ent->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[11] > ent->client->pers.skill_levels[4]) || 
@@ -4131,7 +4125,7 @@ void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower )
 		break;
 	case FP_TELEPATHY:
 		// zyk: remove mind control from these players or npcs
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1 && self->client->pers.mind_controlled1_id != -1)
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && self->client->pers.mind_controlled1_id != -1)
 		{
 			tricked_entity = &g_entities[self->client->pers.mind_controlled1_id];
 			self->client->pers.mind_controlled1_id = -1;
@@ -4555,7 +4549,7 @@ static void WP_UpdateMindtrickEnts(gentity_t *self)
 				if (trap->InPVS(ent->client->ps.origin, self->client->ps.origin) &&
 					OrgVisible(ent->client->ps.origin, self->client->ps.origin, ent->s.number))
 				{
-					if (self->client->sess.amrpgmode < 2 || (self->client->pers.rpg_class != 1 && self->client->pers.rpg_class != 5))
+					if (self->client->sess.amrpgmode < 2 || self->client->pers.rpg_class != RPGCLASS_FORCE_USER)
 					{ // zyk: Force User wont stop Mind Trick (specially because it may be a Mind Control) and Stealth Attacker Ultra Cloak
 						if (ent && !ent->NPC) // zyk: remove tricked entity only for players
 							RemoveTrickedEnt(&self->client->ps.fd, i);
@@ -5773,7 +5767,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 		self->client->ps.fd.forceMindtrickTargetIndex4 = 0;
 
 		// zyk: remove mind control from these players or npcs
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1 && self->client->pers.mind_controlled1_id != -1)
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && self->client->pers.mind_controlled1_id != -1)
 		{
 			gentity_t *tricked_entity = &g_entities[self->client->pers.mind_controlled1_id];
 			self->client->pers.mind_controlled1_id = -1;
@@ -5884,8 +5878,8 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 	}
 
 	if ( ucmd->buttons & BUTTON_FORCE_LIGHTNING || 
-		(self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1 && 
-		 self->client->pers.player_statuses & (1 << 21) && self->client->pers.unique_skill_duration > level.time))
+		(self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && 
+		 self->client->pers.active_unique_skill == 2 && self->client->pers.unique_skill_duration > level.time))
 	{ //lightning
 		WP_DoSpecificPower(self, ucmd, FP_LIGHTNING);
 	}
@@ -5941,7 +5935,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 				self->client->ps.fd.forcePowerDuration[i] = 0;
 			}
 			// zyk: using Sense Health skill of RPG Mode
-			else if (i == FP_SEE && self->client->sess.amrpgmode == 2 && (self->client->pers.skill_levels[35] > 0 || self->client->pers.rpg_class == 8) && 
+			else if (i == FP_SEE && self->client->sess.amrpgmode == 2 && (self->client->pers.skill_levels[35] > 0 || self->client->pers.rpg_class == RPGCLASS_WIZARD) && 
 					 self->client->ps.fd.forcePowersActive & ( 1 << FP_SEE ) && self->client->pers.sense_health_timer < level.time && self->client->ps.hasLookTarget)
 			{
 				// zyk: if you are looking at someone (player or npc), this will be the client id
@@ -6107,7 +6101,7 @@ qboolean Jedi_DodgeEvasion( gentity_t *self, gentity_t *shooter, trace_t *tr, in
 	}
 
 	// zyk: Bounty Hunter with Thermal Vision cannot dodge
-	if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 2)
+	if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER)
 	{
 		return qfalse;
 	}

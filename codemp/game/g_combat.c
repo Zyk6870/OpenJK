@@ -2266,7 +2266,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		self->client->pers.being_mind_controlled = -1;
 	}
 
-	if (!self->NPC && self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == 1 && self->client->pers.mind_controlled1_id > -1)
+	if (!self->NPC && self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && self->client->pers.mind_controlled1_id > -1)
 	{
 		gentity_t *controlled_ent = &g_entities[self->client->pers.mind_controlled1_id];
 		self->client->pers.mind_controlled1_id = -1;
@@ -2684,7 +2684,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			attacker->client->pers.credits_modifier = self->client->pers.credits_modifier;
 		}
 
-		if (attacker->client->pers.rpg_class == 2)
+		if (attacker->client->pers.rpg_class == RPGCLASS_GUNNER)
 		{ // zyk: Gunner class receives more credits
 			attacker->client->pers.credits_modifier += 4 * (attacker->client->pers.skill_levels[38] + 1);
 		}
@@ -4687,12 +4687,7 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 			return qtrue;
 		}
 
-		if (mod == MOD_MELEE && attacker->client->pers.rpg_class == 4)
-		{ // zyk: Monk melee
-			return qtrue;
-		}
-
-		if (mod == MOD_MELEE && attacker->client->pers.rpg_class == 8 &&
+		if (mod == MOD_MELEE && attacker->client->pers.rpg_class == RPGCLASS_WIZARD &&
 			inflictor && inflictor->s.weapon == WP_CONCUSSION)
 		{ // zyk: Magic Master bolts, the Ultra Bolt
 			return qtrue;
@@ -5234,16 +5229,13 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		knockback = 0;
 	}
 
-	// zyk: if player is in RPG Mode, reduce knockback based on the Impact Reducer item of the player and on Force Guardian Upgrade for Force Guardian class
+	// zyk: if player is in RPG Mode, reduce knockback based on the Impact Reducer item of the player
 	if (targ && targ->client && targ->client->sess.amrpgmode == 2)
 	{
 		int new_knockback = knockback;
 
 		if (targ->client->pers.secrets_found & (1 << 9))
 			new_knockback -= knockback * 0.8;
-
-		if (targ->client->pers.rpg_class == 9 && targ->client->pers.secrets_found & (1 << 19))
-			new_knockback -= knockback * 0.15;
 
 		knockback = new_knockback;
 	}
@@ -5555,15 +5547,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	if (check_shield == 1 && targ && targ->client && take > 0)  
 	{ // zyk: check shields if the damage is greater than 0
 		int scaled_damage = take;
-		float bounty_hunter_shield_resistance = 0.0;
 
 		if (targ->client->sess.amrpgmode == 2) // zyk: Shield Strength skill
 		{
-			// zyk: if player is Bounty Hunter and has the Bounty Hunter Upgrade, absorbs more damage
-			if (targ->client->pers.rpg_class == 2 && targ->client->pers.secrets_found & (1 << 1))
-				bounty_hunter_shield_resistance = 0.07;
-
-			scaled_damage = (int)ceil(take * (1.0 - bounty_hunter_shield_resistance - (0.05 * targ->client->pers.skill_levels[31])));
+			scaled_damage = (int)ceil(take * (1.0 - (0.05 * targ->client->pers.skill_levels[31])));
 		}
 
 		if (targ->client->ps.stats[STAT_ARMOR] >= scaled_damage)
@@ -5773,10 +5760,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
-	// zyk: Electric Bolts of Magic Master can disable jetpacks. Except Stealth Attacker ones
+	// zyk: Electric Bolts of Wizard can disable jetpacks
 	if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2 && client)
 	{
-		if (client->jetPackOn && (client->sess.amrpgmode != 2 || client->pers.rpg_class != 5 || !(client->pers.secrets_found & (1 << 7))))
+		if (client->jetPackOn)
 		{ //disable jetpack temporarily
 			Jetpack_Off(targ);
 			client->jetPackToggleTime = level.time + Q_irand(3000, 10000);

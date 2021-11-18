@@ -1088,8 +1088,8 @@ void turret_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
 
 	g_entities[self->genericValue3].client->ps.fd.sentryDeployed = qfalse;
 
-	// zyk: Bounty Hunter with Upgrade can place more sentries
-	if (g_entities[self->genericValue3].client->sess.amrpgmode == 2 && g_entities[self->genericValue3].client->pers.rpg_class == 2)
+	// zyk: Gunner items Upgrade allows placing more sentries
+	if (g_entities[self->genericValue3].client->sess.amrpgmode == 2 && g_entities[self->genericValue3].client->pers.rpg_class == RPGCLASS_GUNNER)
 	{
 		g_entities[self->genericValue3].client->pers.bounty_hunter_placed_sentries--;
 	}
@@ -2700,34 +2700,14 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 			return;
 		}
 
-		if (other->client->pers.rpg_class == 1 && ((ent->item->giType == IT_WEAPON && ent->item->giTag != WP_STUN_BATON) || ent->item->giType == IT_AMMO || 
+		if (other->client->pers.rpg_class == RPGCLASS_FORCE_USER && ((ent->item->giType == IT_WEAPON && ent->item->giTag != WP_STUN_BATON) || ent->item->giType == IT_AMMO || 
 			ent->item->giType == IT_HOLDABLE))
 		{
 			return;
 		}
-		else if (other->client->pers.rpg_class == 3 && ent->item->giType == IT_HOLDABLE && ent->item->giTag == HI_CLOAK)
-		{
-			return;
-		}
-		else if (other->client->pers.rpg_class == 4 && ((ent->item->giType == IT_WEAPON && ent->item->giTag != WP_STUN_BATON) || 
-				 ent->item->giType == IT_AMMO || ent->item->giType == IT_HOLDABLE))
-		{
-			return;
-		}
-		else if (other->client->pers.rpg_class == 6 && ((ent->item->giType == IT_WEAPON && ent->item->giTag != WP_STUN_BATON) || 
-				 ent->item->giType == IT_AMMO || ent->item->giType == IT_HOLDABLE))
-		{
-			return;
-		}
-		else if (other->client->pers.rpg_class == 8 && ((ent->item->giType == IT_WEAPON && ent->item->giTag != WP_STUN_BATON) || ent->item->giType == IT_AMMO || 
+		else if (other->client->pers.rpg_class == RPGCLASS_WIZARD && ((ent->item->giType == IT_WEAPON && ent->item->giTag != WP_STUN_BATON) || ent->item->giType == IT_AMMO || 
 			     (ent->item->giType == IT_HOLDABLE && ent->item->giTag != HI_MEDPAC && ent->item->giTag != HI_CLOAK && ent->item->giTag != HI_JETPACK)))
 		{ // zyk: Magic Master can only pickup some items
-			return;
-		}
-		else if (other->client->pers.rpg_class == 9 && ((ent->item->giType == IT_WEAPON && ent->item->giTag != WP_STUN_BATON && ent->item->giTag != WP_BLASTER) ||
-			(ent->item->giType == IT_AMMO && ent->item->giTag != AMMO_BLASTER) || 
-			(ent->item->giType == IT_HOLDABLE && ent->item->giTag != HI_MEDPAC_BIG && ent->item->giTag != HI_CLOAK && ent->item->giTag != HI_JETPACK)))
-		{
 			return;
 		}
 	}

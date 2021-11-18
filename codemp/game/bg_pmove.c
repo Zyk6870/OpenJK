@@ -2158,10 +2158,6 @@ static qboolean PM_CheckJump( void )
 		pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_0 &&
 		!(pm->ps->pm_flags&PMF_JUMP_HELD) &&
 		(
-#if defined( _GAME ) // zyk: Force Gunner class can use wall runs and wall flips with any weapon
-		(g_entities[pm->ps->clientNum].client->sess.amrpgmode == 2 && 
-		 g_entities[pm->ps->clientNum].client->pers.rpg_class == 7) || 
-#endif
 		(pm->ps->weapon == WP_SABER || pm->ps->weapon == WP_MELEE)) &&
 		!PM_IsRocketTrooper() &&
 		!BG_HasYsalamiri(pm->gametype, pm->ps) &&
@@ -7388,29 +7384,10 @@ static void PM_Weapon( void )
 		BG_InRoll(pm->ps, pm->ps->legsAnim) ||
 		PM_InRollComplete(pm->ps, pm->ps->legsAnim))
 	{
-#if defined (_GAME)
-		gentity_t *player_ent = &g_entities[pm->ps->clientNum];
-		qboolean is_a_force_gunner = qfalse;
-
-		// zyk: Force Gunner class can use weapon even if it is doing some special move
-		if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.rpg_class == 7)
-		{
-			is_a_force_gunner = qtrue;
-		}
-
-		if (is_a_force_gunner == qfalse)
-		{
-			if (pm->ps->weaponTime < pm->ps->legsTimer)
-			{
-				pm->ps->weaponTime = pm->ps->legsTimer;
-			}
-		}
-#else
 		if (pm->ps->weaponTime < pm->ps->legsTimer)
 		{
 			pm->ps->weaponTime = pm->ps->legsTimer;
 		}
-#endif
 	}
 
 	if (pm->ps->duelInProgress)

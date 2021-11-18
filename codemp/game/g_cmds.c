@@ -5033,7 +5033,7 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->ps.fd.forcePowerLevel[FP_SPEED] = ent->client->pers.skill_levels[3];
 
 		// zyk: loading Sense value
-		if (ent->client->pers.rpg_class == 2 || ent->client->pers.rpg_class == 3 || ent->client->pers.rpg_class == 5 || ent->client->pers.rpg_class == 8)
+		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER || ent->client->pers.rpg_class == RPGCLASS_WIZARD)
 		{ // zyk: these classes have no force, so they do not need Sense (although they can have the skill to resist Mind Control)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
 			ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_0;
@@ -5291,7 +5291,7 @@ void initialize_rpg_skills(gentity_t *ent)
 			// zyk: Bounty Hunter starts with 5 sentries if he has the Upgrade
 			if (ent->client->pers.skill_levels[48] > 0)
 			{
-				if (ent->client->pers.secrets_found & (1 << 1))
+				if (ent->client->pers.secrets_found & (1 << 8))
 					ent->client->pers.bounty_hunter_sentries = MAX_BOUNTY_HUNTER_SENTRIES;
 				else
 					ent->client->pers.bounty_hunter_sentries = 1;
@@ -5390,7 +5390,7 @@ void add_new_char(gentity_t *ent)
 
 	ent->client->pers.secrets_found = 0;
 	ent->client->pers.credits = 100;
-	ent->client->pers.rpg_class = 0;
+	ent->client->pers.rpg_class = RPGCLASS_CIVILIAN;
 	ent->client->sess.magic_fist_selection = 0;
 }
 
@@ -5669,7 +5669,7 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 1 && ent->client->pers.mind_controlled1_id != -1)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_FORCE_USER && ent->client->pers.mind_controlled1_id != -1)
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"You cant logout while using Mind Control on someone.\n\"" );
 		return;
@@ -6902,7 +6902,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == 10)
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
-			if (ent->client->pers.rpg_class == 2 && ent->client->pers.bounty_hunter_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
+			if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.bounty_hunter_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
 				ent->client->pers.bounty_hunter_sentries++;
 		}
 		else if (value == 11)
@@ -7237,7 +7237,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SENTRY_GUN);
 
-		if (ent->client->pers.rpg_class == 2 && ent->client->pers.bounty_hunter_sentries > 0)
+		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.bounty_hunter_sentries > 0)
 			ent->client->pers.bounty_hunter_sentries--;
 
 		sold = 1;
@@ -8073,15 +8073,15 @@ void do_change_class(gentity_t *ent, int value)
 	int i = 0;
 	int old_class = ent->client->pers.rpg_class;
 
-	if (value < 0 || value > 9)
+	if (value <= RPGCLASS_CIVILIAN || value >= NUM_RPG_CLASSES)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Invalid RPG Class.\n\"" );
 		return;
 	}
 
-	if (ent->client->pers.level > 1)
+	if (ent->client->pers.rpg_class != RPGCLASS_CIVILIAN)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"You cannot change class after level 1.\n\"" );
+		trap->SendServerCommand(ent->s.number, "print \"You cannot change class after you already changed to a class.\n\"" );
 		return;
 	}
 
@@ -8694,8 +8694,8 @@ void Cmd_Drop_f( gentity_t *ent ) {
 			// zyk: remove item from inventory
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << item->giTag);
 
-			// zyk: if the player is a Bounty Hunter and the item is a sentry gun, must decrease the sentry gun counter
-			if (item->giTag == HI_SENTRY_GUN && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == 2 && ent->client->pers.bounty_hunter_sentries > 0)
+			// zyk: if the player is a Gunner and the item is a sentry gun, must decrease the sentry gun counter
+			if (item->giTag == HI_SENTRY_GUN && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.bounty_hunter_sentries > 0)
 			{
 				ent->client->pers.bounty_hunter_sentries--;
 			}

@@ -1961,17 +1961,10 @@ void ammo_generic_power_converter_use( gentity_t *self, gentity_t *other, gentit
 				// activator->client->ps.ammo[i] += add;
 
 				// zyk: some RPG classes cannot get ammo
-				if (activator->client->sess.amrpgmode == 2 && (activator->client->pers.rpg_class == 1 || activator->client->pers.rpg_class == 4 || 
-					activator->client->pers.rpg_class == 6 || activator->client->pers.rpg_class == 8))
+				if (activator->client->sess.amrpgmode == 2 && 
+					(activator->client->pers.rpg_class == RPGCLASS_FORCE_USER || activator->client->pers.rpg_class == RPGCLASS_WIZARD))
 				{
 					break;
-				}
-
-				if (activator->client->sess.amrpgmode == 2 && activator->client->pers.rpg_class == 9 && 
-					(i == AMMO_THERMAL || i == AMMO_TRIPMINE || i == AMMO_DETPACK))
-				{ // zyk: Force Guardian cannot get explosive weapons
-					i++;
-					continue;
 				}
 
 				if (level.gametype != GT_SIEGE)

@@ -804,13 +804,10 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			}
 			else if ( other && other->client && other->client->ps.powerups[PW_CLOAKED] )
 			{
-				if (other->client->sess.amrpgmode < 2 || other->client->pers.rpg_class != 5)
-				{ // zyk: Stealth Attacker cloak does not decloak by DEMP2 attack
-					Jedi_Decloak( other );
-					// zyk: now always temp disable
-					//temp disable
-					other->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
-				}
+				Jedi_Decloak( other );
+				// zyk: now always temp disable
+				//temp disable
+				other->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
 			}
 		}
 	}
@@ -829,7 +826,7 @@ killProj:
 
 	// zyk: Fire Bolt when removed spawns a fire in the ground
 	if (ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING) && ent->methodOfDeath == MOD_MELEE &&
-		ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_class == 8)
+		ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_class == RPGCLASS_WIZARD)
 	{
 		zyk_quest_effect_spawn(ent->parent, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 100);
 
