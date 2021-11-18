@@ -4963,34 +4963,6 @@ void reverse_wind(gentity_t *ent, int distance, int duration)
 	}
 }
 
-// zyk: Poison Mushrooms
-void poison_mushrooms(gentity_t *ent, int min_distance, int max_distance)
-{
-	int i = 0;
-	int targets_hit = 0;
-
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_POISON_MUSHROOMS] > 1)
-	{
-		min_distance = 0;
-	}
-
-	for (i = 0; i < level.num_entities; i++)
-	{
-		gentity_t *player_ent = &g_entities[i];
-
-		if (zyk_special_power_can_hit_target(ent, player_ent, i, min_distance, max_distance, qfalse, &targets_hit) == qtrue && 
-			(i < MAX_CLIENTS || player_ent->client->NPC_class != CLASS_VEHICLE))
-		{
-			player_ent->client->pers.magic_power_user_id[MAGIC_POISON_MUSHROOMS] = ent->s.number;
-			player_ent->client->pers.quest_power_status |= (1 << 4);
-			player_ent->client->pers.magic_power_debounce_timer[MAGIC_POISON_MUSHROOMS] = level.time + 200;
-			player_ent->client->pers.magic_power_hit_counter[MAGIC_POISON_MUSHROOMS] = 40;
-
-			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/air_burst.mp3"));
-		}
-	}
-}
-
 // zyk: Chaos Power
 void chaos_power(gentity_t *ent, int distance, int duration)
 {
@@ -5561,52 +5533,6 @@ void zyk_force_dash(gentity_t *ent)
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh9.mp3"));
 
 	ent->client->pers.fast_dash_timer = 0;
-}
-
-// zyk: Sleeping Flowers
-void sleeping_flowers(gentity_t *ent, int stun_time, int distance)
-{
-	int i = 0;
-	int targets_hit = 0;
-
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_SLEEPING_FLOWERS] > 1)
-	{
-		distance += 100;
-	}
-
-	for (i = 0; i < level.num_entities; i++)
-	{
-		gentity_t *player_ent = &g_entities[i];
-
-		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
-		{
-			// zyk: removing emotes to prevent exploits
-			if (player_ent->client->pers.player_statuses & (1 << 1))
-			{
-				player_ent->client->pers.player_statuses &= ~(1 << 1);
-				player_ent->client->ps.forceHandExtendTime = level.time;
-			}
-
-			// zyk: if using Meditate taunt, remove it
-			if (player_ent->client->ps.legsAnim == BOTH_MEDITATE && player_ent->client->ps.torsoAnim == BOTH_MEDITATE)
-			{
-				player_ent->client->ps.legsAnim = player_ent->client->ps.torsoAnim = BOTH_MEDITATE_END;
-			}
-
-			player_ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-			player_ent->client->ps.forceHandExtendTime = level.time + stun_time;
-			player_ent->client->ps.velocity[2] += 150;
-			player_ent->client->ps.forceDodgeAnim = 0;
-			player_ent->client->ps.quickerGetup = qtrue;
-
-			player_ent->client->pers.quest_power_status |= (1 << 24);
-			player_ent->client->pers.magic_power_target_timer[MAGIC_SLEEPING_FLOWERS] = level.time + stun_time;
-
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_sleeping", "0", "force/heal2", 0, 0, 0, 800);
-
-			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/air_burst.mp3"));
-		}
-	}
 }
 
 // zyk: Water Attack
@@ -6392,37 +6318,6 @@ void quest_power_events(gentity_t *ent)
 				}
 			}
 
-			if (ent->client->pers.quest_power_status & (1 << 4))
-			{ // zyk: Poison Mushrooms
-				if (ent->client->pers.quest_power_status & (1 << 0))
-				{ // zyk: testing for Immunity Power in target player
-					ent->client->pers.quest_power_status &= ~(1 << 4);
-				}
-
-				if (ent->client->pers.magic_power_hit_counter[MAGIC_POISON_MUSHROOMS] > 0 && ent->client->pers.magic_power_debounce_timer[MAGIC_POISON_MUSHROOMS] < level.time)
-				{
-					gentity_t *poison_mushrooms_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_POISON_MUSHROOMS]];
-
-					if (poison_mushrooms_user && poison_mushrooms_user->client)
-					{
-						zyk_quest_effect_spawn(poison_mushrooms_user, ent, "zyk_quest_effect_poison", "0", "noghri_stick/gas_cloud", 0, 0, 0, 300);
-
-						
-						if (poison_mushrooms_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_POISON_MUSHROOMS] > 1)
-							G_Damage(ent,poison_mushrooms_user,poison_mushrooms_user,NULL,NULL,6,0,MOD_UNKNOWN);
-						else
-							G_Damage(ent,poison_mushrooms_user,poison_mushrooms_user,NULL,NULL,4,0,MOD_UNKNOWN);
-					}
-
-					ent->client->pers.magic_power_hit_counter[MAGIC_POISON_MUSHROOMS]--;
-					ent->client->pers.magic_power_debounce_timer[MAGIC_POISON_MUSHROOMS] = level.time + 200;
-				}
-				else if (ent->client->pers.magic_power_hit_counter[MAGIC_POISON_MUSHROOMS] == 0 && ent->client->pers.magic_power_debounce_timer[MAGIC_POISON_MUSHROOMS] < level.time)
-				{
-					ent->client->pers.quest_power_status &= ~(1 << 4);
-				}
-			}
-
 			if (ent->client->pers.quest_power_status & (1 << 5))
 			{ // zyk: Black Hole
 				if (ent->client->pers.magic_power_timer[MAGIC_BLACK_HOLE] > level.time)
@@ -6854,11 +6749,6 @@ void quest_power_events(gentity_t *ent)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 23);
 				}
-			}
-
-			if (ent->client->pers.quest_power_status & (1 << 24) && ent->client->pers.magic_power_target_timer[MAGIC_SLEEPING_FLOWERS] < level.time)
-			{ // zyk: hit by Sleeping Flowers
-				ent->client->pers.quest_power_status &= ~(1 << 24);
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << 26) && ent->client->pers.elemental_attack_timer < level.time)

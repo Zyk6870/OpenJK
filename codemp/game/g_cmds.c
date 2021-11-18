@@ -119,8 +119,6 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	2, // Magic Shield
 	2, // Magic Disable
 	2, // Enemy Weakening
-	2, // Sleeping Flowers
-	2, // Poison Mushrooms
 	2, // Black Hole
 	2, // Chaos Power
 	2, // Ultra Drain
@@ -214,8 +212,6 @@ char* zyk_skill_name(int skill_index)
 		"Magic Shield",
 		"Magic Disable",
 		"Enemy Weakening",
-		"Sleeping Flowers",
-		"Poison Mushrooms",
 		"Black Hole",
 		"Chaos Power",
 		"Ultra Drain",
@@ -301,8 +297,6 @@ qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
 		{8, -1},
 		{8, -1},
 		{8, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
 		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
 		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
 		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1},
@@ -430,8 +424,6 @@ char* zyk_allowed_skill_color(int skill_index, int rpg_class)
 			"^2",
 			"^2",
 			"^2",
-			"^7",
-			"^7",
 			"^7",
 			"^7",
 			"^7",
@@ -4517,11 +4509,9 @@ void zyk_set_magic_power_cooldown_time(gentity_t *ent, int duration)
 		ent->client->pers.quest_power_usage_timer = level.time + duration;
 }
 
-extern void poison_mushrooms(gentity_t *ent, int min_distance, int max_distance);
 extern void magic_sense(gentity_t *ent, int duration);
 extern void earthquake(gentity_t *ent, int stun_time, int strength, int distance);
 extern void blowing_wind(gentity_t *ent, int distance, int duration);
-extern void sleeping_flowers(gentity_t *ent, int stun_time, int distance);
 extern void time_power(gentity_t *ent, int distance, int duration);
 extern void chaos_power(gentity_t *ent, int distance, int duration);
 extern void water_splash(gentity_t *ent, int distance, int damage);
@@ -10988,6 +10978,7 @@ qboolean zyk_can_use_unique(gentity_t *ent)
 Cmd_Unique_f
 ==================
 */
+extern qboolean zyk_can_hit_target(gentity_t* attacker, gentity_t* target);
 extern void Jedi_Cloak(gentity_t *self);
 extern void WP_AddAsMindtricked(forcedata_t *fd, int entNum);
 extern qboolean G_InGetUpAnim(playerState_t *ps);
@@ -12046,8 +12037,6 @@ int zyk_get_magic_cost(int magic_number)
 		25, // Magic Shield
 		18, // Magic Disable
 		18, // Enemy Weakening
-		25, // Sleeping Flowers
-		18, // Poison Mushrooms
 		40, // Black Hole
 		30, // Chaos Power
 		30, // Ultra Drain
@@ -12208,16 +12197,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			{
 				enemy_nerf(ent, 450);
 				zyk_set_magic_power_cooldown_time(ent, 12000);
-			}
-			else if (magic_number == MAGIC_SLEEPING_FLOWERS)
-			{
-				sleeping_flowers(ent, 2500, 350);
-				zyk_set_magic_power_cooldown_time(ent, 15000);
-			}
-			else if (magic_number == MAGIC_POISON_MUSHROOMS)
-			{
-				poison_mushrooms(ent, 100, 600);
-				zyk_set_magic_power_cooldown_time(ent, 10000);
 			}
 			else if (magic_number == MAGIC_BLACK_HOLE)
 			{

@@ -563,8 +563,6 @@ typedef enum {
 	MAGIC_MAGIC_SHIELD,
 	MAGIC_MAGIC_DISABLE,
 	MAGIC_ENEMY_WEAKENING,
-	MAGIC_SLEEPING_FLOWERS,
-	MAGIC_POISON_MUSHROOMS,
 	MAGIC_BLACK_HOLE,
 	MAGIC_CHAOS_POWER,
 	MAGIC_ULTRA_DRAIN,
@@ -596,7 +594,7 @@ typedef enum {
 } zyk_quest_t;
 
 // zyk: number of RPG Mode skills
-#define NUMBER_OF_SKILLS 89
+#define NUMBER_OF_SKILLS 87
 
 // zyk: damage bonus of weapon skills
 #define RPG_WEAPON_DMG_BONUS 0.05
@@ -878,7 +876,7 @@ typedef struct clientPersistant_s {
 	//  1 - hit by Chaos Power
 	//  2 - hit by Time Power
 	//  3 - using Flaming Rage
-	//  4 - hit by Poison Mushrooms
+	//  4 - unused
 	//  5 - using Black Hole
 	//  6 - hit by Slow Motion
 	//  7 - using Light of Judgement
@@ -898,7 +896,7 @@ typedef struct clientPersistant_s {
 	// 21 - hit by Enemy Nerf
 	// 22 - using Ice Block
 	// 23 - hit by Flaming Area
-	// 24 - hit by Sleeping Flowers
+	// 24 - unused
 	// 25 - unused
 	// 26 - hit by Elemental Attack
 	int quest_power_status;
