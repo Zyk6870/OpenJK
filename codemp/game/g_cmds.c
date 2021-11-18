@@ -6180,6 +6180,16 @@ void zyk_list_stuff(gentity_t *ent, gentity_t *target_ent)
 	else
 		strcpy(stuff_message, va("%s^3Swimming Upgrade - ^1no\n", stuff_message));
 
+	if (ent->client->pers.secrets_found & (1 << 2))
+		strcpy(stuff_message, va("%s^3\nGunner Radar - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3\nGunner Radar - ^1no\n", stuff_message));
+
+	if (ent->client->pers.secrets_found & (1 << 8))
+		strcpy(stuff_message, va("%s^3\nGunner Items Upgrade - ^2yes\n", stuff_message));
+	else
+		strcpy(stuff_message, va("%s^3\nGunner Items Upgrade - ^1no\n", stuff_message));
+
 	if (ent->client->pers.secrets_found & (1 << 9))
 		strcpy(stuff_message, va("%s^3Impact Reducer - ^2yes\n", stuff_message));
 	else
@@ -6463,7 +6473,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^38 - Gunner Items Upgrade: ^7Buy: 3000\n^315 - Impact Reducer: ^7Buy: 4000\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1800\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2200\n^328 - Rocket Upgrade: ^7Buy: 2500\n^329 - Swimming Upgrade: ^7Buy: 2000\n^333 - Stun Baton Upgrade: ^7Buy: 1500\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^346 - Jetpack Upgrade: ^7Buy: 10000\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^38 - Gunner Radar: ^7Buy: 4000\n\n^315 - Impact Reducer: ^7Buy: 4000\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1800\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2200\n^328 - Rocket Upgrade: ^7Buy: 2500\n^329 - Swimming Upgrade: ^7Buy: 2000\n^333 - Stun Baton Upgrade: ^7Buy: 1500\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^345 - Gunner Items Upgrade: ^7Buy: 3000\n^346 - Jetpack Upgrade: ^7Buy: 10000\n\n\"");
 		}
 		else if (i == 1)
 		{
@@ -6495,7 +6505,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 8)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Gunner Items Upgrade: makes sentry gun, seeker drone and e-web stronger\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Gunner Radar: if you have the New Zyk Mod client, a radar will be displayed in the screen showing positions of other players and npcs\n\n\"");
 		}
 		else if (i == 9)
 		{
@@ -6643,7 +6653,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 45)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Gunner Items Upgrade: makes sentry gun, seeker drone and e-web stronger\n\n\"");
 		}
 		else if (i == 46)
 		{
@@ -6700,7 +6710,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	int value = 0;
 	int found = 0;
-	int item_costs[NUMBER_OF_SELLER_ITEMS] = {15,20,25,40,80,120,150,5000,150,170,180,200,300,200,4000,3000,100,120,150,200,110,90,170,300,2000,1800,2200,2500,2000,200,200,20,1500,100,150,150,90,10,5000,3000,50,50,200,50,5000,10000,5000,700,2000,2000,2000,2000};
+	int item_costs[NUMBER_OF_SELLER_ITEMS] = {15,20,25,40,80,120,150,4000,150,170,180,200,300,200,4000,3000,100,120,150,200,110,90,170,300,2000,1800,2200,2500,2000,200,200,20,1500,100,150,150,90,10,5000,3000,50,50,200,50,3000,10000,5000,700,2000,2000,2000,2000};
 
 	if (trap->Argc() == 1)
 	{
@@ -6767,7 +6777,12 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	}
 
 	// zyk: general validations. Some items require certain conditions to be bought
-	if (value == 15 && ent->client->pers.secrets_found & (1 << 9))
+	if (value == 8 && ent->client->pers.secrets_found & (1 << 2))
+	{
+		trap->SendServerCommand(ent - g_entities, "print \"You already have the Gunner Radar.\n\"");
+		return;
+	}
+	else if (value == 15 && ent->client->pers.secrets_found & (1 << 9))
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"You already have the Impact Reducer.\n\"" );
 		return;
@@ -6812,6 +6827,11 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		trap->SendServerCommand( ent-g_entities, "print \"You already have the Holdable Items Upgrade.\n\"" );
 		return;
 	}
+	else if (value == 45 && ent->client->pers.secrets_found & (1 << 8))
+	{
+		trap->SendServerCommand(ent - g_entities, "print \"You already have the Gunner Items Upgrade.\n\"");
+		return;
+	}
 	else if (value == 46 && ent->client->pers.secrets_found & (1 << 17))
 	{
 		trap->SendServerCommand(ent - g_entities, "print \"You already have the Jetpack Upgrade.\n\"");
@@ -6854,7 +6874,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == 8)
 		{
-			ent->client->pers.secrets_found |= (1 << 7);
+			ent->client->pers.secrets_found |= (1 << 2);
 
 			// zyk: update the rpg stuff info at the client-side game
 			send_rpg_events(10000);

@@ -826,13 +826,13 @@ typedef struct clientPersistant_s {
 	// Possible bit values (1 << bit_value) are:
 	// 0 - Holdable Items Upgrade
 	// 1 - Swimming Upgrade
-	// 2 - unused
+	// 2 - Gunner Radar
 	// 3 - unused
 	// 4 - unused
 	// 5 - unused
 	// 6 - unused
 	// 7 - unused
-	// 8 - unused
+	// 8 - Gunner Items Upgrade
 	// 9 - Impact Reducer
 	// 10 - Flame Thrower
 	// 11 - Power Cell Weapons Upgrade

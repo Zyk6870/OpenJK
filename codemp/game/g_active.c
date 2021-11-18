@@ -912,7 +912,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		else if (!(client->pers.player_statuses & (1 << 2)))
 		{ // zyk: send this event after some seconds in map and if the player did not received this event yet
 			// must wait some seconds because after a map change, sometimes the event is not received by the client-side game right away
-			if (client->sess.amrpgmode == 2 && client->pers.rpg_class == 2 && client->pers.secrets_found & (1 << 1))
+			if (client->sess.amrpgmode == 2 && client->pers.rpg_class == RPGCLASS_GUNNER && client->pers.secrets_found & (1 << 2))
 			{
 				G_AddEvent(ent, EV_ITEMUSEFAIL, 5);
 			}
@@ -942,12 +942,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		}
 		else
 		{
-			// zyk: event to set the stealth attacker upgrade
-			if (client->sess.amrpgmode == 2 && client->pers.rpg_class == 5 && client->pers.secrets_found & (1 << 7))
-				G_AddEvent(ent, EV_ITEMUSEFAIL, 9);
-			else
-				G_AddEvent(ent, EV_ITEMUSEFAIL, 10);
-
 			client->pers.player_statuses &= ~(1 << 2);
 			client->pers.player_statuses &= ~(1 << 3);
 			client->pers.player_statuses &= ~(1 << 7);
