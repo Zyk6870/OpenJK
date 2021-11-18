@@ -221,8 +221,8 @@ char* zyk_skill_name(int skill_index)
 		"Ultra Speed",
 		"Slow Motion",
 		"Black Hole",
-		"Chaos Power",
 		"Dome of Damage",
+		"Chaos Power",
 		"Ultra Drain",
 		"Light of Judgement",
 		"Magic Shield",
@@ -400,7 +400,7 @@ char* zyk_allowed_skill_color(int skill_index, int rpg_class)
 			"^6",
 			"^6",
 			"^6",
-			"^7",
+			"^3",
 			"^3",
 			"^3",
 			"^3",
@@ -418,7 +418,12 @@ char* zyk_allowed_skill_color(int skill_index, int rpg_class)
 			"^3",
 			"^5",
 			"^3",
-			"^3",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
+			"^7",
 			"^7",
 			"^7",
 			"^7",
@@ -6168,7 +6173,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 32, 62, 16);
+		zyk_list_category_skills(ent, target_ent, 30, 62, 18);
 	}
 }
 
@@ -6485,7 +6490,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^38 - Gunner Radar: ^7Buy: 4000\n\n^315 - Impact Reducer: ^7Buy: 4000\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1800\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2200\n^328 - Rocket Upgrade: ^7Buy: 2500\n^329 - Swimming Upgrade: ^7Buy: 2000\n^333 - Stun Baton Upgrade: ^7Buy: 1500\n^339 - Thermal Vision: ^7Buy: 2500\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^345 - Gunner Items Upgrade: ^7Buy: 3000\n^346 - Jetpack Upgrade: ^7Buy: 8000\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^38 - Gunner Radar: ^7Buy: 4000\n^315 - Impact Reducer: ^7Buy: 4000\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1800\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2200\n^328 - Rocket Upgrade: ^7Buy: 2500\n^329 - Swimming Upgrade: ^7Buy: 2000\n^333 - Stun Baton Upgrade: ^7Buy: 1500\n^339 - Thermal Vision: ^7Buy: 2500\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^345 - Gunner Items Upgrade: ^7Buy: 3000\n^346 - Jetpack Upgrade: ^7Buy: 8000\n\n\"");
 		}
 		else if (i == 1)
 		{
