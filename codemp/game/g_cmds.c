@@ -115,14 +115,14 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	2, // Reverse Wind
 	2, // Ultra Speed
 	2, // Slow Motion
-	2, // Dome of Damage
-	2, // Magic Shield
 	2, // Magic Disable
 	2, // Enemy Weakening
 	2, // Black Hole
+	2, // Dome of Damage
 	2, // Chaos Power
 	2, // Ultra Drain
 	2, // Light of Judgement
+	2, // Magic Shield
 	2, // Magic Immunity
 	2  // Time Stop
 };
@@ -208,14 +208,14 @@ char* zyk_skill_name(int skill_index)
 		"Reverse Wind",
 		"Ultra Speed",
 		"Slow Motion",
-		"Dome of Damage",
-		"Magic Shield",
 		"Magic Disable",
 		"Enemy Weakening",
 		"Black Hole",
 		"Chaos Power",
+		"Dome of Damage",
 		"Ultra Drain",
 		"Light of Judgement",
+		"Magic Shield",
 		"Magic Immunity",
 		"Time Stop",
 	};
@@ -426,11 +426,11 @@ char* zyk_allowed_skill_color(int skill_index, int rpg_class)
 			"^2",
 			"^7",
 			"^7",
-			"^7",
-			"^7",
 			"^6",
 			"^6",
 			"^6",
+			"^6",
+			"^5",
 			"^5",
 			"^5",
 			"^5",
@@ -603,28 +603,24 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 76)
 		return "decreases run speed of enemies nearby";
 	if (skill_index == 77)
-		return "an energy dome appears at enemies, damaging anyone inside it";
-	if (skill_index == 78)
-		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
-	if (skill_index == 79)
 		return "makes enemies unable to use magic powers for some seconds. Not so effective against magic using npcs, like bosses";
-	if (skill_index == 80)
+	if (skill_index == 78)
 		return "decreases damage and resistance of enemies nearby";
-	if (skill_index == 81)
-		return "knocks down enemies for some seconds";
-	if (skill_index == 82)
-		return "poisons enemies nearby, making them take damage for some seconds";
-	if (skill_index == 83)
+	if (skill_index == 79)
 		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
-	if (skill_index == 84)
+	if (skill_index == 80)
+		return "an energy dome appears at enemies, damaging anyone inside it";
+	if (skill_index == 81)
 		return "damages, stuns, slowers and electrifies enemies";
-	if (skill_index == 85)
+	if (skill_index == 82)
 		return "damages enemies in the area and recovers your hp";
-	if (skill_index == 86)
+	if (skill_index == 83)
 		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
-	if (skill_index == 87)
+	if (skill_index == 84)
+		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
+	if (skill_index == 85)
 		return "protects you from other magic powers for some seconds";
-	if (skill_index == 88)
+	if (skill_index == 86)
 		return "paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed";
 
 	return "";
@@ -12178,16 +12174,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				slow_motion(ent, 400, 15000);
 				zyk_set_magic_power_cooldown_time(ent, 9000);
 			}
-			else if (magic_number == MAGIC_DOME_OF_DAMAGE)
-			{
-				dome_of_damage(ent, 500, 25);
-				zyk_set_magic_power_cooldown_time(ent, 16000);
-			}
-			else if (magic_number == MAGIC_MAGIC_SHIELD)
-			{
-				magic_shield(ent, 6000);
-				zyk_set_magic_power_cooldown_time(ent, 24000);
-			}
 			else if (magic_number == MAGIC_MAGIC_DISABLE)
 			{
 				magic_disable(ent, 450);
@@ -12203,6 +12189,11 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				black_hole(ent, 540, 40, 7000);
 				zyk_set_magic_power_cooldown_time(ent, 48000);
 			}
+			else if (magic_number == MAGIC_DOME_OF_DAMAGE)
+			{
+				dome_of_damage(ent, 500, 25);
+				zyk_set_magic_power_cooldown_time(ent, 16000);
+			}
 			else if (magic_number == MAGIC_CHAOS_POWER)
 			{
 				chaos_power(ent, 400, 3000);
@@ -12217,6 +12208,11 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			{
 				light_of_judgement(ent, 540, 7000);
 				zyk_set_magic_power_cooldown_time(ent, 48000);
+			}
+			else if (magic_number == MAGIC_MAGIC_SHIELD)
+			{
+				magic_shield(ent, 6000);
+				zyk_set_magic_power_cooldown_time(ent, 24000);
 			}
 			else if (magic_number == MAGIC_MAGIC_IMMUNITY)
 			{
