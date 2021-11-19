@@ -3513,12 +3513,15 @@ void ClientThink_real( gentity_t *ent ) {
 				if (pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE)
 				{ 
 					if (ent->client->pers.rpg_class == RPGCLASS_GUNNER &&
-						ent->client->ps.droneExistTime >= (level.time + 5000))
-					{ // zyk: Gunner can get seeker drone back with saber style key
+						ent->client->ps.droneExistTime >= (level.time + 5000) &&
+						ent->client->ps.ammo[AMMO_POWERCELL] >= 1 && ent->client->pers.secrets_found & (1 << 8))
+					{ // zyk: Gunner can get seeker drone back with saber style key. Uses some power cell ammo
 						ent->client->ps.droneExistTime = 0;
 						ent->client->ps.eFlags &= ~EF_SEEKERDRONE;
 						ent->client->ps.genericEnemyIndex = -1;
 						ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
+
+						ent->client->ps.ammo[AMMO_POWERCELL] -= 1;
 
 						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));
 					}

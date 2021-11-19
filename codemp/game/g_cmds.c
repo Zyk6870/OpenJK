@@ -6670,7 +6670,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == 45)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Gunner Items Upgrade: makes sentry gun, seeker drone and e-web stronger. Can get sentry guns and force fields back by pressing Use Key near them\n\n\"");
+			trap->SendServerCommand( ent-g_entities, "print \"\n^3Gunner Items Upgrade: makes sentry gun, seeker drone and e-web stronger. Can get seeker drone back by pressing Saber Style key and sentry guns and force fields back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"");
 		}
 		else if (i == 46)
 		{
