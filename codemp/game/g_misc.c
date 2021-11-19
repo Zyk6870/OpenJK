@@ -3032,9 +3032,9 @@ void fx_runner_link( gentity_t *ent )
 			ent->nextthink = level.time + 100; // wait a small bit, then start working
 		}
 		else if (Q_stricmp(ent->targetname, "zyk_quest_effect_rockfall") == 0)
-		{ // zyk: Rockfall power. Starts the effect imediately but damages a bit later
+		{ // zyk: starts the Rock Smash effect right now
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
-			ent->nextthink = level.time + 1500;
+			ent->nextthink = level.time + 100;
 		}
 		else if (Q_stricmp(ent->targetname, "zyk_quest_effect_watersplash") == 0 || 
 				 Q_stricmp(ent->targetname, "zyk_quest_effect_time") == 0 || 

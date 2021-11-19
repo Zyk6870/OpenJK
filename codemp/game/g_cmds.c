@@ -111,7 +111,7 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	2, // Ice Stalagmite
 	2, // Ice Block
 	2, // Earthquake
-	2, // Rockfall
+	2, // Rock Smash
 	2, // Shifting Sand
 	2, // Tree of Life
 	2, // Flame Burst
@@ -209,7 +209,7 @@ char* zyk_skill_name(int skill_index)
 		"Ice Stalagmite",
 		"Ice Block",
 		"Earthquake",
-		"Rockfall",
+		"Rock Smash",
 		"Shifting Sand",
 		"Tree of Life",
 		"Flame Burst",
@@ -11583,7 +11583,7 @@ int zyk_get_magic_cost(int magic_number)
 		20, // Ice Stalagmite
 		20, // Ice Block
 		18, // Earthquake
-		18, // Rockfall
+		18, // Rock Smash
 		18, // Shifting Sand
 		17, // Tree of Life
 		23, // Flame Burst
