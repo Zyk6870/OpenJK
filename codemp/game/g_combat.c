@@ -2146,11 +2146,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	self->client->pers.player_statuses &= ~(1 << 29);
 	self->client->pers.unique_skill_duration = 0;
 
-	// zyk: stoping Unique Abilities when player dies
-	self->client->pers.player_statuses &= ~(1 << 21);
-	self->client->pers.player_statuses &= ~(1 << 22);
-	self->client->pers.player_statuses &= ~(1 << 23);
-
 	if (self->client->pers.player_statuses & (1 << 28))
 	{ // zyk: custom quest npc defeated
 		if (self->client->playerTeam == NPCTEAM_PLAYER)

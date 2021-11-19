@@ -6654,9 +6654,8 @@ void fire_bolt_hits(gentity_t* ent)
 
 		zyk_quest_effect_spawn(fire_bolt_user, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 300);
 
-		if (fire_bolt_user->client->pers.unique_skill_duration > level.time && !(fire_bolt_user->client->pers.player_statuses & (1 << 21)) &&
-			!(fire_bolt_user->client->pers.player_statuses & (1 << 22)) && !(fire_bolt_user->client->pers.player_statuses & (1 << 23)))
-		{ // zyk: Unique Skill increases damage
+		if (fire_bolt_user->client->pers.unique_skill_duration > level.time && fire_bolt_user->client->pers.active_unique_skill == 1)
+		{ // zyk: Magic Buff increases damage
 			G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 6, 0, MOD_UNKNOWN);
 		}
 		else
