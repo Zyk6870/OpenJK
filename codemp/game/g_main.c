@@ -5796,8 +5796,6 @@ void ultra_drain(gentity_t *ent, int radius, int damage, int duration)
 	}
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_drain", "4", "misc/possession", 500, damage, radius, duration);
-
-	zyk_spawn_black_hole_model(ent, duration, 50);
 }
 
 // zyk: Black Hole
