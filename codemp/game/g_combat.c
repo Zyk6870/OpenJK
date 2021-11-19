@@ -4950,7 +4950,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	// zyk: player or npc with Magic Shield takes little damage
 	if (targ && targ->client && (targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.quest_power_status & (1 << 11))
 	{
-		damage = (int)ceil(damage * 0.1);
+		damage = (int)ceil(damage * 0.2);
 	}
 
 	// zyk: hit by Time Power. Receive less damage
@@ -4991,7 +4991,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		else if (targ->client->pers.rpg_class == RPGCLASS_FORCE_USER && targ->client->pers.active_unique_skill == 1 && 
 			targ->client->pers.unique_skill_duration > level.time)
 		{ // zyk: Force Shield
-			damage = (int)ceil(damage * 0.25);
+			damage = (int)ceil(damage * 0.3);
 		}
 		else if (targ->client->pers.rpg_class == RPGCLASS_GUNNER)
 		{
