@@ -195,7 +195,7 @@ int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] =
 	},
 	{ // zyk: level 5
 		999,//FP_HEAL,//instant
-		10,//FP_LEVITATION,//hold/duration
+		999,//FP_LEVITATION,//hold/duration
 		999,//FP_SPEED,//duration
 		999,//FP_PUSH,//hold/duration
 		999,//FP_PULL,//hold/duration
@@ -222,7 +222,7 @@ float forceJumpHeight[NUM_FORCE_POWER_LEVELS] =
 	96,//(+stepheight+crouchdiff = 130)
 	192,//(+stepheight+crouchdiff = 226)
 	384,//(+stepheight+crouchdiff = 418)
-	928, // zyk: added jump level 4, used in RPG mode
+	6016, // zyk: added jump level 4, used in RPG mode. Old value was 928
 	6016 // zyk: added jump level 5, used in RPG mode
 };
 
@@ -1786,7 +1786,7 @@ float forceJumpHeightMax[NUM_FORCE_POWER_LEVELS] =
 	130,//(96+stepheight(18)+crouchdiff(24) = 138)
 	226,//(192+stepheight(18)+crouchdiff(24) = 234)
 	418,//(384+stepheight(18)+crouchdiff(24) = 426)
-	970, // zyk: added jump level 4, used in RPG mode
+	6058, // zyk: added jump level 4, used in RPG mode. Old value was 970
 	6058 // zyk: added jump level 5, used in RPG mode
 };
 
@@ -2788,8 +2788,8 @@ static qboolean PM_CheckJump( void )
 	*/
 	if ( pm->ps->groundEntityNum == ENTITYNUM_NONE )
 	{
-		// zyk: Jump 5/5 will allow jumping out of water, so dont return qfalse here if player has it
-		if (!(pm->waterlevel == 1 && pm->cmd.upmove > 0 && pm->ps->fd.forcePowerLevel[FP_LEVITATION] == FORCE_LEVEL_5 && pm->ps->fd.forcePower >= 5))
+		// zyk: Jump at max level will allow jumping out of water, so dont return qfalse here if player has it
+		if (!(pm->waterlevel == 1 && pm->cmd.upmove > 0 && pm->ps->fd.forcePowerLevel[FP_LEVITATION] == FORCE_LEVEL_4 && pm->ps->fd.forcePower >= 5))
 		{
 			return qfalse;
 		}

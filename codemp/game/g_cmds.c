@@ -38,7 +38,7 @@ void SetTeamQuick(gentity_t *ent, int team, qboolean doBegin);
 
 // zyk: max levels of the RPG skills
 const int max_skill_levels[NUMBER_OF_SKILLS] = {
-	5, // Jump
+	4, // Jump
 	3, // Push
 	3, // Pull
 	4, // Speed
