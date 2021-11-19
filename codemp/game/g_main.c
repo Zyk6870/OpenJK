@@ -4612,9 +4612,6 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 
 		if (Q_stricmp(targetname, "zyk_quest_effect_drain") == 0)
 			G_Sound(new_ent, CHAN_AUTO, G_SoundIndex("sound/effects/arc_lp.wav"));
-
-		if (Q_stricmp(targetname, "zyk_quest_effect_sand") == 0)
-			ent->client->pers.quest_power_effect1_id = new_ent->s.number;
 	}
 	else
 	{ // zyk: model power
@@ -5443,52 +5440,6 @@ void water_attack(gentity_t *ent, int distance, int damage)
 	}
 }
 
-// zyk Shifting Sand
-void shifting_sand(gentity_t *ent, int distance)
-{
-	int time_to_teleport = 1800;
-	int i = 0;
-	int targets_hit = 0;
-	int min_distance = distance;
-	int enemy_dist = 0;
-	gentity_t *this_enemy = NULL;
-
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_SHIFTING_SAND] > 1)
-	{
-		distance *= 1.5;
-		min_distance = distance;
-	}
-
-	for (i = 0; i < level.num_entities; i++)
-	{
-		gentity_t *player_ent = &g_entities[i];
-
-		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
-		{ // zyk: teleport to the nearest enemy
-			enemy_dist = Distance(ent->client->ps.origin, player_ent->client->ps.origin);
-
-			if (enemy_dist < min_distance)
-			{
-				min_distance = enemy_dist;
-				this_enemy = player_ent;
-			}
-		}
-	}
-
-	if (this_enemy)
-	{ // zyk: found an enemy
-		ent->client->pers.quest_power_status |= (1 << 17);
-
-		ent->client->pers.magic_power_user_id[MAGIC_SHIFTING_SAND] = this_enemy->s.number;
-
-		// zyk: used to bring the player back if he gets stuck
-		VectorCopy(ent->client->ps.origin, ent->client->pers.teleport_angles);
-	}
-
-	ent->client->pers.magic_power_timer[MAGIC_SHIFTING_SAND] = level.time + time_to_teleport;
-	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_sand", "0", "env/sand_spray", 0, 0, 0, time_to_teleport);
-}
-
 // zyk: Time Stop
 extern void display_yellow_bar(gentity_t *ent, int duration);
 void time_power(gentity_t *ent, int distance, int duration)
@@ -5537,6 +5488,48 @@ void time_power(gentity_t *ent, int distance, int duration)
 			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/electric_beam_lp.wav"));
 		}
 	}
+}
+
+// zyk: Rock Shield. Spawns a rock around the player that absorbs all damage
+void rock_shield(gentity_t *ent, int health, int duration)
+{
+	gentity_t* new_ent = G_Spawn();
+
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ROCK_SHIELD] > 1)
+	{
+		health *= 2;
+	}
+
+	zyk_main_set_entity_field(new_ent, "classname", "misc_model_breakable");
+	zyk_main_set_entity_field(new_ent, "spawnflags", "8");
+	zyk_main_set_entity_field(new_ent, "health", "10000");
+	zyk_main_set_entity_field(new_ent, "model", "models/map_objects/desert/rock.md3");
+	zyk_main_set_entity_field(new_ent, "origin", va("%f %f %f", ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2]));
+	zyk_main_set_entity_field(new_ent, "angles", "0 0 90");
+	zyk_main_set_entity_field(new_ent, "zykmodelscale", "70");
+
+	zyk_main_spawn_entity(new_ent);
+
+	// zyk: Rock health
+	new_ent->count = health;
+
+	new_ent->material = 4;
+
+	// zyk: chunk model
+	new_ent->s.modelGhoul2 = G_ModelIndex("models/chunks/rock/rock1_1.md3");
+
+	ent->client->pers.quest_power_model1_id = new_ent->s.number;
+	ent->client->pers.quest_power_status |= (1 << 17);
+	ent->client->pers.magic_power_timer[MAGIC_ROCK_SHIELD] = level.time + duration;
+
+	level.special_power_effects[new_ent->s.number] = ent->s.number;
+	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+
+	new_ent->s.pos.trTime = level.time;
+	new_ent->s.pos.trType = TR_LINEAR;
+	VectorCopy(ent->r.currentOrigin, new_ent->s.pos.trBase);
+
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_drop_small.mp3.wav"));
 }
 
 // zyk: Water Splash. Damages the targets and heals the user
@@ -6463,51 +6456,22 @@ void quest_power_events(gentity_t *ent)
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << 17))
-			{ // zyk: Shifting Sand
-				if (ent->client->pers.magic_power_timer[MAGIC_SHIFTING_SAND] < level.time)
-				{ // zyk: after this time, teleports to the new location and add effect there too
-					if (Distance(ent->client->ps.origin, g_entities[ent->client->pers.quest_power_effect1_id].s.origin) < 100)
-					{ // zyk: only teleports if the player is near the effect
-						vec3_t origin;
-						int random_x = Q_irand(0, 1);
-						int random_y = Q_irand(0, 1);
-
-						if (random_x == 0)
-							random_x = -1;
-						if (random_y == 0)
-							random_y = -1;
-
-						gentity_t *this_enemy = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_SHIFTING_SAND]];
-
-						origin[0] = this_enemy->client->ps.origin[0] + (Q_irand(70, 100) * random_x);
-						origin[1] = this_enemy->client->ps.origin[1] + (Q_irand(70, 100) * random_y);
-						origin[2] = this_enemy->client->ps.origin[2] + Q_irand(40, 100);
-
-						zyk_TeleportPlayer(ent, origin, ent->client->ps.viewangles);
-
-						VectorCopy(ent->client->ps.origin, ent->client->pers.teleport_point);
-					}
-
-					ent->client->pers.quest_power_status &= ~(1 << 17);
-					ent->client->pers.quest_power_status |= (1 << 18);
-
-					ent->client->pers.magic_power_timer[MAGIC_SHIFTING_SAND] = level.time + 4000;
-					zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_sand", "0", "env/sand_spray", 0, 0, 0, 2000);
-				}
-			}
-
-			if (ent->client->pers.quest_power_status & (1 << 18))
-			{ // zyk: Shifting Sand after the teleport, validating if player is not suck
-				if (ent->client->pers.magic_power_timer[MAGIC_SHIFTING_SAND] < level.time)
+			{ // zyk: Rock Shield
+				if (ent->client->pers.quest_power_model1_id != -1)
 				{
-					if (VectorCompare(ent->client->ps.origin, ent->client->pers.teleport_point) == qtrue)
-					{ // zyk: stuck, teleport back
-						zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_sand", "0", "env/sand_spray", 0, 0, 0, 1000);
-						zyk_TeleportPlayer(ent, ent->client->pers.teleport_angles, ent->client->ps.viewangles);
-						zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_sand", "0", "env/sand_spray", 0, 0, 0, 1000);
-					}
+					gentity_t *rock_ent = &g_entities[ent->client->pers.quest_power_model1_id];
 
-					ent->client->pers.quest_power_status &= ~(1 << 18);
+					// zyk: move the Rock so it is always in the player origin
+					VectorCopy(ent->client->ps.origin, rock_ent->s.pos.trBase);
+				}
+				else
+				{ // zyk: Rock was destroyed. Stop using this magic
+					ent->client->pers.quest_power_status &= ~(1 << 17);
+				}
+
+				if (ent->client->pers.magic_power_timer[MAGIC_ROCK_SHIELD] < level.time)
+				{ // zyk: Rock Shield run out
+					ent->client->pers.quest_power_status &= ~(1 << 17);
 				}
 			}
 

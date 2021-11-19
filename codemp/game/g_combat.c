@@ -4959,6 +4959,24 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		damage = (int)ceil(damage * 0.1);
 	}
 
+	// zyk: Rock Shield. Prevents almost all damage
+	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 17))
+	{
+		int original_damage = damage;
+		gentity_t* rock_ent = &g_entities[targ->client->pers.quest_power_model1_id];
+
+		damage = (int)ceil(damage * 0.01);
+
+		rock_ent->count -= (original_damage - damage);
+
+		if (rock_ent->count < 1)
+		{ // zyk: breaks the Rock when it loses all its health
+			rock_ent->die(rock_ent, rock_ent, rock_ent, 9999, MOD_UNKNOWN);
+
+			targ->client->pers.quest_power_model1_id = -1;
+		}
+	}
+
 	if (targ && targ->client && targ->client->sess.amrpgmode == 2)
 	{ // zyk: damage resistance of each class
 		if (targ->client->pers.player_statuses & (1 << 8) && mod == MOD_SABER)

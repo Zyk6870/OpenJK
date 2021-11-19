@@ -112,7 +112,7 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	2, // Ice Block
 	2, // Earthquake
 	2, // Rock Smash
-	2, // Shifting Sand
+	2, // Rock Shield
 	2, // Tree of Life
 	2, // Flame Burst
 	2, // Ultra Flame
@@ -210,7 +210,7 @@ char* zyk_skill_name(int skill_index)
 		"Ice Block",
 		"Earthquake",
 		"Rock Smash",
-		"Shifting Sand",
+		"Rock Shield",
 		"Tree of Life",
 		"Flame Burst",
 		"Ultra Flame",
@@ -617,7 +617,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 73)
 		return "rocks keep falling at the enemies, causing high damage";
 	if (skill_index == 74)
-		return "a shifting sand appears, sending you to your nearest enemy. Stand near the sand to be transported to the enemy";
+		return "a rock appears around you, absorbing 99 per cent of any damage you take. It the rock takes a certain amount of damage, it breaks. At level 2, the rock absorbs more damage";
 	if (skill_index == 75)
 		return "a big tree appears, protecting you from attacks and healing you";
 	if (skill_index == 76)
@@ -4555,7 +4555,7 @@ extern void lightning_dome(gentity_t *ent, int damage);
 extern void magic_explosion(gentity_t *ent, int radius, int damage, int duration);
 extern void flame_burst(gentity_t *ent, int duration);
 extern void water_attack(gentity_t *ent, int distance, int damage);
-extern void shifting_sand(gentity_t *ent, int distance);
+extern void rock_shield(gentity_t* ent, int health, int duration);
 extern void tree_of_life(gentity_t *ent);
 extern void magic_disable(gentity_t *ent, int distance);
 extern void flaming_area(gentity_t *ent, int damage);
@@ -11584,7 +11584,7 @@ int zyk_get_magic_cost(int magic_number)
 		20, // Ice Block
 		18, // Earthquake
 		18, // Rock Smash
-		18, // Shifting Sand
+		18, // Rock Shield
 		17, // Tree of Life
 		23, // Flame Burst
 		21, // Ultra Flame
@@ -11697,9 +11697,9 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				rock_fall(ent, 500, 40);
 				zyk_set_magic_power_cooldown_time(ent, 11000);
 			}
-			else if (magic_number == MAGIC_SHIFTING_SAND)
+			else if (magic_number == MAGIC_ROCK_SHIELD)
 			{
-				shifting_sand(ent, 1000);
+				rock_shield(ent, 500, 20000);
 				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_TREE_OF_LIFE)

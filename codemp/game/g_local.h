@@ -551,7 +551,7 @@ typedef enum {
 	MAGIC_ICE_BLOCK,
 	MAGIC_EARTHQUAKE,
 	MAGIC_ROCKFALL,
-	MAGIC_SHIFTING_SAND,
+	MAGIC_ROCK_SHIELD,
 	MAGIC_TREE_OF_LIFE,
 	MAGIC_FLAME_BURST,
 	MAGIC_ULTRA_FLAME,
@@ -885,8 +885,8 @@ typedef struct clientPersistant_s {
 	// 14 - unused
 	// 15 - unused
 	// 16 - unused
-	// 17 - using Shifting Sand
-	// 18 - Shifting Sand after teleport
+	// 17 - using Rock Shield
+	// 18 - unused
 	// 19 - using Tree of Life
 	// 20 - hit by Reverse Wind
 	// 21 - hit by Enemy Nerf
@@ -915,8 +915,8 @@ typedef struct clientPersistant_s {
 	// zyk: player ids which are hitting the target player with magic
 	int magic_power_user_id[MAX_MAGIC_POWERS];
 
-	// zyk: sets the id of the effect of the magic used by this player
-	int quest_power_effect1_id;
+	// zyk: sets the model of a magic used by this player
+	int quest_power_model1_id;
 
 	// zyk: interval between each time the Immunity Power effect is shown to avoid spamming too many effects
 	int immunity_power_effect_cooldown;
