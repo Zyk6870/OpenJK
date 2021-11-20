@@ -5845,9 +5845,9 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 
 		strcpy(content,"");
 
-		for (i = 0; i < 69; i++)
+		for (i = 0; i < 105; i++)
 		{
-			if (i == 63)
+			if (i == 99)
 			{
 				strcpy(content, va("%s%s", content, zyk_get_settings_values(ent)));
 			}
