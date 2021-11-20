@@ -1673,7 +1673,7 @@ static void CG_ZykMod( void )
 
 	trap->Cmd_Argv( 1, arg, sizeof( arg ) );
 
-	while (j < 89)
+	while (j < 111)
 	{ // zyk: parsing info from the server and setting the respective cvars
 		k = 0;
 
@@ -1741,13 +1741,13 @@ static void CG_ZykMod( void )
 					trap->Cvar_Set(va("ui_zyk_skill_%d_level", skill_number), va("%s",value));
 			}
 		}
-		else if (j < 107)
+		else if (j < 108)
 		{
 			int setting_value = j-99;
 
 			trap->Cvar_Set(va("ui_zyk_setting_%d_value", setting_value), va("%s",value));
 		}
-		else if (j < 108)
+		else if (j < 109)
 		{ // zyk: receive the Upgrades bought from the seller
 			int secrets_found = atoi(value);
 
@@ -1816,7 +1816,7 @@ static void CG_ZykMod( void )
 			else
 				trap->Cvar_Set("ui_zyk_upgrade_12_value","Jetpack Upgrade - no");
 		}
-		else if (j == 108)
+		else if (j == 109)
 		{ // zyk: quest player
 			int quest_player_id = atoi(value);
 
@@ -1829,7 +1829,7 @@ static void CG_ZykMod( void )
 				trap->Cvar_Set("ui_zyk_quest_player", "Quest Player - ");
 			}
 		}
-		else if (j == 109)
+		else if (j == 110)
 		{ // zyk: duration of Unique Skills
 			if (cg.unique_duration_control == 0)
 			{
