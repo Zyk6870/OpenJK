@@ -1038,8 +1038,6 @@ Ghoul2 Insert End
 	int magic_power;
 
 	int immunity_power_duration;
-	int ultra_strength_duration;
-	int ultra_resistance_duration;
 
 	// zyk: Unique Skill cooldown timer
 	int unique_cooldown_timer;
@@ -1050,16 +1048,13 @@ Ghoul2 Insert End
 	// zyk: used to control in which moment the Unique duration must be set so it does not reset when a new server command sends the unique duration again
 	int unique_duration_control;
 
-	// zyk: used to change the Unique bar timer
-	int using_unique_boost;
-
 	// zyk: RPG Mode class of the players
 	int rpg_class[MAX_CLIENTS];
 
 	// zyk: sets clients which must have some RPG stuff set for this cg player to see the stuff on them
 	// Possible bitvalues:
 	// 0 - Blue Jet Flame
-	// 1 - Stealth Attacker Upgrade, which makes Radar not see this player
+	// 1 - unused
 	// 2 - Player ally
 	int zyk_rpg_stuff[MAX_CLIENTS];
 } cg_t;

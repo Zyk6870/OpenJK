@@ -2679,14 +2679,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			{ // zyk: Immunity Power
 				cg.immunity_power_duration = cg.time + 25000;
 			}
-			else if (es->eventParm == 102)
-			{ // zyk: Ultra Strength
-				cg.ultra_strength_duration = cg.time + 30000;
-			}
-			else if (es->eventParm == 103)
-			{ // zyk: Ultra Resistance
-				cg.ultra_resistance_duration = cg.time + 30000;
-			}
 		}
 
 		if (es->number < MAX_CLIENTS)
@@ -2777,14 +2769,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			else if (es->eventParm == 8)
 			{ // zyk: remove blue jetpack flame
 				cg.zyk_rpg_stuff[es->number] &= ~(1 << 0);
-			}
-			else if (es->eventParm == 9)
-			{ // zyk: add this player so it will not be visible by the cg player radar
-				cg.zyk_rpg_stuff[es->number] |= (1 << 1);
-			}
-			else if (es->eventParm == 10)
-			{ // zyk: remove this player so it will be visible by the cg player radar
-				cg.zyk_rpg_stuff[es->number] &= ~(1 << 1);
 			}
 		}
 		break;

@@ -9977,35 +9977,14 @@ void CG_Player( centity_t *cent ) {
 	if (cent->currentState.number < MAX_CLIENTS && 
 		cent->currentState.powerups & (1 << PW_NEUTRALFLAG))
 	{ 
-		if (cg.rpg_class[cent->currentState.number] == 1) // zyk: Force User, draws the Force Shield effect
-			CG_DrawPlayerSphere(cent, cent->lerpOrigin, 1.4f, cgs.media.ysaliblueShader );
-		else if (cg.rpg_class[cent->currentState.number] == 9) // zyk: Force Guardian, draws the resistance shield around him
-			CG_DrawPlayerSphere(cent, cent->lerpOrigin, 1.4f, cgs.media.ysaliredShader );
+		if (cg.rpg_class[cent->currentState.number] == 2) // zyk: Force User, draws the Force Shield effect
+		{
+			CG_DrawPlayerSphere(cent, cent->lerpOrigin, 1.4f, cgs.media.ysaliblueShader);
+		}
 
-		if (cg.snap->ps.clientNum == cent->currentState.number && cg.rpg_class[cent->currentState.number] >= 0 && cg.unique_cooldown_timer == 0)
+		if (cg.snap->ps.clientNum == cent->currentState.number && cg.rpg_class[cent->currentState.number] > 0 && cg.unique_cooldown_timer == 0)
 		{ // zyk: classes that are using Unique Skill must show the cooldown time
-			int unique_cooldown_duration = 0;
-
-			if (cg.rpg_class[cent->currentState.number] == 0)
-				unique_cooldown_duration = 50000;
-			else if (cg.rpg_class[cent->currentState.number] == 1)
-				unique_cooldown_duration = 50000;
-			else if (cg.rpg_class[cent->currentState.number] == 2)
-				unique_cooldown_duration = 35000;
-			else if (cg.rpg_class[cent->currentState.number] == 3)
-				unique_cooldown_duration = 30000;
-			else if (cg.rpg_class[cent->currentState.number] == 4)
-				unique_cooldown_duration = 30000;
-			else if (cg.rpg_class[cent->currentState.number] == 5)
-				unique_cooldown_duration = 45000;
-			else if (cg.rpg_class[cent->currentState.number] == 6)
-				unique_cooldown_duration = 45000;
-			else if (cg.rpg_class[cent->currentState.number] == 7)
-				unique_cooldown_duration = 40000;
-			else if (cg.rpg_class[cent->currentState.number] == 8)
-				unique_cooldown_duration = 50000;
-			else if (cg.rpg_class[cent->currentState.number] == 9)
-				unique_cooldown_duration = 50000;
+			int unique_cooldown_duration = 25000;
 
 			cg.unique_cooldown_timer = cg.time + unique_cooldown_duration;
 			cg.unique_cooldown_duration = unique_cooldown_duration;
