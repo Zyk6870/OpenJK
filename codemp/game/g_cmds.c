@@ -4567,7 +4567,7 @@ extern void time_power(gentity_t *ent, int distance, int duration);
 extern void chaos_power(gentity_t *ent, int distance, int duration);
 extern void water_splash(gentity_t *ent, int distance, int damage);
 extern void ultra_flame(gentity_t *ent, int distance, int damage);
-extern void rock_fall(gentity_t *ent, int distance, int damage);
+extern void rock_smash(gentity_t *ent, int distance, int damage);
 extern void dome_of_damage(gentity_t *ent, int distance, int damage);
 extern void ice_stalagmite(gentity_t *ent, int distance, int damage);
 extern void slow_motion(gentity_t *ent, int distance, int duration);
@@ -11717,9 +11717,9 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				earthquake(ent, 2000, 300, 500);
 				zyk_set_magic_power_cooldown_time(ent, 11000);
 			}
-			else if (magic_number == MAGIC_ROCKFALL)
+			else if (magic_number == MAGIC_ROCK_SMASH)
 			{
-				rock_fall(ent, 500, 40);
+				rock_smash(ent, 500, 40);
 				zyk_set_magic_power_cooldown_time(ent, 11000);
 			}
 			else if (magic_number == MAGIC_ROCK_SHIELD)

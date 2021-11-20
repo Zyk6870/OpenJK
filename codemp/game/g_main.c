@@ -5556,13 +5556,13 @@ void water_splash(gentity_t *ent, int distance, int damage)
 	}
 }
 
-// zyk: Rockfall
-void rock_fall(gentity_t *ent, int distance, int damage)
+// zyk: Rock Smash
+void rock_smash(gentity_t *ent, int distance, int damage)
 {
 	int i = 0;
 	int targets_hit = 0;
 
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ROCKFALL] > 1)
+	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ROCK_SMASH] > 1)
 	{
 		distance += (distance/2);
 	}
@@ -5573,7 +5573,7 @@ void rock_fall(gentity_t *ent, int distance, int damage)
 
 		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qtrue, &targets_hit) == qtrue)
 		{
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_rockfall", "4", "env/rock_smash", 0, damage, 100, 8000);
+			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_rock_smash", "4", "env/rock_smash", 0, damage, 100, 8000);
 		}
 	}
 }
