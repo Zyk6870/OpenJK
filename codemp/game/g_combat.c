@@ -4859,11 +4859,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 		else if (attacker->client->pers.rpg_class == RPGCLASS_FORCE_USER && (mod == MOD_SABER || mod == MOD_FORCE_DARK))
 		{ // zyk: Force User
-			damage = (int)ceil(damage * (1.0 + (0.04 * attacker->client->pers.skill_levels[38])));
+			damage = (int)ceil(damage * (1.0 + (0.05 * attacker->client->pers.skill_levels[38])));
 		}
 		else if (attacker->client->pers.rpg_class == RPGCLASS_GUNNER && mod != MOD_SABER && mod != MOD_MELEE && mod != MOD_FORCE_DARK)
 		{ // zyk: Gunner
-			damage = (int)ceil(damage * (1.0 + (0.04 * attacker->client->pers.skill_levels[38])));
+			damage = (int)ceil(damage * (1.0 + (0.05 * attacker->client->pers.skill_levels[38])));
 		}
 		else if (attacker->client->pers.rpg_class == RPGCLASS_WIZARD && mod == MOD_MELEE)
 		{ // zyk: Magic bolts can damage heavy things

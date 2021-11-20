@@ -545,7 +545,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 37)
 		return "recovers 3 shield at level 1, 6 shield at level 2 and 9 shield at level 3 to players near you. To use it, when near players, use Team Heal force power. It will heal their shield after they have full HP";
 	if (skill_index == 38)
-		return "Free Warrior: +damage +resistance to damage, Force User: +saber damage and force regens faster, Gunner: +gun damage, max ammo, credits in battle, jetpack fuel, sentry gun health, and E-Web health, Wizard: +max MP, new magic bolt types, recovers some jetpack fuel with MP if it runs out, -magic power cooldown";
+		return "^3Free Warrior: ^7+damage +resistance to damage, ^3Force User: ^7+saber damage and force regens faster, ^3Gunner: ^7+gun damage +resistance to damage, +max ammo, +credits in battle, +jetpack fuel, +sentry gun health, +EWeb health, ^3Wizard: ^7+max MP, new magic bolt types, recovers some jetpack fuel with MP if it runs out, -magic power cooldown";
 	if (skill_index == 39)
 		return va("used as ammo for Blaster Pistol, Bryar Pistol and E11 Blaster Rifle. You can carry up to %d ammo", zyk_max_blaster_pack_ammo.integer);
 	if (skill_index == 40)
