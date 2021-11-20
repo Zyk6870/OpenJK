@@ -6463,6 +6463,10 @@ void quest_power_events(gentity_t *ent)
 
 					// zyk: move the Rock so it is always in the player origin
 					VectorCopy(ent->client->ps.origin, rock_ent->s.pos.trBase);
+					VectorCopy(ent->client->ps.origin, rock_ent->s.origin);
+					VectorCopy(ent->client->ps.origin, rock_ent->r.currentOrigin);
+
+					trap->LinkEntity((sharedEntity_t*) rock_ent);
 				}
 				else
 				{ // zyk: Rock was destroyed. Stop using this magic
