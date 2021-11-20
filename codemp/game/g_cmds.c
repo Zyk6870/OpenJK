@@ -2391,6 +2391,28 @@ void zyk_load_common_settings(gentity_t* ent)
 	zyk_jetpack(ent);
 }
 
+// zyk: remove white spaces from a string
+char* zyk_string_with_no_whitespaces(char *old_string)
+{
+	int i = 0, j = 0;
+	char new_string[MAX_STRING_CHARS];
+
+	while (old_string[i] != '\0')
+	{
+		if (old_string[i] != ' ')
+		{
+			new_string[j] = old_string[i];
+			j++;
+		}
+
+		i++;
+	}
+
+	new_string[j] = '\0';
+
+	return G_NewString(new_string);
+}
+
 // zyk: loads the player account
 void load_account(gentity_t* ent)
 {
@@ -2436,6 +2458,9 @@ void load_account(gentity_t* ent)
 		// zyk: loading the current char
 		fscanf(account_file, "%s", content);
 		strcpy(ent->client->sess.rpgchar, content);
+
+		// zyk: reading the mod version of the last time this account was saved. Will be used in future versions for account validation
+		fscanf(account_file, "%s", content);
 
 		fclose(account_file);
 
@@ -2605,8 +2630,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			client = ent->client;
 			account_file = fopen(va("zykmod/accounts/%s.txt", ent->client->sess.filename), "w");
-			fprintf(account_file, "%s\n%d\n%d\n%d\n%s\n",
-				client->pers.password, client->sess.amrpgmode, client->pers.player_settings, client->pers.bitvalue, client->sess.rpgchar);
+			fprintf(account_file, "%s\n%d\n%d\n%d\n%s\n%s\n",
+				client->pers.password, client->sess.amrpgmode, client->pers.player_settings, client->pers.bitvalue, client->sess.rpgchar, zyk_string_with_no_whitespaces(GAMEVERSION));
 			fclose(account_file);
 		}
 	}
@@ -10790,7 +10815,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 	if (unique_skill_number < 1 || unique_skill_number > 6)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"Must be a number between 1 and 6\"");
+		trap->SendServerCommand(ent->s.number, "print \"Must be a number between 1 and 6\n\"");
 		return;
 	}
 
