@@ -5957,7 +5957,7 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 		return qfalse;
 	}
 
-	// zyk: players can only have up to 3 Magic Powers, except Magic Master class
+	// zyk: Free Warrior class can have up to 6 magic powers. Wizard can have all, and other classes only 3 magic powers
 	if (ent->client->pers.rpg_class != RPGCLASS_WIZARD && upgrade_value > (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS))
 	{
 		int i = 0;
@@ -5971,7 +5971,13 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 			}
 		}
 
-		if (number_of_magic_skills >= 3)
+		if (ent->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR && number_of_magic_skills >= 6)
+		{
+			if (dont_show_message == qfalse)
+				trap->SendServerCommand(ent->s.number, "print \"Cannot upgrade more than 6 magic skills.\n\"");
+			return qfalse;
+		}
+		else if (number_of_magic_skills >= 3)
 		{
 			if (dont_show_message == qfalse)
 				trap->SendServerCommand(ent->s.number, "print \"Cannot upgrade more than 3 magic skills.\n\"");
