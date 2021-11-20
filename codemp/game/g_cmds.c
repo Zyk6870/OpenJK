@@ -5788,16 +5788,13 @@ char *zyk_get_settings_values(gentity_t *ent)
 
 	for (i = 0; i < MAX_PLAYER_SETTINGS; i++)
 	{ // zyk: settings values
-		if (i != 5 && i != 8 && i != 14 && i != 15)
+		if (!(ent->client->pers.player_settings & (1 << i)))
 		{
-			if (!(ent->client->pers.player_settings & (1 << i)))
-			{
-				strcpy(content,va("%sON-",content));
-			}
-			else
-			{
-				strcpy(content,va("%sOFF-",content));
-			}
+			strcpy(content,va("%sON-",content));
+		}
+		else
+		{
+			strcpy(content,va("%sOFF-",content));
 		}
 	}
 
@@ -8032,7 +8029,7 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		}
 		else
 		{
-			strcpy(message, va("%s\n^3%d - Boss Battle Music ^7ON", message, SETTINGS_BOSS_MUSIC));
+			strcpy(message, va("%s\n^3%d - Boss Battle Music ^2ON", message, SETTINGS_BOSS_MUSIC));
 		}
 
 		trap->SendServerCommand( ent->s.number, va("print \"%s\n\n^7Choose a setting above and use ^3/settings <number> ^7to turn it ^2ON ^7or ^1OFF^7\n\"", message) );
