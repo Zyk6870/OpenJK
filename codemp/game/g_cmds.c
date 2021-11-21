@@ -36,6 +36,59 @@ void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *sab
 void Cmd_NPC_f( gentity_t *ent );
 void SetTeamQuick(gentity_t *ent, int team, qboolean doBegin);
 
+// zyk: costs to buy or sell for each seller item
+const int seller_items_cost[MAX_SELLER_ITEMS][2] = {
+	{10, 5},
+	{12, 7},
+	{15, 10},
+	{20, 12},
+	{22, 12},
+	{25, 14},
+	{30, 18},
+	{300, 0},
+	{200, 0},
+	{100, 0},
+	{150, 50},
+	{170, 70},
+	{180, 80},
+	{220, 100},
+	{150, 80},
+	{140, 40},
+	{10, 5},
+	{100, 0},
+	{90, 50},
+	{90, 45},
+	{90, 45},
+	{100, 50},
+	{120, 60},
+	{110, 50},
+	{150, 90},
+	{150, 80},
+	{170, 90},
+	{300, 150},
+	{200, 100},
+	{20, 10},
+	{200, 100},
+	{200, 0},
+	{200, 50},
+	{50, 0},
+	{2000, 0},
+	{2000, 0},
+	{3000, 0},
+	{3000, 0},
+	{3000, 0},
+	{1800, 0},
+	{2000, 0},
+	{2200, 0},
+	{2500, 0},
+	{1700, 0},
+	{8000, 0},
+	{2000, 0},
+	{4000, 0},
+	{3500, 0},
+	{3000, 0}
+};
+
 // zyk: max levels of the RPG skills
 const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	4, // Jump
@@ -267,7 +320,7 @@ qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
 {
 	int i = 0;
 
-	int classes_allowed_for_skills[NUMBER_OF_SKILLS][11] = { // zyk: each index is a skill, and contains an array of allowed RPG classes
+	int classes_allowed_for_skills[NUMBER_OF_SKILLS][NUM_RPG_CLASSES + 1] = { // zyk: each index is a skill, and contains an array of allowed RPG classes
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Jump
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Push
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Pull
@@ -362,7 +415,7 @@ qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}
 	};
 
-	for (i = 0; i < 10; i++)
+	for (i = 0; i < NUM_RPG_CLASSES; i++)
 	{
 		if (classes_allowed_for_skills[skill_index][i] == -1)
 		{ // zyk: end of classes array, stops the loop
@@ -6236,12 +6289,12 @@ void zyk_list_stuff(gentity_t *ent, gentity_t *target_ent)
 	for (i = 0; i < MAX_RPG_UPGRAGES; i++)
 	{
 		if (ent->client->pers.rpg_upgrades & (1 << i))
-			strcpy(stuff_message, va("%s^3\n%s - ^2yes\n", zyk_get_upgrade_name(i), stuff_message));
+			strcpy(stuff_message, va("%s^3\n%s - ^2yes", stuff_message, zyk_get_upgrade_name(i)));
 		else
-			strcpy(stuff_message, va("%s^3\n%s - ^1no\n", zyk_get_upgrade_name(i), stuff_message));
+			strcpy(stuff_message, va("%s^3\n%s - ^1no", stuff_message, zyk_get_upgrade_name(i)));
 	}
 
-	trap->SendServerCommand(target_ent->s.number, va("print \"%s\n\"", stuff_message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"%s\n\n\"", stuff_message));
 }
 
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
@@ -6273,7 +6326,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 			if (Q_stricmp( arg1, "rpg" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list ammo: ^7lists ammo skills\n^2/list items: ^7lists holdable items skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list classes: ^7lists the RPG classes\n^2/list stuff: ^7lists upgrades bought from sellers\n\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list ammo: ^7lists ammo skills\n^2/list items: ^7lists holdable items skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list classes: ^7lists the RPG classes\n^2/list stuff: ^7lists upgrades bought from seller\n\n\"");
 			}
 			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || Q_stricmp( arg1, "other" ) == 0 || 
 					 Q_stricmp( arg1, "ammo" ) == 0 || Q_stricmp( arg1, "items" ) == 0 || Q_stricmp(arg1, "magic") == 0)
@@ -6447,6 +6500,90 @@ void Cmd_CallSeller_f( gentity_t *ent ) {
 	}
 }
 
+// zyk: returns the seller item name
+char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
+{
+	char seller_items[MAX_SELLER_ITEMS][32] = {
+		"Blaster Pack",
+		"Power Cell",
+		"Metal Bolts",
+		"Rockets",
+		"Thermals",
+		"Trip Mines",
+		"Det Packs",
+		"Ammo All",
+		"Flame Thrower Fuel",
+		"Shield Booster",
+		"Sentry Gun",
+		"Seeker Drone",
+		"Bacta Canister",
+		"Force Field",
+		"Big Bacta",
+		"E-Web",
+		"Binoculars",
+		"Jetpack",
+		"Cloak Item",
+		"Blaster Pistol",
+		"Bryar Pistol",
+		"E11 Blaster Rifle",
+		"Disruptor",
+		"Bowcaster",
+		"DEMP2",
+		"Repeater",
+		"Flechette",
+		"Concussion Rifle",
+		"Rocket Launcher",
+		"Stun Baton",
+		"Ysalamiri",
+		"Jetpack Fuel",
+		"Force Boon",
+		"Magic Potion",
+		"Healing Crystal",
+		"Energy Crystal",
+		"Holdable Items Upgrade",
+		"Impact Reducer",
+		"Flame Thrower",
+		"Blaster Pack Upgrade",
+		"Powercell Upgrade",
+		"Metal Bolts Upgrade",
+		"Rockets Upgrade",
+		"Stun Baton Upgrade",
+		"Jetpack Upgrade",
+		"Swimming Upgrade",
+		"Gunner Radar",
+		"Thermal Vision",
+		"Gunner Items Upgrade"
+	};
+
+	return G_NewString(seller_items[item_number]);
+}
+
+void zyk_show_stuff_category(gentity_t* ent, int min_item_index, int max_item_index)
+{
+	int i = 0;
+	char content[MAX_STRING_CHARS];
+
+	strcpy(content, "");
+
+	for (i = min_item_index; i <= max_item_index; i++)
+	{
+		char sell_item_string[16];
+
+		if (seller_items_cost[i][1] > 0)
+		{
+			strcpy(sell_item_string, va("%d", seller_items_cost[i][1]));
+		}
+		else
+		{
+			strcpy(sell_item_string, "^1no^7");
+		}
+
+		strcpy(content, va("%s\n^3%d - %s: ^7Buy: %d, Sell: %s", content, (i + 1), zyk_get_seller_item_name(i), seller_items_cost[i][0], sell_item_string));
+	}
+
+	trap->SendServerCommand(ent->s.number, va("print \"%s\n\n\"", content));
+}
+
 /*
 ==================
 Cmd_Stuff_f
@@ -6455,236 +6592,235 @@ Cmd_Stuff_f
 void Cmd_Stuff_f( gentity_t *ent ) {
 	if (trap->Argc() == 1)
 	{ // zyk: shows the categories of stuff
-		trap->SendServerCommand(ent->s.number, "print \"\n^7Use ^2/stuff <category> ^7to buy or sell stuff\nThe Category may be ^3ammo^7, ^3items^7, ^3misc^7, ^3weapons ^7or ^3upgrades\n^7Use ^3/stuff <number> ^7to see info about the item\n\n^7Use ^2/buy <number> ^7to buy or ^2/sell <number> ^7to sell\nStuff bought from ^3upgrades ^7category are permanent\n\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"\n^7Use ^2/stuff <category> ^7to buy or sell stuff\nThe Category may be ^3ammo^7, ^3items^7, ^3weapons^7, ^3misc ^7or ^3upgrades\n^7Use ^3/stuff <number> ^7to see info about the item\n\n^7Use ^2/buy <number> ^7to buy or ^2/sell <number> ^7to sell\nStuff bought from ^3upgrades ^7category are permanent\n\n\"");
 		return;
 	}
 	else
 	{
 		char arg1[1024];
 		int i = 0;
+		int item_number = 0;
 
 		trap->Argv(1, arg1, sizeof( arg1 ));
-		i = atoi(arg1);
+		item_number = atoi(arg1);
+
+		i = item_number - 1;
 
 		if (Q_stricmp(arg1, "ammo" ) == 0)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^31 - Blaster Pack: ^7Buy: 15 - Sell: 10\n^32 - Power Cell: ^7Buy: 20 - Sell: 15\n^33 - Metal Bolts: ^7Buy: 25 - Sell: 20\n^34 - Rockets: ^7Buy: 40 - Sell: 30\n^35 - Thermals: ^7Buy: 80 - Sell: 35\n^36 - Trip Mines: ^7Buy: 120 - Sell: 40\n^37 - Det Packs: ^7Buy: 150 - Sell: 45\n^330 - Flame Thrower Fuel: ^7Buy: 200 - Sell: ^1no\n^348 - Ammo All: ^7Buy: 700 - Sell: ^1no^7\n\n\"");
+			zyk_show_stuff_category(ent, 0, 8);
 		}
 		else if (Q_stricmp(arg1, "items" ) == 0)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^39 - Shield Booster: ^7Buy: 150 - Sell: ^1no\n^310 - Sentry Gun: ^7Buy: 170 - Sell: 60\n^311 - Seeker Drone: ^7Buy: 180 - Sell: 65\n^312 - Big Bacta: ^7Buy: 200 - Sell: 70\n^313 - Force Field: ^7Buy: 300 - Sell: 80\n^334 - Bacta Canister: ^7Buy: 100 - Sell: 20\n^335 - E-Web: ^7Buy: 150 - Sell: 30\n^338 - Binoculars: ^7Buy: 10 - Sell: 5\n^341 - Jetpack: ^7Buy: 50 - Sell: ^1no\n^342 - Cloak Item: ^7Buy: 50 - Sell: 20\n\n\"");
-		}
-		else if (Q_stricmp(arg1, "misc") == 0)
-		{
-			trap->SendServerCommand(ent - g_entities, "print \"\n^314 - Ysalamiri: ^7Buy: 200 - Sell: 50\n^331 - Jetpack Fuel: ^7Buy: 200 - Sell: ^1no\n^343 - Force Boon: ^7Buy: 200 - Sell: 50\n^344 - Magic Potion: ^7Buy: 50 - Sell: ^1no\n^349 - Saber Armor: ^7Buy: 2000 - Sell: ^1no\n^350 - Gun Armor: ^7Buy: 2000 - Sell: ^1no\n^351 - Healing Crystal: ^7Buy: 2000 - Sell: ^1no\n^352 - Energy Crystal: ^7Buy: 2000 - Sell: ^1no^7\n\n\"");
+			zyk_show_stuff_category(ent, 9, 18);
 		}
 		else if (Q_stricmp(arg1, "weapons" ) == 0)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^317 - E11 Blaster Rifle: ^7Buy: 100 - Sell: 50\n^318 - Disruptor: ^7Buy: 120 - Sell: 60\n^319 - Repeater: ^7Buy: 150 - Sell: 70\n^320 - Rocket Launcher: ^7Buy: 200 - Sell: 100\n^321 - Bowcaster: ^7Buy: 110 - Sell: 50\n^322 - Blaster Pistol: ^7Buy: 90 - Sell: 45\n^323 - Flechette: ^7Buy: 170 - Sell: 90\n^324 - Concussion Rifle: ^7Buy: 300 - Sell: 150\n^332 - Stun Baton: ^7Buy: 20 - Sell: 10\n^336 - DEMP2: ^7Buy: 150 - Sell: 90\n^337 - Bryar Pistol: ^7Buy: 90 - Sell: 45^7\n\n\"");
+			zyk_show_stuff_category(ent, 19, 29);
+		}
+		else if (Q_stricmp(arg1, "misc") == 0)
+		{
+			zyk_show_stuff_category(ent, 30, 35);
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^38 - Gunner Radar: ^7Buy: 4000\n^315 - Impact Reducer: ^7Buy: 4000\n^316 - Flame Thrower: ^7Buy: 3000\n^325 - Power Cell Weapons Upgrade: ^7Buy: 2000\n^326 - Blaster Pack Weapons Upgrade: ^7Buy: 1800\n^327 - Metal Bolts Weapons Upgrade: ^7Buy: 2200\n^328 - Rocket Upgrade: ^7Buy: 2500\n^329 - Swimming Upgrade: ^7Buy: 2000\n^333 - Stun Baton Upgrade: ^7Buy: 1500\n^339 - Thermal Vision: ^7Buy: 2500\n^340 - Holdable Items Upgrade: ^7Buy: 3000\n^345 - Gunner Items Upgrade: ^7Buy: 3000\n^346 - Jetpack Upgrade: ^7Buy: 8000\n\n\"");
+			zyk_show_stuff_category(ent, 36, 48);
 		}
-		else if (i == 1)
+		else if (i == SELLER_BLASTER_PACK)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Blaster Pack: ^7recovers 100 ammo of E11 Blaster Rifle, Blaster Pistol and Bryar Pistol weapons\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 100 ammo of E11 Blaster Rifle, Blaster Pistol and Bryar Pistol weapons\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 2)
+		else if (i == SELLER_POWERCELL)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Power Cell: ^7recovers 100 ammo of Disruptor, Bowcaster and DEMP2 weapons\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 100 ammo of Disruptor, Bowcaster and DEMP2 weapons\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 3)
+		else if (i == SELLER_METAL_BOLTS)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Metal Bolts: ^7recovers 100 ammo of Repeater, Flechette and Concussion Rifle weapons\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 100 ammo of Repeater, Flechette and Concussion Rifle weapons\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 4)
+		else if (i == SELLER_ROCKETS)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Rockets: ^7recovers 10 ammo of Rocket Launcher weapon\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 10 ammo of Rocket Launcher weapon\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 5)
+		else if (i == SELLER_THERMALS)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Thermals: ^7recovers 4 ammo of thermals\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 4 ammo of thermals\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 6)
+		else if (i == SELLER_TRIPMINES)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Trip Mines: ^7recovers 3 ammo of trip mines\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 3 ammo of trip mines\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 7)
+		else if (i == SELLER_DETPACKS)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Det Packs: ^7recovers 2 ammo of det packs\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 2 ammo of det packs\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 8)
+		else if (i == SELLER_AMMO_ALL)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Gunner Radar: if you have the New Zyk Mod client, a radar will be displayed in the screen showing positions of other players and npcs\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers all ammo types, including flame thrower fuel\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 9)
+		else if (i == SELLER_FLAME_FUEL)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Shield Booster: ^7recovers 50 shield\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers all fuel of the flame thrower\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 10)
+		else if (i == SELLER_SHIELD_BOOSTER)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Sentry Gun: ^7portable gun which is placed in the ground and shoots nearby enemies\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 50 shield\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 11)
+		else if (i == SELLER_SENTRY_GUN)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Seeker Drone: ^7portable remote drone that shoots enemies at sight\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable gun which is placed in the ground and shoots nearby enemies\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 12)
+		else if (i == SELLER_SEEKER_DRONE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Big Bacta: ^7recovers 50 HP\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable remote drone that shoots enemies at sight\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 13)
+		else if (i == SELLER_BACTA_CANISTER)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Force Field: ^7creates a force field wall in front of the player that can hold almost any attack, except the concussion rifle alternate fire, which can get through\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 25 HP\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 14)
+		else if (i == SELLER_FORCE_FIELD)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Ysalamiri: ^7disables the player force powers but also protects the player from enemy force powers\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7creates a force field wall in front of the player that can hold almost any attack, except the concussion rifle alternate fire, which can get through\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 15)
+		else if (i == SELLER_BIG_BACTA)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Impact Reducer: ^7reduces the knockback of some weapons attacks by 80 per cent\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 50 HP\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 16)
+		else if (i == SELLER_EWEB)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Flame Thrower: ^7gives you the flame thrower. To use it, get stun baton and use alternate fire\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable emplaced gun\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 17)
+		else if (i == SELLER_BINOCULARS)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3E11 Blaster Rifle: ^7Rifle that is used by the stormtroopers. Uses blaster pack ammo\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to see far things better with the zoom feature\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 18)
+		else if (i == SELLER_JETPACK)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Disruptor: ^7Sniper rifle which can desintegrate the enemy. Uses power cell ammo\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to fly. Jump and press Use Key to use it\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 19)
+		else if (i == SELLER_CLOAK_ITEM)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Repeater: ^7imperial weapon that shoots orbs and a plasma bomb with alt fire. Uses metal bolts ammo\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to cloak himself\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 20)
+		else if (i == SELLER_BLASTER_PISTOL)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Rocket Launcher: ^7weapon that shoots rockets and a homing missile with alternate fire. Uses rockets ammo\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7pistol that can shoot a charged shot with alt fire. Uses blaster pack ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 21)
+		else if (i == SELLER_BRYAR_PISTOL)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Bowcaster: ^7weapon that shoots green bolts, normal fire can be charged, and alt fire shoots a bouncing bolt. Uses power cell ammo\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7similar to blaster pistol, but has a faster fire rate with normal fire. Uses blaster pack ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 22)
+		else if (i == SELLER_E11_BLASTER)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Blaster Pistol: ^7pistol that can shoot a charged shot with alt fire. Uses blaster pack ammo\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Rifle that is used by the stormtroopers. Uses blaster pack ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 23)
+		else if (i == SELLER_DISRUPTOR)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Flechette: ^7it is the shotgun of the game, and can shoot 2 bombs with alt fire. Uses metal bolts ammo\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Sniper rifle which can desintegrate the enemy. Uses power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 24)
+		else if (i == SELLER_BOWCASTER)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Concussion Rifle: ^7powerful weapon, alt fire can shoot a beam that gets through force fields. Uses metal bolts ammo\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots green bolts, normal fire can be charged, and alt fire shoots a bouncing bolt. Uses power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 25)
+		else if (i == SELLER_DEMP2)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Power Cell Weapons Upgrade: ^7increases firerate of Disruptor. Bowcaster main fire can do up to 9 shots when charged. Bowcaster altfire bolt can bounce more times\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7fires an electro magnetic pulse that causes bonus damage against droids. Uses power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 26)
+		else if (i == SELLER_REPEATER)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Blaster Pack Weapons Upgrade: ^7E11 Blaster Rifle altfire has less spread. Increases Bryar Pistol firerate\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7imperial weapon that shoots orbs and a plasma bomb with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 27)
+		else if (i == SELLER_FLECHETTE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Metal Bolts Weapons Upgrade: ^7increases firerate of Repeater altfire. Increases number of bolts shot by Flechette primary fire. Concussion rifle can break saber-only damage objects and can move pushable/pullable objects\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7it is the shotgun of the game, and can shoot 2 bombs with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 28)
+		else if (i == SELLER_CONCUSSION)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Rocket Upgrade: ^7makes rockets and detpacks damage saber-only damage objects and move pushable/pullable objects\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7powerful weapon, alt fire can shoot a beam that gets through force fields. Uses metal bolts ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 29)
+		else if (i == SELLER_ROCKET_LAUNCHER)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Swimming Upgrade: ^7prevents drowning when using Gunner class\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots rockets and a homing missile with alternate fire. Uses rockets ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 30)
+		else if (i == SELLER_STUN_BATON)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Flame Thrower Fuel: ^7recovers all fuel of the flame thrower\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that fires a small electric charge\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 31)
+		else if (i == SELLER_YSALAMIRI)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Jetpack Fuel: ^7recovers all fuel of the jetpack\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7disables the player force powers but also protects the player from enemy force powers\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 32)
+		else if (i == SELLER_JETPACK_FUEL)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Stun Baton: ^7weapon that fires a small electric charge\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers all fuel of the jetpack\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 33)
+		else if (i == SELLER_FORCE_BOON)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Stun Baton Upgrade: ^7allows stun baton to open any door, including locked ones, move elevators, and move or destroy other objects. Also makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to regenerate force faster\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 34)
+		else if (i == SELLER_MAGIC_POTION)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Bacta Canister: ^7recovers 25 HP\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some MP\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 35)
+		else if (i == SELLER_HEALING_CRYSTAL)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3E-Web: ^7portable emplaced gun\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7regens hp, mp and force. If the player dies, he loses the crystal\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 36)
+		else if (i == SELLER_ENERGY_CRYSTAL)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3DEMP2: ^7fires an electro magnetic pulse that causes bonus damage against droids. Uses power cell ammo\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7regens shield, blaster pack ammo and power cell ammo. If the player dies, he loses the crystal\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 37)
+		else if (i == SELLER_HOLDABLE_UPGRADE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Bryar Pistol: ^7similar to blaster pistol, but has a faster fire rate with normal fire. Uses blaster pack ammo\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister recovers all Magic Power, Big Bacta recovers more HP, Force Field resists more and Cloak Item will be able to cloak vehicles\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 38)
+		else if (i == SELLER_IMPACT_REDUCER)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Binoculars: ^7allows the player to see far things better with the zoom feature\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 39)
+		else if (i == SELLER_FLAME_THROWER)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nThermal Vision: makes binoculars and disruptor rifle detect enemies through a thermal vision system\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7gives you the flame thrower. To use it, get stun baton and use alternate fire\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 40)
+		else if (i == SELLER_BLASTER_PACK_UPGRADE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Holdable Items Upgrade: ^7Bacta Canister recovers all Magic Power, Big Bacta recovers more HP, Force Field resists more and Cloak Item will be able to cloak vehicles\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7E11 Blaster Rifle altfire has less spread. Increases Bryar Pistol firerate\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 41)
+		else if (i == SELLER_POWERCELL_UPGRADE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Jetpack: ^7allows the player to fly. Jump and press Use Key to use it\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases firerate of Disruptor. Bowcaster main fire can do up to 9 shots when charged. Bowcaster altfire bolt can bounce more times\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 42)
+		else if (i == SELLER_METAL_BOLTS_UPGRADE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Cloak Item: ^7allows the player to cloak himself\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases firerate of Repeater altfire. Increases number of bolts shot by Flechette primary fire. Concussion rifle can break saber-only damage objects and can move pushable/pullable objects\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 43)
+		else if (i == SELLER_ROCKETS_UPGRADE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Force Boon: ^7allows the player to regenerate force faster\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes rockets and detpacks damage saber-only damage objects and move pushable/pullable objects\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 44)
+		else if (i == SELLER_STUN_BATON_UPGRADE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Magic Potion: ^7recovers some MP\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows stun baton to open any door, including locked ones, move elevators, and move or destroy other objects. Also makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 45)
+		else if (i == SELLER_JETPACK_UPGRADE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Gunner Items Upgrade: makes sentry gun, seeker drone and e-web stronger. Can get seeker drone back by pressing Saber Style key and sentry guns and force fields back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases jetpack fuel consumption a bit and makes the jetpack more stable and faster\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 46)
+		else if (i == SELLER_SWIMMING_UPGRADE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Jetpack Upgrade: ^7decreases jetpack fuel consumption a bit and makes the jetpack more stable and faster\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7prevents drowning when using Gunner class\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 47)
+		else if (i == SELLER_GUNNER_RADAR)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7if you have the New Zyk Mod client, a radar will be displayed in the screen showing positions of other players and npcs\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 48)
+		else if (i == SELLER_THERMAL_VISION)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Ammo All: ^7recovers all ammo types, including flame thrower fuel\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes binoculars and disruptor rifle detect enemies through a thermal vision system\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == 51)
+		else if (i == SELLER_GUNNER_ITEMS_UPGRADE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Healing Crystal: ^7regens hp, mp and force. If the player dies, he loses the crystal\n\n\"");
-		}
-		else if (i == 52)
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Energy Crystal: ^7regens shield, blaster pack ammo and power cell ammo. If the player dies, he loses the crystal\n\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes sentry gun, seeker drone and e-web stronger. Can get seeker drone back by pressing Saber Style key and sentry guns and force fields back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
 	}
 }
@@ -6704,6 +6840,79 @@ void zyk_add_mp(gentity_t* ent, int mp_amount)
 	send_rpg_events(2000);
 }
 
+// zyk: tests which skills are allowed for each class
+qboolean zyk_seller_item_allowed_for_class(int item_index, int rpg_class)
+{
+	int i = 0;
+
+	int classes_allowed_for_items[MAX_SELLER_ITEMS][NUM_RPG_CLASSES + 1] = { // zyk: each index is a seller item, and contains an array of allowed RPG classes
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Blaster Pack
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Powercell
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Metal Bolts
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Rockets
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Thermals
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Trip Mines
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Detpacks
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Ammo All
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Flame Thrower Fuel
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Shield Booster
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Sentry Gun
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Seeker Drone
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Bacta Canister
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Force Field
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Big Bacta
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // E-Web
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Binoculars
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Jetpack
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Cloak Item
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Blaster Pistol
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Bryar Pistol
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // E11 Blaster Rifle
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Disruptor
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Bowcaster
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // DEMP2
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Repeater
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Flechette
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Concussion Rifle
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Rocket Launcher
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Stun Baton
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Ysalamiri
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Jetpack Fuel
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Force Boon
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Magic Potion
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Holdable Items Upgrade
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Impact Reducer
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Flame Thrower
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Blaster Pack Upgrade
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Powercell Upgrade
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Metal Bolts Upgrade
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Rockets Upgrade
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Stun Baton Upgrade
+		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Jetpack Upgrade
+		{RPGCLASS_GUNNER, -1}, // Swimming Upgrade
+		{RPGCLASS_GUNNER, -1}, // Gunner Radar
+		{RPGCLASS_GUNNER, -1}, // Thermal Vision
+		{RPGCLASS_GUNNER, -1} // Gunner Items Upgrade
+	};
+
+	for (i = 0; i < NUM_RPG_CLASSES; i++)
+	{
+		if (classes_allowed_for_items[item_index][i] == -1)
+		{ // zyk: end of classes array, stops the loop
+			break;
+		}
+
+		if (classes_allowed_for_items[item_index][i] == rpg_class)
+		{ // zyk: skill is allowed for this class
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
 /*
 ==================
 Cmd_Buy_f
@@ -6713,7 +6922,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	int value = 0;
 	int found = 0;
-	int item_costs[NUMBER_OF_SELLER_ITEMS] = {15,20,25,40,80,120,150,4000,150,170,180,200,300,200,4000,3000,100,120,150,200,110,90,170,300,2000,1800,2200,2500,2000,200,200,20,1500,100,150,150,90,10,2500,3000,50,50,200,50,3000,8000,5000,700,2000,2000,2000,2000};
 
 	if (trap->Argc() == 1)
 	{
@@ -6737,7 +6945,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (value < 1 || value > NUMBER_OF_SELLER_ITEMS)
+	if (value < 1 || value > MAX_SELLER_ITEMS)
 	{
 		trap->SendServerCommand( ent->s.number, "print \"Invalid product number.\n\"" );
 		return;
@@ -6765,129 +6973,122 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 	}
 
-	// zyk: class validations. Some items require certain conditions to be bought
-	if (ent->client->pers.rpg_class == RPGCLASS_FORCE_USER && ((value >= 1 && value <= 7) || (value >= 10 && value <= 13) || 
-		(value >= 17 && value <= 24) || (value >= 34 && value <= 38) || (value >= 41 && value <= 42) || value == 48))
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"%s can't buy this item.\n\"", zyk_rpg_class(ent)));
-		return;
-	}
-	else if (ent->client->pers.rpg_class == RPGCLASS_WIZARD && ((value >= 1 && value <= 7) || (value >= 10 && value <= 13) || 
-			(value >= 17 && value <= 24) || (value >= 35 && value <= 38) || value == 48))
+	// zyk: class validations. Some items are allowed for specific classes
+	if (zyk_seller_item_allowed_for_class((value - 1), ent->client->pers.rpg_class) == qtrue)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"%s can't buy this item.\n\"", zyk_rpg_class(ent)));
 		return;
 	}
 
 	// zyk: general validations. Some items require certain conditions to be bought
-	if (value == 8 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_RADAR))
+	if (value == (SELLER_GUNNER_RADAR + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_RADAR))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_GUNNER_RADAR)));
 		return;
 	}
-	else if (value == 15 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_IMPACT_REDUCER))
+	else if (value == (SELLER_IMPACT_REDUCER + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_IMPACT_REDUCER))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_IMPACT_REDUCER)));
 		return;
 	}
-	else if (value == 16 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_FLAME_THROWER))
+	else if (value == (SELLER_FLAME_THROWER + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_FLAME_THROWER))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_FLAME_THROWER)));
 		return;
 	}
-	else if (value == 25 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL))
+	else if (value == (SELLER_POWERCELL_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_POWERCELL)));
 		return;
 	}
-	else if (value == 26 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_BLASTER_PACK))
+	else if (value == (SELLER_BLASTER_PACK_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_BLASTER_PACK))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_BLASTER_PACK)));
 		return;
 	}
-	else if (value == 27 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS))
+	else if (value == (SELLER_METAL_BOLTS_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_METAL_BOLTS)));
 		return;
 	}
-	else if (value == 28 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_ROCKETS))
+	else if (value == (SELLER_ROCKETS_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_ROCKETS))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_ROCKETS)));
 		return;
 	}
-	else if (value == 29 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_SWIMMING))
+	else if (value == (SELLER_SWIMMING_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_SWIMMING))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_SWIMMING)));
 		return;
 	}
-	else if (value == 33 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_STUN_BATON))
+	else if (value == (SELLER_STUN_BATON_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_STUN_BATON))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_STUN_BATON)));
 		return;
 	}
-	else if (value == 39 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION))
+	else if (value == (SELLER_THERMAL_VISION + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_THERMAL_VISION)));
 		return;
 	}
-	else if (value == 40 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
+	else if (value == (SELLER_HOLDABLE_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_HOLDABLE_ITEMS)));
 		return;
 	}
-	else if (value == 45 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+	else if (value == (SELLER_GUNNER_ITEMS_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_GUNNER_ITEMS)));
 		return;
 	}
-	else if (value == 46 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK))
+	else if (value == (SELLER_JETPACK_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_JETPACK)));
 		return;
 	}
 
 	// zyk: buying the item if player has enough credits
-	if (ent->client->pers.credits >= item_costs[value-1])
+	if (ent->client->pers.credits >= seller_items_cost[value - 1][0])
 	{
-		if (value == 1)
+		if (value == (SELLER_BLASTER_PACK + 1))
 		{
 			Add_Ammo(ent,AMMO_BLASTER,100);
 		}
-		else if (value == 2)
+		else if (value == (SELLER_POWERCELL + 1))
 		{
 			Add_Ammo(ent,AMMO_POWERCELL,100);
 		}
-		else if (value == 3)
+		else if (value == (SELLER_METAL_BOLTS + 1))
 		{
 			Add_Ammo(ent,AMMO_METAL_BOLTS,100);
 		}
-		else if (value == 4)
+		else if (value == (SELLER_ROCKETS + 1))
 		{
 			Add_Ammo(ent,AMMO_ROCKETS,10);
 		}
-		else if (value == 5)
+		else if (value == (SELLER_THERMALS + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_THERMAL);
 			Add_Ammo(ent,AMMO_THERMAL,4);
 		}
-		else if (value == 6)
+		else if (value == (SELLER_TRIPMINES + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_TRIP_MINE);
 			Add_Ammo(ent,AMMO_TRIPMINE,3);
 		}
-		else if (value == 7)
+		else if (value == (SELLER_DETPACKS + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
 			Add_Ammo(ent,AMMO_DETPACK,2);
 		}
-		else if (value == 8)
+		else if (value == (SELLER_GUNNER_RADAR + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_GUNNER_RADAR);
 
 			// zyk: update the rpg stuff info at the client-side game
 			send_rpg_events(10000);
 		}
-		else if (value == 9)
+		else if (value == (SELLER_SHIELD_BOOSTER + 1))
 		{
 			if (ent->client->ps.stats[STAT_ARMOR] < ent->client->pers.max_rpg_shield)
 			{ // zyk: RPG Mode has the Max Shield skill that doesnt allow someone to heal shields above this value
@@ -6897,171 +7098,167 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			if (ent->client->ps.stats[STAT_ARMOR] > ent->client->pers.max_rpg_shield)
 				ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
 		}
-		else if (value == 10)
+		else if (value == (SELLER_SENTRY_GUN + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
 			if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.bounty_hunter_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
 				ent->client->pers.bounty_hunter_sentries++;
 		}
-		else if (value == 11)
+		else if (value == (SELLER_SEEKER_DRONE + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
 		}
-		else if (value == 12)
+		else if (value == (SELLER_BIG_BACTA + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC_BIG);
 		}
-		else if (value == 13)
+		else if (value == (SELLER_FORCE_FIELD + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
 		}
-		else if (value == 14)
+		else if (value == (SELLER_YSALAMIRI + 1))
 		{
 			if (ent->client->ps.powerups[PW_YSALAMIRI] < level.time)
 				ent->client->ps.powerups[PW_YSALAMIRI] = level.time + 60000;
 			else
 				ent->client->ps.powerups[PW_YSALAMIRI] += 60000;
 		}
-		else if (value == 15)
+		else if (value == (SELLER_IMPACT_REDUCER + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_IMPACT_REDUCER);
 		}
-		else if (value == 16)
+		else if (value == (SELLER_FLAME_THROWER + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_FLAME_THROWER);
 		}
-		else if (value == 17)
+		else if (value == (SELLER_E11_BLASTER + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BLASTER);
 		}
-		else if (value == 18)
+		else if (value == (SELLER_DISRUPTOR + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DISRUPTOR);
 		}
-		else if (value == 19)
+		else if (value == (SELLER_REPEATER + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_REPEATER);
 		}
-		else if (value == 20)
+		else if (value == (SELLER_ROCKET_LAUNCHER + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_ROCKET_LAUNCHER);
 		}
-		else if (value == 21)
+		else if (value == (SELLER_BOWCASTER + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BOWCASTER);
 		}
-		else if (value == 22)
+		else if (value == (SELLER_BLASTER_PISTOL + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
 		}
-		else if (value == 23)
+		else if (value == (SELLER_FLECHETTE + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_FLECHETTE);
 		}
-		else if (value == 24)
+		else if (value == (SELLER_CONCUSSION + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_CONCUSSION);
 		}
-		else if (value == 25)
+		else if (value == (SELLER_POWERCELL_UPGRADE + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_POWERCELL);
 		}
-		else if (value == 26)
+		else if (value == (SELLER_BLASTER_PACK_UPGRADE + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_BLASTER_PACK);
 		}
-		else if (value == 27)
+		else if (value == (SELLER_METAL_BOLTS_UPGRADE + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_METAL_BOLTS);
 		}
-		else if (value == 28)
+		else if (value == (SELLER_ROCKETS_UPGRADE + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_ROCKETS);
 		}
-		else if (value == 29)
+		else if (value == (SELLER_SWIMMING_UPGRADE + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_SWIMMING);
 		}
-		else if (value == 30)
+		else if (value == (SELLER_FLAME_FUEL + 1))
 		{
 			ent->client->ps.cloakFuel = 100;
 		}
-		else if (value == 31)
+		else if (value == (SELLER_JETPACK_FUEL + 1))
 		{
 			ent->client->pers.jetpack_fuel = MAX_JETPACK_FUEL;
 			ent->client->ps.jetpackFuel = 100;
 		}
-		else if (value == 32)
+		else if (value == (SELLER_STUN_BATON + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
 		}
-		else if (value == 33)
+		else if (value == (SELLER_STUN_BATON_UPGRADE + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_STUN_BATON);
 		}
-		else if (value == 34)
+		else if (value == (SELLER_BACTA_CANISTER + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC);
 		}
-		else if (value == 35)
+		else if (value == (SELLER_EWEB + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_EWEB);
 		}
-		else if (value == 36)
+		else if (value == (SELLER_DEMP2 + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DEMP2);
 		}
-		else if (value == 37)
+		else if (value == (SELLER_BRYAR_PISTOL + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_OLD);
 		}
-		else if (value == 38)
+		else if (value == (SELLER_BINOCULARS + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_BINOCULARS);
 		}
-		else if (value == 39)
+		else if (value == (SELLER_THERMAL_VISION + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_THERMAL_VISION);
 		}
-		else if (value == 40)
+		else if (value == (SELLER_HOLDABLE_UPGRADE + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_HOLDABLE_ITEMS);
 		}
-		else if (value == 41)
+		else if (value == (SELLER_JETPACK + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 		}
-		else if (value == 42)
+		else if (value == (SELLER_CLOAK_ITEM + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_CLOAK);
 		}
-		else if (value == 43)
+		else if (value == (SELLER_FORCE_BOON + 1))
 		{
 			if (ent->client->ps.powerups[PW_FORCE_BOON] < level.time)
 				ent->client->ps.powerups[PW_FORCE_BOON] = level.time + 60000;
 			else
 				ent->client->ps.powerups[PW_FORCE_BOON] += 60000;
 		}
-		else if (value == 44)
+		else if (value == (SELLER_MAGIC_POTION + 1))
 		{
 			zyk_add_mp(ent, 100);
 		}
-		else if (value == 45)
+		else if (value == (SELLER_GUNNER_ITEMS_UPGRADE + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_GUNNER_ITEMS);
 		}
-		else if (value == 46)
+		else if (value == (SELLER_JETPACK_UPGRADE + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_JETPACK);
 
 			// zyk: update the rpg stuff info at the client-side game
 			send_rpg_events(10000);
 		}
-		else if (value == 47)
-		{
-			
-		}
-		else if (value == 48)
+		else if (value == (SELLER_AMMO_ALL + 1))
 		{
 			Add_Ammo(ent,AMMO_BLASTER,100);
 
@@ -7082,26 +7279,18 @@ void Cmd_Buy_f( gentity_t *ent ) {
 
 			ent->client->ps.cloakFuel = 100;
 		}
-		else if (value == 49)
-		{
-			ent->client->pers.player_statuses |= (1 << 8);
-		}
-		else if (value == 50)
-		{
-			ent->client->pers.player_statuses |= (1 << 9);
-		}
-		else if (value == 51)
+		else if (value == (SELLER_HEALING_CRYSTAL + 1))
 		{
 			ent->client->pers.player_statuses |= (1 << 10);
 		}
-		else if (value == 52)
+		else if (value == (SELLER_ENERGY_CRYSTAL + 1))
 		{
 			ent->client->pers.player_statuses |= (1 << 11);
 		}
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-		ent->client->pers.credits -= item_costs[value-1];
+		ent->client->pers.credits -= seller_items_cost[value - 1][0];
 		save_account(ent, qtrue);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
@@ -7144,7 +7333,6 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	int value = 0;
 	int found = 0;
 	int sold = 0;
-	int items_costs[NUMBER_OF_SELLER_ITEMS] = {10,15,20,30,35,40,45,0,0,60,65,70,80,50,0,0,50,60,70,100,50,45,90,150,0,0,0,0,0,0,0,10,0,20,30,90,45,5,0,0,0,20,50,0,0,0,0,0,0,0,0,0};
 
 	if (trap->Argc() == 1)
 	{
@@ -7168,7 +7356,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (value < 1 || value > NUMBER_OF_SELLER_ITEMS || items_costs[value-1] == 0)
+	if (value < 1 || value > MAX_SELLER_ITEMS || seller_items_cost[value - 1][1] == 0)
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"Invalid product number.\n\"" );
 		return;
@@ -7196,42 +7384,42 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		}
 	}
 
-	if (value == 1 && ent->client->ps.ammo[AMMO_BLASTER] >= 100)
+	if (value == (SELLER_BLASTER_PACK + 1) && ent->client->ps.ammo[AMMO_BLASTER] >= 100)
 	{
 		ent->client->ps.ammo[AMMO_BLASTER] -= 100;
 		sold = 1;
 	}
-	else if (value == 2 && ent->client->ps.ammo[AMMO_POWERCELL] >= 100)
+	else if (value == (SELLER_POWERCELL + 1) && ent->client->ps.ammo[AMMO_POWERCELL] >= 100)
 	{
 		ent->client->ps.ammo[AMMO_POWERCELL] -= 100;
 		sold = 1;
 	}
-	else if (value == 3 && ent->client->ps.ammo[AMMO_METAL_BOLTS] >= 100)
+	else if (value == (SELLER_METAL_BOLTS + 1) && ent->client->ps.ammo[AMMO_METAL_BOLTS] >= 100)
 	{
 		ent->client->ps.ammo[AMMO_METAL_BOLTS] -= 100;
 		sold = 1;
 	}
-	else if (value == 4 && ent->client->ps.ammo[AMMO_ROCKETS] >= 10)
+	else if (value == (SELLER_ROCKETS + 1) && ent->client->ps.ammo[AMMO_ROCKETS] >= 10)
 	{
 		ent->client->ps.ammo[AMMO_ROCKETS] -= 10;
 		sold = 1;
 	}
-	else if (value == 5 && ent->client->ps.ammo[AMMO_THERMAL] >= 4)
+	else if (value == (SELLER_THERMALS + 1) && ent->client->ps.ammo[AMMO_THERMAL] >= 4)
 	{
 		ent->client->ps.ammo[AMMO_THERMAL] -= 4;
 		sold = 1;
 	}
-	else if (value == 6 && ent->client->ps.ammo[AMMO_TRIPMINE] >= 3)
+	else if (value == (SELLER_TRIPMINES + 1) && ent->client->ps.ammo[AMMO_TRIPMINE] >= 3)
 	{
 		ent->client->ps.ammo[AMMO_TRIPMINE] -= 3;
 		sold = 1;
 	}
-	else if (value == 7 && ent->client->ps.ammo[AMMO_DETPACK] >= 2)
+	else if (value == (SELLER_DETPACKS + 1) && ent->client->ps.ammo[AMMO_DETPACK] >= 2)
 	{
 		ent->client->ps.ammo[AMMO_DETPACK] -= 2;
 		sold = 1;
 	}
-	else if (value == 10 && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SENTRY_GUN))
+	else if (value == (SELLER_SENTRY_GUN + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SENTRY_GUN))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SENTRY_GUN);
 
@@ -7240,124 +7428,124 @@ void Cmd_Sell_f( gentity_t *ent ) {
 
 		sold = 1;
 	}
-	else if (value == 11 && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER))
+	else if (value == (SELLER_SEEKER_DRONE + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SEEKER);
 		sold = 1;
 	}
-	else if (value == 12 && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC_BIG))
+	else if (value == (SELLER_BIG_BACTA + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC_BIG))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_MEDPAC_BIG);
 		sold = 1;
 	}
-	else if (value == 13 && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SHIELD))
+	else if (value == (SELLER_FORCE_FIELD + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SHIELD))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SHIELD);
 		sold = 1;
 	}
-	else if (value == 14 && ent->client->ps.powerups[PW_YSALAMIRI])
+	else if (value == (SELLER_YSALAMIRI + 1) && ent->client->ps.powerups[PW_YSALAMIRI])
 	{
 		ent->client->ps.powerups[PW_YSALAMIRI] = 0;
 		sold = 1;
 	}
-	else if (value == 17 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BLASTER)))
+	else if (value == (SELLER_E11_BLASTER + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BLASTER)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BLASTER);
 		if (ent->client->ps.weapon == WP_BLASTER)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == 18 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DISRUPTOR)))
+	else if (value == (SELLER_DISRUPTOR + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DISRUPTOR)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_DISRUPTOR);
 		if (ent->client->ps.weapon == WP_DISRUPTOR)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == 19 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_REPEATER)))
+	else if (value == (SELLER_REPEATER + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_REPEATER)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_REPEATER);
 		if (ent->client->ps.weapon == WP_REPEATER)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == 20 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_ROCKET_LAUNCHER)))
+	else if (value == (SELLER_ROCKET_LAUNCHER + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_ROCKET_LAUNCHER)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_ROCKET_LAUNCHER);
 		if (ent->client->ps.weapon == WP_ROCKET_LAUNCHER)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == 21 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BOWCASTER)))
+	else if (value == (SELLER_BOWCASTER + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BOWCASTER)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BOWCASTER);
 		if (ent->client->ps.weapon == WP_BOWCASTER)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == 22 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_PISTOL)))
+	else if (value == (SELLER_BLASTER_PISTOL + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_PISTOL)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BRYAR_PISTOL);
 		if (ent->client->ps.weapon == WP_BRYAR_PISTOL)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == 23 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_FLECHETTE)))
+	else if (value == (SELLER_FLECHETTE + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_FLECHETTE)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_FLECHETTE);
 		if (ent->client->ps.weapon == WP_FLECHETTE)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == 24 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_CONCUSSION)))
+	else if (value == (SELLER_CONCUSSION + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_CONCUSSION)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_CONCUSSION);
 		if (ent->client->ps.weapon == WP_CONCUSSION)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == 32 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)))
+	else if (value == (SELLER_STUN_BATON + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_STUN_BATON);
 		if (ent->client->ps.weapon == WP_STUN_BATON)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == 34 && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC))
+	else if (value == (SELLER_BACTA_CANISTER + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_MEDPAC);
 		sold = 1;
 	}
-	else if (value == 35 && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_EWEB))
+	else if (value == (SELLER_EWEB + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_EWEB))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_EWEB);
 		sold = 1;
 	}
-	else if (value == 36 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DEMP2)))
+	else if (value == (SELLER_DEMP2 + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DEMP2)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_DEMP2);
 		if (ent->client->ps.weapon == WP_DEMP2)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == 37 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_OLD)))
+	else if (value == (SELLER_BRYAR_PISTOL + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_OLD)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BRYAR_OLD);
 		if (ent->client->ps.weapon == WP_BRYAR_OLD)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == 38 && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_BINOCULARS))
+	else if (value == (SELLER_BINOCULARS + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_BINOCULARS))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_BINOCULARS);
 		sold = 1;
 	}
-	else if (value == 42 && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_CLOAK))
+	else if (value == (SELLER_CLOAK_ITEM + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_CLOAK))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_CLOAK);
 		sold = 1;
 	}
-	else if (value == 43 && ent->client->ps.powerups[PW_FORCE_BOON])
+	else if (value == (SELLER_FORCE_BOON + 1) && ent->client->ps.powerups[PW_FORCE_BOON])
 	{
 		ent->client->ps.powerups[PW_FORCE_BOON] = 0;
 		sold = 1;
@@ -7367,7 +7555,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 			
 	if (sold == 1)
 	{
-		add_credits(ent,items_costs[value-1]);
+		add_credits(ent,seller_items_cost[value - 1][1]);
 		save_account(ent, qtrue);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
