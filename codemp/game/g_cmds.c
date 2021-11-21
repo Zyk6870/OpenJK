@@ -4615,7 +4615,7 @@ int zyk_max_magic_power(gentity_t *ent)
 
 	if (ent->client->pers.rpg_class == RPGCLASS_WIZARD) // zyk: Wizard has more Magic Power
 	{
-		max_mp = ((ent->client->pers.level * 4) / 5) * ent->client->pers.skill_levels[55];
+		max_mp = ((ent->client->pers.level * 5) / 5) * ent->client->pers.skill_levels[55];
 		return (max_mp + (40 * (ent->client->pers.skill_levels[38] + 1)));
 	}
 
