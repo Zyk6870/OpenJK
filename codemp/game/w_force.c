@@ -4146,9 +4146,9 @@ void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower )
 		{
 			G_MuteSound(self->client->ps.fd.killSoundEntIndex[TRACK_CHANNEL_5-50], CHAN_VOICE);
 
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.secrets_found & (1 << 3) && 
+			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION) &&
 				self->client->ps.zoomMode == 2)
-			{ // zyk: Gunner Items Upgrade that stops Thermal Vision. In this case, stop binoculars
+			{ // zyk: stops Thermal Vision. In this case, stop binoculars
 				self->client->ps.zoomMode = 0;
 				self->client->ps.zoomTime = level.time;
 			}
@@ -5183,7 +5183,7 @@ void SeekerDroneUpdate(gentity_t *self)
 
 				// zyk: changed shot speed from 2000 to 4000
 				// zyk: changed damage when a Gunner uses the seeker drone
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.secrets_found & (1 << 8))
+				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 					WP_FireGenericBlasterMissile(self, org, endir, qfalse, 20, 4000, MOD_BLASTER);
 				else
 					WP_FireGenericBlasterMissile(self, org, endir, qfalse, 15, 4000, MOD_BLASTER);
@@ -5191,7 +5191,7 @@ void SeekerDroneUpdate(gentity_t *self)
 				G_SoundAtLoc( org, CHAN_WEAPON, G_SoundIndex("sound/weapons/bryar/fire.wav") );
 
 				// zyk: Gunner has fast-shooting seeker drone
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.secrets_found & (1 << 8))
+				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 					self->client->ps.droneFireTime = level.time + Q_irand(200, 300);
 				else
 					self->client->ps.droneFireTime = level.time + Q_irand(400, 700);

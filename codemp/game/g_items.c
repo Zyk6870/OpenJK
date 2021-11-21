@@ -358,8 +358,8 @@ void CreateShield(gentity_t *ent)
 
 	if ( level.gametype == GT_SIEGE || level.gametype == GT_CTF)
 	{ // zyk: added CTF condition
-		// zyk: Force Field 2/2 in RPG Mode has double health
-		if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.secrets_found & (1 << 0))
+		// zyk: Force Field gets double health
+		if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
 		{
 			ent->health = SHIELD_SIEGE_HEALTH * 2;
 		}
@@ -369,8 +369,8 @@ void CreateShield(gentity_t *ent)
 		}
 	}
 	else
-	{ // zyk: Force Field 2/2 in RPG Mode has double health
-		if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.secrets_found & (1 << 0))
+	{ // zyk: Force Field gets double health
+		if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
 		{
 			ent->health = SHIELD_HEALTH * 2;
 		}
@@ -478,7 +478,7 @@ qboolean PlaceShield(gentity_t *playerent)
 			// Set team number.
 			shield->s.otherEntityNum2 = playerent->client->sess.sessionTeam;
 
-			if (level.gametype < GT_TEAM && playerent->client && playerent->client->sess.amrpgmode == 2 && playerent->client->pers.secrets_found & (1 << 0))
+			if (level.gametype < GT_TEAM && playerent->client && playerent->client->sess.amrpgmode == 2 && playerent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
 			{
 				// zyk: setting shield red color if it has the upgrade
 				shield->s.otherEntityNum2 = TEAM_RED;
@@ -545,7 +545,7 @@ void ItemUse_Binoculars(gentity_t *ent)
 	*/
 
 	// zyk: with Thermal Vision, sets the cooldown between activating and deactivating Binoculars to avoid problem in which it gets instantly on and off
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.secrets_found & (1 << 3) && 
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION) &&
 		ent->client->pers.thermal_vision_cooldown_time > level.time)
 	{
 		return;
@@ -608,7 +608,7 @@ void pas_fire( gentity_t *ent )
 	// zyk: changed sentry gun shotspeed from 2300 to 2800
 	// zyk: Gunner Items Upgrade makes sentry gun have more damage
 	if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && 
-		ent->parent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->parent->client->pers.secrets_found & (1 << 8))
+		ent->parent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->parent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 		WP_FireTurretMissile(&g_entities[ent->genericValue3], myOrg, fwd, qfalse, 12, 2800, MOD_SENTRY, ent );
 	else
 		WP_FireTurretMissile(&g_entities[ent->genericValue3], myOrg, fwd, qfalse, 10, 2800, MOD_SENTRY, ent );
@@ -646,7 +646,7 @@ static qboolean pas_find_enemies( gentity_t *self )
 
 	// zyk: Gunner Items Upgrade allows it to find enemies in a greater distance
 	if (self->parent && self->parent->client && self->parent->client->sess.amrpgmode == 2 && 
-		self->parent->client->pers.rpg_class == RPGCLASS_GUNNER && self->parent->client->pers.secrets_found & (1 << 8))
+		self->parent->client->pers.rpg_class == RPGCLASS_GUNNER && self->parent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 	{
 		distance_to_find_enemies *= 2;
 		bestDist = distance_to_find_enemies*distance_to_find_enemies;
@@ -1231,7 +1231,7 @@ void ItemUse_Sentry( gentity_t *ent )
 
 	SP_PAS( sentry );
 
-	// zyk: Bounty Hunter sentry gun has more HP and with the Upgrade, player can place more sentry guns
+	// zyk: Gunner sentry gun has more HP and with the Gunner Items Upgrade, player can place more sentry guns
 	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
 	{
 		sentry->health = 40 * (ent->client->pers.skill_levels[38] + 1);
@@ -1240,7 +1240,7 @@ void ItemUse_Sentry( gentity_t *ent )
 		ent->client->pers.bounty_hunter_placed_sentries++;
 		ent->client->pers.bounty_hunter_sentries--;
 
-		if (ent->client->pers.secrets_found & (1 << 8) && ent->client->pers.bounty_hunter_placed_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
+		if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) && ent->client->pers.bounty_hunter_placed_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
 		{
 			ent->client->ps.fd.sentryDeployed = qfalse;
 		}
@@ -1275,7 +1275,7 @@ void ItemUse_Seeker(gentity_t *ent)
 	{
 		ent->client->ps.eFlags |= EF_SEEKERDRONE;
 		// zyk: Bounty Hunter Upgrade increases seeker drone lifetime
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.secrets_found & (1 << 8))
+		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 			ent->client->ps.droneExistTime = level.time + 80000;
 		else
 			ent->client->ps.droneExistTime = level.time + 60000; // zyk: the seeker drone lifetime, changed from 30000 to 60000
@@ -1313,7 +1313,7 @@ static void MedPackGive(gentity_t *ent, int amount)
 void ItemUse_MedPack_Big(gentity_t *ent)
 {
 	// zyk: RPG Mode Big Bacta. Recover 150 HP
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 0))
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
 		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT * 3);
 	else
 		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
@@ -1323,7 +1323,7 @@ extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 void ItemUse_MedPack(gentity_t *ent)
 {
 	// zyk: RPG Mode Bacta Canister. Recovers some mp
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 0))
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
 	{
 		zyk_add_mp(ent, 100);
 	}
@@ -1408,7 +1408,7 @@ void ItemUse_Jetpack( gentity_t *ent )
 	rpg_skill_counter(ent, 10);
 
 	// zyk: Jetpack Upgrade decreases jetpack toggle time
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 17))
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK))
 		ent->client->jetPackToggleTime = level.time + (JETPACK_TOGGLE_TIME/2);
 	else
 		ent->client->jetPackToggleTime = level.time + JETPACK_TOGGLE_TIME;
@@ -1825,7 +1825,7 @@ void EWebFire(gentity_t *owner, gentity_t *eweb)
 
 	// zyk: Gunner Items Upgrade makes EWeb have more damage
 	if (owner && owner->client && owner->client->sess.amrpgmode == 2 && 
-		owner->client->pers.rpg_class == RPGCLASS_GUNNER && owner->client->pers.secrets_found & (1 << 8))
+		owner->client->pers.rpg_class == RPGCLASS_GUNNER && owner->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 		missile->damage = EWEB_MISSILE_DAMAGE + 5;
 	else
 		missile->damage = EWEB_MISSILE_DAMAGE;
@@ -2746,8 +2746,8 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 
 	if (other->client->sess.amrpgmode == 2 && other->client->pers.rpg_class == RPGCLASS_GUNNER && 
 		ent->item->giType == IT_HOLDABLE && ent->item->giTag == HI_SENTRY_GUN && 
-		other->client->pers.secrets_found & (1 << 8) && other->client->pers.bounty_hunter_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
-	{ // zyk: Bounty Hunter can grab more sentries when he has the Bounty Hunter Upgrade
+		other->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) && other->client->pers.bounty_hunter_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
+	{ // zyk: Gunner can grab more sentries when he has the Gunner Items Upgrade
 		other->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SENTRY_GUN);
 		other->client->pers.bounty_hunter_sentries++;
 		zyk_bounty_sentry_validation = qtrue;

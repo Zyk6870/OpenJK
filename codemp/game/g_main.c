@@ -8867,7 +8867,7 @@ void G_RunFrame( int levelTime ) {
 						jetpack_debounce_amount -= (ent->client->pers.skill_levels[34] * 2);
 					}
 
-					if (ent->client->pers.secrets_found & (1 << 17)) // zyk: Jetpack Upgrade decreases fuel usage
+					if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK)) // zyk: Jetpack Upgrade decreases fuel usage
 						jetpack_debounce_amount -= 2;
 				}
 
@@ -9119,17 +9119,17 @@ void G_RunFrame( int levelTime ) {
 			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
 				// zyk: Weapon Upgrades
-				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.secrets_found & (1 << 11) && ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4)
+				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL) && ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4)
 				{
 					ent->client->ps.weaponTime = (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4;
 				}
 
-				if (ent->client->ps.weapon == WP_BRYAR_OLD && ent->client->pers.secrets_found & (1 << 12) && ent->client->ps.weaponTime > (weaponData[WP_BRYAR_OLD].fireTime * 0.6))
+				if (ent->client->ps.weapon == WP_BRYAR_OLD && ent->client->pers.rpg_upgrades & (1 << UPGRADE_BLASTER_PACK) && ent->client->ps.weaponTime > (weaponData[WP_BRYAR_OLD].fireTime * 0.6))
 				{
 					ent->client->ps.weaponTime = weaponData[WP_BRYAR_OLD].fireTime * 0.6;
 				}
 
-				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.secrets_found & (1 << 13) && ent->client->ps.weaponTime > weaponData[WP_REPEATER].altFireTime / 2)
+				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS) && ent->client->ps.weaponTime > weaponData[WP_REPEATER].altFireTime / 2)
 				{
 					ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime / 2;
 				}
@@ -9161,14 +9161,14 @@ void G_RunFrame( int levelTime ) {
 
 						ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 					}
-					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 1 && ent->client->pers.secrets_found & (1 << 3))
+					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 1 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION))
 					{ // zyk: Gunner with upgrade, activate the Thermal Detector
 						ent->client->pers.thermal_vision = qtrue;
 						ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
 						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_1;
 						ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
 					}
-					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 2 && ent->client->pers.secrets_found & (1 << 3))
+					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION))
 					{ // zyk: Gunner with Thermal Vision Upgrade, activate the Thermal Vision
 						ent->client->pers.thermal_vision = qtrue;
 						ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);

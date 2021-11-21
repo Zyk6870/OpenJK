@@ -240,6 +240,28 @@ char* zyk_skill_name(int skill_index)
 	}
 }
 
+// zyk: return the name of a RPG Upgrade
+char* zyk_get_upgrade_name(zyk_upgrade_t upgrade_flag)
+{
+	char rpg_upgrade_names[MAX_RPG_UPGRAGES][32] = {
+		"Holdable Items Upgrade",
+		"Impact Reducer",
+		"Flame Thrower",
+		"Blaster Pack Upgrade",
+		"Powercell Upgrade",
+		"Metal Bolts Upgrade",
+		"Rockets Upgrade",
+		"Stun Baton Upgrade",
+		"Jetpack Upgrade",
+		"Swimming Upgrade",
+		"Gunner Radar",
+		"Thermal Vision",
+		"Gunner Items Upgrade"
+	};
+
+	return G_NewString(rpg_upgrade_names[upgrade_flag]);
+}
+
 // zyk: tests which skills are allowed for each class
 qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
 {
@@ -2526,7 +2548,7 @@ void load_account(gentity_t* ent)
 
 			// zyk: loading secrets found value
 			fscanf(account_file, "%s", content);
-			ent->client->pers.secrets_found = atoi(content);
+			ent->client->pers.rpg_upgrades = atoi(content);
 
 			// zyk: loading credits value
 			fscanf(account_file, "%s", content);
@@ -2618,7 +2640,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
 			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n",
-				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.secrets_found, client->pers.credits,
+				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.rpg_upgrades, client->pers.credits,
 				client->pers.rpg_class, client->sess.magic_fist_selection, client->pers.main_quest_progress);
 
 			fclose(account_file);
@@ -5328,7 +5350,7 @@ void initialize_rpg_skills(gentity_t *ent)
 			// zyk: Bounty Hunter starts with 5 sentries if he has the Upgrade
 			if (ent->client->pers.skill_levels[48] > 0)
 			{
-				if (ent->client->pers.secrets_found & (1 << 8))
+				if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 					ent->client->pers.bounty_hunter_sentries = MAX_BOUNTY_HUNTER_SENTRIES;
 				else
 					ent->client->pers.bounty_hunter_sentries = 1;
@@ -5425,7 +5447,7 @@ void add_new_char(gentity_t *ent)
 		ent->client->pers.skill_levels[i] = 0;
 	}
 
-	ent->client->pers.secrets_found = 0;
+	ent->client->pers.rpg_upgrades = 0;
 	ent->client->pers.credits = 100;
 	ent->client->pers.rpg_class = RPGCLASS_CIVILIAN;
 	ent->client->sess.magic_fist_selection = 0;
@@ -5834,7 +5856,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 			unique_duration = ent->client->pers.unique_skill_duration - level.time;
 		}
 
-		strcpy(content, va("%s%d-%d-", content, ent->client->pers.secrets_found, unique_duration));
+		strcpy(content, va("%s%d-%d-", content, ent->client->pers.rpg_upgrades, unique_duration));
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-%s-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,zyk_rpg_class(ent),content));
 	}
@@ -6207,73 +6229,17 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 
 void zyk_list_stuff(gentity_t *ent, gentity_t *target_ent)
 {
+	int i = 0;
 	char stuff_message[1024];
 	strcpy(stuff_message, "");
 
-	if (ent->client->pers.secrets_found & (1 << 0))
-		strcpy(stuff_message, va("%s^3\nHoldable Items Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3\nHoldable Items Upgrade - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 1))
-		strcpy(stuff_message, va("%s^3Swimming Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Swimming Upgrade - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 2))
-		strcpy(stuff_message, va("%s^3\nGunner Radar - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3\nGunner Radar - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 3))
-		strcpy(stuff_message, va("%s^3\nThermal Vision - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3\nThermal Vision - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 8))
-		strcpy(stuff_message, va("%s^3\nGunner Items Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3\nGunner Items Upgrade - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 9))
-		strcpy(stuff_message, va("%s^3Impact Reducer - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Impact Reducer - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 10))
-		strcpy(stuff_message, va("%s^3Flame Thrower - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Flame Thrower - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 11))
-		strcpy(stuff_message, va("%s^3Power Cell Weapons Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Power Cell Weapons Upgrade - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 12))
-		strcpy(stuff_message, va("%s^3Blaster Pack Weapons Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Blaster Pack Weapons Upgrade - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 13))
-		strcpy(stuff_message, va("%s^3Metal Bolts Weapons Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Metal Bolts Weapons Upgrade - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 14))
-		strcpy(stuff_message, va("%s^3Rocket Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Rocket Upgrade - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 15))
-		strcpy(stuff_message, va("%s^3Stun Baton Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Stun Baton Upgrade - ^1no\n", stuff_message));
-
-	if (ent->client->pers.secrets_found & (1 << 17))
-		strcpy(stuff_message, va("%s^3Jetpack Upgrade - ^2yes\n", stuff_message));
-	else
-		strcpy(stuff_message, va("%s^3Jetpack Upgrade - ^1no\n", stuff_message));
+	for (i = 0; i < MAX_RPG_UPGRAGES; i++)
+	{
+		if (ent->client->pers.rpg_upgrades & (1 << i))
+			strcpy(stuff_message, va("%s^3\n%s - ^2yes\n", zyk_get_upgrade_name(i), stuff_message));
+		else
+			strcpy(stuff_message, va("%s^3\n%s - ^1no\n", zyk_get_upgrade_name(i), stuff_message));
+	}
 
 	trap->SendServerCommand(target_ent->s.number, va("print \"%s\n\"", stuff_message));
 }
@@ -6822,69 +6788,69 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	}
 
 	// zyk: general validations. Some items require certain conditions to be bought
-	if (value == 8 && ent->client->pers.secrets_found & (1 << 2))
+	if (value == 8 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_RADAR))
 	{
-		trap->SendServerCommand(ent - g_entities, "print \"You already have the Gunner Radar.\n\"");
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_GUNNER_RADAR)));
 		return;
 	}
-	else if (value == 15 && ent->client->pers.secrets_found & (1 << 9))
+	else if (value == 15 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_IMPACT_REDUCER))
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Impact Reducer.\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_IMPACT_REDUCER)));
 		return;
 	}
-	else if (value == 16 && ent->client->pers.secrets_found & (1 << 10))
+	else if (value == 16 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_FLAME_THROWER))
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Flame Thrower.\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_FLAME_THROWER)));
 		return;
 	}
-	else if (value == 25 && ent->client->pers.secrets_found & (1 << 11))
+	else if (value == 25 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL))
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Power Cell Weapons Upgrade.\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_POWERCELL)));
 		return;
 	}
-	else if (value == 26 && ent->client->pers.secrets_found & (1 << 12))
+	else if (value == 26 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_BLASTER_PACK))
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Blaster Pack Weapons Upgrade.\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_BLASTER_PACK)));
 		return;
 	}
-	else if (value == 27 && ent->client->pers.secrets_found & (1 << 13))
+	else if (value == 27 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS))
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Metal Bolts Weapons Weapons Upgrade.\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_METAL_BOLTS)));
 		return;
 	}
-	else if (value == 28 && ent->client->pers.secrets_found & (1 << 14))
+	else if (value == 28 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_ROCKETS))
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Rocket Upgrade.\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_ROCKETS)));
 		return;
 	}
-	else if (value == 29 && ent->client->pers.secrets_found & (1 << 1))
+	else if (value == 29 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_SWIMMING))
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Swimming Upgrade.\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_SWIMMING)));
 		return;
 	}
-	else if (value == 33 && ent->client->pers.secrets_found & (1 << 15))
+	else if (value == 33 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_STUN_BATON))
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Stun Baton Upgrade.\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_STUN_BATON)));
 		return;
 	}
-	else if (value == 39 && ent->client->pers.secrets_found & (1 << 3))
+	else if (value == 39 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION))
 	{
-		trap->SendServerCommand(ent - g_entities, "print \"You already have the Thermal Vision.\n\"");
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_THERMAL_VISION)));
 		return;
 	}
-	else if (value == 40 && ent->client->pers.secrets_found & (1 << 0))
+	else if (value == 40 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You already have the Holdable Items Upgrade.\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_HOLDABLE_ITEMS)));
 		return;
 	}
-	else if (value == 45 && ent->client->pers.secrets_found & (1 << 8))
+	else if (value == 45 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 	{
-		trap->SendServerCommand(ent - g_entities, "print \"You already have the Gunner Items Upgrade.\n\"");
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_GUNNER_ITEMS)));
 		return;
 	}
-	else if (value == 46 && ent->client->pers.secrets_found & (1 << 17))
+	else if (value == 46 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK))
 	{
-		trap->SendServerCommand(ent - g_entities, "print \"You already have the Jetpack Upgrade.\n\"");
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_JETPACK)));
 		return;
 	}
 
@@ -6924,7 +6890,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == 8)
 		{
-			ent->client->pers.secrets_found |= (1 << 2);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_GUNNER_RADAR);
 
 			// zyk: update the rpg stuff info at the client-side game
 			send_rpg_events(10000);
@@ -6966,11 +6932,11 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == 15)
 		{
-			ent->client->pers.secrets_found |= (1 << 9);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_IMPACT_REDUCER);
 		}
 		else if (value == 16)
 		{
-			ent->client->pers.secrets_found |= (1 << 10);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_FLAME_THROWER);
 		}
 		else if (value == 17)
 		{
@@ -7006,23 +6972,23 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == 25)
 		{
-			ent->client->pers.secrets_found |= (1 << 11);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_POWERCELL);
 		}
 		else if (value == 26)
 		{
-			ent->client->pers.secrets_found |= (1 << 12);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_BLASTER_PACK);
 		}
 		else if (value == 27)
 		{
-			ent->client->pers.secrets_found |= (1 << 13);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_METAL_BOLTS);
 		}
 		else if (value == 28)
 		{
-			ent->client->pers.secrets_found |= (1 << 14);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_ROCKETS);
 		}
 		else if (value == 29)
 		{
-			ent->client->pers.secrets_found |= (1 << 1);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_SWIMMING);
 		}
 		else if (value == 30)
 		{
@@ -7039,7 +7005,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == 33)
 		{
-			ent->client->pers.secrets_found |= (1 << 15);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_STUN_BATON);
 		}
 		else if (value == 34)
 		{
@@ -7063,11 +7029,11 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == 39)
 		{
-			ent->client->pers.secrets_found |= (1 << 3);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_THERMAL_VISION);
 		}
 		else if (value == 40)
 		{
-			ent->client->pers.secrets_found |= (1 << 0);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_HOLDABLE_ITEMS);
 		}
 		else if (value == 41)
 		{
@@ -7090,18 +7056,18 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == 45)
 		{
-			ent->client->pers.secrets_found |= (1 << 8);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_GUNNER_ITEMS);
 		}
 		else if (value == 46)
 		{
-			ent->client->pers.secrets_found |= (1 << 17);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_JETPACK);
 
 			// zyk: update the rpg stuff info at the client-side game
 			send_rpg_events(10000);
 		}
 		else if (value == 47)
 		{
-			ent->client->pers.secrets_found |= (1 << 19);
+			
 		}
 		else if (value == 48)
 		{
@@ -7481,7 +7447,7 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 			ent->client->pers.skill_levels[i] = 0;
 
 		ent->client->pers.max_rpg_shield = 0;
-		ent->client->pers.secrets_found = 0;
+		ent->client->pers.rpg_upgrades = 0;
 
 		ent->client->pers.level = 1;
 		ent->client->pers.level_up_score = 0;
@@ -7519,7 +7485,7 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 			ent->client->pers.skill_levels[i] = 0;
 
 		ent->client->pers.max_rpg_shield = 0;
-		ent->client->pers.secrets_found = 0;
+		ent->client->pers.rpg_upgrades = 0;
 
 		ent->client->pers.level = 1;
 		ent->client->pers.level_up_score = 0;

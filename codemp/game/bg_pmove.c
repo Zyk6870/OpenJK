@@ -3300,7 +3300,7 @@ static void PM_AirMove( void ) {
 		{ // zyk: added the Jetpack Upgrade test, in this case, player can have more control
 #if defined (_GAME)
 			gentity_t *player_ent = &g_entities[pm->ps->clientNum];
-			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.secrets_found & (1 << 17))
+			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK))
 				VectorScale(wishvel, 1.1f, wishvel);
 			else
 				VectorScale(wishvel, 0.8f, wishvel);
@@ -3312,7 +3312,7 @@ static void PM_AirMove( void ) {
 		{ //if we are jetting then we have more control than usual
 #if defined (_GAME) // zyk: added the Jetpack Upgrade test, in this case, player can have more control
 			gentity_t *player_ent = &g_entities[pm->ps->clientNum];
-			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.secrets_found & (1 << 17))
+			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK))
 				VectorScale(wishvel, 2.5f, wishvel);
 			else
 				VectorScale(wishvel, 2.0f, wishvel);
@@ -6434,7 +6434,7 @@ int PM_ItemUsable(playerState_t *ps, int forcedUse)
 	{
 	case HI_MEDPAC:
 #if defined( _GAME )
-		if (item_user && item_user->client && item_user->client->sess.amrpgmode == 2 && item_user->client->pers.secrets_found & (1 << 0))
+		if (item_user && item_user->client && item_user->client->sess.amrpgmode == 2 && item_user->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
 		{ // zyk: bacta canister with holdable items upgrade. Must allow even with max health to regen MP
 			if (ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] && item_user->client->pers.magic_power == zyk_max_magic_power(item_user))
 				return 0;
@@ -11253,7 +11253,7 @@ void PmoveSingle (pmove_t *pmove) {
 		gentity_t *player_ent = &g_entities[pm->ps->clientNum];
 
 		// zyk: if player has the Jetpack Upgrade, increase max velocity
-		if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.secrets_found & (1 << 17))
+		if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK))
 			zyk_jetpack_max_vel = 672;
 #endif
 

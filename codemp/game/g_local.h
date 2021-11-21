@@ -586,11 +586,29 @@ typedef enum {
 	MAX_PLAYER_SETTINGS
 } zyk_settings_t;
 
-// /zyk: 
+// zyk: Main Quest missions
 typedef enum {
 	QUEST_CITY_ARRIVAL,
 	MAX_QUEST_MISSIONS
 } zyk_quest_t;
+
+// zyk: Upgrades bought from seller
+typedef enum {
+	UPGRADE_HOLDABLE_ITEMS,
+	UPGRADE_IMPACT_REDUCER,
+	UPGRADE_FLAME_THROWER,
+	UPGRADE_BLASTER_PACK,
+	UPGRADE_POWERCELL,
+	UPGRADE_METAL_BOLTS,
+	UPGRADE_ROCKETS,
+	UPGRADE_STUN_BATON,
+	UPGRADE_JETPACK,
+	UPGRADE_SWIMMING,
+	UPGRADE_GUNNER_RADAR,
+	UPGRADE_THERMAL_VISION,
+	UPGRADE_GUNNER_ITEMS,
+	MAX_RPG_UPGRAGES
+} zyk_upgrade_t;
 
 // zyk: number of RPG Mode skills
 #define NUMBER_OF_SKILLS 92
@@ -821,27 +839,8 @@ typedef struct clientPersistant_s {
 	// zyk: entity ids of the mind controlled entities. Default -1, which means player is not controlling anyone
 	int mind_controlled1_id;
 
-	// zyk: bit flag, loaded in load_account()
-	// Possible bit values (1 << bit_value) are:
-	// 0 - Holdable Items Upgrade
-	// 1 - Swimming Upgrade
-	// 2 - Gunner Radar
-	// 3 - Thermal Vision
-	// 4 - unused
-	// 5 - unused
-	// 6 - unused
-	// 7 - unused
-	// 8 - Gunner Items Upgrade
-	// 9 - Impact Reducer
-	// 10 - Flame Thrower
-	// 11 - Power Cell Weapons Upgrade
-	// 12 - Blaster Pack Weapons Upgrade
-	// 13 - Metal Bolts Weapons Upgrade
-	// 14 - Rocket Upgrade
-	// 15 - Stun Baton Upgrade
-	// 16 - unused
-	// 17 - Jetpack Upgrade
-	int secrets_found;
+	// zyk: Upgrades bought from the seller
+	int rpg_upgrades;
 
 	// zyk: amount of sentries the Bounty Hunter starts with
 	int bounty_hunter_sentries;

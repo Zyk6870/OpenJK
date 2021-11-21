@@ -434,8 +434,8 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	// zyk: rockets and concussion, both with upgrade, and Ultra Bolt, can use force pushable/pullable entities, like the rock at start of t3_rift map
 	if (Q_stricmp(other->classname, "func_static") == 0 && (other->spawnflags & 1 || other->spawnflags & 2) && 
 		ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && 
-		((ent->s.weapon == WP_ROCKET_LAUNCHER && ent->parent->client->pers.secrets_found & (1 << 14)) ||
-		(ent->s.weapon == WP_CONCUSSION && ent->parent->client->pers.secrets_found & (1 << 13)) || 
+		((ent->s.weapon == WP_ROCKET_LAUNCHER && ent->parent->client->pers.rpg_upgrades & (1 << UPGRADE_ROCKETS)) ||
+		(ent->s.weapon == WP_CONCUSSION && ent->parent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS)) ||
 		(ent->s.weapon == WP_CONCUSSION && ent->methodOfDeath == MOD_MELEE)))
 	{
 		GlobalUse(other, ent->parent, ent->parent);

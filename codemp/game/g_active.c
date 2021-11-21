@@ -175,7 +175,7 @@ void P_WorldEffects( gentity_t *ent ) {
 			// drown!
 			ent->client->airOutTime += 1000;
 			if ( ent->health > 0 && ent->client->tempSpectate < level.time && 
-				!(ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.secrets_found & (1 << 1))) 
+				!(ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_SWIMMING)))
 			{ // zyk: Swimming Upgrade Upgrade protects Gunner from drowning
 				// take more damage the longer underwater
 				ent->damage += 2;
@@ -912,7 +912,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		else if (!(client->pers.player_statuses & (1 << 2)))
 		{ // zyk: send this event after some seconds in map and if the player did not received this event yet
 			// must wait some seconds because after a map change, sometimes the event is not received by the client-side game right away
-			if (client->sess.amrpgmode == 2 && client->pers.rpg_class == RPGCLASS_GUNNER && client->pers.secrets_found & (1 << 2))
+			if (client->sess.amrpgmode == 2 && client->pers.rpg_class == RPGCLASS_GUNNER && client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_RADAR))
 			{
 				G_AddEvent(ent, EV_ITEMUSEFAIL, 5);
 			}
@@ -924,7 +924,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		else if (!(client->pers.player_statuses & (1 << 3)))
 		{
 			// zyk: event to set the blue jetpack flame
-			if (client->sess.amrpgmode == 2 && client->pers.secrets_found & (1 << 17))
+			if (client->sess.amrpgmode == 2 && client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK))
 				G_AddEvent(ent, EV_ITEMUSEFAIL, 7);
 			else
 				G_AddEvent(ent, EV_ITEMUSEFAIL, 8);
@@ -3498,7 +3498,7 @@ void ClientThink_real( gentity_t *ent ) {
 		{ //these are the only two where you wouldn't care about a delay between
 			if (ent->client->sess.amrpgmode == 2)
 			{
-				if (ent->client->pers.secrets_found & (1 << 0) && pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE && ent->client->ps.m_iVehicleNum)
+				if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS) && pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE && ent->client->ps.m_iVehicleNum)
 				{ // zyk: RPG Mode Cloak Item can cloak vehicles
 					if (!g_entities[ent->client->ps.m_iVehicleNum].client->ps.powerups[PW_CLOAKED])
 					{
@@ -3514,7 +3514,7 @@ void ClientThink_real( gentity_t *ent ) {
 				{ 
 					if (ent->client->pers.rpg_class == RPGCLASS_GUNNER &&
 						ent->client->ps.droneExistTime >= (level.time + 5000) &&
-						ent->client->ps.ammo[AMMO_POWERCELL] >= 1 && ent->client->pers.secrets_found & (1 << 8))
+						ent->client->ps.ammo[AMMO_POWERCELL] >= 1 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 					{ // zyk: Gunner can get seeker drone back with saber style key. Uses some power cell ammo
 						ent->client->ps.droneExistTime = 0;
 						ent->client->ps.eFlags &= ~EF_SEEKERDRONE;

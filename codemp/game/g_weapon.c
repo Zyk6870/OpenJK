@@ -532,8 +532,8 @@ static void WP_FireBlaster( gentity_t *ent, qboolean altFire )
 	if ( altFire )
 	{
 		// add some slop to the alt-fire direction
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 12))
-		{ // zyk: Blaster Pack Weapons Upgrade improves accuracy
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_BLASTER_PACK))
+		{ // zyk: Blaster Pack Upgrade improves accuracy
 			angs[PITCH] += Q_flrand(-1.0f, 1.0f) * (BLASTER_SPREAD/2.0);
 			angs[YAW]       += Q_flrand(-1.0f, 1.0f) * (BLASTER_SPREAD/2.0);
 		}
@@ -1090,7 +1090,7 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 	missile->flags |= FL_BOUNCE;
 	// zyk: this is the bounce count used to count how many times the shot bounces, default: 3. In RPG Mode bounces more times with Bowcaster 2/2
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 11))
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL))
 		missile->bounceCount = 18;  
 	else
 		missile->bounceCount = 3;  
@@ -1123,7 +1123,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 	else if ( count > 5 )
 	{
 		// zyk: Bowcaster with Power Cell Weapons Upgrade in RPG Mode can shoot more missiles
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 11))
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL))
 		{
 			if (count > 9)
 				count = 9;
@@ -1140,7 +1140,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 		count--;
 	}
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 11))
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL))
 	{ // zyk: decrease spread
 		bowcaster_spread = BOWCASTER_ALT_SPREAD * 0.7;
 	}
@@ -1288,7 +1288,7 @@ static void WP_FireRepeater( gentity_t *ent, qboolean altFire )
 	else
 	{
 		// add some slop to the alt-fire direction
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 13))
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS))
 		{ // zyk: with Metal Bolts Weapons Upgrade, repeater will be more accurate
 			angs[PITCH] += Q_flrand(-1.0f, 1.0f) * (REPEATER_SPREAD/2);
 			angs[YAW]	+= Q_flrand(-1.0f, 1.0f) * (REPEATER_SPREAD/2);
@@ -1794,7 +1794,7 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 	int i;
 	int zyk_number_of_shots = FLECHETTE_SHOTS;
 
-	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 13))
+	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS))
 	{ // zyk: Metal Bolts Weapons Upgrade makes flechette have more shots
 		zyk_number_of_shots += 2;
 	}
@@ -3910,7 +3910,7 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	// zyk: starts flame thrower
 	if (ent->client && ent->client->sess.amrpgmode == 2 && alt_fire == qtrue && 
 		ent->client->pers.rpg_class != RPGCLASS_FORCE_USER && ent->client->pers.rpg_class != RPGCLASS_WIZARD &&
-		ent->client->pers.secrets_found & (1 << 10) && ent->client->ps.cloakFuel > 0 && ent->waterlevel < 3)
+		ent->client->pers.rpg_upgrades & (1 << UPGRADE_FLAME_THROWER) && ent->client->ps.cloakFuel > 0 && ent->waterlevel < 3)
 	{ // zyk: do not use flame thrower when underwater
 		int flame_thrower_fuel_usage = 2;
 
@@ -3929,7 +3929,7 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	tr_ent = &g_entities[tr.entityNum];
 
 	// zyk: Stun Baton with Stun Baton Upgrade in RPG Mode allows the player to open any door
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 15) && tr_ent->s.eType == ET_MOVER && 
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_STUN_BATON) && tr_ent->s.eType == ET_MOVER &&
 		zyk_allow_stun_baton_upgrade.integer == 1)
 	{
 		GlobalUse(tr_ent, ent, ent);
@@ -3982,14 +3982,14 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 			{
 				tr_ent->client->ps.electrifyTime = level.time + 700;
 
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 15) && 
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_STUN_BATON) &&
 					tr_ent->client->ps.powerups[PW_CLOAKED])
 				{ // zyk: stun baton upgrade decloaks players
 					Jedi_Decloak(tr_ent);
 				}
 
 				// zyk: if the player has stun baton upgrade in RPG mode, enemy has its speed decreased
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.secrets_found & (1 << 15))
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_STUN_BATON))
 				{
 					// zyk: allies cant be hit by it
 					if (zyk_is_ally(ent,tr_ent) == qtrue)

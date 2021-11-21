@@ -4672,12 +4672,12 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 	{
 		if ((mod == MOD_ROCKET || mod == MOD_ROCKET_HOMING || mod == MOD_ROCKET_SPLASH || mod == MOD_ROCKET_HOMING_SPLASH) && 
-			attacker->client->pers.secrets_found & (1 << 14))
+			attacker->client->pers.rpg_upgrades & (1 << UPGRADE_ROCKETS))
 		{
 			return qtrue;
 		}
 	
-		if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && attacker->client->pers.secrets_found & (1 << 13))
+		if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && attacker->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS))
 		{
 			return qtrue;
 		}
@@ -4688,7 +4688,7 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 			return qtrue;
 		}
 
-		if (mod == MOD_DET_PACK_SPLASH && attacker->client->pers.secrets_found & (1 << 14))
+		if (mod == MOD_DET_PACK_SPLASH && attacker->client->pers.rpg_upgrades & (1 << UPGRADE_ROCKETS))
 		{ // zyk: detpacks
 			return qtrue;
 		}
@@ -5247,7 +5247,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	{
 		int new_knockback = knockback;
 
-		if (targ->client->pers.secrets_found & (1 << 9))
+		if (targ->client->pers.rpg_upgrades & (1 << UPGRADE_IMPACT_REDUCER))
 			new_knockback -= knockback * 0.8;
 
 		knockback = new_knockback;
