@@ -6460,6 +6460,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						}
 
 						G_Damage (ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
+
+						if (Q_stricmp(attacker->targetname, "zyk_quest_effect_black_hole") == 0 && ent && ent->client && ent->health < 1)
+						{ // zyk: Black Hole disintegrates enemies who got killed by it
+							ent->client->ps.eFlags |= EF_DISINTEGRATION;
+						}
 					}
 					else
 					{
