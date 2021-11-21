@@ -680,8 +680,8 @@ typedef struct clientPersistant_s {
 	// 5 - Chat protection activated for this player
 	// 6 - Paralyzed by an admin
 	// 7 - send event so client-side mod knows if this is a Force User or not, to render the Force Shield effect
-	// 8 - using Saber Armor
-	// 9 - using Gun Armor
+	// 8 - unused
+	// 9 - unused
 	// 10 - using Healing Crystal
 	// 11 - using Energy Crystal
 	// 12 - Give Command - Force

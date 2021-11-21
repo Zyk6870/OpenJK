@@ -6455,7 +6455,7 @@ Cmd_Stuff_f
 void Cmd_Stuff_f( gentity_t *ent ) {
 	if (trap->Argc() == 1)
 	{ // zyk: shows the categories of stuff
-		trap->SendServerCommand( ent-g_entities, "print \"\n^7Use ^2/stuff <category> ^7to buy or sell stuff\nThe Category may be ^3ammo^7, ^3items^7, ^3misc^7, ^3weapons ^7or ^3upgrades\n^7Use ^3/stuff <number> ^7to see info about the item\n\n^7Use ^2/buy <number> ^7to buy or ^2/sell <number> ^7to sell\nStuff bought from ^3upgrades ^7category are permanent\n\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"\n^7Use ^2/stuff <category> ^7to buy or sell stuff\nThe Category may be ^3ammo^7, ^3items^7, ^3misc^7, ^3weapons ^7or ^3upgrades\n^7Use ^3/stuff <number> ^7to see info about the item\n\n^7Use ^2/buy <number> ^7to buy or ^2/sell <number> ^7to sell\nStuff bought from ^3upgrades ^7category are permanent\n\n\"");
 		return;
 	}
 	else
@@ -6677,14 +6677,6 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		else if (i == 48)
 		{
 			trap->SendServerCommand( ent-g_entities, "print \"\n^3Ammo All: ^7recovers all ammo types, including flame thrower fuel\n\n\"");
-		}
-		else if (i == 49)
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Saber Armor: ^7increases damage resistance to saber attacks. If the player dies, he loses the armor\n\n\"");
-		}
-		else if (i == 50)
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"\n^3Gun Armor: ^7increases damage resistance to gun attacks and melee attacks. If the player dies, he loses the armor\n\n\"");
 		}
 		else if (i == 51)
 		{
