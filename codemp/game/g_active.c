@@ -3514,7 +3514,12 @@ void ClientThink_real( gentity_t *ent ) {
 				{ 
 					if (ent->client->pers.rpg_class == RPGCLASS_GUNNER &&
 						ent->client->ps.droneExistTime >= (level.time + 5000) &&
-						ent->client->ps.ammo[AMMO_POWERCELL] >= 1 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+						ent->client->ps.ammo[AMMO_POWERCELL] >= 1 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) && 
+						(
+						 (ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY) && ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE] < NUMBER_OF_GUNNER_ITEMS) ||
+						 (!(ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY)) && ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE] < 1)
+						)
+						)
 					{ // zyk: Gunner can get seeker drone back with saber style key. Uses some power cell ammo
 						ent->client->ps.droneExistTime = 0;
 						ent->client->ps.eFlags &= ~EF_SEEKERDRONE;
@@ -3522,6 +3527,8 @@ void ClientThink_real( gentity_t *ent ) {
 						ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
 
 						ent->client->ps.ammo[AMMO_POWERCELL] -= 1;
+
+						ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE]++;
 
 						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));
 					}

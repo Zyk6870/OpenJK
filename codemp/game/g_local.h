@@ -607,6 +607,7 @@ typedef enum {
 	UPGRADE_GUNNER_RADAR,
 	UPGRADE_THERMAL_VISION,
 	UPGRADE_GUNNER_ITEMS,
+	UPGRADE_INVENTORY_CAPACITY,
 	MAX_RPG_UPGRAGES
 } zyk_upgrade_t;
 
@@ -660,17 +661,28 @@ typedef enum {
 	SELLER_GUNNER_RADAR,
 	SELLER_THERMAL_VISION,
 	SELLER_GUNNER_ITEMS_UPGRADE,
+	SELLER_INVENTORY_CAPACITY,
 	MAX_SELLER_ITEMS
 } zyk_seller_item_t;
+
+// zyk: items that a Gunner can carry more than one
+typedef enum {
+	GUNNERITEM_BACTA_CANISTER,
+	GUNNERITEM_BIG_BACTA,
+	GUNNERITEM_SENTRY_GUN,
+	GUNNERITEM_SEEKER_DRONE,
+	GUNNERITEM_FORCE_FIELD,
+	MAX_GUNNER_ITEMS
+} zyk_gunner_item_t;
 
 // zyk: number of RPG Mode skills
 #define NUMBER_OF_SKILLS 92
 
+// zyk: Gunner with Inventory Capacity upgrade can carry up to this amount of some holdable items
+#define NUMBER_OF_GUNNER_ITEMS 3
+
 // zyk: damage bonus of weapon skills
 #define RPG_WEAPON_DMG_BONUS 0.05
-
-// zyk: max sentries a Bounty Hunter can have if he has the Upgrade
-#define MAX_BOUNTY_HUNTER_SENTRIES 5
 
 // zyk: max RPG chars an account can have
 #define MAX_RPG_CHARS 15
@@ -892,8 +904,8 @@ typedef struct clientPersistant_s {
 	// zyk: Upgrades bought from the seller
 	int rpg_upgrades;
 
-	// zyk: amount of sentries the Bounty Hunter starts with
-	int bounty_hunter_sentries;
+	// zyk: amount of items the Gunner can carry
+	int gunner_items[MAX_GUNNER_ITEMS];
 
 	// zyk: amount of sentries placed in map
 	int bounty_hunter_placed_sentries;
@@ -1732,6 +1744,7 @@ void send_rpg_events(int send_event_timer);
 int zyk_get_remap_count();
 void zyk_text_message(gentity_t *ent, char *filename, qboolean show_in_chat, qboolean broadcast_message, ...);
 qboolean zyk_can_deflect_shots(gentity_t *ent);
+holdable_t zyk_get_holdable_item_tag(zyk_gunner_item_t item_index);
 
 // zyk: shader remap struct
 typedef struct shaderRemap_s {

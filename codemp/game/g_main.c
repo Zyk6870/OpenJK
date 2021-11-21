@@ -9148,9 +9148,16 @@ void G_RunFrame( int levelTime ) {
 
 				if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
 				{
-					// zyk: if the bounty hunter still has sentries, give the item to him
-					if (ent->client->pers.bounty_hunter_sentries > 0)
-						ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
+					int gunner_item_it = 0;
+
+					// zyk: if Gunner still has an item, set the flag so the item will be in inventory
+					for (gunner_item_it = 0; gunner_item_it < MAX_GUNNER_ITEMS; gunner_item_it++)
+					{
+						if (ent->client->pers.gunner_items[gunner_item_it] > 0)
+						{
+							ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << zyk_get_holdable_item_tag(gunner_item_it));
+						}
+					}
 
 					if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
 					{ // zyk: if Gunner stops using sniper scope or binoculars, stop the Thermal Vision

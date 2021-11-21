@@ -484,6 +484,11 @@ qboolean PlaceShield(gentity_t *playerent)
 				shield->s.otherEntityNum2 = TEAM_RED;
 			}
 
+			if (playerent->client && playerent->client->sess.amrpgmode == 2 && playerent->client->pers.rpg_class == RPGCLASS_GUNNER)
+			{ // zyk: used a Force Field, decrease amount of them in inventory
+				playerent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD]--;
+			}
+
 			shield->s.eType = ET_SPECIAL;
 			shield->s.modelindex =  HI_SHIELD;	// this'll be used in CG_Useable() for rendering.
 			shield->classname = shieldItem->classname;
@@ -1231,16 +1236,16 @@ void ItemUse_Sentry( gentity_t *ent )
 
 	SP_PAS( sentry );
 
-	// zyk: Gunner sentry gun has more HP and with the Gunner Items Upgrade, player can place more sentry guns
+	// zyk: Gunner sentry gun has more HP and with the Inventory Capacity upgrade, player can place more sentry guns
 	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
 	{
 		sentry->health = 40 * (ent->client->pers.skill_levels[38] + 1);
 
 		// zyk: validating quantity of sentry guns that the Gunner can place
 		ent->client->pers.bounty_hunter_placed_sentries++;
-		ent->client->pers.bounty_hunter_sentries--;
+		ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN]--;
 
-		if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) && ent->client->pers.bounty_hunter_placed_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
+		if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY) && ent->client->pers.bounty_hunter_placed_sentries < NUMBER_OF_GUNNER_ITEMS)
 		{
 			ent->client->ps.fd.sentryDeployed = qfalse;
 		}
@@ -1274,12 +1279,17 @@ void ItemUse_Seeker(gentity_t *ent)
 	else
 	{
 		ent->client->ps.eFlags |= EF_SEEKERDRONE;
-		// zyk: Bounty Hunter Upgrade increases seeker drone lifetime
+		// zyk: Gunner Items Upgrade increases seeker drone lifetime
 		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 			ent->client->ps.droneExistTime = level.time + 80000;
 		else
 			ent->client->ps.droneExistTime = level.time + 60000; // zyk: the seeker drone lifetime, changed from 30000 to 60000
 		ent->client->ps.droneFireTime = level.time + 500;   // zyk: fire time of seeker drone changed from 1500 to 500
+
+		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
+		{ // zyk: used a seeker, decrease amount of them in inventory
+			ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE]--;
+		}
 	}
 }
 
@@ -1317,6 +1327,11 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT * 3);
 	else
 		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
+
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
+	{ // zyk: used a Big Bacta, decrease amount of them in inventory
+		ent->client->pers.gunner_items[GUNNERITEM_BIG_BACTA]--;
+	}
 }
 
 extern void zyk_add_mp(gentity_t* ent, int mp_amount);
@@ -1329,6 +1344,11 @@ void ItemUse_MedPack(gentity_t *ent)
 	}
 	
 	MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);
+
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
+	{ // zyk: used a Bacta Canister, decrease amount of them in inventory
+		ent->client->pers.gunner_items[GUNNERITEM_BACTA_CANISTER]--;
+	}
 }
 
 #define JETPACK_TOGGLE_TIME			900 // zyk: default 1000
@@ -2644,7 +2664,7 @@ extern void save_account(gentity_t *ent, qboolean save_char_file);
 void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	int			respawn;
 	qboolean	predict;
-	qboolean	zyk_bounty_sentry_validation = qfalse; // zyk: used to test if the player is a Bounty Hunter with Upgrade, which can grab more sentry guns
+	qboolean	zyk_gunner_validation = qfalse; // zyk: tests if the player is a Gunner with Inventory Capacity upgrade, which can grab more than one of some holdable items
 
 	if (ent->genericValue10 > level.time &&
 		other &&
@@ -2707,7 +2727,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		}
 		else if (other->client->pers.rpg_class == RPGCLASS_WIZARD && ((ent->item->giType == IT_WEAPON && ent->item->giTag != WP_STUN_BATON) || ent->item->giType == IT_AMMO || 
 			     (ent->item->giType == IT_HOLDABLE && ent->item->giTag != HI_MEDPAC && ent->item->giTag != HI_CLOAK && ent->item->giTag != HI_JETPACK)))
-		{ // zyk: Magic Master can only pickup some items
+		{ // zyk: Wizard can only pickup some items
 			return;
 		}
 	}
@@ -2744,17 +2764,30 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		}
 	}
 
-	if (other->client->sess.amrpgmode == 2 && other->client->pers.rpg_class == RPGCLASS_GUNNER && 
-		ent->item->giType == IT_HOLDABLE && ent->item->giTag == HI_SENTRY_GUN && 
-		other->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) && other->client->pers.bounty_hunter_sentries < MAX_BOUNTY_HUNTER_SENTRIES)
-	{ // zyk: Gunner can grab more sentries when he has the Gunner Items Upgrade
-		other->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SENTRY_GUN);
-		other->client->pers.bounty_hunter_sentries++;
-		zyk_bounty_sentry_validation = qtrue;
+	if (other->client->sess.amrpgmode == 2 && other->client->pers.rpg_class == RPGCLASS_GUNNER && ent->item->giType == IT_HOLDABLE)
+	{ // zyk: Gunner can grab more of some holdable items when he has the Inventory Capacity upgrade
+		int item_iterator = 0;
+
+		for (item_iterator = 0; item_iterator < MAX_GUNNER_ITEMS; item_iterator++)
+		{
+			if (ent->item->giTag == zyk_get_holdable_item_tag(item_iterator))
+			{
+				if (other->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY) && other->client->pers.gunner_items[item_iterator] < NUMBER_OF_GUNNER_ITEMS)
+				{
+					other->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << zyk_get_holdable_item_tag(item_iterator));
+					other->client->pers.gunner_items[item_iterator]++;
+					zyk_gunner_validation = qtrue;
+				}
+				else if (!(other->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY)) && other->client->pers.gunner_items[item_iterator] < 1)
+				{
+					other->client->pers.gunner_items[item_iterator]++;
+				}
+			}
+		}
 	}
 
 	// the same pickup rules are used for client side and server side
-	if ( !BG_CanItemBeGrabbed( level.gametype, &ent->s, &other->client->ps ) && zyk_bounty_sentry_validation == qfalse) {
+	if ( !BG_CanItemBeGrabbed( level.gametype, &ent->s, &other->client->ps ) && zyk_gunner_validation == qfalse) {
 		return;
 	}
 

@@ -1800,9 +1800,13 @@ void TryUse( gentity_t *ent )
 	}
 	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) &&
 			target && Q_stricmp(target->classname, "sentryGun") == 0 && target->parent && target->parent == ent &&
-			 ent->client->pers.bounty_hunter_sentries < MAX_BOUNTY_HUNTER_SENTRIES && ent->client->ps.ammo[AMMO_POWERCELL] >= 2)
+			(
+			(ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY) && ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN] < NUMBER_OF_GUNNER_ITEMS) ||
+			(!(ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY)) && ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN] < 1)
+			) && 
+			ent->client->ps.ammo[AMMO_POWERCELL] >= 2)
 	{ // zyk: Gunner Items Upgrade allows recovering sentry guns. Uses some power cell ammo
-		ent->client->pers.bounty_hunter_sentries++;
+		ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN]++;
 		ent->client->pers.bounty_hunter_placed_sentries--;
 		ent->client->ps.fd.sentryDeployed = qfalse;
 
@@ -1814,9 +1818,13 @@ void TryUse( gentity_t *ent )
 	}
 	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) &&
 			target && target->s.eType == ET_SPECIAL && target->s.modelindex == HI_SHIELD && target->parent && target->parent == ent &&
+			(
+			 (ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY) && ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD] < NUMBER_OF_GUNNER_ITEMS) ||
+			 (!(ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY)) && ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD] < 1)
+			) &&
 			ent->client->ps.ammo[AMMO_POWERCELL] >= 3)
 	{ // zyk: Gunner Items Upgrade allows recovering force fields. Uses some power cell ammo
-		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
+		ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD]++;
 
 		ent->client->ps.ammo[AMMO_POWERCELL] -= 3;
 
