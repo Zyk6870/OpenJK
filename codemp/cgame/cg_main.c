@@ -2457,7 +2457,6 @@ Ghoul2 Insert End
 
 	cg.magic_power = 100;
 
-	cg.immunity_power_duration = 0;
 	cg.unique_cooldown_timer = 0;
 	cg.unique_cooldown_duration = 0;
 	cg.unique_duration_timer = 0;

@@ -1673,7 +1673,7 @@ static void CG_ZykMod( void )
 
 	trap->Cmd_Argv( 1, arg, sizeof( arg ) );
 
-	while (j < 111)
+	while (j < 109)
 	{ // zyk: parsing info from the server and setting the respective cvars
 		k = 0;
 
@@ -1705,20 +1705,20 @@ static void CG_ZykMod( void )
 			trap->Cvar_Set("ui_zyk_rpg_rpgclass", va("%s",value));
 			strcpy(rpg_class, value);
 		}
-		else if (j < 99)
+		else if (j < 97)
 		{
 			int skill_number = j-6;
 
 			if (Q_stricmp(rpg_class, "Free Warrior") == 0)
 			{
-				if (skill_number > 62 && skill_number < 69)
+				if (skill_number > 62 && skill_number < 67)
 					trap->Cvar_Set(va("ui_zyk_skill_%d_level", skill_number), "");
 				else
 					trap->Cvar_Set(va("ui_zyk_skill_%d_level", skill_number), va("%s", value));
 			}
 			else if (Q_stricmp(rpg_class, "Force User") == 0)
 			{
-				if ((skill_number > 19 && skill_number < 30) || (skill_number == 35) || (skill_number > 39 && skill_number < 55) || (skill_number > 62 && skill_number < 69))
+				if ((skill_number > 19 && skill_number < 30) || (skill_number == 35) || (skill_number > 39 && skill_number < 55) || (skill_number > 62 && skill_number < 67))
 					trap->Cvar_Set(va("ui_zyk_skill_%d_level", skill_number), "");
 				else
 					trap->Cvar_Set(va("ui_zyk_skill_%d_level", skill_number), va("%s",value));
@@ -1726,7 +1726,7 @@ static void CG_ZykMod( void )
 			else if (Q_stricmp(rpg_class, "Gunner") == 0)
 			{
 				if ((skill_number > 0 && skill_number < 5) || (skill_number > 5 && skill_number < 19) || skill_number == 34 || 
-					(skill_number > 35 && skill_number < 39) || skill_number == 55 || (skill_number > 62 && skill_number < 69))
+					(skill_number > 35 && skill_number < 39) || skill_number == 55 || (skill_number > 62 && skill_number < 67))
 					trap->Cvar_Set(va("ui_zyk_skill_%d_level", skill_number), "");
 				else
 					trap->Cvar_Set(va("ui_zyk_skill_%d_level", skill_number), va("%s",value));
@@ -1741,13 +1741,13 @@ static void CG_ZykMod( void )
 					trap->Cvar_Set(va("ui_zyk_skill_%d_level", skill_number), va("%s",value));
 			}
 		}
-		else if (j < 108)
+		else if (j < 106)
 		{
-			int setting_value = j-99;
+			int setting_value = j-97;
 
 			trap->Cvar_Set(va("ui_zyk_setting_%d_value", setting_value), va("%s",value));
 		}
-		else if (j < 109)
+		else if (j < 107)
 		{ // zyk: receive the Upgrades bought from the seller
 			int secrets_found = atoi(value);
 
@@ -1826,7 +1826,7 @@ static void CG_ZykMod( void )
 			else
 				trap->Cvar_Set("ui_zyk_upgrade_15_value", "Energy Modulator - no");
 		}
-		else if (j == 109)
+		else if (j == 107)
 		{ // zyk: quest player
 			int quest_player_id = atoi(value);
 
@@ -1839,7 +1839,7 @@ static void CG_ZykMod( void )
 				trap->Cvar_Set("ui_zyk_quest_player", "Quest Player - ");
 			}
 		}
-		else if (j == 110)
+		else if (j == 108)
 		{ // zyk: duration of Unique Skills
 			if (cg.unique_duration_control == 0)
 			{

@@ -4634,24 +4634,6 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 	}
 }
 
-// zyk: if this player or npc has immunity power, returns qtrue and shows Immunity effect
-qboolean zyk_check_immunity_power(gentity_t *ent)
-{
-	if (ent && ent->client && ent->client->pers.quest_power_status & (1 << 0))
-	{
-		if (ent->client->pers.immunity_power_effect_cooldown < level.time)
-		{
-			zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_immunity", "0", "scepter/invincibility", 0, 0, 0, 300);
-
-			ent->client->pers.immunity_power_effect_cooldown = level.time + 500;
-		}
-
-		return qtrue;
-	}
-
-	return qfalse;
-}
-
 // zyk: tests if the target player can be hit by the attacker gun/saber damage, force power or special power
 qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target)
 {
@@ -4772,8 +4754,8 @@ qboolean zyk_special_power_can_hit_target(gentity_t *attacker, gentity_t *target
 				is_ally = 1;
 			}
 
-			if (is_ally == 0 && !(zyk_check_immunity_power(target)))
-			{ // zyk: Cannot hit target with Immunity Power. Players in bosses can only hit bosses and their helper npcs. Players not in boss battles
+			if (is_ally == 0)
+			{ // zyk: players in bosses can only hit bosses and their helper npcs. Players not in boss battles
 			  // can only hit normal enemy npcs and npcs spawned by bosses but not the bosses themselves. Magic-using npcs can hit everyone that are not their allies
 				(*targets_hit)++;
 
@@ -4820,8 +4802,8 @@ qboolean zyk_magic_effect_can_hit_target(gentity_t* attacker, gentity_t* target,
 				is_ally = 1;
 			}
 
-			if (is_ally == 0 && !(zyk_check_immunity_power(target)))
-			{ // zyk: Cannot hit target with Immunity Power. Players in bosses can only hit bosses and their helper npcs. Players not in boss battles
+			if (is_ally == 0)
+			{ // zyk: players in bosses can only hit bosses and their helper npcs. Players not in boss battles
 			  // can only hit normal enemy npcs and npcs spawned by bosses but not the bosses themselves. Magic-using npcs can hit everyone that are not their allies
 				return qtrue;
 			}
@@ -5098,25 +5080,6 @@ void lightning_dome(gentity_t *ent, int damage)
 
 	if (ent->s.number < level.maxclients)
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
-}
-
-// zyk: Magic Immunity. Becomes immune against other magic powers
-void immunity_power(gentity_t *ent, int duration)
-{
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_MAGIC_IMMUNITY] > 1)
-	{
-		duration += 10000;
-	}
-
-	ent->client->pers.quest_power_status |= (1 << 0);
-	ent->client->pers.magic_power_timer[MAGIC_MAGIC_IMMUNITY] = level.time + duration;
-
-	ent->client->pers.immunity_power_effect_cooldown = level.time + 500;
-
-	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_immunity", "0", "scepter/invincibility", 0, 0, 0, 300);
-
-	if (ent->s.number < level.maxclients)
-		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/boon.mp3"));
 }
 
 // zyk: Enemy Weakening
@@ -5688,45 +5651,6 @@ void tree_of_life(gentity_t *ent)
 	zyk_quest_effect_spawn(ent, ent, "zyk_tree_of_life", "1", "models/map_objects/yavin/tree10_b.md3", 0, 0, 0, 4000);
 }
 
-// zyk: Magic Disable
-void magic_disable(gentity_t *ent, int distance)
-{
-	int i = 0;
-	int targets_hit = 0;
-	int duration = 6000;
-
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_MAGIC_DISABLE] > 1)
-	{
-		duration += 2000;
-	}
-
-	for (i = 0; i < level.num_entities; i++)
-	{
-		gentity_t *player_ent = &g_entities[i];
-
-		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
-		{
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_magic_disable", "0", "env/small_electricity2", 0, 0, 0, 1500);
-
-			if (player_ent->client->pers.quest_power_usage_timer < level.time)
-			{
-				player_ent->client->pers.quest_power_usage_timer = level.time + duration;
-			}
-			else
-			{ // zyk: already used a power, so increase the cooldown time
-				player_ent->client->pers.quest_power_usage_timer += duration;
-			}
-
-			if (i < MAX_CLIENTS)
-			{ // zyk: show the cooldown time bar only to players, not to npcs
-				display_yellow_bar(player_ent, (player_ent->client->pers.quest_power_usage_timer - level.time));
-			}
-
-			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh10.mp3"));
-		}
-	}
-}
-
 // zyk: Ice Stalagmite
 void ice_stalagmite(gentity_t *ent, int distance, int damage)
 {
@@ -6129,10 +6053,6 @@ void Player_FireFlameThrower( gentity_t *self, qboolean is_magic)
 			{ //only bother with arc rules if the victim is a client
 				entityList[e] = ENTITYNUM_NONE;
 			}
-			else if (traceEnt->client && (traceEnt->client->sess.amrpgmode == 2 || traceEnt->NPC) && is_magic == qtrue && zyk_check_immunity_power(traceEnt))
-			{ // zyk: Immunity Power protects from Flame Burst
-				entityList[e] = ENTITYNUM_NONE;
-			}
 		}
 		traceEnt = &g_entities[entityList[e]];
 		if (traceEnt && traceEnt != self)
@@ -6214,11 +6134,6 @@ void quest_power_events(gentity_t *ent)
 	{
 		if (ent->health > 0)
 		{
-			if (ent->client->pers.quest_power_status & (1 << 0) && ent->client->pers.magic_power_timer[MAGIC_MAGIC_IMMUNITY] < level.time)
-			{ // zyk: Immunity Power
-				ent->client->pers.quest_power_status &= ~(1 << 0);
-			}
-
 			if (ent->client->pers.quest_power_status & (1 << 1))
 			{ // zyk: Chaos Power
 				if (ent->client->pers.magic_power_hit_counter[MAGIC_CHAOS_POWER] > 0 && ent->client->pers.magic_power_target_timer[MAGIC_CHAOS_POWER] < level.time)
@@ -6325,11 +6240,6 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << 6))
 			{ // zyk: Slow Motion
-				if (ent->client->pers.quest_power_status & (1 << 0))
-				{ // zyk: testing for Immunity Power in target player
-					ent->client->pers.quest_power_status &= ~(1 << 6);
-				}
-
 				if (ent->client->pers.magic_power_target_timer[MAGIC_SLOW_MOTION] < level.time)
 				{ // zyk: Slow Motion run out
 					ent->client->pers.quest_power_status &= ~(1 << 6);
@@ -6422,11 +6332,6 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << 8))
 			{ // zyk: Blowing Wind
-				if (ent->client->pers.quest_power_status & (1 << 0))
-				{ // zyk: testing for Immunity Power in target player
-					ent->client->pers.quest_power_status &= ~(1 << 8);
-				}
-
 				if (ent->client->pers.magic_power_target_timer[MAGIC_BLOWING_WIND] > level.time)
 				{
 					gentity_t *blowing_wind_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_BLOWING_WIND]];
@@ -6491,11 +6396,6 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << 13))
 			{ // zyk: hit by Ultra Flame
-				if (ent->client->pers.quest_power_status & (1 << 0))
-				{ // zyk: testing for Immunity Power in target player
-					ent->client->pers.quest_power_status &= ~(1 << 13);
-				}
-
 				if (ent->client->pers.magic_power_hit_counter[MAGIC_ULTRA_FLAME] > 0 && ent->client->pers.magic_power_target_timer[MAGIC_ULTRA_FLAME] < level.time)
 				{
 					gentity_t* ultra_flame_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_ULTRA_FLAME]];
@@ -6575,11 +6475,6 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << 20))
 			{ // zyk: Reverse Wind
-				if (ent->client->pers.quest_power_status & (1 << 0))
-				{ // zyk: testing for Immunity Power in target player
-					ent->client->pers.quest_power_status &= ~(1 << 20);
-				}
-
 				if (ent->client->pers.magic_power_target_timer[MAGIC_REVERSE_WIND] > level.time)
 				{
 					gentity_t *reverse_wind_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_REVERSE_WIND]];
@@ -6612,11 +6507,6 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << 21))
 			{ // zyk: Enemy Weakening
-				if (ent->client->pers.quest_power_status & (1 << 0))
-				{ // zyk: testing for Immunity Power in target player
-					ent->client->pers.quest_power_status &= ~(1 << 21);
-				}
-
 				if (ent->client->pers.magic_power_target_timer[MAGIC_ENEMY_WEAKENING] < level.time)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 21);
@@ -6625,11 +6515,6 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << 22))
 			{ // zyk: Ice Block
-				if (ent->client->pers.quest_power_status & (1 << 0))
-				{ // zyk: testing for Immunity Power in target player
-					ent->client->pers.quest_power_status &= ~(1 << 22);
-				}
-
 				if (ent->client->pers.magic_power_timer[MAGIC_ICE_BLOCK] < level.time)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 22);
@@ -6638,11 +6523,6 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << 23))
 			{ // zyk: hit by Flaming Area
-				if (ent->client->pers.quest_power_status & (1 << 0))
-				{ // zyk: testing for Immunity Power in target player
-					ent->client->pers.quest_power_status &= ~(1 << 23);
-				}
-
 				if (ent->client->pers.magic_power_hit_counter[MAGIC_FLAMING_AREA] > 0 && ent->client->pers.magic_power_target_timer[MAGIC_FLAMING_AREA] < level.time)
 				{
 					gentity_t *flaming_area_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_FLAMING_AREA]];
@@ -6896,10 +6776,6 @@ void duel_tournament_prepare(gentity_t *ent)
 	ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
 	ent->client->ps.weapon = WP_SABER;
 	ent->s.weapon = WP_SABER;
-
-	// zyk: setting Immunity Power so every status power on the duelist will be cancelled
-	ent->client->pers.quest_power_status |= (1 << 0);
-	ent->client->pers.magic_power_timer[MAGIC_MAGIC_IMMUNITY] = level.duel_tournament_timer;
 
 	// zyk: reset hp and shield of duelist
 	ent->health = 100;

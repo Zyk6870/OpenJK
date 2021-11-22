@@ -7357,43 +7357,6 @@ void CG_DrawMagicPower(void)
 	CG_FillRect(x+1.0f, y+1.0f, RPG_BAR_WIDTH-1.0f, JPFUELBAR_H-scaled_magic_power, cColor);
 }
 
-// zyk: draws the Immunity Power bar
-void CG_DrawImmunityPower(void)
-{
-	vec4_t aColor;
-	vec4_t cColor;
-	float x = 25.0;
-	float y = RPG_BAR_Y;
-	float scaled_duration = (((cg.immunity_power_duration - cg.time) * 1.0)/25000) * 100.0;
-
-	if (scaled_duration < 0.0 || cg.snap->ps.stats[STAT_HEALTH] < 1)
-	{
-		cg.immunity_power_duration = 0;
-		return;
-	}
-
-	//color of the bar
-	aColor[0] = 0.9f;
-	aColor[1] = 0.9f;
-	aColor[2] = 0.9f;
-	aColor[3] = 0.8f;
-
-	//color of greyed out "missing fuel"
-	cColor[0] = 0.5f;
-	cColor[1] = 0.5f;
-	cColor[2] = 0.5f;
-	cColor[3] = 0.1f;
-
-	//draw the background (black)
-	CG_DrawRect(x, y, RPG_BAR_WIDTH, JPFUELBAR_H, 1.0f, colorTable[CT_BLACK]);
-
-	//now draw the part to show how much health there is in the color specified
-	CG_FillRect(x+1.0f, y+1.0f+(JPFUELBAR_H-scaled_duration), RPG_BAR_WIDTH-1.0f, JPFUELBAR_H-1.0f-(JPFUELBAR_H-scaled_duration), aColor);
-
-	//then draw the other part greyed out
-	CG_FillRect(x+1.0f, y+1.0f, RPG_BAR_WIDTH-1.0f, JPFUELBAR_H-scaled_duration, cColor);
-}
-
 //draw meter showing cloak fuel when it's not full
 #define CLFUELBAR_H			100.0f
 #define CLFUELBAR_W			15.0f // zyk: changed from 20.0f to 15.0f to reduce bar width
@@ -8332,11 +8295,7 @@ static void CG_Draw2D( void ) {
 			CG_DrawMagicPower();
 		}
 
-		// zyk: draw magic power duration bars
-		if (cg.immunity_power_duration > 0)
-		{
-			CG_DrawImmunityPower();
-		}
+		// zyk: draw RPG bars
 		if (cg.unique_cooldown_duration > 0)
 		{
 			CG_DrawUniqueSkillTimer();

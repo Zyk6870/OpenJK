@@ -6223,7 +6223,6 @@ G_RadiusDamage
 */
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
 extern qboolean zyk_unique_ability_can_hit_target(gentity_t *attacker, gentity_t *target);
-extern qboolean zyk_check_immunity_power(gentity_t *ent);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, gentity_t *missile, int mod) {
 	float		points, dist;
@@ -6394,18 +6393,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 				if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 && level.special_power_effects[attacker->s.number] != ent->s.number)
 				{ // zyk: if it is an effect used by special power, then attacker must be the owner of the effect. Also, do not hit the owner
 					gentity_t *quest_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
-
-					if (ent && ent->client &&
-						Q_stricmp(attacker->targetname, "zyk_effect_scream") != 0 &&
-						Q_stricmp(attacker->targetname, "zyk_effect_fire_bolt_hit") != 0 &&
-						Q_stricmp(attacker->targetname, "zyk_timed_bomb_explosion") != 0 &&
-						Q_stricmp(attacker->targetname, "zyk_vertical_dfa") != 0 &&
-						Q_stricmp(attacker->targetname, "zyk_force_storm") != 0 &&
-						((Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") != 0 && zyk_check_immunity_power(ent)) || 
-						 (Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0 && zyk_is_ally(quest_power_user, ent) == qfalse && zyk_check_immunity_power(ent))))
-					{ // zyk: do not hit enemies using Immunity Power if the effect is not from some unique abilities
-						continue;
-					}
 
 					// zyk: if the power user and the target are allies (player or npc), then do not hit
 					if (quest_power_user && quest_power_user->client && ent && ent->client &&

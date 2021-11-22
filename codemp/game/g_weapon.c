@@ -1592,7 +1592,6 @@ static void WP_FireDEMP2( gentity_t *ent, qboolean altFire )
 }
 
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
-extern qboolean zyk_check_immunity_power(gentity_t *ent);
 void zyk_lightning_dome_radius_damage( gentity_t *ent )
 {
 	float		frac = ( level.time - ent->genericValue5 ) / 800.0f; // / 1600.0f; // synchronize with demp2 effect
@@ -1697,11 +1696,6 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 
 		if (gent != myOwner)
 		{
-			if (gent->client && myOwner->client->pers.rpg_class != RPGCLASS_GUNNER && zyk_check_immunity_power(gent))
-			{ // zyk: Immunity Power users cannot be hit by Lightning Dome, but can be hit by Lightning Shield discharge
-				continue;
-			}
-
 			if (OnSameTeam(myOwner, gent) == qtrue || npcs_on_same_team(myOwner, gent) == qtrue)
 			{ // zyk: dont hit players or npcs on the same team
 				continue;

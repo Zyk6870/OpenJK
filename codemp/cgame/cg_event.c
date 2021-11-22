@@ -2675,10 +2675,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			{ // zyk: current magic power
 				cg.magic_power = es->eventParm;
 			}
-			else if (es->eventParm == 101)
-			{ // zyk: Immunity Power
-				cg.immunity_power_duration = cg.time + 25000;
-			}
 		}
 
 		if (es->number < MAX_CLIENTS)

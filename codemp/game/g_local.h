@@ -541,10 +541,8 @@ typedef enum {
 typedef enum {
 	MAGIC_MAGIC_SENSE,
 	MAGIC_HEALING_AREA,
-	MAGIC_MAGIC_DISABLE,
 	MAGIC_ENEMY_WEAKENING,
 	MAGIC_MAGIC_EXPLOSION,
-	MAGIC_LIGHTNING_DOME,
 	MAGIC_WATER_SPLASH,
 	MAGIC_WATER_ATTACK,
 	MAGIC_ICE_STALAGMITE,
@@ -567,7 +565,7 @@ typedef enum {
 	MAGIC_ULTRA_DRAIN,
 	MAGIC_LIGHT_OF_JUDGEMENT,
 	MAGIC_MAGIC_SHIELD,
-	MAGIC_MAGIC_IMMUNITY,
+	MAGIC_LIGHTNING_DOME,
 	MAGIC_TIME_STOP,
 	MAX_MAGIC_POWERS
 } zyk_magic_t;
@@ -678,7 +676,7 @@ typedef enum {
 } zyk_gunner_item_t;
 
 // zyk: number of RPG Mode skills
-#define NUMBER_OF_SKILLS 92
+#define NUMBER_OF_SKILLS 90
 
 // zyk: Gunner with Inventory Capacity upgrade can carry up to this amount of some holdable items
 #define NUMBER_OF_GUNNER_ITEMS 3
@@ -751,7 +749,7 @@ typedef struct clientPersistant_s {
 	// 12 - Give Command - Force
 	// 13 - Give Command - Guns
 	// 14 - Sending current Magic Power event
-	// 15 - Sending Immunity Power event
+	// 15 - unused
 	// 16 - unused
 	// 17 - unused
 	// 18 - NPC has the guard order
@@ -937,7 +935,7 @@ typedef struct clientPersistant_s {
 
 	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
 	// Possible values are:
-	//  0 - using Immunity Power
+	//  0 - unused
 	//  1 - hit by Chaos Power
 	//  2 - hit by Time Power
 	//  3 - using Flaming Rage
@@ -986,9 +984,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: sets the model of a magic used by this player
 	int quest_power_model1_id;
-
-	// zyk: interval between each time the Immunity Power effect is shown to avoid spamming too many effects
-	int immunity_power_effect_cooldown;
 
 	float black_hole_distance;
 	vec3_t black_hole_origin;

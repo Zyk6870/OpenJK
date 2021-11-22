@@ -157,10 +157,8 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	1, // Unique Skill 6
 	2, // Magic Sense
 	2, // Healing Area
-	2, // Magic Disable
 	2, // Enemy Weakening
 	2, // Magic Explosion
-	2, // Lightning Dome
 	2, // Water Splash
 	2, // Water Attack
 	2, // Ice Stalagmite
@@ -183,7 +181,7 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	2, // Ultra Drain
 	2, // Light of Judgement
 	2, // Magic Shield
-	2, // Magic Immunity
+	2, // Lightning Dome
 	2  // Time Stop
 };
 
@@ -255,10 +253,8 @@ char* zyk_skill_name(int skill_index)
 		"Unique Skill 6",
 		"Magic Sense",
 		"Healing Area",
-		"Magic Disable",
 		"Enemy Weakening",
 		"Magic Explosion",
-		"Lightning Dome",
 		"Water Splash",
 		"Water Attack",
 		"Ice Stalagmite",
@@ -281,7 +277,7 @@ char* zyk_skill_name(int skill_index)
 		"Ultra Drain",
 		"Light of Judgement",
 		"Magic Shield",
-		"Magic Immunity",
+		"Lightning Dome",
 		"Time Stop",
 	};
 
@@ -391,8 +387,6 @@ qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
 		{RPGCLASS_WIZARD, -1},
 		{RPGCLASS_WIZARD, -1},
 		{RPGCLASS_WIZARD, -1},
-		{RPGCLASS_WIZARD, -1},
-		{RPGCLASS_WIZARD, -1},
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
 		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
@@ -497,8 +491,6 @@ char* zyk_allowed_skill_color(int skill_index, int rpg_class)
 			"^3",
 			"^5",
 			"^3",
-			"^7",
-			"^7",
 			"^7",
 			"^7",
 			"^7",
@@ -676,60 +668,56 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 63)
 		return "creates an energy area that heals you and your allies and damage enemies";
 	if (skill_index == 64)
-		return "makes enemies unable to use magic powers for some seconds. Not so effective against magic using npcs, like bosses";
-	if (skill_index == 65)
 		return "decreases damage and resistance of enemies nearby";
-	if (skill_index == 66)
+	if (skill_index == 65)
 		return "creates an explosion that does a lot of damage";
-	if (skill_index == 67)
-		return "creates a dome that does lightning damage. Damage is based on player level";
-	if (skill_index == 68)
+	if (skill_index == 66)
 		return "damages enemies, draining their hp and healing you";
-	if (skill_index == 69)
+	if (skill_index == 67)
 		return "attacks enemies nearby with water, causing high damage";
-	if (skill_index == 70)
+	if (skill_index == 68)
 		return "greatly damages enemies nearby with a stalagmite";
-	if (skill_index == 71)
+	if (skill_index == 69)
 		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
-	if (skill_index == 72)
+	if (skill_index == 70)
 		return "knocks people down causing damage";
-	if (skill_index == 73)
+	if (skill_index == 71)
 		return "rocks keep falling at the enemies, causing high damage";
-	if (skill_index == 74)
+	if (skill_index == 72)
 		return "a rock appears around you, absorbing 99 per cent of any damage you take. It the rock takes a certain amount of damage, it breaks. At level 2, the rock absorbs more damage";
-	if (skill_index == 75)
+	if (skill_index == 73)
 		return "a big tree appears, protecting you from attacks and healing you";
-	if (skill_index == 76)
+	if (skill_index == 74)
 		return "fires a flame burst for some seconds";
-	if (skill_index == 77)
+	if (skill_index == 75)
 		return "a flame jet appears at the enemies and damages them. At level 2, if the flame hits the target, it will catch fire";
-	if (skill_index == 78)
+	if (skill_index == 76)
 		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
-	if (skill_index == 79)
+	if (skill_index == 77)
 		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
-	if (skill_index == 80)
+	if (skill_index == 78)
 		return "blows people away for some seconds";
-	if (skill_index == 81)
+	if (skill_index == 79)
 		return "makes people go towards you";
-	if (skill_index == 82)
+	if (skill_index == 80)
 		return "increases your run speed";
-	if (skill_index == 83)
+	if (skill_index == 81)
 		return "decreases run speed of enemies nearby";
-	if (skill_index == 84)
+	if (skill_index == 82)
 		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
-	if (skill_index == 85)
+	if (skill_index == 83)
 		return "an energy dome appears at enemies, damaging anyone inside it";
-	if (skill_index == 86)
+	if (skill_index == 84)
 		return "damages, stuns, slowers and electrifies enemies";
-	if (skill_index == 87)
+	if (skill_index == 85)
 		return "damages enemies in the area and recovers your hp";
-	if (skill_index == 88)
+	if (skill_index == 86)
 		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
-	if (skill_index == 89)
+	if (skill_index == 87)
 		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
-	if (skill_index == 90)
-		return "protects you from other magic powers for some seconds";
-	if (skill_index == 91)
+	if (skill_index == 88)
+		return "creates a dome that does lightning damage. Damage is based on player level";
+	if (skill_index == 89)
 		return "paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed";
 
 	return "";
@@ -4658,7 +4646,6 @@ extern void dome_of_damage(gentity_t *ent, int distance, int damage);
 extern void ice_stalagmite(gentity_t *ent, int distance, int damage);
 extern void slow_motion(gentity_t *ent, int distance, int duration);
 extern void ultra_speed(gentity_t *ent, int duration);
-extern void immunity_power(gentity_t *ent, int duration);
 extern void ultra_drain(gentity_t *ent, int radius, int damage, int duration);
 extern void magic_shield(gentity_t *ent, int duration);
 extern void healing_area(gentity_t *ent, int damage, int duration);
@@ -4668,7 +4655,6 @@ extern void flame_burst(gentity_t *ent, int duration);
 extern void water_attack(gentity_t *ent, int distance, int damage);
 extern void rock_shield(gentity_t* ent, int health, int duration);
 extern void tree_of_life(gentity_t *ent);
-extern void magic_disable(gentity_t *ent, int distance);
 extern void flaming_area(gentity_t *ent, int damage);
 extern void reverse_wind(gentity_t *ent, int distance, int duration);
 extern void enemy_nerf(gentity_t *ent, int distance);
@@ -6293,7 +6279,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 30, 62, 18);
+		zyk_list_category_skills(ent, target_ent, 28, 62, 18);
 	}
 }
 
@@ -11851,10 +11837,8 @@ int zyk_get_magic_cost(int magic_number)
 	int magic_costs[MAX_MAGIC_POWERS] = {
 		5, // Magic Sense
 		5, // Healing Area
-		18, // Magic Disable
 		18, // Enemy Weakening
 		10, // Magic Explosion
-		15, // Lightning Dome
 		20, // Water Splash
 		21, // Water Attack
 		20, // Ice Stalagmite
@@ -11877,7 +11861,7 @@ int zyk_get_magic_cost(int magic_number)
 		30, // Ultra Drain
 		40, // Light of Judgement
 		25, // Magic Shield
-		30, // Magic Immunity
+		15, // Lightning Dome
 		30 // Time Stop
 	};
 
@@ -11924,11 +11908,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				healing_area(ent, 2, 5000);
 				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
-			else if (magic_number == MAGIC_MAGIC_DISABLE)
-			{
-				magic_disable(ent, 450);
-				zyk_set_magic_power_cooldown_time(ent, 6000);
-			}
 			else if (magic_number == MAGIC_ENEMY_WEAKENING)
 			{
 				enemy_nerf(ent, 450);
@@ -11938,11 +11917,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			{
 				magic_explosion(ent, 320, 130, 900);
 				zyk_set_magic_power_cooldown_time(ent, 24000);
-			}
-			else if (magic_number == MAGIC_LIGHTNING_DOME)
-			{
-				lightning_dome(ent, 70);
-				zyk_set_magic_power_cooldown_time(ent, 25000);
 			}
 			else if (magic_number == MAGIC_WATER_SPLASH)
 			{
@@ -12054,12 +12028,10 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				magic_shield(ent, 6000);
 				zyk_set_magic_power_cooldown_time(ent, 24000);
 			}
-			else if (magic_number == MAGIC_MAGIC_IMMUNITY)
+			else if (magic_number == MAGIC_LIGHTNING_DOME)
 			{
-				immunity_power(ent, 15000);
-				zyk_set_magic_power_cooldown_time(ent, 28000);
-
-				ent->client->pers.player_statuses |= (1 << 15);
+				lightning_dome(ent, 70);
+				zyk_set_magic_power_cooldown_time(ent, 25000);
 			}
 			else if (magic_number == MAGIC_TIME_STOP)
 			{
