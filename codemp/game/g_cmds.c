@@ -6791,7 +6791,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_HOLDABLE_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister recovers all Magic Power, Big Bacta recovers more HP, Force Field resists more and Cloak Item will be able to cloak vehicles\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister recovers some Magic Power, Big Bacta recovers more HP, Force Field resists more and Cloak Item will be able to cloak vehicles\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_IMPACT_REDUCER)
 		{
