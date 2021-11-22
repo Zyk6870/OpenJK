@@ -4855,7 +4855,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	{ // zyk: bonus damage of each RPG class
 		if (attacker->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR)
 		{ // zyk: Free Warrior
-			damage = (int)ceil(damage * (1.0 + (0.025 * attacker->client->pers.skill_levels[38])));
+			damage = (int)ceil(damage * (1.0 + (0.03 * attacker->client->pers.skill_levels[38])));
 		}
 		else if (attacker->client->pers.rpg_class == RPGCLASS_FORCE_USER && mod == MOD_SABER)
 		{ // zyk: Force User
@@ -4995,7 +4995,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			damage = (int)ceil(damage * (1.0 - (0.025 * targ->client->pers.skill_levels[38])));
+			damage = (int)ceil(damage * (1.0 - (0.03 * targ->client->pers.skill_levels[38])));
 		}
 		else if (targ->client->pers.rpg_class == RPGCLASS_FORCE_USER && targ->client->pers.active_unique_skill == 1 && 
 			targ->client->pers.unique_skill_duration > level.time)
