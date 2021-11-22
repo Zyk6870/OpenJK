@@ -5023,7 +5023,7 @@ void magic_sense(gentity_t *ent, int duration)
 
 // zyk: Lightning Dome
 extern void zyk_lightning_dome_detonate( gentity_t *ent );
-void lightning_dome(gentity_t *ent, int damage)
+void lightning_dome(gentity_t *ent, int damage, qboolean is_magic)
 {
 	gentity_t *missile;
 	vec3_t origin;
@@ -5041,10 +5041,21 @@ void lightning_dome(gentity_t *ent, int damage)
 
 	VectorCopy( tr.plane.normal, missile->pos1 );
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER) // zyk: Lightning Shield has less radius
+	if (is_magic == qfalse) // zyk: Lightning Shield has less radius
+	{
 		missile->count = 6;
+	}
 	else
-		missile->count = 9;
+	{
+		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ENEMY_WEAKENING] > 1)
+		{ // zyk: Lightning Dome at a level > 1 has a bigger radius
+			missile->count = 9;
+		}
+		else
+		{
+			missile->count = 6;
+		}
+	}
 
 	missile->classname = "demp2_alt_proj";
 	missile->s.weapon = WP_DEMP2;
@@ -5052,20 +5063,10 @@ void lightning_dome(gentity_t *ent, int damage)
 	missile->think = zyk_lightning_dome_detonate;
 	missile->nextthink = level.time;
 
-	// zyk: damage is level based
-	damage = (int)ceil(damage * (0.5 + ((ent->client->pers.level * 1.0) / 200.0)));
-
-	// zyk: Magic Buff increases damage
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD && 
-		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
-	{
-		damage *= 2;
-	}
-
 	missile->splashDamage = missile->damage = damage;
 	missile->splashMethodOfDeath = missile->methodOfDeath = MOD_DEMP2;
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER) // zyk: Lightning Shield has less radius
+	if (is_magic == qfalse) // zyk: Lightning Shield has less radius
 		missile->splashRadius = 512;
 	else
 		missile->splashRadius = 768;
@@ -5090,6 +5091,13 @@ void enemy_nerf(gentity_t *ent, int distance)
 	int duration = 12000;
 
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ENEMY_WEAKENING] > 1)
+	{
+		duration += 4000;
+	}
+
+	// zyk: Magic Buff increases duration
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD &&
+		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
 	{
 		duration += 4000;
 	}

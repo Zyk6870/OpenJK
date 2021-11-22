@@ -652,7 +652,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 55)
 		return "increases the max amount of Magic Points the player can have. It is based on the current player level";
 	if (skill_index == 56)
-		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Mimic Damage. If you take damage, does part of the damage back to the enemy. Spends 50 force and 25 mp\nForce User: Force Shield. Greatly reduces damage and protects against force powers\nGunner: Poison Darts. Fires poison darts with melee by spending metal bolts ammo\nWizard: Magic Buff. Increases magic bolts, Lightning Dome, Magic Explosion and Healing Area damage. Increases Magic Sense duration. Healing Area heals more";
+		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Mimic Damage. If you take damage, does part of the damage back to the enemy. Spends 50 force and 25 mp\nForce User: Force Shield. Greatly reduces damage and protects against force powers\nGunner: Poison Darts. Fires poison darts with melee by spending metal bolts ammo\nWizard: Magic Buff. Increases magic bolts, Magic Explosion and Healing Area damage. Increases Enemy Weakening duration. Increases Magic Sense duration. Healing Area heals more";
 	if (skill_index == 57)
 		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Thermal Throw, which throws 3 thermal detonators with higher damage. Spends 3 thermals and 3 power cell ammo\nForce User: Force Maelstrom, which grips enemies nearby, damages them, sets force shield and uses lightning if player has the force power. Spends 50 force\nGunner: Homing Rocket, which shoots a powerful rocket that automatically goes after the nearest target. Spends 2 rockets and 2 power cell ammo\nWizard: Faster Bolts, which increases speed and firerate of magic bolts";
 	if (skill_index == 58)
@@ -716,7 +716,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 87)
 		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
 	if (skill_index == 88)
-		return "creates a dome that does lightning damage. Damage is based on player level";
+		return "creates a dome that does lightning damage";
 	if (skill_index == 89)
 		return "paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed";
 
@@ -4649,7 +4649,7 @@ extern void ultra_speed(gentity_t *ent, int duration);
 extern void ultra_drain(gentity_t *ent, int radius, int damage, int duration);
 extern void magic_shield(gentity_t *ent, int duration);
 extern void healing_area(gentity_t *ent, int damage, int duration);
-extern void lightning_dome(gentity_t *ent, int damage);
+extern void lightning_dome(gentity_t *ent, int damage, qboolean is_magic);
 extern void magic_explosion(gentity_t *ent, int radius, int damage, int duration);
 extern void flame_burst(gentity_t *ent, int duration);
 extern void water_attack(gentity_t *ent, int distance, int damage);
@@ -11085,7 +11085,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 		ent->client->ps.powerups[PW_NEUTRALFLAG] = 0;
 		ent->client->pers.unique_skill_duration = 0;
 
-		lightning_dome(ent, 45);
+		lightning_dome(ent, 45, qfalse);
 
 		return;
 	}
@@ -12030,7 +12030,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			}
 			else if (magic_number == MAGIC_LIGHTNING_DOME)
 			{
-				lightning_dome(ent, 70);
+				lightning_dome(ent, 70, qtrue);
 				zyk_set_magic_power_cooldown_time(ent, 25000);
 			}
 			else if (magic_number == MAGIC_TIME_STOP)
