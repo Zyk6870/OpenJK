@@ -6054,7 +6054,7 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 
 		for (i = (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS); i < NUMBER_OF_SKILLS; i++)
 		{
-			if (ent->client->pers.skill_levels[i] > 0)
+			if (ent->client->pers.skill_levels[i] > 0 && i != (upgrade_value - 1))
 			{
 				number_of_magic_skills++;
 			}
