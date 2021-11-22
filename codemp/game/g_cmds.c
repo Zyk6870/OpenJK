@@ -7003,7 +7003,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	}
 
 	// zyk: class validations. Some items are allowed for specific classes
-	if (zyk_seller_item_allowed_for_class((value - 1), ent->client->pers.rpg_class) == qtrue)
+	if (zyk_seller_item_allowed_for_class((value - 1), ent->client->pers.rpg_class) == qfalse)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"%s can't buy this item.\n\"", zyk_rpg_class(ent)));
 		return;
