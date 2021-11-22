@@ -859,19 +859,25 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 			if (client->pers.rpg_class == RPGCLASS_GUNNER && client->pers.energy_modulator_mode > 0)
 			{ // zyk: Energy Modulator consumes ammo while active
-				if (client->ps.ammo[AMMO_BLASTER] < 3 && client->ps.ammo[AMMO_POWERCELL] < 3)
+				if (ent->health < 1)
+				{ // zyk: if player dies, deactivate Energy Modulator
+					ent->client->pers.energy_modulator_mode = 2;
+
+					zyk_energy_modulator(ent);
+				}
+				else if (client->ps.ammo[AMMO_BLASTER] < 2 && client->ps.ammo[AMMO_POWERCELL] < 2)
 				{ // zyk: no more ammo to keep it active. Turn it off
 					ent->client->pers.energy_modulator_mode = 2;
 
 					zyk_energy_modulator(ent);
 				}
-				else if (client->ps.ammo[AMMO_BLASTER] < 3)
+				else if (client->ps.ammo[AMMO_BLASTER] < 2)
 				{
-					client->ps.ammo[AMMO_POWERCELL] -= 3;
+					client->ps.ammo[AMMO_POWERCELL] -= 2;
 				}
 				else
 				{
-					client->ps.ammo[AMMO_BLASTER] -= 3;
+					client->ps.ammo[AMMO_BLASTER] -= 2;
 				}
 			}
 

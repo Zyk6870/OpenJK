@@ -11092,7 +11092,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.unique_skill_duration > level.time)
+	if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.active_unique_skill == 3)
 	{ // zyk: releasing the small lightning dome
 		ent->client->ps.powerups[PW_SHIELDHIT] = 0;
 

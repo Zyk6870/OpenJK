@@ -5418,42 +5418,66 @@ void zyk_force_dash(gentity_t *ent)
 	ent->client->pers.fast_dash_timer = 0;
 }
 
+void energy_modulator_think(gentity_t* self)
+{
+	if (self)
+	{
+		if (self->parent && self->parent->client)
+		{
+			// zyk: do this to prevent the model from disappearing in some places
+			VectorCopy(self->parent->client->ps.origin, self->r.currentOrigin);
+			trap->LinkEntity((sharedEntity_t*)self);
+
+			self->s.boltToPlayer = self->parent->s.number + 1;
+
+			if (self->parent->health < 1)
+			{ // zyk: Gunner died. Free this entity
+				self->think = G_FreeEntity;
+			}
+			else if (self->count != self->parent->client->pers.energy_modulator_mode)
+			{ // zyk: changed mode. Remove this one
+				self->think = G_FreeEntity;
+			}
+		}
+
+		self->nextthink = level.time + FRAMETIME;
+	}
+}
+
+void energy_modulator_spawn_model(gentity_t* ent, char *model_path)
+{
+	gentity_t* new_ent = G_Spawn();
+
+	zyk_main_set_entity_field(new_ent, "classname", "misc_model_breakable");
+	zyk_main_set_entity_field(new_ent, "origin", va("%d %d %d", ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2]));
+	zyk_main_set_entity_field(new_ent, "zykmodelscale", "30");
+	zyk_main_set_entity_field(new_ent, "model", G_NewString(model_path));
+	zyk_main_spawn_entity(new_ent);
+
+	new_ent->parent = ent;
+	new_ent->count = ent->client->pers.energy_modulator_mode;
+	new_ent->think = energy_modulator_think;
+	new_ent->nextthink = level.time;
+	ent->client->pers.energy_modulator_entity_id = new_ent->s.number;
+}
+
 // zyk: spawns the entity when turning it on or free it when turning it off
 void zyk_energy_modulator(gentity_t* ent)
 {
 	if (ent->client->pers.energy_modulator_mode == 0)
 	{ // zyk: if it is Off, turn it on and spawns the model
-		gentity_t* new_ent = G_Spawn();
-
-		zyk_main_set_entity_field(new_ent, "classname", "misc_model_breakable");
-		zyk_main_set_entity_field(new_ent, "origin", "0 0 0");
-		zyk_main_set_entity_field(new_ent, "model", "models/map_objects/cairn/receptor.md3");
-		zyk_main_spawn_entity(new_ent);
-
-		ent->client->pers.energy_modulator_entity_id = new_ent->s.number;
-		new_ent->s.boltToPlayer = ent->s.number + 1;
-
 		ent->client->pers.energy_modulator_mode = 1;
+
+		energy_modulator_spawn_model(ent, "models/map_objects/danger/ship_item04.md3");
 	}
-	else if (ent->client->pers.energy_modulator_mode < 2)
+	else if (ent->client->pers.energy_modulator_mode == 1)
 	{ // zyk: sets the new mode
-		gentity_t* new_ent = &g_entities[ent->client->pers.energy_modulator_entity_id];
+		ent->client->pers.energy_modulator_mode = 2;
 
-		zyk_main_set_entity_field(new_ent, "model", "models/map_objects/desert/emitter.md3");
-		zyk_main_spawn_entity(new_ent);
-
-		ent->client->pers.energy_modulator_entity_id = new_ent->s.number;
-		new_ent->s.boltToPlayer = ent->s.number + 1;
-
-		ent->client->pers.energy_modulator_mode++;
+		energy_modulator_spawn_model(ent, "models/map_objects/danger/ship_item04_placed.md3");
 	}
 	else
-	{ // zyk: if it is 2, turn it off and clear the model
-		gentity_t* new_ent = &g_entities[ent->client->pers.energy_modulator_entity_id];
-
-		new_ent->think = G_FreeEntity;
-		new_ent->nextthink = level.time + FRAMETIME;
-
+	{ // zyk: if it is 2, turn it off
 		ent->client->pers.energy_modulator_mode = 0;
 	}
 }

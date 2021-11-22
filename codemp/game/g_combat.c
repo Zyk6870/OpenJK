@@ -5013,9 +5013,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (targ->client->pers.energy_modulator_mode == 2)
 			{ // zyk: Energy Modulator mode 2 decreases damage
 				bonus_resistance += 0.20;
+
+				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 			}
 			
-			damage = (int)ceil(damage * (0.9 - ((0.04 * targ->client->pers.skill_levels[38]) + bonus_resistance)));
+			damage = (int)ceil(damage * (1.0 - ((0.05 * targ->client->pers.skill_levels[38]) + bonus_resistance)));
 		}
 		else if (targ->client->pers.rpg_class == RPGCLASS_WIZARD &&
 				 targ->client->ps.legsAnim == BOTH_MEDITATE)
