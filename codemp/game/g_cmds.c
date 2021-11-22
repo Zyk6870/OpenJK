@@ -11868,6 +11868,7 @@ int zyk_get_magic_cost(int magic_number)
 	return magic_costs[magic_number];
 }
 
+extern void zyk_spawn_magic_element_effect(gentity_t* ent, int magic_number);
 void zyk_cast_magic(gentity_t* ent, int skill_index)
 {
 	int magic_number = (skill_index - (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS));
@@ -11885,14 +11886,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 		if (ent->client->pers.magic_power >= zyk_get_magic_cost(magic_number))
 		{
 			// zyk: magic usage effect
-			if (ent->client->pers.skill_levels[skill_index] > 1)
-			{
-				ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = level.time + 1000;
-			}
-			else
-			{
-				ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 1000;
-			}
+			zyk_spawn_magic_element_effect(ent, magic_number);
 
 			// zyk: magic usage anim
 			G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCELIGHTNING_HOLD, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);

@@ -4822,6 +4822,79 @@ qboolean zyk_magic_effect_can_hit_target(gentity_t* attacker, gentity_t* target,
 	return qfalse;
 }
 
+zyk_magic_element_t zyk_get_magic_element(int magic_number)
+{
+	int i = 0;
+	zyk_magic_t magic_power_elements[MAX_MAGIC_POWERS] = {
+		MAGICELEMENT_NONE,
+		MAGICELEMENT_NONE,
+		MAGICELEMENT_NONE,
+		MAGICELEMENT_NONE,
+		MAGICELEMENT_WATER,
+		MAGICELEMENT_WATER,
+		MAGICELEMENT_WATER,
+		MAGICELEMENT_WATER,
+		MAGICELEMENT_EARTH,
+		MAGICELEMENT_EARTH,
+		MAGICELEMENT_EARTH,
+		MAGICELEMENT_EARTH,
+		MAGICELEMENT_FIRE,
+		MAGICELEMENT_FIRE,
+		MAGICELEMENT_FIRE,
+		MAGICELEMENT_FIRE,
+		MAGICELEMENT_AIR,
+		MAGICELEMENT_AIR,
+		MAGICELEMENT_AIR,
+		MAGICELEMENT_AIR,
+		MAGICELEMENT_DARK,
+		MAGICELEMENT_DARK,
+		MAGICELEMENT_DARK,
+		MAGICELEMENT_DARK,
+		MAGICELEMENT_LIGHT,
+		MAGICELEMENT_LIGHT,
+		MAGICELEMENT_LIGHT,
+		MAGICELEMENT_LIGHT
+	};
+
+	for (i = 0; i < MAX_MAGIC_POWERS; i++)
+	{
+		if (i == magic_number)
+		{ // zyk: found the magic index. Return the Element
+			return magic_power_elements[i];
+		}
+	}
+
+	return MAGICELEMENT_NONE;
+}
+
+// zyk: spawns the element effect above the player or npc when magic is cast
+void zyk_spawn_magic_element_effect(gentity_t* ent, int magic_number)
+{
+	char magic_element_effects[NUM_MAGIC_ELEMENTS][64] = {
+		"env/small_electricity2",
+		"env/water_drops_steam",
+		"materials/gravel",
+		"env/fire",
+		"env/water_steam3",
+		"force/rage2",
+		"howler/sonic"
+	};
+
+	zyk_magic_element_t magic_element = zyk_get_magic_element(magic_number);
+	gentity_t* new_ent = G_Spawn();
+
+	zyk_set_entity_field(new_ent, "classname", "fx_runner");
+	zyk_set_entity_field(new_ent, "targetname", "zyk_magic_element");
+	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->r.currentOrigin[0], (int)ent->r.currentOrigin[1], (int)ent->r.currentOrigin[2] + 56));
+
+	new_ent->s.modelindex = G_EffectIndex(magic_element_effects[magic_element]);
+
+	zyk_spawn_entity(new_ent);
+
+	level.special_power_effects[new_ent->s.number] = ent->s.number;
+	level.special_power_effects_timer[new_ent->s.number] = level.time + 1000;
+}
+
 // zyk: Earthquake
 void earthquake(gentity_t *ent, int stun_time, int strength, int distance)
 {

@@ -570,6 +570,18 @@ typedef enum {
 	MAX_MAGIC_POWERS
 } zyk_magic_t;
 
+// zyk: Elements of each Magic power
+typedef enum {
+	MAGICELEMENT_NONE,
+	MAGICELEMENT_WATER,
+	MAGICELEMENT_EARTH,
+	MAGICELEMENT_FIRE,
+	MAGICELEMENT_AIR,
+	MAGICELEMENT_DARK,
+	MAGICELEMENT_LIGHT,
+	NUM_MAGIC_ELEMENTS
+} zyk_magic_element_t;
+
 // zyk: settings values
 typedef enum {
 	SETTINGS_RPG_QUESTS, 
