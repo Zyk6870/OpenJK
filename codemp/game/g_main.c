@@ -5418,6 +5418,46 @@ void zyk_force_dash(gentity_t *ent)
 	ent->client->pers.fast_dash_timer = 0;
 }
 
+// zyk: spawns the entity when turning it on or free it when turning it off
+void zyk_energy_modulator(gentity_t* ent)
+{
+	if (ent->client->pers.energy_modulator_mode == 0)
+	{ // zyk: if it is Off, turn it on and spawns the model
+		gentity_t* new_ent = G_Spawn();
+
+		zyk_main_set_entity_field(new_ent, "classname", "misc_model_breakable");
+		zyk_main_set_entity_field(new_ent, "origin", "0 0 0");
+		zyk_main_set_entity_field(new_ent, "model", "models/map_objects/cairn/receptor.md3");
+		zyk_main_spawn_entity(new_ent);
+
+		ent->client->pers.energy_modulator_entity_id = new_ent->s.number;
+		new_ent->s.boltToPlayer = ent->s.number + 1;
+
+		ent->client->pers.energy_modulator_mode = 1;
+	}
+	else if (ent->client->pers.energy_modulator_mode < 2)
+	{ // zyk: sets the new mode
+		gentity_t* new_ent = &g_entities[ent->client->pers.energy_modulator_entity_id];
+
+		zyk_main_set_entity_field(new_ent, "model", "models/map_objects/desert/emitter.md3");
+		zyk_main_spawn_entity(new_ent);
+
+		ent->client->pers.energy_modulator_entity_id = new_ent->s.number;
+		new_ent->s.boltToPlayer = ent->s.number + 1;
+
+		ent->client->pers.energy_modulator_mode++;
+	}
+	else
+	{ // zyk: if it is 2, turn it off and clear the model
+		gentity_t* new_ent = &g_entities[ent->client->pers.energy_modulator_entity_id];
+
+		new_ent->think = G_FreeEntity;
+		new_ent->nextthink = level.time + FRAMETIME;
+
+		ent->client->pers.energy_modulator_mode = 0;
+	}
+}
+
 // zyk: Water Attack
 void water_attack(gentity_t *ent, int distance, int damage)
 {

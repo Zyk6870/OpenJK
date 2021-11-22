@@ -3914,6 +3914,11 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	{ // zyk: do not use flame thrower when underwater
 		int flame_thrower_fuel_usage = 2;
 
+		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.energy_modulator_mode == 1)
+		{ // zyk: Energy Modulator mode 1 decreases flame thrower fuel usage
+			flame_thrower_fuel_usage = 1;
+		}
+
 		G_Sound( ent, CHAN_WEAPON, G_SoundIndex("sound/effects/fireout.mp3") );
 
 		ent->client->pers.flame_thrower = level.time + 1500;

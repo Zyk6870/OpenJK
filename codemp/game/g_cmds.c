@@ -87,7 +87,8 @@ const int seller_items_cost[MAX_SELLER_ITEMS][2] = {
 	{4000, 0},
 	{3500, 0},
 	{3000, 0},
-	{3500, 0}
+	{3500, 0},
+	{7000, 0}
 };
 
 // zyk: max levels of the RPG skills
@@ -311,7 +312,8 @@ char* zyk_get_upgrade_name(zyk_upgrade_t upgrade_flag)
 		"Gunner Radar",
 		"Thermal Vision",
 		"Gunner Items Upgrade",
-		"Inventory Capacity"
+		"Inventory Capacity",
+		"Energy Modulator"
 	};
 
 	return G_NewString(rpg_upgrade_names[upgrade_flag]);
@@ -582,7 +584,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 17)
 		return "restores some force power to players near you. If Improvements skill is at least at level 1, regens blaster pack and power cell ammo of the target players";
 	if (skill_index == 18)
-		return va("attacks someone with a small electric charge. Has %d damage multiplied by the stun baton level. Can fire the flame thrower when using alternate fire (does not work for Force User, Monk, Duelist or Magic Master). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
+		return va("attacks someone with a small electric charge. Has %d damage multiplied by the stun baton level. Can fire the flame thrower when using alternate fire (does not work for Force User or Wizard). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
 	if (skill_index == 19)
 		return va("the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged. Higher levels increase damage by 5 per cent", zyk_blaster_pistol_damage.integer);
 	if (skill_index == 20)
@@ -662,7 +664,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 57)
 		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Thermal Throw, which throws 3 thermal detonators with higher damage. Spends 3 thermals and 3 power cell ammo\nForce User: Force Maelstrom, which grips enemies nearby, damages them, sets force shield and uses lightning if player has the force power. Spends 50 force\nGunner: Homing Rocket, which shoots a powerful rocket that automatically goes after the nearest target. Spends 2 rockets and 2 power cell ammo\nWizard: Faster Bolts, which increases speed and firerate of magic bolts";
 	if (skill_index == 58)
-		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Vertical DFA, which makes him jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force\nForce User: Force Repulse, which damages and pushes everyone away from you. Spends 50 force\nGunner: Lightning Shield, which increases resistance to damage, does a bit of damage to enemies nearby and deflects some weapon shots. Using /unique again will release a small lightning dome. Spends 5 power cell ammo\nWizard: Meditation Strength, which increases auto-healing, force regen, and his own resistance is heavily increased. Spends 5 mp";
+		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Vertical DFA, which makes him jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force\nForce User: Force Repulse, which damages and pushes everyone away from you. Spends 50 force\nGunner: Lightning Shield, which increases resistance to damage, does a bit of damage to enemies nearby. Using /unique 1 again will release a small lightning dome. Spends 5 power cell ammo\nWizard: Meditation Strength, which increases auto-healing, force regen, and his own resistance is heavily increased. Spends 5 mp";
 	if (skill_index == 59)
 		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: No Attack, which makes the nearby enemies not able to attack for some seconds. Spends 50 force\nForce User: Force Scream, which sets the resistance shield during 6 seconds. Player makes a scream that damages nearby enemies and may cause stun anim on them. Spends 50 force\nGunner: Wrist Shot, which allows shooting up to five powerful blaster shots. Spends 5 blaster pack ammo and 5 more per shot\nWizard: Meditation Drain, which heavily increases resistance and drains shield and health from enemies nearby to restore health and shield. Spends 5 mp";
 	if (skill_index == 60)
@@ -5317,6 +5319,7 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->pers.active_unique_skill = 0;
 
 		ent->client->pers.lightning_shield_timer = 0;
+		ent->client->pers.energy_modulator_mode = 0;
 
 		ent->client->pers.credits_modifier = 0;
 		ent->client->pers.score_modifier = 0;
@@ -6567,7 +6570,8 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 		"Gunner Radar",
 		"Thermal Vision",
 		"Gunner Items Upgrade",
-		"Inventory Capacity"
+		"Inventory Capacity",
+		"Energy Modulator"
 	};
 
 	return G_NewString(seller_items[item_number]);
@@ -6639,7 +6643,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
-			zyk_show_stuff_category(ent, 36, 49);
+			zyk_show_stuff_category(ent, 36, 50);
 		}
 		else if (i == SELLER_BLASTER_PACK)
 		{
@@ -6841,6 +6845,10 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases the max amount of bacta canisters, big bactas, sentry guns, seeker drones and force fields a Gunner can carry\n\n\"", zyk_get_seller_item_name(i)));
 		}
+		else if (i == SELLER_ENERGY_MODULATOR)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a Gunner class device that has two modes. Either increase damage by 30 per cent and reduce flame thrower fuel usage, or increase resistance to damage by 20 per cent and add gun shot deflection. Activate it by getting melee and pressing Saber Style key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_seller_item_name(i)));
+		}
 	}
 }
 
@@ -6914,7 +6922,8 @@ qboolean zyk_seller_item_allowed_for_class(int item_index, int rpg_class)
 		{RPGCLASS_GUNNER, -1}, // Gunner Radar
 		{RPGCLASS_GUNNER, -1}, // Thermal Vision
 		{RPGCLASS_GUNNER, -1}, // Gunner Items Upgrade
-		{RPGCLASS_GUNNER, -1} // Inventory Capacity
+		{RPGCLASS_GUNNER, -1}, // Inventory Capacity
+		{RPGCLASS_GUNNER, -1} // Energy Modulator
 	};
 
 	for (i = 0; i < NUM_RPG_CLASSES; i++)
@@ -7069,6 +7078,11 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	else if (value == (SELLER_INVENTORY_CAPACITY + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_INVENTORY_CAPACITY)));
+		return;
+	}
+	else if (value == (SELLER_ENERGY_MODULATOR + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_ENERGY_MODULATOR))
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_ENERGY_MODULATOR)));
 		return;
 	}
 
@@ -7338,6 +7352,10 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == (SELLER_INVENTORY_CAPACITY + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_INVENTORY_CAPACITY);
+		}
+		else if (value == (SELLER_ENERGY_MODULATOR + 1))
+		{
+		ent->client->pers.rpg_upgrades |= (1 << UPGRADE_ENERGY_MODULATOR);
 		}
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
@@ -10983,9 +11001,8 @@ qboolean zyk_can_deflect_shots(gentity_t *ent)
 	if (ent->client && ent->client->sess.amrpgmode == 2)
 	{
 		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && 
-			ent->client->pers.unique_skill_duration > level.time && 
-			ent->client->pers.active_unique_skill == 3)
-		{ // zyk: Gunner Lightning Shield deflects shots
+			ent->client->pers.energy_modulator_mode == 2)
+		{ // zyk: Gunner Energy Modulator at mode 2 deflects shots
 			return qtrue;
 		}
 	}

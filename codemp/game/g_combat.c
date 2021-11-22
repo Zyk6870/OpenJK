@@ -4864,6 +4864,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		else if (attacker->client->pers.rpg_class == RPGCLASS_GUNNER && mod != MOD_SABER && mod != MOD_MELEE && mod != MOD_FORCE_DARK)
 		{ // zyk: Gunner
 			damage = (int)ceil(damage * (1.0 + (0.05 * attacker->client->pers.skill_levels[38])));
+
+			if (attacker->client->pers.energy_modulator_mode == 1 && mod != MOD_UNKNOWN)
+			{ // zyk: Energy Modulator mode 1 increases damage done by guns
+				damage = (int)ceil(damage * 1.3);
+			}
 		}
 		else if (attacker->client->pers.rpg_class == RPGCLASS_WIZARD && mod == MOD_MELEE)
 		{ // zyk: Magic bolts can damage heavy things
@@ -5003,6 +5008,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (targ->client->pers.active_unique_skill == 3 && targ->client->pers.unique_skill_duration > level.time)
 			{
 				bonus_resistance += 0.25;
+			}
+
+			if (targ->client->pers.energy_modulator_mode == 2)
+			{ // zyk: Energy Modulator mode 2 decreases damage
+				bonus_resistance += 0.20;
 			}
 			
 			damage = (int)ceil(damage * (0.9 - ((0.04 * targ->client->pers.skill_levels[38]) + bonus_resistance)));

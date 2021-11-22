@@ -608,6 +608,7 @@ typedef enum {
 	UPGRADE_THERMAL_VISION,
 	UPGRADE_GUNNER_ITEMS,
 	UPGRADE_INVENTORY_CAPACITY,
+	UPGRADE_ENERGY_MODULATOR,
 	MAX_RPG_UPGRAGES
 } zyk_upgrade_t;
 
@@ -662,6 +663,7 @@ typedef enum {
 	SELLER_THERMAL_VISION,
 	SELLER_GUNNER_ITEMS_UPGRADE,
 	SELLER_INVENTORY_CAPACITY,
+	SELLER_ENERGY_MODULATOR,
 	MAX_SELLER_ITEMS
 } zyk_seller_item_t;
 
@@ -909,6 +911,13 @@ typedef struct clientPersistant_s {
 
 	// zyk: amount of sentries placed in map
 	int bounty_hunter_placed_sentries;
+
+	// zyk: each of the modes of Energy Modulator Upgrade for Gunner:
+	// 0 - Off
+	// 1 - Damage buff and lower flame thrower fuel usage
+	// 2 - Resistance buff and gun shot deflection
+	int energy_modulator_mode;
+	int energy_modulator_entity_id;
 
 	int max_force_power; // zyk: max force power the player can have based on skill_levels[54] value
 
