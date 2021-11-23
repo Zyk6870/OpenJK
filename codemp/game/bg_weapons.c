@@ -308,11 +308,11 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 	{	// WP_CONCUSSION
 //		"Concussion Rifle",		//	char	classname[32];		// Spawning name
 		AMMO_METAL_BOLTS,		//	int		ammoIndex;			// Index to proper ammo slot
-		40,						//	int		ammoLow;			// Count when ammo is low
-		40,						//	int		energyPerShot;		// Amount of energy used per shot
+		20,						//	int		ammoLow;			// Count when ammo is low // zyk: default 40
+		20,						//	int		energyPerShot;		// Amount of energy used per shot // zyk: default 40
 		800,					//	int		fireTime;			// Amount of time between firings
 		8192,					//	int		range;				// Range of weapon
-		50,						//	int		altEnergyPerShot;	// Amount of energy used for alt-fire
+		25,						//	int		altEnergyPerShot;	// Amount of energy used for alt-fire // zyk: default 50
 		1200,					//	int		altFireTime;		// Amount of time between alt-firings
 		8192,					//	int		altRange;			// Range of alt-fire
 		0,						//	int		chargeSubTime;		// ms interval for subtracting ammo during charge
