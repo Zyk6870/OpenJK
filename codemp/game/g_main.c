@@ -6428,6 +6428,9 @@ void quest_power_events(gentity_t *ent)
 							static vec3_t forward;
 							vec3_t dir;
 
+							// zyk: doing a little damage to the target
+							G_Damage(ent, blowing_wind_user, blowing_wind_user, NULL, NULL, 2, 0, MOD_UNKNOWN);
+
 							AngleVectors(blowing_wind_user->client->ps.viewangles, forward, NULL, NULL);
 
 							VectorNormalize(forward);
@@ -6578,6 +6581,9 @@ void quest_power_events(gentity_t *ent)
 						if (reverse_wind_user && reverse_wind_user->client)
 						{
 							vec3_t dir, forward;
+
+							// zyk: doing a little damage to the target
+							G_Damage(ent, reverse_wind_user, reverse_wind_user, NULL, NULL, 2, 0, MOD_UNKNOWN);
 
 							VectorSubtract(reverse_wind_user->client->ps.origin, ent->client->ps.origin, forward);
 							VectorNormalize(forward);
