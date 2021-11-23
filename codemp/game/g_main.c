@@ -5812,7 +5812,7 @@ void zyk_spawn_black_hole_model(gentity_t* ent, int duration, int model_scale)
 
 	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
 	zyk_set_entity_field(new_ent, "spawnflags", "65536");
-	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->r.currentOrigin[0], (int)ent->r.currentOrigin[1], (int)ent->r.currentOrigin[2]));
+	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2] - 24));
 
 	zyk_set_entity_field(new_ent, "model", "models/map_objects/mp/sphere_1.md3");
 
@@ -5825,7 +5825,7 @@ void zyk_spawn_black_hole_model(gentity_t* ent, int duration, int model_scale)
 	level.special_power_effects[new_ent->s.number] = ent->s.number;
 	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
 
-	VectorCopy(new_ent->s.origin, ent->client->pers.black_hole_origin);
+	VectorCopy(ent->r.currentOrigin, ent->client->pers.black_hole_origin);
 
 	// zyk: remaps the sphere for Black Hole textures
 	AddRemap("models/map_objects/mp/spheretwo", "textures/mp/black", level.time * 0.001);
@@ -5854,7 +5854,7 @@ void black_hole(gentity_t* ent, int radius, int damage, int duration)
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_black_hole", "4", "ships/proton_impact", 500, damage, radius, duration);
 
-	zyk_spawn_black_hole_model(ent, duration, 140);
+	zyk_spawn_black_hole_model(ent, duration, 80);
 
 	ent->client->pers.black_hole_distance = radius;
 
