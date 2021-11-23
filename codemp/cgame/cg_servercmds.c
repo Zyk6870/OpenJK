@@ -1666,14 +1666,12 @@ static void CG_ZykMod( void )
 	char value[64] = {0};
 	char rpg_class[32] = {0};
 	int i = 0, j = 0, k = 0;
-	int light_quest_progress = 0;
-	int dark_quest_progress = 0;
-	int eternity_quest_progress = 0;
-	int universe_quest_progress = 0;
+	int main_quest_progress = 0;
+	int side_quest_progress = 0;
 
 	trap->Cmd_Argv( 1, arg, sizeof( arg ) );
 
-	while (j < 109)
+	while (j < 112)
 	{ // zyk: parsing info from the server and setting the respective cvars
 		k = 0;
 
@@ -1832,11 +1830,11 @@ static void CG_ZykMod( void )
 
 			if (quest_player_id < MAX_CLIENTS)
 			{
-				trap->Cvar_Set("ui_zyk_quest_player", va("Quest Player - %s", cgs.clientinfo[quest_player_id].name));
+				trap->Cvar_Set("ui_zyk_quest_player", va("%s", cgs.clientinfo[quest_player_id].name));
 			}
 			else
 			{
-				trap->Cvar_Set("ui_zyk_quest_player", "Quest Player - ");
+				trap->Cvar_Set("ui_zyk_quest_player", "");
 			}
 		}
 		else if (j == 108)
@@ -1847,6 +1845,45 @@ static void CG_ZykMod( void )
 				cg.unique_duration_timer = cg.time + cg.unique_duration;
 				cg.unique_duration_control = 1;
 			}
+		}
+		else if (j == 109)
+		{ // zyk: Main Quest
+			main_quest_progress = atoi(value);
+		}
+		else if (j == 110)
+		{ // zyk: Side Quests
+			side_quest_progress = atoi(value);
+		}
+		else if (j == 111)
+		{
+			int element_iterator = 7;
+			int current_element_iterator = 0;
+			int number_main_quest_missions = atoi(value);
+			char content[256];
+			char elemental_spirits[6][16] = {
+				"^4Water",
+				"^3Earth",
+				"^1Fire",
+				"^2Air",
+				"^6Dark",
+				"^5Light"
+			};
+
+			strcpy(content, "");
+
+			// zyk: tests which Elemental Spirits the player already has
+			while (element_iterator > 1)
+			{
+				if (main_quest_progress & (1 << (number_main_quest_missions - element_iterator)))
+				{
+					strcpy(content, va("%s%s ", content, elemental_spirits[current_element_iterator]));
+				}
+
+				current_element_iterator++;
+				element_iterator--;
+			}
+
+			trap->Cvar_Set("ui_zyk_elemental_spirits", va("%s", content));
 		}
 
 		j++;

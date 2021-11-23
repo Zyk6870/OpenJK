@@ -596,12 +596,6 @@ typedef enum {
 	MAX_PLAYER_SETTINGS
 } zyk_settings_t;
 
-// zyk: Main Quest missions
-typedef enum {
-	QUEST_CITY_ARRIVAL,
-	MAX_QUEST_MISSIONS
-} zyk_quest_t;
-
 // zyk: Upgrades bought from seller
 typedef enum {
 	UPGRADE_HOLDABLE_ITEMS,
@@ -686,6 +680,19 @@ typedef enum {
 	GUNNERITEM_FORCE_FIELD,
 	MAX_GUNNER_ITEMS
 } zyk_gunner_item_t;
+
+// zyk: Main Quest missions
+typedef enum {
+	QUEST_FIRST_MISSION,
+	QUEST_WATER_SPIRIT,
+	QUEST_EARTH_SPIRIT,
+	QUEST_FIRE_SPIRIT,
+	QUEST_AIR_SPIRIT,
+	QUEST_DARK_SPIRIT,
+	QUEST_LIGHT_SPIRIT,
+	QUEST_THE_END,
+	MAX_QUEST_MISSIONS
+} zyk_quest_t;
 
 // zyk: number of RPG Mode skills
 #define NUMBER_OF_SKILLS 90
@@ -1008,6 +1015,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: has bitvalue of each Main Quest task completed
 	int main_quest_progress;
+
+	// zyk: has bitvalue of each side quest tasks completed
+	int side_quest_progress;
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;

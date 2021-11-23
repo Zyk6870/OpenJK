@@ -2628,6 +2628,10 @@ void load_account(gentity_t* ent)
 			fscanf(account_file, "%s", content);
 			ent->client->pers.main_quest_progress = atoi(content);
 
+			// zyk: Side Quest progress
+			fscanf(account_file, "%s", content);
+			ent->client->pers.side_quest_progress = atoi(content);
+
 			if (ent->client->sess.amrpgmode == 1)
 			{
 				ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
@@ -2691,9 +2695,9 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n",
+			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n",
 				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.rpg_upgrades, client->pers.credits,
-				client->pers.rpg_class, client->sess.magic_fist_selection, client->pers.main_quest_progress);
+				client->pers.rpg_class, client->sess.magic_fist_selection, client->pers.main_quest_progress, client->pers.side_quest_progress);
 
 			fclose(account_file);
 		}
@@ -5912,7 +5916,8 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 			unique_duration = ent->client->pers.unique_skill_duration - level.time;
 		}
 
-		strcpy(content, va("%s%d-%d-", content, ent->client->pers.rpg_upgrades, unique_duration));
+		strcpy(content, va("%s%d-%d-%d-%d-%d-%d-", 
+			content, ent->client->pers.rpg_upgrades, 0, unique_duration, ent->client->pers.main_quest_progress, ent->client->pers.side_quest_progress, MAX_QUEST_MISSIONS));
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-%s-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,zyk_rpg_class(ent),content));
 	}
@@ -5923,9 +5928,9 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 
 		strcpy(content,"");
 
-		for (i = 0; i < 105; i++)
+		for (i = 0; i < 103; i++)
 		{
-			if (i == 99)
+			if (i == 97)
 			{
 				strcpy(content, va("%s%s", content, zyk_get_settings_values(ent)));
 			}
