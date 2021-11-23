@@ -1715,10 +1715,7 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 					else if ( gent->s.NPC_class != CLASS_VEHICLE
 						|| (gent->m_pVehicle && gent->m_pVehicle->m_pVehicleInfo->type != VH_FIGHTER) )
 					{//don't do this to fighters
-						if (ent->count == 9) // zyk: Lightning Dome at level > 1
-							gent->client->ps.electrifyTime = level.time + Q_irand( 1000, 2000 );
-						else
-							gent->client->ps.electrifyTime = level.time + Q_irand( 300, 800 );
+						gent->client->ps.electrifyTime = level.time + Q_irand( 500, 1200 );
 					}
 				}
 				if ( gent->client->ps.powerups[PW_CLOAKED] )

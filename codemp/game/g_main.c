@@ -5120,7 +5120,7 @@ void lightning_dome(gentity_t *ent, int damage, qboolean is_magic)
 	}
 	else
 	{
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ENEMY_WEAKENING] > 1)
+		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_LIGHTNING_DOME] > 1)
 		{ // zyk: Lightning Dome at a level > 1 has a bigger radius
 			missile->count = 9;
 		}
