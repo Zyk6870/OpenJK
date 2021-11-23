@@ -6082,7 +6082,7 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 		}
 	}
 
-	// zyk: validating
+	// zyk: each magic requires a certain Elemental Spirit to be upgraded to a level > 1
 	if (upgrade_value > (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS))
 	{
 		int magic_skill_index = (upgrade_value - 1) - (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS);

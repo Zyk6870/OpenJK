@@ -380,44 +380,6 @@ gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int
 	return NULL;
 }
 
-// zyk: gets the map bspname based in the map_number which should correspond to level.quest_map
-char* zyk_get_door_map_name(int map_number)
-{
-	char* map_names[MAX_QUEST_MAPS] = {
-		"none",
-		"t1_inter",
-		"t1_surprise",
-		"mp/siege_desert",
-		"t2_trip"
-	};
-
-	if (map_number < 0 || map_number >= MAX_QUEST_MAPS)
-	{
-		return map_names[0];
-	}
-
-	return map_names[map_number];
-}
-
-// zyk: gets the map name based in the map_number which corresponds to level.quest_map
-char* zyk_get_door_map_title(int map_number)
-{
-	char* map_titles[MAX_QUEST_MAPS] = {
-		"None",
-		"Hero's House",
-		"Kalahari Desert",
-		"Capital City of Ishtar",
-		"Foggy Way"
-	};
-
-	if (map_number < 0 || map_number >= MAX_QUEST_MAPS)
-	{
-		return map_titles[0];
-	}
-
-	return map_titles[map_number];
-}
-
 /*
 ============
 G_InitGame
@@ -613,17 +575,20 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.quest_event_counter = 0;
 
 	// zyk: making case sensitive comparing so only low case quest map names will be set to play quests. This allows building these maps without conflicting with quests
-	if (Q_strncmp(zyk_mapname, "t1_inter", 9) == 0)
+	if (zyk_allow_quests.integer > 0)
 	{
-		level.quest_map = 1;
-	}
-	else if (Q_strncmp(zyk_mapname, "t1_surprise", 12) == 0)
-	{
-		level.quest_map = 2;
-	}
-	else if (Q_strncmp(zyk_mapname, "mp/siege_desert", 16) == 0 && g_gametype.integer == GT_FFA)
-	{
-		level.quest_map = 3;
+		if (Q_strncmp(zyk_mapname, "t1_inter", 9) == 0)
+		{
+			level.quest_map = 1;
+		}
+		else if (Q_strncmp(zyk_mapname, "t1_surprise", 12) == 0)
+		{
+			level.quest_map = 2;
+		}
+		else if (Q_strncmp(zyk_mapname, "mp/siege_desert", 16) == 0 && g_gametype.integer == GT_FFA)
+		{
+			level.quest_map = 3;
+		}
 	}
 
 	// parse the key/value pairs and spawn gentities
@@ -9325,8 +9290,8 @@ void G_RunFrame( int levelTime ) {
 					zyk_vertical_dfa_effect(ent);
 				}
 
-				if (level.quest_map > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0 && level.quest_debounce_timer < level.time &&
-					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+				if (level.quest_map > 0 && zyk_allow_quests.integer > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
+					level.quest_debounce_timer < level.time && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
 					int zyk_it = 0;
 					level.quest_debounce_timer = level.time + 100;

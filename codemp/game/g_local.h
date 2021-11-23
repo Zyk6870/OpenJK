@@ -722,9 +722,6 @@ typedef enum {
 // zyk: duration of the duelists protection in Duel Tournament
 #define DUEL_TOURNAMENT_PROTECTION_TIME 2000
 
-// zyk: number of Quest Maps
-#define MAX_QUEST_MAPS 5
-
 // zyk: max quest npc events each npc can have
 #define MAX_QUEST_NPC_EVENTS 8
 
