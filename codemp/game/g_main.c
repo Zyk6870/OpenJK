@@ -5614,7 +5614,7 @@ void rock_shield(gentity_t *ent, int health, int duration)
 	zyk_main_set_entity_field(new_ent, "model", "models/map_objects/desert/rock.md3");
 	zyk_main_set_entity_field(new_ent, "origin", va("%f %f %f", ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2]));
 	zyk_main_set_entity_field(new_ent, "angles", "0 0 90");
-	zyk_main_set_entity_field(new_ent, "zykmodelscale", "70");
+	zyk_main_set_entity_field(new_ent, "zykmodelscale", "55");
 
 	zyk_main_spawn_entity(new_ent);
 
@@ -5629,6 +5629,8 @@ void rock_shield(gentity_t *ent, int health, int duration)
 	ent->client->pers.quest_power_model1_id = new_ent->s.number;
 	ent->client->pers.quest_power_status |= (1 << 17);
 	ent->client->pers.magic_power_timer[MAGIC_ROCK_SHIELD] = level.time + duration;
+
+	ent->client->pers.magic_power_debounce_timer[MAGIC_ROCK_SHIELD] = level.time;
 
 	level.special_power_effects[new_ent->s.number] = ent->s.number;
 	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
@@ -6504,14 +6506,23 @@ void quest_power_events(gentity_t *ent)
 			{ // zyk: Rock Shield
 				if (ent->client->pers.quest_power_model1_id != -1)
 				{
-					gentity_t *rock_ent = &g_entities[ent->client->pers.quest_power_model1_id];
+					if (ent->client->pers.magic_power_debounce_timer[MAGIC_ROCK_SHIELD] < level.time)
+					{
+						gentity_t* rock_ent = &g_entities[ent->client->pers.quest_power_model1_id];
+						vec3_t rock_origin;
 
-					// zyk: move the Rock so it is always in the player origin
-					VectorCopy(ent->client->ps.origin, rock_ent->s.pos.trBase);
-					VectorCopy(ent->client->ps.origin, rock_ent->s.origin);
-					VectorCopy(ent->client->ps.origin, rock_ent->r.currentOrigin);
+						// zyk: move the Rock so it is always in the player origin
+						VectorSet(rock_origin, ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
 
-					trap->LinkEntity((sharedEntity_t*) rock_ent);
+						VectorCopy(rock_origin, rock_ent->s.pos.trBase);
+						VectorCopy(rock_origin, rock_ent->s.origin);
+						VectorCopy(rock_origin, rock_ent->r.currentOrigin);
+
+						// zyk: do this so the Rock model will not disappear in some places
+						trap->LinkEntity((sharedEntity_t*)rock_ent);
+
+						ent->client->pers.magic_power_debounce_timer[MAGIC_ROCK_SHIELD] = level.time + 40;
+					}
 				}
 				else
 				{ // zyk: Rock was destroyed. Stop using this magic
