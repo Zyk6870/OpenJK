@@ -4825,7 +4825,7 @@ qboolean zyk_magic_effect_can_hit_target(gentity_t* attacker, gentity_t* target,
 zyk_magic_element_t zyk_get_magic_element(int magic_number)
 {
 	int i = 0;
-	zyk_magic_t magic_power_elements[MAX_MAGIC_POWERS] = {
+	zyk_magic_element_t magic_power_elements[MAX_MAGIC_POWERS] = {
 		MAGICELEMENT_NONE,
 		MAGICELEMENT_NONE,
 		MAGICELEMENT_NONE,
@@ -4865,6 +4865,22 @@ zyk_magic_element_t zyk_get_magic_element(int magic_number)
 	}
 
 	return MAGICELEMENT_NONE;
+}
+
+// zyk: return the Spirit value of this magic element
+zyk_main_quest_t zyk_get_magic_spirit(zyk_magic_element_t magic_element)
+{
+	zyk_magic_element_t magic_spirits[NUMBER_OF_MAGIC_SPIRITS + 1] = {
+		-1, // Non-Elemental Magic does not have an Elemental Spirit
+		QUEST_WATER_SPIRIT,
+		QUEST_EARTH_SPIRIT,
+		QUEST_FIRE_SPIRIT,
+		QUEST_AIR_SPIRIT,
+		QUEST_DARK_SPIRIT,
+		QUEST_LIGHT_SPIRIT
+	};
+
+	return magic_spirits[magic_element];
 }
 
 // zyk: spawns the element effect above the player or npc when magic is cast

@@ -692,10 +692,13 @@ typedef enum {
 	QUEST_LIGHT_SPIRIT,
 	QUEST_THE_END,
 	MAX_QUEST_MISSIONS
-} zyk_quest_t;
+} zyk_main_quest_t;
 
 // zyk: number of RPG Mode skills
 #define NUMBER_OF_SKILLS 90
+
+// zyk: number of Elemental Spirits
+#define NUMBER_OF_MAGIC_SPIRITS 6
 
 // zyk: Gunner with Inventory Capacity upgrade can carry up to this amount of some holdable items
 #define NUMBER_OF_GUNNER_ITEMS 3
