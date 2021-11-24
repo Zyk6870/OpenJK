@@ -332,7 +332,7 @@ void zyk_set_quest_npc_events(gentity_t* npc_ent)
 		npc_ent->client->pers.quest_npc_timer = 0;
 		npc_ent->client->pers.quest_npc_current_event = 0;
 
-		if (level.quest_map == 3)
+		if (level.quest_map == QUESTMAP_MAIN_CITY)
 		{ // zyk: main city
 			if (npc_ent->client->pers.quest_npc == 1)
 			{
@@ -378,6 +378,55 @@ gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int
 	}
 
 	return NULL;
+}
+
+void zyk_quest_item_use(gentity_t *self, gentity_t* other, gentity_t* activator)
+{
+	if (level.quest_map == QUESTMAP_HERO_HOUSE && self->count == 1)
+	{ // zyk: Book in the table
+		// zyk: starts tutorial
+		if (other && other->client && other->client->sess.amrpgmode == 2)
+		{
+			other->client->pers.tutorial_step = 0;
+			other->client->pers.tutorial_timer = level.time + 1000;
+			other->client->pers.player_statuses |= (1 << 25);
+		}
+	}
+}
+
+void zyk_load_quest_model(char *origin, char *angles, char *model_path, int spawnflags, char *mins, char *maxs, int model_scale, int count, qboolean is_effect)
+{
+	gentity_t* new_ent = G_Spawn();
+
+	if (is_effect == qtrue)
+	{
+		zyk_main_set_entity_field(new_ent, "classname", "fx_runner");
+		zyk_main_set_entity_field(new_ent, "spawnflags", va("%d", spawnflags));
+		zyk_main_set_entity_field(new_ent, "origin", G_NewString(origin));
+		zyk_main_set_entity_field(new_ent, "angles", G_NewString(angles));
+		zyk_main_set_entity_field(new_ent, "fxFile", G_NewString(model_path));
+	}
+	else
+	{
+		zyk_main_set_entity_field(new_ent, "classname", "misc_model_breakable");
+		zyk_main_set_entity_field(new_ent, "spawnflags", va("%d", spawnflags));
+		zyk_main_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
+		zyk_main_set_entity_field(new_ent, "origin", G_NewString(origin));
+		zyk_main_set_entity_field(new_ent, "angles", G_NewString(angles));
+		zyk_main_set_entity_field(new_ent, "model", G_NewString(model_path));
+		zyk_main_set_entity_field(new_ent, "mins", G_NewString(mins));
+		zyk_main_set_entity_field(new_ent, "maxs", G_NewString(maxs));
+	}
+
+	zyk_main_spawn_entity(new_ent);
+
+	new_ent->count = count;
+
+	if (level.quest_map == QUESTMAP_HERO_HOUSE && count == 1)
+	{ // zyk: Book in the table
+		new_ent->use = zyk_quest_item_use;
+		new_ent->r.svFlags |= SVF_PLAYER_USABLE;
+	}
 }
 
 /*
@@ -570,7 +619,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		level.sp_map = qtrue;
 	}
 
-	level.quest_map = 0;
+	level.quest_map = QUESTMAP_NONE;
 	level.quest_debounce_timer = 0;
 	level.quest_event_counter = 0;
 
@@ -579,15 +628,11 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	{
 		if (Q_strncmp(zyk_mapname, "t1_inter", 9) == 0)
 		{
-			level.quest_map = 1;
-		}
-		else if (Q_strncmp(zyk_mapname, "t1_surprise", 12) == 0)
-		{
-			level.quest_map = 2;
+			level.quest_map = QUESTMAP_HERO_HOUSE;
 		}
 		else if (Q_strncmp(zyk_mapname, "mp/siege_desert", 16) == 0 && g_gametype.integer == GT_FFA)
 		{
-			level.quest_map = 3;
+			level.quest_map = QUESTMAP_MAIN_CITY;
 		}
 	}
 
@@ -1739,7 +1784,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			}
 		}
 
-		if (level.quest_map == 3)
+		if (level.quest_map == QUESTMAP_MAIN_CITY)
 		{ // zyk: loading quest stuff
 			zyk_create_info_player_deathmatch(12500, 32, -486, 179);
 			zyk_create_info_player_deathmatch(12500, -93, -486, 179);
@@ -1791,6 +1836,15 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	if (Q_stricmp(level.default_map_music, "") == 0)
 	{ // zyk: if the default map music is empty (the map has no music) then set a default music
 		strcpy(level.default_map_music, "music/yavin2/yavtemp2_explore.mp3");
+	}
+
+	// zyk: loading quest map stuff, like npcs, models, etc
+	if (zyk_allow_quests.integer > 0)
+	{
+		if (level.quest_map == QUESTMAP_HERO_HOUSE)
+		{
+			zyk_load_quest_model("295 -350 93", "0 0 0", "models/map_objects/nar_shaddar/book.md3", 1, "-8 -8 -8", "8 8 8", 100, 1, qfalse);
+		}
 	}
 
 	zyk_create_dir(va("entities/%s", zyk_mapname));
@@ -9290,13 +9344,13 @@ void G_RunFrame( int levelTime ) {
 					zyk_vertical_dfa_effect(ent);
 				}
 
-				if (level.quest_map > 0 && zyk_allow_quests.integer > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
+				if (level.quest_map > QUESTMAP_NONE && zyk_allow_quests.integer > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0 &&
 					level.quest_debounce_timer < level.time && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
 					int zyk_it = 0;
 					level.quest_debounce_timer = level.time + 100;
 
-					if (level.quest_map == 3)
+					if (level.quest_map == QUESTMAP_MAIN_CITY)
 					{ // zyk: main city
 
 						// zyk: spawning the citizens

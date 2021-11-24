@@ -694,6 +694,14 @@ typedef enum {
 	MAX_QUEST_MISSIONS
 } zyk_main_quest_t;
 
+// zyk: maps used in quests will have their level.quest_map set to one of these values
+typedef enum {
+	QUESTMAP_NONE,
+	QUESTMAP_HERO_HOUSE,
+	QUESTMAP_MAIN_CITY,
+	NUM_QUEST_MAPS
+} zyk_quest_map_t;
+
 // zyk: number of RPG Mode skills
 #define NUMBER_OF_SKILLS 90
 
