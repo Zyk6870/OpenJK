@@ -7728,84 +7728,32 @@ Cmd_ResetAccount_f
 ==================
 */
 void Cmd_ResetAccount_f( gentity_t *ent ) {
-	char arg1[MAX_STRING_CHARS];
-			
-	if (trap->Argc() == 1)
-	{
-		trap->SendServerCommand( ent->s.number, "print \"^2Choose one of the options below\n\n^3/resetaccount rpg: ^7resets your entire account except admin commands.\n^3/resetaccount quests: ^7resets your RPG quests.\n^3/resetaccount levels: ^7resets your levels and upgrades.\n\"" );
-		return;
-	}
+	int i = 0;
 
-	trap->Argv( 1, arg1, sizeof( arg1 ) );
+	for (i = 0; i < NUMBER_OF_SKILLS; i++)
+		ent->client->pers.skill_levels[i] = 0;
 
-	if (Q_stricmp( arg1, "rpg") == 0)
-	{
-		int i = 0;
+	ent->client->pers.max_rpg_shield = 0;
+	ent->client->pers.rpg_upgrades = 0;
 
-		for (i = 0; i < NUMBER_OF_SKILLS; i++)
-			ent->client->pers.skill_levels[i] = 0;
+	ent->client->pers.level = 1;
+	ent->client->pers.level_up_score = 0;
+	ent->client->pers.skillpoints = 1;
 
-		ent->client->pers.max_rpg_shield = 0;
-		ent->client->pers.rpg_upgrades = 0;
+	ent->client->pers.credits = 100;
 
-		ent->client->pers.level = 1;
-		ent->client->pers.level_up_score = 0;
-		ent->client->pers.skillpoints = 1;
+	ent->client->sess.magic_fist_selection = 0;
 
-		ent->client->pers.credits = 100;
+	ent->client->pers.main_quest_progress = 0;
+	ent->client->pers.side_quest_progress = 0;
 
-		ent->client->sess.magic_fist_selection = 0;
+	save_account(ent, qtrue);
 
-		save_account(ent, qtrue);
+	trap->SendServerCommand(ent->s.number, "print \"Your account is reset.\n\"");
 
-		trap->SendServerCommand( ent->s.number, "print \"Your entire account is reset.\n\"" );
-
-		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
-		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-			G_Kill(ent);
-		}
-	}
-	else if (Q_stricmp( arg1, "quests") == 0)
-	{
-		save_account(ent, qtrue);
-
-		trap->SendServerCommand( ent->s.number, "print \"Your quests are reset.\n\"" );
-
-		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
-		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-			G_Kill(ent);
-		}
-	}
-	else if (Q_stricmp( arg1, "levels") == 0)
-	{
-		int i = 0;
-
-		for (i = 0; i < NUMBER_OF_SKILLS; i++)
-			ent->client->pers.skill_levels[i] = 0;
-
-		ent->client->pers.max_rpg_shield = 0;
-		ent->client->pers.rpg_upgrades = 0;
-
-		ent->client->pers.level = 1;
-		ent->client->pers.level_up_score = 0;
-		ent->client->pers.skillpoints = 1;
-
-		ent->client->pers.credits = 100;
-
-		ent->client->sess.magic_fist_selection = 0;
-
-		save_account(ent, qtrue);
-
-		trap->SendServerCommand( ent->s.number, "print \"Your levels are reset.\n\"" );
-
-		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
-		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-			G_Kill(ent);
-		}
-	}
-	else
-	{
-		trap->SendServerCommand( ent->s.number, "print \"Invalid option.\n\"" );
+	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+	{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
+		G_Kill(ent);
 	}
 }
 
