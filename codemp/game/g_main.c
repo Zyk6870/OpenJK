@@ -9189,6 +9189,27 @@ void G_RunFrame( int levelTime ) {
 
 			zyk_print_custom_quest_info(ent);
 
+			if (level.quest_map > QUESTMAP_NONE && zyk_allow_quests.integer > 0 && level.quest_debounce_timer < level.time)
+			{ // zyk: control the quest events which happen in the quest maps
+				level.quest_debounce_timer = level.time + FRAMETIME;
+
+				if (level.quest_map == QUESTMAP_MAIN_CITY)
+				{ // zyk: main city
+					// zyk: spawning the citizens
+					if (level.quest_event_counter == 1)
+					{
+						gentity_t* npc_ent = zyk_spawn_quest_npc("quest_jawa", 12253, -454, -486, 45, 0, level.quest_event_counter);
+						zyk_set_quest_npc_events(npc_ent);
+					}
+					else if (level.quest_event_counter == 2)
+					{
+						gentity_t* npc_ent = zyk_spawn_quest_npc("quest_jawa", 11893, -1262, -487, -179, 0, level.quest_event_counter);
+					}
+
+					level.quest_event_counter++;
+				}
+			}
+
 			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
 				// zyk: Weapon Upgrades
@@ -9396,18 +9417,6 @@ void G_RunFrame( int levelTime ) {
 							ent->client->pers.current_quest_event++;
 							ent->client->pers.quest_event_timer = level.time + 5000;
 						}
-					}
-					else if (level.quest_map == QUESTMAP_MAIN_CITY)
-					{ // zyk: main city
-
-						// zyk: spawning the citizens
-						if (level.quest_event_counter == 1)
-						{
-							gentity_t *npc_ent = zyk_spawn_quest_npc("quest_jawa", 12253, -454, -486, 45, 0, level.quest_event_counter);
-							zyk_set_quest_npc_events(npc_ent);
-						}
-
-						level.quest_event_counter++;
 					}
 				}
 
@@ -9709,22 +9718,26 @@ void G_RunFrame( int levelTime ) {
 			}
 
 			// zyk: quest npc events
-			if (ent->client->pers.quest_npc > 0 && ent->health > 0)
+			if (ent->client->pers.quest_npc > 0 && ent->health > 0 && ent->client->pers.quest_npc_timer < level.time && 
+				ent->client->pers.quest_npc_current_event < MAX_QUEST_NPC_EVENTS)
 			{
-				if (ent->client->pers.quest_npc_timer < level.time && ent->client->pers.quest_npc_current_event < MAX_QUEST_NPC_EVENTS)
+				if (level.quest_map == QUESTMAP_MAIN_CITY)
 				{
-					G_SetAnim(ent, NULL, SETANIM_BOTH, ent->client->pers.quest_npc_anims[ent->client->pers.quest_npc_current_event], SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-					ent->client->ps.torsoTimer = ent->client->pers.quest_npc_anim_duration[ent->client->pers.quest_npc_current_event];
-					ent->client->ps.legsTimer = ent->client->ps.torsoTimer;
-
-					ent->client->pers.quest_npc_timer = level.time + ent->client->pers.quest_npc_interval_timer[ent->client->pers.quest_npc_current_event];
-					ent->client->pers.quest_npc_current_event++;
-
-					if (ent->client->pers.quest_npc_current_event == 1)
+					if (ent->client->pers.quest_npc == 1)
 					{
-						VectorSet(ent->NPC->tempGoal->r.currentOrigin, ent->client->ps.origin[0] + 100, ent->client->ps.origin[1] + 100, -486);
-						ent->NPC->goalEntity = ent->NPC->tempGoal;
-						ent->NPC->tempBehavior = BS_INVESTIGATE;
+						G_SetAnim(ent, NULL, SETANIM_BOTH, ent->client->pers.quest_npc_anims[ent->client->pers.quest_npc_current_event], SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+						ent->client->ps.torsoTimer = ent->client->pers.quest_npc_anim_duration[ent->client->pers.quest_npc_current_event];
+						ent->client->ps.legsTimer = ent->client->ps.torsoTimer;
+
+						ent->client->pers.quest_npc_timer = level.time + ent->client->pers.quest_npc_interval_timer[ent->client->pers.quest_npc_current_event];
+						ent->client->pers.quest_npc_current_event++;
+
+						if (ent->client->pers.quest_npc_current_event == 1)
+						{
+							VectorSet(ent->NPC->tempGoal->r.currentOrigin, ent->client->ps.origin[0] + 100, ent->client->ps.origin[1] + 100, -486);
+							ent->NPC->goalEntity = ent->NPC->tempGoal;
+							ent->NPC->tempBehavior = BS_INVESTIGATE;
+						}
 					}
 				}
 			}
