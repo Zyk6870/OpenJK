@@ -9347,10 +9347,57 @@ void G_RunFrame( int levelTime ) {
 				if (level.quest_map > QUESTMAP_NONE && zyk_allow_quests.integer > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0 &&
 					level.quest_debounce_timer < level.time && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
-					int zyk_it = 0;
 					level.quest_debounce_timer = level.time + 100;
 
-					if (level.quest_map == QUESTMAP_MAIN_CITY)
+					if (level.quest_map == QUESTMAP_HERO_HOUSE && !(ent->client->pers.main_quest_progress & (1 << QUEST_PROLOGUE)))
+					{ // zyk: Hero's House, show the Prologue to the player
+						vec3_t heros_house_center;
+
+						VectorSet(heros_house_center, -64, -512, 88);
+
+						if (Distance(ent->r.currentOrigin, heros_house_center) < 120 && ent->client->pers.quest_event_timer < level.time)
+						{
+							if (ent->client->pers.current_quest_event == 0)
+							{
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7years ago, after the Great War, evil took over everything.\"");
+							}
+							else if (ent->client->pers.current_quest_event == 1)
+							{
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7the evil king Drakon created an age of oppression and sadness.\"");
+							}
+							else if (ent->client->pers.current_quest_event == 2)
+							{
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7a rebel group was formed to fight the king's forces, but failed. The rebel survivors either got arrested or fled.\"");
+							}
+							else if (ent->client->pers.current_quest_event == 3)
+							{
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7now people wait for a hero who will bring hope and will be able to defeat King Drakon.\"");
+							}
+							else if (ent->client->pers.current_quest_event == 4)
+							{
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7you are this hero! With your courage, you can fight for freedom!\"");
+							}
+							else if (ent->client->pers.current_quest_event == 5)
+							{
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7for now, you know you must find more information that will help you get more power and allies for this quest.\"");
+							}
+							else if (ent->client->pers.current_quest_event == 6)
+							{
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7going to the Main City and talking to people there perhaps will give you the information you need.\"");
+							}
+							else if (ent->client->pers.current_quest_event == 7)
+							{
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7also read the books in this house to get more information\"");
+
+								ent->client->pers.main_quest_progress |= (1 << QUEST_PROLOGUE);
+								save_account(ent, qtrue);
+							}
+							
+							ent->client->pers.current_quest_event++;
+							ent->client->pers.quest_event_timer = level.time + 5000;
+						}
+					}
+					else if (level.quest_map == QUESTMAP_MAIN_CITY)
 					{ // zyk: main city
 
 						// zyk: spawning the citizens

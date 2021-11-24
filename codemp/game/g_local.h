@@ -683,7 +683,7 @@ typedef enum {
 
 // zyk: Main Quest missions
 typedef enum {
-	QUEST_FIRST_MISSION,
+	QUEST_PROLOGUE,
 	QUEST_WATER_SPIRIT,
 	QUEST_EARTH_SPIRIT,
 	QUEST_FIRE_SPIRIT,
@@ -1020,6 +1020,10 @@ typedef struct clientPersistant_s {
 
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
+
+	// zyk: sets the current quest event for this player and the time between events
+	int current_quest_event;
+	int quest_event_timer;
 
 	// zyk: has bitvalue of each Main Quest task completed
 	int main_quest_progress;

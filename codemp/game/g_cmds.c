@@ -5332,6 +5332,9 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->pers.buy_sell_timer = 0;
 		ent->client->pers.vertical_dfa_timer = 0;
 
+		ent->client->pers.current_quest_event = 0;
+		ent->client->pers.quest_event_timer = 0;
+
 		// zyk: loading initial RPG weapons
 		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)) && ent->client->pers.skill_levels[18] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
