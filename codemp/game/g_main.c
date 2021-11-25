@@ -7807,6 +7807,9 @@ qboolean zyk_quest_get_this_player(gentity_t* ent)
 
 	level.quest_player = ent;
 	level.last_quest_player_id = ent->s.number;
+
+	ent->client->pers.quest_afk_timer = level.time + zyk_quest_afk_timer.integer;
+
 	return qtrue;
 }
 
@@ -9291,6 +9294,13 @@ void G_RunFrame( int levelTime ) {
 
 			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
+
+				if (ent->client->pers.quest_afk_timer < level.time)
+				{ // zyk: quest player afk for too long
+					level.quest_player = NULL;
+					level.get_quest_player = qtrue;
+				}
+
 				// zyk: Weapon Upgrades
 				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL) && ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4)
 				{
