@@ -2236,6 +2236,12 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		try_finishing_race();
 	}
 
+	// zyk: player died in Custom Quest
+	if (self->s.number < MAX_CLIENTS && level.zyk_custom_quest_player_ids[self->s.number] == qtrue)
+	{
+		level.zyk_custom_quest_player_ids[self->s.number] = qfalse;
+	}
+
 	// zyk: player died in Sniper Battle
 	if (level.sniper_mode == 2 && self->s.number < MAX_CLIENTS && level.sniper_players[self->s.number] != -1)
 	{

@@ -786,6 +786,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			level.screen_message_timer[zyk_iterator] = 0;
 			level.ignored_players[zyk_iterator][0] = 0;
 			level.ignored_players[zyk_iterator][1] = 0;
+
+			level.zyk_custom_quest_player_ids[zyk_iterator] = qfalse;
 		}
 
 		// zyk: initializing quest_crystal_id value
@@ -15541,7 +15543,8 @@ void G_RunFrame( int levelTime ) {
 					}
 				}
 
-				if (level.custom_quest_map > -1 && level.zyk_custom_quest_timer < level.time && ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
+				if (level.custom_quest_map > -1 && level.zyk_custom_quest_timer < level.time && ent->client->ps.duelInProgress == qfalse && 
+					ent->health > 0 && level.zyk_custom_quest_player_ids[ent->s.number] == qtrue &&
 					(level.zyk_quest_test_origin == qfalse || Distance(ent->client->ps.origin, level.zyk_quest_mission_origin) < level.zyk_quest_radius))
 				{ // zyk: Custom Quest map
 					char *zyk_keys[5] = {"text", "npc", "item", "entfile", "" };

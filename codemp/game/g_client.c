@@ -4223,6 +4223,12 @@ void ClientDisconnect( int clientNum ) {
 		level.melee_mode_quantity--;
 	}
 
+	// zyk: player was in Custom Quest
+	if (level.zyk_custom_quest_player_ids[ent->s.number] == qtrue)
+	{
+		level.zyk_custom_quest_player_ids[ent->s.number] = qfalse;
+	}
+
 	// zyk: cleaning ally ids of other players who have this player as ally
 	for (i = 0; i < level.maxclients; i++)
 	{

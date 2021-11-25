@@ -16821,7 +16821,7 @@ void Cmd_CustomQuest_f(gentity_t *ent) {
 
 	if (argc == 1)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"\n^3/customquest quests: ^7visualize custom quests\n^3/customquest new: ^7creates a new quest\n^3/customquest delete <quest number>: ^7removes the quest\n^3/customquest change <quest number> <field> <value>: ^7changes value of the main quest fields\n^3/customquest edit <quest number> [mission number] [field] [value]: ^7sets the value to the field of this quest mission. Can also be used to see quest info or mission info\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"\n^3/customquest quests: ^7visualize custom quests\n^3/customquest new: ^7creates a new quest\n^3/customquest join: sets this player as able to play a Custom Quest\n^3/customquest delete <quest number>: ^7removes the quest\n^3/customquest change <quest number> <field> <value>: ^7changes value of the main quest fields\n^3/customquest edit <quest number> [mission number] [field] [value]: ^7sets the value to the field of this quest mission. Can also be used to see quest info or mission info\n\"");
 	}
 	else
 	{
@@ -16874,6 +16874,19 @@ void Cmd_CustomQuest_f(gentity_t *ent) {
 			save_quest_file(quest_number);
 
 			trap->SendServerCommand(ent->s.number, "print \"Quest created.\n\"");
+		}
+		else if (Q_stricmp(arg1, "join") == 0)
+		{
+			if (level.zyk_custom_quest_player_ids[ent->s.number] == qfalse)
+			{
+				level.zyk_custom_quest_player_ids[ent->s.number] = qtrue;
+				trap->SendServerCommand(ent->s.number, "print \"Joined Custom Quests.\n\"");
+			}
+			else
+			{
+				level.zyk_custom_quest_player_ids[ent->s.number] = qfalse;
+				trap->SendServerCommand(ent->s.number, "print \"Leaving Custom Quests.\n\"");
+			}
 		}
 		else if (Q_stricmp(arg1, "delete") == 0)
 		{

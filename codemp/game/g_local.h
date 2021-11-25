@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Zyk OpenJK Mod v3.81a"
+#define	GAMEVERSION	"Zyk OpenJK Mod v3.82"
 
 #define SECURITY_LOG "security.log"
 
@@ -1800,6 +1800,8 @@ typedef struct level_locals_s {
 
 	// zyk: custom quest counter, used for keys that can have multiple values (text1, text2, etc)
 	int zyk_custom_quest_counter;
+
+	qboolean zyk_custom_quest_player_ids[MAX_CLIENTS];
 
 	// zyk: origin point of the quest mission
 	vec3_t zyk_quest_mission_origin;
