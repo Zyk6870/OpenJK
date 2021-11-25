@@ -1146,6 +1146,10 @@ qboolean NPC_ValidEnemy( gentity_t *ent )
 	if ( ent->client == NULL )
 	{
 	//	if ( ent->svFlags&SVF_NONNPC_ENEMY )
+
+		return qfalse;// zyk: commented code below. If it is not a client, it will not be considered a valid enemy
+
+		/*
 		if (ent->s.eType != ET_NPC)
 		{//still potentially valid
 			if ( ent->alliedTeam == NPCS.NPC->client->playerTeam )
@@ -1161,6 +1165,7 @@ qboolean NPC_ValidEnemy( gentity_t *ent )
 		{
 			return qfalse;
 		}
+		*/
 	}
 	else if ( ent->client && ent->client->sess.sessionTeam == TEAM_SPECTATOR )
 	{//don't go after spectators
