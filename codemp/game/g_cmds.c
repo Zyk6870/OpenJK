@@ -16670,7 +16670,7 @@ void load_custom_quest_mission()
 			{ // zyk: goes through all keys of this mission to find the map keys
 				char *zyk_map = zyk_get_mission_value(i, current_mission, va("map%d", j));
 
-				if (Q_stricmp(level.zykmapname, zyk_map) == 0 && Q_stricmp(zyk_get_mission_value(i, current_mission, va("donemap%d", j)), "") == 0)
+				if (strncmp(level.zykmapname, zyk_map, 128) == 0 && Q_stricmp(zyk_get_mission_value(i, current_mission, va("donemap%d", j)), "") == 0)
 				{ // zyk: current mission of this quest is in the current map and the mission is not done yet
 					int radius = atoi(zyk_get_mission_value(i, current_mission, "radius"));
 					vec3_t vec;

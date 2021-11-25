@@ -15561,7 +15561,7 @@ void G_RunFrame( int levelTime ) {
 
 							still_has_keys = qtrue;
 
-							if (Q_stricmp(level.zykmapname, zyk_map) == 0)
+							if (strncmp(level.zykmapname, zyk_map, 128) == 0)
 							{ // zyk: this mission step is in this map
 								if (Q_stricmp(zyk_keys[j], "text") == 0)
 								{ // zyk: a text message
