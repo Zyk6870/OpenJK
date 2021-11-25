@@ -5648,7 +5648,7 @@ void rock_shield(gentity_t *ent, int health, int duration)
 	}
 
 	zyk_main_set_entity_field(new_ent, "classname", "misc_model_breakable");
-	zyk_main_set_entity_field(new_ent, "spawnflags", "8");
+	zyk_main_set_entity_field(new_ent, "spawnflags", "0");
 	zyk_main_set_entity_field(new_ent, "health", "10000");
 	zyk_main_set_entity_field(new_ent, "model", "models/map_objects/desert/rock.md3");
 	zyk_main_set_entity_field(new_ent, "origin", va("%f %f %f", ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2]));

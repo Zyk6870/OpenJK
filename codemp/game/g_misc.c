@@ -436,6 +436,7 @@ void SP_misc_model_breakable( gentity_t *ent )
 	
 	if (ent->takedamage) {
 		//Dead/damaged model
+		/* zyk: these will not work in MP
 		if( !(ent->spawnflags & 8) ) {	//no dmodel
 			strcat( damageModel, "_d1.md3" );
 			ent->s.modelindex2 = G_ModelIndex( damageModel );
@@ -444,13 +445,16 @@ void SP_misc_model_breakable( gentity_t *ent )
 		//Chunk model
 		strcat( chunkModel, "_c1.md3" );
 		ent->s.modelGhoul2 = G_ModelIndex( chunkModel );
+		*/
 	}
 
 	//Use model
+	/* zyk: this will not work in MP
 	if( ent->spawnflags & 32 ) {	//has umodel
 		strcat( useModel, "_u1.md3" );
 		ent->sound1to2 = G_ModelIndex( useModel );
 	}
+	*/
 
 	// Scale up the tie-bomber bbox a little.
 	if ( ent->model && Q_stricmp( "models/map_objects/ships/tie_bomber.md3", ent->model ) == 0 )
