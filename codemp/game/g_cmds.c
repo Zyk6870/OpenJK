@@ -11388,7 +11388,7 @@ Cmd_RaceMode_f
 ==================
 */
 void Cmd_RaceMode_f( gentity_t *ent ) {
-	if (zyk_allow_race_mode.integer != 1)
+	if (zyk_allow_race_mode.integer < 1)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"^3Race System: ^7this mode is not allowed in this server\n\""));
 		return;
@@ -11539,6 +11539,12 @@ void Cmd_RaceMode_f( gentity_t *ent ) {
 		else if (Q_stricmp(zyk_mapname, "t3_stamp") == 0)
 		{
 			int i = 0;
+
+			if (zyk_allow_race_mode.integer == 2)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Race in this map not allowed in this server!\n\"");
+				return;
+			}
 
 			level.race_map = 2;
 
