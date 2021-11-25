@@ -5902,7 +5902,7 @@ void black_hole(gentity_t* ent, int radius, int damage, int duration)
 {
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_BLACK_HOLE] > 1)
 	{
-		damage += 10;
+		damage += 15;
 		duration += 3000;
 	}
 

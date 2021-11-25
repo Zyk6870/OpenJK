@@ -11982,7 +11982,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			}
 			else if (magic_number == MAGIC_BLACK_HOLE)
 			{
-				black_hole(ent, 540, 40, 7000);
+				black_hole(ent, 540, 30, 7000);
 				zyk_set_magic_power_cooldown_time(ent, 48000);
 			}
 			else if (magic_number == MAGIC_DOME_OF_DAMAGE)
