@@ -1768,6 +1768,15 @@ typedef struct level_locals_s {
 	// zyk: used to pass through each quest event
 	int quest_event_counter;
 
+	// zyk: when qtrue, tries to get the next player
+	qboolean get_quest_player;
+
+	// zyk: last player who played a quest in this map
+	int last_quest_player_id;
+
+	// zyk: the current quest player
+	gentity_t* quest_player;
+
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];
 } level_locals_t;

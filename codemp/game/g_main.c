@@ -847,6 +847,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	level.ent_origin_set = qfalse;
 
+	level.get_quest_player = qfalse;
+	level.last_quest_player_id = -1;
+	level.quest_player = NULL;
+
 	level.load_entities_timer = 0;
 	strcpy(level.load_entities_file,"");
 
@@ -7783,7 +7787,75 @@ void melee_battle_winner()
 	}
 }
 
+// zyk: tests if this player can become the quest player
+qboolean zyk_quest_get_this_player(gentity_t* ent)
+{
+	if (!ent || !(ent->client))
+	{ // zyk: if for some reason it is not a valid player entity
+		return qfalse;
+	}
 
+	if (ent->client->pers.connected != CON_CONNECTED || ent->client->sess.sessionTeam == TEAM_SPECTATOR)
+	{ // zyk: player must be connected and not in Spectator mode to be valid
+		return qfalse;
+	}
+
+	if (ent->health < 1 || ent->client->sess.amrpgmode < 2)
+	{ // zyk: must be alive and in RPG Mode to be a valid client
+		return qfalse;
+	}
+
+	level.quest_player = ent;
+	level.last_quest_player_id = ent->s.number;
+	return qtrue;
+}
+
+// zyk: gets the current quest player to play this mission
+void zyk_get_quest_player()
+{
+	int i = 0;
+	gentity_t* last_quest_player = NULL;
+
+	if (level.last_quest_player_id != -1)
+	{ // zyk: starts from the next player
+		i = level.last_quest_player_id + 1;
+
+		last_quest_player = &g_entities[level.last_quest_player_id];
+	}
+
+	while (i < level.maxclients)
+	{
+		gentity_t* ent = &g_entities[i];
+
+		if (zyk_quest_get_this_player(ent) == qtrue)
+		{
+			return;
+		}
+
+		i++;
+	}
+
+	// zyk: restart from the first client
+	i = 0;
+
+	while (i < level.last_quest_player_id)
+	{
+		gentity_t* ent = &g_entities[i];
+
+		if (zyk_quest_get_this_player(ent) == qtrue)
+		{
+			return;
+		}
+
+		i++;
+	}
+
+	// zyk: tries to get the same player again
+	if (last_quest_player)
+	{
+		zyk_quest_get_this_player(last_quest_player);
+	}
+}
 
 /*
 ================
@@ -8744,6 +8816,13 @@ void G_RunFrame( int levelTime ) {
 		}
 
 		level.load_entities_timer = 0;
+	}
+
+	if (level.get_quest_player == qtrue && level.quest_map > QUESTMAP_NONE && level.quest_player == NULL)
+	{
+		zyk_get_quest_player();
+
+		level.get_quest_player = qfalse;
 	}
 
 	//
