@@ -5647,6 +5647,16 @@ void rock_shield(gentity_t *ent, int health, int duration)
 		health *= 2;
 	}
 
+	// zyk: if player was already using a Rock Shield (Wizard has less magic cooldown, it may be possible for him), remove old model
+	if (ent->client->pers.quest_power_model1_id != -1)
+	{
+		gentity_t* rock_ent = &g_entities[ent->client->pers.quest_power_model1_id];
+
+		ent->client->pers.quest_power_model1_id = -1;
+
+		level.special_power_effects_timer[rock_ent->s.number] = 0;
+	}
+
 	zyk_main_set_entity_field(new_ent, "classname", "misc_model_breakable");
 	zyk_main_set_entity_field(new_ent, "spawnflags", "0");
 	zyk_main_set_entity_field(new_ent, "health", "10000");

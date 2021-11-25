@@ -4962,7 +4962,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	}
 
 	// zyk: Rock Shield. Prevents almost all damage
-	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 17))
+	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 17) && targ->client->pers.quest_power_model1_id != -1)
 	{
 		int original_damage = damage;
 		gentity_t* rock_ent = &g_entities[targ->client->pers.quest_power_model1_id];
