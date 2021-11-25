@@ -2469,7 +2469,14 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 	other->client->ps.stats[STAT_WEAPONS] |= ( 1 << ent->item->giTag );
 
 	//Add_Ammo( other, ent->item->giTag, quantity );
-	Add_Ammo( other, weaponData[ent->item->giTag].ammoIndex, (int)ceil(quantity * zyk_add_ammo_scale.value) ); // zyk: cvar to scale the add ammo amount
+	if (ent->item->giTag == WP_CONCUSSION)
+	{
+		Add_Ammo(other, weaponData[ent->item->giTag].ammoIndex, (int)ceil(quantity * zyk_add_ammo_scale.value * 2)); // zyk: so concussion will be able to fire at least once
+	}
+	else
+	{
+		Add_Ammo(other, weaponData[ent->item->giTag].ammoIndex, (int)ceil(quantity * zyk_add_ammo_scale.value)); // zyk: cvar to scale the add ammo amount
+	}
 
 	G_LogWeaponPickup(other->s.number, ent->item->giTag);
 
