@@ -16311,9 +16311,9 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 				return;
 			}
 
-			if (strlen(ent->client->sess.rpgchar) < MAX_ACC_NAME_SIZE - 4)
+			if (strlen(ent->client->sess.rpgchar) < MAX_ACC_NAME_SIZE - 3)
 			{
-				strcpy(new_char_name, va("dup_%s", ent->client->sess.rpgchar));
+				strcpy(new_char_name, va("dup%s", ent->client->sess.rpgchar));
 			}
 			else
 			{ // zyk: cannot go over the max, so remove the last chars
@@ -16322,7 +16322,6 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 				new_char_name[0] = 'd';
 				new_char_name[1] = 'u';
 				new_char_name[2] = 'p';
-				new_char_name[3] = '_';
 			}
 
 			chars_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, new_char_name), "r");

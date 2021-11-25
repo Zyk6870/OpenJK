@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Zyk OpenJK Mod v3.81"
+#define	GAMEVERSION	"Zyk OpenJK Mod v3.81a"
 
 #define SECURITY_LOG "security.log"
 
