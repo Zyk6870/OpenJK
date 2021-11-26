@@ -374,6 +374,9 @@ gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] += 10 * level;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
+		// zyk: every quest stuff will have this spawnflag
+		npc_ent->spawnflags |= 131072;
+
 		return npc_ent;
 	}
 
@@ -394,11 +397,16 @@ void zyk_quest_item_use(gentity_t *self, gentity_t* other, gentity_t* activator)
 	}
 }
 
-void zyk_load_quest_model(char *origin, char *angles, char *model_path, int spawnflags, char *mins, char *maxs, int model_scale, int count, qboolean is_effect)
+// zyk: spawns quest entities
+// entity_type can be:
+// 0: model
+// 1: effect
+
+void zyk_load_quest_model(char *origin, char *angles, char *model_path, int spawnflags, char *mins, char *maxs, int model_scale, int count, int entity_type)
 {
 	gentity_t* new_ent = G_Spawn();
 
-	if (is_effect == qtrue)
+	if (entity_type == 1)
 	{
 		zyk_main_set_entity_field(new_ent, "classname", "fx_runner");
 		zyk_main_set_entity_field(new_ent, "spawnflags", va("%d", spawnflags));
@@ -422,10 +430,50 @@ void zyk_load_quest_model(char *origin, char *angles, char *model_path, int spaw
 
 	new_ent->count = count;
 
+	// zyk: every quest stuff will have this spawnflag
+	new_ent->spawnflags |= 131072;
+
 	if (level.quest_map == QUESTMAP_HERO_HOUSE && count == 1)
 	{ // zyk: Book in the table
 		new_ent->use = zyk_quest_item_use;
 		new_ent->r.svFlags |= SVF_PLAYER_USABLE;
+	}
+}
+
+// zyk: spawn quest stuff (like models and npcs)
+// If load_quest_player_stuff is qfalse, load the default quest stuff. Oherwise, also load the specific stuff of the current mission for the quest player
+void zyk_spawn_quest_stuff(qboolean load_quest_player_stuff)
+{
+	if (zyk_allow_quests.integer > 0)
+	{
+		if (level.quest_map == QUESTMAP_HERO_HOUSE)
+		{
+			zyk_load_quest_model("295 -350 93", "0 0 0", "models/map_objects/nar_shaddar/book.md3", 1, "-8 -8 -8", "8 8 8", 100, 1, 0);
+		}
+		else if (level.quest_map == QUESTMAP_MAIN_CITY)
+		{
+			// zyk: spawning the citizens
+			gentity_t* npc_ent = zyk_spawn_quest_npc("quest_jawa", 12253, -454, -486, 45, 0, 0);
+			zyk_set_quest_npc_events(npc_ent);
+
+			npc_ent = zyk_spawn_quest_npc("quest_jawa", 11893, -1262, -487, -179, 0, 1);
+		}
+	}
+}
+
+// zyk: remove all entities used in quests
+void zyk_clear_quest_stuff()
+{
+	int i = 0;
+
+	for (i = MAX_CLIENTS + BODY_QUEUE_SIZE; i < level.num_entities; i++)
+	{
+		gentity_t* this_ent = &g_entities[i];
+
+		if (this_ent && this_ent->spawnflags & (131072))
+		{ // zyk: remove quest entity
+			G_FreeEntity(this_ent);
+		}
 	}
 }
 
@@ -1843,13 +1891,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	}
 
 	// zyk: loading quest map stuff, like npcs, models, etc
-	if (zyk_allow_quests.integer > 0)
-	{
-		if (level.quest_map == QUESTMAP_HERO_HOUSE)
-		{
-			zyk_load_quest_model("295 -350 93", "0 0 0", "models/map_objects/nar_shaddar/book.md3", 1, "-8 -8 -8", "8 8 8", 100, 1, qfalse);
-		}
-	}
+	zyk_spawn_quest_stuff(qfalse);
 
 	zyk_create_dir(va("entities/%s", zyk_mapname));
 
@@ -8836,6 +8878,29 @@ void G_RunFrame( int levelTime ) {
 		zyk_get_quest_player();
 
 		level.get_quest_player = qfalse;
+
+		if (level.quest_player)
+		{
+			zyk_clear_quest_stuff();
+
+			level.quest_event_counter = 1;
+			level.quest_debounce_timer = level.time + 1500;
+
+			ClientSpawn(level.quest_player);
+		}
+	}
+
+	// zyk: spaw quest stuff
+	if (level.quest_event_counter == 1 && level.quest_debounce_timer < level.time)
+	{
+		zyk_spawn_quest_stuff(qtrue);
+
+		level.quest_event_counter = 0;
+
+		if (level.quest_player)
+		{ // zyk: place the player in a spawn point so he starts the quest mission properly
+			ClientSpawn(level.quest_player);
+		}
 	}
 
 	//
@@ -9280,27 +9345,6 @@ void G_RunFrame( int levelTime ) {
 			}
 
 			zyk_print_custom_quest_info(ent);
-
-			if (level.quest_map > QUESTMAP_NONE && zyk_allow_quests.integer > 0 && level.quest_debounce_timer < level.time)
-			{ // zyk: control the quest events which happen in the quest maps
-				level.quest_debounce_timer = level.time + FRAMETIME;
-
-				if (level.quest_map == QUESTMAP_MAIN_CITY)
-				{ // zyk: main city
-					// zyk: spawning the citizens
-					if (level.quest_event_counter == 1)
-					{
-						gentity_t* npc_ent = zyk_spawn_quest_npc("quest_jawa", 12253, -454, -486, 45, 0, level.quest_event_counter);
-						zyk_set_quest_npc_events(npc_ent);
-					}
-					else if (level.quest_event_counter == 2)
-					{
-						gentity_t* npc_ent = zyk_spawn_quest_npc("quest_jawa", 11893, -1262, -487, -179, 0, level.quest_event_counter);
-					}
-
-					level.quest_event_counter++;
-				}
-			}
 
 			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
