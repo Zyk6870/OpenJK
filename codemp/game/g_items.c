@@ -1340,7 +1340,7 @@ void ItemUse_MedPack(gentity_t *ent)
 	// zyk: RPG Mode Bacta Canister. Recovers some mp
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
 	{
-		zyk_add_mp(ent, 180);
+		zyk_add_mp(ent, 230);
 	}
 	
 	MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);
