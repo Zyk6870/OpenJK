@@ -1470,7 +1470,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			ent->client->ps.forceHandExtendTime = level.time;
 		}
 
-		if (ent->client->sess.amrpgmode == 2 && level.quest_player == ent &&
+		if (ent->client->sess.amrpgmode == 2 && level.quest_players[ent->s.number] == 1 &&
 			(actionPressed || ucmd->forwardmove || ucmd->rightmove || ucmd->upmove ||
 				!G_StandingAnim(ent->client->ps.legsAnim) || (ent->client->ps.weaponstate != WEAPON_READY && ent->client->ps.weapon !=
 					WP_SABER) ||

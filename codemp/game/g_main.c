@@ -441,22 +441,28 @@ void zyk_load_quest_model(char *origin, char *angles, char *model_path, int spaw
 }
 
 // zyk: spawn quest stuff (like models and npcs)
-// If load_quest_player_stuff is qfalse, load the default quest stuff. Oherwise, also load the specific stuff of the current mission for the quest player
+// If load_quest_player_stuff is qfalse, load the default quest stuff. Oherwise, load the specific stuff of the current mission for the quest players
 void zyk_spawn_quest_stuff(qboolean load_quest_player_stuff)
 {
 	if (zyk_allow_quests.integer > 0)
 	{
 		if (level.quest_map == QUESTMAP_HERO_HOUSE)
 		{
-			zyk_load_quest_model("295 -350 93", "0 0 0", "models/map_objects/nar_shaddar/book.md3", 1, "-8 -8 -8", "8 8 8", 100, 1, 0);
+			if (load_quest_player_stuff == qfalse)
+			{
+				zyk_load_quest_model("295 -350 93", "0 0 0", "models/map_objects/nar_shaddar/book.md3", 1, "-8 -8 -8", "8 8 8", 100, 1, 0);
+			}
 		}
 		else if (level.quest_map == QUESTMAP_MAIN_CITY)
 		{
 			// zyk: spawning the citizens
-			gentity_t* npc_ent = zyk_spawn_quest_npc("quest_jawa", 12253, -454, -486, 45, 0, 0);
-			zyk_set_quest_npc_events(npc_ent);
+			if (load_quest_player_stuff == qfalse)
+			{
+				gentity_t* npc_ent = zyk_spawn_quest_npc("quest_jawa", 12253, -454, -486, 45, 0, 0);
+				zyk_set_quest_npc_events(npc_ent);
 
-			npc_ent = zyk_spawn_quest_npc("quest_jawa", 11893, -1262, -487, -179, 0, 1);
+				npc_ent = zyk_spawn_quest_npc("quest_jawa", 11893, -1262, -487, -179, 0, 1);
+			}
 		}
 	}
 }
@@ -896,8 +902,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.ent_origin_set = qfalse;
 
 	level.get_quest_player = qfalse;
-	level.last_quest_player_id = -1;
-	level.quest_player = NULL;
+	level.spawned_quest_stuff = qfalse;
 
 	level.load_entities_timer = 0;
 	strcpy(level.load_entities_file,"");
@@ -916,6 +921,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			level.sniper_players[zyk_iterator] = -1;
 			level.melee_players[zyk_iterator] = -1;
 			level.rpg_lms_players[zyk_iterator] = -1;
+
+			level.quest_players[zyk_iterator] = 0;
 
 			// zyk: initializing ally table
 			level.duel_allies[zyk_iterator] = -1;
@@ -7857,58 +7864,59 @@ qboolean zyk_quest_get_this_player(gentity_t* ent)
 		return qfalse;
 	}
 
-	level.quest_player = ent;
-	level.last_quest_player_id = ent->s.number;
+	if (level.quest_players[ent->s.number] == 2)
+	{ // zyk: player failed the quest mission
+		return qfalse;
+	}
 
-	ent->client->pers.quest_afk_timer = level.time + zyk_quest_afk_timer.integer;
+
+
+	// zyk: found a quest player
+	if (level.quest_players[ent->s.number] == 0)
+	{
+		ent->client->pers.quest_afk_timer = level.time + zyk_quest_afk_timer.integer;
+	}
+
+	level.quest_players[ent->s.number] = 1;
 
 	return qtrue;
 }
 
-// zyk: gets the current quest player to play this mission
-void zyk_get_quest_player()
+// zyk: gets the quest players to play this mission
+void zyk_get_quest_players()
 {
 	int i = 0;
-	gentity_t* last_quest_player = NULL;
+	int number_of_quest_players = 0;
+	int number_of_failed_players = 0;
 
-	if (level.last_quest_player_id != -1)
-	{ // zyk: starts from the next player
-		i = level.last_quest_player_id + 1;
-
-		last_quest_player = &g_entities[level.last_quest_player_id];
-	}
-
-	while (i < level.maxclients)
+	for (i = 0; i < level.maxclients; i++)
 	{
 		gentity_t* ent = &g_entities[i];
 
 		if (zyk_quest_get_this_player(ent) == qtrue)
 		{
-			return;
+			if (level.spawned_quest_stuff == qfalse)
+			{
+				zyk_spawn_quest_stuff(qtrue);
+
+				level.spawned_quest_stuff = qtrue;
+			}
+
+			number_of_quest_players++;
 		}
-
-		i++;
-	}
-
-	// zyk: restart from the first client
-	i = 0;
-
-	while (i < level.last_quest_player_id)
-	{
-		gentity_t* ent = &g_entities[i];
-
-		if (zyk_quest_get_this_player(ent) == qtrue)
+		else if (level.quest_players[i] == 2)
 		{
-			return;
+			number_of_failed_players++;
 		}
 
 		i++;
 	}
 
-	// zyk: tries to get the same player again
-	if (last_quest_player)
-	{
-		zyk_quest_get_this_player(last_quest_player);
+	if (number_of_failed_players >= number_of_quest_players)
+	{ // zyk: all players who could play the quest in this map failed the mission
+		zyk_clear_quest_stuff();
+
+		trap->SendServerCommand(-1, "chat \"^3Quest System: ^7all quest players failed. Do a full map change to this map to play the quest again\"");
 	}
 }
 
@@ -8873,34 +8881,11 @@ void G_RunFrame( int levelTime ) {
 		level.load_entities_timer = 0;
 	}
 
-	if (level.get_quest_player == qtrue && level.quest_map > QUESTMAP_NONE && level.quest_player == NULL)
+	if (level.get_quest_player == qtrue && level.quest_map > QUESTMAP_NONE)
 	{
-		zyk_get_quest_player();
+		zyk_get_quest_players();
 
 		level.get_quest_player = qfalse;
-
-		if (level.quest_player)
-		{
-			zyk_clear_quest_stuff();
-
-			level.quest_event_counter = 1;
-			level.quest_debounce_timer = level.time + 1500;
-
-			ClientSpawn(level.quest_player);
-		}
-	}
-
-	// zyk: spaw quest stuff
-	if (level.quest_event_counter == 1 && level.quest_debounce_timer < level.time)
-	{
-		zyk_spawn_quest_stuff(qtrue);
-
-		level.quest_event_counter = 0;
-
-		if (level.quest_player)
-		{ // zyk: place the player in a spawn point so he starts the quest mission properly
-			ClientSpawn(level.quest_player);
-		}
 	}
 
 	//
@@ -9351,7 +9336,6 @@ void G_RunFrame( int levelTime ) {
 
 				if (ent->client->pers.quest_afk_timer < level.time)
 				{ // zyk: quest player afk for too long
-					level.quest_player = NULL;
 					level.get_quest_player = qtrue;
 				}
 

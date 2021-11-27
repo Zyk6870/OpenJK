@@ -1771,11 +1771,14 @@ typedef struct level_locals_s {
 	// zyk: when qtrue, tries to get the next player
 	qboolean get_quest_player;
 
-	// zyk: last player who played a quest in this map
-	int last_quest_player_id;
+	// zyk: after finding the first quest player, spawn the quest stuff in this map
+	qboolean spawned_quest_stuff;
 
-	// zyk: the current quest player
-	gentity_t* quest_player;
+	// zyk: players who can play the quest in this map
+	// 0 - Possible candidate to be a quest player
+	// 1 - A quest player
+	// 2 - A quest player who failed the mission
+	int quest_players[MAX_CLIENTS];
 
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];
