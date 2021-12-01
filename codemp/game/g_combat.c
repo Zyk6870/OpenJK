@@ -2278,13 +2278,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		self->client->pers.player_statuses &= ~(1 << 10);
 		self->client->pers.player_statuses &= ~(1 << 11);
 
-		// zyk: if this is a quest player, set him as a player who failed the mission
-		if (level.quest_map > QUESTMAP_NONE && level.quest_players[self->s.number] == 1)
-		{
-			level.quest_players[self->s.number] = 2;
-			level.get_quest_player = qtrue;
-		}
-
 		// zyk: player has the Resurrection Power, after completing quests in Challenge Mode. Uses mp. Not allowed in CTF gametype
 		/* zyk: disabled for now
 		if (self->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && self->client->pers.universe_quest_counter & (1 << 29) && g_gametype.integer != GT_CTF && 

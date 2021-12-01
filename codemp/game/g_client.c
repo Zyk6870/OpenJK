@@ -3857,9 +3857,6 @@ void ClientSpawn(gentity_t *ent) {
 	if (ent->client->sess.amrpgmode == 2)
 	{
 		initialize_rpg_skills(ent);
-
-		level.quest_players[ent->s.number] = 0;
-		level.get_quest_player = qtrue;
 	}
 	else if (ent->client->pers.player_statuses & (1 << 12))
 	{ // zyk: player received force powers from admin
@@ -4241,10 +4238,6 @@ void ClientDisconnect( int clientNum ) {
 
 	// zyk: logout player from account
 	ent->client->sess.amrpgmode = 0;
-
-	// zyk: resetting the quest player value for this player index
-	level.quest_players[ent->s.number] = 0;
-	level.get_quest_player = qtrue;
 
 	trap->UnlinkEntity ((sharedEntity_t *)ent);
 	ent->s.modelindex = 0;

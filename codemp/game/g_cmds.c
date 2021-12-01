@@ -8241,11 +8241,11 @@ void Cmd_Settings_f( gentity_t *ent ) {
 
 		if (ent->client->pers.player_settings & (1 << SETTINGS_BOSS_MUSIC))
 		{
-			strcpy(message, va("%s\n^3%d - Boss Battle Music ^1OFF", message, SETTINGS_BOSS_MUSIC));
+			strcpy(message, va("%s\n^3%d - Custom Music ^1OFF", message, SETTINGS_BOSS_MUSIC));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^3%d - Boss Battle Music ^2ON", message, SETTINGS_BOSS_MUSIC));
+			strcpy(message, va("%s\n^3%d - Custom Music ^2ON", message, SETTINGS_BOSS_MUSIC));
 		}
 
 		trap->SendServerCommand( ent->s.number, va("print \"%s\n\n^7Choose a setting above and use ^3/settings <number> ^7to turn it ^2ON ^7or ^1OFF^7\n\"", message) );
@@ -8312,7 +8312,7 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		}
 		else if (value == SETTINGS_BOSS_MUSIC)
 		{
-			trap->SendServerCommand( ent->s.number, va("print \"Boss Battle Music %s\n\"", new_status) );
+			trap->SendServerCommand( ent->s.number, va("print \"Custom Music %s\n\"", new_status) );
 		}
 
 		if (value == SETTINGS_RPG_QUESTS && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)

@@ -258,6 +258,12 @@ void fix_sp_func_door(gentity_t *ent)
 	G_FreeEntity( ent );
 }
 
+// zyk: sets the music to play in this quest map. Music will start after some miliseconds set in music_timer
+void zyk_set_map_music(zyk_map_music_t music_to_set, int music_timer)
+{
+	level.current_map_music = music_to_set;
+	level.map_music_reset_timer = level.time + music_timer;
+}
 
 extern gentity_t *NPC_Spawn_Do( gentity_t *ent );
 
@@ -332,7 +338,7 @@ void zyk_set_quest_npc_events(gentity_t* npc_ent)
 		npc_ent->client->pers.quest_npc_timer = 0;
 		npc_ent->client->pers.quest_npc_current_event = 0;
 
-		if (level.quest_map == QUESTMAP_MAIN_CITY)
+		if (level.quest_map == QUESTMAP_DESERT_CITY)
 		{ // zyk: main city
 			if (npc_ent->client->pers.quest_npc == 1)
 			{
@@ -453,7 +459,7 @@ void zyk_spawn_quest_stuff(qboolean load_quest_player_stuff)
 				zyk_load_quest_model("295 -350 93", "0 0 0", "models/map_objects/nar_shaddar/book.md3", 1, "-8 -8 -8", "8 8 8", 100, 1, 0);
 			}
 		}
-		else if (level.quest_map == QUESTMAP_MAIN_CITY)
+		else if (level.quest_map == QUESTMAP_DESERT_CITY)
 		{
 			// zyk: spawning the citizens
 			if (load_quest_player_stuff == qfalse)
@@ -686,7 +692,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		}
 		else if (Q_strncmp(zyk_mapname, "mp/siege_desert", 16) == 0 && g_gametype.integer == GT_FFA)
 		{
-			level.quest_map = QUESTMAP_MAIN_CITY;
+			level.quest_map = QUESTMAP_DESERT_CITY;
 		}
 	}
 
@@ -859,7 +865,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.bounty_quest_target_id = 0;
 	level.bounty_quest_choose_target = qtrue;
 
-	level.boss_battle_music_reset_timer = 0;
+	level.map_music_reset_timer = 0;
 
 	level.voting_player = -1;
 
@@ -901,7 +907,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	level.ent_origin_set = qfalse;
 
-	level.get_quest_player = qfalse;
 	level.spawned_quest_stuff = qfalse;
 
 	level.load_entities_timer = 0;
@@ -921,8 +926,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			level.sniper_players[zyk_iterator] = -1;
 			level.melee_players[zyk_iterator] = -1;
 			level.rpg_lms_players[zyk_iterator] = -1;
-
-			level.quest_players[zyk_iterator] = 0;
 
 			// zyk: initializing ally table
 			level.duel_allies[zyk_iterator] = -1;
@@ -1843,7 +1846,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			}
 		}
 
-		if (level.quest_map == QUESTMAP_MAIN_CITY)
+		if (level.quest_map == QUESTMAP_DESERT_CITY)
 		{ // zyk: loading quest stuff
 			zyk_create_info_player_deathmatch(12500, 32, -486, 179);
 			zyk_create_info_player_deathmatch(12500, -93, -486, 179);
@@ -7846,80 +7849,6 @@ void melee_battle_winner()
 	}
 }
 
-// zyk: tests if this player can become the quest player
-qboolean zyk_quest_get_this_player(gentity_t* ent)
-{
-	if (!ent || !(ent->client))
-	{ // zyk: if for some reason it is not a valid player entity
-		return qfalse;
-	}
-
-	if (ent->client->pers.connected != CON_CONNECTED || ent->client->sess.sessionTeam == TEAM_SPECTATOR)
-	{ // zyk: player must be connected and not in Spectator mode to be valid
-		return qfalse;
-	}
-
-	if (ent->health < 1 || ent->client->sess.amrpgmode < 2)
-	{ // zyk: must be alive and in RPG Mode to be a valid client
-		return qfalse;
-	}
-
-	if (level.quest_players[ent->s.number] == 2)
-	{ // zyk: player failed the quest mission
-		return qfalse;
-	}
-
-
-
-	// zyk: found a quest player
-	if (level.quest_players[ent->s.number] == 0)
-	{
-		ent->client->pers.quest_afk_timer = level.time + zyk_quest_afk_timer.integer;
-	}
-
-	level.quest_players[ent->s.number] = 1;
-
-	return qtrue;
-}
-
-// zyk: gets the quest players to play this mission
-void zyk_get_quest_players()
-{
-	int i = 0;
-	int number_of_quest_players = 0;
-	int number_of_failed_players = 0;
-
-	for (i = 0; i < level.maxclients; i++)
-	{
-		gentity_t* ent = &g_entities[i];
-
-		if (zyk_quest_get_this_player(ent) == qtrue)
-		{
-			if (level.spawned_quest_stuff == qfalse)
-			{
-				zyk_spawn_quest_stuff(qtrue);
-
-				level.spawned_quest_stuff = qtrue;
-			}
-
-			number_of_quest_players++;
-		}
-		else if (level.quest_players[i] == 2)
-		{
-			number_of_failed_players++;
-		}
-
-		i++;
-	}
-
-	if (number_of_failed_players >= number_of_quest_players)
-	{ // zyk: all players who could play the quest in this map failed the mission
-		zyk_clear_quest_stuff();
-
-		trap->SendServerCommand(-1, "chat \"^3Quest System: ^7all quest players failed. Do a full map change to this map to play the quest again\"");
-	}
-}
-
 /*
 ================
 G_RunFrame
@@ -8102,10 +8031,22 @@ void G_RunFrame( int levelTime ) {
 	trap->PrecisionTimer_Start(&timer_ItemRun);
 #endif
 
-	if (level.boss_battle_music_reset_timer > 0 && level.boss_battle_music_reset_timer < level.time)
+	if (level.map_music_reset_timer > 0 && level.map_music_reset_timer < level.time)
 	{ // zyk: resets music to default one
-		level.boss_battle_music_reset_timer = 0;
-		trap->SetConfigstring( CS_MUSIC, G_NewString(level.default_map_music) );
+		level.map_music_reset_timer = 0;
+
+		if (level.current_map_music == MAPMUSIC_NONE)
+		{
+			trap->SetConfigstring(CS_MUSIC, G_NewString(level.default_map_music));
+		}
+		else if (level.current_map_music == MAPMUSIC_PROLOGUE)
+		{
+			trap->SetConfigstring(CS_MUSIC, "music/zyknewmod/sb_fateandfortune.mp3");
+		}
+		else if (level.current_map_music == MAPMUSIC_DESERT_CITY)
+		{
+			trap->SetConfigstring(CS_MUSIC, "music/zyknewmod/al-andalus.mp3");
+		}
 	}
 
 	if (level.race_mode == 1 && level.race_start_timer < level.time)
@@ -8881,13 +8822,6 @@ void G_RunFrame( int levelTime ) {
 		level.load_entities_timer = 0;
 	}
 
-	if (level.get_quest_player == qtrue && level.quest_map > QUESTMAP_NONE)
-	{
-		zyk_get_quest_players();
-
-		level.get_quest_player = qfalse;
-	}
-
 	//
 	// go through all allocated objects
 	//
@@ -9334,11 +9268,6 @@ void G_RunFrame( int levelTime ) {
 			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
 
-				if (ent->client->pers.quest_afk_timer < level.time)
-				{ // zyk: quest player afk for too long
-					level.get_quest_player = qtrue;
-				}
-
 				// zyk: Weapon Upgrades
 				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL) && ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4)
 				{
@@ -9497,6 +9426,13 @@ void G_RunFrame( int levelTime ) {
 				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
 					level.quest_debounce_timer = level.time + 100;
 
+					if (level.spawned_quest_stuff == qfalse)
+					{
+						zyk_spawn_quest_stuff(qtrue);
+
+						level.spawned_quest_stuff = qtrue;
+					}
+
 					if (level.quest_map == QUESTMAP_HERO_HOUSE && !(ent->client->pers.main_quest_progress & (1 << QUEST_PROLOGUE)))
 					{ // zyk: Hero's House, show the Prologue to the player
 						vec3_t heros_house_center;
@@ -9507,11 +9443,16 @@ void G_RunFrame( int levelTime ) {
 						{
 							if (ent->client->pers.current_quest_event == 0)
 							{
+								if (!(ent->client->pers.player_settings & ((1 << SETTINGS_BOSS_MUSIC))))
+								{
+									zyk_set_map_music(MAPMUSIC_PROLOGUE, 500);
+								}
+
 								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7years ago, after the Great War, evil took over everything.\"");
 							}
 							else if (ent->client->pers.current_quest_event == 1)
 							{
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7the evil king Drakon created an age of oppression and sadness.\"");
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7the evil king Drakon created an age of oppression and sadness for people.\"");
 							}
 							else if (ent->client->pers.current_quest_event == 2)
 							{
@@ -9531,14 +9472,20 @@ void G_RunFrame( int levelTime ) {
 							}
 							else if (ent->client->pers.current_quest_event == 6)
 							{
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7going to the Main City and talking to people there perhaps will give you the information you need.\"");
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7going to the Desert City and talking to people there perhaps will give you the information you need.\"");
 							}
 							else if (ent->client->pers.current_quest_event == 7)
 							{
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7also read the books in this house to get more information\"");
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7you can also visit cities and places to get levels and information.\"");
+							}
+							else if (ent->client->pers.current_quest_event == 8)
+							{
+								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7the Main Quest begins!\"");
 
 								ent->client->pers.main_quest_progress |= (1 << QUEST_PROLOGUE);
 								save_account(ent, qtrue);
+
+								zyk_set_map_music(MAPMUSIC_NONE, 500);
 							}
 							
 							ent->client->pers.current_quest_event++;
@@ -9848,7 +9795,7 @@ void G_RunFrame( int levelTime ) {
 			if (ent->client->pers.quest_npc > 0 && ent->health > 0 && ent->client->pers.quest_npc_timer < level.time && 
 				ent->client->pers.quest_npc_current_event < MAX_QUEST_NPC_EVENTS)
 			{
-				if (level.quest_map == QUESTMAP_MAIN_CITY)
+				if (level.quest_map == QUESTMAP_DESERT_CITY)
 				{
 					if (ent->client->pers.quest_npc == 1)
 					{

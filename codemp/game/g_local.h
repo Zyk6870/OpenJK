@@ -698,9 +698,16 @@ typedef enum {
 typedef enum {
 	QUESTMAP_NONE,
 	QUESTMAP_HERO_HOUSE,
-	QUESTMAP_MAIN_CITY,
+	QUESTMAP_DESERT_CITY,
 	NUM_QUEST_MAPS
 } zyk_quest_map_t;
+
+typedef enum {
+	MAPMUSIC_NONE,
+	MAPMUSIC_PROLOGUE,
+	MAPMUSIC_DESERT_CITY,
+	NUM_MAP_MUSIC
+} zyk_map_music_t;
 
 // zyk: number of RPG Mode skills
 #define NUMBER_OF_SKILLS 90
@@ -1654,11 +1661,14 @@ typedef struct level_locals_s {
 	// zyk: sets the map in which the player must complete a quest objective
 	int quest_map;
 
-	// zyk: default map music. After a boss battle, resets music to this one
+	// zyk: default map music
 	char default_map_music[128];
 
-	// zyk: timer to reset boss song after battle ends
-	int boss_battle_music_reset_timer;
+	// zyk: timer to set
+	int map_music_reset_timer;
+
+	// zyk: which map music to set
+	zyk_map_music_t current_map_music;
 
 	// zyk: each index has the effect id. The value is the owner of the effect used in Special Powers
 	int special_power_effects[ENTITYNUM_MAX_NORMAL];
@@ -1768,17 +1778,8 @@ typedef struct level_locals_s {
 	// zyk: used to pass through each quest event
 	int quest_event_counter;
 
-	// zyk: when qtrue, tries to get the next player
-	qboolean get_quest_player;
-
-	// zyk: after finding the first quest player, spawn the quest stuff in this map
+	// zyk: spawn the quest stuff in this map
 	qboolean spawned_quest_stuff;
-
-	// zyk: players who can play the quest in this map
-	// 0 - Possible candidate to be a quest player
-	// 1 - A quest player
-	// 2 - A quest player who failed the mission
-	int quest_players[MAX_CLIENTS];
 
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];
