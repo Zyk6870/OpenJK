@@ -449,14 +449,11 @@ void SP_misc_model_breakable( gentity_t *ent )
 		*/
 	}
 
-	// zyk: in MP this will not work
 	//Use model
-	/*
 	if( ent->spawnflags & 32 ) {	//has umodel
 		strcat( useModel, "_u1.md3" );
 		ent->sound1to2 = G_ModelIndex( useModel );
 	}
-	*/
 
 	// Scale up the tie-bomber bbox a little.
 	if ( ent->model && Q_stricmp( "models/map_objects/ships/tie_bomber.md3", ent->model ) == 0 )
