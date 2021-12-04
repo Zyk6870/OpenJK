@@ -436,13 +436,13 @@ void SP_misc_model_breakable( gentity_t *ent )
 	
 	if (ent->takedamage) {
 		//Dead/damaged model
-		// zyk: in MP these will not work
-		/*
 		if( !(ent->spawnflags & 8) ) {	//no dmodel
 			strcat( damageModel, "_d1.md3" );
 			ent->s.modelindex2 = G_ModelIndex( damageModel );
 		}
-		
+	
+		// zyk: this will not work in MP
+		/*
 		//Chunk model
 		strcat( chunkModel, "_c1.md3" );
 		ent->s.modelGhoul2 = G_ModelIndex( chunkModel );
