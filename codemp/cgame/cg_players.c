@@ -9977,13 +9977,13 @@ void CG_Player( centity_t *cent ) {
 	if (cent->currentState.number < MAX_CLIENTS && 
 		cent->currentState.powerups & (1 << PW_NEUTRALFLAG))
 	{ 
-		if (cg.rpg_class[cent->currentState.number] == 2) // zyk: Force User, draws the Force Shield effect
+		if (cg.use_force_shield_effect == qtrue) // zyk: Force User, draws the Force Shield effect
 		{
 			CG_DrawPlayerSphere(cent, cent->lerpOrigin, 1.4f, cgs.media.ysaliblueShader);
 		}
 
-		if (cg.snap->ps.clientNum == cent->currentState.number && cg.rpg_class[cent->currentState.number] > 0 && cg.unique_cooldown_timer == 0)
-		{ // zyk: classes that are using Unique Skill must show the cooldown time
+		if (cg.snap->ps.clientNum == cent->currentState.number && cg.unique_cooldown_timer == 0)
+		{ // zyk: using Unique Skill, must show the cooldown time
 			int unique_cooldown_duration = 25000;
 
 			cg.unique_cooldown_timer = cg.time + unique_cooldown_duration;

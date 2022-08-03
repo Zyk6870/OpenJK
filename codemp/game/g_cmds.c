@@ -5705,7 +5705,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 		strcpy(content, va("%s%d-%d-%d-%d-%d-%d-", 
 			content, ent->client->pers.rpg_upgrades, 0, unique_duration, ent->client->pers.main_quest_progress, ent->client->pers.side_quest_progress, MAX_QUEST_MISSIONS));
 
-		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
+		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-NOCLASS-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
 	}
 	else if (ent->client->sess.amrpgmode == 1)
 	{ // zyk: just sends the player settings

@@ -1034,6 +1034,8 @@ Ghoul2 Insert End
 	// 1 - Blue Jetpack Flame
 	int rpg_stuff;
 
+	qboolean use_force_shield_effect;
+
 	// zyk: current amount of Magic Power (MP) of this RPG player
 	int magic_power;
 
@@ -1045,9 +1047,6 @@ Ghoul2 Insert End
 
 	// zyk: used to control in which moment the Unique duration must be set so it does not reset when a new server command sends the unique duration again
 	int unique_duration_control;
-
-	// zyk: RPG Mode class of the players
-	int rpg_class[MAX_CLIENTS];
 
 	// zyk: sets clients which must have some RPG stuff set for this cg player to see the stuff on them
 	// Possible bitvalues:

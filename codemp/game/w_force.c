@@ -675,11 +675,6 @@ qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int 
 	{
 		drain = (zyk_max_force_power.integer/2);
 	}
-	
-	if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER)
-	{ // zyk: Force User class. He spends less force power
-		drain *= 0.75;
-	}
 
 	if (self->client->ps.fd.forcePowersActive & (1 << forcePower))
 	{ //we're probably going to deactivate it..
@@ -1167,18 +1162,10 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 
 	if ((int)forcePower == FP_SPEED && overrideAmt)
 	{
-		// zyk: Force User class spends less force
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER)
-			overrideAmt = forcePowerNeeded[self->client->ps.fd.forcePowerLevel[forcePower]][forcePower] * 0.75;
-
 		BG_ForcePowerDrain( &self->client->ps, forcePower, overrideAmt*0.025 );
 	}
 	else if ((int)forcePower != FP_GRIP && (int)forcePower != FP_DRAIN)
 	{ //grip and drain drain as damage is done
-		// zyk: Force User class spends less force
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER)
-			overrideAmt = forcePowerNeeded[self->client->ps.fd.forcePowerLevel[forcePower]][forcePower] * 0.75;
-
 		BG_ForcePowerDrain( &self->client->ps, forcePower, overrideAmt );
 	}
 }
@@ -1258,11 +1245,7 @@ void ForceHeal( gentity_t *self )
 	//NOTE: Decided to make all levels instant.
 
 	// zyk: now heal force power requires force based on the force power max cvar
-	// zyk: Force User class spends less force
-	if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER)
-		self->client->ps.fd.forcePower -= ((zyk_max_force_power.integer / 2) * 0.75);
-	else
-		self->client->ps.fd.forcePower -= (zyk_max_force_power.integer/2);
+	self->client->ps.fd.forcePower -= (zyk_max_force_power.integer/2);
 
 	// zyk: Heal will have a cooldown time
 	self->client->ps.fd.forceHealTime = level.time + 500;
@@ -1481,17 +1464,8 @@ void ForceTeamForceReplenish( gentity_t *self )
 	{
 		ent = &g_entities[i];
 
-		// zyk: Gunner class has more max ammo
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
-		{
-			max_blasterpack_ammo = zyk_max_blaster_pack_ammo.integer + zyk_max_blaster_pack_ammo.integer / 8.0 * ent->client->pers.skill_levels[38];
-			max_powercell_ammo = zyk_max_power_cell_ammo.integer + zyk_max_power_cell_ammo.integer / 8.0 * ent->client->pers.skill_levels[38];
-		}
-		else
-		{
-			max_blasterpack_ammo = zyk_max_blaster_pack_ammo.integer;
-			max_powercell_ammo = zyk_max_power_cell_ammo.integer;
-		}
+		max_blasterpack_ammo = zyk_max_blaster_pack_ammo.integer;
+		max_powercell_ammo = zyk_max_power_cell_ammo.integer;
 
 		// zyk: created new condition so we can use Team Energize in FFA. Also added Improvements skill condition to restore ammo of the target
 		if (ent && ent->client && self != ent && 
@@ -4058,7 +4032,6 @@ void ForceThrow( gentity_t *self, qboolean pull )
 void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower )
 {
 	int wasActive = self->client->ps.fd.forcePowersActive;
-	gentity_t *tricked_entity; // zyk: used to stop mind control
 
 	self->client->ps.fd.forcePowersActive &= ~( 1 << forcePower );
 
@@ -4095,16 +4068,11 @@ void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower )
 		{
 			G_MuteSound(self->client->ps.fd.killSoundEntIndex[TRACK_CHANNEL_5-50], CHAN_VOICE);
 
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION) &&
+			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION) &&
 				self->client->ps.zoomMode == 2)
 			{ // zyk: stops Thermal Vision. In this case, stop binoculars
 				self->client->ps.zoomMode = 0;
 				self->client->ps.zoomTime = level.time;
-			}
-
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_WIZARD)
-			{ // zyk: removing Sense level so he can use holdable items with force keys again
-				self->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_0;
 			}
 		}
 		break;
@@ -5873,7 +5841,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 				self->client->ps.fd.forcePowerDuration[i] = 0;
 			}
 			// zyk: using Sense Health skill of RPG Mode
-			else if (i == FP_SEE && self->client->sess.amrpgmode == 2 && (self->client->pers.skill_levels[35] > 0 || self->client->pers.rpg_class == RPGCLASS_WIZARD) && 
+			else if (i == FP_SEE && self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[35] > 0 && 
 					 self->client->ps.fd.forcePowersActive & ( 1 << FP_SEE ) && self->client->pers.sense_health_timer < level.time && self->client->ps.hasLookTarget)
 			{
 				// zyk: if you are looking at someone (player or npc), this will be the client id
@@ -5909,8 +5877,6 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 					WP_ForcePowerRegenerate( self, 6 );
 				else if ( self->client->ps.isJediMaster && level.gametype == GT_JEDIMASTER )
 					WP_ForcePowerRegenerate( self, 4 ); //jedi master regenerates 4 times as fast
-				else if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER)
-					WP_ForcePowerRegenerate( self, self->client->pers.skill_levels[38] ); // zyk: Force User can regen force faster
 				else
 					WP_ForcePowerRegenerate( self, 0 );
 			}
@@ -6036,8 +6002,8 @@ qboolean Jedi_DodgeEvasion( gentity_t *self, gentity_t *shooter, trace_t *tr, in
 		}
 	}
 
-	// zyk: Bounty Hunter with Thermal Vision cannot dodge
-	if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER)
+	// zyk: Thermal Vision, cannot dodge
+	if (self->client->sess.amrpgmode == 2 && self->client->pers.thermal_vision == qtrue)
 	{
 		return qfalse;
 	}

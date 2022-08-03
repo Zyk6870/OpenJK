@@ -824,9 +824,9 @@ killProj:
 		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
 	}
 
-	// zyk: Fire Bolt when removed spawns a fire in the ground
+	// zyk: Fire Bolt spawns a fire in the ground
 	if (ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING) && ent->methodOfDeath == MOD_MELEE &&
-		ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_class == RPGCLASS_WIZARD)
+		ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2)
 	{
 		zyk_quest_effect_spawn(ent->parent, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 100);
 
