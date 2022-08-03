@@ -5233,12 +5233,6 @@ void magic_sense(gentity_t *ent, int duration)
 		duration += 1000;
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD &&
-		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
-	{ // zyk: Magic Buff
-		duration += 1000;
-	}
-
 	// zyk: Magic Sense gets more duration based on Sense skill level
 	duration += (ent->client->pers.skill_levels[4] * 1000);
 
@@ -5323,13 +5317,6 @@ void enemy_nerf(gentity_t *ent, int distance)
 	int duration = 12000;
 
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ENEMY_WEAKENING] > 1)
-	{
-		duration += 4000;
-	}
-
-	// zyk: Magic Buff increases duration
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD &&
-		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
 	{
 		duration += 4000;
 	}
@@ -6078,15 +6065,7 @@ void magic_explosion(gentity_t *ent, int radius, int damage, int duration)
 		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_explosion", "4", "explosions/hugeexplosion1", 1500, damage, radius, duration + 1000);
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD && 
-		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
-	{ // zyk: Magic Buff increases damage
-		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_explosion", "4", "explosions/hugeexplosion1", 500, damage * 2, radius, duration);
-	}
-	else
-	{
-		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_explosion", "4", "explosions/hugeexplosion1", 500, damage, radius, duration);
-	}
+	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_explosion", "4", "explosions/hugeexplosion1", 500, damage, radius, duration);
 }
 
 // zyk: Healing Area
@@ -6097,15 +6076,7 @@ void healing_area(gentity_t *ent, int damage, int duration)
 		damage += 1;
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD && 
-		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
-	{ // zyk: Magic Buff increases damage
-		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_healing", "4", "env/red_cyc", 0, damage * 2, 228, duration);
-	}
-	else
-	{
-		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_healing", "4", "env/red_cyc", 0, damage, 228, duration);
-	}
+	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_healing", "4", "env/red_cyc", 0, damage, 228, duration);
 }
 
 // zyk: Slow Motion
@@ -9075,14 +9046,7 @@ void G_RunFrame( int levelTime ) {
 
 				if (ent->client->sess.amrpgmode == 2)
 				{ // zyk: RPG Mode jetpack skill. Each level decreases fuel debounce
-					if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
-					{ // zyk: Gunner can have a more efficient jetpack
-						jetpack_debounce_amount -= ((ent->client->pers.skill_levels[34] * 2) + (ent->client->pers.skill_levels[38]));
-					}
-					else
-					{
-						jetpack_debounce_amount -= (ent->client->pers.skill_levels[34] * 2);
-					}
+					jetpack_debounce_amount -= (ent->client->pers.skill_levels[34] * 2);
 
 					if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK)) // zyk: Jetpack Upgrade decreases fuel usage
 						jetpack_debounce_amount -= 2;
@@ -9094,14 +9058,6 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				ent->client->pers.jetpack_fuel -= jetpack_debounce_amount;
-
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD && ent->client->pers.jetpack_fuel <= 0 && 
-					ent->client->pers.magic_power >= 10 && ent->client->pers.skill_levels[38] > 0)
-				{ // zyk: Wizard Improvements skill allows recovering jetpack fuel with magic
-					ent->client->pers.jetpack_fuel = (100 * ent->client->pers.skill_levels[38]);
-					ent->client->pers.magic_power -= 10;
-					send_rpg_events(2000);
-				}
 
 				if (ent->client->pers.jetpack_fuel <= 0)
 				{ // zyk: out of fuel. Turn jetpack off
@@ -9350,13 +9306,6 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS) && ent->client->ps.weaponTime > weaponData[WP_REPEATER].altFireTime / 2)
 				{
 					ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime / 2;
-				}
-
-				if (ent->client->pers.rpg_class == RPGCLASS_WIZARD && 
-					ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 2 &&
-					ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * 0.8))
-				{ // zyk: Wizard Faster Bolt ability makes melee faster to shoot bolts faster
-					ent->client->ps.weaponTime = weaponData[WP_MELEE].fireTime * 0.8;
 				}
 
 				if (ent->client->pers.flame_thrower > level.time && ent->client->cloakDebReduce < level.time)

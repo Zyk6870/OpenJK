@@ -330,225 +330,104 @@ char* zyk_get_spirit_name(zyk_main_quest_t spirit_value)
 	return G_NewString(spirit_names[spirit_value - (MAX_QUEST_MISSIONS - 7)]);
 }
 
-// zyk: tests which skills are allowed for each class
-qboolean zyk_skill_allowed_for_class(int skill_index, int rpg_class)
+// zyk: returns the special jka color chars for RPG skills
+char* zyk_allowed_skill_color(int skill_index)
 {
-	int i = 0;
-
-	int classes_allowed_for_skills[NUMBER_OF_SKILLS][NUM_RPG_CLASSES + 1] = { // zyk: each index is a skill, and contains an array of allowed RPG classes
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Jump
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Push
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Pull
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Speed
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Sense
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Saber Attack
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Saber Defense
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Saber Throw
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Absorb
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Heal
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Protect
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Mind Trick
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Team Heal
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Lightning
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Grip
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Drain
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Rage
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Team Energize
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Stun Baton
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Blaster Pistol
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // E11 Blaster Rifle
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Disruptor
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Bowcaster
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Repeater
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // DEMP2
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Flechette
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Rocket Launcher
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Concussion Rifle
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Bryar Pistol
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Melee
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Max Shield
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Shield Strength
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Health Strength
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Drain Shield
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Jetpack
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_WIZARD, -1}, // Sense Health
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Shield Heal
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Team Shield Heal
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Improvements
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Blaster Pack
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Powercell
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Metal Bolts
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Rockets
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Thermals
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Trip Mines
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Detpacks
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Binoculars
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Bacta Canister
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Sentry Gun
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Seeker Drone
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // E-Web
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Big Bacta
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Force Field
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Cloak Item
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Force Power
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Max MP
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 1
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 2
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 3
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 4
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 5
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Unique Skill 6
-		{RPGCLASS_WIZARD, -1},
-		{RPGCLASS_WIZARD, -1},
-		{RPGCLASS_WIZARD, -1},
-		{RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}
+	char skill_colors[NUMBER_OF_SKILLS + 1][3] = {
+		"^7",
+		"^7",
+		"^7",
+		"^7",
+		"^7",
+		"^3",
+		"^3",
+		"^3",
+		"^5",
+		"^5",
+		"^5",
+		"^5",
+		"^5",
+		"^1",
+		"^1",
+		"^1",
+		"^1",
+		"^1",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^2",
+		"^2",
+		"^1",
+		"^3",
+		"^3",
+		"^6",
+		"^6",
+		"^6",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^5",
+		"^3",
+		"^7",
+		"^7",
+		"^7",
+		"^7",
+		"^7",
+		"^7",
+		"^7",
+		"^7",
+		"^7",
+		"^7",
+		"^4",
+		"^4",
+		"^4",
+		"^4",
+		"^3",
+		"^3",
+		"^3",
+		"^3",
+		"^1",
+		"^1",
+		"^1",
+		"^1",
+		"^2",
+		"^2",
+		"^2",
+		"^2",
+		"^6",
+		"^6",
+		"^6",
+		"^6",
+		"^5",
+		"^5",
+		"^5",
+		"^5",
+		""
 	};
 
-	for (i = 0; i < NUM_RPG_CLASSES; i++)
-	{
-		if (classes_allowed_for_skills[skill_index][i] == -1)
-		{ // zyk: end of classes array, stops the loop
-			break;
-		}
-
-		if (classes_allowed_for_skills[skill_index][i] == rpg_class)
-		{ // zyk: skill is allowed for this class
-			return qtrue;
-		}
-	}
-
-	return qfalse;
-}
-
-// zyk: returns the special jka color chars for RPG skills
-char* zyk_allowed_skill_color(int skill_index, int rpg_class)
-{
-	if (zyk_skill_allowed_for_class(skill_index, rpg_class) == qtrue)
-	{
-		char skill_colors[NUMBER_OF_SKILLS + 1][3] = {
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^3",
-			"^3",
-			"^3",
-			"^5",
-			"^5",
-			"^5",
-			"^5",
-			"^5",
-			"^1",
-			"^1",
-			"^1",
-			"^1",
-			"^1",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^2",
-			"^2",
-			"^1",
-			"^3",
-			"^3",
-			"^6",
-			"^6",
-			"^6",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^5",
-			"^3",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^7",
-			"^4",
-			"^4",
-			"^4",
-			"^4",
-			"^3",
-			"^3",
-			"^3",
-			"^3",
-			"^1",
-			"^1",
-			"^1",
-			"^1",
-			"^2",
-			"^2",
-			"^2",
-			"^2",
-			"^6",
-			"^6",
-			"^6",
-			"^6",
-			"^5",
-			"^5",
-			"^5",
-			"^5",
-			""
-		};
-
-		return G_NewString(skill_colors[skill_index]);
-	}
-	else
-	{
-		return "^0";
-	}
+	return G_NewString(skill_colors[skill_index]);
 }
 
 // zy: returns the description of a RPG skill
@@ -2631,10 +2510,6 @@ void load_account(gentity_t* ent)
 				ent->client->pers.credits = 0;
 			}
 
-			// zyk: loading RPG class
-			fscanf(account_file, "%s", content);
-			ent->client->pers.rpg_class = atoi(content);
-
 			// zyk: loading Magic Master first selection and selected powers
 			fscanf(account_file, "%s", content);
 			ent->client->sess.magic_fist_selection = atoi(content);
@@ -2710,9 +2585,9 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n",
+			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n",
 				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.rpg_upgrades, client->pers.credits,
-				client->pers.rpg_class, client->sess.magic_fist_selection, client->pers.main_quest_progress, client->pers.side_quest_progress);
+				client->sess.magic_fist_selection, client->pers.main_quest_progress, client->pers.side_quest_progress);
 
 			fclose(account_file);
 		}
@@ -4620,13 +4495,7 @@ void display_yellow_bar(gentity_t *ent, int duration)
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = ((ent->client->pers.level * 3)/5) * ent->client->pers.skill_levels[55];
-
-	if (ent->client->pers.rpg_class == RPGCLASS_WIZARD) // zyk: Wizard has more Magic Power
-	{
-		max_mp = ((ent->client->pers.level * 5) / 5) * ent->client->pers.skill_levels[55];
-		return (max_mp + (40 * (ent->client->pers.skill_levels[38] + 1)));
-	}
+	int max_mp = ((ent->client->pers.level * 9)/max_skill_levels[55]) * ent->client->pers.skill_levels[55];
 
 	return max_mp;
 }
@@ -4641,16 +4510,12 @@ void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
 	}
 
 	trap->SendServerCommand(ent->s.number, va("chat \"%s^7: %s%s!\"", 
-		ent->client->pers.netname, zyk_allowed_skill_color(skill_index, ent->client->pers.rpg_class), zyk_skill_name(skill_index)));
+		ent->client->pers.netname, zyk_allowed_skill_color(skill_index), zyk_skill_name(skill_index)));
 }
 
 void zyk_set_magic_power_cooldown_time(gentity_t *ent, int duration)
 {
-	// zyk: Wizard has less cooldown time after casting magic powers
-	if (ent->client->pers.rpg_class == RPGCLASS_WIZARD)
-		ent->client->pers.quest_power_usage_timer = level.time + (duration * (1.0 - (ent->client->pers.skill_levels[38] * 0.15)));
-	else
-		ent->client->pers.quest_power_usage_timer = level.time + duration;
+	ent->client->pers.quest_power_usage_timer = level.time + duration;
 }
 
 extern void magic_sense(gentity_t *ent, int duration);
@@ -4987,53 +4852,6 @@ qboolean zyk_check_user_input(char *user_input, int user_input_size)
 	return qtrue;
 }
 
-char* zyk_get_class_name(zyk_rpgclass_t class_number)
-{
-	if (class_number == RPGCLASS_CIVILIAN)
-		return "Civilian";
-	else if (class_number == RPGCLASS_FREE_WARRIOR)
-		return "Free Warrior";
-	else if (class_number == RPGCLASS_FORCE_USER)
-		return "Force User";
-	else if (class_number == RPGCLASS_GUNNER)
-		return "Gunner";
-	else if (class_number == RPGCLASS_WIZARD)
-		return "Wizard";
-	else
-		return "";
-}
-
-char* zyk_rpg_class(gentity_t* ent)
-{
-	return zyk_get_class_name(ent->client->pers.rpg_class);
-}
-
-qboolean validate_rpg_class(gentity_t *ent)
-{
-	if (ent->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR && zyk_allow_free_warrior.integer == 0)
-	{
-		trap->SendServerCommand( ent->s.number, va("print \"%s not allowed in this server\n\"", zyk_rpg_class(ent)));
-		return qfalse;
-	}
-	else if (ent->client->pers.rpg_class == RPGCLASS_FORCE_USER && zyk_allow_force_user.integer == 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"%s not allowed in this server\n\"", zyk_rpg_class(ent)));
-		return qfalse;
-	}
-	else if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && zyk_allow_gunner.integer == 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"%s not allowed in this server\n\"", zyk_rpg_class(ent)));
-		return qfalse;
-	}
-	else if (ent->client->pers.rpg_class == RPGCLASS_WIZARD && zyk_allow_wizard.integer == 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"%s not allowed in this server\n\"", zyk_rpg_class(ent)));
-		return qfalse;
-	}
-
-	return qtrue;
-}
-
 // zyk: gives rpg score to the player
 void rpg_score(gentity_t *ent)
 {
@@ -5041,16 +4859,6 @@ void rpg_score(gentity_t *ent)
 	char message[128];
 
 	strcpy(message,"");
-
-	if (validate_rpg_class(ent) == qfalse)
-	{
-		return;
-	}
-
-	if (ent->client->pers.rpg_class == RPGCLASS_CIVILIAN)
-	{ // zyk: the starting class cannot get levels
-		return;
-	}
 
 	add_credits(ent, (10 + ent->client->pers.credits_modifier));
 
@@ -5119,9 +4927,6 @@ void initialize_rpg_skills(gentity_t *ent)
 	{
 		int i = 0;
 
-		if (validate_rpg_class(ent) == qfalse)
-			return;
-
 		// zyk: validating max skill levels. If for some reason a skill is above max, get the skillpoint back
 		for (i = 0; i < NUMBER_OF_SKILLS; i++)
 		{
@@ -5161,19 +4966,11 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->ps.fd.forcePowerLevel[FP_SPEED] = ent->client->pers.skill_levels[3];
 
 		// zyk: loading Sense value
-		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER || ent->client->pers.rpg_class == RPGCLASS_WIZARD)
-		{ // zyk: these classes have no force, so they do not need Sense (although they can have the skill to resist Mind Control)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SEE)) && ent->client->pers.skill_levels[4] > 0)
+			ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
+		if (ent->client->pers.skill_levels[4] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
-			ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_0;
-		}
-		else
-		{
-			if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SEE)) && ent->client->pers.skill_levels[4] > 0)
-				ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
-			if (ent->client->pers.skill_levels[4] == 0)
-				ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
-			ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[4];
-		}
+		ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[4];
 
 		// zyk: loading Saber Offense value
 		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABER_OFFENSE)) && ent->client->pers.skill_levels[5] > 0)
@@ -5415,6 +5212,7 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->ps.ammo[AMMO_TRIPMINE] = ((int)ceil(zyk_max_tripmine_ammo.value/3.0) * ent->client->pers.skill_levels[44]);
 		ent->client->ps.ammo[AMMO_DETPACK] = ((int)ceil(zyk_max_detpack_ammo.value/3.0) * ent->client->pers.skill_levels[45]);
 		
+		/*
 		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
 		{ // zyk: modifying max ammo if the player is a Gunner
 			gentity_t *this_ent = NULL;
@@ -5456,6 +5254,7 @@ void initialize_rpg_skills(gentity_t *ent)
 			ent->client->ps.ammo[AMMO_TRIPMINE] += ent->client->ps.ammo[AMMO_TRIPMINE] / 8.0 * ent->client->pers.skill_levels[38];
 			ent->client->ps.ammo[AMMO_DETPACK] += ent->client->ps.ammo[AMMO_DETPACK] / 8.0 * ent->client->pers.skill_levels[38];
 		}
+		*/
 
 		// zyk: reseting initial holdable items of the player
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SEEKER) & ~(1 << HI_BINOCULARS) & ~(1 << HI_SENTRY_GUN) & ~(1 << HI_EWEB) & ~(1 << HI_CLOAK) & ~(1 << HI_SHIELD) & ~(1 << HI_MEDPAC) & ~(1 << HI_MEDPAC_BIG);
@@ -5527,7 +5326,6 @@ void add_new_char(gentity_t *ent)
 
 	ent->client->pers.rpg_upgrades = 0;
 	ent->client->pers.credits = 100;
-	ent->client->pers.rpg_class = RPGCLASS_CIVILIAN;
 	ent->client->sess.magic_fist_selection = 0;
 }
 
@@ -5806,7 +5604,7 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_FORCE_USER && ent->client->pers.mind_controlled1_id != -1)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.mind_controlled1_id != -1)
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"You cant logout while using Mind Control on someone.\n\"" );
 		return;
@@ -5937,7 +5735,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 		strcpy(content, va("%s%d-%d-%d-%d-%d-%d-", 
 			content, ent->client->pers.rpg_upgrades, 0, unique_duration, ent->client->pers.main_quest_progress, ent->client->pers.side_quest_progress, MAX_QUEST_MISSIONS));
 
-		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-%s-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,zyk_rpg_class(ent),content));
+		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
 	}
 	else if (ent->client->sess.amrpgmode == 1)
 	{ // zyk: just sends the player settings
@@ -6045,44 +5843,8 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 	if (ent->client->pers.skillpoints == 0)
 	{
 		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"You dont have enough skillpoints.\n\"" );
+			trap->SendServerCommand( ent->s.number, "print \"Not enough skillpoints.\n\"" );
 		return qfalse;
-	}
-
-	// zyk: skill must be allowed to the player RPG class
-	if (zyk_skill_allowed_for_class(upgrade_value - 1, ent->client->pers.rpg_class) == qfalse)
-	{
-		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, va("print \"%s class doesn't allow ^3%s ^7skill.\n\"", zyk_rpg_class(ent), zyk_skill_name(upgrade_value - 1)));
-		return qfalse;
-	}
-
-	// zyk: Free Warrior class can have up to 6 magic powers. Wizard can have all, and other classes only 3 magic powers
-	if (ent->client->pers.rpg_class != RPGCLASS_WIZARD && upgrade_value > (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS))
-	{
-		int i = 0;
-		int number_of_magic_skills = 0;
-
-		for (i = (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS); i < NUMBER_OF_SKILLS; i++)
-		{
-			if (ent->client->pers.skill_levels[i] > 0 && i != (upgrade_value - 1))
-			{
-				number_of_magic_skills++;
-			}
-		}
-
-		if (ent->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR && number_of_magic_skills >= 6)
-		{
-			if (dont_show_message == qfalse)
-				trap->SendServerCommand(ent->s.number, "print \"Cannot upgrade more than 6 magic skills.\n\"");
-			return qfalse;
-		}
-		else if (number_of_magic_skills >= 3)
-		{
-			if (dont_show_message == qfalse)
-				trap->SendServerCommand(ent->s.number, "print \"Cannot upgrade more than 3 magic skills.\n\"");
-			return qfalse;
-		}
 	}
 
 	/*
@@ -6173,9 +5935,6 @@ void Cmd_UpSkill_f( gentity_t *ent ) {
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	upgrade_value = atoi(arg1);
 
-	if (validate_rpg_class(ent) == qfalse)
-		return;
-
 	if (Q_stricmp(arg1, "all") == 0)
 	{ // zyk: upgrade all skills of this class
 		do_upgrade_skill(ent, 0, qtrue);
@@ -6194,9 +5953,6 @@ void do_downgrade_skill(gentity_t *ent, int downgrade_value)
 		trap->SendServerCommand( ent->s.number, "print \"Invalid skill number.\n\"" );
 		return;
 	}
-
-	if (validate_rpg_class(ent) == qfalse)
-		return;
 
 	if (ent->client->pers.skill_levels[downgrade_value - 1] > 0)
 	{
@@ -6278,7 +6034,7 @@ void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, int number_
 		}
 
 		strcpy(message, va("%s%s%d - %s: %d/%d%s", message,
-			zyk_allowed_skill_color(lowest_skill_index, ent->client->pers.rpg_class), (lowest_skill_index + 1), zyk_skill_name(lowest_skill_index),
+			zyk_allowed_skill_color(lowest_skill_index), (lowest_skill_index + 1), zyk_skill_name(lowest_skill_index),
 			ent->client->pers.skill_levels[lowest_skill_index], max_skill_levels[lowest_skill_index], final_chars));
 
 		lowest_skill_index++;
@@ -6344,7 +6100,7 @@ void zyk_list_stuff(gentity_t *ent, gentity_t *target_ent)
 
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Level: ^7%d/%d\n^3Level Up Score: ^7%d/%d\n^3Skill Points: ^7%d\n^3Skill Counter: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Credits: ^7%d\n^3RPG Class: ^7%s\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.level, zyk_rpg_max_level.integer, ent->client->pers.level_up_score, (ent->client->pers.level * zyk_level_up_score_factor.integer), ent->client->pers.skillpoints, ent->client->pers.skill_counter, zyk_max_skill_counter.integer, ent->client->pers.magic_power, zyk_max_magic_power(ent), ent->client->pers.credits, zyk_rpg_class(ent)));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Level: ^7%d/%d\n^3Level Up Score: ^7%d/%d\n^3Skill Points: ^7%d\n^3Skill Counter: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.level, zyk_rpg_max_level.integer, ent->client->pers.level_up_score, (ent->client->pers.level * zyk_level_up_score_factor.integer), ent->client->pers.skillpoints, ent->client->pers.skill_counter, zyk_max_skill_counter.integer, ent->client->pers.magic_power, zyk_max_magic_power(ent), ent->client->pers.credits));
 }
 
 /*
@@ -6371,7 +6127,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 			if (Q_stricmp( arg1, "rpg" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list ammo: ^7lists ammo skills\n^2/list items: ^7lists holdable items skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list classes: ^7lists the RPG classes\n^2/list stuff: ^7lists upgrades bought from seller\n\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list ammo: ^7lists ammo skills\n^2/list items: ^7lists holdable items skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list stuff: ^7lists upgrades bought from seller\n\n\"");
 			}
 			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || Q_stricmp( arg1, "other" ) == 0 || 
 					 Q_stricmp( arg1, "ammo" ) == 0 || Q_stricmp( arg1, "items" ) == 0 || Q_stricmp(arg1, "magic") == 0)
@@ -6463,10 +6219,6 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			else if (Q_stricmp( arg1, "commands" ) == 0)
 			{
 				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/new [login] [password]: ^7creates a new account.\n^3/login [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill. Passing ^3all ^7as parameter upgrades all skills.\n^3/down [skill number]: ^7downgrades a skill.\n^3/resetaccount: ^7resets account stuff of the player.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/callseller: ^7calls the jawa seller.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/logout: ^7logs out the account.\n\n\"" );
-			}
-			else if (Q_stricmp( arg1, "classes" ) == 0)
-			{
-				trap->SendServerCommand(ent->s.number, va("print \"\n^3%d - %s\n^7 Starting class. Change to one of the other classes as soon as possible\n^3%d - %s\n^7 Can have almost all skills. All-round class\n^3%d - %s\n^7 Saber/force class. Force powers use less force. Regens force faster. Each 5 levels increase saber damage a little\n^3%d - %s\n^7 Gun class. Higher max ammo, stronger items and more credits in battles\n^3%d - %s\n^7 Magic-based class. Shoots magic bolts from melee. Learns all magic powers\n\n^3/rpgclass <class number>\n\"", RPGCLASS_CIVILIAN, zyk_get_class_name(RPGCLASS_CIVILIAN), RPGCLASS_FREE_WARRIOR, zyk_get_class_name(RPGCLASS_FREE_WARRIOR), RPGCLASS_FORCE_USER, zyk_get_class_name(RPGCLASS_FORCE_USER), RPGCLASS_GUNNER, zyk_get_class_name(RPGCLASS_GUNNER), RPGCLASS_WIZARD, zyk_get_class_name(RPGCLASS_WIZARD)));
 			}
 			else if (Q_stricmp( arg1, "stuff" ) == 0)
 			{
@@ -6895,81 +6647,6 @@ void zyk_add_mp(gentity_t* ent, int mp_amount)
 	send_rpg_events(2000);
 }
 
-// zyk: tests which skills are allowed for each class
-qboolean zyk_seller_item_allowed_for_class(int item_index, int rpg_class)
-{
-	int i = 0;
-
-	int classes_allowed_for_items[MAX_SELLER_ITEMS][NUM_RPG_CLASSES + 1] = { // zyk: each index is a seller item, and contains an array of allowed RPG classes
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Blaster Pack
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Powercell
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Metal Bolts
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Rockets
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Thermals
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Trip Mines
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Detpacks
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Ammo All
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Flame Thrower Fuel
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Shield Booster
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Sentry Gun
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Seeker Drone
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Bacta Canister
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Force Field
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Big Bacta
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // E-Web
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Binoculars
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Jetpack
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Cloak Item
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Blaster Pistol
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Bryar Pistol
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // E11 Blaster Rifle
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Disruptor
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Bowcaster
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // DEMP2
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Repeater
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Flechette
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Concussion Rifle
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Rocket Launcher
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Stun Baton
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Ysalamiri
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Jetpack Fuel
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, -1}, // Force Boon
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Magic Potion
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1},
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Holdable Items Upgrade
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Impact Reducer
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Flame Thrower
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Blaster Pack Upgrade
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Powercell Upgrade
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Metal Bolts Upgrade
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, -1}, // Rockets Upgrade
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_FORCE_USER, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Stun Baton Upgrade
-		{RPGCLASS_FREE_WARRIOR, RPGCLASS_GUNNER, RPGCLASS_WIZARD, -1}, // Jetpack Upgrade
-		{RPGCLASS_GUNNER, -1}, // Swimming Upgrade
-		{RPGCLASS_GUNNER, -1}, // Gunner Radar
-		{RPGCLASS_GUNNER, -1}, // Thermal Vision
-		{RPGCLASS_GUNNER, -1}, // Gunner Items Upgrade
-		{RPGCLASS_GUNNER, -1}, // Inventory Capacity
-		{RPGCLASS_GUNNER, -1} // Energy Modulator
-	};
-
-	for (i = 0; i < NUM_RPG_CLASSES; i++)
-	{
-		if (classes_allowed_for_items[item_index][i] == -1)
-		{ // zyk: end of classes array, stops the loop
-			break;
-		}
-
-		if (classes_allowed_for_items[item_index][i] == rpg_class)
-		{ // zyk: skill is allowed for this class
-			return qtrue;
-		}
-	}
-
-	return qfalse;
-}
-
 /*
 ==================
 Cmd_Buy_f
@@ -7028,13 +6705,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			trap->SendServerCommand(ent->s.number, "print \"You must be near the jawa seller to buy from him.\n\"" );
 			return;
 		}
-	}
-
-	// zyk: class validations. Some items are allowed for specific classes
-	if (zyk_seller_item_allowed_for_class((value - 1), ent->client->pers.rpg_class) == qfalse)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"%s can't buy this item.\n\"", zyk_rpg_class(ent)));
-		return;
 	}
 
 	// zyk: general validations. Some items require certain conditions to be bought
@@ -7168,47 +6838,22 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == (SELLER_BACTA_CANISTER + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC);
-
-			if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.gunner_items[GUNNERITEM_BACTA_CANISTER] < NUMBER_OF_GUNNER_ITEMS)
-			{
-				ent->client->pers.gunner_items[GUNNERITEM_BACTA_CANISTER]++;
-			}
 		}
 		else if (value == (SELLER_BIG_BACTA + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC_BIG);
-
-			if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.gunner_items[GUNNERITEM_BIG_BACTA] < NUMBER_OF_GUNNER_ITEMS)
-			{
-				ent->client->pers.gunner_items[GUNNERITEM_BIG_BACTA]++;
-			}
 		}
 		else if (value == (SELLER_SENTRY_GUN + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
-
-			if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN] < NUMBER_OF_GUNNER_ITEMS)
-			{
-				ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN]++;
-			}
 		}
 		else if (value == (SELLER_SEEKER_DRONE + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
-
-			if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE] < NUMBER_OF_GUNNER_ITEMS)
-			{
-				ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE]++;
-			}
 		}
 		else if (value == (SELLER_FORCE_FIELD + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
-
-			if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD] < NUMBER_OF_GUNNER_ITEMS)
-			{
-				ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD]++;
-			}
 		}
 		else if (value == (SELLER_YSALAMIRI + 1))
 		{
@@ -7521,21 +7166,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_MEDPAC);
 
-		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.gunner_items[GUNNERITEM_BACTA_CANISTER] > 0)
-		{
-			ent->client->pers.gunner_items[GUNNERITEM_BACTA_CANISTER]--;
-		}
-
 		sold = 1;
 	}
 	else if (value == (SELLER_BIG_BACTA + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC_BIG))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_MEDPAC_BIG);
-
-		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.gunner_items[GUNNERITEM_BIG_BACTA] > 0)
-		{
-			ent->client->pers.gunner_items[GUNNERITEM_BIG_BACTA]--;
-		}
 
 		sold = 1;
 	}
@@ -7543,32 +7178,17 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SENTRY_GUN);
 
-		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN] > 0)
-		{
-			ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN]--;
-		}
-
 		sold = 1;
 	}
 	else if (value == (SELLER_SEEKER_DRONE + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SEEKER);
 
-		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE] > 0)
-		{
-			ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE]--;
-		}
-
 		sold = 1;
 	}
 	else if (value == (SELLER_FORCE_FIELD + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SHIELD))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SHIELD);
-
-		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD] > 0)
-		{
-			ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD]--;
-		}
 
 		sold = 1;
 	}
@@ -8326,78 +7946,6 @@ void Cmd_Settings_f( gentity_t *ent ) {
 	}
 }
 
-void do_change_class(gentity_t *ent, int value)
-{
-	int i = 0;
-	int old_class = ent->client->pers.rpg_class;
-
-	if (value <= RPGCLASS_CIVILIAN || value >= NUM_RPG_CLASSES)
-	{
-		trap->SendServerCommand(ent->s.number, "print \"Invalid RPG Class.\n\"" );
-		return;
-	}
-
-	if (ent->client->pers.rpg_class != RPGCLASS_CIVILIAN)
-	{
-		trap->SendServerCommand(ent->s.number, "print \"You cannot change class after you already changed to a class.\n\"" );
-		return;
-	}
-
-	// zyk: change the class
-	ent->client->pers.rpg_class = value;
-
-	// zyk validating the new class
-	if (validate_rpg_class(ent) == qfalse)
-	{
-		ent->client->pers.rpg_class = old_class;
-
-		trap->SendServerCommand(ent->s.number, va("print \"You are still a %s\n\"", zyk_rpg_class(ent)));
-		return;
-	}
-
-	ent->client->pers.rpg_class = value;
-
-	// zyk: resetting skills
-	for (i = 0; i < NUMBER_OF_SKILLS; i++)
-	{
-		while (ent->client->pers.skill_levels[i] > 0)
-		{
-			ent->client->pers.skill_levels[i]--;
-			ent->client->pers.skillpoints++;
-		}
-	}
-
-	save_account(ent, qtrue);
-
-	trap->SendServerCommand(ent->s.number, va("print \"You are now a %s\n\"", zyk_rpg_class(ent)) );
-
-	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
-	{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-		G_Kill(ent);
-	}
-}
-
-/*
-==================
-Cmd_RpgClass_f
-==================
-*/
-void Cmd_RpgClass_f( gentity_t *ent ) {
-	char arg1[MAX_STRING_CHARS];
-	int value = 0;
-
-	if (trap->Argc() == 1)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Look at ^3/list classes ^7to see the class number, then ^2/rpgclass <class number>^7\n\"" );
-		return;
-	}
-
-	trap->Argv(1, arg1, sizeof( arg1 ));
-	value = atoi(arg1);
-
-	do_change_class(ent, value);
-}
-
 /*
 ==================
 Cmd_BountyQuest_f
@@ -8951,20 +8499,6 @@ void Cmd_Drop_f( gentity_t *ent ) {
 
 			// zyk: remove item from inventory
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << item->giTag);
-
-			// zyk: if the player is a Gunner, decrease the item counter for items that the Gunner can carry more than one
-			if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
-			{
-				int i = 0;
-
-				for (i = 0; i < MAX_GUNNER_ITEMS; i++)
-				{
-					if (ent->client->pers.gunner_items[i] > 0 && item->giTag == zyk_get_holdable_item_tag(i))
-					{
-						ent->client->pers.gunner_items[i]--;
-					}
-				}
-			}
 
 			zyk_adjust_holdable_items(ent);
 		}
@@ -13935,7 +13469,6 @@ command_t commands[] = {
 	{ "remapsave",			Cmd_RemapSave_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "resetaccount",		Cmd_ResetAccount_f,			CMD_RPG|CMD_NOINTERMISSION },
 	{ "rpgchar",			Cmd_RpgChar_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
-	{ "rpgclass",			Cmd_RpgClass_f,				CMD_RPG|CMD_NOINTERMISSION },
 	{ "rpglmsmode",			Cmd_RpgLmsMode_f,			CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "rpglmstable",		Cmd_RpgLmsTable_f,			CMD_NOINTERMISSION },
 	{ "saber",				Cmd_Saber_f,				CMD_NOINTERMISSION },

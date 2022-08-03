@@ -1907,18 +1907,6 @@ void ammo_generic_power_converter_use( gentity_t *self, gentity_t *other, gentit
 		return;
 	}
 
-	// zyk: Gunner class has more max ammo
-	if (activator->client->sess.amrpgmode == 2 && activator->client->pers.rpg_class == RPGCLASS_GUNNER)
-	{
-		max_blasterpack_ammo += max_blasterpack_ammo/ 8.0 * activator->client->pers.skill_levels[38];
-		max_powercell_ammo += max_powercell_ammo/ 8.0 * activator->client->pers.skill_levels[38];
-		max_metalbolt_ammo += max_metalbolt_ammo/ 8.0 * activator->client->pers.skill_levels[38];
-		max_rocket_ammo += max_rocket_ammo/ 8.0 * activator->client->pers.skill_levels[38];
-		max_thermal_ammo += max_thermal_ammo/ 8.0 * activator->client->pers.skill_levels[38];
-		max_tripmine_ammo += max_tripmine_ammo/ 8.0 * activator->client->pers.skill_levels[38];
-		max_detpack_ammo += max_detpack_ammo/ 8.0 * activator->client->pers.skill_levels[38];
-	}
-
 	if (self->setTime < level.time)
 	{
 		int i = AMMO_BLASTER;
@@ -1962,13 +1950,6 @@ void ammo_generic_power_converter_use( gentity_t *self, gentity_t *other, gentit
 			{
 				// zyk: changed this. Now it will use Add_Ammo function
 				// activator->client->ps.ammo[i] += add;
-
-				// zyk: some RPG classes cannot get ammo
-				if (activator->client->sess.amrpgmode == 2 && 
-					(activator->client->pers.rpg_class == RPGCLASS_FORCE_USER || activator->client->pers.rpg_class == RPGCLASS_WIZARD))
-				{
-					break;
-				}
 
 				if (level.gametype != GT_SIEGE)
 				{

@@ -175,7 +175,7 @@ void P_WorldEffects( gentity_t *ent ) {
 			// drown!
 			ent->client->airOutTime += 1000;
 			if ( ent->health > 0 && ent->client->tempSpectate < level.time && 
-				!(ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_SWIMMING)))
+				!(ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_SWIMMING)))
 			{ // zyk: Swimming Upgrade Upgrade protects Gunner from drowning
 				// take more damage the longer underwater
 				ent->damage += 2;
@@ -931,7 +931,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		else if (!(client->pers.player_statuses & (1 << 2)))
 		{ // zyk: send this event after some seconds in map and if the player did not received this event yet
 			// must wait some seconds because after a map change, sometimes the event is not received by the client-side game right away
-			if (client->sess.amrpgmode == 2 && client->pers.rpg_class == RPGCLASS_GUNNER && client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_RADAR))
+			if (client->sess.amrpgmode == 2 && client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_RADAR))
 			{
 				G_AddEvent(ent, EV_ITEMUSEFAIL, 5);
 			}
@@ -953,7 +953,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		else if (!(client->pers.player_statuses & (1 << 7)))
 		{ // zyk: tells the RPG class to the client-side mod to render the Force Shield effect
 			if (client->sess.amrpgmode == 2)
-				G_AddEvent(ent, EV_USE_ITEM13, (104 + client->pers.rpg_class));
+				G_AddEvent(ent, EV_USE_ITEM13, (106));
 			else
 				G_AddEvent(ent, EV_USE_ITEM13, 114);
 
@@ -3567,8 +3567,8 @@ void ClientThink_real( gentity_t *ent ) {
 							zyk_energy_modulator(ent);
 						}
 					}
-					else if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.rpg_class == RPGCLASS_WIZARD)
-					{ // zyk: Magic Master Fist attacks
+					else if (ent->client->ps.weapon == WP_MELEE)
+					{ // zyk: Magic Fist attacks
 						if (ent->client->sess.magic_fist_selection < 5 && ent->client->sess.magic_fist_selection < ent->client->pers.skill_levels[38])
 							ent->client->sess.magic_fist_selection++;
 						else if (ent->client->sess.magic_fist_selection == 5)

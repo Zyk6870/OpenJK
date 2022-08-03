@@ -527,16 +527,6 @@ typedef enum {
 	ADM_NUM_CMDS
 } zyk_admin_t;
 
-// zyk: RPG Classes
-typedef enum {
-	RPGCLASS_CIVILIAN,
-	RPGCLASS_FREE_WARRIOR,
-	RPGCLASS_FORCE_USER,
-	RPGCLASS_GUNNER,
-	RPGCLASS_WIZARD,
-	NUM_RPG_CLASSES
-} zyk_rpgclass_t;
-
 // zyk: magic powers values
 typedef enum {
 	MAGIC_MAGIC_SENSE,
@@ -862,15 +852,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: turn on or off features of this player in his account file. It is a bit value attribute that uses the zyk_settings_t enum values
 	int player_settings;
-
-	// zyk: used to set the player class in the RPG Mode
-	// Possible values are:
-	// 0 - Civilian (default)
-	// 1 - Free Warrior
-	// 2 - Force User
-	// 3 - Gunner
-	// 4 - Magician
-	int rpg_class;
 
 	// zyk: this is the cooldown timer of the Unique Skill used by some RPG classes
 	int unique_skill_timer;
