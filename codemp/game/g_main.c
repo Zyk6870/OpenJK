@@ -9947,8 +9947,7 @@ void G_RunFrame( int levelTime ) {
 			}
 		}
 
-		// zyk: added check for mind control on npcs here. NPCs being mind controlled cant think
-		if (!(ent && ent->client && ent->client->pers.being_mind_controlled != -1))
+		if (ent) // zyk: testing if ent is not NULL
 			G_RunThink( ent );
 
 		if (g_allowNPC.integer)

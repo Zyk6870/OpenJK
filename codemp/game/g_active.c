@@ -4054,15 +4054,6 @@ void ClientThink( int clientNum, usercmd_t *ucmd ) {
 	// phone jack if they don't get any for a while
 	ent->client->lastCmdTime = level.time;
 
-	if (!ent->NPC)
-	{ // zyk: applying mind control action if this player is controlling another player or a npc
-		if (ent->client->pers.mind_controlled1_id != -1)
-		{
-			g_entities[ent->client->pers.mind_controlled1_id].client->pers.cmd = ent->client->pers.cmd;
-			ClientThink_real(&g_entities[ent->client->pers.mind_controlled1_id]);
-		}
-	}
-
 	if (ucmd)
 	{
 		ent->client->pers.cmd = *ucmd;
@@ -4095,9 +4086,7 @@ void ClientThink( int clientNum, usercmd_t *ucmd ) {
 	}
 */
 	if ( !(ent->r.svFlags & SVF_BOT) && !g_synchronousClients.integer ) {
-		// zyk: player or npc who is not being mind controlled can think
-		if (ent->client->pers.being_mind_controlled == -1)
-			ClientThink_real( ent );
+		ClientThink_real( ent );
 	}
 	// vehicles are clients and when running synchronous they still need to think here
 	// so special case them.

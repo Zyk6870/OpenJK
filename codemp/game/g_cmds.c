@@ -5326,7 +5326,7 @@ void add_new_char(gentity_t *ent)
 
 	ent->client->pers.rpg_upgrades = 0;
 	ent->client->pers.credits = 100;
-	ent->client->sess.magic_fist_selection = 0;
+	ent->client->sess.magic_fist_selection = 5;
 }
 
 // zyk: creates the directory correctly depending on the OS
@@ -5598,18 +5598,6 @@ Cmd_LogoutAccount_f
 ==================
 */
 void Cmd_LogoutAccount_f( gentity_t *ent ) {
-	if (ent->client->pers.being_mind_controlled != -1)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"You cant logout while being mind-controlled.\n\"" );
-		return;
-	}
-
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.mind_controlled1_id != -1)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"You cant logout while using Mind Control on someone.\n\"" );
-		return;
-	}
-
 	if (level.duel_tournament_mode > 0 && level.duel_players[ent->s.number] != -1)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Cannot logout while in a Duel Tournament\n\"");
@@ -5626,10 +5614,6 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 	ent->client->sess.amrpgmode = 0;
 
 	ent->client->pers.bitvalue = 0;
-
-	// zyk: initializing mind control attributes used in RPG mode
-	ent->client->pers.being_mind_controlled = -1;
-	ent->client->pers.mind_controlled1_id = -1;
 
 	// zyk: resetting the forcePowerMax to the cvar value
 	ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
@@ -7367,7 +7351,7 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 
 	ent->client->pers.credits = 100;
 
-	ent->client->sess.magic_fist_selection = 0;
+	ent->client->sess.magic_fist_selection = 5;
 
 	ent->client->pers.main_quest_progress = 0;
 	ent->client->pers.side_quest_progress = 0;

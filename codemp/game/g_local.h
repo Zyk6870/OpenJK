@@ -906,12 +906,6 @@ typedef struct clientPersistant_s {
 	int sense_health_timer; // zyk: used to periodically show health of player or npc with Sense Health skill
 
 	int flame_thrower; // zyk: used by stun baton. Its the flame thrower timer
-	
-	// zyk: tests if this player or npc is being mind controlled by a player. If -1, means that he is not being controlled, otherwise it has the player id of the player who is controlling this player or npc
-	int being_mind_controlled;
-
-	// zyk: entity ids of the mind controlled entities. Default -1, which means player is not controlling anyone
-	int mind_controlled1_id;
 
 	// zyk: Upgrades bought from the seller
 	int rpg_upgrades;

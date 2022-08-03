@@ -1770,8 +1770,6 @@ finish:
 		int zyk_it = 0;
 
 		newent->client->sess.amrpgmode = 0;
-		newent->client->pers.being_mind_controlled = -1;
-		newent->client->pers.mind_controlled1_id = -1;
 		newent->client->pers.player_statuses = 0;
 		newent->client->pers.race_position = 0;
 		newent->client->pers.seller_invoked_by_id = -1;

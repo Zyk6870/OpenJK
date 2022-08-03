@@ -2680,9 +2680,6 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	ent->playerState = &ent->client->ps;
 
 	// zyk: initializing attributes used in RPG mode
-	client->pers.being_mind_controlled = -1;
-	client->pers.mind_controlled1_id = -1;
-
 	// zyk: cooldown time between magic powers
 	client->pers.quest_power_usage_timer = 0;
 
@@ -3831,9 +3828,6 @@ void ClientSpawn(gentity_t *ent) {
 	VectorCopy( spawn_origin, client->ps.origin );
 
 	// zyk: initializing mind control attributes on spawn time
-	ent->client->pers.being_mind_controlled = -1;
-	ent->client->pers.mind_controlled1_id = -1;
-
 	// zyk: loading default value of race_position
 	ent->client->pers.race_position = 0;
 
@@ -4249,19 +4243,6 @@ void ClientDisconnect( int clientNum ) {
 	ent->r.contents = 0;
 
 	level.read_screen_message[ent->s.number] = qfalse;
-
-	// zyk: if this player is being mind controlled, stops mind control on him
-	if (ent->client->pers.being_mind_controlled != -1)
-	{
-		gentity_t *mind_controller = &g_entities[ent->client->pers.being_mind_controlled];
-
-		if (mind_controller->client->pers.mind_controlled1_id == (ent-g_entities))
-		{
-			mind_controller->client->pers.mind_controlled1_id = -1;
-		}
-
-		ent->client->pers.being_mind_controlled = -1;
-	}
 
 	// zyk: if this was the target player, sets qtrue to choose another target
 	if (level.bounty_quest_choose_target == qfalse && level.bounty_quest_target_id == (ent-g_entities))

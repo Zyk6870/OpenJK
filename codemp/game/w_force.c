@@ -458,14 +458,6 @@ void WP_SpawnInitForcePowers( gentity_t *ent )
 	ent->client->ps.fd.forceMindtrickTargetIndex3 = 0;
 	ent->client->ps.fd.forceMindtrickTargetIndex4 = 0;
 
-	// zyk: remove mind control from these players or npcs
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_FORCE_USER && ent->client->pers.mind_controlled1_id != -1)
-	{
-		gentity_t *tricked_entity = &g_entities[ent->client->pers.mind_controlled1_id];
-		ent->client->pers.mind_controlled1_id = -1;
-		tricked_entity->client->pers.being_mind_controlled = -1;
-	}
-
 	ent->client->ps.holocronBits = 0;
 
 	i = 0;
@@ -2953,24 +2945,6 @@ void ForceTelepathy(gentity_t *self)
 			if (!tricked_entity->NPC) // zyk: NPCs wont have the glowing head effect of mind trick because of how the game handles the tricked entities
 				WP_AddAsMindtricked(&self->client->ps.fd, tr.entityNum);
 
-			// zyk: mind control this player, if he is not being mind controlled by someone else
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && 
-				(tricked_entity->NPC || (tricked_entity->client->sess.sessionTeam != TEAM_SPECTATOR && tricked_entity->inuse == qtrue)) && 
-				tricked_entity->s.NPC_class != CLASS_VEHICLE && tricked_entity->client->pers.being_mind_controlled == -1 && 
-				self->client->pers.being_mind_controlled == -1 && 
-				((tricked_entity->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[11] > tricked_entity->client->pers.skill_levels[4]) || 
-				(tricked_entity->client->sess.amrpgmode != 2 && self->client->pers.skill_levels[11] > tricked_entity->client->ps.fd.forcePowerLevel[FP_SEE])) && tricked_entity->health > 0 && 
-				self->client->ps.hasLookTarget && self->client->ps.lookTarget == tricked_entity->s.number)
-			{
-				if (self->client->pers.mind_controlled1_id == -1)
-				{
-					self->client->pers.mind_controlled1_id = tricked_entity-g_entities;
-					tricked_entity->client->pers.being_mind_controlled = self-g_entities;
-
-					trap->SendServerCommand( tricked_entity-g_entities, va("cp \"^7You are being Mind-Controlled by ^7%s\n\"", self->client->pers.netname ) );
-				}
-			}
-
 			if ( !tookPower )
 			{
 				WP_ForcePowerStart( self, FP_TELEPATHY, 0 );
@@ -3041,23 +3015,6 @@ void ForceTelepathy(gentity_t *self)
 
 				if (!ent->NPC) // zyk: NPCs wont have the glowing head effect of mind trick because of how the game handles the tricked entities
 					WP_AddAsMindtricked(&self->client->ps.fd, ent->s.number);
-
-				// zyk: mind control this player, if he is not being mind controlled by someone else
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && 
-					(ent->NPC || (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->inuse == qtrue)) && ent->s.NPC_class != CLASS_VEHICLE && 
-					ent->client->pers.being_mind_controlled == -1 && self->client->pers.being_mind_controlled == -1 && 
-					((ent->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[11] > ent->client->pers.skill_levels[4]) || 
-					(ent->client->sess.amrpgmode != 2 && self->client->pers.skill_levels[11] > ent->client->ps.fd.forcePowerLevel[FP_SEE])) && 
-					ent->health > 0 && self->client->ps.hasLookTarget && self->client->ps.lookTarget == ent->s.number)
-				{
-					if (self->client->pers.mind_controlled1_id == -1)
-					{
-						self->client->pers.mind_controlled1_id = ent-g_entities;
-						ent->client->pers.being_mind_controlled = self-g_entities;
-
-						trap->SendServerCommand( ent-g_entities, va("cp \"^7You are being Mind-Controlled by ^7%s\n\"", self->client->pers.netname ) );
-					}
-				}
 			}
 			e++;
 		}
@@ -4124,14 +4081,6 @@ void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower )
 	case FP_PULL:
 		break;
 	case FP_TELEPATHY:
-		// zyk: remove mind control from these players or npcs
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && self->client->pers.mind_controlled1_id != -1)
-		{
-			tricked_entity = &g_entities[self->client->pers.mind_controlled1_id];
-			self->client->pers.mind_controlled1_id = -1;
-			tricked_entity->client->pers.being_mind_controlled = -1;
-		}
-
 		if (wasActive & (1 << FP_TELEPATHY))
 		{
 			G_Sound( self, CHAN_AUTO, G_SoundIndex("sound/weapons/force/distractstop.wav") );
@@ -4549,11 +4498,8 @@ static void WP_UpdateMindtrickEnts(gentity_t *self)
 				if (trap->InPVS(ent->client->ps.origin, self->client->ps.origin) &&
 					OrgVisible(ent->client->ps.origin, self->client->ps.origin, ent->s.number))
 				{
-					if (self->client->sess.amrpgmode < 2 || self->client->pers.rpg_class != RPGCLASS_FORCE_USER)
-					{ // zyk: Force User wont stop Mind Trick (specially because it may be a Mind Control) and Stealth Attacker Ultra Cloak
-						if (ent && !ent->NPC) // zyk: remove tricked entity only for players
-							RemoveTrickedEnt(&self->client->ps.fd, i);
-					}
+					if (ent && !ent->NPC) // zyk: remove tricked entity only for players
+						RemoveTrickedEnt(&self->client->ps.fd, i);
 				}
 			}
 			else if (BG_HasYsalamiri(level.gametype, &ent->client->ps))
@@ -4568,8 +4514,8 @@ static void WP_UpdateMindtrickEnts(gentity_t *self)
 	if (!self->client->ps.fd.forceMindtrickTargetIndex &&
 		!self->client->ps.fd.forceMindtrickTargetIndex2 &&
 		!self->client->ps.fd.forceMindtrickTargetIndex3 &&
-		!self->client->ps.fd.forceMindtrickTargetIndex4 && self->client->pers.mind_controlled1_id == -1)
-	{ //everyone who we had tricked is no longer tricked, so stop the power. zyk: added the mind control conditions
+		!self->client->ps.fd.forceMindtrickTargetIndex4)
+	{ //everyone who we had tricked is no longer tricked, so stop the power
 		WP_ForcePowerStop(self, FP_TELEPATHY);
 	}
 	else if (self->client->ps.powerups[PW_REDFLAG] ||
@@ -5765,14 +5711,6 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 		self->client->ps.fd.forceMindtrickTargetIndex2 = 0;
 		self->client->ps.fd.forceMindtrickTargetIndex3 = 0;
 		self->client->ps.fd.forceMindtrickTargetIndex4 = 0;
-
-		// zyk: remove mind control from these players or npcs
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && self->client->pers.mind_controlled1_id != -1)
-		{
-			gentity_t *tricked_entity = &g_entities[self->client->pers.mind_controlled1_id];
-			self->client->pers.mind_controlled1_id = -1;
-			tricked_entity->client->pers.being_mind_controlled = -1;
-		}
 	}
 
 	if (self->health < 1)

@@ -2252,21 +2252,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			level.melee_players[attacker->s.number]++;
 		}
 	}
-
-	// zyk: if player dies being mind controlled or controlling someone, stop mind control
-	if (self->client->pers.being_mind_controlled > -1)
-	{
-		gentity_t *controller_ent = &g_entities[self->client->pers.being_mind_controlled];
-		controller_ent->client->pers.mind_controlled1_id = -1;
-		self->client->pers.being_mind_controlled = -1;
-	}
-
-	if (!self->NPC && self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && self->client->pers.mind_controlled1_id > -1)
-	{
-		gentity_t *controlled_ent = &g_entities[self->client->pers.mind_controlled1_id];
-		self->client->pers.mind_controlled1_id = -1;
-		controlled_ent->client->pers.being_mind_controlled = -1;
-	}
 	
 	if (self->client->sess.amrpgmode == 2)
 	{ 
