@@ -700,7 +700,7 @@ typedef enum {
 } zyk_map_music_t;
 
 // zyk: number of RPG Mode skills
-#define NUMBER_OF_SKILLS 90
+#define NUMBER_OF_SKILLS 102
 
 // zyk: number of Elemental Spirits
 #define NUMBER_OF_MAGIC_SPIRITS 6

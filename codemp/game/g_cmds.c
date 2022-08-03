@@ -155,6 +155,18 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	1, // Unique Skill 4
 	1, // Unique Skill 5
 	1, // Unique Skill 6
+	1, // Unique Skill 7
+	1, // Unique Skill 8
+	1, // Unique Skill 9
+	1, // Unique Skill 10
+	1, // Unique Skill 11
+	1, // Unique Skill 12
+	1, // Unique Skill 13
+	1, // Unique Skill 14
+	1, // Unique Skill 15
+	1, // Unique Skill 16
+	1, // Unique Skill 17
+	1, // Unique Skill 18
 	2, // Magic Sense
 	2, // Healing Area
 	2, // Enemy Weakening
@@ -245,12 +257,24 @@ char* zyk_skill_name(int skill_index)
 		"Cloak Item",
 		"Force Power",
 		"Max MP",
-		"Unique Skill 1",
-		"Unique Skill 2",
-		"Unique Skill 3",
-		"Unique Skill 4",
-		"Unique Skill 5",
-		"Unique Skill 6",
+		"Vertical DFA",
+		"No Attack",
+		"Fast Dash",
+		"Force Shield",
+		"Force Maelstrom",
+		"Force Repulse",
+		"Force Scream",
+		"Force Storm",
+		"Force Attraction",
+		"Poison Darts",
+		"Homing Rocket",
+		"Lightning Shield",
+		"Timed Bomb",
+		"Aimed Shot",
+		"Faster Bolts",
+		"Meditation Drain",
+		"Elemental Attack",
+		"Super Beam",
 		"Magic Sense",
 		"Healing Area",
 		"Enemy Weakening",
@@ -6035,7 +6059,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp( arg1, "other" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 17, 30, 15);
+		zyk_list_category_skills(ent, target_ent, 11, 30, 15);
 	}
 	else if (Q_stricmp( arg1, "ammo" ) == 0)
 	{
@@ -6045,9 +6069,13 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	{
 		zyk_list_category_skills(ent, target_ent, 8, 46, 11);
 	}
+	else if (Q_stricmp(arg1, "unique") == 0)
+	{
+		zyk_list_category_skills(ent, target_ent, 18, 56, 18);
+	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 28, 62, 18);
+		zyk_list_category_skills(ent, target_ent, 28, 74, 18);
 	}
 }
 
@@ -6097,10 +6125,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 			if (Q_stricmp( arg1, "rpg" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list ammo: ^7lists ammo skills\n^2/list items: ^7lists holdable items skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list stuff: ^7lists upgrades bought from seller\n\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list ammo: ^7lists ammo skills\n^2/list items: ^7lists holdable items skills\n^2/list unique: ^7lists unique skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list stuff: ^7lists upgrades bought from seller\n\n\"");
 			}
 			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || Q_stricmp( arg1, "other" ) == 0 || 
-					 Q_stricmp( arg1, "ammo" ) == 0 || Q_stricmp( arg1, "items" ) == 0 || Q_stricmp(arg1, "magic") == 0)
+					 Q_stricmp( arg1, "ammo" ) == 0 || Q_stricmp( arg1, "items" ) == 0 || Q_stricmp(arg1, "unique") == 0 || Q_stricmp(arg1, "magic") == 0)
 			{
 				zyk_list_player_skills(ent, ent, G_NewString(arg1));
 			}
@@ -10281,7 +10309,7 @@ void Cmd_Players_f( gentity_t *ent ) {
 			trap->Argv( 2, arg2, sizeof( arg2 ) );
 
 			if (Q_stricmp(arg2, "force") == 0 || Q_stricmp(arg2, "weapons") == 0 || Q_stricmp(arg2, "other") == 0 || 
-				Q_stricmp(arg2, "ammo") == 0 || Q_stricmp(arg2, "items") == 0 || Q_stricmp(arg2, "magic") == 0)
+				Q_stricmp(arg2, "ammo") == 0 || Q_stricmp(arg2, "items") == 0 || Q_stricmp(arg2, "unique") == 0 || Q_stricmp(arg2, "magic") == 0)
 			{ // zyk: show skills of the player
 				zyk_list_player_skills(player_ent, ent, G_NewString(arg2));
 			}
@@ -10572,24 +10600,29 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"You must pass a unique skill number. Example: ^3/unique <number from 1 to 18>^7\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"You must pass a unique skill number. Example: ^3/unique <number from 57 to 74>^7\n\"");
 		return;
 	}
 
 	trap->Argv(1, arg1, sizeof(arg1));
 	unique_skill_number = atoi(arg1);
 
-	if (unique_skill_number < 1 || unique_skill_number > 18)
+	if (unique_skill_number < 57 || unique_skill_number > 74)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"Must be a number between 1 and 18\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"Must be a number between 57 and 74\n\"");
 		return;
 	}
 
-	if (ent->client->pers.skill_levels[55 + unique_skill_number] < 1)
+	
+
+	if (ent->client->pers.skill_levels[unique_skill_number - 1] < 1)
 	{ // zyk: player did not upgrade the unique skill he is trying to use
 		trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7you don't have this Unique Skill\"");
 		return;
 	}
+
+	// zyk: uniques are set from 1 to 18
+	unique_skill_number -= 56;
 
 	if (ent->client->pers.active_unique_skill == 12)
 	{ // zyk: releasing the small lightning dome
