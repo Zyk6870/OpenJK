@@ -739,7 +739,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 
 	//VectorCopy( muzzle, muzzle2 ); // making a backup copy
 
-	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.active_unique_skill == 6)
+	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.active_unique_skill == 14)
 	{ // zyk: Aimed Shot ability
 		if (ent->client->pers.unique_skill_user_id > -1)
 		{ // zyk: if we have a target, shoot at him
@@ -2496,79 +2496,6 @@ gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean altFire )
 	return bolt;
 }
 
-// zyk: used by Thermal Throw ability
-gentity_t *zyk_WP_FireThermalDetonator(gentity_t *ent, int yaw)
-//---------------------------------------------------------
-{
-	gentity_t	*bolt;
-	vec3_t		dir, start;
-	float chargeAmount = 1.0f; // default of full charge
-
-	vec3_t zyk_origin, zyk_forward;
-
-	VectorSet(dir, ent->client->ps.viewangles[PITCH], yaw, 0);
-	VectorSet(zyk_origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 30);
-	AngleVectors(dir, zyk_forward, NULL, NULL);
-
-	VectorCopy(zyk_forward, dir);
-	VectorCopy(zyk_origin, start);
-
-	bolt = G_Spawn();
-
-	bolt->physicsObject = qtrue;
-
-	bolt->classname = "thermal_detonator";
-	bolt->think = thermalThinkStandard;
-	bolt->nextthink = level.time;
-	bolt->touch = touch_NULL;
-
-	// How 'bout we give this thing a size...
-	VectorSet(bolt->r.mins, -3.0f, -3.0f, -3.0f);
-	VectorSet(bolt->r.maxs, 3.0f, 3.0f, 3.0f);
-	bolt->clipmask = MASK_SHOT;
-
-	W_TraceSetStart(ent, start, bolt->r.mins, bolt->r.maxs);//make sure our start point isn't on the other side of a wall
-
-	// normal ones bounce, alt ones explode on impact
-	bolt->genericValue5 = level.time + TD_TIME; // How long 'til she blows
-	bolt->s.pos.trType = TR_GRAVITY;
-	bolt->parent = ent;
-	bolt->r.ownerNum = ent->s.number;
-	VectorScale(dir, zyk_thermal_velocity.integer * chargeAmount, bolt->s.pos.trDelta);
-
-	if (ent->health >= 0)
-	{
-		bolt->s.pos.trDelta[2] += 120;
-	}
-
-	bolt->s.loopSound = G_SoundIndex("sound/weapons/thermal/thermloop.wav");
-	bolt->s.loopIsSoundset = qfalse;
-
-	bolt->damage = zyk_thermal_damage.integer * 1.05;
-	bolt->dflags = 0;
-	bolt->splashDamage = zyk_thermal_splash_damage.integer * 1.05;
-	bolt->splashRadius = 160;
-
-	bolt->s.eType = ET_MISSILE;
-	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-	bolt->s.weapon = WP_THERMAL;
-
-	bolt->methodOfDeath = MOD_THERMAL;
-	bolt->splashMethodOfDeath = MOD_THERMAL_SPLASH;
-
-	bolt->s.pos.trTime = level.time;		// move a bit on the very first frame
-	VectorCopy(start, bolt->s.pos.trBase);
-
-	SnapVector(bolt->s.pos.trDelta);			// save net bandwidth
-	VectorCopy(start, bolt->r.currentOrigin);
-
-	VectorCopy(start, bolt->pos2);
-
-	bolt->bounceCount = -5;
-
-	return bolt;
-}
-
 gentity_t *WP_DropThermal( gentity_t *ent )
 {
 	AngleVectors( ent->client->ps.viewangles, forward, vright, up );
@@ -3900,12 +3827,11 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 
 	// zyk: starts flame thrower
 	if (ent->client && ent->client->sess.amrpgmode == 2 && alt_fire == qtrue && 
-		ent->client->pers.rpg_class != RPGCLASS_FORCE_USER && ent->client->pers.rpg_class != RPGCLASS_WIZARD &&
 		ent->client->pers.rpg_upgrades & (1 << UPGRADE_FLAME_THROWER) && ent->client->ps.cloakFuel > 0 && ent->waterlevel < 3)
 	{ // zyk: do not use flame thrower when underwater
 		int flame_thrower_fuel_usage = 2;
 
-		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.energy_modulator_mode == 1)
+		if (ent->client->pers.energy_modulator_mode == 1)
 		{ // zyk: Energy Modulator mode 1 decreases flame thrower fuel usage
 			flame_thrower_fuel_usage = 1;
 		}
@@ -4010,7 +3936,7 @@ int magic_fist_velocity(gentity_t *ent)
 	int magic_bolt_speed = zyk_magic_fist_velocity.integer;
 
 	if (ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 8) &&
-		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 2)
+		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 15)
 	{ // zyk: Faster Bolts skill increases speed of magic bolt shots
 		magic_bolt_speed += (magic_bolt_speed * 0.2);
 	}
@@ -4051,10 +3977,10 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 	}
 	else
 	{
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD)
-		{ // zyk: Magic Master fist attacks
+		if (ent->client->sess.amrpgmode == 2 && ent->client->sess.magic_fist_selection < 5)
+		{ // zyk: Magic fist attacks
 			if (ent->client->sess.magic_fist_selection == 0 && ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
-			{ // zyk: Magic Bolt
+			{ // zyk: Normal Bolt
 				vec3_t origin, dir, zyk_forward;
 				gentity_t *missile = NULL;
 
@@ -4075,14 +4001,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				VectorSet(missile->r.maxs, BOWCASTER_SIZE, BOWCASTER_SIZE, BOWCASTER_SIZE);
 				VectorScale(missile->r.maxs, -1, missile->r.mins);
 
-				if (ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
-				{// zyk: Magic Buff increases damage
-					missile->damage = zyk_magic_fist_damage.integer * 2;
-				}
-				else
-				{
-					missile->damage = zyk_magic_fist_damage.integer;
-				}
+				missile->damage = zyk_magic_fist_damage.integer;
 
 				missile->dflags = DAMAGE_DEATH_KNOCKBACK;
 				missile->methodOfDeath = MOD_MELEE;
@@ -4102,7 +4021,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			{ // zyk: Electric Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;
-				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * (1.6 + ((ent->client->pers.level * 1.0) / 200.0)));
+				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * 2.0);
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 12);
@@ -4123,14 +4042,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				VectorSet(missile->r.maxs, 2, 2, 2);
 				VectorScale(missile->r.maxs, -1, missile->r.mins);
 
-				if (ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
-				{ // zyk: Magic Buff increases damage
-					missile->damage = fist_damage * 2;
-				}
-				else
-				{
-					missile->damage = fist_damage;
-				}
+				missile->damage = fist_damage;
 
 				missile->dflags = DAMAGE_DEATH_KNOCKBACK;
 				missile->methodOfDeath = MOD_MELEE;
@@ -4157,12 +4069,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				float		shotRange = 8192.0f;
 				vec3_t shot_mins, shot_maxs;
 				int			i;
-				int damage = zyk_magic_fist_damage.integer * 1.2;
-
-				if (ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
-				{// zyk: Magic Buff increases damage
-					damage *= 2;
-				}
+				int damage = (int)ceil(zyk_magic_fist_damage.integer * 1.4);
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 12);
@@ -4355,7 +4262,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			{ // zyk: Fire Bolt
 				gentity_t* missile;
 				vec3_t origin, dir, zyk_forward;
-				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * (1.1 + ((ent->client->pers.level * 1.0) / 200.0)));
+				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * 1.8);
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 12);
@@ -4377,11 +4284,6 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				// How 'bout we give this thing a size...
 				VectorSet(missile->r.mins, -3.0f, -3.0f, -3.0f);
 				VectorSet(missile->r.maxs, 3.0f, 3.0f, 3.0f);
-
-				if (ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
-				{ // zyk: Magic Buff increases damage
-					fist_damage *= 2;
-				}
 
 				missile->damage = fist_damage;
 
@@ -4410,7 +4312,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			{ // zyk: Ultra Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;
-				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * (1.5 + ((ent->client->pers.level * 1.0) / 200.0)));
+				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * 2.2);
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 12);
@@ -4432,11 +4334,6 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				// Make it easier to hit things
 				VectorSet( missile->r.maxs, ROCKET_SIZE, ROCKET_SIZE, ROCKET_SIZE );
 				VectorScale( missile->r.maxs, -1, missile->r.mins );
-
-				if (ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 1)
-				{ // zyk: Magic Buff increases damage
-					fist_damage *= 2;
-				}
 
 				missile->damage = fist_damage;
 
@@ -4460,9 +4357,9 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				send_rpg_events(2000);
 			}
 		}
-		else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER &&
+		else if (ent->client->sess.amrpgmode == 2 &&
 				 ent->client->pers.unique_skill_duration > level.time &&
-				 ent->client->pers.active_unique_skill == 1 &&
+				 ent->client->pers.active_unique_skill == 10 &&
 				 ent->client->ps.ammo[AMMO_METAL_BOLTS] > 0)
 		{ // zyk: Poison Darts
 			vec3_t		fwd, dir, origin;
@@ -5500,7 +5397,7 @@ void FireWeapon( gentity_t *ent, qboolean altFire ) {
 		}
 	}
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_WIZARD && 
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && 
 		ent->client->sess.magic_fist_selection < 5 && ent->s.weapon == WP_MELEE)
 	{ // zyk: Magic Master can shoot from his hands
 		ent->client->accuracy_shots++;

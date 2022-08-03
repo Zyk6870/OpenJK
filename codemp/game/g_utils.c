@@ -1798,7 +1798,7 @@ void TryUse( gentity_t *ent )
 
 		return;
 	}
-	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) &&
+	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) &&
 			target && Q_stricmp(target->classname, "sentryGun") == 0 && target->parent && target->parent == ent &&
 			(
 			(ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY) && ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN] < NUMBER_OF_GUNNER_ITEMS) ||
@@ -1816,7 +1816,7 @@ void TryUse( gentity_t *ent )
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));
 		return;
 	}
-	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) &&
+	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) &&
 			target && target->s.eType == ET_SPECIAL && target->s.modelindex == HI_SHIELD && target->parent && target->parent == ent &&
 			(
 			 (ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY) && ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD] < NUMBER_OF_GUNNER_ITEMS) ||

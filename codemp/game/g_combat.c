@@ -4852,30 +4852,16 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	}
 
 	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
-	{ // zyk: bonus damage of each RPG class
-		if (attacker->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR)
-		{ // zyk: Free Warrior
-			damage = (int)ceil(damage * (1.0 + (0.03 * attacker->client->pers.skill_levels[38])));
+	{ // zyk: bonus damage
+		// zyk: Magic bolts can damage heavy things
+		if (mod == MOD_MELEE && inflictor && (inflictor->s.weapon == WP_BOWCASTER || inflictor->s.weapon == WP_DEMP2 || inflictor->s.weapon == WP_CONCUSSION))
+		{
+			can_damage_heavy_things = qtrue;
 		}
-		else if (attacker->client->pers.rpg_class == RPGCLASS_FORCE_USER && mod == MOD_SABER)
-		{ // zyk: Force User
-			float level_bonus_damage = 0.01 * (attacker->client->pers.level / 5);
 
-			damage = (int)ceil(damage * (1.0 + level_bonus_damage + (0.05 * attacker->client->pers.skill_levels[38])));
-		}
-		else if (attacker->client->pers.rpg_class == RPGCLASS_GUNNER && mod != MOD_SABER && mod != MOD_MELEE && mod != MOD_FORCE_DARK)
-		{ // zyk: Gunner
-			damage = (int)ceil(damage * (1.0 + (0.05 * attacker->client->pers.skill_levels[38])));
-
-			if (attacker->client->pers.energy_modulator_mode == 1 && mod != MOD_UNKNOWN)
-			{ // zyk: Energy Modulator mode 1 increases damage done by guns
-				damage = (int)ceil(damage * 1.3);
-			}
-		}
-		else if (attacker->client->pers.rpg_class == RPGCLASS_WIZARD && mod == MOD_MELEE)
-		{ // zyk: Magic bolts can damage heavy things
-			if (inflictor && (inflictor->s.weapon == WP_BOWCASTER || inflictor->s.weapon == WP_DEMP2 || inflictor->s.weapon == WP_CONCUSSION))
-				can_damage_heavy_things = qtrue;
+		if (attacker->client->pers.energy_modulator_mode == 1 && mod != MOD_UNKNOWN)
+		{ // zyk: Energy Modulator mode 1 increases damage done by weapons
+			damage = (int)ceil(damage * 1.3);
 		}
 	}
 
@@ -4980,52 +4966,39 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	}
 
 	if (targ && targ->client && targ->client->sess.amrpgmode == 2)
-	{ // zyk: damage resistance of each class
-		if (targ->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR) // zyk: Free Warrior damage resistance
-		{
-			// zyk: Free Warrior Mimic Damage ability. Deals half of the damage taken back to the enemy
-			if (attacker && attacker != targ && (!attacker->NPC ||
-				(attacker->client && (attacker->client->NPC_class != CLASS_RANCOR || !(targ->client->ps.eFlags2 & EF2_HELD_BY_MONSTER)))) &&
-				targ->client->pers.unique_skill_duration > level.time && targ->client->pers.active_unique_skill == 1)
-			{
-				if (!(attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR &&
-					attacker->client->pers.unique_skill_duration > level.time && attacker->client->pers.active_unique_skill == 1))
-				{ // zyk: Mimic Damage will not work if attacker pointer is also a Free Warrior using Mimic Damage
-					G_Damage(attacker, targ, targ, NULL, NULL, (int)ceil(damage * 0.5), 0, MOD_UNKNOWN);
-				}
-			}
+	{ // zyk: damage resistance
+		float bonus_resistance = 0.00;
 
-			damage = (int)ceil(damage * (1.0 - (0.03 * targ->client->pers.skill_levels[38])));
-		}
-		else if (targ->client->pers.rpg_class == RPGCLASS_FORCE_USER && targ->client->pers.active_unique_skill == 1 && 
-			targ->client->pers.unique_skill_duration > level.time)
+		if (targ->client->pers.active_unique_skill == 4 && targ->client->pers.unique_skill_duration > level.time)
 		{ // zyk: Force Shield
-			damage = (int)ceil(damage * 0.3);
+			bonus_resistance += 0.70;
 		}
-		else if (targ->client->pers.rpg_class == RPGCLASS_GUNNER)
-		{
-			float bonus_resistance = 0.0;
-
-			// zyk: Lightning Shield reduces damage
-			if (targ->client->pers.active_unique_skill == 3 && targ->client->pers.unique_skill_duration > level.time)
-			{
-				bonus_resistance += 0.25;
-			}
-
-			if (targ->client->pers.energy_modulator_mode == 2)
-			{ // zyk: Energy Modulator mode 2 decreases damage
-				bonus_resistance += 0.20;
-
-				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
-			}
 			
-			damage = (int)ceil(damage * (1.0 - ((0.05 * targ->client->pers.skill_levels[38]) + bonus_resistance)));
+		// zyk: Lightning Shield
+		if (targ->client->pers.active_unique_skill == 12 && targ->client->pers.unique_skill_duration > level.time)
+		{
+			bonus_resistance += 0.25;
 		}
-		else if (targ->client->pers.rpg_class == RPGCLASS_WIZARD &&
-				 targ->client->ps.legsAnim == BOTH_MEDITATE)
-		{ // zyk: Meditation Strength and Meditation Drain increases resistance to damage
-			if (targ->client->pers.active_unique_skill == 3 || targ->client->pers.active_unique_skill == 4)
-				damage = (int)ceil(damage * (0.5));
+
+		if (targ->client->pers.energy_modulator_mode == 2)
+		{ // zyk: Energy Modulator mode 2
+			bonus_resistance += 0.20;
+
+			targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
+		}
+			
+		if (targ->client->ps.legsAnim == BOTH_MEDITATE && targ->client->pers.active_unique_skill == 16)
+		{ // zyk: Meditation Drain
+			bonus_resistance += 0.50;
+		}
+
+		if (bonus_resistance >= 1.00)
+		{ // zyk: cannot make player fully absorb all damage
+			damage = 1;
+		}
+		else
+		{
+			damage = (int)ceil(damage * (1.00 - bonus_resistance));
 		}
 	}
 

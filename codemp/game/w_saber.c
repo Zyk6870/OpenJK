@@ -4337,14 +4337,11 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 				dmg = 0;
 		}
 
-		// zyk: Free Warrior saber Unique Skills. Heavily increases saber damage
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR &&
-			self->client->pers.unique_skill_duration > level.time)
+		// zyk: Vertical DFA unique skill heavily increases saber damage
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.active_unique_skill == 1 && self->client->pers.unique_skill_duration > level.time)
 		{
-			if (self->client->ps.torsoAnim == BOTH_FORCELEAP2_T__B_) // zyk: Vertical DFA
+			if (self->client->ps.torsoAnim == BOTH_FORCELEAP2_T__B_)
 				dmg = 28;
-			else if (self->client->ps.torsoAnim == BOTH_ALORA_SPIN_SLASH || self->client->ps.torsoAnim == BOTH_ALORA_SPIN_THROW) // zyk: Spin Throw
-				dmg = 55;
 		}
 
 		idleDamage = qtrue;

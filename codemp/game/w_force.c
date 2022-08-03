@@ -579,8 +579,8 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 	}
 
 	if (other && other->client && other->client->sess.amrpgmode == 2 && 
-		other->client->pers.rpg_class == RPGCLASS_FORCE_USER && other->client->pers.unique_skill_duration > level.time && 
-		other->client->pers.active_unique_skill == 1)
+		other->client->pers.unique_skill_duration > level.time && 
+		other->client->pers.active_unique_skill == 4)
 	{ // zyk: Force Shield protects against force powers
 		return 0;
 	}
@@ -5182,16 +5182,16 @@ void SeekerDroneUpdate(gentity_t *self)
 				VectorNormalize(endir);
 
 				// zyk: changed shot speed from 2000 to 4000
-				// zyk: changed damage when a Gunner uses the seeker drone
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+				// zyk: Gunner Items Upgrade increase seeker drone damage
+				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 					WP_FireGenericBlasterMissile(self, org, endir, qfalse, 20, 4000, MOD_BLASTER);
 				else
 					WP_FireGenericBlasterMissile(self, org, endir, qfalse, 15, 4000, MOD_BLASTER);
 
 				G_SoundAtLoc( org, CHAN_WEAPON, G_SoundIndex("sound/weapons/bryar/fire.wav") );
 
-				// zyk: Gunner has fast-shooting seeker drone
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_GUNNER && self->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+				// zyk: Gunner Items Upgrade makes a fast-shooting seeker drone
+				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 					self->client->ps.droneFireTime = level.time + Q_irand(200, 300);
 				else
 					self->client->ps.droneFireTime = level.time + Q_irand(400, 700);
@@ -5878,8 +5878,8 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 	}
 
 	if ( ucmd->buttons & BUTTON_FORCE_LIGHTNING || 
-		(self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER && 
-		 self->client->pers.active_unique_skill == 2 && self->client->pers.unique_skill_duration > level.time))
+		(self->client->sess.amrpgmode == 2 && 
+		 self->client->pers.active_unique_skill == 5 && self->client->pers.unique_skill_duration > level.time))
 	{ //lightning
 		WP_DoSpecificPower(self, ucmd, FP_LIGHTNING);
 	}
@@ -5969,8 +5969,6 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 			{
 				if ( self->client->ps.powerups[PW_FORCE_BOON] )
 					WP_ForcePowerRegenerate( self, 6 );
-				else if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_WIZARD && self->client->pers.active_unique_skill == 3 && self->client->ps.legsAnim == BOTH_MEDITATE)
-					WP_ForcePowerRegenerate(self, 6); // zyk: Meditation Strength
 				else if ( self->client->ps.isJediMaster && level.gametype == GT_JEDIMASTER )
 					WP_ForcePowerRegenerate( self, 4 ); //jedi master regenerates 4 times as fast
 				else if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_class == RPGCLASS_FORCE_USER)

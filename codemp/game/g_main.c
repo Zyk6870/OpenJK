@@ -5380,7 +5380,7 @@ void zyk_bomb_model_think(gentity_t *ent)
 
 	if (ent->count == 0)
 	{ // zyk: explodes the bomb
-		zyk_quest_effect_spawn(ent->parent, ent, "zyk_timed_bomb_explosion", "4", "explosions/hugeexplosion1", 0, 480, 430, 800);
+		zyk_quest_effect_spawn(ent->parent, ent, "zyk_timed_bomb_explosion", "4", "explosions/hugeexplosion1", 0, 500, 450, 800);
 
 		ent->think = G_FreeEntity;
 		ent->nextthink = level.time + 500;
@@ -5408,7 +5408,7 @@ void zyk_add_bomb_model(gentity_t *ent)
 
 	new_ent->parent = ent;
 	new_ent->think = zyk_bomb_model_think;
-	new_ent->nextthink = level.time + 1000;
+	new_ent->nextthink = level.time + 500;
 
 	zyk_spawn_entity(new_ent);
 
@@ -9355,7 +9355,7 @@ void G_RunFrame( int levelTime ) {
 						ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 					}
 
-					if (ent->client->pers.active_unique_skill == 6 && ent->client->pers.aimed_shot_timer < level.time)
+					if (ent->client->pers.active_unique_skill == 14 && ent->client->pers.aimed_shot_timer < level.time)
 					{ // zyk: Aimed Shot ability. Fires the full charged sniper shot
 						if (ent->health > 0)
 						{

@@ -842,9 +842,9 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 		if (client->sess.amrpgmode == 2 && !(client->pers.quest_power_status & (1 << 2)))
 		{ // zyk: healing abilities will only work if player is not hit by Time Power
-			if (client->pers.rpg_class == RPGCLASS_WIZARD && ent->health > 0 && client->ps.legsAnim == BOTH_MEDITATE &&
-				client->pers.unique_skill_duration > level.time && client->pers.active_unique_skill == 3)
-			{ // zyk: Meditation Strength
+			if (ent->health > 0 && client->ps.legsAnim == BOTH_MEDITATE &&
+				client->pers.unique_skill_duration > level.time && client->pers.active_unique_skill == 16)
+			{ // zyk: Meditation Drain
 				int heal_amount = 60;
 
 				if ((ent->health + heal_amount) < client->pers.max_rpg_health)
@@ -2732,7 +2732,7 @@ void ClientThink_real( gentity_t *ent ) {
 		client->ps.speed = zyk_player_speed;
 		client->ps.basespeed = zyk_player_speed;
 
-		if (client->sess.amrpgmode == 2 && client->pers.rpg_class == RPGCLASS_FREE_WARRIOR && client->pers.active_unique_skill == 5)
+		if (client->sess.amrpgmode == 2 && client->pers.active_unique_skill == 3)
 		{ // zyk: using Force Dash
 			zyk_do_force_dash(ent);
 		}

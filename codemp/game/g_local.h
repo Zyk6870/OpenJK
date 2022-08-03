@@ -814,9 +814,6 @@ typedef struct clientPersistant_s {
 	int fire_bolt_user_id;
 	int fire_bolt_hits_counter;
 
-	// zyk: used by Wrist Shot ability
-	int wrist_shot_counter;
-
 	// zyk: cooldown time to buy or sell
 	int buy_sell_timer;
 

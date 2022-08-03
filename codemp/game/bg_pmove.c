@@ -10609,8 +10609,6 @@ void PmoveSingle (pmove_t *pmove) {
 
 #if defined( _GAME )
 	gentity_t *player_ent = NULL;
-
-	int rpg_class = -1;
 #endif
 
 	pm = pmove;
@@ -10674,11 +10672,6 @@ void PmoveSingle (pmove_t *pmove) {
 
 #if defined( _GAME )
 	player_ent = &g_entities[pm->ps->clientNum];
-
-	if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
-	{
-		rpg_class = player_ent->client->pers.rpg_class;
-	}
 #endif
 
 	if (pm->ps->pm_type == PM_FLOAT)
@@ -10772,13 +10765,7 @@ void PmoveSingle (pmove_t *pmove) {
 		qboolean stop_meditate_anim = qtrue;
 
 #if defined( _GAME )
-		if (rpg_class == RPGCLASS_WIZARD && player_ent && player_ent->client &&
-			player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 3)
-		{ // zyk: Meditation Strength ability does not allow stop the meditate anim
-			stop_meditate_anim = qfalse;
-		}
-		else if (rpg_class == RPGCLASS_WIZARD && player_ent && player_ent->client &&
-				 player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 4)
+		if (player_ent && player_ent->client && player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 16)
 		{ // zyk: Meditation Drain ability does not allow stop the meditate anim
 			stop_meditate_anim = qfalse;
 		}
@@ -10932,33 +10919,28 @@ void PmoveSingle (pmove_t *pmove) {
 	*/
 
 #if defined( _GAME )
-	if (rpg_class == RPGCLASS_WIZARD && player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 6)
+	if (player_ent && player_ent->client &&
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 18)
 	{ // zyk: Super Beam ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
-	else if (rpg_class == RPGCLASS_FORCE_USER && player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 2)
+	else if (player_ent && player_ent->client &&
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 5)
 	{ // zyk: Force Maelstrom ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
-	else if (rpg_class == RPGCLASS_FORCE_USER && player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 5)
+	else if (player_ent && player_ent->client &&
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 8)
 	{ // zyk: Force Storm ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
-	else if (rpg_class == RPGCLASS_WIZARD && player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 3)
-	{ // zyk: Monk Meditation Strength ability does not allow him to move
+	else if (player_ent && player_ent->client &&
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 16)
+	{ // zyk: Meditation Drain ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
-	else if (rpg_class == RPGCLASS_WIZARD && player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 4)
-	{ // zyk: Monk Meditation Drain ability does not allow him to move
-		stiffenedUp = qtrue;
-	}
-	else if (rpg_class == RPGCLASS_FORCE_USER && player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 4)
+	else if (player_ent && player_ent->client &&
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 7)
 	{ // zyk: Force Scream ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
