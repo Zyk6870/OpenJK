@@ -1291,7 +1291,17 @@ static void CG_DrawSimpleAmmo( const centity_t *cent )
 	// No ammo
 	if ( currValue < 0 || (weaponData[cent->currentState.weapon].energyPerShot == 0 && weaponData[cent->currentState.weapon].altEnergyPerShot == 0) )
 	{
-		CG_DrawProportionalString( SCREEN_WIDTH - (16 + 32), (SCREEN_HEIGHT - 80) + 40, "--", UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_HUD_ORANGE] );
+		// zyk: added Flame Thrower ammo
+		if (cent->currentState.weapon == WP_STUN_BATON)
+		{
+			Com_sprintf(num, sizeof(num), "%i", cg.snap->ps.cloakFuel);
+			CG_DrawProportionalString(SCREEN_WIDTH - 40, (SCREEN_HEIGHT - 80) + 24 + 28, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_HUD_ORANGE]);
+			return;
+		}
+
+		// CG_DrawProportionalString( SCREEN_WIDTH - (16 + 32), (SCREEN_HEIGHT - 80) + 40, "--", UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_HUD_ORANGE] );
+		// zyk: new screen position
+		CG_DrawProportionalString(SCREEN_WIDTH - 40, (SCREEN_HEIGHT - 80) + 24 + 28, "--", UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_HUD_ORANGE]);
 		return;
 	}
 
@@ -1334,7 +1344,10 @@ static void CG_DrawSimpleAmmo( const centity_t *cent )
 
 	Com_sprintf( num, sizeof( num ), "%i", currValue );
 
-	CG_DrawProportionalString( SCREEN_WIDTH - (16 + 32), (SCREEN_HEIGHT - 80) + 40, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor] );
+	// CG_DrawProportionalString( SCREEN_WIDTH - (16 + 32), (SCREEN_HEIGHT - 80) + 40, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor] );
+
+	// zyk: new screen position
+	CG_DrawProportionalString(SCREEN_WIDTH - 40, (SCREEN_HEIGHT - 80) + 24 + 28, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor]);
 }
 
 static void CG_DrawSimpleForcePower( const centity_t *cent )
@@ -1378,7 +1391,10 @@ static void CG_DrawSimpleForcePower( const centity_t *cent )
 
 	Com_sprintf( num, sizeof( num ), "%i", cg.snap->ps.fd.forcePower );
 
-	CG_DrawProportionalString( SCREEN_WIDTH - (18 + 14 + 32), (SCREEN_HEIGHT - 80) + 40 + 14, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor] );
+	// CG_DrawProportionalString( SCREEN_WIDTH - (18 + 14 + 32), (SCREEN_HEIGHT - 80) + 40 + 14, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor] );
+
+	// zyk: new draw position
+	CG_DrawProportionalString((8 + 8), (SCREEN_HEIGHT - 80) + 24 + 28, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor]);
 }
 
 /*
@@ -1401,9 +1417,19 @@ void CG_DrawHUD(centity_t	*cent)
 
 		if (cg.predictedPlayerState.pm_type != PM_SPECTATOR)
 		{
-			CG_DrawProportionalString( x+16, y+40, va( "%i", cg.snap->ps.stats[STAT_HEALTH] ), UI_SMALLFONT|UI_DROPSHADOW, colorTable[CT_HUD_RED] );
+			//CG_DrawProportionalString( x+16, y+40, va( "%i", cg.snap->ps.stats[STAT_HEALTH] ), UI_SMALLFONT|UI_DROPSHADOW, colorTable[CT_HUD_RED] );
 
-			CG_DrawProportionalString( x+18+14, y+40+14, va( "%i", cg.snap->ps.stats[STAT_ARMOR] ), UI_SMALLFONT|UI_DROPSHADOW, colorTable[CT_HUD_GREEN] );
+			//CG_DrawProportionalString( x+18+14, y+40+14, va( "%i", cg.snap->ps.stats[STAT_ARMOR] ), UI_SMALLFONT|UI_DROPSHADOW, colorTable[CT_HUD_GREEN] );
+			// zyk: new draw positions
+			CG_DrawProportionalString( x+8, y+24, va( "%i", cg.snap->ps.stats[STAT_HEALTH] ), UI_SMALLFONT|UI_DROPSHADOW, colorTable[CT_HUD_RED] );
+
+			CG_DrawProportionalString( x+8+4, y+24+14, va( "%i", cg.snap->ps.stats[STAT_ARMOR] ), UI_SMALLFONT|UI_DROPSHADOW, colorTable[CT_HUD_GREEN] );
+
+			// zyk: current jetpackFuel
+			CG_DrawProportionalString(SCREEN_WIDTH - (40 + 16), y + 24, va("%i", cg.snap->ps.jetpackFuel), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_MAGENTA]);
+
+			// zyk: current MP
+			CG_DrawProportionalString(SCREEN_WIDTH - (40 + 8), y + 24 + 14, va("%i", cg.magic_power), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_GREEN]);
 
 			CG_DrawSimpleForcePower( cent );
 
@@ -7241,6 +7267,11 @@ void CG_DrawJetpackFuel(void)
 		return;
 	}
 
+	if (cg_hudFiles.integer)
+	{ // zyk: simple hud
+		return;
+	}
+
 	if (percent < 0.1f)
 	{
 		percent = 0.1f;
@@ -7248,8 +7279,8 @@ void CG_DrawJetpackFuel(void)
 
 	//color of the bar
 	aColor[0] = 0.8f; // zyk: changed from 0.5f
-	aColor[1] = 0.4f; // zyk: changed from 0.0f
-	aColor[2] = 0.0f;
+	aColor[1] = 0.2f; // zyk: changed from 0.0f
+	aColor[2] = 0.4f;
 	aColor[3] = 0.8f;
 
 	//color of greyed out "missing fuel"
@@ -7335,6 +7366,11 @@ void CG_DrawMagicPower(void)
 	float y = RPG_BAR_Y;
 	float scaled_magic_power = cg.magic_power;
 
+	if (cg_hudFiles.integer)
+	{ // zyk: simple hud
+		return;
+	}
+
 	//color of the bar
 	aColor[0] = 0.0f;
 	aColor[1] = 0.7f;
@@ -7372,6 +7408,11 @@ void CG_DrawCloakFuel(void)
 
 	if (percent > CLFUELBAR_H)
 	{
+		return;
+	}
+
+	if (cg_hudFiles.integer)
+	{ // zyk: simple hud
 		return;
 	}
 
