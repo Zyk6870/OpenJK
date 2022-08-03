@@ -1467,10 +1467,10 @@ void ForceTeamForceReplenish( gentity_t *self )
 		max_blasterpack_ammo = zyk_max_blaster_pack_ammo.integer;
 		max_powercell_ammo = zyk_max_power_cell_ammo.integer;
 
-		// zyk: created new condition so we can use Team Energize in FFA. Also added Improvements skill condition to restore ammo of the target
+		// zyk: created new condition so we can use Team Energize in FFA. Also restore ammo of the target player
 		if (ent && ent->client && self != ent && 
 			(ent->client->ps.fd.forcePower < ent->client->ps.fd.forcePowerMax || 
-			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[38] > 0 && !ent->NPC && 
+			 (self->client->sess.amrpgmode == 2 && !ent->NPC && 
 			  ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
 			  (ent->client->ps.ammo[AMMO_BLASTER] < max_blasterpack_ammo || ent->client->ps.ammo[AMMO_POWERCELL] < max_powercell_ammo)
 			 )
@@ -1518,11 +1518,11 @@ void ForceTeamForceReplenish( gentity_t *self )
 
 	while (i < numpl)
 	{
-		// zyk: Team Energize now can recover ammo if the player has full force and improvements skill
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[38] > 0 && !g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.fd.forcePower == g_entities[pl[i]].client->ps.fd.forcePowerMax)
+		// zyk: Team Energize now can recover ammo if the player has full force
+		if (self->client->sess.amrpgmode == 2 && !g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.fd.forcePower == g_entities[pl[i]].client->ps.fd.forcePowerMax)
 		{
-			Add_Ammo(&g_entities[pl[i]], AMMO_BLASTER, (self->client->pers.skill_levels[38] * 5));
-			Add_Ammo(&g_entities[pl[i]], AMMO_POWERCELL, (self->client->pers.skill_levels[38] * 5));
+			Add_Ammo(&g_entities[pl[i]], AMMO_BLASTER, 5);
+			Add_Ammo(&g_entities[pl[i]], AMMO_POWERCELL, 5);
 			G_Sound(&g_entities[pl[i]], CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 		}
 		else

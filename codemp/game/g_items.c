@@ -2121,10 +2121,10 @@ gentity_t *EWeb_Create(gentity_t *spawner)
 
 	ent->takedamage = qtrue;
 
-	// zyk: Bounty Hunter EWeb has more health
-	if (spawner->client->sess.amrpgmode == 2)
+	// zyk: EWeb with Gunner Items Upgrade has more health
+	if (spawner->client->sess.amrpgmode == 2 && spawner->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 	{
-		eweb_health = eweb_health * (spawner->client->pers.skill_levels[38] + 1);
+		eweb_health = eweb_health * 2;
 	}
 
 	if (spawner->client->ewebHealth <= 0)

@@ -131,7 +131,7 @@ const int max_skill_levels[NUMBER_OF_SKILLS] = {
 	3, // Sense Health
 	3, // Shield Heal
 	3, // Team Shield Heal
-	4, // Improvements
+	5, // Magic Fist
 	4, // Blaster Pack
 	4, // Powercell
 	4, // Metal Bolts
@@ -239,7 +239,7 @@ char* zyk_skill_name(int skill_index)
 		"Sense Health",
 		"Shield Heal",
 		"Team Shield Heal",
-		"Improvements",
+		"Magic Fist",
 		"Blaster Pack",
 		"Powercell",
 		"Metal Bolts",
@@ -502,9 +502,9 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 15)
 		return "drains force power from a player to restore your health";
 	if (skill_index == 16)
-		return "makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage. Force Guardian class, with Improvements skill at least on level 1, can regen some force when taking damage on health while Rage is active";
+		return "makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage";
 	if (skill_index == 17)
-		return "restores some force power to players near you. If Improvements skill is at least at level 1, regens blaster pack and power cell ammo of the target players";
+		return "restores some force power to players near you. Regens some blaster pack and power cell ammo of the target players";
 	if (skill_index == 18)
 		return va("attacks someone with a small electric charge. Has %d damage multiplied by the stun baton level. Can fire the flame thrower when using alternate fire (does not work for Force User or Wizard). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
 	if (skill_index == 19)
@@ -546,7 +546,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 37)
 		return "recovers 3 shield at level 1, 6 shield at level 2 and 9 shield at level 3 to players near you. To use it, when near players, use Team Heal force power. It will heal their shield after they have full HP";
 	if (skill_index == 38)
-		return "^3Free Warrior: ^7+damage +resistance to damage, ^3Force User: ^7+saber damage and force regens faster, ^3Gunner: ^7+gun damage +resistance to damage, +max ammo, +credits in battle, +jetpack fuel, +sentry gun health, +EWeb health, ^3Wizard: ^7+max MP, new magic bolt types, recovers some jetpack fuel with MP if it runs out, -magic power cooldown";
+		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key";
 	if (skill_index == 39)
 		return va("used as ammo for Blaster Pistol, Bryar Pistol and E11 Blaster Rifle. You can carry up to %d ammo", zyk_max_blaster_pack_ammo.integer);
 	if (skill_index == 40)
@@ -5156,6 +5156,11 @@ void initialize_rpg_skills(gentity_t *ent)
 
 		ent->client->pers.magic_power = zyk_max_magic_power(ent);
 
+		if (ent->client->sess.magic_fist_selection > ent->client->pers.skill_levels[38])
+		{ // zyk: reset magic fist selected if player downgrades Magic Fist skill
+			ent->client->sess.magic_fist_selection = 0;
+		}
+
 		ent->client->pers.meditation_drain_timer = 0;
 		ent->client->pers.unique_skill_duration = 0;
 		ent->client->pers.active_unique_skill = 0;
@@ -5348,7 +5353,7 @@ void add_new_char(gentity_t *ent)
 
 	ent->client->pers.rpg_upgrades = 0;
 	ent->client->pers.credits = 100;
-	ent->client->sess.magic_fist_selection = 5;
+	ent->client->sess.magic_fist_selection = 0;
 }
 
 // zyk: creates the directory correctly depending on the OS
@@ -7414,7 +7419,7 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 
 	ent->client->pers.credits = 100;
 
-	ent->client->sess.magic_fist_selection = 5;
+	ent->client->sess.magic_fist_selection = 0;
 
 	ent->client->pers.main_quest_progress = 0;
 	ent->client->pers.side_quest_progress = 0;

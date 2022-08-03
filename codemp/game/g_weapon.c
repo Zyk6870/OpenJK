@@ -3977,9 +3977,9 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 	}
 	else
 	{
-		if (ent->client->sess.amrpgmode == 2 && ent->client->sess.magic_fist_selection < 5)
+		if (ent->client->sess.amrpgmode == 2 && ent->client->sess.magic_fist_selection > 0)
 		{ // zyk: Magic fist attacks
-			if (ent->client->sess.magic_fist_selection == 0 && ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
+			if (ent->client->sess.magic_fist_selection == 1 && ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
 			{ // zyk: Normal Bolt
 				vec3_t origin, dir, zyk_forward;
 				gentity_t *missile = NULL;
@@ -4017,7 +4017,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 
 				send_rpg_events(2000);
 			}
-			else if (ent->client->sess.magic_fist_selection == 1 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
+			else if (ent->client->sess.magic_fist_selection == 2 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
 			{ // zyk: Electric Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;
@@ -4058,7 +4058,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 
 				send_rpg_events(2000);
 			}
-			else if (ent->client->sess.magic_fist_selection == 2 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
+			else if (ent->client->sess.magic_fist_selection == 3 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
 			{ // zyk: Instant-Hit Bolt
 				int skip, traces = DISRUPTOR_ALT_TRACES;
 				qboolean	render_impact = qtrue;
@@ -4258,7 +4258,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 
 				send_rpg_events(2000);
 			}
-			else if (ent->client->sess.magic_fist_selection == 3 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
+			else if (ent->client->sess.magic_fist_selection == 4 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
 			{ // zyk: Fire Bolt
 				gentity_t* missile;
 				vec3_t origin, dir, zyk_forward;
@@ -4308,7 +4308,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 
 				send_rpg_events(2000);
 			}
-			else if (ent->client->sess.magic_fist_selection == 4 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
+			else if (ent->client->sess.magic_fist_selection == 5 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
 			{ // zyk: Ultra Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;

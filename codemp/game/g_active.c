@@ -3545,34 +3545,32 @@ void ClientThink_real( gentity_t *ent ) {
 					{ // zyk: Energy Modulator Upgrade
 						zyk_energy_modulator(ent);
 					}
-					else if (ent->client->ps.weapon == WP_MELEE)
+					else if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[38] > 0)
 					{ // zyk: Magic Fist attacks
-						if (ent->client->sess.magic_fist_selection < 5 && ent->client->sess.magic_fist_selection < ent->client->pers.skill_levels[38])
+						if (ent->client->sess.magic_fist_selection < ent->client->pers.skill_levels[38])
 							ent->client->sess.magic_fist_selection++;
-						else if (ent->client->sess.magic_fist_selection == 5)
-							ent->client->sess.magic_fist_selection = 0;
 						else
-							ent->client->sess.magic_fist_selection = 5;
+							ent->client->sess.magic_fist_selection = 0;
 
 						save_account(ent, qtrue);
 
-						if (ent->client->sess.magic_fist_selection == 0)
+						if (ent->client->sess.magic_fist_selection == 1)
 						{
 							trap->SendServerCommand(ent->s.number, va("chat \"^7Normal Bolt       ^3MP: ^7%d\"", ent->client->pers.magic_power));
 						}
-						else if (ent->client->sess.magic_fist_selection == 1)
+						else if (ent->client->sess.magic_fist_selection == 2)
 						{
 							trap->SendServerCommand(ent->s.number, va("chat \"^7Electric Bolt     ^3MP: ^7%d\"", ent->client->pers.magic_power));
 						}
-						else if (ent->client->sess.magic_fist_selection == 2)
+						else if (ent->client->sess.magic_fist_selection == 3)
 						{
 							trap->SendServerCommand(ent->s.number, va("chat \"^7Instant-Hit Bolt  ^3MP: ^7%d\"", ent->client->pers.magic_power));
 						}
-						else if (ent->client->sess.magic_fist_selection == 3)
+						else if (ent->client->sess.magic_fist_selection == 4)
 						{
 							trap->SendServerCommand(ent->s.number, va("chat \"^7Fire Bolt         ^3MP: ^7%d\"", ent->client->pers.magic_power));
 						}
-						else if (ent->client->sess.magic_fist_selection == 4)
+						else if (ent->client->sess.magic_fist_selection == 5)
 						{
 							trap->SendServerCommand(ent->s.number, va("chat \"^7Ultra Bolt        ^3MP: ^7%d\"", ent->client->pers.magic_power));
 						}

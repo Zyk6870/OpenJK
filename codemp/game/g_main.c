@@ -5230,14 +5230,11 @@ void magic_sense(gentity_t *ent, int duration)
 {
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_MAGIC_SENSE] > 1)
 	{
-		duration += 1000;
+		duration += 2000;
 	}
 
 	// zyk: Magic Sense gets more duration based on Sense skill level
 	duration += (ent->client->pers.skill_levels[4] * 1000);
-
-	// zyk: Magic Sense gets more duration based on Improvements skill level
-	duration += (ent->client->pers.skill_levels[38] * 1000);
 
 	ent->client->ps.forceAllowDeactivateTime = level.time + duration;
 	ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[4];
