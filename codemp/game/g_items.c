@@ -484,7 +484,7 @@ qboolean PlaceShield(gentity_t *playerent)
 				shield->s.otherEntityNum2 = TEAM_RED;
 			}
 
-			if (playerent->client && playerent->client->sess.amrpgmode == 2 && playerent->client->pers.rpg_class == RPGCLASS_GUNNER)
+			if (playerent->client && playerent->client->sess.amrpgmode == 2)
 			{ // zyk: used a Force Field, decrease amount of them in inventory
 				playerent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD]--;
 			}
@@ -550,7 +550,7 @@ void ItemUse_Binoculars(gentity_t *ent)
 	*/
 
 	// zyk: with Thermal Vision, sets the cooldown between activating and deactivating Binoculars to avoid problem in which it gets instantly on and off
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION) &&
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION) &&
 		ent->client->pers.thermal_vision_cooldown_time > level.time)
 	{
 		return;
@@ -613,7 +613,7 @@ void pas_fire( gentity_t *ent )
 	// zyk: changed sentry gun shotspeed from 2300 to 2800
 	// zyk: Gunner Items Upgrade makes sentry gun have more damage
 	if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && 
-		ent->parent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->parent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+		ent->parent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 		WP_FireTurretMissile(&g_entities[ent->genericValue3], myOrg, fwd, qfalse, 12, 2800, MOD_SENTRY, ent );
 	else
 		WP_FireTurretMissile(&g_entities[ent->genericValue3], myOrg, fwd, qfalse, 10, 2800, MOD_SENTRY, ent );
@@ -651,7 +651,7 @@ static qboolean pas_find_enemies( gentity_t *self )
 
 	// zyk: Gunner Items Upgrade allows it to find enemies in a greater distance
 	if (self->parent && self->parent->client && self->parent->client->sess.amrpgmode == 2 && 
-		self->parent->client->pers.rpg_class == RPGCLASS_GUNNER && self->parent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+		self->parent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 	{
 		distance_to_find_enemies *= 2;
 		bestDist = distance_to_find_enemies*distance_to_find_enemies;
@@ -1094,7 +1094,7 @@ void turret_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
 	g_entities[self->genericValue3].client->ps.fd.sentryDeployed = qfalse;
 
 	// zyk: Gunner items Upgrade allows placing more sentries
-	if (g_entities[self->genericValue3].client->sess.amrpgmode == 2 && g_entities[self->genericValue3].client->pers.rpg_class == RPGCLASS_GUNNER)
+	if (g_entities[self->genericValue3].client->sess.amrpgmode == 2)
 	{
 		g_entities[self->genericValue3].client->pers.bounty_hunter_placed_sentries--;
 	}
@@ -1237,9 +1237,9 @@ void ItemUse_Sentry( gentity_t *ent )
 	SP_PAS( sentry );
 
 	// zyk: Gunner sentry gun has more HP and with the Inventory Capacity upgrade, player can place more sentry guns
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
+	if (ent->client->sess.amrpgmode == 2)
 	{
-		sentry->health = 40 * (ent->client->pers.skill_levels[38] + 1);
+		sentry->health = 150;
 
 		// zyk: validating quantity of sentry guns that the Gunner can place
 		ent->client->pers.bounty_hunter_placed_sentries++;
@@ -1280,13 +1280,13 @@ void ItemUse_Seeker(gentity_t *ent)
 	{
 		ent->client->ps.eFlags |= EF_SEEKERDRONE;
 		// zyk: Gunner Items Upgrade increases seeker drone lifetime
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 			ent->client->ps.droneExistTime = level.time + 80000;
 		else
 			ent->client->ps.droneExistTime = level.time + 60000; // zyk: the seeker drone lifetime, changed from 30000 to 60000
 		ent->client->ps.droneFireTime = level.time + 500;   // zyk: fire time of seeker drone changed from 1500 to 500
 
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
+		if (ent->client->sess.amrpgmode == 2)
 		{ // zyk: used a seeker, decrease amount of them in inventory
 			ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE]--;
 		}
@@ -1328,7 +1328,7 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 	else
 		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{ // zyk: used a Big Bacta, decrease amount of them in inventory
 		ent->client->pers.gunner_items[GUNNERITEM_BIG_BACTA]--;
 	}
@@ -1345,7 +1345,7 @@ void ItemUse_MedPack(gentity_t *ent)
 	
 	MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{ // zyk: used a Bacta Canister, decrease amount of them in inventory
 		ent->client->pers.gunner_items[GUNNERITEM_BACTA_CANISTER]--;
 	}
@@ -1409,10 +1409,8 @@ void ItemUse_Jetpack( gentity_t *ent )
 
 	if (!ent->client->jetPackOn &&
 		// ent->client->ps.jetpackFuel < 5
-		ent->client->pers.jetpack_fuel < JETPACK_SCALE && 
-		(ent->client->sess.amrpgmode != 2 || ent->client->pers.rpg_class != RPGCLASS_WIZARD || ent->client->pers.magic_power < 10 || ent->client->pers.skill_levels[38] == 0))
+		ent->client->pers.jetpack_fuel < JETPACK_SCALE)
 	{ //too low on fuel to start it up
-		// zyk: Wizard can use magic to restore fuel so allow him to activate jetpack
 		return;
 	}
 
@@ -1844,8 +1842,7 @@ void EWebFire(gentity_t *owner, gentity_t *eweb)
 	missile->s.weapon = WP_TURRET;
 
 	// zyk: Gunner Items Upgrade makes EWeb have more damage
-	if (owner && owner->client && owner->client->sess.amrpgmode == 2 && 
-		owner->client->pers.rpg_class == RPGCLASS_GUNNER && owner->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+	if (owner && owner->client && owner->client->sess.amrpgmode == 2 && owner->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
 		missile->damage = EWEB_MISSILE_DAMAGE + 5;
 	else
 		missile->damage = EWEB_MISSILE_DAMAGE;
@@ -2125,7 +2122,7 @@ gentity_t *EWeb_Create(gentity_t *spawner)
 	ent->takedamage = qtrue;
 
 	// zyk: Bounty Hunter EWeb has more health
-	if (spawner->client->sess.amrpgmode == 2 && spawner->client->pers.rpg_class == RPGCLASS_GUNNER)
+	if (spawner->client->sess.amrpgmode == 2)
 	{
 		eweb_health = eweb_health * (spawner->client->pers.skill_levels[38] + 1);
 	}
@@ -2336,18 +2333,6 @@ void Add_Ammo (gentity_t *ent, int weapon, int count)
 	int max_thermal_ammo = zyk_max_thermal_ammo.integer;
 	int max_tripmine_ammo = zyk_max_tripmine_ammo.integer;
 	int max_detpack_ammo = zyk_max_detpack_ammo.integer;
-
-	// zyk: Bounty Hunter class has more max ammo
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_class == RPGCLASS_GUNNER)
-	{
-		max_blasterpack_ammo += max_blasterpack_ammo / 8.0 * ent->client->pers.skill_levels[38];
-		max_powercell_ammo += max_powercell_ammo / 8.0 * ent->client->pers.skill_levels[38];
-		max_metalbolt_ammo += max_metalbolt_ammo / 8.0 * ent->client->pers.skill_levels[38];
-		max_rocket_ammo += max_rocket_ammo / 8.0 * ent->client->pers.skill_levels[38];
-		max_thermal_ammo += max_thermal_ammo / 8.0 * ent->client->pers.skill_levels[38];
-		max_tripmine_ammo += max_tripmine_ammo / 8.0 * ent->client->pers.skill_levels[38];
-		max_detpack_ammo += max_detpack_ammo / 8.0 * ent->client->pers.skill_levels[38];
-	}
 
 	if (weapon == AMMO_BLASTER){
 		if (max_blasterpack_ammo - ent->client->ps.ammo[weapon] > count)
@@ -2696,7 +2681,6 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	if (other->health < 1)
 		return;		// dead people can't pickup
 
-	// zyk: Some RPG classes cant pickup some items
 	if (other->client->sess.amrpgmode == 2)
 	{
 		if (ent->spawnflags & 262144)
@@ -2717,17 +2701,6 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 			ent->think = G_FreeEntity;
 			ent->nextthink = level.time;
 
-			return;
-		}
-
-		if (other->client->pers.rpg_class == RPGCLASS_FORCE_USER && ((ent->item->giType == IT_WEAPON && ent->item->giTag != WP_STUN_BATON) || ent->item->giType == IT_AMMO || 
-			ent->item->giType == IT_HOLDABLE))
-		{
-			return;
-		}
-		else if (other->client->pers.rpg_class == RPGCLASS_WIZARD && ((ent->item->giType == IT_WEAPON && ent->item->giTag != WP_STUN_BATON) || ent->item->giType == IT_AMMO || 
-			     (ent->item->giType == IT_HOLDABLE && ent->item->giTag != HI_MEDPAC && ent->item->giTag != HI_CLOAK && ent->item->giTag != HI_JETPACK)))
-		{ // zyk: Wizard can only pickup some items
 			return;
 		}
 	}
@@ -2764,7 +2737,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		}
 	}
 
-	if (other->client->sess.amrpgmode == 2 && other->client->pers.rpg_class == RPGCLASS_GUNNER && ent->item->giType == IT_HOLDABLE)
+	if (other->client->sess.amrpgmode == 2 && ent->item->giType == IT_HOLDABLE)
 	{ // zyk: Gunner can grab more of some holdable items when he has the Inventory Capacity upgrade
 		int item_iterator = 0;
 

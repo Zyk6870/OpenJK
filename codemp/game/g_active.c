@@ -857,7 +857,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				}
 			}
 
-			if (client->pers.rpg_class == RPGCLASS_GUNNER && client->pers.energy_modulator_mode > 0)
+			if (client->pers.energy_modulator_mode > 0)
 			{ // zyk: Energy Modulator consumes ammo while active
 				if (ent->health < 1)
 				{ // zyk: if player dies, deactivate Energy Modulator
@@ -3541,31 +3541,9 @@ void ClientThink_real( gentity_t *ent ) {
 
 				if (pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE)
 				{ 
-					if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
-					{
-						if (ent->client->ps.droneExistTime >= (level.time + 5000) &&
-							ent->client->ps.ammo[AMMO_POWERCELL] >= 1 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) &&
-							(
-							(ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY) && ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE] < NUMBER_OF_GUNNER_ITEMS) ||
-							(!(ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY)) && ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE] < 1)
-							)
-						)
-						{ // zyk: Gunner can get seeker drone back with saber style key. Uses some power cell ammo
-							ent->client->ps.droneExistTime = 0;
-							ent->client->ps.eFlags &= ~EF_SEEKERDRONE;
-							ent->client->ps.genericEnemyIndex = -1;
-							ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
-
-							ent->client->ps.ammo[AMMO_POWERCELL] -= 1;
-
-							ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE]++;
-
-							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));
-						}
-						else if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_ENERGY_MODULATOR))
-						{ // zyk: Gunner Energy Modulator
-							zyk_energy_modulator(ent);
-						}
+					if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_ENERGY_MODULATOR) && ent->client->ps.weapon != WP_MELEE)
+					{ // zyk: Energy Modulator Upgrade
+						zyk_energy_modulator(ent);
 					}
 					else if (ent->client->ps.weapon == WP_MELEE)
 					{ // zyk: Magic Fist attacks

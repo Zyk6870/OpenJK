@@ -4926,6 +4926,10 @@ void initialize_rpg_skills(gentity_t *ent)
 	if (ent->client->sess.amrpgmode == 2)
 	{
 		int i = 0;
+		gentity_t* this_ent = NULL;
+		int sentry_guns_iterator = 0;
+		int gunner_items_iterator = 0;
+		int gunner_items_skill_indexes[MAX_GUNNER_ITEMS] = { 47, 51, 48, 49, 52 };
 
 		// zyk: validating max skill levels. If for some reason a skill is above max, get the skillpoint back
 		for (i = 0; i < NUMBER_OF_SKILLS; i++)
@@ -5212,49 +5216,31 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->ps.ammo[AMMO_TRIPMINE] = ((int)ceil(zyk_max_tripmine_ammo.value/3.0) * ent->client->pers.skill_levels[44]);
 		ent->client->ps.ammo[AMMO_DETPACK] = ((int)ceil(zyk_max_detpack_ammo.value/3.0) * ent->client->pers.skill_levels[45]);
 		
-		/*
-		if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
-		{ // zyk: modifying max ammo if the player is a Gunner
-			gentity_t *this_ent = NULL;
-			int sentry_guns_iterator = 0;
-			int gunner_items_iterator = 0;
-			int gunner_items_skill_indexes[MAX_GUNNER_ITEMS] = {47, 51, 48, 49, 52};
-
-			// zyk: Gunner starts with more items if he has the Inventory Capacity upgrade
-			for (gunner_items_iterator = 0; gunner_items_iterator < MAX_GUNNER_ITEMS; gunner_items_iterator++)
+		// zyk: player starts with more items if he has the Inventory Capacity upgrade
+		for (gunner_items_iterator = 0; gunner_items_iterator < MAX_GUNNER_ITEMS; gunner_items_iterator++)
+		{
+			if (ent->client->pers.skill_levels[gunner_items_skill_indexes[gunner_items_iterator]] > 0)
 			{
-				if (ent->client->pers.skill_levels[gunner_items_skill_indexes[gunner_items_iterator]] > 0)
-				{
-					if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY))
-						ent->client->pers.gunner_items[gunner_items_iterator] = NUMBER_OF_GUNNER_ITEMS;
-					else
-						ent->client->pers.gunner_items[gunner_items_iterator] = 1;
-				}
+				if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY))
+					ent->client->pers.gunner_items[gunner_items_iterator] = NUMBER_OF_GUNNER_ITEMS;
 				else
-				{
-					ent->client->pers.gunner_items[gunner_items_iterator] = 0;
-				}
+					ent->client->pers.gunner_items[gunner_items_iterator] = 1;
 			}
-
-			ent->client->pers.bounty_hunter_placed_sentries = 0;
-
-			for (sentry_guns_iterator = MAX_CLIENTS; sentry_guns_iterator < level.num_entities; sentry_guns_iterator++)
+			else
 			{
-				this_ent = &g_entities[sentry_guns_iterator];
-
-				if (this_ent && Q_stricmp(this_ent->classname,"sentryGun") == 0 && this_ent->s.owner == ent->s.number)
-					ent->client->pers.bounty_hunter_placed_sentries++;
+				ent->client->pers.gunner_items[gunner_items_iterator] = 0;
 			}
-
-			ent->client->ps.ammo[AMMO_BLASTER] += ent->client->ps.ammo[AMMO_BLASTER] / 8.0 * ent->client->pers.skill_levels[38];
-			ent->client->ps.ammo[AMMO_POWERCELL] += ent->client->ps.ammo[AMMO_POWERCELL] / 8.0 * ent->client->pers.skill_levels[38];
-			ent->client->ps.ammo[AMMO_METAL_BOLTS] += ent->client->ps.ammo[AMMO_METAL_BOLTS] / 8.0 * ent->client->pers.skill_levels[38];
-			ent->client->ps.ammo[AMMO_ROCKETS] += ent->client->ps.ammo[AMMO_ROCKETS] / 8.0 * ent->client->pers.skill_levels[38];
-			ent->client->ps.ammo[AMMO_THERMAL] += ent->client->ps.ammo[AMMO_THERMAL] / 8.0 * ent->client->pers.skill_levels[38];
-			ent->client->ps.ammo[AMMO_TRIPMINE] += ent->client->ps.ammo[AMMO_TRIPMINE] / 8.0 * ent->client->pers.skill_levels[38];
-			ent->client->ps.ammo[AMMO_DETPACK] += ent->client->ps.ammo[AMMO_DETPACK] / 8.0 * ent->client->pers.skill_levels[38];
 		}
-		*/
+
+		ent->client->pers.bounty_hunter_placed_sentries = 0;
+
+		for (sentry_guns_iterator = MAX_CLIENTS; sentry_guns_iterator < level.num_entities; sentry_guns_iterator++)
+		{
+			this_ent = &g_entities[sentry_guns_iterator];
+
+			if (this_ent && Q_stricmp(this_ent->classname,"sentryGun") == 0 && this_ent->s.owner == ent->s.number)
+				ent->client->pers.bounty_hunter_placed_sentries++;
+		}
 
 		// zyk: reseting initial holdable items of the player
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SEEKER) & ~(1 << HI_BINOCULARS) & ~(1 << HI_SENTRY_GUN) & ~(1 << HI_EWEB) & ~(1 << HI_CLOAK) & ~(1 << HI_SHIELD) & ~(1 << HI_MEDPAC) & ~(1 << HI_MEDPAC_BIG);
@@ -6599,11 +6585,11 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_THERMAL_VISION)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes binoculars and disruptor rifle detect enemies through a thermal vision system\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes binoculars detect enemies through a thermal vision system\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_GUNNER_ITEMS_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes sentry gun, seeker drone and e-web stronger. Can get seeker drone back by pressing Saber Style key and sentry guns and force fields back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes sentry gun, seeker drone and e-web stronger. Can get sentry guns and force fields back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_INVENTORY_CAPACITY)
 		{
@@ -6771,6 +6757,13 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	// zyk: buying the item if player has enough credits
 	if (ent->client->pers.credits >= seller_items_cost[value - 1][0])
 	{
+		int max_items = 1;
+
+		if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY))
+		{
+			max_items = NUMBER_OF_GUNNER_ITEMS;
+		}
+
 		if (value == (SELLER_BLASTER_PACK + 1))
 		{
 			Add_Ammo(ent,AMMO_BLASTER,100);
@@ -6822,22 +6815,37 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == (SELLER_BACTA_CANISTER + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC);
+
+			if (ent->client->pers.gunner_items[GUNNERITEM_BACTA_CANISTER] < max_items)
+				ent->client->pers.gunner_items[GUNNERITEM_BACTA_CANISTER]++;
 		}
 		else if (value == (SELLER_BIG_BACTA + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC_BIG);
+
+			if (ent->client->pers.gunner_items[GUNNERITEM_BIG_BACTA] < max_items)
+				ent->client->pers.gunner_items[GUNNERITEM_BIG_BACTA]++;
 		}
 		else if (value == (SELLER_SENTRY_GUN + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
+
+			if (ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN] < max_items)
+				ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN]++;
 		}
 		else if (value == (SELLER_SEEKER_DRONE + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
+
+			if (ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE] < max_items)
+				ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE]++;
 		}
 		else if (value == (SELLER_FORCE_FIELD + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
+
+			if (ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD] < max_items)
+				ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD]++;
 		}
 		else if (value == (SELLER_YSALAMIRI + 1))
 		{
@@ -7150,11 +7158,17 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_MEDPAC);
 
+		if (ent->client->pers.gunner_items[GUNNERITEM_BACTA_CANISTER] > 0)
+			ent->client->pers.gunner_items[GUNNERITEM_BACTA_CANISTER]--;
+
 		sold = 1;
 	}
 	else if (value == (SELLER_BIG_BACTA + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC_BIG))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_MEDPAC_BIG);
+
+		if (ent->client->pers.gunner_items[GUNNERITEM_BIG_BACTA] > 0)
+			ent->client->pers.gunner_items[GUNNERITEM_BIG_BACTA]--;
 
 		sold = 1;
 	}
@@ -7162,17 +7176,26 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SENTRY_GUN);
 
+		if (ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN] > 0)
+			ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN]--;
+
 		sold = 1;
 	}
 	else if (value == (SELLER_SEEKER_DRONE + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SEEKER);
 
+		if (ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE] > 0)
+			ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE]--;
+
 		sold = 1;
 	}
 	else if (value == (SELLER_FORCE_FIELD + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SHIELD))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SHIELD);
+
+		if (ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD] > 0)
+			ent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD]--;
 
 		sold = 1;
 	}

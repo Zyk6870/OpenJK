@@ -2664,11 +2664,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			attacker->client->pers.credits_modifier = self->client->pers.credits_modifier;
 		}
 
-		if (attacker->client->pers.rpg_class == RPGCLASS_GUNNER)
-		{ // zyk: Gunner class receives more credits
-			attacker->client->pers.credits_modifier += 4 * (attacker->client->pers.skill_levels[38] + 1);
-		}
-
 		// zyk: Bounty Quest manager
 		if (level.bounty_quest_choose_target == qfalse && attacker != self && self->client->sess.amrpgmode == 2)
 		{
@@ -4667,9 +4662,8 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 			return qtrue;
 		}
 
-		if (mod == MOD_MELEE && attacker->client->pers.rpg_class == RPGCLASS_WIZARD &&
-			inflictor && inflictor->s.weapon == WP_CONCUSSION)
-		{ // zyk: Magic Master bolts, the Ultra Bolt
+		if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_CONCUSSION)
+		{ // zyk: Ultra Bolt
 			return qtrue;
 		}
 
@@ -6289,61 +6283,38 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						(level.special_power_effects[attacker->s.number] == ent->s.number || OnSameTeam(quest_power_user, ent) == qtrue || 
 						npcs_on_same_team(quest_power_user, ent) == qtrue || zyk_is_ally(quest_power_user,ent) == qtrue))
 					{
-						if (quest_power_user->client->sess.amrpgmode == 2 && quest_power_user->client->pers.rpg_class == RPGCLASS_WIZARD &&
-							quest_power_user->client->pers.unique_skill_duration > level.time &&
-							quest_power_user->client->pers.active_unique_skill == 1)
-						{ // zyk: Magic Buff increases amount of health recovered
-							int heal_amount = 8;
-							int shield_amount = 8;
+						int heal_amount = 8;
+						int shield_amount = 4;
 
-							if (quest_power_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_HEALING_AREA] > 1)
+						if (quest_power_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_HEALING_AREA] > 1)
+						{
+							heal_amount += 4;
+							shield_amount += 2;
+						}
+
+						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
+							ent->health += heal_amount;
+						else
+							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
+
+						if (ent->health == ent->client->ps.stats[STAT_MAX_HEALTH])
+						{ // zyk: can restore shield shield too, if hp is full
+							int max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
+
+							if (ent->client->sess.amrpgmode == 2)
+								max_shield = ent->client->pers.max_rpg_shield;
+
+							if (!ent->NPC)
 							{
-								heal_amount += 4;
-								shield_amount += 4;
-
-								// zyk: restores force too
-								if (ent->client->ps.fd.forcePower < ent->client->ps.fd.forcePowerMax)
-									ent->client->ps.fd.forcePower += 1;
-							}
-
-							if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
-								ent->health += heal_amount;
-							else
-								ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-							if (ent->health == ent->client->ps.stats[STAT_MAX_HEALTH])
-							{ // zyk: Magic Buff makes it possible to heal shield too, if hp is full
-								int max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-								if (ent->client->sess.amrpgmode == 2)
-									max_shield = ent->client->pers.max_rpg_shield;
-
-								if (!ent->NPC)
+								if ((ent->client->ps.stats[STAT_ARMOR] + shield_amount) < max_shield)
 								{
-									if ((ent->client->ps.stats[STAT_ARMOR] + shield_amount) < max_shield)
-									{
-										ent->client->ps.stats[STAT_ARMOR] += shield_amount;
-									}
-									else
-									{
-										ent->client->ps.stats[STAT_ARMOR] = max_shield;
-									}
+									ent->client->ps.stats[STAT_ARMOR] += shield_amount;
+								}
+								else
+								{
+									ent->client->ps.stats[STAT_ARMOR] = max_shield;
 								}
 							}
-						}
-						else
-						{
-							int heal_amount = 6;
-
-							if (quest_power_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_HEALING_AREA] > 1)
-							{
-								heal_amount += 2;
-							}
-
-							if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
-								ent->health += heal_amount;
-							else
-								ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
 						}
 					}
 				}

@@ -9291,6 +9291,7 @@ void G_RunFrame( int levelTime ) {
 
 			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
+				int gunner_item_it = 0;
 
 				// zyk: Weapon Upgrades
 				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL) && ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4)
@@ -9313,60 +9314,47 @@ void G_RunFrame( int levelTime ) {
 					Player_FireFlameThrower(ent, qfalse);
 				}
 
-				if (ent->client->pers.rpg_class == RPGCLASS_GUNNER)
+				// zyk: if player still has a holdable item, set the flag so the item will be in inventory
+				for (gunner_item_it = 0; gunner_item_it < MAX_GUNNER_ITEMS; gunner_item_it++)
 				{
-					int gunner_item_it = 0;
-
-					// zyk: if Gunner still has an item, set the flag so the item will be in inventory
-					for (gunner_item_it = 0; gunner_item_it < MAX_GUNNER_ITEMS; gunner_item_it++)
+					if (ent->client->pers.gunner_items[gunner_item_it] > 0)
 					{
-						if (ent->client->pers.gunner_items[gunner_item_it] > 0)
-						{
-							ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << zyk_get_holdable_item_tag(gunner_item_it));
-						}
-					}
-
-					if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
-					{ // zyk: if Gunner stops using sniper scope or binoculars, stop the Thermal Vision
-						ent->client->pers.thermal_vision = qfalse;
-						ent->client->ps.fd.forcePowersActive &= ~(1 << FP_SEE);
-						ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
-						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_0;
-
-						ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
-					}
-					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 1 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION))
-					{ // zyk: Gunner with upgrade, activate the Thermal Detector
-						ent->client->pers.thermal_vision = qtrue;
-						ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
-						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_1;
-						ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
-					}
-					else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION))
-					{ // zyk: Gunner with Thermal Vision Upgrade, activate the Thermal Vision
-						ent->client->pers.thermal_vision = qtrue;
-						ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
-						ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_3;
-						ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
-
-						// zyk: adds some time to allow deactivating the Binoculars. Force Sense is active, so using this variable to add the cooldown time
-						ent->client->ps.forceAllowDeactivateTime = level.time + 300;
-
-						ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
-					}
-
-					if (ent->client->pers.active_unique_skill == 14 && ent->client->pers.aimed_shot_timer < level.time)
-					{ // zyk: Aimed Shot ability. Fires the full charged sniper shot
-						if (ent->health > 0)
-						{
-							WP_DisruptorAltFire(ent);
-						}
-
-						ent->client->pers.aimed_shot_timer = level.time + 2000;
+						ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << zyk_get_holdable_item_tag(gunner_item_it));
 					}
 				}
-				else if (ent->client->pers.rpg_class == RPGCLASS_GUNNER && 
-						ent->client->pers.active_unique_skill == 3 && ent->client->pers.lightning_shield_timer < level.time)
+				
+				if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
+				{ // zyk: if Gunner stops using sniper scope or binoculars, stop the Thermal Vision
+					ent->client->pers.thermal_vision = qfalse;
+					ent->client->ps.fd.forcePowersActive &= ~(1 << FP_SEE);
+					ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
+					ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_0;
+
+					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
+				}
+				else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION))
+				{ // zyk: Gunner with Thermal Vision Upgrade, activate the Thermal Vision
+					ent->client->pers.thermal_vision = qtrue;
+					ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
+					ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_3;
+					ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
+
+					// zyk: adds some time to allow deactivating the Binoculars. Force Sense is active, so using this variable to add the cooldown time
+					ent->client->ps.forceAllowDeactivateTime = level.time + 300;
+
+					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
+				}
+
+				if (ent->client->pers.active_unique_skill == 14 && ent->client->pers.aimed_shot_timer < level.time)
+				{ // zyk: Aimed Shot ability. Fires the full charged sniper shot
+					if (ent->health > 0)
+					{
+						WP_DisruptorAltFire(ent);
+					}
+
+					ent->client->pers.aimed_shot_timer = level.time + 2000;
+				}
+				else if (ent->client->pers.active_unique_skill == 12 && ent->client->pers.lightning_shield_timer < level.time)
 				{ // zyk: Lightning Shield damage to enemies nearby
 					int player_it = 0;
 
@@ -9385,8 +9373,7 @@ void G_RunFrame( int levelTime ) {
 
 					ent->client->pers.lightning_shield_timer = level.time + 200;
 				}
-				else if (ent->client->pers.rpg_class == RPGCLASS_WIZARD &&
-						 ent->client->pers.active_unique_skill == 4 &&
+				else if (ent->client->pers.active_unique_skill == 16 &&
 						 ent->client->pers.meditation_drain_timer < level.time)
 				{ // zyk: Meditation Drain
 					int player_it = 0;
@@ -9429,7 +9416,7 @@ void G_RunFrame( int levelTime ) {
 
 					ent->client->pers.meditation_drain_timer = level.time + 200;
 				}
-				else if (ent->client->pers.rpg_class == RPGCLASS_FREE_WARRIOR && ent->client->pers.active_unique_skill == 3 &&
+				else if (ent->client->pers.active_unique_skill == 1 &&
 						ent->client->pers.vertical_dfa_timer > 0 && ent->client->pers.vertical_dfa_timer < level.time && 
 						ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 				{ // zyk: Vertical DFA should appear when player hits the ground
