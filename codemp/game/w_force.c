@@ -671,11 +671,6 @@ qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int 
 	int	drain = overrideAmt ? overrideAmt :
 				forcePowerNeeded[self->client->ps.fd.forcePowerLevel[forcePower]][forcePower];
 
-	if (forcePower == FP_HEAL) // zyk: added the HEAL condition to keep balance
-	{
-		drain = (zyk_max_force_power.integer/2);
-	}
-
 	if (self->client->ps.fd.forcePowersActive & (1 << forcePower))
 	{ //we're probably going to deactivate it..
 		return qtrue;
@@ -1197,7 +1192,7 @@ void ForceHeal( gentity_t *self )
 			if (self->client->ps.stats[STAT_ARMOR] > self->client->pers.max_rpg_shield)
 				self->client->ps.stats[STAT_ARMOR] = self->client->pers.max_rpg_shield;
 
-			self->client->ps.fd.forcePower -= zyk_max_force_power.integer/2;
+			BG_ForcePowerDrain(&self->client->ps, FP_HEAL, 0);
 
 			G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/player/pickupshield.wav"));
 
@@ -1214,7 +1209,8 @@ void ForceHeal( gentity_t *self )
 		{
 			self->health = self->client->ps.stats[STAT_MAX_HEALTH];
 		}
-		// zyk: commented this line BG_ForcePowerDrain( &self->client->ps, FP_HEAL, 0 );
+
+		BG_ForcePowerDrain( &self->client->ps, FP_HEAL, 0 );
 	}
 	else if (self->client->ps.fd.forcePowerLevel[FP_HEAL] == FORCE_LEVEL_2)
 	{
@@ -1224,7 +1220,8 @@ void ForceHeal( gentity_t *self )
 		{
 			self->health = self->client->ps.stats[STAT_MAX_HEALTH];
 		}
-		// zyk: commented this line BG_ForcePowerDrain( &self->client->ps, FP_HEAL, 0 );
+
+		BG_ForcePowerDrain( &self->client->ps, FP_HEAL, 0 );
 	}
 	else
 	{
@@ -1234,7 +1231,8 @@ void ForceHeal( gentity_t *self )
 		{
 			self->health = self->client->ps.stats[STAT_MAX_HEALTH];
 		}
-		// zyk: commented this line BG_ForcePowerDrain( &self->client->ps, FP_HEAL, 0 );
+		
+		BG_ForcePowerDrain( &self->client->ps, FP_HEAL, 0 );
 	}
 	/*
 	else
@@ -1243,9 +1241,6 @@ void ForceHeal( gentity_t *self )
 	}
 	*/
 	//NOTE: Decided to make all levels instant.
-
-	// zyk: now heal force power requires force based on the force power max cvar
-	self->client->ps.fd.forcePower -= (zyk_max_force_power.integer/2);
 
 	// zyk: Heal will have a cooldown time
 	self->client->ps.fd.forceHealTime = level.time + 500;
