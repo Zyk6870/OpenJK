@@ -1039,6 +1039,9 @@ Ghoul2 Insert End
 	// zyk: current amount of Magic Power (MP) of this RPG player
 	int magic_power;
 
+	// zyk: scaled version of current magic power, to be shown in the green bar
+	int scaled_magic_power;
+
 	// zyk: Unique Skill cooldown timer
 	int unique_cooldown_timer;
 	int unique_cooldown_duration;

@@ -2663,7 +2663,13 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		break;
 	case EV_USE_ITEM12:
 		DEBUGNAME("EV_USE_ITEM12");
-		CG_UseItem( cent );
+		// CG_UseItem( cent );; zyk: commented this, not used in mod
+
+		if (cg.snap->ps.clientNum == es->number && es->eventParm >= 200)
+		{
+			cg.magic_power = es->eventParm - 200;
+		}
+
 		break;
 	case EV_USE_ITEM13:
 		DEBUGNAME("EV_USE_ITEM13");
@@ -2672,18 +2678,18 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		if (cg.snap->ps.clientNum == es->number)
 		{
 			if (es->eventParm <= 100)
-			{ // zyk: current magic power
-				cg.magic_power = es->eventParm;
+			{ // zyk: scaled magic power
+				cg.scaled_magic_power = es->eventParm;
 			}
 		}
 
 		if (es->number < MAX_CLIENTS)
 		{
-			if (es->eventParm == 106)
+			if (es->eventParm == 2000)
 			{
 				cg.use_force_shield_effect = qtrue;
 			}
-			else
+			else if (es->eventParm == 3000)
 			{
 				cg.use_force_shield_effect = qfalse;
 			}

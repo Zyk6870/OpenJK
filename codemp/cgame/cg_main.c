@@ -2457,7 +2457,8 @@ Ghoul2 Insert End
 
 	cg.use_force_shield_effect = qfalse;
 
-	cg.magic_power = 100;
+	cg.magic_power = 0;
+	cg.scaled_magic_power = 100;
 
 	cg.unique_cooldown_timer = 0;
 	cg.unique_cooldown_duration = 0;

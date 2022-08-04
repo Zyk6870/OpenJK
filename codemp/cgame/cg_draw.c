@@ -1269,7 +1269,10 @@ static void CG_DrawSimpleSaberStyle( const centity_t *cent )
 		break;
 	}
 
-	CG_DrawProportionalString( SCREEN_WIDTH - (weapX + 16 + 32), (SCREEN_HEIGHT - 80) + 40, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor] );
+	// CG_DrawProportionalString( SCREEN_WIDTH - (weapX + 16 + 32), (SCREEN_HEIGHT - 80) + 40, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor] );
+
+	// zyk: new screen position
+	CG_DrawProportionalString(SCREEN_WIDTH - (weapX + 16 + 32), (SCREEN_HEIGHT - 80) + 24 + 28, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor]);
 }
 
 static void CG_DrawSimpleAmmo( const centity_t *cent )
@@ -1394,7 +1397,7 @@ static void CG_DrawSimpleForcePower( const centity_t *cent )
 	// CG_DrawProportionalString( SCREEN_WIDTH - (18 + 14 + 32), (SCREEN_HEIGHT - 80) + 40 + 14, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor] );
 
 	// zyk: new draw position
-	CG_DrawProportionalString((8 + 8), (SCREEN_HEIGHT - 80) + 24 + 28, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor]);
+	CG_DrawProportionalString(SCREEN_WIDTH - (40 + 8), (SCREEN_HEIGHT - 80) + 24 + 14, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor]);
 }
 
 /*
@@ -1426,10 +1429,10 @@ void CG_DrawHUD(centity_t	*cent)
 			CG_DrawProportionalString( x+8+4, y+24+14, va( "%i", cg.snap->ps.stats[STAT_ARMOR] ), UI_SMALLFONT|UI_DROPSHADOW, colorTable[CT_HUD_GREEN] );
 
 			// zyk: current jetpackFuel
-			CG_DrawProportionalString(SCREEN_WIDTH - (40 + 16), y + 24, va("%i", cg.snap->ps.jetpackFuel), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_MAGENTA]);
+			CG_DrawProportionalString((8 + 8), y + 24 + 28, va("%i", cg.snap->ps.jetpackFuel), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_MAGENTA]);
 
 			// zyk: current MP
-			CG_DrawProportionalString(SCREEN_WIDTH - (40 + 8), y + 24 + 14, va("%i", cg.magic_power), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_GREEN]);
+			CG_DrawProportionalString(SCREEN_WIDTH - (40 + 16), y + 24, va("%i", cg.magic_power), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_GREEN]);
 
 			CG_DrawSimpleForcePower( cent );
 
@@ -7364,7 +7367,7 @@ void CG_DrawMagicPower(void)
 	vec4_t cColor;
 	float x = 10.0;
 	float y = RPG_BAR_Y;
-	float scaled_magic_power = cg.magic_power;
+	float scaled_magic_power = cg.scaled_magic_power;
 
 	if (cg_hudFiles.integer)
 	{ // zyk: simple hud

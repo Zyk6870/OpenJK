@@ -772,8 +772,8 @@ typedef struct clientPersistant_s {
 	// 11 - using Energy Crystal
 	// 12 - Give Command - Force
 	// 13 - Give Command - Guns
-	// 14 - Sending current Magic Power event
-	// 15 - unused
+	// 14 - Sending scaled current Magic Power event
+	// 15 - Sending current Magic Power event
 	// 16 - unused
 	// 17 - unused
 	// 18 - NPC has the guard order
