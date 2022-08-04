@@ -582,72 +582,96 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == 55)
 		return "increases the max amount of Magic Points the player can have. It is based on the current player level";
 	if (skill_index == 56)
-		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Mimic Damage. If you take damage, does part of the damage back to the enemy. Spends 50 force and 25 mp\nForce User: Force Shield. Greatly reduces damage and protects against force powers\nGunner: Poison Darts. Fires poison darts with melee by spending metal bolts ammo\nWizard: Magic Buff. Increases magic bolts, Magic Explosion and Healing Area damage. Increases Enemy Weakening duration. Increases Magic Sense duration. Healing Area heals more";
+		return "Bind with ^3/bind <key> unique 56 ^7to use it\nVertical DFA. Makes you jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force";
 	if (skill_index == 57)
-		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Thermal Throw, which throws 3 thermal detonators with higher damage. Spends 3 thermals and 3 power cell ammo\nForce User: Force Maelstrom, which grips enemies nearby, damages them, sets force shield and uses lightning if player has the force power. Spends 50 force\nGunner: Homing Rocket, which shoots a powerful rocket that automatically goes after the nearest target. Spends 2 rockets and 2 power cell ammo\nWizard: Faster Bolts, which increases speed and firerate of magic bolts";
+		return "Bind with ^3/bind <key> unique 57 ^7to use it\nNo Attack. Makes the nearby enemies not able to attack for some seconds. Spends 50 force";
 	if (skill_index == 58)
-		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Vertical DFA, which makes him jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force\nForce User: Force Repulse, which damages and pushes everyone away from you. Spends 50 force\nGunner: Lightning Shield, which increases resistance to damage, does a bit of damage to enemies nearby. Using /unique 1 again will release a small lightning dome. Spends 5 power cell ammo\nWizard: Meditation Strength, which increases auto-healing, force regen, and his own resistance is heavily increased. Spends 5 mp";
+		return "Bind with ^3/bind <key> unique 58 ^7to use it\nFast Dash. Makes you do a dash towards where he is looking at. If he hits someone, damages and knocks the target down. Spends 50 force and 10 mp";
 	if (skill_index == 59)
-		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: No Attack, which makes the nearby enemies not able to attack for some seconds. Spends 50 force\nForce User: Force Scream, which sets the resistance shield during 6 seconds. Player makes a scream that damages nearby enemies and may cause stun anim on them. Spends 50 force\nGunner: Wrist Shot, which allows shooting up to five powerful blaster shots. Spends 5 blaster pack ammo and 5 more per shot\nWizard: Meditation Drain, which heavily increases resistance, gives auto-healing and drains shield and health from enemies nearby to restore health and shield. Spends 5 mp";
+		return "Bind with ^3/bind <key> unique 59 ^7to use it\nForce Shield. Greatly reduces damage and protects against force powers. Spends 50 force";
 	if (skill_index == 60)
-		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Fast Dash, which makes him do a dash towards where he is looking at. If he hits someone, damages and knocks the target down. Spends 50 force and 10 mp\nForce User: Force Storm, which protects you with Force Shield and attacks enemies nearby with powerful lightning strikes. The strikes slows down enemies and disable jetpack and cloak item. Spends 50 force\nGunner: Timed Bomb, which places a powerful bomb that explodes after some seconds. Spends 5 power cell ammo and 5 metal bolts ammo\nWizard: Elemental Attack, a magic power that hits enemies with the power of the elements. Spends 20 mp";
+		return "Bind with ^3/bind <key> unique 60 ^7to use it\nForce Maelstrom. Grips enemies nearby, damages them, sets force shield and uses lightning if player has the force power. Spends 50 force";
 	if (skill_index == 61)
-		return "Bind with ^3/bind <key> unique <unique skill number between 1 and 6> ^7to use it\nFree Warrior: Spin Throw, which spins the saber and does a slash attack, doing a lot of damage. If used again during the first spin slash move, does a spin throw attack. Spends 50 force\nForce User: Force Attraction, which damages and pulls enemies towards the user. Spends 50 force\nGunner: Aimed Shot, in which he aims with the disruptor rifle and fires a charged shot with 100 per cent accuracy. Spends 30 power cell ammo\nWizard: Super Beam, a powerful beam with high damage. Spends 25 mp";
+		return "Bind with ^3/bind <key> unique 61 ^7to use it\nForce Repulse. Damages and pushes everyone away from you. Spends 50 force";
 	if (skill_index == 62)
-		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels";
+		return "Bind with ^3/bind <key> unique 62 ^7to use it\nForce Scream. Player makes a scream that damages nearby enemies and may cause stun anim on them. Spends 50 force";
 	if (skill_index == 63)
-		return "creates an energy area that heals you and your allies and damage enemies";
+		return "Bind with ^3/bind <key> unique 63 ^7to use it\nForce Storm. Attacks enemies nearby with powerful lightning strikes. The strikes slows down enemies and disable jetpack and cloak item. Spends 50 force";
 	if (skill_index == 64)
-		return "decreases damage and resistance of enemies nearby";
+		return "Bind with ^3/bind <key> unique 64 ^7to use it\nForce Attraction. Damages and pulls enemies towards the user. Spends 50 force";
 	if (skill_index == 65)
-		return "creates an explosion that does a lot of damage";
+		return "Bind with ^3/bind <key> unique 65 ^7to use it\nPoison Darts. Fires poison darts with melee by spending metal bolts ammo";
 	if (skill_index == 66)
-		return "damages enemies, draining their hp and healing you";
+		return "Bind with ^3/bind <key> unique 66 ^7to use it\nHoming Rocket. Shoots a powerful rocket that automatically goes after the nearest target. Spends 2 rockets and 2 power cell ammo";
 	if (skill_index == 67)
-		return "attacks enemies nearby with water, causing high damage";
+		return "Bind with ^3/bind <key> unique 67 ^7to use it\nLightning Shield. Increases resistance to damage and does a bit of damage to enemies nearby. Using /unique 1 again will release a small lightning dome. Spends 5 power cell ammo";
 	if (skill_index == 68)
-		return "greatly damages enemies nearby with a stalagmite";
+		return "Bind with ^3/bind <key> unique 68 ^7to use it\nTimed Bomb. Places a powerful bomb that explodes after some seconds. Spends 5 power cell ammo and 5 metal bolts ammo";
 	if (skill_index == 69)
-		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
+		return "Bind with ^3/bind <key> unique 69 ^7to use it\nAimed Shot. Aims with the disruptor rifle and fires a charged shot with 100 per cent accuracy. Spends 30 power cell ammo";
 	if (skill_index == 70)
-		return "knocks people down causing damage";
+		return "Bind with ^3/bind <key> unique 70 ^7to use it\nFaster Bolts. Increases speed and firerate of magic bolts. Spends 2 mp";
 	if (skill_index == 71)
-		return "rocks keep falling at the enemies, causing high damage";
+		return "Bind with ^3/bind <key> unique 71 ^7to use it\nMeditation Drain. Heavily increases damage resistance, gives auto-healing and drains shield and health from enemies nearby to restore health and shield. Spends 5 mp";
 	if (skill_index == 72)
-		return "a rock appears around you, absorbing 99 per cent of any damage you take. It the rock takes a certain amount of damage, it breaks. At level 2, the rock absorbs more damage";
+		return "Bind with ^3/bind <key> unique 72 ^7to use it\nElemental Attack. A magic power that hits enemies with the power of the elements. Spends 20 mp";
 	if (skill_index == 73)
-		return "a big tree appears, protecting you from attacks and healing you";
+		return "Bind with ^3/bind <key> unique 73 ^7to use it\nSuper Beam. A powerful beam with high damage. Spends 25 mp";
 	if (skill_index == 74)
-		return "fires a flame burst for some seconds";
+		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels";
 	if (skill_index == 75)
-		return "a flame jet appears at the enemies and damages them. At level 2, if the flame hits the target, it will catch fire";
+		return "creates an energy area that heals you and your allies and damage enemies";
 	if (skill_index == 76)
-		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
+		return "decreases damage and resistance of enemies nearby";
 	if (skill_index == 77)
-		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
+		return "creates an explosion that does a lot of damage";
 	if (skill_index == 78)
-		return "blows people away for some seconds";
+		return "damages enemies, draining their hp and healing you";
 	if (skill_index == 79)
-		return "makes people go towards you";
+		return "attacks enemies nearby with water, causing high damage";
 	if (skill_index == 80)
-		return "increases your run speed";
+		return "greatly damages enemies nearby with a stalagmite";
 	if (skill_index == 81)
-		return "decreases run speed of enemies nearby";
+		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
 	if (skill_index == 82)
-		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
+		return "knocks people down causing damage";
 	if (skill_index == 83)
-		return "an energy dome appears at enemies, damaging anyone inside it";
+		return "rocks keep falling at the enemies, causing high damage";
 	if (skill_index == 84)
-		return "damages, stuns, slowers and electrifies enemies";
+		return "a rock appears around you, absorbing 99 per cent of any damage you take. It the rock takes a certain amount of damage, it breaks. At level 2, the rock absorbs more damage";
 	if (skill_index == 85)
-		return "damages enemies in the area and recovers your hp";
+		return "a big tree appears, protecting you from attacks and healing you";
 	if (skill_index == 86)
-		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
+		return "fires a flame burst for some seconds";
 	if (skill_index == 87)
-		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
+		return "a flame jet appears at the enemies and damages them. At level 2, if the flame hits the target, it will catch fire";
 	if (skill_index == 88)
-		return "creates a dome that does lightning damage";
+		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
 	if (skill_index == 89)
+		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
+	if (skill_index == 90)
+		return "blows people away for some seconds";
+	if (skill_index == 91)
+		return "makes people go towards you";
+	if (skill_index == 92)
+		return "increases your run speed";
+	if (skill_index == 93)
+		return "decreases run speed of enemies nearby";
+	if (skill_index == 94)
+		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
+	if (skill_index == 95)
+		return "an energy dome appears at enemies, damaging anyone inside it";
+	if (skill_index == 96)
+		return "damages, stuns, slowers and electrifies enemies";
+	if (skill_index == 97)
+		return "damages enemies in the area and recovers your hp";
+	if (skill_index == 98)
+		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
+	if (skill_index == 99)
+		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
+	if (skill_index == 100)
+		return "creates a dome that does lightning damage";
+	if (skill_index == 101)
 		return "paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed";
 
 	return "";
