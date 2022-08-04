@@ -9977,7 +9977,7 @@ void CG_Player( centity_t *cent ) {
 	if (cent->currentState.number < MAX_CLIENTS && 
 		cent->currentState.powerups & (1 << PW_NEUTRALFLAG))
 	{ 
-		if (cg.use_force_shield_effect == qtrue) // zyk: Force User, draws the Force Shield effect
+		if (cg.use_rpg_effect[cent->currentState.number] == 1) // zyk: draws the Force Shield effect
 		{
 			CG_DrawPlayerSphere(cent, cent->lerpOrigin, 1.4f, cgs.media.ysaliblueShader);
 		}

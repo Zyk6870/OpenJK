@@ -2455,8 +2455,6 @@ Ghoul2 Insert End
 	// zyk: initialize this value, used by RPG Mode
 	cg.rpg_stuff = 0;
 
-	cg.use_force_shield_effect = qfalse;
-
 	cg.magic_power = 0;
 	cg.scaled_magic_power = 100;
 
@@ -2470,6 +2468,7 @@ Ghoul2 Insert End
 	for (j = 0; j < MAX_CLIENTS; j++)
 	{
 		cg.zyk_rpg_stuff[j] = 0;
+		cg.use_rpg_effect[j] = 0;
 	}
 
 	cgs.processedSnapshotNum = serverMessageNum;

@@ -1034,7 +1034,8 @@ Ghoul2 Insert End
 	// 1 - Blue Jetpack Flame
 	int rpg_stuff;
 
-	qboolean use_force_shield_effect;
+	// zyk: has the client ids of the player to have the Force Shield effect drawn or not
+	int use_rpg_effect[MAX_CLIENTS];
 
 	// zyk: current amount of Magic Power (MP) of this RPG player
 	int magic_power;

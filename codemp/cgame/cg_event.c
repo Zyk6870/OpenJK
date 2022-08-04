@@ -2683,18 +2683,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			}
 		}
 
-		if (es->number < MAX_CLIENTS)
-		{
-			if (es->eventParm == 2000)
-			{
-				cg.use_force_shield_effect = qtrue;
-			}
-			else if (es->eventParm == 3000)
-			{
-				cg.use_force_shield_effect = qfalse;
-			}
-		}
-
 		break;
 	case EV_USE_ITEM14:
 		DEBUGNAME("EV_USE_ITEM14");
@@ -2715,6 +2703,18 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_ITEMUSEFAIL:
 		DEBUGNAME("EV_ITEMUSEFAIL");
+
+		if (es->number < MAX_CLIENTS)
+		{ // zyk: Force Shield
+			if (es->eventParm == 9)
+			{
+				cg.use_rpg_effect[es->number] = 0;
+			}
+			else if (es->eventParm == 10)
+			{
+				cg.use_rpg_effect[es->number] = 1;
+			}
+		}
 
 		if (cg.snap->ps.clientNum == es->number)
 		{
@@ -2774,6 +2774,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				cg.zyk_rpg_stuff[es->number] &= ~(1 << 0);
 			}
 		}
+
 		break;
 
 	//=================================================================

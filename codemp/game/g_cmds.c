@@ -10714,8 +10714,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 				zyk_force_dash(ent);
 
-				send_rpg_events(2000);
-
 				rpg_skill_counter(ent, 200);
 			}
 			else
@@ -11135,8 +11133,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 				ent->client->pers.active_unique_skill = unique_skill_number;
 
-				send_rpg_events(2000);
-
 				rpg_skill_counter(ent, 200);
 			}
 			else
@@ -11179,8 +11175,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 				elemental_attack(ent);
 
-				send_rpg_events(2000);
-
 				ent->client->pers.quest_power_usage_timer = level.time + 10000;
 
 				display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
@@ -11209,8 +11203,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 				zyk_super_beam(ent, ent->client->ps.viewangles[1]);
 
-				send_rpg_events(2000);
-
 				rpg_skill_counter(ent, 200);
 			}
 			else
@@ -11221,6 +11213,8 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 		// zyk: Unique Skill cooldown time
 		ent->client->pers.unique_skill_timer = level.time + 25000;
+
+		send_rpg_events(2000);
 
 		Cmd_ZykMod_f(ent);
 	}
