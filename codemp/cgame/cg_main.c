@@ -2455,7 +2455,6 @@ Ghoul2 Insert End
 	// zyk: initialize this value, used by RPG Mode
 	cg.rpg_stuff = 0;
 
-	cg.magic_power = 0;
 	cg.scaled_magic_power = 100;
 
 	cg.unique_cooldown_timer = 0;

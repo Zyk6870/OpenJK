@@ -963,19 +963,12 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 			client->pers.player_statuses |= (1 << 7);
 		}
-		else if (!(client->pers.player_statuses & (1 << 15)))
-		{ // zyk: send current magic power to client-side mod
-			G_AddEvent(ent, EV_USE_ITEM12, 200 + client->pers.magic_power);
-
-			client->pers.player_statuses |= (1 << 15);
-		}
 		else
 		{
 			client->pers.player_statuses &= ~(1 << 2);
 			client->pers.player_statuses &= ~(1 << 3);
 			client->pers.player_statuses &= ~(1 << 7);
 			client->pers.player_statuses &= ~(1 << 14);
-			client->pers.player_statuses &= ~(1 << 15);
 		}
 	}
 }

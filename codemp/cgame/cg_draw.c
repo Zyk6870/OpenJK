@@ -1432,7 +1432,7 @@ void CG_DrawHUD(centity_t	*cent)
 			CG_DrawProportionalString((8 + 8), y + 24 + 28, va("%i", cg.snap->ps.jetpackFuel), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_MAGENTA]);
 
 			// zyk: current MP
-			CG_DrawProportionalString(SCREEN_WIDTH - (40 + 16), y + 24, va("%i", cg.magic_power), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_GREEN]);
+			CG_DrawProportionalString(SCREEN_WIDTH - (40 + 16), y + 24, va("%i", cg.scaled_magic_power), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_GREEN]);
 
 			CG_DrawSimpleForcePower( cent );
 
@@ -8334,7 +8334,7 @@ static void CG_Draw2D( void ) {
 
 	if (cg_drawStatus.integer && cg.snap->ps.stats[STAT_MAX_HEALTH] > 100)
 	{
-		if (cg.magic_power < 100)
+		if (cg.scaled_magic_power < 100)
 		{ // zyk: draw magic power bar if it is not full and it is a rpg player
 			CG_DrawMagicPower();
 		}
