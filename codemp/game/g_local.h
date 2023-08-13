@@ -739,6 +739,7 @@ typedef enum {
 	SKILL_MAX_HEALTH,
 	SKILL_HEALTH_STRENGTH,
 	SKILL_DRAIN_SHIELD,
+	SKILL_MAX_WEIGHT,
 	SKILL_RUN_SPEED,
 	SKILL_UNIQUE_1,
 	SKILL_UNIQUE_2,
@@ -1009,6 +1010,12 @@ typedef struct clientPersistant_s {
 
 	// zyk: amount of skills used by the player. After a certain amount of uses, player gets 1 experience point (level up score)
 	int skill_counter;
+
+	// zyk: current weight of stuff the player is carrying
+	int current_weight;
+
+	// zyk: max weight of stuff the player can carry
+	int max_weight;
 
 	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
 	// Possible values are:

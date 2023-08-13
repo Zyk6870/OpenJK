@@ -137,6 +137,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAX_HEALTH] = 5;
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
 	max_skill_levels[SKILL_DRAIN_SHIELD] = 1;
+	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
 	max_skill_levels[SKILL_RUN_SPEED] = 3;
 	
 	max_skill_levels[SKILL_UNIQUE_1] = 1;
@@ -237,6 +238,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
 	skill_names[SKILL_DRAIN_SHIELD] = "Drain Shield";
+	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
 
 	skill_names[SKILL_UNIQUE_1] = "Vertical DFA";
@@ -413,6 +415,8 @@ char* zyk_skill_description(int skill_index)
 		return "Each level increases your health resistance by 5 per cent";
 	if (skill_index == SKILL_DRAIN_SHIELD)
 		return "When using Drain force power, and your health is full, restores some shield. It also makes Drain suck hp/shield from the enemy to restore your hp/shield";
+	if (skill_index == SKILL_MAX_WEIGHT)
+		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio";
 	if (skill_index == SKILL_RUN_SPEED)
 		return va("At level 0 your run speed is %f. Each level increases it by 50", g_speed.value);
 	
@@ -4615,6 +4619,12 @@ void set_max_shield(gentity_t *ent)
 	ent->client->pers.max_rpg_shield = (int)ceil(((ent->client->pers.skill_levels[SKILL_MAX_SHIELD] * 1.0)/5) * ent->client->pers.max_rpg_health);
 }
 
+// zyk: sets the Max Weight of stuff the player can carry
+void set_max_weight(gentity_t* ent)
+{
+	ent->client->pers.max_weight = 200 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 80);
+}
+
 // zyk: gives credits to the player
 void add_credits(gentity_t *ent, int credits)
 {
@@ -5139,6 +5149,9 @@ void initialize_rpg_skills(gentity_t *ent)
 		// zyk: loading initial shield of the player
 		set_max_shield(ent);
 		ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
+
+		// zyk: setting the max weight of stuff the player can carry
+		set_max_weight(ent);
 
 		// zyk: update the rpg stuff info at the client-side game
 		send_rpg_events(10000);
@@ -5903,7 +5916,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^2", SKILL_MAGIC_1, SKILL_MAGIC_28, 18);
+		zyk_list_category_skills(ent, target_ent, "^2", SKILL_MAGIC_FIST, SKILL_MAGIC_28, 18);
 	}
 }
 
@@ -5926,7 +5939,7 @@ void zyk_list_stuff(gentity_t *ent, gentity_t *target_ent)
 
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Level: ^7%d/%d\n^3Level Up Score: ^7%d/%d\n^3Skill Points: ^7%d\n^3Skill Counter: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.level, zyk_rpg_max_level.integer, ent->client->pers.level_up_score, (ent->client->pers.level * zyk_level_up_score_factor.integer), ent->client->pers.skillpoints, ent->client->pers.skill_counter, zyk_max_skill_counter.integer, ent->client->pers.magic_power, zyk_max_magic_power(ent), ent->client->pers.credits));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Level: ^7%d/%d\n^3Level Up Score: ^7%d/%d\n^3Skill Points: ^7%d\n^3Skill Counter: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.level, zyk_rpg_max_level.integer, ent->client->pers.level_up_score, (ent->client->pers.level * zyk_level_up_score_factor.integer), ent->client->pers.skillpoints, ent->client->pers.skill_counter, zyk_max_skill_counter.integer, ent->client->pers.magic_power, zyk_max_magic_power(ent), ent->client->pers.current_weight, ent->client->pers.max_weight, ent->client->pers.credits));
 }
 
 /*
