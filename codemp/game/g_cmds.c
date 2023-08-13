@@ -135,21 +135,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_SHIELD_HEAL] = 3;
 	max_skill_levels[SKILL_TEAM_SHIELD_HEAL] = 3;
 	max_skill_levels[SKILL_MAGIC_FIST] = 5;
-	max_skill_levels[SKILL_BLASTER_PACK] = 4;
-	max_skill_levels[SKILL_POWERCELL] = 4;
-	max_skill_levels[SKILL_METAL_BOLTS] = 4;
-	max_skill_levels[SKILL_ROCKETS] = 4;
-	max_skill_levels[SKILL_THERMALS] = 3;
-	max_skill_levels[SKILL_TRIP_MINES] = 3;
-	max_skill_levels[SKILL_DETPACKS] = 3;
-	max_skill_levels[SKILL_BINOCULARS] = 1;
-	max_skill_levels[SKILL_BACTA_CANISTER] = 1;
-	max_skill_levels[SKILL_SENTRY_GUN] = 1;
-	max_skill_levels[SKILL_SEEKER_DRONE] = 1;
-	max_skill_levels[SKILL_EWEB] = 1;
-	max_skill_levels[SKILL_BIG_BACTA] = 1;
-	max_skill_levels[SKILL_FORCE_FIELD] = 1;
-	max_skill_levels[SKILL_CLOAK_ITEM] = 1;
 	max_skill_levels[SKILL_FORCE_POWER] = 5;
 	max_skill_levels[SKILL_MAX_MP] = 5;
 	max_skill_levels[SKILL_UNIQUE_1] = 1;
@@ -245,21 +230,6 @@ char* zyk_skill_name(int skill_index)
 		"Shield Heal",
 		"Team Shield Heal",
 		"Magic Fist",
-		"Blaster Pack",
-		"Powercell",
-		"Metal Bolts",
-		"Rockets",
-		"Thermals",
-		"Trip Mines",
-		"Detpacks",
-		"Binoculars",
-		"Bacta Canister",
-		"Sentry Gun",
-		"Seeker Drone",
-		"E-Web",
-		"Big Bacta",
-		"Force Field",
-		"Cloak Item",
 		"Force Power",
 		"Max MP",
 		"Vertical DFA",
@@ -401,21 +371,6 @@ char* zyk_allowed_skill_color(int skill_index)
 		"^6",
 		"^6",
 		"^6",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
 		"^3",
 		"^5",
 		"^3",
@@ -4995,8 +4950,6 @@ void initialize_rpg_skills(gentity_t *ent)
 		int i = 0;
 		gentity_t* this_ent = NULL;
 		int sentry_guns_iterator = 0;
-		int gunner_items_iterator = 0;
-		int gunner_items_skill_indexes[MAX_GUNNER_ITEMS] = { 47, 51, 48, 49, 52 };
 
 		// zyk: validating max skill levels. If for some reason a skill is above max, get the skillpoint back
 		for (i = 0; i < NUMBER_OF_SKILLS; i++)
@@ -5264,6 +5217,7 @@ void initialize_rpg_skills(gentity_t *ent)
 		if (ent->client->pers.skill_levels[SKILL_BRYAR_PISTOL] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BRYAR_OLD);
 
+		/*
 		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_THERMAL)) && ent->client->pers.skill_levels[SKILL_THERMALS] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_THERMAL);
 		if (ent->client->pers.skill_levels[SKILL_THERMALS] == 0)
@@ -5278,31 +5232,7 @@ void initialize_rpg_skills(gentity_t *ent)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
 		if (ent->client->pers.skill_levels[SKILL_DETPACKS] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_DET_PACK);
-
-		// zyk: loading initial RPG ammo at spawn
-		ent->client->ps.ammo[AMMO_BLASTER] = ((int)ceil(zyk_max_blaster_pack_ammo.value/ zyk_max_skill_level(SKILL_BLASTER_PACK)) * ent->client->pers.skill_levels[SKILL_BLASTER_PACK]);
-		ent->client->ps.ammo[AMMO_POWERCELL] = ((int)ceil(zyk_max_power_cell_ammo.value/ zyk_max_skill_level(SKILL_POWERCELL)) * ent->client->pers.skill_levels[SKILL_POWERCELL]);
-		ent->client->ps.ammo[AMMO_METAL_BOLTS] = ((int)ceil(zyk_max_metal_bolt_ammo.value/ zyk_max_skill_level(SKILL_METAL_BOLTS)) * ent->client->pers.skill_levels[SKILL_METAL_BOLTS]);
-		ent->client->ps.ammo[AMMO_ROCKETS] = ((int)ceil(zyk_max_rocket_ammo.value/ zyk_max_skill_level(SKILL_ROCKETS)) * ent->client->pers.skill_levels[SKILL_ROCKETS]);
-		ent->client->ps.ammo[AMMO_THERMAL] = ((int)ceil(zyk_max_thermal_ammo.value/3.0) * ent->client->pers.skill_levels[SKILL_THERMALS]);
-		ent->client->ps.ammo[AMMO_TRIPMINE] = ((int)ceil(zyk_max_tripmine_ammo.value/3.0) * ent->client->pers.skill_levels[SKILL_TRIP_MINES]);
-		ent->client->ps.ammo[AMMO_DETPACK] = ((int)ceil(zyk_max_detpack_ammo.value/3.0) * ent->client->pers.skill_levels[SKILL_DETPACKS]);
-		
-		// zyk: player starts with more items if he has the Inventory Capacity upgrade
-		for (gunner_items_iterator = 0; gunner_items_iterator < MAX_GUNNER_ITEMS; gunner_items_iterator++)
-		{
-			if (ent->client->pers.skill_levels[gunner_items_skill_indexes[gunner_items_iterator]] > 0)
-			{
-				if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY))
-					ent->client->pers.gunner_items[gunner_items_iterator] = NUMBER_OF_GUNNER_ITEMS;
-				else
-					ent->client->pers.gunner_items[gunner_items_iterator] = 1;
-			}
-			else
-			{
-				ent->client->pers.gunner_items[gunner_items_iterator] = 0;
-			}
-		}
+		*/
 
 		ent->client->pers.bounty_hunter_placed_sentries = 0;
 
@@ -5314,6 +5244,7 @@ void initialize_rpg_skills(gentity_t *ent)
 				ent->client->pers.bounty_hunter_placed_sentries++;
 		}
 
+		/*
 		// zyk: reseting initial holdable items of the player
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SEEKER) & ~(1 << HI_BINOCULARS) & ~(1 << HI_SENTRY_GUN) & ~(1 << HI_EWEB) & ~(1 << HI_CLOAK) & ~(1 << HI_SHIELD) & ~(1 << HI_MEDPAC) & ~(1 << HI_MEDPAC_BIG);
 
@@ -5340,6 +5271,7 @@ void initialize_rpg_skills(gentity_t *ent)
 
 		if (ent->client->pers.skill_levels[SKILL_CLOAK_ITEM] > 0)
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_CLOAK);
+		*/
 
 		// zyk: loading initial health of the player
 		set_max_health(ent);
@@ -6109,21 +6041,13 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	{
 		zyk_list_category_skills(ent, target_ent, 11, 30, 15);
 	}
-	else if (Q_stricmp( arg1, "ammo" ) == 0)
-	{
-		zyk_list_category_skills(ent, target_ent, 7, 39, 12);
-	}
-	else if (Q_stricmp( arg1, "items" ) == 0)
-	{
-		zyk_list_category_skills(ent, target_ent, 8, 46, 11);
-	}
 	else if (Q_stricmp(arg1, "unique") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 18, 56, 18);
+		zyk_list_category_skills(ent, target_ent, 18, 41, 18);
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 28, 74, 18);
+		zyk_list_category_skills(ent, target_ent, 28, 59, 18);
 	}
 }
 
@@ -6173,10 +6097,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 			if (Q_stricmp( arg1, "rpg" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list ammo: ^7lists ammo skills\n^2/list items: ^7lists holdable items skills\n^2/list unique: ^7lists unique skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list stuff: ^7lists upgrades bought from seller\n\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list unique: ^7lists unique skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list stuff: ^7lists upgrades bought from seller\n\n\"");
 			}
 			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || Q_stricmp( arg1, "other" ) == 0 || 
-					 Q_stricmp( arg1, "ammo" ) == 0 || Q_stricmp( arg1, "items" ) == 0 || Q_stricmp(arg1, "unique") == 0 || Q_stricmp(arg1, "magic") == 0)
+					 Q_stricmp(arg1, "unique") == 0 || Q_stricmp(arg1, "magic") == 0)
 			{
 				zyk_list_player_skills(ent, ent, G_NewString(arg1));
 			}
