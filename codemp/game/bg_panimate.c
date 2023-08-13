@@ -2879,9 +2879,6 @@ setAnimLegs:
 					else if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_3){
 						ps->legsTimer /= 2.5;
 					}
-					else if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_4){
-						ps->legsTimer /= 2.9;
-					}
 				}
 			}
 		}

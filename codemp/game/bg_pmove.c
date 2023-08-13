@@ -8807,9 +8807,6 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 		else if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_3){
 			ps->speed *= 2.5f; // zyk: changed speed value
 		}
-		else if (ps->fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_4){
-			ps->speed *= 2.9f; // zyk: changed speed value
-		}
 	}
 	else if (ps->fd.forcePowersActive & (1 << FP_RAGE))
 	{
