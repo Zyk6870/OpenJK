@@ -2683,6 +2683,11 @@ void ClientThink_real( gentity_t *ent ) {
 			zyk_player_speed *= bgSiegeClasses[client->siegeClass].speed;
 		}
 
+		if (client->sess.amrpgmode == 2 && client->pers.skill_levels[SKILL_RUN_SPEED] > 0)
+		{ // zyk: Run Speed skill
+			zyk_player_speed += (client->pers.skill_levels[SKILL_RUN_SPEED] * 50.0f);
+		}
+
 		if (client->bodyGrabIndex != ENTITYNUM_NONE)
 		{ //can't go nearly as fast when dragging a body around
 			zyk_player_speed *= 0.2f;

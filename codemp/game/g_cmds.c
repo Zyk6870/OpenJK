@@ -114,6 +114,11 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_DRAIN] = 3;
 	max_skill_levels[SKILL_RAGE] = 4;
 	max_skill_levels[SKILL_TEAM_ENERGIZE] = 3;
+	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
+	max_skill_levels[SKILL_SHIELD_HEAL] = 3;
+	max_skill_levels[SKILL_TEAM_SHIELD_HEAL] = 3;
+	max_skill_levels[SKILL_FORCE_POWER] = 5;
+
 	max_skill_levels[SKILL_STUN_BATON] = 3;
 	max_skill_levels[SKILL_BLASTER_PISTOL] = 3;
 	max_skill_levels[SKILL_E11_BLASTER_RIFLE] = 3;
@@ -126,16 +131,13 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_CONCUSSION_RIFLE] = 3;
 	max_skill_levels[SKILL_BRYAR_PISTOL] = 3;
 	max_skill_levels[SKILL_MELEE] = 3;
+
 	max_skill_levels[SKILL_MAX_SHIELD] = 5;
 	max_skill_levels[SKILL_SHIELD_STRENGTH] = 5;
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
 	max_skill_levels[SKILL_DRAIN_SHIELD] = 1;
-	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
-	max_skill_levels[SKILL_SHIELD_HEAL] = 3;
-	max_skill_levels[SKILL_TEAM_SHIELD_HEAL] = 3;
-	max_skill_levels[SKILL_MAGIC_FIST] = 5;
-	max_skill_levels[SKILL_FORCE_POWER] = 5;
-	max_skill_levels[SKILL_MAX_MP] = 5;
+	max_skill_levels[SKILL_RUN_SPEED] = 3;
+	
 	max_skill_levels[SKILL_UNIQUE_1] = 1;
 	max_skill_levels[SKILL_UNIQUE_2] = 1;
 	max_skill_levels[SKILL_UNIQUE_3] = 1;
@@ -148,6 +150,9 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_UNIQUE_10] = 1;
 	max_skill_levels[SKILL_UNIQUE_11] = 1;
 	max_skill_levels[SKILL_UNIQUE_12] = 1;
+
+	max_skill_levels[SKILL_MAGIC_FIST] = 5;
+	max_skill_levels[SKILL_MAX_MP] = 5;
 	max_skill_levels[SKILL_MAGIC_1] = 2;
 	max_skill_levels[SKILL_MAGIC_2] = 2;
 	max_skill_levels[SKILL_MAGIC_3] = 2;
@@ -208,6 +213,11 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_DRAIN] = "Drain";
 	skill_names[SKILL_RAGE] = "Rage";
 	skill_names[SKILL_TEAM_ENERGIZE] = "Team Energize";
+	skill_names[SKILL_SENSE_HEALTH] = "Sense Health";
+	skill_names[SKILL_SHIELD_HEAL] = "Shield Heal";
+	skill_names[SKILL_TEAM_SHIELD_HEAL] = "Team Shield Heal";
+	skill_names[SKILL_FORCE_POWER] = "Force Power";
+
 	skill_names[SKILL_STUN_BATON] = "Stun Baton";
 	skill_names[SKILL_BLASTER_PISTOL] = "Blaster Pistol";
 	skill_names[SKILL_E11_BLASTER_RIFLE] = "E11 Blaster Rifle";
@@ -220,16 +230,13 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_CONCUSSION_RIFLE] = "Concussion Rifle";
 	skill_names[SKILL_BRYAR_PISTOL] = "Bryar Pistol";
 	skill_names[SKILL_MELEE] = "Melee";
+
 	skill_names[SKILL_MAX_SHIELD] = "Max Shield";
 	skill_names[SKILL_SHIELD_STRENGTH] = "Shield Strength";
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
 	skill_names[SKILL_DRAIN_SHIELD] = "Drain Shield";
-	skill_names[SKILL_SENSE_HEALTH] = "Sense Health";
-	skill_names[SKILL_SHIELD_HEAL] = "Shield Heal";
-	skill_names[SKILL_TEAM_SHIELD_HEAL] = "Team Shield Heal";
-	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
-	skill_names[SKILL_FORCE_POWER] = "Force Power";
-	skill_names[SKILL_MAX_MP] = "Max Magic Points";
+	skill_names[SKILL_RUN_SPEED] = "Run Speed";
+
 	skill_names[SKILL_UNIQUE_1] = "Vertical DFA";
 	skill_names[SKILL_UNIQUE_2] = "No Attack";
 	skill_names[SKILL_UNIQUE_3] = "Fast Dash";
@@ -242,6 +249,9 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_UNIQUE_10] = "Poison Darts";
 	skill_names[SKILL_UNIQUE_11] = "Homing Rocket";
 	skill_names[SKILL_UNIQUE_12] = "Super Beam";
+
+	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
+	skill_names[SKILL_MAX_MP] = "Max Magic Points";
 	skill_names[SKILL_MAGIC_1] = "Magic Sense";
 	skill_names[SKILL_MAGIC_2] = "Healing Area";
 	skill_names[SKILL_MAGIC_3] = "Enemy Weakening";
@@ -365,6 +375,7 @@ char* zyk_skill_description(int skill_index)
 		return "recovers 3 shield at level 1, 6 shield at level 2 and 9 shield at level 3 to players near you. To use it, when near players, use Team Heal force power. It will heal their shield after they have full HP";
 	if (skill_index == SKILL_FORCE_POWER)
 		return "increases the max force power you have. Necessary to allow you to use force powers and force-based skills";
+
 	if (skill_index == SKILL_STUN_BATON)
 		return va("attacks someone with a small electric charge. Has %d damage multiplied by the stun baton level. Can fire the flame thrower when using alternate fire (does not work for Force User or Wizard). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
 	if (skill_index == SKILL_BLASTER_PISTOL)
@@ -389,6 +400,7 @@ char* zyk_skill_description(int skill_index)
 		return va("very similar to the blaster pistol, but this one has a better fire rate with normal shot. Does %d damage. Higher levels increase damage by 5 per cent", zyk_blaster_pistol_damage.integer);
 	if (skill_index == SKILL_MELEE)
 		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
+	
 	if (skill_index == SKILL_MAX_SHIELD)
 		return "The max shield (armor) the player can have. Each level increases 20 per cent of max shield the player can have";
 	if (skill_index == SKILL_SHIELD_STRENGTH)
@@ -397,6 +409,9 @@ char* zyk_skill_description(int skill_index)
 		return "Each level increases your health resistance by 5 per cent";
 	if (skill_index == SKILL_DRAIN_SHIELD)
 		return "When using Drain force power, and your health is full, restores some shield. It also makes Drain suck hp/shield from the enemy to restore your hp/shield";
+	if (skill_index == SKILL_RUN_SPEED)
+		return va("At level 0 your run speed is %f. Each level increases it by 50", g_speed.value);
+	
 	if (skill_index == SKILL_UNIQUE_1)
 		return "Bind with ^3/bind <key> unique 56 ^7to use it\nVertical DFA. Makes you jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force";
 	if (skill_index == SKILL_UNIQUE_2)
@@ -421,6 +436,7 @@ char* zyk_skill_description(int skill_index)
 		return "Bind with ^3/bind <key> unique 66 ^7to use it\nHoming Rocket. Shoots a powerful rocket that automatically goes after the nearest target. Spends 2 rockets and 2 power cell ammo";
 	if (skill_index == SKILL_UNIQUE_12)
 		return "Bind with ^3/bind <key> unique 73 ^7to use it\nSuper Beam. A powerful beam with high damage. Spends 25 mp";
+	
 	if (skill_index == SKILL_MAGIC_FIST)
 		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key";
 	if (skill_index == SKILL_MAX_MP)
@@ -5882,7 +5898,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp( arg1, "other" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^7", SKILL_MAX_SHIELD, SKILL_DRAIN_SHIELD, 15);
+		zyk_list_category_skills(ent, target_ent, "^7", SKILL_MAX_SHIELD, SKILL_RUN_SPEED, 15);
 	}
 	else if (Q_stricmp(arg1, "unique") == 0)
 	{
