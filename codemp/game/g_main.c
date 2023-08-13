@@ -9041,12 +9041,9 @@ void G_RunFrame( int levelTime ) {
 			{
 				int jetpack_debounce_amount = 20;
 
-				if (ent->client->sess.amrpgmode == 2)
-				{ // zyk: RPG Mode jetpack skill. Each level decreases fuel debounce
-					jetpack_debounce_amount -= (ent->client->pers.skill_levels[SKILL_JETPACK] * 2);
-
-					if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK)) // zyk: Jetpack Upgrade decreases fuel usage
-						jetpack_debounce_amount -= 2;
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK))
+				{ // zyk: Jetpack Upgrade decreases fuel debounce
+					jetpack_debounce_amount -= 4;
 				}
 
 				if (ent->client->pers.cmd.upmove > 0)

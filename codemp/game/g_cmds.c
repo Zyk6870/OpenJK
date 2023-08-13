@@ -130,7 +130,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_SHIELD_STRENGTH] = 5;
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
 	max_skill_levels[SKILL_DRAIN_SHIELD] = 1;
-	max_skill_levels[SKILL_JETPACK] = 3;
 	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
 	max_skill_levels[SKILL_SHIELD_HEAL] = 3;
 	max_skill_levels[SKILL_TEAM_SHIELD_HEAL] = 3;
@@ -231,7 +230,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_SHIELD_STRENGTH] = "Shield Strength";
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
 	skill_names[SKILL_DRAIN_SHIELD] = "Drain Shield";
-	skill_names[SKILL_JETPACK] = "Jetpack";
 	skill_names[SKILL_SENSE_HEALTH] = "Sense Health";
 	skill_names[SKILL_SHIELD_HEAL] = "Shield Heal";
 	skill_names[SKILL_TEAM_SHIELD_HEAL] = "Team Shield Heal";
@@ -411,8 +409,6 @@ char* zyk_skill_description(int skill_index)
 		return "Each level increases your health resistance by 5 per cent";
 	if (skill_index == SKILL_DRAIN_SHIELD)
 		return "When using Drain force power, and your health is full, restores some shield. It also makes Drain suck hp/shield from the enemy to restore your hp/shield";
-	if (skill_index == SKILL_JETPACK)
-		return "the jetpack, used by Boba Fett. Allows you to fly. To use it, jump and press the Use key (usually R) while in the middle of the jump. Each level uses less fuel, allowing you to fly for a longer time";
 	if (skill_index == SKILL_UNIQUE_1)
 		return "Bind with ^3/bind <key> unique 56 ^7to use it\nVertical DFA. Makes you jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force";
 	if (skill_index == SKILL_UNIQUE_2)
@@ -2225,9 +2221,8 @@ void zyk_jetpack(gentity_t* ent)
 {
 	// zyk: player starts with jetpack if it is enabled in player settings, is not in Siege Mode, and does not have all force powers through /give command
 	if (!(ent->client->pers.player_settings & (1 << SETTINGS_JETPACK)) && zyk_allow_jetpack_command.integer &&
-		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && level.gametype != GT_JEDIMASTER &&
-		!(ent->client->pers.player_statuses & (1 << 12)) &&
-		((ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_JETPACK] > 0) || ent->client->sess.amrpgmode == 1))
+		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && 
+		level.gametype != GT_JEDIMASTER && !(ent->client->pers.player_statuses & (1 << 12)) && ent->client->sess.amrpgmode < 2)
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 	}
@@ -5913,7 +5908,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp( arg1, "other" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^7", SKILL_MAX_SHIELD, SKILL_JETPACK, 15);
+		zyk_list_category_skills(ent, target_ent, "^7", SKILL_MAX_SHIELD, SKILL_DRAIN_SHIELD, 15);
 	}
 	else if (Q_stricmp(arg1, "unique") == 0)
 	{
@@ -8440,7 +8435,7 @@ void Cmd_Jetpack_f( gentity_t *ent ) {
 	}
 
 	if (!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)) && zyk_allow_jetpack_command.integer && 
-		(ent->client->sess.amrpgmode < 2 || ent->client->pers.skill_levels[SKILL_JETPACK] > 0) &&
+		 ent->client->sess.amrpgmode < 2 &&
 		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && level.gametype != GT_JEDIMASTER && 
 		!(ent->client->pers.player_statuses & (1 << 12)))
 	{ // zyk: gets jetpack if player does not have it. RPG players need jetpack skill to get it
