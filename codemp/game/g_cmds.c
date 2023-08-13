@@ -153,7 +153,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_UNIQUE_12] = 1;
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 5;
-	max_skill_levels[SKILL_MAX_MP] = 5;
+	max_skill_levels[SKILL_MAX_MP] = 10;
 	max_skill_levels[SKILL_MAGIC_1] = 2;
 	max_skill_levels[SKILL_MAGIC_2] = 2;
 	max_skill_levels[SKILL_MAGIC_3] = 2;
@@ -4384,7 +4384,7 @@ void display_yellow_bar(gentity_t *ent, int duration)
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = ((ent->client->pers.level * 9)/zyk_max_skill_level(SKILL_MAX_MP)) * ent->client->pers.skill_levels[SKILL_MAX_MP];
+	int max_mp = ent->client->pers.skill_levels[SKILL_MAX_MP] * 100;
 
 	return max_mp;
 }
