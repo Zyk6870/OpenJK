@@ -5893,20 +5893,22 @@ char* zyk_add_whitespaces(int skill_index, int biggest_skill_name_length)
 }
 
 // zyk: lists skills from a specific category
-void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, char *skill_color, int number_of_skills, int lowest_skill_index, int number_of_whitespaces)
+void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, char *skill_color, int lowest_skill_index, int highest_skill_index, int number_of_whitespaces)
 {
 	char message[1024];
 	char final_chars[32];
 	int i = 0;
+	int current_skill_index = lowest_skill_index;
+	int skill_count = (highest_skill_index - lowest_skill_index) + 1;
 
 	strcpy(message, "");
 	strcpy(final_chars, "");
 
-	for (i = 0; i < number_of_skills; i++)
+	while (i < skill_count)
 	{
 		if ((i % 2) == 0)
 		{ // zyk: adds whitespaces in first column
-			strcpy(final_chars, va("%s ", zyk_add_whitespaces(lowest_skill_index, number_of_whitespaces)));
+			strcpy(final_chars, va("%s ", zyk_add_whitespaces(current_skill_index, number_of_whitespaces)));
 		}
 		else
 		{
@@ -5914,15 +5916,11 @@ void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, char *skill
 		}
 
 		strcpy(message, va("%s%s%d - %s: %d/%d%s", message,
-			skill_color, (lowest_skill_index + 1), zyk_skill_name(lowest_skill_index),
-			ent->client->pers.skill_levels[lowest_skill_index], zyk_max_skill_level(lowest_skill_index), final_chars));
+			skill_color, (current_skill_index + 1), zyk_skill_name(current_skill_index),
+			ent->client->pers.skill_levels[current_skill_index], zyk_max_skill_level(current_skill_index), final_chars));
 
-		lowest_skill_index++;
-
-		if (lowest_skill_index == 39)
-		{ // zyk: category 'other' goes from skill index 39 to 54
-			lowest_skill_index = 54;
-		}
+		current_skill_index++;
+		i++;
 	}
 
 	if ((i % 2) != 0)
@@ -5937,23 +5935,23 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 {
 	if (Q_stricmp( arg1, "force" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^5", 18, 0, 13);
+		zyk_list_category_skills(ent, target_ent, "^5", SKILL_JUMP, SKILL_FORCE_POWER, 16);
 	}
 	else if (Q_stricmp( arg1, "weapons" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^3", 12, 18, 17);
+		zyk_list_category_skills(ent, target_ent, "^3", SKILL_STUN_BATON, SKILL_MELEE, 17);
 	}
 	else if (Q_stricmp( arg1, "other" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^7", 11, 30, 15);
+		zyk_list_category_skills(ent, target_ent, "^7", SKILL_MAX_SHIELD, SKILL_JETPACK, 15);
 	}
 	else if (Q_stricmp(arg1, "unique") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^6", 18, 41, 18);
+		zyk_list_category_skills(ent, target_ent, "^6", SKILL_UNIQUE_1, SKILL_UNIQUE_18, 18);
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^2", 28, 59, 18);
+		zyk_list_category_skills(ent, target_ent, "^2", SKILL_MAGIC_1, SKILL_MAGIC_28, 18);
 	}
 }
 
@@ -10500,7 +10498,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 	}
 
 	// zyk: uniques are set from 1 to 18
-	unique_skill_number -= 56;
+	unique_skill_number -= SKILL_UNIQUE_1;
 
 	if (ent->client->pers.active_unique_skill == 12)
 	{ // zyk: releasing the small lightning dome
