@@ -10761,13 +10761,6 @@ void PmoveSingle (pmove_t *pmove) {
 	{
 		qboolean stop_meditate_anim = qtrue;
 
-#if defined( _GAME )
-		if (player_ent && player_ent->client && player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 16)
-		{ // zyk: Meditation Drain ability does not allow stop the meditate anim
-			stop_meditate_anim = qfalse;
-		}
-#endif
-
 		if (stop_meditate_anim == qtrue && 
 			((pm->cmd.buttons&BUTTON_ATTACK)
 			|| (pm->cmd.buttons&BUTTON_ALT_ATTACK)
@@ -10917,27 +10910,22 @@ void PmoveSingle (pmove_t *pmove) {
 
 #if defined( _GAME )
 	if (player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 18)
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == (SKILL_UNIQUE_12 + 1))
 	{ // zyk: Super Beam ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
 	else if (player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 5)
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == (SKILL_UNIQUE_5 + 1))
 	{ // zyk: Force Maelstrom ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
 	else if (player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 8)
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == (SKILL_UNIQUE_8 + 1))
 	{ // zyk: Force Storm ability does not allow him to move
 		stiffenedUp = qtrue;
 	}
 	else if (player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 16)
-	{ // zyk: Meditation Drain ability does not allow him to move
-		stiffenedUp = qtrue;
-	}
-	else if (player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == 7)
+		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == (SKILL_UNIQUE_7 + 1))
 	{ // zyk: Force Scream ability does not allow him to move
 		stiffenedUp = qtrue;
 	}

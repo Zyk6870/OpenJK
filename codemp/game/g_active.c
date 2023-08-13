@@ -937,7 +937,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		}
 		else if (!(client->pers.player_statuses & (1 << 7)))
 		{ // zyk: tells client-side mod to render the Force Shield effect
-			if (client->sess.amrpgmode == 2 && client->pers.active_unique_skill == 4)
+			if (client->sess.amrpgmode == 2 && client->pers.active_unique_skill == (SKILL_UNIQUE_4 + 1))
 			{
 				G_AddEvent(ent, EV_ITEMUSEFAIL, 10);
 			}
@@ -2721,7 +2721,7 @@ void ClientThink_real( gentity_t *ent ) {
 		client->ps.speed = zyk_player_speed;
 		client->ps.basespeed = zyk_player_speed;
 
-		if (client->sess.amrpgmode == 2 && client->pers.active_unique_skill == 3)
+		if (client->sess.amrpgmode == 2 && client->pers.active_unique_skill == (SKILL_UNIQUE_3 + 1))
 		{ // zyk: using Force Dash
 			zyk_do_force_dash(ent);
 		}

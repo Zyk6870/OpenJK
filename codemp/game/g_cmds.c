@@ -147,7 +147,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_UNIQUE_9] = 1;
 	max_skill_levels[SKILL_UNIQUE_10] = 1;
 	max_skill_levels[SKILL_UNIQUE_11] = 1;
-	max_skill_levels[SKILL_UNIQUE_18] = 1;
+	max_skill_levels[SKILL_UNIQUE_12] = 1;
 	max_skill_levels[SKILL_MAGIC_1] = 2;
 	max_skill_levels[SKILL_MAGIC_2] = 2;
 	max_skill_levels[SKILL_MAGIC_3] = 2;
@@ -241,7 +241,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_UNIQUE_9] = "Force Attraction";
 	skill_names[SKILL_UNIQUE_10] = "Poison Darts";
 	skill_names[SKILL_UNIQUE_11] = "Homing Rocket";
-	skill_names[SKILL_UNIQUE_18] = "Super Beam";
+	skill_names[SKILL_UNIQUE_12] = "Super Beam";
 	skill_names[SKILL_MAGIC_1] = "Magic Sense";
 	skill_names[SKILL_MAGIC_2] = "Healing Area";
 	skill_names[SKILL_MAGIC_3] = "Enemy Weakening";
@@ -419,7 +419,7 @@ char* zyk_skill_description(int skill_index)
 		return "Bind with ^3/bind <key> unique 65 ^7to use it\nPoison Darts. Fires poison darts with melee by spending metal bolts ammo";
 	if (skill_index == SKILL_UNIQUE_11)
 		return "Bind with ^3/bind <key> unique 66 ^7to use it\nHoming Rocket. Shoots a powerful rocket that automatically goes after the nearest target. Spends 2 rockets and 2 power cell ammo";
-	if (skill_index == SKILL_UNIQUE_18)
+	if (skill_index == SKILL_UNIQUE_12)
 		return "Bind with ^3/bind <key> unique 73 ^7to use it\nSuper Beam. A powerful beam with high damage. Spends 25 mp";
 	if (skill_index == SKILL_MAGIC_FIST)
 		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key";
@@ -5886,7 +5886,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp(arg1, "unique") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^6", SKILL_UNIQUE_1, SKILL_UNIQUE_18, 18);
+		zyk_list_category_skills(ent, target_ent, "^6", SKILL_UNIQUE_1, SKILL_UNIQUE_12, 18);
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
@@ -10420,9 +10420,9 @@ void Cmd_Unique_f(gentity_t *ent) {
 	trap->Argv(1, arg1, sizeof(arg1));
 	unique_skill_number = atoi(arg1);
 
-	if (unique_skill_number < (SKILL_UNIQUE_1 + 1) || unique_skill_number > (SKILL_UNIQUE_18 + 1))
+	if (unique_skill_number < (SKILL_UNIQUE_1 + 1) || unique_skill_number > (SKILL_UNIQUE_12 + 1))
 	{
-		trap->SendServerCommand(ent->s.number, "print \"Must be a number between 57 and 74\n\"");
+		trap->SendServerCommand(ent->s.number, va("print \"Must be a number between %d and %d\n\"", (SKILL_UNIQUE_1 + 1), (SKILL_UNIQUE_12 + 1)));
 		return;
 	}
 
@@ -10432,12 +10432,9 @@ void Cmd_Unique_f(gentity_t *ent) {
 		return;
 	}
 
-	// zyk: uniques are set from 1 to 18
-	unique_skill_number -= SKILL_UNIQUE_1;
-
 	if (ent->client->pers.unique_skill_timer < level.time)
 	{
-		if (unique_skill_number == 1)
+		if (unique_skill_number == (SKILL_UNIQUE_1 + 1))
 		{ // zyk: Vertical DFA
 			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
 			{
@@ -10463,7 +10460,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
 			}
 		}
-		else if (unique_skill_number == 2)
+		else if (unique_skill_number == (SKILL_UNIQUE_2 + 1))
 		{ // zyk: No Attack
 			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
 			{
@@ -10482,7 +10479,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
 			}
 		}
-		else if (unique_skill_number == 3)
+		else if (unique_skill_number == (SKILL_UNIQUE_3 + 1))
 		{ // zyk: Fast Dash
 			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4) && ent->client->pers.magic_power >= 10)
 			{
@@ -10503,7 +10500,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force and 10 mp to use it\"", (zyk_max_force_power.integer / 4)));
 			}
 		}
-		else if (unique_skill_number == 4)
+		else if (unique_skill_number == (SKILL_UNIQUE_4 + 1))
 		{ // zyk: Force Shield
 			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
 			{
@@ -10521,7 +10518,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
 			}
 		}
-		else if (unique_skill_number == 5)
+		else if (unique_skill_number == (SKILL_UNIQUE_5 + 1))
 		{ // zyk: Force Maelstrom
 			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
 			{
@@ -10564,7 +10561,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
 			}
 		}
-		else if (unique_skill_number == 6)
+		else if (unique_skill_number == (SKILL_UNIQUE_6 + 1))
 		{ // zyk: Force Repulse
 			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
 			{
@@ -10634,7 +10631,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
 			}
 		}
-		else if (unique_skill_number == 7)
+		else if (unique_skill_number == (SKILL_UNIQUE_7 + 1))
 		{ // zyk: Force Scream
 			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
 			{
@@ -10654,7 +10651,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
 			}
 		}
-		else if (unique_skill_number == 8)
+		else if (unique_skill_number == (SKILL_UNIQUE_8 + 1))
 		{ // zyk: Force Storm
 			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
 			{
@@ -10678,7 +10675,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
 			}
 		}
-		else if (unique_skill_number == 9)
+		else if (unique_skill_number == (SKILL_UNIQUE_9 + 1))
 		{ // zyk: Force Attraction
 			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
 			{
@@ -10740,7 +10737,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
 			}
 		}
-		else if (unique_skill_number == 10)
+		else if (unique_skill_number == (SKILL_UNIQUE_10 + 1))
 		{ // zyk: Poison Darts
 			if (ent->client->ps.ammo[AMMO_METAL_BOLTS] >= 2)
 			{
@@ -10758,7 +10755,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs 2 metal bolts ammo to use it\"");
 			}
 		}
-		else if (unique_skill_number == 11)
+		else if (unique_skill_number == (SKILL_UNIQUE_11 + 1))
 		{ // zyk: Homing Rocket
 			if (ent->client->ps.ammo[AMMO_ROCKETS] >= 2 && ent->client->ps.ammo[AMMO_POWERCELL] >= 2)
 			{
@@ -10807,7 +10804,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs 2 rockets and 2 powercell ammo to use it\"");
 			}
 		}
-		else if (unique_skill_number == 18)
+		else if (unique_skill_number == (SKILL_UNIQUE_12 + 1))
 		{ // zyk: Super Beam
 			if (ent->client->pers.magic_power >= 25)
 			{

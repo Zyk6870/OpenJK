@@ -4312,7 +4312,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 		}
 		else if (ent->client->sess.amrpgmode == 2 &&
 				 ent->client->pers.unique_skill_duration > level.time &&
-				 ent->client->pers.active_unique_skill == 10 &&
+				 ent->client->pers.active_unique_skill == (SKILL_UNIQUE_10 + 1) &&
 				 ent->client->ps.ammo[AMMO_METAL_BOLTS] > 0)
 		{ // zyk: Poison Darts
 			vec3_t		fwd, dir, origin;

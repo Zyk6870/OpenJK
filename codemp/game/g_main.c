@@ -6711,14 +6711,7 @@ void fire_bolt_hits(gentity_t* ent)
 
 		zyk_quest_effect_spawn(fire_bolt_user, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 300);
 
-		if (fire_bolt_user->client->pers.unique_skill_duration > level.time && fire_bolt_user->client->pers.active_unique_skill == 1)
-		{ // zyk: Magic Buff increases damage
-			G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 6, 0, MOD_UNKNOWN);
-		}
-		else
-		{
-			G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 4, 0, MOD_UNKNOWN);
-		}
+		G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 4, 0, MOD_UNKNOWN);
 
 		ent->client->pers.fire_bolt_hits_counter--;
 		ent->client->pers.fire_bolt_timer = level.time + 200;
@@ -9213,7 +9206,7 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 				}
 
-				if (ent->client->pers.active_unique_skill == 1 &&
+				if (ent->client->pers.active_unique_skill == (SKILL_UNIQUE_1 + 1) &&
 						ent->client->pers.vertical_dfa_timer > 0 && ent->client->pers.vertical_dfa_timer < level.time && 
 						ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 				{ // zyk: Vertical DFA should appear when player hits the ground
