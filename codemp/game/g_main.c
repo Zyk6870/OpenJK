@@ -5234,10 +5234,10 @@ void magic_sense(gentity_t *ent, int duration)
 	}
 
 	// zyk: Magic Sense gets more duration based on Sense skill level
-	duration += (ent->client->pers.skill_levels[4] * 1000);
+	duration += (ent->client->pers.skill_levels[SKILL_SENSE] * 1000);
 
 	ent->client->ps.forceAllowDeactivateTime = level.time + duration;
-	ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[4];
+	ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[SKILL_SENSE];
 	ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
 	ent->client->ps.fd.forcePowerDuration[FP_SEE] = level.time + duration;
 
@@ -9043,7 +9043,7 @@ void G_RunFrame( int levelTime ) {
 
 				if (ent->client->sess.amrpgmode == 2)
 				{ // zyk: RPG Mode jetpack skill. Each level decreases fuel debounce
-					jetpack_debounce_amount -= (ent->client->pers.skill_levels[34] * 2);
+					jetpack_debounce_amount -= (ent->client->pers.skill_levels[SKILL_JETPACK] * 2);
 
 					if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK)) // zyk: Jetpack Upgrade decreases fuel usage
 						jetpack_debounce_amount -= 2;
@@ -9920,7 +9920,7 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.magic_power < 20)
 				{
 					ent->client->pers.level = 200;
-					ent->client->pers.skill_levels[55] = 5;
+					ent->client->pers.skill_levels[SKILL_MAX_MP] = 5;
 					ent->client->pers.magic_power = zyk_max_magic_power(ent);
 				}
 

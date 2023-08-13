@@ -3549,9 +3549,9 @@ void ClientThink_real( gentity_t *ent ) {
 					{ // zyk: Energy Modulator Upgrade
 						zyk_energy_modulator(ent);
 					}
-					else if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[38] > 0)
+					else if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0)
 					{ // zyk: Magic Fist attacks
-						if (ent->client->sess.magic_fist_selection < ent->client->pers.skill_levels[38])
+						if (ent->client->sess.magic_fist_selection < ent->client->pers.skill_levels[SKILL_MAGIC_FIST])
 							ent->client->sess.magic_fist_selection++;
 						else
 							ent->client->sess.magic_fist_selection = 0;

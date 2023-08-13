@@ -891,7 +891,7 @@ int WP_AbsorbConversion(gentity_t *attacked, int atdAbsLevel, gentity_t *attacke
 		addTot = 1;
 	}
 
-	if (attacked->client->sess.amrpgmode == 2 && attacked->client->pers.skill_levels[8] == 4)
+	if (attacked->client->sess.amrpgmode == 2 && attacked->client->pers.skill_levels[SKILL_ABSORB] == 4)
 	{ // zyk: Absorb 4/4 in RPG Mode absorbs more force
 		addTot = addTot + (zyk_max_force_power.integer/10);
 	}
@@ -1185,9 +1185,9 @@ void ForceHeal( gentity_t *self )
 	if ( self->health >= self->client->ps.stats[STAT_MAX_HEALTH])
 	{
 		// zyk: Shield Heal skill. Done when player has full HP
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[36] > 0 && self->client->ps.fd.forcePower >= zyk_max_force_power.integer/2 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_SHIELD_HEAL] > 0 && self->client->ps.fd.forcePower >= zyk_max_force_power.integer/2 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
 		{
-			self->client->ps.stats[STAT_ARMOR] += 4 * self->client->pers.skill_levels[36];
+			self->client->ps.stats[STAT_ARMOR] += 4 * self->client->pers.skill_levels[SKILL_SHIELD_HEAL];
 
 			if (self->client->ps.stats[STAT_ARMOR] > self->client->pers.max_rpg_shield)
 				self->client->ps.stats[STAT_ARMOR] = self->client->pers.max_rpg_shield;
@@ -1327,7 +1327,7 @@ void ForceTeamHeal( gentity_t *self )
 			((!ent->NPC && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR) || 
 			 (ent->client->playerTeam != NPCTEAM_ENEMY && ent->s.NPC_class != CLASS_VEHICLE)) && 
 			 (ent->client->ps.stats[STAT_HEALTH] < ent->client->ps.stats[STAT_MAX_HEALTH] || 
-			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[37] > 0 && 
+			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_TEAM_SHIELD_HEAL] > 0 &&
 			 !ent->NPC && ent->client->ps.stats[STAT_HEALTH] >= ent->client->ps.stats[STAT_MAX_HEALTH] && 
 			 ((ent->client->sess.amrpgmode < 2 && ent->client->ps.stats[STAT_ARMOR] < 100) || (ent->client->sess.amrpgmode == 2 && 
 			 ent->client->ps.stats[STAT_ARMOR] < max_shield)))) && ent->client->ps.stats[STAT_HEALTH] > 0 && ForcePowerUsableOn(self, ent, FP_TEAM_HEAL) &&
@@ -1379,9 +1379,11 @@ void ForceTeamHeal( gentity_t *self )
 				max_shield = g_entities[pl[i]].client->pers.max_rpg_shield;
 
 			// zyk: Team Shield Heal skill of RPG Mode
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[37] > 0 && !g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.stats[STAT_HEALTH] >= g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH] && g_entities[pl[i]].client->ps.stats[STAT_ARMOR] < max_shield)
+			if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_TEAM_SHIELD_HEAL] > 0 && 
+				!g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.stats[STAT_HEALTH] >= g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH] && 
+				g_entities[pl[i]].client->ps.stats[STAT_ARMOR] < max_shield)
 			{ // zyk: can only be used on players with full health already
-				g_entities[pl[i]].client->ps.stats[STAT_ARMOR] += 3 * self->client->pers.skill_levels[37];
+				g_entities[pl[i]].client->ps.stats[STAT_ARMOR] += 3 * self->client->pers.skill_levels[SKILL_TEAM_SHIELD_HEAL];
 
 				if (g_entities[pl[i]].client->ps.stats[STAT_ARMOR] > max_shield)
 					g_entities[pl[i]].client->ps.stats[STAT_ARMOR] = max_shield;
@@ -1912,7 +1914,7 @@ void ForceLightningDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec
 				}
 				*/
 				// zyk: Lightning level 4 in RPG Mode causes double damage
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[13] > 3)
+				if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_LIGHTNING] > 3)
 				{
 					dmg *= 2;
 				}
@@ -1978,7 +1980,7 @@ void ForceShootLightning( gentity_t *self )
 		VectorCopy( self->client->ps.origin, center );
 
 		// zyk: Lightning 4/4 has more range
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[13] > 3)
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_LIGHTNING] > 3)
 		{
 			radius = FORCE_LIGHTNING_RADIUS * 1.8;
 		}
@@ -2178,7 +2180,7 @@ void ForceDrainDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec3_t 
 
 				if (dmg)
 				{
-					if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[33] > 0 && traceEnt->client->ps.fd.forcePower <= 0)
+					if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_DRAIN_SHIELD] > 0 && traceEnt->client->ps.fd.forcePower <= 0)
 					{ // zyk: Drain Shield skill. Enemy has no force. Damages him
 						G_Damage( traceEnt, self, self, NULL, impactPoint, (dmg/2), 0, MOD_FORCE_DARK );
 
@@ -2217,7 +2219,7 @@ void ForceDrainDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec3_t 
 					}
 					self->client->ps.stats[STAT_HEALTH] = self->health;
 				}
-				else if (dmg > 0 && self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[33] > 0 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
+				else if (dmg > 0 && self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_DRAIN_SHIELD] > 0 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
 				{ // zyk: if player has RPG Drain Shield skill and hp is full, recover shield
 					self->client->ps.stats[STAT_ARMOR] += 1;
 				}
@@ -4594,7 +4596,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 			int addTime = 400;
 
 			// zyk: added this condition because of Rage 4/4 in RPG Mode, which dont damage the player
-			if (self->client->sess.amrpgmode < 2 || self->client->pers.skill_levels[16] < 4)
+			if (self->client->sess.amrpgmode < 2 || self->client->pers.skill_levels[SKILL_RAGE] < 4)
 				self->health -= 2;
 
 			if (self->client->ps.fd.forcePowerLevel[FP_RAGE] == FORCE_LEVEL_1)
@@ -4698,7 +4700,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 	case FP_SABERTHROW:
 		break;
 	case FP_PROTECT:
-		if (self->client->sess.amrpgmode < 2 || self->client->pers.skill_levels[10] < 4)
+		if (self->client->sess.amrpgmode < 2 || self->client->pers.skill_levels[SKILL_PROTECT] < 4)
 		{ // zyk: Protect 4/4 does not have force debounce
 			if (self->client->ps.fd.forcePowerDebounce[forcePower] < level.time)
 			{
@@ -4713,7 +4715,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 		}
 		break;
 	case FP_ABSORB:
-		if (self->client->sess.amrpgmode < 2 || self->client->pers.skill_levels[8] < 4)
+		if (self->client->sess.amrpgmode < 2 || self->client->pers.skill_levels[SKILL_ABSORB] < 4)
 		{ // zyk: Absorb 4/4 does not have force debounce
 			if (self->client->ps.fd.forcePowerDebounce[forcePower] < level.time)
 			{
@@ -5356,7 +5358,6 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 	char client_name[64];
 	int magic_power = 0;
 	int max_magic_power = 0;
-	int skill_number = 35; // zyk: skill index of Sense Health skill
 
 	if (!target || !target->client)
 	{ // zyk: for some reason, this guy has no client structure. Happens to quest_ragnos npc
@@ -5376,15 +5377,15 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 		strcpy(client_name, target->client->pers.netname);
 	}
 	
-	if (self->client->pers.skill_levels[skill_number] == 1)
+	if (self->client->pers.skill_levels[SKILL_SENSE_HEALTH] == 1)
 	{
 		trap->SendServerCommand(self->s.number, va("cp \"^1%d\n\"", client_health));
 	}
-	else if (self->client->pers.skill_levels[skill_number] == 2)
+	else if (self->client->pers.skill_levels[SKILL_SENSE_HEALTH] == 2)
 	{
 		trap->SendServerCommand(self->s.number, va("cp \"%s\n\n^1%d^3/^2%d\n\"", client_name, client_health, client_armor));
 	}
-	else if (self->client->pers.skill_levels[skill_number] == 3)
+	else if (self->client->pers.skill_levels[SKILL_SENSE_HEALTH] == 3)
 	{
 		if (target->NPC)
 		{
@@ -5836,7 +5837,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 				self->client->ps.fd.forcePowerDuration[i] = 0;
 			}
 			// zyk: using Sense Health skill of RPG Mode
-			else if (i == FP_SEE && self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[35] > 0 && 
+			else if (i == FP_SEE && self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_SENSE_HEALTH] > 0 &&
 					 self->client->ps.fd.forcePowersActive & ( 1 << FP_SEE ) && self->client->pers.sense_health_timer < level.time && self->client->ps.hasLookTarget)
 			{
 				// zyk: if you are looking at someone (player or npc), this will be the client id

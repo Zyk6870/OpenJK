@@ -4766,43 +4766,43 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		{ // zyk: player in RPG mode, with duals or staff, has a better damage depending on Saber Attack level
 			if (attacker->client->saber[0].saberFlags&SFL_TWO_HANDED || (attacker->client->saber[0].model[0] && attacker->client->saber[1].model[0]))
 			{
-				if (attacker->client->pers.skill_levels[5] <= FORCE_LEVEL_1)
+				if (attacker->client->pers.skill_levels[SKILL_SABER_ATTACK] <= FORCE_LEVEL_1)
 				{
 					damage = (int)ceil(damage*0.2);
 				}
-				else if (attacker->client->pers.skill_levels[5] == FORCE_LEVEL_2)
+				else if (attacker->client->pers.skill_levels[SKILL_SABER_ATTACK] == FORCE_LEVEL_2)
 				{
 					damage = (int)ceil(damage*0.4);
 				}
-				else if (attacker->client->pers.skill_levels[5] == FORCE_LEVEL_3)
+				else if (attacker->client->pers.skill_levels[SKILL_SABER_ATTACK] == FORCE_LEVEL_3)
 				{
 					damage = (int)ceil(damage*0.6);
 				}
-				else if (attacker->client->pers.skill_levels[5] == FORCE_LEVEL_4)
+				else if (attacker->client->pers.skill_levels[SKILL_SABER_ATTACK] == FORCE_LEVEL_4)
 				{
 					damage = (int)ceil(damage*0.8);
 				}
 			}
 		}
-		else if (attacker->client->pers.skill_levels[24] > 1 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT))
+		else if (attacker->client->pers.skill_levels[SKILL_DEMP2] > 1 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT))
 		{ // zyk: DEMP2 2/2 in RPG Mode causes more damage
-			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[24] - 1))));
+			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[SKILL_DEMP2] - 1))));
 		}
-		else if (attacker->client->pers.skill_levels[25] > 1 && (mod == MOD_FLECHETTE || mod == MOD_FLECHETTE_ALT_SPLASH))
+		else if (attacker->client->pers.skill_levels[SKILL_FLECHETTE] > 1 && (mod == MOD_FLECHETTE || mod == MOD_FLECHETTE_ALT_SPLASH))
 		{ // zyk: Flechette 2/2 in RPG Mode causes more damage
-			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[25] - 1))));
+			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[SKILL_FLECHETTE] - 1))));
 		}
-		else if (attacker->client->pers.skill_levels[27] > 1 && (mod == MOD_CONC || mod == MOD_CONC_ALT))
+		else if (attacker->client->pers.skill_levels[SKILL_CONCUSSION_RIFLE] > 1 && (mod == MOD_CONC || mod == MOD_CONC_ALT))
 		{ // zyk: Concussion Rifle 2/2 in RPG Mode causes more damage
-			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[27] - 1))));
+			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[SKILL_CONCUSSION_RIFLE] - 1))));
 		}
 		else if (mod == MOD_MELEE)
 		{ // zyk: setting melee damage in RPG Mode
-			if (attacker->client->pers.skill_levels[29] == 0)
+			if (attacker->client->pers.skill_levels[SKILL_MELEE] == 0)
 				damage = (int)ceil((damage * 1.0) / 2.0);
-			else if (attacker->client->pers.skill_levels[29] == 2)
+			else if (attacker->client->pers.skill_levels[SKILL_MELEE] == 2)
 				damage = damage * 2;
-			else if (attacker->client->pers.skill_levels[29] == 3)
+			else if (attacker->client->pers.skill_levels[SKILL_MELEE] == 3)
 				damage = damage * 3;
 		}
 	}
@@ -5169,7 +5169,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	// zyk: lowered knockback. Default: knockback = damage
 	knockback = damage/2;
 	// zyk: Lightning level 4 in RPG Mode causes knockback
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.skill_levels[13] > 3 && 
+	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.skill_levels[SKILL_LIGHTNING] > 3 &&
 		attacker->client->ps.fd.forcePowersActive & (1 << FP_LIGHTNING) && mod == MOD_FORCE_DARK)
 	{
 		knockback *= 6;
@@ -5506,7 +5506,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (targ->client->sess.amrpgmode == 2) // zyk: Shield Strength skill
 		{
-			scaled_damage = (int)ceil(take * (1.0 - (0.05 * targ->client->pers.skill_levels[31])));
+			scaled_damage = (int)ceil(take * (1.0 - (0.05 * targ->client->pers.skill_levels[SKILL_SHIELD_STRENGTH])));
 		}
 
 		if (targ->client->ps.stats[STAT_ARMOR] >= scaled_damage)
@@ -5879,7 +5879,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				float force_decrease_change = 1.0; // zyk: Protect 4/4 will make player lose less force
 
-				if (targ->client->sess.amrpgmode == 2 && targ->client->pers.skill_levels[10] == 4)
+				if (targ->client->sess.amrpgmode == 2 && targ->client->pers.skill_levels[SKILL_PROTECT] == 4)
 					force_decrease_change = 0.5;
 
 				if (targ->client->forcePowerSoundDebounce < level.time)
@@ -5940,7 +5940,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (!targ->NPC && targ->client && targ->client->sess.amrpgmode == 2)
 		{ // zyk: Health Strength skill decreases damage taken
-			take = (int)ceil(take * (1.0 - (0.05 * targ->client->pers.skill_levels[32])));
+			take = (int)ceil(take * (1.0 - (0.05 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH])));
 		}
 
 		targ->health = targ->health - take;
