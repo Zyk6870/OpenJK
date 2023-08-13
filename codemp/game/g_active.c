@@ -842,21 +842,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 		if (client->sess.amrpgmode == 2 && !(client->pers.quest_power_status & (1 << 2)))
 		{ // zyk: healing abilities will only work if player is not hit by Time Power
-			if (ent->health > 0 && client->ps.legsAnim == BOTH_MEDITATE &&
-				client->pers.unique_skill_duration > level.time && client->pers.active_unique_skill == 16)
-			{ // zyk: Meditation Drain
-				int heal_amount = 60;
-
-				if ((ent->health + heal_amount) < client->pers.max_rpg_health)
-				{
-					ent->health += heal_amount;
-				}
-				else
-				{
-					ent->health = client->pers.max_rpg_health;
-				}
-			}
-
 			if (client->pers.energy_modulator_mode > 0)
 			{ // zyk: Energy Modulator consumes ammo while active
 				if (ent->health < 1)

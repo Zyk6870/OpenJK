@@ -739,47 +739,6 @@ void WP_DisruptorAltFire( gentity_t *ent )
 
 	//VectorCopy( muzzle, muzzle2 ); // making a backup copy
 
-	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.active_unique_skill == 14)
-	{ // zyk: Aimed Shot ability
-		if (ent->client->pers.unique_skill_user_id > -1)
-		{ // zyk: if we have a target, shoot at him
-			gentity_t *target_ent = &g_entities[ent->client->pers.unique_skill_user_id];
-			vec3_t zyk_dir, zyk_enemy_origin;
-
-			// zyk: make it a full charged shot
-			ent->client->ps.weaponChargeTime = level.time - 2000;
-
-			VectorCopy(ent->client->ps.origin, muzzle);
-			muzzle[2] += 18;
-
-			VectorCopy(target_ent->client->ps.origin, zyk_enemy_origin);
-			if (target_ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
-			{
-				zyk_enemy_origin[2] -= 24;
-			}
-
-			VectorSubtract(zyk_enemy_origin, muzzle, zyk_dir);
-			VectorNormalize(zyk_dir);
-
-			VectorCopy(zyk_dir, forward);
-		}
-		else
-		{ // zyk if no target, shoot forward
-			vec3_t zyk_dir;
-
-			// zyk: make it a full charged shot
-			ent->client->ps.weaponChargeTime = level.time - 2000;
-
-			VectorCopy(ent->client->ps.origin, muzzle);
-			muzzle[2] += 18;
-
-			AngleVectors(ent->client->ps.viewangles, zyk_dir, NULL, NULL);
-			VectorNormalize(zyk_dir);
-
-			VectorCopy(zyk_dir, forward);
-		}
-	}
-
 	if (ent->client)
 	{
 		VectorCopy( ent->client->ps.origin, start );
@@ -3934,12 +3893,6 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 int magic_fist_velocity(gentity_t *ent)
 {
 	int magic_bolt_speed = zyk_magic_fist_velocity.integer;
-
-	if (ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 8) &&
-		ent->client->pers.unique_skill_duration > level.time && ent->client->pers.active_unique_skill == 15)
-	{ // zyk: Faster Bolts skill increases speed of magic bolt shots
-		magic_bolt_speed += (magic_bolt_speed * 0.2);
-	}
 
 	return magic_bolt_speed;
 }

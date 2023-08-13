@@ -749,12 +749,6 @@ typedef enum {
 	SKILL_UNIQUE_9,
 	SKILL_UNIQUE_10,
 	SKILL_UNIQUE_11,
-	SKILL_UNIQUE_12,
-	SKILL_UNIQUE_13,
-	SKILL_UNIQUE_14,
-	SKILL_UNIQUE_15,
-	SKILL_UNIQUE_16,
-	SKILL_UNIQUE_17,
 	SKILL_UNIQUE_18,
 	SKILL_MAGIC_FIST,
 	SKILL_MAX_MP,
@@ -949,15 +943,6 @@ typedef struct clientPersistant_s {
 	// zyk: used to set the duration that some unique skills or unique abilities are active
 	int unique_skill_duration;
 
-	// zyk: used by Monk Meditation Drain ability as interval between hits
-	int meditation_drain_timer;
-
-	// zyk: Aimed Shot unique skill timer
-	int aimed_shot_timer;
-
-	// zyk: Lightning Shield timer to hit targets near the Armored Soldier
-	int lightning_shield_timer;
-
 	// zyk: used by Fast Dash ability
 	int fast_dash_timer;
 
@@ -978,9 +963,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: timer to keep this player stunned by No Attack ability
 	int no_attack_timer;
-
-	// zyk: timer used for the target of Elemental Attack ability
-	int elemental_attack_timer;
 
 	// zyk: RPG skills
 	int skill_levels[NUMBER_OF_SKILLS];

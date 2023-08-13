@@ -5246,7 +5246,7 @@ void magic_sense(gentity_t *ent, int duration)
 
 // zyk: Lightning Dome
 extern void zyk_lightning_dome_detonate( gentity_t *ent );
-void lightning_dome(gentity_t *ent, int damage, qboolean is_magic)
+void lightning_dome(gentity_t *ent, int damage)
 {
 	gentity_t *missile;
 	vec3_t origin;
@@ -5264,20 +5264,13 @@ void lightning_dome(gentity_t *ent, int damage, qboolean is_magic)
 
 	VectorCopy( tr.plane.normal, missile->pos1 );
 
-	if (is_magic == qfalse) // zyk: Lightning Shield has less radius
-	{
-		missile->count = 6;
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_LIGHTNING_DOME] > 1)
+	{ // zyk: Lightning Dome at a level > 1 has a bigger radius
+		missile->count = 9;
 	}
 	else
 	{
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_LIGHTNING_DOME] > 1)
-		{ // zyk: Lightning Dome at a level > 1 has a bigger radius
-			missile->count = 9;
-		}
-		else
-		{
-			missile->count = 6;
-		}
+		missile->count = 6;
 	}
 
 	missile->classname = "demp2_alt_proj";
@@ -5289,10 +5282,7 @@ void lightning_dome(gentity_t *ent, int damage, qboolean is_magic)
 	missile->splashDamage = missile->damage = damage;
 	missile->splashMethodOfDeath = missile->methodOfDeath = MOD_DEMP2;
 
-	if (is_magic == qfalse) // zyk: Lightning Shield has less radius
-		missile->splashRadius = 512;
-	else
-		missile->splashRadius = 768;
+	missile->splashRadius = 768;
 
 	missile->r.ownerNum = ent->s.number;
 
@@ -5368,117 +5358,6 @@ void zyk_vertical_dfa_effect(gentity_t *ent)
 
 	level.special_power_effects[new_ent->s.number] = ent->s.number;
 	level.special_power_effects_timer[new_ent->s.number] = level.time + 600;
-}
-
-void zyk_bomb_model_think(gentity_t *ent)
-{
-	// zyk: bomb timer seconds to explode. Each call to this function decrease counter until it reaches 0
-	ent->count--;
-
-	if (ent->count == 0)
-	{ // zyk: explodes the bomb
-		zyk_quest_effect_spawn(ent->parent, ent, "zyk_timed_bomb_explosion", "4", "explosions/hugeexplosion1", 0, 500, 450, 800);
-
-		ent->think = G_FreeEntity;
-		ent->nextthink = level.time + 500;
-	}
-	else
-	{
-		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/mpalarm.wav"));
-		ent->nextthink = level.time + 1000;
-	}
-}
-
-void zyk_add_bomb_model(gentity_t *ent)
-{
-	gentity_t *new_ent = G_Spawn();
-
-	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
-	zyk_set_entity_field(new_ent, "spawnflags", "0");
-	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->r.currentOrigin[0], (int)ent->r.currentOrigin[1], (int)ent->r.currentOrigin[2] - 20));
-
-	zyk_set_entity_field(new_ent, "model", "models/map_objects/factory/bomb_new_deact.md3");
-
-	zyk_set_entity_field(new_ent, "targetname", "zyk_timed_bomb");
-
-	zyk_set_entity_field(new_ent, "count", "3");
-
-	new_ent->parent = ent;
-	new_ent->think = zyk_bomb_model_think;
-	new_ent->nextthink = level.time + 500;
-
-	zyk_spawn_entity(new_ent);
-
-	ent->wait = level.time + 5000;
-
-	G_Sound(new_ent, CHAN_AUTO, G_SoundIndex("sound/effects/cloth1.mp3"));
-}
-
-void zyk_spawn_ice_element(gentity_t *ent, gentity_t *player_ent)
-{
-	int i = 0;
-	int initial_angle = -179;
-
-	for (i = 0; i < 4; i++)
-	{
-		gentity_t *new_ent = G_Spawn();
-
-		zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
-		zyk_set_entity_field(new_ent, "spawnflags", "65537");
-		zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)player_ent->r.currentOrigin[0], (int)player_ent->r.currentOrigin[1], (int)player_ent->r.currentOrigin[2]));
-
-		zyk_set_entity_field(new_ent, "angles", va("0 %d 0", initial_angle + (i * 89)));
-
-		zyk_set_entity_field(new_ent, "mins", "-70 -70 -70");
-		zyk_set_entity_field(new_ent, "maxs", "70 70 70");
-
-		zyk_set_entity_field(new_ent, "model", "models/map_objects/rift/crystal_wall.md3");
-
-		zyk_set_entity_field(new_ent, "targetname", "zyk_elemental_ice");
-
-		zyk_spawn_entity(new_ent);
-
-		level.special_power_effects[new_ent->s.number] = ent->s.number;
-		level.special_power_effects_timer[new_ent->s.number] = level.time + 4000;
-	}
-}
-
-// zyk: Elemental Attack
-void elemental_attack(gentity_t *ent)
-{
-	int i = 0;
-	int targets_hit = 0;
-	int min_distance = 100;
-	int damage = 16;
-
-	for (i = 0; i < level.num_entities; i++)
-	{
-		gentity_t *player_ent = &g_entities[i];
-
-		if (zyk_special_power_can_hit_target(ent, player_ent, i, min_distance, 500, qfalse, &targets_hit) == qtrue)
-		{
-			// zyk: first element, Ice
-			zyk_spawn_ice_element(ent, player_ent);
-
-			// zyk: second element, Fire. Multiplies by 2.5 because of the damage reduction in G_Damage()
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_elemental_fire", "4", "env/flame_jet", 1000, 2.5 * damage, 35, 2500);
-
-			// zyk: third element, Earth. Multiplies by 2.5 because of the damage reduction in G_Damage()
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_elemental_earth", "4", "env/rock_smash", 2500, 2.5 * damage, 35, 4000);
-
-			// zyk: fourth element, Wind
-			ent->client->pers.magic_power_debounce_timer[MAGIC_BLOWING_WIND] = 0;
-			player_ent->client->pers.magic_power_user_id[MAGIC_BLOWING_WIND] = ent->s.number;
-			player_ent->client->pers.quest_power_status |= (1 << 8);
-			player_ent->client->pers.magic_power_target_timer[MAGIC_BLOWING_WIND] = level.time + 7000;
-
-			// zyk: target is hit by the Ice element for 4 seconds
-			player_ent->client->pers.quest_power_status |= (1 << 26);
-			player_ent->client->pers.elemental_attack_timer = level.time + 4000;
-
-			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
-		}
-	}
 }
 
 // zyk: No Attack ability
@@ -6779,11 +6658,6 @@ void quest_power_events(gentity_t *ent)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 23);
 				}
-			}
-
-			if (ent->client->pers.quest_power_status & (1 << 26) && ent->client->pers.elemental_attack_timer < level.time)
-			{ // zyk: hit by Elemental Attack
-				ent->client->pers.quest_power_status &= ~(1 << 26);
 			}
 		}
 		/*
@@ -9339,78 +9213,7 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 				}
 
-				if (ent->client->pers.active_unique_skill == 14 && ent->client->pers.aimed_shot_timer < level.time)
-				{ // zyk: Aimed Shot ability. Fires the full charged sniper shot
-					if (ent->health > 0)
-					{
-						WP_DisruptorAltFire(ent);
-					}
-
-					ent->client->pers.aimed_shot_timer = level.time + 2000;
-				}
-				else if (ent->client->pers.active_unique_skill == 12 && ent->client->pers.lightning_shield_timer < level.time)
-				{ // zyk: Lightning Shield damage to enemies nearby
-					int player_it = 0;
-
-					for (player_it = 0; player_it < level.num_entities; player_it++)
-					{
-						gentity_t* player_ent = &g_entities[player_it];
-
-						if (player_ent && player_ent->client && ent != player_ent &&
-							zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue && Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 60)
-						{
-							G_Damage(player_ent, ent, ent, NULL, NULL, 8, 0, MOD_UNKNOWN);
-
-							player_ent->client->ps.electrifyTime = level.time + 500;
-						}
-					}
-
-					ent->client->pers.lightning_shield_timer = level.time + 200;
-				}
-				else if (ent->client->pers.active_unique_skill == 16 &&
-						 ent->client->pers.meditation_drain_timer < level.time)
-				{ // zyk: Meditation Drain
-					int player_it = 0;
-					int push_scale = 100;
-
-					for (player_it = 0; player_it < level.num_entities; player_it++)
-					{
-						gentity_t *player_ent = &g_entities[player_it];
-
-						if (player_ent && player_ent->client && ent != player_ent &&
-							zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue)
-						{ // zyk: can only hit the target if he is not knocked down yet
-							if (ent->health > 0 && Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 300)
-							{ 
-								int heal_amount = 8;
-
-								G_Damage(player_ent, ent, ent, NULL, NULL, heal_amount/3, 0, MOD_MELEE);
-
-								player_ent->client->ps.electrifyTime = level.time + 1000;
-
-								if ((ent->health + heal_amount) < ent->client->pers.max_rpg_health)
-								{
-									ent->health += heal_amount;
-								}
-								else if (ent->health < ent->client->pers.max_rpg_health)
-								{
-									ent->health = ent->client->pers.max_rpg_health;
-								}
-								else if ((ent->client->ps.stats[STAT_ARMOR] + heal_amount) < ent->client->pers.max_rpg_shield)
-								{
-									ent->client->ps.stats[STAT_ARMOR] += heal_amount;
-								}
-								else
-								{
-									ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
-								}
-							}
-						}
-					}
-
-					ent->client->pers.meditation_drain_timer = level.time + 200;
-				}
-				else if (ent->client->pers.active_unique_skill == 1 &&
+				if (ent->client->pers.active_unique_skill == 1 &&
 						ent->client->pers.vertical_dfa_timer > 0 && ent->client->pers.vertical_dfa_timer < level.time && 
 						ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 				{ // zyk: Vertical DFA should appear when player hits the ground
@@ -9871,12 +9674,7 @@ void G_RunFrame( int levelTime ) {
 
 						zyk_super_beam(ent, ent->client->ps.viewangles[1]);
 					}
-					else if (ent->client->pers.custom_quest_unique_abilities & (1 << 1) && random_number == 1)
-					{
-						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-						elemental_attack(ent);
-					}
-					else if (ent->client->pers.custom_quest_unique_abilities & (1 << 2) && random_number == 2)
+					if (ent->client->pers.custom_quest_unique_abilities & (1 << 2) && random_number == 2)
 					{
 						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 						zyk_no_attack(ent);

@@ -147,12 +147,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_UNIQUE_9] = 1;
 	max_skill_levels[SKILL_UNIQUE_10] = 1;
 	max_skill_levels[SKILL_UNIQUE_11] = 1;
-	max_skill_levels[SKILL_UNIQUE_12] = 1;
-	max_skill_levels[SKILL_UNIQUE_13] = 1;
-	max_skill_levels[SKILL_UNIQUE_14] = 1;
-	max_skill_levels[SKILL_UNIQUE_15] = 1;
-	max_skill_levels[SKILL_UNIQUE_16] = 1;
-	max_skill_levels[SKILL_UNIQUE_17] = 1;
 	max_skill_levels[SKILL_UNIQUE_18] = 1;
 	max_skill_levels[SKILL_MAGIC_1] = 2;
 	max_skill_levels[SKILL_MAGIC_2] = 2;
@@ -247,12 +241,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_UNIQUE_9] = "Force Attraction";
 	skill_names[SKILL_UNIQUE_10] = "Poison Darts";
 	skill_names[SKILL_UNIQUE_11] = "Homing Rocket";
-	skill_names[SKILL_UNIQUE_12] = "Lightning Shield";
-	skill_names[SKILL_UNIQUE_13] = "Timed Bomb";
-	skill_names[SKILL_UNIQUE_14] = "Aimed Shot";
-	skill_names[SKILL_UNIQUE_15] = "Faster Bolts";
-	skill_names[SKILL_UNIQUE_16] = "Meditation Drain";
-	skill_names[SKILL_UNIQUE_17] = "Elemental Attack";
 	skill_names[SKILL_UNIQUE_18] = "Super Beam";
 	skill_names[SKILL_MAGIC_1] = "Magic Sense";
 	skill_names[SKILL_MAGIC_2] = "Healing Area";
@@ -431,18 +419,6 @@ char* zyk_skill_description(int skill_index)
 		return "Bind with ^3/bind <key> unique 65 ^7to use it\nPoison Darts. Fires poison darts with melee by spending metal bolts ammo";
 	if (skill_index == SKILL_UNIQUE_11)
 		return "Bind with ^3/bind <key> unique 66 ^7to use it\nHoming Rocket. Shoots a powerful rocket that automatically goes after the nearest target. Spends 2 rockets and 2 power cell ammo";
-	if (skill_index == SKILL_UNIQUE_12)
-		return "Bind with ^3/bind <key> unique 67 ^7to use it\nLightning Shield. Increases resistance to damage and does a bit of damage to enemies nearby. Using /unique 1 again will release a small lightning dome. Spends 5 power cell ammo";
-	if (skill_index == SKILL_UNIQUE_13)
-		return "Bind with ^3/bind <key> unique 68 ^7to use it\nTimed Bomb. Places a powerful bomb that explodes after some seconds. Spends 5 power cell ammo and 5 metal bolts ammo";
-	if (skill_index == SKILL_UNIQUE_14)
-		return "Bind with ^3/bind <key> unique 69 ^7to use it\nAimed Shot. Aims with the disruptor rifle and fires a charged shot with 100 per cent accuracy. Spends 30 power cell ammo";
-	if (skill_index == SKILL_UNIQUE_15)
-		return "Bind with ^3/bind <key> unique 70 ^7to use it\nFaster Bolts. Increases speed and firerate of magic bolts. Spends 2 mp";
-	if (skill_index == SKILL_UNIQUE_16)
-		return "Bind with ^3/bind <key> unique 71 ^7to use it\nMeditation Drain. Heavily increases damage resistance, gives auto-healing and drains shield and health from enemies nearby to restore health and shield. Spends 5 mp";
-	if (skill_index == SKILL_UNIQUE_17)
-		return "Bind with ^3/bind <key> unique 72 ^7to use it\nElemental Attack. A magic power that hits enemies with the power of the elements. Spends 20 mp";
 	if (skill_index == SKILL_UNIQUE_18)
 		return "Bind with ^3/bind <key> unique 73 ^7to use it\nSuper Beam. A powerful beam with high damage. Spends 25 mp";
 	if (skill_index == SKILL_MAGIC_FIST)
@@ -4426,7 +4402,7 @@ extern void ultra_speed(gentity_t *ent, int duration);
 extern void ultra_drain(gentity_t *ent, int radius, int damage, int duration);
 extern void magic_shield(gentity_t *ent, int duration);
 extern void healing_area(gentity_t *ent, int damage, int duration);
-extern void lightning_dome(gentity_t *ent, int damage, qboolean is_magic);
+extern void lightning_dome(gentity_t *ent, int damage);
 extern void magic_explosion(gentity_t *ent, int radius, int damage, int duration);
 extern void flame_burst(gentity_t *ent, int duration);
 extern void water_attack(gentity_t *ent, int distance, int damage);
@@ -5016,11 +4992,9 @@ void initialize_rpg_skills(gentity_t *ent)
 			ent->client->sess.magic_fist_selection = 0;
 		}
 
-		ent->client->pers.meditation_drain_timer = 0;
 		ent->client->pers.unique_skill_duration = 0;
 		ent->client->pers.active_unique_skill = 0;
 
-		ent->client->pers.lightning_shield_timer = 0;
 		ent->client->pers.energy_modulator_mode = 0;
 
 		ent->client->pers.credits_modifier = 0;
@@ -10421,8 +10395,6 @@ extern void Jedi_Cloak(gentity_t *self);
 extern void WP_AddAsMindtricked(forcedata_t *fd, int entNum);
 extern qboolean G_InGetUpAnim(playerState_t *ps);
 extern void zyk_WP_FireRocket(gentity_t *ent);
-extern void zyk_add_bomb_model(gentity_t *ent);
-extern void elemental_attack(gentity_t *ent);
 extern void zyk_no_attack(gentity_t *ent);
 extern void zyk_super_beam(gentity_t *ent, int angle_yaw);
 extern void force_scream(gentity_t *ent);
@@ -10454,8 +10426,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 		return;
 	}
 
-	
-
 	if (ent->client->pers.skill_levels[unique_skill_number - 1] < 1)
 	{ // zyk: player did not upgrade the unique skill he is trying to use
 		trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7you don't have this Unique Skill\"");
@@ -10464,18 +10434,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 	// zyk: uniques are set from 1 to 18
 	unique_skill_number -= SKILL_UNIQUE_1;
-
-	if (ent->client->pers.active_unique_skill == 12)
-	{ // zyk: releasing the small lightning dome
-		ent->client->ps.powerups[PW_SHIELDHIT] = 0;
-
-		ent->client->ps.powerups[PW_NEUTRALFLAG] = 0;
-		ent->client->pers.unique_skill_duration = 0;
-
-		lightning_dome(ent, 45, qfalse);
-
-		return;
-	}
 
 	if (ent->client->pers.unique_skill_timer < level.time)
 	{
@@ -10849,167 +10807,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs 2 rockets and 2 powercell ammo to use it\"");
 			}
 		}
-		else if (unique_skill_number == 12)
-		{ // zyk: Lightning Shield
-			if (ent->client->ps.ammo[AMMO_POWERCELL] >= 5)
-			{
-				ent->client->ps.ammo[AMMO_POWERCELL] -= 5;
-
-				ent->client->ps.powerups[PW_SHIELDHIT] = level.time + 8000;
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 8000;
-				ent->client->pers.unique_skill_duration = level.time + 8000;
-
-				ent->client->pers.lightning_shield_timer = level.time + 200;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs 5 power cell ammo to use it\"");
-			}
-		}
-		else if (unique_skill_number == 13)
-		{ // zyk: Timed Bomb
-			if (ent->client->ps.ammo[AMMO_POWERCELL] >= 5 && ent->client->ps.ammo[AMMO_METAL_BOLTS] >= 5)
-			{
-				ent->client->ps.ammo[AMMO_POWERCELL] -= 5;
-				ent->client->ps.ammo[AMMO_METAL_BOLTS] -= 5;
-
-				zyk_add_bomb_model(ent);
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs 5 power cell ammo and 5 metal bolts ammo to use it\"");
-			}
-		}
-		else if (unique_skill_number == 14)
-		{ // zyk: Aimed Shot
-			if (ent->client->ps.ammo[AMMO_POWERCELL] >= 30 && ent->client->ps.weapon == WP_DISRUPTOR)
-			{
-				int i = 0;
-				int min_dist = 900;
-				gentity_t* chosen_ent = NULL;
-
-				ent->client->ps.ammo[AMMO_POWERCELL] -= 30;
-
-				for (i = 0; i < level.num_entities; i++)
-				{
-					gentity_t* player_ent = &g_entities[i];
-
-					if (player_ent && player_ent->client && ent != player_ent && player_ent->health > 0 &&
-						zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue)
-					{
-						int player_dist = Distance(ent->client->ps.origin, player_ent->client->ps.origin);
-
-						if (player_dist < min_dist)
-						{
-							min_dist = player_dist;
-
-							chosen_ent = player_ent;
-						}
-					}
-				}
-
-				if (chosen_ent)
-				{ // zyk: if we have a target, shoot at him
-					ent->client->pers.unique_skill_user_id = chosen_ent->s.number;
-				}
-				else
-				{
-					ent->client->pers.unique_skill_user_id = -1;
-				}
-
-				ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-				ent->client->ps.forceDodgeAnim = TORSO_WEAPONREADY4;
-				ent->client->ps.forceHandExtendTime = level.time + 1500;
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 1500;
-				ent->client->pers.unique_skill_duration = level.time + 1500;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				ent->client->pers.aimed_shot_timer = level.time + 750;
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs 30 power cell ammo and disruptor rifle to use it\"");
-			}
-		}
-		else if (unique_skill_number == 15)
-		{ // zyk: Faster Bolts
-			if (ent->client->pers.magic_power >= 2)
-			{
-				ent->client->pers.magic_power -= 2;
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 15000;
-				ent->client->pers.unique_skill_duration = level.time + 15000;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs at least 2 MP to use it\"");
-			}
-		}
-		else if (unique_skill_number == 16)
-		{ // zyk: Meditation Drain
-			if (ent->client->pers.magic_power >= 5)
-			{
-				ent->client->pers.magic_power -= 5;
-
-				ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-				ent->client->ps.forceDodgeAnim = BOTH_MEDITATE;
-				ent->client->ps.forceHandExtendTime = level.time + 3000;
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 3000;
-				ent->client->pers.unique_skill_duration = level.time + 3000;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs at least 5 MP to use it\"");
-			}
-		}
-		else if (unique_skill_number == 17)
-		{ // zyk: Elemental Attack
-			if (ent->client->pers.magic_power >= 20 && ent->client->pers.quest_power_usage_timer < level.time)
-			{
-				ent->client->pers.magic_power -= 20;
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-				ent->client->pers.unique_skill_duration = level.time + 500;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				elemental_attack(ent);
-
-				ent->client->pers.quest_power_usage_timer = level.time + 10000;
-
-				display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs at least 20 MP to use it and wait some seconds after last magic used\"");
-			}
-		}
 		else if (unique_skill_number == 18)
 		{ // zyk: Super Beam
 			if (ent->client->pers.magic_power >= 25)
@@ -11245,7 +11042,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			}
 			else if (magic_number == MAGIC_LIGHTNING_DOME)
 			{
-				lightning_dome(ent, 70, qtrue);
+				lightning_dome(ent, 70);
 				zyk_set_magic_power_cooldown_time(ent, 25000);
 			}
 			else if (magic_number == MAGIC_TIME_STOP)

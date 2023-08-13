@@ -4892,11 +4892,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		damage = (int)ceil(damage*1.08);
 	}
 
-	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 26))
-	{ // zyk: Elemental Attack Ice decreases damage taken
-		damage = (int)ceil(damage*0.4);
-	}
-
 	if (targ && targ->client && (targ->NPC || targ->client->sess.amrpgmode == 2) && targ->client->pers.quest_power_status & (1 << 22))
 	{ // zyk: Ice Block decreases damage taken
 		damage = (int)ceil(damage*0.2);
@@ -4940,23 +4935,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		{ // zyk: Force Shield
 			bonus_resistance += 0.70;
 		}
-			
-		// zyk: Lightning Shield
-		if (targ->client->pers.active_unique_skill == 12 && targ->client->pers.unique_skill_duration > level.time)
-		{
-			bonus_resistance += 0.25;
-		}
 
 		if (targ->client->pers.energy_modulator_mode == 2)
 		{ // zyk: Energy Modulator mode 2
 			bonus_resistance += 0.20;
 
 			targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
-		}
-			
-		if (targ->client->ps.legsAnim == BOTH_MEDITATE && targ->client->pers.active_unique_skill == 16)
-		{ // zyk: Meditation Drain
-			bonus_resistance += 0.50;
 		}
 
 		if (bonus_resistance >= 1.00)
