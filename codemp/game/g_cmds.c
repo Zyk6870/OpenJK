@@ -91,111 +91,116 @@ const int seller_items_cost[MAX_SELLER_ITEMS][2] = {
 	{7000, 0}
 };
 
-// zyk: max levels of the RPG skills
-const int max_skill_levels[NUMBER_OF_SKILLS] = {
-	4, // Jump
-	3, // Push
-	3, // Pull
-	4, // Speed
-	3, // Sense
-	5, // Saber Attack
-	3, // Saber Defense
-	4, // Saber Throw
-	4, // Absorb
-	3, // Heal
-	4, // Protect
-	3, // Mind Trick
-	3, // Team Heal
-	4, // Lightning
-	3, // Grip
-	3, // Drain
-	4, // Rage
-	3, // Team Energize
-	3, // Stun Baton
-	3, // Blaster Pistol
-	3, // E11 Blaster Rifle
-	3, // Disruptor
-	3, // Bowcaster
-	3, // Repeater
-	3, // DEMP2
-	3, // Flechette
-	3, // Rocket Launcher
-	3, // Concussion Rifle
-	3, // Bryar Pistol
-	3, // Melee
-	5, // Max Shield
-	5, // Shield Strength
-	5, // Health Strength
-	1, // Drain Shield
-	3, // Jetpack
-	3, // Sense Health
-	3, // Shield Heal
-	3, // Team Shield Heal
-	5, // Magic Fist
-	4, // Blaster Pack
-	4, // Powercell
-	4, // Metal Bolts
-	4, // Rockets
-	3, // Thermals
-	3, // Trip Mines
-	3, // Detpacks
-	1, // Binoculars
-	1, // Bacta Canister
-	1, // Sentry Gun
-	1, // Seeker Drone
-	1, // E-Web
-	1, // Big Bacta
-	1, // Force Field
-	1, // Cloak Item
-	5, // Force Power
-	5, // Max MP
-	1, // Unique Skill 1
-	1, // Unique Skill 2
-	1, // Unique Skill 3
-	1, // Unique Skill 4
-	1, // Unique Skill 5
-	1, // Unique Skill 6
-	1, // Unique Skill 7
-	1, // Unique Skill 8
-	1, // Unique Skill 9
-	1, // Unique Skill 10
-	1, // Unique Skill 11
-	1, // Unique Skill 12
-	1, // Unique Skill 13
-	1, // Unique Skill 14
-	1, // Unique Skill 15
-	1, // Unique Skill 16
-	1, // Unique Skill 17
-	1, // Unique Skill 18
-	2, // Magic Sense
-	2, // Healing Area
-	2, // Enemy Weakening
-	2, // Magic Explosion
-	2, // Water Splash
-	2, // Water Attack
-	2, // Ice Stalagmite
-	2, // Ice Block
-	2, // Earthquake
-	2, // Rock Smash
-	2, // Rock Shield
-	2, // Tree of Life
-	2, // Flame Burst
-	2, // Ultra Flame
-	2, // Flaming Area
-	2, // Flaming Rage
-	2, // Blowing Wind
-	2, // Reverse Wind
-	2, // Ultra Speed
-	2, // Slow Motion
-	2, // Black Hole
-	2, // Dome of Damage
-	2, // Chaos Power
-	2, // Ultra Drain
-	2, // Light of Judgement
-	2, // Magic Shield
-	2, // Lightning Dome
-	2  // Time Stop
-};
+// zyk: returns the max level of a RPG skill
+int zyk_max_skill_level(int skill_index)
+{
+	int max_skill_levels[NUMBER_OF_SKILLS];
+
+	max_skill_levels[SKILL_JUMP] = 4;
+	max_skill_levels[SKILL_PUSH] = 3;
+	max_skill_levels[SKILL_PULL] = 3;
+	max_skill_levels[SKILL_SPEED] = 4;
+	max_skill_levels[SKILL_SENSE] = 3;
+	max_skill_levels[SKILL_SABER_ATTACK] = 5;
+	max_skill_levels[SKILL_SABER_DEFENSE] = 3;
+	max_skill_levels[SKILL_SABER_THROW] = 4;
+	max_skill_levels[SKILL_ABSORB] = 4;
+	max_skill_levels[SKILL_HEAL] = 3;
+	max_skill_levels[SKILL_PROTECT] = 4;
+	max_skill_levels[SKILL_MIND_TRICK] = 3;
+	max_skill_levels[SKILL_TEAM_HEAL] = 3;
+	max_skill_levels[SKILL_LIGHTNING] = 4;
+	max_skill_levels[SKILL_GRIP] = 3;
+	max_skill_levels[SKILL_DRAIN] = 3;
+	max_skill_levels[SKILL_RAGE] = 4;
+	max_skill_levels[SKILL_TEAM_ENERGIZE] = 3;
+	max_skill_levels[SKILL_STUN_BATON] = 3;
+	max_skill_levels[SKILL_BLASTER_PISTOL] = 3;
+	max_skill_levels[SKILL_E11_BLASTER_RIFLE] = 3;
+	max_skill_levels[SKILL_DISRUPTOR] = 3;
+	max_skill_levels[SKILL_BOWCASTER] = 3;
+	max_skill_levels[SKILL_REPEATER] = 3;
+	max_skill_levels[SKILL_DEMP2] = 3;
+	max_skill_levels[SKILL_FLECHETTE] = 3;
+	max_skill_levels[SKILL_ROCKET_LAUNCHER] = 3;
+	max_skill_levels[SKILL_CONCUSSION_RIFLE] = 3;
+	max_skill_levels[SKILL_BRYAR_PISTOL] = 3;
+	max_skill_levels[SKILL_MELEE] = 3;
+	max_skill_levels[SKILL_MAX_SHIELD] = 5;
+	max_skill_levels[SKILL_SHIELD_STRENGTH] = 5;
+	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
+	max_skill_levels[SKILL_DRAIN_SHIELD] = 1;
+	max_skill_levels[SKILL_JETPACK] = 3;
+	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
+	max_skill_levels[SKILL_SHIELD_HEAL] = 3;
+	max_skill_levels[SKILL_TEAM_SHIELD_HEAL] = 3;
+	max_skill_levels[SKILL_MAGIC_FIST] = 5;
+	max_skill_levels[SKILL_BLASTER_PACK] = 4;
+	max_skill_levels[SKILL_POWERCELL] = 4;
+	max_skill_levels[SKILL_METAL_BOLTS] = 4;
+	max_skill_levels[SKILL_ROCKETS] = 4;
+	max_skill_levels[SKILL_THERMALS] = 3;
+	max_skill_levels[SKILL_TRIP_MINES] = 3;
+	max_skill_levels[SKILL_DETPACKS] = 3;
+	max_skill_levels[SKILL_BINOCULARS] = 1;
+	max_skill_levels[SKILL_BACTA_CANISTER] = 1;
+	max_skill_levels[SKILL_SENTRY_GUN] = 1;
+	max_skill_levels[SKILL_SEEKER_DRONE] = 1;
+	max_skill_levels[SKILL_EWEB] = 1;
+	max_skill_levels[SKILL_BIG_BACTA] = 1;
+	max_skill_levels[SKILL_FORCE_FIELD] = 1;
+	max_skill_levels[SKILL_CLOAK_ITEM] = 1;
+	max_skill_levels[SKILL_FORCE_POWER] = 5;
+	max_skill_levels[SKILL_MAX_MP] = 5;
+	max_skill_levels[SKILL_UNIQUE_1] = 1;
+	max_skill_levels[SKILL_UNIQUE_2] = 1;
+	max_skill_levels[SKILL_UNIQUE_3] = 1;
+	max_skill_levels[SKILL_UNIQUE_4] = 1;
+	max_skill_levels[SKILL_UNIQUE_5] = 1;
+	max_skill_levels[SKILL_UNIQUE_6] = 1;
+	max_skill_levels[SKILL_UNIQUE_7] = 1;
+	max_skill_levels[SKILL_UNIQUE_8] = 1;
+	max_skill_levels[SKILL_UNIQUE_9] = 1;
+	max_skill_levels[SKILL_UNIQUE_10] = 1;
+	max_skill_levels[SKILL_UNIQUE_11] = 1;
+	max_skill_levels[SKILL_UNIQUE_12] = 1;
+	max_skill_levels[SKILL_UNIQUE_13] = 1;
+	max_skill_levels[SKILL_UNIQUE_14] = 1;
+	max_skill_levels[SKILL_UNIQUE_15] = 1;
+	max_skill_levels[SKILL_UNIQUE_16] = 1;
+	max_skill_levels[SKILL_UNIQUE_17] = 1;
+	max_skill_levels[SKILL_UNIQUE_18] = 1;
+	max_skill_levels[SKILL_MAGIC_1] = 2;
+	max_skill_levels[SKILL_MAGIC_2] = 2;
+	max_skill_levels[SKILL_MAGIC_3] = 2;
+	max_skill_levels[SKILL_MAGIC_4] = 2;
+	max_skill_levels[SKILL_MAGIC_5] = 2;
+	max_skill_levels[SKILL_MAGIC_6] = 2;
+	max_skill_levels[SKILL_MAGIC_7] = 2;
+	max_skill_levels[SKILL_MAGIC_8] = 2;
+	max_skill_levels[SKILL_MAGIC_9] = 2;
+	max_skill_levels[SKILL_MAGIC_10] = 2;
+	max_skill_levels[SKILL_MAGIC_11] = 2;
+	max_skill_levels[SKILL_MAGIC_12] = 2;
+	max_skill_levels[SKILL_MAGIC_13] = 2;
+	max_skill_levels[SKILL_MAGIC_14] = 2;
+	max_skill_levels[SKILL_MAGIC_15] = 2;
+	max_skill_levels[SKILL_MAGIC_16] = 2;
+	max_skill_levels[SKILL_MAGIC_17] = 2;
+	max_skill_levels[SKILL_MAGIC_18] = 2;
+	max_skill_levels[SKILL_MAGIC_19] = 2;
+	max_skill_levels[SKILL_MAGIC_20] = 2;
+	max_skill_levels[SKILL_MAGIC_21] = 2;
+	max_skill_levels[SKILL_MAGIC_22] = 2;
+	max_skill_levels[SKILL_MAGIC_23] = 2;
+	max_skill_levels[SKILL_MAGIC_24] = 2;
+	max_skill_levels[SKILL_MAGIC_25] = 2;
+	max_skill_levels[SKILL_MAGIC_26] = 2;
+	max_skill_levels[SKILL_MAGIC_27] = 2;
+	max_skill_levels[SKILL_MAGIC_28] = 2;
+
+	return max_skill_levels[skill_index];
+}
 
 // zyk: returns the name of a RPG skill
 char* zyk_skill_name(int skill_index)
@@ -4557,7 +4562,7 @@ void display_yellow_bar(gentity_t *ent, int duration)
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = ((ent->client->pers.level * 9)/max_skill_levels[SKILL_MAX_MP]) * ent->client->pers.skill_levels[SKILL_MAX_MP];
+	int max_mp = ((ent->client->pers.level * 9)/zyk_max_skill_level(SKILL_MAX_MP)) * ent->client->pers.skill_levels[SKILL_MAX_MP];
 
 	return max_mp;
 }
@@ -4996,7 +5001,7 @@ void initialize_rpg_skills(gentity_t *ent)
 		// zyk: validating max skill levels. If for some reason a skill is above max, get the skillpoint back
 		for (i = 0; i < NUMBER_OF_SKILLS; i++)
 		{
-			if (ent->client->pers.skill_levels[i] > max_skill_levels[i])
+			if (ent->client->pers.skill_levels[i] > zyk_max_skill_level(i))
 			{
 				ent->client->pers.skill_levels[i]--;
 				ent->client->pers.skillpoints++;
@@ -5275,10 +5280,10 @@ void initialize_rpg_skills(gentity_t *ent)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_DET_PACK);
 
 		// zyk: loading initial RPG ammo at spawn
-		ent->client->ps.ammo[AMMO_BLASTER] = ((int)ceil(zyk_max_blaster_pack_ammo.value/ max_skill_levels[SKILL_BLASTER_PACK]) * ent->client->pers.skill_levels[SKILL_BLASTER_PACK]);
-		ent->client->ps.ammo[AMMO_POWERCELL] = ((int)ceil(zyk_max_power_cell_ammo.value/ max_skill_levels[SKILL_POWERCELL]) * ent->client->pers.skill_levels[SKILL_POWERCELL]);
-		ent->client->ps.ammo[AMMO_METAL_BOLTS] = ((int)ceil(zyk_max_metal_bolt_ammo.value/ max_skill_levels[SKILL_METAL_BOLTS]) * ent->client->pers.skill_levels[SKILL_METAL_BOLTS]);
-		ent->client->ps.ammo[AMMO_ROCKETS] = ((int)ceil(zyk_max_rocket_ammo.value/ max_skill_levels[SKILL_ROCKETS]) * ent->client->pers.skill_levels[SKILL_ROCKETS]);
+		ent->client->ps.ammo[AMMO_BLASTER] = ((int)ceil(zyk_max_blaster_pack_ammo.value/ zyk_max_skill_level(SKILL_BLASTER_PACK)) * ent->client->pers.skill_levels[SKILL_BLASTER_PACK]);
+		ent->client->ps.ammo[AMMO_POWERCELL] = ((int)ceil(zyk_max_power_cell_ammo.value/ zyk_max_skill_level(SKILL_POWERCELL)) * ent->client->pers.skill_levels[SKILL_POWERCELL]);
+		ent->client->ps.ammo[AMMO_METAL_BOLTS] = ((int)ceil(zyk_max_metal_bolt_ammo.value/ zyk_max_skill_level(SKILL_METAL_BOLTS)) * ent->client->pers.skill_levels[SKILL_METAL_BOLTS]);
+		ent->client->ps.ammo[AMMO_ROCKETS] = ((int)ceil(zyk_max_rocket_ammo.value/ zyk_max_skill_level(SKILL_ROCKETS)) * ent->client->pers.skill_levels[SKILL_ROCKETS]);
 		ent->client->ps.ammo[AMMO_THERMAL] = ((int)ceil(zyk_max_thermal_ammo.value/3.0) * ent->client->pers.skill_levels[SKILL_THERMALS]);
 		ent->client->ps.ammo[AMMO_TRIPMINE] = ((int)ceil(zyk_max_tripmine_ammo.value/3.0) * ent->client->pers.skill_levels[SKILL_TRIP_MINES]);
 		ent->client->ps.ammo[AMMO_DETPACK] = ((int)ceil(zyk_max_detpack_ammo.value/3.0) * ent->client->pers.skill_levels[SKILL_DETPACKS]);
@@ -5699,7 +5704,7 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 
 qboolean rpg_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont_show_message)
 {
-	if (ent->client->pers.skill_levels[upgrade_value - 1] < max_skill_levels[upgrade_value - 1])
+	if (ent->client->pers.skill_levels[upgrade_value - 1] < zyk_max_skill_level(upgrade_value - 1))
 	{
 		ent->client->pers.skill_levels[upgrade_value - 1]++;
 		ent->client->pers.skillpoints--;
@@ -5759,7 +5764,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 
 		for (i = 0; i < NUMBER_OF_SKILLS; i++)
 		{
-			strcpy(content, va("%s%d/%d-", content, ent->client->pers.skill_levels[i], max_skill_levels[i]));
+			strcpy(content, va("%s%d/%d-", content, ent->client->pers.skill_levels[i], zyk_max_skill_level(i)));
 		}
 
 		strcpy(content, va("%s%s", content, zyk_get_settings_values(ent)));
@@ -6072,7 +6077,7 @@ void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, int number_
 
 		strcpy(message, va("%s%s%d - %s: %d/%d%s", message,
 			zyk_allowed_skill_color(lowest_skill_index), (lowest_skill_index + 1), zyk_skill_name(lowest_skill_index),
-			ent->client->pers.skill_levels[lowest_skill_index], max_skill_levels[lowest_skill_index], final_chars));
+			ent->client->pers.skill_levels[lowest_skill_index], zyk_max_skill_level(lowest_skill_index), final_chars));
 
 		lowest_skill_index++;
 
