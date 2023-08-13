@@ -2391,7 +2391,7 @@ void zyk_jetpack(gentity_t* ent)
 	if (!(ent->client->pers.player_settings & (1 << SETTINGS_JETPACK)) && zyk_allow_jetpack_command.integer &&
 		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && level.gametype != GT_JEDIMASTER &&
 		!(ent->client->pers.player_statuses & (1 << 12)) &&
-		((ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[34] > 0) || ent->client->sess.amrpgmode == 1))
+		((ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_JETPACK] > 0) || ent->client->sess.amrpgmode == 1))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 	}
@@ -4557,7 +4557,7 @@ void display_yellow_bar(gentity_t *ent, int duration)
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = ((ent->client->pers.level * 9)/max_skill_levels[55]) * ent->client->pers.skill_levels[55];
+	int max_mp = ((ent->client->pers.level * 9)/max_skill_levels[SKILL_MAX_MP]) * ent->client->pers.skill_levels[SKILL_MAX_MP];
 
 	return max_mp;
 }
@@ -4785,7 +4785,7 @@ void set_max_health(gentity_t *ent)
 // zyk: sets the Max Shield a player can have in RPG Mode
 void set_max_shield(gentity_t *ent)
 {
-	ent->client->pers.max_rpg_shield = (int)ceil(((ent->client->pers.skill_levels[30] * 1.0)/5) * ent->client->pers.max_rpg_health);
+	ent->client->pers.max_rpg_shield = (int)ceil(((ent->client->pers.skill_levels[SKILL_MAX_SHIELD] * 1.0)/5) * ent->client->pers.max_rpg_health);
 }
 
 // zyk: gives credits to the player
@@ -5004,53 +5004,53 @@ void initialize_rpg_skills(gentity_t *ent)
 		}
 
 		// zyk: loading Jump value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_LEVITATION)) && ent->client->pers.skill_levels[0] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_LEVITATION)) && ent->client->pers.skill_levels[SKILL_JUMP] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_LEVITATION);
-		if (ent->client->pers.skill_levels[0] == 0)
+		if (ent->client->pers.skill_levels[SKILL_JUMP] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_LEVITATION);
-		ent->client->ps.fd.forcePowerLevel[FP_LEVITATION] = ent->client->pers.skill_levels[0];
+		ent->client->ps.fd.forcePowerLevel[FP_LEVITATION] = ent->client->pers.skill_levels[SKILL_JUMP];
 
 		// zyk: loading Push value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_PUSH)) && ent->client->pers.skill_levels[1] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_PUSH)) && ent->client->pers.skill_levels[SKILL_PUSH] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_PUSH);
-		if (ent->client->pers.skill_levels[1] == 0)
+		if (ent->client->pers.skill_levels[SKILL_PUSH] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_PUSH);
-		ent->client->ps.fd.forcePowerLevel[FP_PUSH] = ent->client->pers.skill_levels[1];
+		ent->client->ps.fd.forcePowerLevel[FP_PUSH] = ent->client->pers.skill_levels[SKILL_PUSH];
 
 		// zyk: loading Pull value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_PULL)) && ent->client->pers.skill_levels[2] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_PULL)) && ent->client->pers.skill_levels[SKILL_PULL] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_PULL);
-		if (ent->client->pers.skill_levels[2] == 0)
+		if (ent->client->pers.skill_levels[SKILL_PULL] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_PULL);
-		ent->client->ps.fd.forcePowerLevel[FP_PULL] = ent->client->pers.skill_levels[2];
+		ent->client->ps.fd.forcePowerLevel[FP_PULL] = ent->client->pers.skill_levels[SKILL_PULL];
 
 		// zyk: loading Speed value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SPEED)) && ent->client->pers.skill_levels[3] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SPEED)) && ent->client->pers.skill_levels[SKILL_SPEED] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_SPEED);
-		if (ent->client->pers.skill_levels[3] == 0)
+		if (ent->client->pers.skill_levels[SKILL_SPEED] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SPEED);
-		ent->client->ps.fd.forcePowerLevel[FP_SPEED] = ent->client->pers.skill_levels[3];
+		ent->client->ps.fd.forcePowerLevel[FP_SPEED] = ent->client->pers.skill_levels[SKILL_SPEED];
 
 		// zyk: loading Sense value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SEE)) && ent->client->pers.skill_levels[4] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SEE)) && ent->client->pers.skill_levels[SKILL_SENSE] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
-		if (ent->client->pers.skill_levels[4] == 0)
+		if (ent->client->pers.skill_levels[SKILL_SENSE] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
-		ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[4];
+		ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[SKILL_SENSE];
 
 		// zyk: loading Saber Offense value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABER_OFFENSE)) && ent->client->pers.skill_levels[5] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABER_OFFENSE)) && ent->client->pers.skill_levels[SKILL_SABER_ATTACK] > 0)
 		{
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_SABER_OFFENSE);
 		}
-		if (ent->client->pers.skill_levels[5] == 0)
+		if (ent->client->pers.skill_levels[SKILL_SABER_ATTACK] == 0)
 		{
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SABER_OFFENSE);
 		}
-		ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] = ent->client->pers.skill_levels[5];
+		ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] = ent->client->pers.skill_levels[SKILL_SABER_ATTACK];
 
 		// zyk: giving the saber if he has Saber Attack skill level greater than 0
-		if (ent->client->pers.skill_levels[5] > 0)
+		if (ent->client->pers.skill_levels[SKILL_SABER_ATTACK] > 0)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
 		}
@@ -5060,104 +5060,104 @@ void initialize_rpg_skills(gentity_t *ent)
 		}
 
 		// zyk: loading Saber Defense value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABER_DEFENSE)) && ent->client->pers.skill_levels[6] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABER_DEFENSE)) && ent->client->pers.skill_levels[SKILL_SABER_DEFENSE] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_SABER_DEFENSE);
-		if (ent->client->pers.skill_levels[6] == 0)
+		if (ent->client->pers.skill_levels[SKILL_SABER_DEFENSE] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SABER_DEFENSE);
-		ent->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] = ent->client->pers.skill_levels[6];
+		ent->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] = ent->client->pers.skill_levels[SKILL_SABER_DEFENSE];
 
 		// zyk: loading Saber Throw value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABERTHROW)) && ent->client->pers.skill_levels[7] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABERTHROW)) && ent->client->pers.skill_levels[SKILL_SABER_THROW] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_SABERTHROW);
-		if (ent->client->pers.skill_levels[7] == 0)
+		if (ent->client->pers.skill_levels[SKILL_SABER_THROW] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SABERTHROW);
-		ent->client->ps.fd.forcePowerLevel[FP_SABERTHROW] = ent->client->pers.skill_levels[7];
+		ent->client->ps.fd.forcePowerLevel[FP_SABERTHROW] = ent->client->pers.skill_levels[SKILL_SABER_THROW];
 
 		// zyk: loading Absorb value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_ABSORB)) && ent->client->pers.skill_levels[8] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_ABSORB)) && ent->client->pers.skill_levels[SKILL_ABSORB] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_ABSORB);
-		if (ent->client->pers.skill_levels[8] == 0)
+		if (ent->client->pers.skill_levels[SKILL_ABSORB] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_ABSORB);
 
-		if (ent->client->pers.skill_levels[8] < 4)
-			ent->client->ps.fd.forcePowerLevel[FP_ABSORB] = ent->client->pers.skill_levels[8];
+		if (ent->client->pers.skill_levels[SKILL_ABSORB] < 4)
+			ent->client->ps.fd.forcePowerLevel[FP_ABSORB] = ent->client->pers.skill_levels[SKILL_ABSORB];
 		else
 			ent->client->ps.fd.forcePowerLevel[FP_ABSORB] = FORCE_LEVEL_3;
 
 		// zyk: loading Heal value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_HEAL)) && ent->client->pers.skill_levels[9] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_HEAL)) && ent->client->pers.skill_levels[SKILL_HEAL] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_HEAL);
-		if (ent->client->pers.skill_levels[9] == 0)
+		if (ent->client->pers.skill_levels[SKILL_HEAL] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_HEAL);
-		ent->client->ps.fd.forcePowerLevel[FP_HEAL] = ent->client->pers.skill_levels[9];
+		ent->client->ps.fd.forcePowerLevel[FP_HEAL] = ent->client->pers.skill_levels[SKILL_HEAL];
 
 		// zyk: loading Protect value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_PROTECT)) && ent->client->pers.skill_levels[10] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_PROTECT)) && ent->client->pers.skill_levels[SKILL_PROTECT] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_PROTECT);
-		if (ent->client->pers.skill_levels[10] == 0)
+		if (ent->client->pers.skill_levels[SKILL_PROTECT] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_PROTECT);
 
-		if (ent->client->pers.skill_levels[10] < 4)
-			ent->client->ps.fd.forcePowerLevel[FP_PROTECT] = ent->client->pers.skill_levels[10];
+		if (ent->client->pers.skill_levels[SKILL_PROTECT] < 4)
+			ent->client->ps.fd.forcePowerLevel[FP_PROTECT] = ent->client->pers.skill_levels[SKILL_PROTECT];
 		else
 			ent->client->ps.fd.forcePowerLevel[FP_PROTECT] = FORCE_LEVEL_3;
 
 		// zyk: loading Mind Trick value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_TELEPATHY)) && ent->client->pers.skill_levels[11] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_TELEPATHY)) && ent->client->pers.skill_levels[SKILL_MIND_TRICK] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_TELEPATHY);
-		if (ent->client->pers.skill_levels[11] == 0)
+		if (ent->client->pers.skill_levels[SKILL_MIND_TRICK] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_TELEPATHY);
-		ent->client->ps.fd.forcePowerLevel[FP_TELEPATHY] = ent->client->pers.skill_levels[11];
+		ent->client->ps.fd.forcePowerLevel[FP_TELEPATHY] = ent->client->pers.skill_levels[SKILL_MIND_TRICK];
 
 		// zyk: loading Team Heal value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_TEAM_HEAL)) && ent->client->pers.skill_levels[12] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_TEAM_HEAL)) && ent->client->pers.skill_levels[SKILL_TEAM_HEAL] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_TEAM_HEAL);
-		if (ent->client->pers.skill_levels[12] == 0)
+		if (ent->client->pers.skill_levels[SKILL_TEAM_HEAL] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_TEAM_HEAL);
-		ent->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL] = ent->client->pers.skill_levels[12];
+		ent->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL] = ent->client->pers.skill_levels[SKILL_TEAM_HEAL];
 
 		// zyk: loading Lightning value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_LIGHTNING)) && ent->client->pers.skill_levels[13] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_LIGHTNING)) && ent->client->pers.skill_levels[SKILL_LIGHTNING] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_LIGHTNING);
-		if (ent->client->pers.skill_levels[13] == 0)
+		if (ent->client->pers.skill_levels[SKILL_LIGHTNING] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_LIGHTNING);
 
-		if (ent->client->pers.skill_levels[13] < 4)
-			ent->client->ps.fd.forcePowerLevel[FP_LIGHTNING] = ent->client->pers.skill_levels[13];
+		if (ent->client->pers.skill_levels[SKILL_LIGHTNING] < 4)
+			ent->client->ps.fd.forcePowerLevel[FP_LIGHTNING] = ent->client->pers.skill_levels[SKILL_LIGHTNING];
 		else
 			ent->client->ps.fd.forcePowerLevel[FP_LIGHTNING] = FORCE_LEVEL_3;
 
 		// zyk: loading Grip value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_GRIP)) && ent->client->pers.skill_levels[14] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_GRIP)) && ent->client->pers.skill_levels[SKILL_GRIP] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_GRIP);
-		if (ent->client->pers.skill_levels[14] == 0)
+		if (ent->client->pers.skill_levels[SKILL_GRIP] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_GRIP);
-		ent->client->ps.fd.forcePowerLevel[FP_GRIP] = ent->client->pers.skill_levels[14];
+		ent->client->ps.fd.forcePowerLevel[FP_GRIP] = ent->client->pers.skill_levels[SKILL_GRIP];
 
 		// zyk: loading Drain value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_DRAIN)) && ent->client->pers.skill_levels[15] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_DRAIN)) && ent->client->pers.skill_levels[SKILL_DRAIN] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_DRAIN);
-		if (ent->client->pers.skill_levels[15] == 0)
+		if (ent->client->pers.skill_levels[SKILL_DRAIN] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_DRAIN);
-		ent->client->ps.fd.forcePowerLevel[FP_DRAIN] = ent->client->pers.skill_levels[15];
+		ent->client->ps.fd.forcePowerLevel[FP_DRAIN] = ent->client->pers.skill_levels[SKILL_DRAIN];
 
 		// zyk: loading Rage value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_RAGE)) && ent->client->pers.skill_levels[16] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_RAGE)) && ent->client->pers.skill_levels[SKILL_RAGE] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_RAGE);
-		if (ent->client->pers.skill_levels[16] == 0)
+		if (ent->client->pers.skill_levels[SKILL_RAGE] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_RAGE);
 
-		if (ent->client->pers.skill_levels[16] < 4)
-			ent->client->ps.fd.forcePowerLevel[FP_RAGE] = ent->client->pers.skill_levels[16];
+		if (ent->client->pers.skill_levels[SKILL_RAGE] < 4)
+			ent->client->ps.fd.forcePowerLevel[FP_RAGE] = ent->client->pers.skill_levels[SKILL_RAGE];
 		else
 			ent->client->ps.fd.forcePowerLevel[FP_RAGE] = FORCE_LEVEL_3;
 
 		// zyk: loading Team Energize value
-		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_TEAM_FORCE)) && ent->client->pers.skill_levels[17] > 0)
+		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_TEAM_FORCE)) && ent->client->pers.skill_levels[SKILL_TEAM_ENERGIZE] > 0)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_TEAM_FORCE);
-		if (ent->client->pers.skill_levels[17] == 0)
+		if (ent->client->pers.skill_levels[SKILL_TEAM_ENERGIZE] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_TEAM_FORCE);
-		ent->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] = ent->client->pers.skill_levels[17];
+		ent->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] = ent->client->pers.skill_levels[SKILL_TEAM_ENERGIZE];
 
 		// zyk: loading Melee
 		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_MELEE)))
@@ -5170,7 +5170,7 @@ void initialize_rpg_skills(gentity_t *ent)
 		// zyk: used to add a cooldown between each flame
 		ent->client->cloakDebReduce = 0;
 
-		ent->client->pers.max_force_power = (int)ceil((zyk_max_force_power.value/4.0) * ent->client->pers.skill_levels[54]);
+		ent->client->pers.max_force_power = (int)ceil((zyk_max_force_power.value/4.0) * ent->client->pers.skill_levels[SKILL_FORCE_POWER]);
 		ent->client->ps.fd.forcePowerMax = ent->client->pers.max_force_power;
 		ent->client->ps.fd.forcePower = ent->client->ps.fd.forcePowerMax;
 
@@ -5182,7 +5182,7 @@ void initialize_rpg_skills(gentity_t *ent)
 
 		ent->client->pers.magic_power = zyk_max_magic_power(ent);
 
-		if (ent->client->sess.magic_fist_selection > ent->client->pers.skill_levels[38])
+		if (ent->client->sess.magic_fist_selection > ent->client->pers.skill_levels[SKILL_MAGIC_FIST])
 		{ // zyk: reset magic fist selected if player downgrades Magic Fist skill
 			ent->client->sess.magic_fist_selection = 0;
 		}
@@ -5204,84 +5204,84 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->pers.quest_event_timer = 0;
 
 		// zyk: loading initial RPG weapons
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)) && ent->client->pers.skill_levels[18] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)) && ent->client->pers.skill_levels[SKILL_STUN_BATON] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
-		if (ent->client->pers.skill_levels[18] == 0)
+		if (ent->client->pers.skill_levels[SKILL_STUN_BATON] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_STUN_BATON);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_PISTOL)) && ent->client->pers.skill_levels[19] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_PISTOL)) && ent->client->pers.skill_levels[SKILL_BLASTER_PISTOL] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
-		if (ent->client->pers.skill_levels[19] == 0)
+		if (ent->client->pers.skill_levels[SKILL_BLASTER_PISTOL] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BRYAR_PISTOL);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BLASTER)) && ent->client->pers.skill_levels[20] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BLASTER)) && ent->client->pers.skill_levels[SKILL_E11_BLASTER_RIFLE] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BLASTER);
-		if (ent->client->pers.skill_levels[20] == 0)
+		if (ent->client->pers.skill_levels[SKILL_E11_BLASTER_RIFLE] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BLASTER);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DISRUPTOR)) && ent->client->pers.skill_levels[21] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DISRUPTOR)) && ent->client->pers.skill_levels[SKILL_DISRUPTOR] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DISRUPTOR);
-		if (ent->client->pers.skill_levels[21] == 0)
+		if (ent->client->pers.skill_levels[SKILL_DISRUPTOR] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_DISRUPTOR);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BOWCASTER)) && ent->client->pers.skill_levels[22] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BOWCASTER)) && ent->client->pers.skill_levels[SKILL_BOWCASTER] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BOWCASTER);
-		if (ent->client->pers.skill_levels[22] == 0)
+		if (ent->client->pers.skill_levels[SKILL_BOWCASTER] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BOWCASTER);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_REPEATER)) && ent->client->pers.skill_levels[23] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_REPEATER)) && ent->client->pers.skill_levels[SKILL_REPEATER] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_REPEATER);
-		if (ent->client->pers.skill_levels[23] == 0)
+		if (ent->client->pers.skill_levels[SKILL_REPEATER] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_REPEATER);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DEMP2)) && ent->client->pers.skill_levels[24] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DEMP2)) && ent->client->pers.skill_levels[SKILL_DEMP2] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DEMP2);
-		if (ent->client->pers.skill_levels[24] == 0)
+		if (ent->client->pers.skill_levels[SKILL_DEMP2] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_DEMP2);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_FLECHETTE)) && ent->client->pers.skill_levels[25] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_FLECHETTE)) && ent->client->pers.skill_levels[SKILL_FLECHETTE] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_FLECHETTE);
-		if (ent->client->pers.skill_levels[25] == 0)
+		if (ent->client->pers.skill_levels[SKILL_FLECHETTE] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_FLECHETTE);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_ROCKET_LAUNCHER)) && ent->client->pers.skill_levels[26] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_ROCKET_LAUNCHER)) && ent->client->pers.skill_levels[SKILL_ROCKET_LAUNCHER] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_ROCKET_LAUNCHER);
-		if (ent->client->pers.skill_levels[26] == 0)
+		if (ent->client->pers.skill_levels[SKILL_ROCKET_LAUNCHER] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_ROCKET_LAUNCHER);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_CONCUSSION)) && ent->client->pers.skill_levels[27] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_CONCUSSION)) && ent->client->pers.skill_levels[SKILL_CONCUSSION_RIFLE] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_CONCUSSION);
-		if (ent->client->pers.skill_levels[27] == 0)
+		if (ent->client->pers.skill_levels[SKILL_CONCUSSION_RIFLE] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_CONCUSSION);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_OLD)) && ent->client->pers.skill_levels[28] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_OLD)) && ent->client->pers.skill_levels[SKILL_BRYAR_PISTOL] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_OLD);
-		if (ent->client->pers.skill_levels[28] == 0)
+		if (ent->client->pers.skill_levels[SKILL_BRYAR_PISTOL] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BRYAR_OLD);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_THERMAL)) && ent->client->pers.skill_levels[43] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_THERMAL)) && ent->client->pers.skill_levels[SKILL_THERMALS] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_THERMAL);
-		if (ent->client->pers.skill_levels[43] == 0)
+		if (ent->client->pers.skill_levels[SKILL_THERMALS] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_THERMAL);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_TRIP_MINE)) && ent->client->pers.skill_levels[44] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_TRIP_MINE)) && ent->client->pers.skill_levels[SKILL_TRIP_MINES] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_TRIP_MINE);
-		if (ent->client->pers.skill_levels[44] == 0)
+		if (ent->client->pers.skill_levels[SKILL_TRIP_MINES] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_TRIP_MINE);
 
-		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DET_PACK)) && ent->client->pers.skill_levels[45] > 0)
+		if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DET_PACK)) && ent->client->pers.skill_levels[SKILL_DETPACKS] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
-		if (ent->client->pers.skill_levels[45] == 0)
+		if (ent->client->pers.skill_levels[SKILL_DETPACKS] == 0)
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_DET_PACK);
 
 		// zyk: loading initial RPG ammo at spawn
-		ent->client->ps.ammo[AMMO_BLASTER] = ((int)ceil(zyk_max_blaster_pack_ammo.value/ max_skill_levels[39]) * ent->client->pers.skill_levels[39]);
-		ent->client->ps.ammo[AMMO_POWERCELL] = ((int)ceil(zyk_max_power_cell_ammo.value/ max_skill_levels[40]) * ent->client->pers.skill_levels[40]);
-		ent->client->ps.ammo[AMMO_METAL_BOLTS] = ((int)ceil(zyk_max_metal_bolt_ammo.value/ max_skill_levels[41]) * ent->client->pers.skill_levels[41]);
-		ent->client->ps.ammo[AMMO_ROCKETS] = ((int)ceil(zyk_max_rocket_ammo.value/ max_skill_levels[42]) * ent->client->pers.skill_levels[42]);
-		ent->client->ps.ammo[AMMO_THERMAL] = ((int)ceil(zyk_max_thermal_ammo.value/3.0) * ent->client->pers.skill_levels[43]);
-		ent->client->ps.ammo[AMMO_TRIPMINE] = ((int)ceil(zyk_max_tripmine_ammo.value/3.0) * ent->client->pers.skill_levels[44]);
-		ent->client->ps.ammo[AMMO_DETPACK] = ((int)ceil(zyk_max_detpack_ammo.value/3.0) * ent->client->pers.skill_levels[45]);
+		ent->client->ps.ammo[AMMO_BLASTER] = ((int)ceil(zyk_max_blaster_pack_ammo.value/ max_skill_levels[SKILL_BLASTER_PACK]) * ent->client->pers.skill_levels[SKILL_BLASTER_PACK]);
+		ent->client->ps.ammo[AMMO_POWERCELL] = ((int)ceil(zyk_max_power_cell_ammo.value/ max_skill_levels[SKILL_POWERCELL]) * ent->client->pers.skill_levels[SKILL_POWERCELL]);
+		ent->client->ps.ammo[AMMO_METAL_BOLTS] = ((int)ceil(zyk_max_metal_bolt_ammo.value/ max_skill_levels[SKILL_METAL_BOLTS]) * ent->client->pers.skill_levels[SKILL_METAL_BOLTS]);
+		ent->client->ps.ammo[AMMO_ROCKETS] = ((int)ceil(zyk_max_rocket_ammo.value/ max_skill_levels[SKILL_ROCKETS]) * ent->client->pers.skill_levels[SKILL_ROCKETS]);
+		ent->client->ps.ammo[AMMO_THERMAL] = ((int)ceil(zyk_max_thermal_ammo.value/3.0) * ent->client->pers.skill_levels[SKILL_THERMALS]);
+		ent->client->ps.ammo[AMMO_TRIPMINE] = ((int)ceil(zyk_max_tripmine_ammo.value/3.0) * ent->client->pers.skill_levels[SKILL_TRIP_MINES]);
+		ent->client->ps.ammo[AMMO_DETPACK] = ((int)ceil(zyk_max_detpack_ammo.value/3.0) * ent->client->pers.skill_levels[SKILL_DETPACKS]);
 		
 		// zyk: player starts with more items if he has the Inventory Capacity upgrade
 		for (gunner_items_iterator = 0; gunner_items_iterator < MAX_GUNNER_ITEMS; gunner_items_iterator++)
@@ -5312,28 +5312,28 @@ void initialize_rpg_skills(gentity_t *ent)
 		// zyk: reseting initial holdable items of the player
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SEEKER) & ~(1 << HI_BINOCULARS) & ~(1 << HI_SENTRY_GUN) & ~(1 << HI_EWEB) & ~(1 << HI_CLOAK) & ~(1 << HI_SHIELD) & ~(1 << HI_MEDPAC) & ~(1 << HI_MEDPAC_BIG);
 
-		if (ent->client->pers.skill_levels[46] > 0)
+		if (ent->client->pers.skill_levels[SKILL_BINOCULARS] > 0)
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_BINOCULARS);
 
-		if (ent->client->pers.skill_levels[47] > 0)
+		if (ent->client->pers.skill_levels[SKILL_BACTA_CANISTER] > 0)
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC);
 
-		if (ent->client->pers.skill_levels[48] > 0)
+		if (ent->client->pers.skill_levels[SKILL_SENTRY_GUN] > 0)
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
 
-		if (ent->client->pers.skill_levels[49] > 0)
+		if (ent->client->pers.skill_levels[SKILL_SEEKER_DRONE] > 0)
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
 
-		if (ent->client->pers.skill_levels[50] > 0)
+		if (ent->client->pers.skill_levels[SKILL_EWEB] > 0)
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_EWEB);
 
-		if (ent->client->pers.skill_levels[51] > 0)
+		if (ent->client->pers.skill_levels[SKILL_BIG_BACTA] > 0)
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC_BIG);
 
-		if (ent->client->pers.skill_levels[52] > 0)
+		if (ent->client->pers.skill_levels[SKILL_FORCE_FIELD] > 0)
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
 
-		if (ent->client->pers.skill_levels[53] > 0)
+		if (ent->client->pers.skill_levels[SKILL_CLOAK_ITEM] > 0)
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_CLOAK);
 
 		// zyk: loading initial health of the player
@@ -8637,7 +8637,7 @@ void Cmd_Jetpack_f( gentity_t *ent ) {
 	}
 
 	if (!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)) && zyk_allow_jetpack_command.integer && 
-		(ent->client->sess.amrpgmode < 2 || ent->client->pers.skill_levels[34] > 0) && 
+		(ent->client->sess.amrpgmode < 2 || ent->client->pers.skill_levels[SKILL_JETPACK] > 0) &&
 		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && level.gametype != GT_JEDIMASTER && 
 		!(ent->client->pers.player_statuses & (1 << 12)))
 	{ // zyk: gets jetpack if player does not have it. RPG players need jetpack skill to get it
@@ -10650,7 +10650,7 @@ void Cmd_Unique_f(gentity_t *ent) {
 	trap->Argv(1, arg1, sizeof(arg1));
 	unique_skill_number = atoi(arg1);
 
-	if (unique_skill_number < 57 || unique_skill_number > 74)
+	if (unique_skill_number < (SKILL_UNIQUE_1 + 1) || unique_skill_number > (SKILL_UNIQUE_18 + 1))
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Must be a number between 57 and 74\n\"");
 		return;
