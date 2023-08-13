@@ -184,110 +184,113 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAGIC_27] = 2;
 	max_skill_levels[SKILL_MAGIC_28] = 2;
 
-	return max_skill_levels[skill_index];
+	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
+	{
+		return max_skill_levels[skill_index];
+	}
+
+	return 0;
 }
 
 // zyk: returns the name of a RPG skill
 char* zyk_skill_name(int skill_index)
 {
-	char *skill_names[NUMBER_OF_SKILLS] = {
-		"Jump",
-		"Push",
-		"Pull",
-		"Speed",
-		"Sense",
-		"Saber Attack",
-		"Saber Defense",
-		"Saber Throw",
-		"Absorb",
-		"Heal",
-		"Protect",
-		"Mind Trick",
-		"Team Heal",
-		"Lightning",
-		"Grip",
-		"Drain",
-		"Rage",
-		"Team Energize",
-		"Stun Baton",
-		"Blaster Pistol",
-		"E11 Blaster Rifle",
-		"Disruptor",
-		"Bowcaster",
-		"Repeater",
-		"DEMP2",
-		"Flechette",
-		"Rocket Launcher",
-		"Concussion Rifle",
-		"Bryar Pistol",
-		"Melee",
-		"Max Shield",
-		"Shield Strength",
-		"Health Strength",
-		"Drain Shield",
-		"Jetpack",
-		"Sense Health",
-		"Shield Heal",
-		"Team Shield Heal",
-		"Magic Fist",
-		"Force Power",
-		"Max MP",
-		"Vertical DFA",
-		"No Attack",
-		"Fast Dash",
-		"Force Shield",
-		"Force Maelstrom",
-		"Force Repulse",
-		"Force Scream",
-		"Force Storm",
-		"Force Attraction",
-		"Poison Darts",
-		"Homing Rocket",
-		"Lightning Shield",
-		"Timed Bomb",
-		"Aimed Shot",
-		"Faster Bolts",
-		"Meditation Drain",
-		"Elemental Attack",
-		"Super Beam",
-		"Magic Sense",
-		"Healing Area",
-		"Enemy Weakening",
-		"Magic Explosion",
-		"Water Splash",
-		"Water Attack",
-		"Ice Stalagmite",
-		"Ice Block",
-		"Earthquake",
-		"Rock Smash",
-		"Rock Shield",
-		"Tree of Life",
-		"Flame Burst",
-		"Ultra Flame",
-		"Flaming Area",
-		"Flaming Rage",
-		"Blowing Wind",
-		"Reverse Wind",
-		"Ultra Speed",
-		"Slow Motion",
-		"Black Hole",
-		"Dome of Damage",
-		"Chaos Power",
-		"Ultra Drain",
-		"Light of Judgement",
-		"Magic Shield",
-		"Lightning Dome",
-		"Time Stop",
-	};
+	char *skill_names[NUMBER_OF_SKILLS];
+
+	skill_names[SKILL_JUMP] = "Jump";
+	skill_names[SKILL_PUSH] = "Push";
+	skill_names[SKILL_PULL] = "Pull";
+	skill_names[SKILL_SPEED] = "Speed";
+	skill_names[SKILL_SENSE] = "Sense";
+	skill_names[SKILL_SABER_ATTACK] = "Saber Attack";
+	skill_names[SKILL_SABER_DEFENSE] = "Saber Defense";
+	skill_names[SKILL_SABER_THROW] = "Saber Throw";
+	skill_names[SKILL_ABSORB] = "Absorb";
+	skill_names[SKILL_HEAL] = "Heal";
+	skill_names[SKILL_PROTECT] = "Protect";
+	skill_names[SKILL_MIND_TRICK] = "Mind Trick";
+	skill_names[SKILL_TEAM_HEAL] = "Team Heal";
+	skill_names[SKILL_LIGHTNING] = "Lightning";
+	skill_names[SKILL_GRIP] = "Grip";
+	skill_names[SKILL_DRAIN] = "Drain";
+	skill_names[SKILL_RAGE] = "Rage";
+	skill_names[SKILL_TEAM_ENERGIZE] = "Team Energize";
+	skill_names[SKILL_STUN_BATON] = "Stun Baton";
+	skill_names[SKILL_BLASTER_PISTOL] = "Blaster Pistol";
+	skill_names[SKILL_E11_BLASTER_RIFLE] = "E11 Blaster Rifle";
+	skill_names[SKILL_DISRUPTOR] = "Disruptor";
+	skill_names[SKILL_BOWCASTER] = "Bowcaster";
+	skill_names[SKILL_REPEATER] = "Repeater";
+	skill_names[SKILL_DEMP2] = "DEMP2";
+	skill_names[SKILL_FLECHETTE] = "Flechette";
+	skill_names[SKILL_ROCKET_LAUNCHER] = "Rocket Launcher";
+	skill_names[SKILL_CONCUSSION_RIFLE] = "Concussion Rifle";
+	skill_names[SKILL_BRYAR_PISTOL] = "Bryar Pistol";
+	skill_names[SKILL_MELEE] = "Melee";
+	skill_names[SKILL_MAX_SHIELD] = "Max Shield";
+	skill_names[SKILL_SHIELD_STRENGTH] = "Shield Strength";
+	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
+	skill_names[SKILL_DRAIN_SHIELD] = "Drain Shield";
+	skill_names[SKILL_JETPACK] = "Jetpack";
+	skill_names[SKILL_SENSE_HEALTH] = "Sense Health";
+	skill_names[SKILL_SHIELD_HEAL] = "Shield Heal";
+	skill_names[SKILL_TEAM_SHIELD_HEAL] = "Team Shield Heal";
+	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
+	skill_names[SKILL_FORCE_POWER] = "Force Power";
+	skill_names[SKILL_MAX_MP] = "Max Magic Points";
+	skill_names[SKILL_UNIQUE_1] = "Vertical DFA";
+	skill_names[SKILL_UNIQUE_2] = "No Attack";
+	skill_names[SKILL_UNIQUE_3] = "Fast Dash";
+	skill_names[SKILL_UNIQUE_4] = "Force Shield";
+	skill_names[SKILL_UNIQUE_5] = "Force Maelstrom";
+	skill_names[SKILL_UNIQUE_6] = "Force Repulse";
+	skill_names[SKILL_UNIQUE_7] = "Force Scream";
+	skill_names[SKILL_UNIQUE_8] = "Force Storm";
+	skill_names[SKILL_UNIQUE_9] = "Force Attraction";
+	skill_names[SKILL_UNIQUE_10] = "Poison Darts";
+	skill_names[SKILL_UNIQUE_11] = "Homing Rocket";
+	skill_names[SKILL_UNIQUE_12] = "Lightning Shield";
+	skill_names[SKILL_UNIQUE_13] = "Timed Bomb";
+	skill_names[SKILL_UNIQUE_14] = "Aimed Shot";
+	skill_names[SKILL_UNIQUE_15] = "Faster Bolts";
+	skill_names[SKILL_UNIQUE_16] = "Meditation Drain";
+	skill_names[SKILL_UNIQUE_17] = "Elemental Attack";
+	skill_names[SKILL_UNIQUE_18] = "Super Beam";
+	skill_names[SKILL_MAGIC_1] = "Magic Sense";
+	skill_names[SKILL_MAGIC_2] = "Healing Area";
+	skill_names[SKILL_MAGIC_3] = "Enemy Weakening";
+	skill_names[SKILL_MAGIC_4] = "Magic Explosion";
+	skill_names[SKILL_MAGIC_5] = "Water Splash";
+	skill_names[SKILL_MAGIC_6] = "Water Attack";
+	skill_names[SKILL_MAGIC_7] = "Ice Stalagmite";
+	skill_names[SKILL_MAGIC_8] = "Ice Block";
+	skill_names[SKILL_MAGIC_9] = "Earthquake";
+	skill_names[SKILL_MAGIC_10] = "Rock Smash";
+	skill_names[SKILL_MAGIC_11] = "Rock Shield";
+	skill_names[SKILL_MAGIC_12] = "Tree of Life";
+	skill_names[SKILL_MAGIC_13] = "Flame Burst";
+	skill_names[SKILL_MAGIC_14] = "Ultra Flame";
+	skill_names[SKILL_MAGIC_15] = "Flaming Area";
+	skill_names[SKILL_MAGIC_16] = "Flaming Rage";
+	skill_names[SKILL_MAGIC_17] = "Blowing Wind";
+	skill_names[SKILL_MAGIC_18] = "Reverse Wind";
+	skill_names[SKILL_MAGIC_19] = "Ultra Speed";
+	skill_names[SKILL_MAGIC_20] = "Slow Motion";
+	skill_names[SKILL_MAGIC_21] = "Black Hole";
+	skill_names[SKILL_MAGIC_22] = "Dome of Damage";
+	skill_names[SKILL_MAGIC_23] = "Chaos Power";
+	skill_names[SKILL_MAGIC_24] = "Ultra Drain";
+	skill_names[SKILL_MAGIC_25] = "Light of Judgement";
+	skill_names[SKILL_MAGIC_26] = "Magic Shield";
+	skill_names[SKILL_MAGIC_27] = "Lightning Dome";
+	skill_names[SKILL_MAGIC_28] = "Time Stop";
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
 		return G_NewString(skill_names[skill_index]);
 	}
-	else
-	{
-		return "";
-	}
+
+	return "";
 }
 
 // zyk: return the name of a RPG Upgrade
