@@ -134,6 +134,7 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAX_SHIELD] = 5;
 	max_skill_levels[SKILL_SHIELD_STRENGTH] = 5;
+	max_skill_levels[SKILL_MAX_HEALTH] = 5;
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
 	max_skill_levels[SKILL_DRAIN_SHIELD] = 1;
 	max_skill_levels[SKILL_RUN_SPEED] = 3;
@@ -233,6 +234,7 @@ char* zyk_skill_name(int skill_index)
 
 	skill_names[SKILL_MAX_SHIELD] = "Max Shield";
 	skill_names[SKILL_SHIELD_STRENGTH] = "Shield Strength";
+	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
 	skill_names[SKILL_DRAIN_SHIELD] = "Drain Shield";
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
@@ -405,6 +407,8 @@ char* zyk_skill_description(int skill_index)
 		return "The max shield (armor) the player can have. Each level increases 20 per cent of max shield the player can have";
 	if (skill_index == SKILL_SHIELD_STRENGTH)
 		return "Each level increases your shield resistance by 5 per cent";
+	if (skill_index == SKILL_MAX_HEALTH)
+		return "Each level increases your max health by 80";
 	if (skill_index == SKILL_HEALTH_STRENGTH)
 		return "Each level increases your health resistance by 5 per cent";
 	if (skill_index == SKILL_DRAIN_SHIELD)
@@ -4601,7 +4605,7 @@ void send_rpg_events(int send_event_timer)
 // zyk: sets the Max HP a player can have in RPG Mode
 void set_max_health(gentity_t *ent)
 {
-	ent->client->pers.max_rpg_health = 100 + (ent->client->pers.level * 2);
+	ent->client->pers.max_rpg_health = 100 + (ent->client->pers.skill_levels[SKILL_MAX_HEALTH] * 80);
 	ent->client->ps.stats[STAT_MAX_HEALTH] = ent->client->pers.max_rpg_health;
 }
 
@@ -4762,13 +4766,6 @@ void rpg_score(gentity_t *ent)
 				ent->client->pers.skillpoints++;
 
 			strcpy(message,va("^3New Level: ^7%d^3, Skillpoints: ^7%d\n", ent->client->pers.level, ent->client->pers.skillpoints));
-
-			// zyk: got a new level, so change the max health and max shield
-			set_max_health(ent);
-			set_max_shield(ent);
-
-			// zyk: mp also increased, so send event to client-side to display the magic power bar
-			send_rpg_events(2000);
 
 			send_message = 1;
 		}
