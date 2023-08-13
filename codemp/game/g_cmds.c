@@ -332,104 +332,7 @@ char* zyk_get_spirit_name(zyk_main_quest_t spirit_value)
 	return G_NewString(spirit_names[spirit_value - (MAX_QUEST_MISSIONS - 7)]);
 }
 
-// zyk: returns the special jka color chars for RPG skills
-char* zyk_allowed_skill_color(int skill_index)
-{
-	char skill_colors[NUMBER_OF_SKILLS + 1][3] = {
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^3",
-		"^3",
-		"^3",
-		"^5",
-		"^5",
-		"^5",
-		"^5",
-		"^5",
-		"^1",
-		"^1",
-		"^1",
-		"^1",
-		"^1",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^2",
-		"^2",
-		"^1",
-		"^3",
-		"^3",
-		"^6",
-		"^6",
-		"^6",
-		"^3",
-		"^5",
-		"^3",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^7",
-		"^4",
-		"^4",
-		"^4",
-		"^4",
-		"^3",
-		"^3",
-		"^3",
-		"^3",
-		"^1",
-		"^1",
-		"^1",
-		"^1",
-		"^2",
-		"^2",
-		"^2",
-		"^2",
-		"^6",
-		"^6",
-		"^6",
-		"^6",
-		"^5",
-		"^5",
-		"^5",
-		"^5",
-		""
-	};
-
-	return G_NewString(skill_colors[skill_index]);
-}
-
-// zy: returns the description of a RPG skill
+// zyk: returns the description of a RPG skill
 char* zyk_skill_description(int skill_index)
 {
 	if (skill_index == 0)
@@ -4534,8 +4437,8 @@ void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
 		return;
 	}
 
-	trap->SendServerCommand(ent->s.number, va("chat \"%s^7: %s%s!\"", 
-		ent->client->pers.netname, zyk_allowed_skill_color(skill_index), zyk_skill_name(skill_index)));
+	trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^2%s!\"", 
+		ent->client->pers.netname, zyk_skill_name(skill_index)));
 }
 
 void zyk_set_magic_power_cooldown_time(gentity_t *ent, int duration)
@@ -5990,7 +5893,7 @@ char* zyk_add_whitespaces(int skill_index, int biggest_skill_name_length)
 }
 
 // zyk: lists skills from a specific category
-void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, int number_of_skills, int lowest_skill_index, int number_of_whitespaces)
+void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, char *skill_color, int number_of_skills, int lowest_skill_index, int number_of_whitespaces)
 {
 	char message[1024];
 	char final_chars[32];
@@ -6011,7 +5914,7 @@ void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, int number_
 		}
 
 		strcpy(message, va("%s%s%d - %s: %d/%d%s", message,
-			zyk_allowed_skill_color(lowest_skill_index), (lowest_skill_index + 1), zyk_skill_name(lowest_skill_index),
+			skill_color, (lowest_skill_index + 1), zyk_skill_name(lowest_skill_index),
 			ent->client->pers.skill_levels[lowest_skill_index], zyk_max_skill_level(lowest_skill_index), final_chars));
 
 		lowest_skill_index++;
@@ -6034,23 +5937,23 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 {
 	if (Q_stricmp( arg1, "force" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 18, 0, 13);
+		zyk_list_category_skills(ent, target_ent, "^5", 18, 0, 13);
 	}
 	else if (Q_stricmp( arg1, "weapons" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 12, 18, 17);
+		zyk_list_category_skills(ent, target_ent, "^3", 12, 18, 17);
 	}
 	else if (Q_stricmp( arg1, "other" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 11, 30, 15);
+		zyk_list_category_skills(ent, target_ent, "^7", 11, 30, 15);
 	}
 	else if (Q_stricmp(arg1, "unique") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 18, 41, 18);
+		zyk_list_category_skills(ent, target_ent, "^6", 18, 41, 18);
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, 28, 59, 18);
+		zyk_list_category_skills(ent, target_ent, "^2", 28, 59, 18);
 	}
 }
 
