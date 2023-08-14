@@ -6047,6 +6047,47 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Level: ^7%d/%d\n^3Level Up Score: ^7%d/%d\n^3Skill Points: ^7%d\n^3Skill Counter: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.level, zyk_rpg_max_level.integer, ent->client->pers.level_up_score, (ent->client->pers.level * zyk_level_up_score_factor.integer), ent->client->pers.skillpoints, ent->client->pers.skill_counter, zyk_max_skill_counter.integer, ent->client->pers.magic_power, zyk_max_magic_power(ent), ent->client->pers.current_weight, ent->client->pers.max_weight, ent->client->pers.credits));
 }
 
+char* zyk_get_inventory_item_name(int inventory_index)
+{
+	char* inventory_item_names[MAX_RPG_INVENTORY_ITEMS];
+
+	inventory_item_names[RPG_INVENTORY_WP_STUN_BATON] = "Stun Baton";
+	inventory_item_names[RPG_INVENTORY_WP_SABER] = "Saber";
+	inventory_item_names[RPG_INVENTORY_WP_BLASTER_PISTOL] = "Blaster Pistol";
+	inventory_item_names[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] = "E11 Blaster Rifle";
+	inventory_item_names[RPG_INVENTORY_WP_DISRUPTOR] = "Disruptor";
+	inventory_item_names[RPG_INVENTORY_WP_BOWCASTER] = "Bowcaster";
+	inventory_item_names[RPG_INVENTORY_WP_REPEATER] = "Repeater";
+	inventory_item_names[RPG_INVENTORY_WP_DEMP2] = "DEMP2";
+	inventory_item_names[RPG_INVENTORY_WP_FLECHETTE] = "Flechette";
+	inventory_item_names[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = "Rocket Launcher";
+	inventory_item_names[RPG_INVENTORY_WP_CONCUSSION] = "Concussion";
+	inventory_item_names[RPG_INVENTORY_WP_BRYAR_PISTOL] = "Bryar Pistol";
+	inventory_item_names[RPG_INVENTORY_AMMO_BLASTER_PACK] = "Blaster Pack Ammo";
+	inventory_item_names[RPG_INVENTORY_AMMO_POWERCELL] = "Powercell Ammo";
+	inventory_item_names[RPG_INVENTORY_AMMO_METAL_BOLTS] = "Metal Bolts Ammo";
+	inventory_item_names[RPG_INVENTORY_AMMO_ROCKETS] = "Rockets Ammo";
+	inventory_item_names[RPG_INVENTORY_AMMO_THERMALS] = "Thermals";
+	inventory_item_names[RPG_INVENTORY_AMMO_TRIPMINES] = "Trip Mines";
+	inventory_item_names[RPG_INVENTORY_AMMO_DETPACKS] = "Detpacks";
+	inventory_item_names[RPG_INVENTORY_ITEM_BINOCULARS] = "Binoculars";
+	inventory_item_names[RPG_INVENTORY_ITEM_BACTA_CANISTER] = "Bacta Canister";
+	inventory_item_names[RPG_INVENTORY_ITEM_SENTRY_GUN] = "Sentry Gun";
+	inventory_item_names[RPG_INVENTORY_ITEM_SEEKER_DRONE] = "Seeker Drone";
+	inventory_item_names[RPG_INVENTORY_ITEM_EWEB] = "E-Web";
+	inventory_item_names[RPG_INVENTORY_ITEM_BIG_BACTA] = "Big Bacta";
+	inventory_item_names[RPG_INVENTORY_ITEM_FORCE_FIELD] = "Force Field";
+	inventory_item_names[RPG_INVENTORY_ITEM_CLOAK] = "Cloak Item";
+	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "Jetpack";
+
+	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
+	{
+		return G_NewString(inventory_item_names[inventory_index]);
+	}
+
+	return "";
+}
+
 /*
 ==================
 Cmd_ListAccount_f
@@ -6061,22 +6102,51 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 		}
 		else
 		{
-			char message[MAX_STRING_CHARS];
 			char arg1[MAX_STRING_CHARS];
 			int i = 0;
-
-			strcpy(message,"");
 
 			trap->Argv(1, arg1, sizeof( arg1 ));
 
 			if (Q_stricmp( arg1, "rpg" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list unique: ^7lists unique skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list stuff: ^7lists upgrades bought from seller\n\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list unique: ^7lists unique skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list inventory: ^7shows player inventory\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list stuff: ^7lists upgrades bought from seller\n\n\"");
 			}
 			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || Q_stricmp( arg1, "other" ) == 0 || 
 					 Q_stricmp(arg1, "unique") == 0 || Q_stricmp(arg1, "magic") == 0)
 			{
 				zyk_list_player_skills(ent, ent, G_NewString(arg1));
+			}
+			else if (Q_stricmp(arg1, "inventory") == 0)
+			{
+				int inventory_it = 0;
+
+				char message[MAX_STRING_CHARS];
+				char final_chars[32];
+
+				strcpy(message, "");
+				strcpy(final_chars, "");
+
+				for (inventory_it = 0; inventory_it < MAX_RPG_INVENTORY_ITEMS; inventory_it++)
+				{
+					if ((inventory_it % 2) == 0)
+					{ // zyk: adds whitespaces in first column
+						strcpy(final_chars, va("%s ", zyk_add_whitespaces(inventory_it, 30)));
+					}
+					else
+					{
+						strcpy(final_chars, "\n");
+					}
+
+					strcpy(message, va("%s%s: %d%s", message, zyk_get_inventory_item_name(inventory_it),
+						ent->client->pers.rpg_inventory[inventory_it], final_chars));
+				}
+
+				if ((inventory_it % 2) != 0)
+				{ // zyk: if this category has an odd number of skills, add a final line break
+					strcpy(message, va("%s\n", message));
+				}
+
+				trap->SendServerCommand(ent->s.number, va("print \"%s\"", message));
 			}
 			else if (Q_stricmp( arg1, "quests" ) == 0)
 			{
