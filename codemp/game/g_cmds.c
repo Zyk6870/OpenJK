@@ -116,7 +116,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
 	max_skill_levels[SKILL_SHIELD_HEAL] = 3;
 	max_skill_levels[SKILL_TEAM_SHIELD_HEAL] = 3;
-	max_skill_levels[SKILL_FORCE_POWER] = 5;
+	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
 	max_skill_levels[SKILL_STUN_BATON] = 3;
 	max_skill_levels[SKILL_BLASTER_PISTOL] = 3;
