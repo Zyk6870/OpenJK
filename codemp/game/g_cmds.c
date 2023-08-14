@@ -110,7 +110,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_TEAM_HEAL] = 3;
 	max_skill_levels[SKILL_LIGHTNING] = 4;
 	max_skill_levels[SKILL_GRIP] = 3;
-	max_skill_levels[SKILL_DRAIN] = 3;
+	max_skill_levels[SKILL_DRAIN] = 4;
 	max_skill_levels[SKILL_RAGE] = 4;
 	max_skill_levels[SKILL_TEAM_ENERGIZE] = 3;
 	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
@@ -135,7 +135,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_SHIELD_STRENGTH] = 5;
 	max_skill_levels[SKILL_MAX_HEALTH] = 5;
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
-	max_skill_levels[SKILL_DRAIN_SHIELD] = 1;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
 	max_skill_levels[SKILL_RUN_SPEED] = 3;
 	
@@ -236,7 +235,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_SHIELD_STRENGTH] = "Shield Strength";
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
-	skill_names[SKILL_DRAIN_SHIELD] = "Drain Shield";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
 
@@ -352,7 +350,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_ABSORB)
 		return "allows you to absorb force power attacks done to you";
 	if (skill_index == SKILL_HEAL)
-		return "recover some Health. Level 1 restores 5 hp, level 2 restores 10 hp and level 3 restores 25 hp";
+		return "recover some Health. Each level increases hp restored";
 	if (skill_index == SKILL_PROTECT)
 		return "decreases damage done to you by non-force power attacks. At level 4 decreases force consumption when receiving damage";
 	if (skill_index == SKILL_MIND_TRICK)
@@ -364,7 +362,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_GRIP)
 		return "attacks a player by holding and damaging him";
 	if (skill_index == SKILL_DRAIN)
-		return "drains force power from a player to restore your health";
+		return "drains force power from a player to restore your health. At level 4, with full health, restores some shield and also suck hp/shield from the enemy to restore your hp/shield";
 	if (skill_index == SKILL_RAGE)
 		return "makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage";
 	if (skill_index == SKILL_TEAM_ENERGIZE)
@@ -411,8 +409,6 @@ char* zyk_skill_description(int skill_index)
 		return "Each level increases your max health by 80";
 	if (skill_index == SKILL_HEALTH_STRENGTH)
 		return "Each level increases your health resistance by 5 per cent";
-	if (skill_index == SKILL_DRAIN_SHIELD)
-		return "When using Drain force power, and your health is full, restores some shield. It also makes Drain suck hp/shield from the enemy to restore your hp/shield";
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio";
 	if (skill_index == SKILL_RUN_SPEED)
@@ -5134,7 +5130,11 @@ void initialize_rpg_skills(gentity_t *ent)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_DRAIN);
 		if (ent->client->pers.skill_levels[SKILL_DRAIN] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_DRAIN);
-		ent->client->ps.fd.forcePowerLevel[FP_DRAIN] = ent->client->pers.skill_levels[SKILL_DRAIN];
+
+		if (ent->client->pers.skill_levels[SKILL_DRAIN] < 4)
+			ent->client->ps.fd.forcePowerLevel[FP_DRAIN] = ent->client->pers.skill_levels[SKILL_DRAIN];
+		else
+			ent->client->ps.fd.forcePowerLevel[FP_DRAIN] = FORCE_LEVEL_3;
 
 		// zyk: loading Rage value
 		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_RAGE)) && ent->client->pers.skill_levels[SKILL_RAGE] > 0)

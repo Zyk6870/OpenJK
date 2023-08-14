@@ -2180,8 +2180,8 @@ void ForceDrainDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec3_t 
 
 				if (dmg)
 				{
-					if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_DRAIN_SHIELD] > 0 && traceEnt->client->ps.fd.forcePower <= 0)
-					{ // zyk: Drain Shield skill. Enemy has no force. Damages him
+					if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_DRAIN] > 3 && traceEnt->client->ps.fd.forcePower <= 0)
+					{ // zyk: Drain skill at level > 3. Enemy has no force. Damages him
 						G_Damage( traceEnt, self, self, NULL, impactPoint, (dmg/2), 0, MOD_FORCE_DARK );
 
 						if (zyk_is_ally(self, traceEnt))
@@ -2219,8 +2219,8 @@ void ForceDrainDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec3_t 
 					}
 					self->client->ps.stats[STAT_HEALTH] = self->health;
 				}
-				else if (dmg > 0 && self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_DRAIN_SHIELD] > 0 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
-				{ // zyk: if player has RPG Drain Shield skill and hp is full, recover shield
+				else if (dmg > 0 && self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_DRAIN] > 3 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
+				{ // zyk: Drain skill at level > 3 and hp is full, recover shield
 					self->client->ps.stats[STAT_ARMOR] += 1;
 				}
 
