@@ -119,17 +119,17 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_FASTER_FORCE_REGEN] = 2;
 	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
-	max_skill_levels[SKILL_STUN_BATON] = 3;
-	max_skill_levels[SKILL_BLASTER_PISTOL] = 3;
-	max_skill_levels[SKILL_E11_BLASTER_RIFLE] = 3;
-	max_skill_levels[SKILL_DISRUPTOR] = 3;
-	max_skill_levels[SKILL_BOWCASTER] = 3;
-	max_skill_levels[SKILL_REPEATER] = 3;
-	max_skill_levels[SKILL_DEMP2] = 3;
-	max_skill_levels[SKILL_FLECHETTE] = 3;
-	max_skill_levels[SKILL_ROCKET_LAUNCHER] = 3;
-	max_skill_levels[SKILL_CONCUSSION_RIFLE] = 3;
-	max_skill_levels[SKILL_BRYAR_PISTOL] = 3;
+	max_skill_levels[SKILL_STUN_BATON] = 2;
+	max_skill_levels[SKILL_BLASTER_PISTOL] = 2;
+	max_skill_levels[SKILL_E11_BLASTER_RIFLE] = 2;
+	max_skill_levels[SKILL_DISRUPTOR] = 2;
+	max_skill_levels[SKILL_BOWCASTER] = 2;
+	max_skill_levels[SKILL_REPEATER] = 2;
+	max_skill_levels[SKILL_DEMP2] = 2;
+	max_skill_levels[SKILL_FLECHETTE] = 2;
+	max_skill_levels[SKILL_ROCKET_LAUNCHER] = 2;
+	max_skill_levels[SKILL_CONCUSSION_RIFLE] = 2;
+	max_skill_levels[SKILL_BRYAR_PISTOL] = 2;
 	max_skill_levels[SKILL_MELEE] = 3;
 
 	max_skill_levels[SKILL_MAX_SHIELD] = 5;
@@ -381,27 +381,27 @@ char* zyk_skill_description(int skill_index)
 		return "increases the max force power you have. Necessary to allow you to use force powers and force-based skills";
 
 	if (skill_index == SKILL_STUN_BATON)
-		return va("attacks someone with a small electric charge. Has %d damage multiplied by the stun baton level. Can fire the flame thrower when using alternate fire (does not work for Force User or Wizard). With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
+		return va("attacks someone with a small electric charge. Has %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level. Can fire the flame thrower when using alternate fire. With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
 	if (skill_index == SKILL_BLASTER_PISTOL)
-		return va("the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged. Higher levels increase damage by 5 per cent", zyk_blaster_pistol_damage.integer);
+		return va("the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_blaster_pistol_damage.integer);
 	if (skill_index == SKILL_E11_BLASTER_RIFLE)
-		return va("the rifle used by the Storm Troopers. E11 shots do %d damage. Normal fire is a single shot, while the alternate fire is the rapid fire. Higher levels increase damage by 5 per cent", zyk_e11_blaster_rifle_damage.integer);
+		return va("the rifle used by the Storm Troopers. E11 shots do %d damage. Normal fire is a single shot, while the alternate fire is the rapid fire. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_e11_blaster_rifle_damage.integer);
 	if (skill_index == SKILL_DISRUPTOR)
-		return va("the sniper, used by the rodians ingame. Normal fire is a shot that causes %d damage, alternate fire allows zoom and a charged shot that when fully charged, causes %d damage. Higher levels increase damage by 5 per cent", zyk_disruptor_damage.integer, zyk_disruptor_alt_damage.integer);
+		return va("the sniper, used by the rodians ingame. Normal fire is a shot that causes %d damage, alternate fire allows zoom and a charged shot that when fully charged, causes %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_disruptor_damage.integer, zyk_disruptor_alt_damage.integer);
 	if (skill_index == SKILL_BOWCASTER)
-		return va("the famous weapon used by Chewbacca. Normal fire can be charged to fire up to 5 shots at once. It does %d damage. Higher levels increase damage by 5 per cent", zyk_bowcaster_damage.integer);
+		return va("the famous weapon used by Chewbacca. Normal fire can be charged to fire up to 5 shots at once. It does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_bowcaster_damage.integer);
 	if (skill_index == SKILL_REPEATER)
-		return va("a powerful weapon with a rapid fire and a plasma bomb. Normal fire shoots the rapid fire, and does %d damage. Alt fire fires the plasma bomb and does %d damage. Higher levels increase damage by 5 per cent", zyk_repeater_damage.integer, zyk_repeater_alt_damage.integer);
+		return va("a powerful weapon with a rapid fire and a plasma bomb. Normal fire shoots the rapid fire, and does %d damage. Alt fire fires the plasma bomb and does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_repeater_damage.integer, zyk_repeater_alt_damage.integer);
 	if (skill_index == SKILL_DEMP2)
-		return va("a very powerful weapon against machine npc and some vehicles, causing more damage to them and stunning them. Normal fire does %d damage and alt fire can be charged and does %d damage. Higher levels increase damage by 5 per cent", zyk_demp2_damage.integer, zyk_demp2_alt_damage.integer);
+		return va("a very powerful weapon against machine npc and some vehicles, causing more damage to them and stunning them. Normal fire does %d damage and alt fire can be charged and does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_demp2_damage.integer, zyk_demp2_alt_damage.integer);
 	if (skill_index == SKILL_FLECHETTE)
-		return va("this weapon is similar to a shotgun. Normal fire causes %d damage. Alt fire shoots 2 bombs and causes %d damage. Higher levels increase damage by 5 per cent", zyk_flechette_damage.integer, zyk_flechette_alt_damage.integer);
+		return va("this weapon is similar to a shotgun. Normal fire causes %d damage. Alt fire shoots 2 bombs and causes %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_flechette_damage.integer, zyk_flechette_alt_damage.integer);
 	if (skill_index == SKILL_ROCKET_LAUNCHER)
-		return va("a powerful explosive weapon. Normal fire shoots a rocket causing %d damage. Alt fire shoots a homing missile. Higher levels increase damage by 5 per cent", zyk_rocket_damage.integer);
+		return va("a powerful explosive weapon. Normal fire shoots a rocket causing %d damage. Alt fire shoots a homing missile. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_rocket_damage.integer);
 	if (skill_index == SKILL_CONCUSSION_RIFLE)
-		return va("it shoots a powerful shot that has a big damage area. Alt fire shoots a ray similar to disruptor shots, but it can go through force fields and can throw the enemy on the ground. Normal fire does %d damage and alt fire does %d damage. Higher levels increase damage by 5 per cent", zyk_concussion_damage.integer, zyk_concussion_alt_damage.integer);
+		return va("it shoots a powerful shot that has a big damage area. Alt fire shoots a ray similar to disruptor shots, but it can go through force fields and can throw the enemy on the ground. Normal fire does %d damage and alt fire does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_concussion_damage.integer, zyk_concussion_alt_damage.integer);
 	if (skill_index == SKILL_BRYAR_PISTOL)
-		return va("very similar to the blaster pistol, but this one has a better fire rate with normal shot. Does %d damage. Higher levels increase damage by 5 per cent", zyk_blaster_pistol_damage.integer);
+		return va("very similar to the blaster pistol, but this one has a better fire rate with normal shot. Does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_blaster_pistol_damage.integer);
 	if (skill_index == SKILL_MELEE)
 		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	

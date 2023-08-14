@@ -133,6 +133,8 @@ extern qboolean G_BoxInBounds( vec3_t point, vec3_t mins, vec3_t maxs, vec3_t bo
 extern qboolean G_HeavyMelee( gentity_t *attacker );
 extern void Jedi_Decloak( gentity_t *self );
 
+extern int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int skill_index, int inventory_index);
+
 static void WP_FireEmplaced( gentity_t *ent, qboolean altFire );
 
 void laserTrapStick( gentity_t *ent, vec3_t endpos, vec3_t normal );
@@ -251,13 +253,13 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire, int weapon )
 
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{ // zyk: bonus damage of the pistols
-		if (ent->client->pers.skill_levels[SKILL_BLASTER_PISTOL] > 1 && weapon == WP_BRYAR_PISTOL)
+		if (weapon == WP_BRYAR_PISTOL)
 		{
-			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_BLASTER_PISTOL] - 1))));
+			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_BLASTER_PISTOL, RPG_INVENTORY_WP_BLASTER_PISTOL);
 		}
-		else if (ent->client->pers.skill_levels[SKILL_BRYAR_PISTOL] > 1 && weapon == WP_BRYAR_OLD)
+		else if (weapon == WP_BRYAR_OLD)
 		{
-			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_BRYAR_PISTOL] - 1))));
+			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_BRYAR_PISTOL, RPG_INVENTORY_WP_BRYAR_PISTOL);
 		}
 	}
 
@@ -271,42 +273,6 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire, int weapon )
 	{
 		missile->methodOfDeath = MOD_BRYAR_PISTOL;
 	}
-	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
-
-	// we don't want it to bounce forever
-	missile->bounceCount = 8;
-}
-
-// zyk: used by Wrist Shot ability
-void zyk_WP_FireBryarPistol(gentity_t *ent)
-//---------------------------------------------------------
-{
-	int damage = zyk_blaster_pistol_damage.integer * 8;
-	int count = 5;
-	float boxSize = BRYAR_ALT_SIZE*(2.5);
-
-	vec3_t zyk_origin, dir, zyk_forward;
-
-	VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
-	VectorSet(zyk_origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 34);
-
-	AngleVectors(dir, zyk_forward, NULL, NULL);
-
-	gentity_t	*missile = CreateMissile(zyk_origin, zyk_forward, zyk_blaster_pistol_velocity.integer, 10000, ent, qtrue);
-
-	missile->classname = "bryar_proj";
-	missile->s.weapon = WP_BRYAR_PISTOL;
-
-	missile->s.generic1 = count; // The missile will then render according to the charge level.
-
-	VectorSet(missile->r.maxs, boxSize, boxSize, boxSize);
-	VectorSet(missile->r.mins, -boxSize, -boxSize, -boxSize);
-
-	missile->damage = damage;
-	missile->dflags = DAMAGE_DEATH_KNOCKBACK;
-
-	missile->methodOfDeath = MOD_BRYAR_PISTOL_ALT;
-
 	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
 
 	// we don't want it to bounce forever
@@ -442,9 +408,9 @@ void WP_FireBlasterMissile( gentity_t *ent, vec3_t start, vec3_t dir, qboolean a
 	missile->classname = "blaster_proj";
 	missile->s.weapon = WP_BLASTER;
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_E11_BLASTER_RIFLE] > 1)
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_E11_BLASTER_RIFLE] - 1))));
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_E11_BLASTER_RIFLE, RPG_INVENTORY_WP_E11_BLASTER_RIFLE);
 	}
 
 	missile->damage = damage;
@@ -677,9 +643,9 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 				ent->client->accuracy_hits++;
 			}
 
-			if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_DISRUPTOR] > 1)
+			if (ent->client && ent->client->sess.amrpgmode == 2)
 			{ // zyk: Disruptor at higher levels causes more damage
-				damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_DISRUPTOR] - 1))));
+				damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_DISRUPTOR, RPG_INVENTORY_WP_DISRUPTOR);
 			}
 
 			G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, DAMAGE_NORMAL, MOD_DISRUPTOR );
@@ -906,9 +872,9 @@ void WP_DisruptorAltFire( gentity_t *ent )
 				 {
 					if ( traceEnt->takedamage )
 					{
-						if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_DISRUPTOR] > 1)
+						if (ent->client && ent->client->sess.amrpgmode == 2)
 						{
-							damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_DISRUPTOR] - 1))));
+							damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_DISRUPTOR, RPG_INVENTORY_WP_DISRUPTOR);
 						}
 
 						G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage,
@@ -946,9 +912,9 @@ void WP_DisruptorAltFire( gentity_t *ent )
 					VectorCopy(traceEnt->client->ps.viewangles, preAng);
 				}
 
-				if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_DISRUPTOR] > 1)
+				if (ent->client && ent->client->sess.amrpgmode == 2)
 				{
-					damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_DISRUPTOR] - 1))));
+					damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_DISRUPTOR, RPG_INVENTORY_WP_DISRUPTOR);
 				}
 
 				G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, DAMAGE_NO_KNOCKBACK, MOD_DISRUPTOR_SNIPER );
@@ -1036,9 +1002,9 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 	VectorSet( missile->r.maxs, BOWCASTER_SIZE, BOWCASTER_SIZE, BOWCASTER_SIZE );
 	VectorScale( missile->r.maxs, -1, missile->r.mins );
 
-	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_BOWCASTER] > 1)
+	if (ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_BOWCASTER] - 1))));
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_BOWCASTER, RPG_INVENTORY_WP_BOWCASTER);
 	}
 
 	missile->damage = damage;
@@ -1047,8 +1013,8 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
 
 	missile->flags |= FL_BOUNCE;
-	// zyk: this is the bounce count used to count how many times the shot bounces, default: 3. In RPG Mode bounces more times with Bowcaster 2/2
 
+	// zyk: this is the bounce count used to count how many times the shot bounces, default: 3. In RPG Mode bounces more times with Upgrade
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL))
 		missile->bounceCount = 18;  
 	else
@@ -1125,9 +1091,9 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 		VectorSet( missile->r.maxs, BOWCASTER_SIZE, BOWCASTER_SIZE, BOWCASTER_SIZE );
 		VectorScale( missile->r.maxs, -1, missile->r.mins );
 
-		if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_BOWCASTER] > 1)
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 		{
-			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_BOWCASTER] - 1))));
+			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_BOWCASTER, RPG_INVENTORY_WP_BOWCASTER);
 		}
 
 		missile->damage = damage;
@@ -1176,9 +1142,9 @@ static void WP_RepeaterMainFire( gentity_t *ent, vec3_t dir )
 	missile->classname = "repeater_proj";
 	missile->s.weapon = WP_REPEATER;
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_REPEATER] > 1)
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_REPEATER] - 1))));
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_REPEATER, RPG_INVENTORY_WP_REPEATER);
 	}
 
 	missile->damage = damage;
@@ -1207,10 +1173,10 @@ static void WP_RepeaterAltFire( gentity_t *ent )
 	missile->s.pos.trType = TR_GRAVITY;
 	missile->s.pos.trDelta[2] += 40.0f; //give a slight boost in the upward direction
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_REPEATER] > 1)
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_REPEATER] - 1))));
-		splash_damage = (int)ceil(splash_damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_REPEATER] - 1))));
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_REPEATER, RPG_INVENTORY_WP_REPEATER);
+		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_REPEATER, RPG_INVENTORY_WP_REPEATER);
 	}
 
 	missile->damage = damage;
@@ -1284,6 +1250,12 @@ static void WP_DEMP2_MainFire( gentity_t *ent )
 
 	VectorSet( missile->r.maxs, DEMP2_SIZE, DEMP2_SIZE, DEMP2_SIZE );
 	VectorScale( missile->r.maxs, -1, missile->r.mins );
+
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	{
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_DEMP2, RPG_INVENTORY_WP_DEMP2);
+	}
+
 	missile->damage = damage;
 	missile->dflags = DAMAGE_DEATH_KNOCKBACK;
 	missile->methodOfDeath = MOD_DEMP2;
@@ -1523,6 +1495,11 @@ static void WP_DEMP2_AltFire( gentity_t *ent )
 	missile->think = DEMP2_AltDetonate;
 	missile->nextthink = level.time;
 
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	{
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_DEMP2, RPG_INVENTORY_WP_DEMP2);
+	}
+
 	missile->splashDamage = missile->damage = damage;
 	missile->splashMethodOfDeath = missile->methodOfDeath = MOD_DEMP2;
 	missile->splashRadius = DEMP2_ALT_SPLASHRADIUS;
@@ -1743,6 +1720,7 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 	gentity_t	*missile;
 	int i;
 	int zyk_number_of_shots = FLECHETTE_SHOTS;
+	int damage = zyk_flechette_damage.integer;
 
 	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS))
 	{ // zyk: Metal Bolts Weapons Upgrade makes flechette have more shots
@@ -1769,7 +1747,12 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 		VectorSet( missile->r.maxs, FLECHETTE_SIZE, FLECHETTE_SIZE, FLECHETTE_SIZE );
 		VectorScale( missile->r.maxs, -1, missile->r.mins );
 
-		missile->damage = zyk_flechette_damage.integer;
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+		{
+			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_FLECHETTE, RPG_INVENTORY_WP_FLECHETTE);
+		}
+
+		missile->damage = damage;
 		missile->dflags = DAMAGE_DEATH_KNOCKBACK;
 		missile->methodOfDeath = MOD_FLECHETTE;
 		missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
@@ -1877,6 +1860,8 @@ static void WP_CreateFlechetteBouncyThing( vec3_t start, vec3_t fwd, gentity_t *
 {
 	// zyk: gentity_t	*missile = CreateMissile( start, fwd, 700 + Q_flrand(0.0f, 1.0f) * 700, 1500 + Q_flrand(0.0f, 1.0f) * 2000, self, qtrue );
 	gentity_t	*missile = CreateMissile( start, fwd, zyk_flechette_alt_velocity.integer, 1500 + Q_flrand(0.0f, 1.0f) * 2000, self, qtrue );
+	int damage = zyk_flechette_alt_damage.integer;
+	int splash_damage = zyk_flechette_alt_splash_damage.integer;
 
 	missile->think = WP_flechette_alt_blow;
 
@@ -1901,9 +1886,15 @@ static void WP_CreateFlechetteBouncyThing( vec3_t start, vec3_t fwd, gentity_t *
 
 	missile->bounceCount = 50;
 
-	missile->damage = zyk_flechette_alt_damage.integer;
+	if (self && self->client && self->client->sess.amrpgmode == 2)
+	{
+		damage = zyk_calculate_rpg_weapon_damage(self, damage, SKILL_FLECHETTE, RPG_INVENTORY_WP_FLECHETTE);
+		splash_damage = zyk_calculate_rpg_weapon_damage(self, splash_damage, SKILL_FLECHETTE, RPG_INVENTORY_WP_FLECHETTE);
+	}
+
+	missile->damage = damage;
 	missile->dflags = 0;
-	missile->splashDamage = zyk_flechette_alt_splash_damage.integer;
+	missile->splashDamage = splash_damage;
 	missile->splashRadius = FLECHETTE_ALT_SPLASH_RAD;
 
 	missile->r.svFlags = SVF_USE_CURRENT_ORIGIN;
@@ -2197,9 +2188,10 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 	VectorSet( missile->r.maxs, ROCKET_SIZE, ROCKET_SIZE, ROCKET_SIZE );
 	VectorScale( missile->r.maxs, -1, missile->r.mins );
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_ROCKET_LAUNCHER] > 1)
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_ROCKET_LAUNCHER] - 1))));
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_ROCKET_LAUNCHER, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
+		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_ROCKET_LAUNCHER, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
 	}
 
 	missile->damage = damage;
@@ -2222,11 +2214,6 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 //===testing being able to shoot rockets out of the air==================================
 
 	missile->clipmask = MASK_SHOT;
-
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_ROCKET_LAUNCHER] > 1)
-	{
-		splash_damage = (int)ceil(splash_damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.skill_levels[SKILL_ROCKET_LAUNCHER] - 1))));
-	}
 
 	missile->splashDamage = splash_damage;
 	missile->splashRadius = ROCKET_SPLASH_RADIUS;
@@ -3558,6 +3545,11 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 						ent->client->accuracy_hits++;
 					}
 
+					if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+					{
+						damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_CONCUSSION_RIFLE, RPG_INVENTORY_WP_CONCUSSION);
+					}
+
 					noKnockBack = (traceEnt->flags&FL_NO_KNOCKBACK);//will be set if they die, I want to know if it was on *before* they died
 					if ( traceEnt && traceEnt->client && traceEnt->client->NPC_class == CLASS_GALAKMECH )
 					{//hehe
@@ -3710,6 +3702,7 @@ static void WP_FireConcussion( gentity_t *ent )
 {//a fast rocket-like projectile
 	vec3_t	start;
 	int		damage	= zyk_concussion_damage.integer;
+	int		splash_damage = zyk_concussion_splash_damage.integer;
 	float	vel = zyk_concussion_velocity.integer;
 	gentity_t *missile;
 
@@ -3738,6 +3731,12 @@ static void WP_FireConcussion( gentity_t *ent )
 	VectorSet( missile->r.maxs, ROCKET_SIZE, ROCKET_SIZE, ROCKET_SIZE );
 	VectorScale( missile->r.maxs, -1, missile->r.mins );
 
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	{
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_CONCUSSION_RIFLE, RPG_INVENTORY_WP_CONCUSSION);
+		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_CONCUSSION_RIFLE, RPG_INVENTORY_WP_CONCUSSION);
+	}
+
 	missile->damage = damage;
 	missile->dflags = DAMAGE_EXTRA_KNOCKBACK;
 
@@ -3745,7 +3744,7 @@ static void WP_FireConcussion( gentity_t *ent )
 	missile->splashMethodOfDeath = MOD_CONC;
 
 	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
-	missile->splashDamage = zyk_concussion_splash_damage.integer;
+	missile->splashDamage = splash_damage;
 	missile->splashRadius = CONC_SPLASH_RADIUS;
 
 	// we don't want it to ever bounce
@@ -3839,9 +3838,9 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 		G_Sound( tr_ent, CHAN_WEAPON, G_SoundIndex( va("sound/weapons/melee/punch%d", Q_irand(1, 4)) ) );
 
 		// zyk: stun baton in RPG mode does more damage
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STUN_BATON] > 1)
+		if (ent->client->sess.amrpgmode == 2)
 		{
-			G_Damage( tr_ent, ent, ent, forward, tr.endpos, zyk_stun_baton_damage.integer * ent->client->pers.skill_levels[SKILL_STUN_BATON], (DAMAGE_NO_KNOCKBACK|DAMAGE_HALF_ABSORB), MOD_STUN_BATON );
+			G_Damage( tr_ent, ent, ent, forward, tr.endpos, zyk_calculate_rpg_weapon_damage(ent, zyk_stun_baton_damage.integer, SKILL_STUN_BATON, RPG_INVENTORY_WP_STUN_BATON), (DAMAGE_NO_KNOCKBACK | DAMAGE_HALF_ABSORB), MOD_STUN_BATON);
 		}
 		else
 		{

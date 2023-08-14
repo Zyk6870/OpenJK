@@ -810,7 +810,7 @@ typedef enum {
 #define NUMBER_OF_MAGIC_SPIRITS 6
 
 // zyk: damage bonus of weapon skills
-#define RPG_WEAPON_DMG_BONUS 0.05
+#define RPG_WEAPON_DMG_BONUS 0.04
 
 // zyk: max RPG chars an account can have
 #define MAX_RPG_CHARS 15

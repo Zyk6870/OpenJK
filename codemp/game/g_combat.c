@@ -4702,6 +4702,19 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 	return qfalse;
 }
 
+// zyk: calculates weapon damage based on the weapon skill level and extra amount of this weapon in inventory
+int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int skill_index, int inventory_index)
+{
+	int final_dmg = base_dmg;
+
+	if (ent->client->pers.skill_levels[skill_index] > 0 && ent->client->pers.rpg_inventory[inventory_index] > 1)
+	{
+		final_dmg = (int)ceil(final_dmg * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.rpg_inventory[inventory_index] - 1) * ent->client->pers.skill_levels[skill_index])));
+	}
+
+	return final_dmg;
+}
+
 /*
 ============
 G_Damage
@@ -4821,18 +4834,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					damage = (int)ceil(damage*0.8);
 				}
 			}
-		}
-		else if (attacker->client->pers.skill_levels[SKILL_DEMP2] > 1 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT))
-		{ // zyk: DEMP2 2/2 in RPG Mode causes more damage
-			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[SKILL_DEMP2] - 1))));
-		}
-		else if (attacker->client->pers.skill_levels[SKILL_FLECHETTE] > 1 && (mod == MOD_FLECHETTE || mod == MOD_FLECHETTE_ALT_SPLASH))
-		{ // zyk: Flechette 2/2 in RPG Mode causes more damage
-			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[SKILL_FLECHETTE] - 1))));
-		}
-		else if (attacker->client->pers.skill_levels[SKILL_CONCUSSION_RIFLE] > 1 && (mod == MOD_CONC || mod == MOD_CONC_ALT))
-		{ // zyk: Concussion Rifle 2/2 in RPG Mode causes more damage
-			damage = (int)ceil(damage * (1.0 + (RPG_WEAPON_DMG_BONUS * (attacker->client->pers.skill_levels[SKILL_CONCUSSION_RIFLE] - 1))));
 		}
 		else if (mod == MOD_MELEE)
 		{ // zyk: setting melee damage in RPG Mode
