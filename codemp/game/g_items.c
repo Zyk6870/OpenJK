@@ -2808,7 +2808,8 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	}
 
 	// the same pickup rules are used for client side and server side
-	if ( !BG_CanItemBeGrabbed( level.gametype, &ent->s, &other->client->ps ) && validate_pickup_item == qtrue) {
+	if ( !BG_CanItemBeGrabbed( level.gametype, &ent->s, &other->client->ps ) && (validate_pickup_item == qtrue || ent->s.powerups > level.time)) {
+		// zyk: if powerups > level.time, item is a dropped item, cant get it now
 		return;
 	}
 
