@@ -6088,6 +6088,23 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	return "";
 }
 
+char* zyk_add_inventory_whitespaces(int inventory_index, int biggest_inventory_item_name_length)
+{
+	char result_text[MAX_STRING_CHARS];
+	int inventory_item_name_length = strlen(zyk_get_inventory_item_name(inventory_index));
+	int i = 0;
+
+	strcpy(result_text, "");
+
+	for (i = 0; i < (biggest_inventory_item_name_length - inventory_item_name_length); i++)
+	{
+		// zyk: adds a whitespace at the end of the current string
+		strcpy(result_text, va("%s ", result_text));
+	}
+
+	return G_NewString(result_text);
+}
+
 /*
 ==================
 Cmd_ListAccount_f
@@ -6130,14 +6147,14 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if ((inventory_it % 2) == 0)
 					{ // zyk: adds whitespaces in first column
-						strcpy(final_chars, va("%s ", zyk_add_whitespaces(inventory_it, 30)));
+						strcpy(final_chars, va("%s ", zyk_add_inventory_whitespaces(inventory_it, 30)));
 					}
 					else
 					{
 						strcpy(final_chars, "\n");
 					}
 
-					strcpy(message, va("%s%s: %d%s", message, zyk_get_inventory_item_name(inventory_it),
+					strcpy(message, va("%s^3%s: ^7%d%s", message, zyk_get_inventory_item_name(inventory_it),
 						ent->client->pers.rpg_inventory[inventory_it], final_chars));
 				}
 

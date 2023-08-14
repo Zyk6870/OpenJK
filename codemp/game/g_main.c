@@ -7752,6 +7752,50 @@ void melee_battle_winner()
 	}
 }
 
+// zyk: calculates current weight of stuff the RPG player is carrying
+void zyk_calculate_current_weight(gentity_t* ent)
+{
+	int rpg_inventory_weights[MAX_RPG_INVENTORY_ITEMS];
+	int i = 0;
+	int current_weight = 0;
+
+	rpg_inventory_weights[RPG_INVENTORY_WP_STUN_BATON] = 8;
+	rpg_inventory_weights[RPG_INVENTORY_WP_SABER] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_WP_BLASTER_PISTOL] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] = 15;
+	rpg_inventory_weights[RPG_INVENTORY_WP_DISRUPTOR] = 18;
+	rpg_inventory_weights[RPG_INVENTORY_WP_BOWCASTER] = 17;
+	rpg_inventory_weights[RPG_INVENTORY_WP_REPEATER] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_WP_DEMP2] = 19;
+	rpg_inventory_weights[RPG_INVENTORY_WP_FLECHETTE] = 22;
+	rpg_inventory_weights[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = 25;
+	rpg_inventory_weights[RPG_INVENTORY_WP_CONCUSSION] = 30;
+	rpg_inventory_weights[RPG_INVENTORY_WP_BRYAR_PISTOL] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_BLASTER_PACK] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_POWERCELL] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_METAL_BOLTS] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_ROCKETS] = 4;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_THERMALS] = 5;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_TRIPMINES] = 7;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_DETPACKS] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_BINOCULARS] = 3;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_BACTA_CANISTER] = 4;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_SENTRY_GUN] = 6;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_SEEKER_DRONE] = 5;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_EWEB] = 22;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_BIG_BACTA] = 8;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_FORCE_FIELD] = 9;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_CLOAK] = 7;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 30;
+
+	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+	{
+		current_weight += (ent->client->pers.rpg_inventory[i] * rpg_inventory_weights[i]);
+	}
+
+	ent->client->pers.current_weight = current_weight;
+}
+
 /*
 ================
 G_RunFrame
@@ -9322,6 +9366,8 @@ void G_RunFrame( int levelTime ) {
 				{ // zyk: save account with new updated inventory
 					save_account(ent, qtrue);
 				}
+
+				zyk_calculate_current_weight(ent);
 				
 				if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
 				{ // zyk: if Gunner stops using sniper scope or binoculars, stop the Thermal Vision
