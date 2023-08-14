@@ -2723,6 +2723,11 @@ void ClientThink_real( gentity_t *ent ) {
 			zyk_player_speed /= 2;
 		}
 
+		if (client->pers.current_weight > client->pers.max_weight)
+		{ // zyk: too much weight decreases player speed
+			zyk_player_speed -= (client->pers.current_weight - client->pers.max_weight);
+		}
+
 		client->ps.speed = zyk_player_speed;
 		client->ps.basespeed = zyk_player_speed;
 
