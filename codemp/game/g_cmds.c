@@ -116,6 +116,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
 	max_skill_levels[SKILL_SHIELD_HEAL] = 3;
 	max_skill_levels[SKILL_TEAM_SHIELD_HEAL] = 3;
+	max_skill_levels[SKILL_FASTER_FORCE_REGEN] = 2;
 	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
 	max_skill_levels[SKILL_STUN_BATON] = 3;
@@ -216,6 +217,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_SENSE_HEALTH] = "Sense Health";
 	skill_names[SKILL_SHIELD_HEAL] = "Shield Heal";
 	skill_names[SKILL_TEAM_SHIELD_HEAL] = "Team Shield Heal";
+	skill_names[SKILL_FASTER_FORCE_REGEN] = "Faster Force Regen";
 	skill_names[SKILL_FORCE_POWER] = "Force Power";
 
 	skill_names[SKILL_STUN_BATON] = "Stun Baton";
@@ -373,6 +375,8 @@ char* zyk_skill_description(int skill_index)
 		return va("recovers 4 shield at level 1, 8 shield at level 2 and 12 shield at level 3. To use it, use Heal force power when you have full HP. This skill uses %d force power", zyk_max_force_power.integer / 2);
 	if (skill_index == SKILL_TEAM_SHIELD_HEAL)
 		return "recovers 3 shield at level 1, 6 shield at level 2 and 9 shield at level 3 to players near you. To use it, when near players, use Team Heal force power. It will heal their shield after they have full HP";
+	if (skill_index == SKILL_FASTER_FORCE_REGEN)
+		return "increases how fast your force is recovered";
 	if (skill_index == SKILL_FORCE_POWER)
 		return "increases the max force power you have. Necessary to allow you to use force powers and force-based skills";
 
@@ -6005,7 +6009,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 {
 	if (Q_stricmp( arg1, "force" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^5", SKILL_JUMP, SKILL_FORCE_POWER, 16);
+		zyk_list_category_skills(ent, target_ent, "^5", SKILL_JUMP, SKILL_FORCE_POWER, 18);
 	}
 	else if (Q_stricmp( arg1, "weapons" ) == 0)
 	{

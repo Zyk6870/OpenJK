@@ -5884,6 +5884,10 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 					WP_ForcePowerRegenerate( self, 6 );
 				else if ( self->client->ps.isJediMaster && level.gametype == GT_JEDIMASTER )
 					WP_ForcePowerRegenerate( self, 4 ); //jedi master regenerates 4 times as fast
+				else if (self->client->sess.amrpgmode == 2)
+				{ // zyk: Faster Force Regen skill
+					WP_ForcePowerRegenerate(self, (1 + self->client->pers.skill_levels[SKILL_FASTER_FORCE_REGEN]));
+				}
 				else
 					WP_ForcePowerRegenerate( self, 0 );
 			}
