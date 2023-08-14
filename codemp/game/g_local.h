@@ -601,7 +601,6 @@ typedef enum {
 	UPGRADE_GUNNER_RADAR,
 	UPGRADE_THERMAL_VISION,
 	UPGRADE_GUNNER_ITEMS,
-	UPGRADE_INVENTORY_CAPACITY,
 	UPGRADE_ENERGY_MODULATOR,
 	MAX_RPG_UPGRAGES
 } zyk_upgrade_t;
@@ -656,20 +655,9 @@ typedef enum {
 	SELLER_GUNNER_RADAR,
 	SELLER_THERMAL_VISION,
 	SELLER_GUNNER_ITEMS_UPGRADE,
-	SELLER_INVENTORY_CAPACITY,
 	SELLER_ENERGY_MODULATOR,
 	MAX_SELLER_ITEMS
 } zyk_seller_item_t;
-
-// zyk: items that a Gunner can carry more than one
-typedef enum {
-	GUNNERITEM_BACTA_CANISTER,
-	GUNNERITEM_BIG_BACTA,
-	GUNNERITEM_SENTRY_GUN,
-	GUNNERITEM_SEEKER_DRONE,
-	GUNNERITEM_FORCE_FIELD,
-	MAX_GUNNER_ITEMS
-} zyk_gunner_item_t;
 
 // zyk: Main Quest missions
 typedef enum {
@@ -786,11 +774,40 @@ typedef enum {
 	NUMBER_OF_SKILLS
 } zyk_rpg_skill_t;
 
+typedef enum {
+	RPG_INVENTORY_WP_STUN_BATON,
+	RPG_INVENTORY_WP_SABER,
+	RPG_INVENTORY_WP_BLASTER_PISTOL,
+	RPG_INVENTORY_WP_E11_BLASTER_RIFLE,
+	RPG_INVENTORY_WP_DISRUPTOR,
+	RPG_INVENTORY_WP_BOWCASTER,
+	RPG_INVENTORY_WP_REPEATER,
+	RPG_INVENTORY_WP_DEMP2,
+	RPG_INVENTORY_WP_FLECHETTE,
+	RPG_INVENTORY_WP_ROCKET_LAUNCHER,
+	RPG_INVENTORY_WP_CONCUSSION,
+	RPG_INVENTORY_WP_BRYAR_PISTOL,
+	RPG_INVENTORY_AMMO_BLASTER_PACK,
+	RPG_INVENTORY_AMMO_POWERCELL,
+	RPG_INVENTORY_AMMO_METAL_BOLTS,
+	RPG_INVENTORY_AMMO_ROCKETS,
+	RPG_INVENTORY_AMMO_THERMALS,
+	RPG_INVENTORY_AMMO_TRIPMINES,
+	RPG_INVENTORY_AMMO_DETPACKS,
+	RPG_INVENTORY_ITEM_BINOCULARS,
+	RPG_INVENTORY_ITEM_BACTA_CANISTER,
+	RPG_INVENTORY_ITEM_SENTRY_GUN,
+	RPG_INVENTORY_ITEM_SEEKER_DRONE,
+	RPG_INVENTORY_ITEM_EWEB,
+	RPG_INVENTORY_ITEM_BIG_BACTA,
+	RPG_INVENTORY_ITEM_FORCE_FIELD,
+	RPG_INVENTORY_ITEM_CLOAK,
+	RPG_INVENTORY_ITEM_JETPACK,
+	MAX_RPG_INVENTORY_ITEMS
+} zyk_inventory_t;
+
 // zyk: number of Elemental Spirits
 #define NUMBER_OF_MAGIC_SPIRITS 6
-
-// zyk: Gunner with Inventory Capacity upgrade can carry up to this amount of some holdable items
-#define NUMBER_OF_GUNNER_ITEMS 3
 
 // zyk: damage bonus of weapon skills
 #define RPG_WEAPON_DMG_BONUS 0.05
@@ -982,9 +999,6 @@ typedef struct clientPersistant_s {
 	// zyk: Upgrades bought from the seller
 	int rpg_upgrades;
 
-	// zyk: amount of items the Gunner can carry
-	int gunner_items[MAX_GUNNER_ITEMS];
-
 	// zyk: amount of sentries placed in map
 	int bounty_hunter_placed_sentries;
 
@@ -1016,6 +1030,12 @@ typedef struct clientPersistant_s {
 
 	// zyk: max weight of stuff the player can carry
 	int max_weight;
+
+	// zyk: all stuff the player can carry. Used to determine if player is carrying above the max weight
+	int rpg_inventory[MAX_RPG_INVENTORY_ITEMS];
+
+	// zyk: if qtrue, must save player account with the updated inventory
+	qboolean rpg_inventory_modified;
 
 	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
 	// Possible values are:
@@ -1845,7 +1865,6 @@ void send_rpg_events(int send_event_timer);
 int zyk_get_remap_count();
 void zyk_text_message(gentity_t *ent, char *filename, qboolean show_in_chat, qboolean broadcast_message, ...);
 qboolean zyk_can_deflect_shots(gentity_t *ent);
-holdable_t zyk_get_holdable_item_tag(zyk_gunner_item_t item_index);
 
 // zyk: shader remap struct
 typedef struct shaderRemap_s {

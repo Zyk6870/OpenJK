@@ -484,11 +484,6 @@ qboolean PlaceShield(gentity_t *playerent)
 				shield->s.otherEntityNum2 = TEAM_RED;
 			}
 
-			if (playerent->client && playerent->client->sess.amrpgmode == 2)
-			{ // zyk: used a Force Field, decrease amount of them in inventory
-				playerent->client->pers.gunner_items[GUNNERITEM_FORCE_FIELD]--;
-			}
-
 			shield->s.eType = ET_SPECIAL;
 			shield->s.modelindex =  HI_SHIELD;	// this'll be used in CG_Useable() for rendering.
 			shield->classname = shieldItem->classname;
@@ -529,6 +524,8 @@ qboolean PlaceShield(gentity_t *playerent)
 	// no room
 	return qfalse;
 }
+
+extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
 
 void ItemUse_Binoculars(gentity_t *ent)
 {
@@ -1243,12 +1240,13 @@ void ItemUse_Sentry( gentity_t *ent )
 
 		// zyk: validating quantity of sentry guns that the Gunner can place
 		ent->client->pers.bounty_hunter_placed_sentries++;
-		ent->client->pers.gunner_items[GUNNERITEM_SENTRY_GUN]--;
 
+		/*
 		if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY) && ent->client->pers.bounty_hunter_placed_sentries < NUMBER_OF_GUNNER_ITEMS)
 		{
 			ent->client->ps.fd.sentryDeployed = qfalse;
 		}
+		*/
 	}
 }
 
@@ -1286,10 +1284,6 @@ void ItemUse_Seeker(gentity_t *ent)
 			ent->client->ps.droneExistTime = level.time + 60000; // zyk: the seeker drone lifetime, changed from 30000 to 60000
 		ent->client->ps.droneFireTime = level.time + 500;   // zyk: fire time of seeker drone changed from 1500 to 500
 
-		if (ent->client->sess.amrpgmode == 2)
-		{ // zyk: used a seeker, decrease amount of them in inventory
-			ent->client->pers.gunner_items[GUNNERITEM_SEEKER_DRONE]--;
-		}
 	}
 }
 
@@ -1328,10 +1322,6 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 	else
 		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
-	{ // zyk: used a Big Bacta, decrease amount of them in inventory
-		ent->client->pers.gunner_items[GUNNERITEM_BIG_BACTA]--;
-	}
 }
 
 extern void zyk_add_mp(gentity_t* ent, int mp_amount);
@@ -1345,10 +1335,6 @@ void ItemUse_MedPack(gentity_t *ent)
 	
 	MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
-	{ // zyk: used a Bacta Canister, decrease amount of them in inventory
-		ent->client->pers.gunner_items[GUNNERITEM_BACTA_CANISTER]--;
-	}
 }
 
 #define JETPACK_TOGGLE_TIME			900 // zyk: default 1000
@@ -2316,6 +2302,37 @@ int Pickup_Holdable( gentity_t *ent, gentity_t *other ) {
 
 	other->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << ent->item->giTag);
 
+	// zyk: updating the RPG inventory
+	if (other->client->sess.amrpgmode == 2)
+	{
+		if (ent->item->giTag == HI_BINOCULARS)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_BINOCULARS);
+
+		if (ent->item->giTag == HI_MEDPAC)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_BACTA_CANISTER);
+
+		if (ent->item->giTag == HI_SENTRY_GUN)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_SENTRY_GUN);
+
+		if (ent->item->giTag == HI_SEEKER)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_SEEKER_DRONE);
+
+		if (ent->item->giTag == HI_EWEB)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_EWEB);
+
+		if (ent->item->giTag == HI_MEDPAC_BIG)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_BIG_BACTA);
+
+		if (ent->item->giTag == HI_SHIELD)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_FORCE_FIELD);
+
+		if (ent->item->giTag == HI_CLOAK)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_CLOAK);
+
+		if (ent->item->giTag == HI_JETPACK)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_JETPACK);
+	}
+
 	G_LogWeaponItem(other->s.number, ent->item->giTag);
 
 	return adjustRespawnTime(zyk_holdable_item_respawn_time.integer, ent->item->giType, ent->item->giTag);
@@ -2333,6 +2350,17 @@ void Add_Ammo (gentity_t *ent, int weapon, int count)
 	int max_thermal_ammo = zyk_max_thermal_ammo.integer;
 	int max_tripmine_ammo = zyk_max_tripmine_ammo.integer;
 	int max_detpack_ammo = zyk_max_detpack_ammo.integer;
+
+	if (ent->client->sess.amrpgmode == 2)
+	{ // zyk: players in RPG Mode have no max ammo
+		max_blasterpack_ammo = 200000000;
+		max_powercell_ammo = 200000000;
+		max_metalbolt_ammo = 200000000;
+		max_rocket_ammo = 200000000;
+		max_thermal_ammo = 200000000;
+		max_tripmine_ammo = 200000000;
+		max_detpack_ammo = 200000000;
+	}
 
 	if (weapon == AMMO_BLASTER){
 		if (max_blasterpack_ammo - ent->client->ps.ammo[weapon] > count)
@@ -2467,6 +2495,43 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 
 	// add the weapon
 	other->client->ps.stats[STAT_WEAPONS] |= ( 1 << ent->item->giTag );
+
+	// zyk: updating the RPG inventory
+	if (other->client->sess.amrpgmode == 2)
+	{
+		if (ent->item->giTag == WP_STUN_BATON)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_STUN_BATON);
+
+		if (ent->item->giTag == WP_BRYAR_PISTOL)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_BLASTER_PISTOL);
+
+		if (ent->item->giTag == WP_BLASTER)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_E11_BLASTER_RIFLE);
+
+		if (ent->item->giTag == WP_DISRUPTOR)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_DISRUPTOR);
+
+		if (ent->item->giTag == WP_BOWCASTER)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_BOWCASTER);
+
+		if (ent->item->giTag == WP_REPEATER)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_REPEATER);
+
+		if (ent->item->giTag == WP_DEMP2)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_DEMP2);
+
+		if (ent->item->giTag == WP_FLECHETTE)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_FLECHETTE);
+
+		if (ent->item->giTag == WP_ROCKET_LAUNCHER)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
+
+		if (ent->item->giTag == WP_CONCUSSION)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_CONCUSSION);
+
+		if (ent->item->giTag == WP_BRYAR_OLD)
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_BRYAR_PISTOL);
+	}
 
 	//Add_Ammo( other, ent->item->giTag, quantity );
 	Add_Ammo( other, weaponData[ent->item->giTag].ammoIndex, (int)ceil(quantity * zyk_add_ammo_scale.value) ); // zyk: cvar to scale the add ammo amount
@@ -2649,7 +2714,7 @@ extern void save_account(gentity_t *ent, qboolean save_char_file);
 void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	int			respawn;
 	qboolean	predict;
-	qboolean	zyk_gunner_validation = qfalse; // zyk: tests if the player is a Gunner with Inventory Capacity upgrade, which can grab more than one of some holdable items
+	qboolean validate_pickup_item = qtrue;
 
 	if (ent->genericValue10 > level.time &&
 		other &&
@@ -2683,6 +2748,11 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 
 	if (other->client->sess.amrpgmode == 2)
 	{
+		if (ent->item->giType == IT_WEAPON || ent->item->giType == IT_AMMO || ent->item->giType == IT_HOLDABLE)
+		{ // zyk: RPG players always can pickup weapons, ammo and holdable items
+			validate_pickup_item = qfalse;
+		}
+
 		if (ent->spawnflags & 262144)
 		{ // zyk: custom quest item
 			// zyk: remove touch function to avoid getting it again
@@ -2737,30 +2807,8 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		}
 	}
 
-	if (other->client->sess.amrpgmode == 2 && ent->item->giType == IT_HOLDABLE)
-	{ // zyk: Gunner can grab more of some holdable items when he has the Inventory Capacity upgrade
-		int item_iterator = 0;
-
-		for (item_iterator = 0; item_iterator < MAX_GUNNER_ITEMS; item_iterator++)
-		{
-			if (ent->item->giTag == zyk_get_holdable_item_tag(item_iterator))
-			{
-				if (other->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY) && other->client->pers.gunner_items[item_iterator] < NUMBER_OF_GUNNER_ITEMS)
-				{
-					other->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << zyk_get_holdable_item_tag(item_iterator));
-					other->client->pers.gunner_items[item_iterator]++;
-					zyk_gunner_validation = qtrue;
-				}
-				else if (!(other->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY)) && other->client->pers.gunner_items[item_iterator] < 1)
-				{
-					other->client->pers.gunner_items[item_iterator]++;
-				}
-			}
-		}
-	}
-
 	// the same pickup rules are used for client side and server side
-	if ( !BG_CanItemBeGrabbed( level.gametype, &ent->s, &other->client->ps ) && zyk_gunner_validation == qfalse) {
+	if ( !BG_CanItemBeGrabbed( level.gametype, &ent->s, &other->client->ps ) && validate_pickup_item == qtrue) {
 		return;
 	}
 
