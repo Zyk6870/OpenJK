@@ -173,7 +173,7 @@ int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] =
 		//NUM_FORCE_POWERS
 	},
 	{ // zyk: level 4
-		999,//FP_HEAL,//instant
+		50,//FP_HEAL,//instant
 		10,//FP_LEVITATION,//hold/duration
 		50,//FP_SPEED,//duration
 		999,//FP_PUSH,//hold/duration
