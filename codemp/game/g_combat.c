@@ -629,6 +629,9 @@ void TossClientItems( gentity_t *self ) {
 		weapon == WP_STUN_BATON
 		) ) {
 		gentity_t *te;
+		int current_ammo = 0;
+		int ammo_count = 0;
+		gentity_t* launched;
 
 		// find the item type for this weapon
 		item = BG_FindItemForWeapon( weapon );
@@ -639,7 +642,42 @@ void TossClientItems( gentity_t *self ) {
 		te->s.eventParm = self->s.number;
 
 		// spawn the item
-		Drop_Item( self, item, 0 );
+		launched = Drop_Item( self, item, 0 );
+
+		// zyk: remove the weapon from the player or npc
+		self->client->ps.stats[STAT_WEAPONS] &= ~(1 << weapon);
+
+		launched->count = bg_itemlist[BG_GetItemIndexByTag(weapon, IT_WEAPON)].quantity;
+
+		// zyk: setting amount of ammo in this dropped weapon
+		current_ammo = self->client->ps.ammo[weaponData[weapon].ammoIndex];
+		ammo_count = (int)ceil(bg_itemlist[BG_GetItemIndexByTag(weapon, IT_WEAPON)].quantity * zyk_add_ammo_scale.value);
+
+		if (current_ammo < ammo_count)
+		{ // zyk: player does not have the default ammo to set in the weapon, so set the current_ammo of the player in the weapon
+			self->client->ps.ammo[weaponData[weapon].ammoIndex] -= current_ammo;
+			if (zyk_add_ammo_scale.value > 0 && current_ammo > 0)
+				launched->count = (current_ammo / zyk_add_ammo_scale.value);
+			else
+				launched->count = -1; // zyk: in this case, player has no ammo, so weapon should add no ammo to the player who picks up this weapon
+		}
+		else
+		{
+			self->client->ps.ammo[weaponData[weapon].ammoIndex] -= ammo_count;
+			if (zyk_add_ammo_scale.value > 0 && current_ammo > 0)
+				launched->count = (ammo_count / zyk_add_ammo_scale.value);
+			else
+				launched->count = -1; // zyk: in this case, player has no ammo, so weapon should add no ammo to the player who picks up this weapon
+		}
+
+		if ((self->client->ps.ammo[weaponData[weapon].ammoIndex] < 1 && weapon != WP_DET_PACK) ||
+			(weapon != WP_THERMAL && weapon != WP_DET_PACK && weapon != WP_TRIP_MINE))
+		{
+			self->client->ps.stats[STAT_WEAPONS] &= ~(1 << weapon);
+
+			self->s.weapon = WP_MELEE;
+			self->client->ps.weapon = WP_MELEE;
+		}
 	}
 
 	// drop all the powerups if not in teamplay
@@ -2912,7 +2950,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	}
 
 	if (!self->client->ps.fallingToDeath && (!self->NPC || self->client->NPC_class != CLASS_VEHICLE)) 
-	{ // zyk: now npcs also drop their weapons and powerups
+	{ // zyk: now npcs (that are not vehicles) also drop their weapons and powerups
 		TossClientItems( self );
 	}
 	else {
