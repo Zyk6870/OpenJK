@@ -2613,7 +2613,7 @@ extern qboolean	gSiegeRoundBegun;
 extern qboolean	gSiegeRoundEnded;
 extern qboolean g_dontPenalizeTeam; //g_cmds.c
 extern void load_account(gentity_t *ent);
-extern void initialize_rpg_skills(gentity_t *ent);
+extern void initialize_rpg_skills(gentity_t *ent, qboolean init_all);
 void SetTeamQuick(gentity_t *ent, int team, qboolean doBegin);
 void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	gentity_t	*ent;
@@ -2735,7 +2735,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 		// zyk: load account again
 		load_account(ent);
 
-		initialize_rpg_skills(ent);
+		initialize_rpg_skills(ent, qtrue);
 	}
 
 	client->pers.connected = CON_CONNECTED;
@@ -3850,7 +3850,7 @@ void ClientSpawn(gentity_t *ent) {
 	// zyk: if player is logged at spawn, load his skills
 	if (ent->client->sess.amrpgmode == 2)
 	{
-		initialize_rpg_skills(ent);
+		initialize_rpg_skills(ent, qtrue);
 	}
 	else if (ent->client->pers.player_statuses & (1 << 12))
 	{ // zyk: player received force powers from admin

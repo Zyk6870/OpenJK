@@ -4627,6 +4627,12 @@ void set_max_shield(gentity_t *ent)
 	ent->client->pers.max_rpg_shield = (int)ceil(((ent->client->pers.skill_levels[SKILL_MAX_SHIELD] * 1.0)/5) * ent->client->pers.max_rpg_health);
 }
 
+void set_max_force(gentity_t* ent)
+{
+	ent->client->pers.max_force_power = (int)ceil((zyk_max_force_power.value / 4.0) * ent->client->pers.skill_levels[SKILL_FORCE_POWER]);
+	ent->client->ps.fd.forcePowerMax = ent->client->pers.max_force_power;
+}
+
 // zyk: sets the Max Weight of stuff the player can carry
 void set_max_weight(gentity_t* ent)
 {
@@ -4759,147 +4765,8 @@ qboolean zyk_check_user_input(char *user_input, int user_input_size)
 	return qtrue;
 }
 
-// zyk: gives rpg score to the player
-void rpg_score(gentity_t *ent)
-{
-	int send_message = 0; // zyk: if its 1, sends the message in player console
-	char message[128];
-
-	strcpy(message,"");
-
-	add_credits(ent, (10 + ent->client->pers.credits_modifier));
-
-	if (ent->client->pers.level < zyk_rpg_max_level.integer)
-	{
-		ent->client->pers.level_up_score += (1 + ent->client->pers.score_modifier); // zyk: add score to the RPG mode score
-
-		if (ent->client->pers.level_up_score >= (ent->client->pers.level * zyk_level_up_score_factor.integer))
-		{ // zyk: player got a new level
-			ent->client->pers.level_up_score -= (ent->client->pers.level * zyk_level_up_score_factor.integer);
-			ent->client->pers.level++;
-
-			if (ent->client->pers.level % 5 == 0) // zyk: every level divisible by 5 gives bonus skillpoints
-				ent->client->pers.skillpoints += 3;
-			else
-				ent->client->pers.skillpoints++;
-
-			strcpy(message,va("^3New Level: ^7%d^3, Skillpoints: ^7%d\n", ent->client->pers.level, ent->client->pers.skillpoints));
-
-			send_message = 1;
-		}
-	}
-
-	save_account(ent, qtrue); // zyk: saves new score and credits in the account file
-
-	// zyk: cleaning the modifiers after they are applied
-	ent->client->pers.credits_modifier = 0;
-	ent->client->pers.score_modifier = 0;
-
-	if (send_message == 1)
-	{
-		trap->SendServerCommand( ent->s.number, va("chat \"%s\"", message));
-	}
-}
-
-// zyk: increases the RPG skill counter by this amount
-void rpg_skill_counter(gentity_t *ent, int amount)
-{
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.level < zyk_rpg_max_level.integer)
-	{ // zyk: now RPG mode increases level up score after a certain amount of attacks
-		ent->client->pers.skill_counter += amount;
-
-		if (ent->client->pers.skill_counter >= zyk_max_skill_counter.integer)
-		{
-			ent->client->pers.skill_counter = 0;
-
-			// zyk: skill counter does not give credits, only Level Up Score
-			ent->client->pers.credits_modifier = -10;
-
-			rpg_score(ent);
-		}
-	}
-}
-
-void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item)
-{
-	if (add_item == qtrue)
-	{
-		ent->client->pers.rpg_inventory[item]++;
-	}
-	else
-	{
-		ent->client->pers.rpg_inventory[item]--;
-
-		if (ent->client->pers.rpg_inventory[item] > 0)
-		{ // zyk: set the weapon or item if player still has it
-			if (item == RPG_INVENTORY_WP_STUN_BATON)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
-
-			if (item == RPG_INVENTORY_WP_BLASTER_PISTOL)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
-
-			if (item == RPG_INVENTORY_WP_E11_BLASTER_RIFLE)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BLASTER);
-
-			if (item == RPG_INVENTORY_WP_DISRUPTOR)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DISRUPTOR);
-
-			if (item == RPG_INVENTORY_WP_BOWCASTER)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BOWCASTER);
-
-			if (item == RPG_INVENTORY_WP_REPEATER)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_REPEATER);
-
-			if (item == RPG_INVENTORY_WP_DEMP2)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DEMP2);
-
-			if (item == RPG_INVENTORY_WP_FLECHETTE)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_FLECHETTE);
-
-			if (item == RPG_INVENTORY_WP_ROCKET_LAUNCHER)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_ROCKET_LAUNCHER);
-
-			if (item == RPG_INVENTORY_WP_CONCUSSION)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_CONCUSSION);
-
-			if (item == RPG_INVENTORY_WP_BRYAR_PISTOL)
-				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_OLD);
-
-			if (item == RPG_INVENTORY_ITEM_BINOCULARS)
-				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_BINOCULARS);
-
-			if (item == RPG_INVENTORY_ITEM_BACTA_CANISTER)
-				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC);
-
-			if (item == RPG_INVENTORY_ITEM_SENTRY_GUN)
-				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
-
-			if (item == RPG_INVENTORY_ITEM_SEEKER_DRONE)
-				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
-
-			if (item == RPG_INVENTORY_ITEM_EWEB)
-				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_EWEB);
-
-			if (item == RPG_INVENTORY_ITEM_BIG_BACTA)
-				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC_BIG);
-
-			if (item == RPG_INVENTORY_ITEM_FORCE_FIELD)
-				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
-
-			if (item == RPG_INVENTORY_ITEM_CLOAK)
-				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_CLOAK);
-
-			if (item == RPG_INVENTORY_ITEM_JETPACK)
-				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
-
-		}
-	}
-
-	ent->client->pers.rpg_inventory_modified = qtrue;
-}
-
 // zyk: initialize RPG skills of this player
-void initialize_rpg_skills(gentity_t *ent)
+void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 {
 	if (ent->client->sess.amrpgmode == 2)
 	{
@@ -4917,9 +4784,12 @@ void initialize_rpg_skills(gentity_t *ent)
 			}
 		}
 
-		// zyk: loading initial inventory
-		ent->client->pers.rpg_inventory_modified = qfalse;
+		if (init_all == qtrue)
+		{
+			ent->client->pers.rpg_inventory_modified = qfalse;
+		}
 
+		// zyk: loading initial inventory
 		ent->client->ps.stats[STAT_WEAPONS] = 0;
 		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_NONE);
 		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_MELEE);
@@ -4934,6 +4804,8 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->ps.stats[STAT_HOLDABLE_ITEM] = 0;
 
 		// zyk: settings the correct amount of stuff to the player based on the RPG inventory
+
+		// zyk: weapons inventory
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_STUN_BATON] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
 
@@ -4967,6 +4839,7 @@ void initialize_rpg_skills(gentity_t *ent)
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_BRYAR_PISTOL] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_OLD);
 
+		// zyk: ammo inventory
 		ent->client->ps.ammo[AMMO_BLASTER] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK];
 		ent->client->ps.ammo[AMMO_POWERCELL] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL];
 		ent->client->ps.ammo[AMMO_METAL_BOLTS] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS];
@@ -4975,6 +4848,16 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->ps.ammo[AMMO_TRIPMINE] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_TRIPMINES];
 		ent->client->ps.ammo[AMMO_DETPACK] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS];
 
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_THERMALS] > 0)
+			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_THERMAL);
+
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_TRIPMINES] > 0)
+			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_TRIP_MINE);
+
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS] > 0)
+			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
+
+		// zyk: holdable items inventory
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_BINOCULARS] > 0)
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_BINOCULARS);
 
@@ -5164,52 +5047,19 @@ void initialize_rpg_skills(gentity_t *ent)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_TEAM_FORCE);
 		ent->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] = ent->client->pers.skill_levels[SKILL_TEAM_ENERGIZE];
 
+		set_max_health(ent);
+		set_max_shield(ent);
+		set_max_force(ent);
+		set_max_weight(ent);
+
 		zyk_load_common_settings(ent);
 
-		ent->client->pers.sense_health_timer = 0;
-
-		// zyk: used to add a cooldown between each flame
-		ent->client->cloakDebReduce = 0;
-
-		ent->client->pers.max_force_power = (int)ceil((zyk_max_force_power.value/4.0) * ent->client->pers.skill_levels[SKILL_FORCE_POWER]);
-		ent->client->ps.fd.forcePowerMax = ent->client->pers.max_force_power;
-		ent->client->ps.fd.forcePower = ent->client->ps.fd.forcePowerMax;
-
 		// zyk: setting rpg control attributes
-		ent->client->pers.thermal_vision = qfalse;
-		ent->client->pers.thermal_vision_cooldown_time = 0;
-
-		ent->client->pers.quest_power_status = 0;
-
-		ent->client->pers.magic_power = zyk_max_magic_power(ent);
 
 		if (ent->client->sess.magic_fist_selection > ent->client->pers.skill_levels[SKILL_MAGIC_FIST])
 		{ // zyk: reset magic fist selected if player downgrades Magic Fist skill
 			ent->client->sess.magic_fist_selection = 0;
 		}
-
-		ent->client->pers.unique_skill_duration = 0;
-		ent->client->pers.active_unique_skill = 0;
-
-		ent->client->pers.energy_modulator_mode = 0;
-
-		ent->client->pers.credits_modifier = 0;
-		ent->client->pers.score_modifier = 0;
-
-		ent->client->pers.buy_sell_timer = 0;
-		ent->client->pers.vertical_dfa_timer = 0;
-
-		ent->client->pers.current_quest_event = 0;
-		ent->client->pers.quest_event_timer = 0;
-
-		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_THERMALS] > 0)
-			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_THERMAL);
-
-		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_TRIPMINES] > 0)
-			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_TRIP_MINE);
-
-		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS] > 0)
-			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
 
 		ent->client->pers.bounty_hunter_placed_sentries = 0;
 
@@ -5217,54 +5067,217 @@ void initialize_rpg_skills(gentity_t *ent)
 		{
 			this_ent = &g_entities[sentry_guns_iterator];
 
-			if (this_ent && Q_stricmp(this_ent->classname,"sentryGun") == 0 && this_ent->s.owner == ent->s.number)
+			if (this_ent && Q_stricmp(this_ent->classname, "sentryGun") == 0 && this_ent->s.owner == ent->s.number)
 				ent->client->pers.bounty_hunter_placed_sentries++;
 		}
 
-		/*
-		// zyk: reseting initial holdable items of the player
-		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SEEKER) & ~(1 << HI_BINOCULARS) & ~(1 << HI_SENTRY_GUN) & ~(1 << HI_EWEB) & ~(1 << HI_CLOAK) & ~(1 << HI_SHIELD) & ~(1 << HI_MEDPAC) & ~(1 << HI_MEDPAC_BIG);
+		if (init_all == qtrue)
+		{
+			ent->client->pers.sense_health_timer = 0;
 
-		if (ent->client->pers.skill_levels[SKILL_BINOCULARS] > 0)
-			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_BINOCULARS);
+			ent->client->pers.thermal_vision = qfalse;
+			ent->client->pers.thermal_vision_cooldown_time = 0;
 
-		if (ent->client->pers.skill_levels[SKILL_BACTA_CANISTER] > 0)
-			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC);
+			ent->client->pers.quest_power_status = 0;
 
-		if (ent->client->pers.skill_levels[SKILL_SENTRY_GUN] > 0)
-			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
+			// zyk: used to add a cooldown between each flame
+			ent->client->cloakDebReduce = 0;
 
-		if (ent->client->pers.skill_levels[SKILL_SEEKER_DRONE] > 0)
-			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
+			ent->client->pers.unique_skill_duration = 0;
+			ent->client->pers.active_unique_skill = 0;
+			ent->client->pers.vertical_dfa_timer = 0;
 
-		if (ent->client->pers.skill_levels[SKILL_EWEB] > 0)
-			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_EWEB);
+			ent->client->pers.energy_modulator_mode = 0;
 
-		if (ent->client->pers.skill_levels[SKILL_BIG_BACTA] > 0)
-			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC_BIG);
+			ent->client->pers.credits_modifier = 0;
+			ent->client->pers.score_modifier = 0;
 
-		if (ent->client->pers.skill_levels[SKILL_FORCE_FIELD] > 0)
-			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
+			ent->client->pers.buy_sell_timer = 0;
 
-		if (ent->client->pers.skill_levels[SKILL_CLOAK_ITEM] > 0)
-			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_CLOAK);
-		*/
+			ent->client->pers.current_quest_event = 0;
+			ent->client->pers.quest_event_timer = 0;
 
-		// zyk: loading initial health of the player
-		set_max_health(ent);
-		ent->health = ent->client->pers.max_rpg_health;
-		ent->client->ps.stats[STAT_HEALTH] = ent->health;
+			// zyk: loading initial health
+			ent->health = ent->client->pers.max_rpg_health;
+			ent->client->ps.stats[STAT_HEALTH] = ent->health;
 
-		// zyk: loading initial shield of the player
-		set_max_shield(ent);
-		ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
+			// zyk: loading initial shield
+			ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
 
-		// zyk: setting the max weight of stuff the player can carry
-		set_max_weight(ent);
+			// zyk: loading initial force
+			ent->client->ps.fd.forcePower = ent->client->pers.max_force_power;
+
+			// zyk: loading initial MP
+			ent->client->pers.magic_power = zyk_max_magic_power(ent);
+		}
+		else
+		{ // it is possible to have above max of these if player downgrades these skills
+			if (ent->health > ent->client->pers.max_rpg_health)
+			{
+				ent->health = ent->client->pers.max_rpg_health;
+				ent->client->ps.stats[STAT_HEALTH] = ent->health;
+			}
+
+			if (ent->client->ps.stats[STAT_ARMOR] > ent->client->pers.max_rpg_shield)
+			{
+				ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
+			}
+
+			if (ent->client->ps.fd.forcePower > ent->client->pers.max_force_power)
+			{
+				ent->client->ps.fd.forcePower = ent->client->pers.max_force_power;
+			}
+
+			if (ent->client->pers.magic_power > zyk_max_magic_power(ent))
+			{
+				ent->client->pers.magic_power = zyk_max_magic_power(ent);
+			}
+		}
 
 		// zyk: update the rpg stuff info at the client-side game
 		send_rpg_events(10000);
 	}
+}
+
+// zyk: gives rpg score to the player
+void rpg_score(gentity_t *ent)
+{
+	int send_message = 0; // zyk: if its 1, sends the message in player console
+	char message[128];
+
+	strcpy(message,"");
+
+	add_credits(ent, (10 + ent->client->pers.credits_modifier));
+
+	if (ent->client->pers.level < zyk_rpg_max_level.integer)
+	{
+		ent->client->pers.level_up_score += (1 + ent->client->pers.score_modifier); // zyk: add score to the RPG mode score
+
+		if (ent->client->pers.level_up_score >= (ent->client->pers.level * zyk_level_up_score_factor.integer))
+		{ // zyk: player got a new level
+			ent->client->pers.level_up_score -= (ent->client->pers.level * zyk_level_up_score_factor.integer);
+			ent->client->pers.level++;
+
+			if (ent->client->pers.level % 5 == 0) // zyk: every level divisible by 5 gives bonus skillpoints
+				ent->client->pers.skillpoints += 3;
+			else
+				ent->client->pers.skillpoints++;
+
+			initialize_rpg_skills(ent, qfalse);
+
+			strcpy(message,va("^3New Level: ^7%d^3, Skillpoints: ^7%d\n", ent->client->pers.level, ent->client->pers.skillpoints));
+
+			send_message = 1;
+		}
+	}
+
+	save_account(ent, qtrue); // zyk: saves new score and credits in the account file
+
+	// zyk: cleaning the modifiers after they are applied
+	ent->client->pers.credits_modifier = 0;
+	ent->client->pers.score_modifier = 0;
+
+	if (send_message == 1)
+	{
+		trap->SendServerCommand( ent->s.number, va("chat \"%s\"", message));
+	}
+}
+
+// zyk: increases the RPG skill counter by this amount
+void rpg_skill_counter(gentity_t *ent, int amount)
+{
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.level < zyk_rpg_max_level.integer)
+	{ // zyk: now RPG mode increases level up score after a certain amount of attacks
+		ent->client->pers.skill_counter += amount;
+
+		if (ent->client->pers.skill_counter >= zyk_max_skill_counter.integer)
+		{
+			ent->client->pers.skill_counter = 0;
+
+			// zyk: skill counter does not give credits, only Level Up Score
+			ent->client->pers.credits_modifier = -10;
+
+			rpg_score(ent);
+		}
+	}
+}
+
+void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item)
+{
+	if (add_item == qtrue)
+	{
+		ent->client->pers.rpg_inventory[item]++;
+	}
+	else
+	{
+		ent->client->pers.rpg_inventory[item]--;
+
+		if (ent->client->pers.rpg_inventory[item] > 0)
+		{ // zyk: set the weapon or item if player still has it
+			if (item == RPG_INVENTORY_WP_STUN_BATON)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
+
+			if (item == RPG_INVENTORY_WP_BLASTER_PISTOL)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
+
+			if (item == RPG_INVENTORY_WP_E11_BLASTER_RIFLE)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BLASTER);
+
+			if (item == RPG_INVENTORY_WP_DISRUPTOR)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DISRUPTOR);
+
+			if (item == RPG_INVENTORY_WP_BOWCASTER)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BOWCASTER);
+
+			if (item == RPG_INVENTORY_WP_REPEATER)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_REPEATER);
+
+			if (item == RPG_INVENTORY_WP_DEMP2)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DEMP2);
+
+			if (item == RPG_INVENTORY_WP_FLECHETTE)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_FLECHETTE);
+
+			if (item == RPG_INVENTORY_WP_ROCKET_LAUNCHER)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_ROCKET_LAUNCHER);
+
+			if (item == RPG_INVENTORY_WP_CONCUSSION)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_CONCUSSION);
+
+			if (item == RPG_INVENTORY_WP_BRYAR_PISTOL)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_OLD);
+
+			if (item == RPG_INVENTORY_ITEM_BINOCULARS)
+				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_BINOCULARS);
+
+			if (item == RPG_INVENTORY_ITEM_BACTA_CANISTER)
+				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC);
+
+			if (item == RPG_INVENTORY_ITEM_SENTRY_GUN)
+				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
+
+			if (item == RPG_INVENTORY_ITEM_SEEKER_DRONE)
+				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
+
+			if (item == RPG_INVENTORY_ITEM_EWEB)
+				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_EWEB);
+
+			if (item == RPG_INVENTORY_ITEM_BIG_BACTA)
+				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC_BIG);
+
+			if (item == RPG_INVENTORY_ITEM_FORCE_FIELD)
+				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
+
+			if (item == RPG_INVENTORY_ITEM_CLOAK)
+				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_CLOAK);
+
+			if (item == RPG_INVENTORY_ITEM_JETPACK)
+				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
+
+		}
+	}
+
+	ent->client->pers.rpg_inventory_modified = qtrue;
 }
 
 /*
@@ -5416,7 +5429,7 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 
 	if (ent->client->sess.amrpgmode == 2)
 	{
-		initialize_rpg_skills(ent);
+		initialize_rpg_skills(ent, qtrue);
 	}
 	else
 	{
@@ -5513,7 +5526,7 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 		}
 		else if (ent->client->sess.amrpgmode == 2)
 		{
-			initialize_rpg_skills(ent);
+			initialize_rpg_skills(ent, qtrue);
 			trap->SendServerCommand( ent->s.number, "print \"^7Account loaded succesfully in ^2RPG Mode^7. Use command ^3/list^7.\n\"" );
 
 			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
@@ -5875,6 +5888,8 @@ void do_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean update_all)
 		trap->SendServerCommand( ent-g_entities, "print \"Skills upgraded successfully.\n\"" );
 		Cmd_ZykMod_f(ent);
 	}
+
+	initialize_rpg_skills(ent, qfalse);
 }
 
 /*
@@ -5929,6 +5944,8 @@ void do_downgrade_skill(gentity_t *ent, int downgrade_value)
 	save_account(ent, qtrue);
 
 	trap->SendServerCommand( ent->s.number, "print \"Skill downgraded successfully.\n\"" );
+
+	initialize_rpg_skills(ent, qfalse);
 
 	Cmd_ZykMod_f(ent);
 }

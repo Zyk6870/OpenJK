@@ -6225,7 +6225,7 @@ void zyk_text_message(gentity_t *ent, char *filename, qboolean show_in_chat, qbo
 }
 
 // zyk: controls the quest powers stuff
-extern void initialize_rpg_skills(gentity_t *ent);
+extern void initialize_rpg_skills(gentity_t *ent, qboolean init_all);
 extern int zyk_max_magic_power(gentity_t* ent);
 void quest_power_events(gentity_t *ent)
 {
@@ -7579,7 +7579,7 @@ void rpg_lms_prepare()
 			}
 			else
 			{
-				initialize_rpg_skills(ent);
+				initialize_rpg_skills(ent, qtrue);
 			}
 		}
 	}
