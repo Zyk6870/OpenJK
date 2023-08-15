@@ -174,9 +174,8 @@ void P_WorldEffects( gentity_t *ent ) {
 		if ( ent->client->airOutTime < level.time) {
 			// drown!
 			ent->client->airOutTime += 1000;
-			if ( ent->health > 0 && ent->client->tempSpectate < level.time && 
-				!(ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_SWIMMING)))
-			{ // zyk: Swimming Upgrade Upgrade protects Gunner from drowning
+			if ( ent->health > 0 && ent->client->tempSpectate < level.time)
+			{
 				// take more damage the longer underwater
 				ent->damage += 2;
 				if (ent->damage > 15)
@@ -201,6 +200,12 @@ void P_WorldEffects( gentity_t *ent ) {
 	} else {
 		ent->client->airOutTime = level.time + 12000;
 		ent->damage = 2;
+
+		// zyk: Swimming skill
+		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_UNDERWATER] > 0)
+		{
+			ent->client->airOutTime = level.time + (12000 * (ent->client->pers.skill_levels[SKILL_UNDERWATER] * 2));
+		}
 	}
 
 	//

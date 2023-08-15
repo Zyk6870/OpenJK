@@ -83,7 +83,6 @@ const int seller_items_cost[MAX_SELLER_ITEMS][2] = {
 	{2500, 0},
 	{1700, 0},
 	{8000, 0},
-	{2000, 0},
 	{4000, 0},
 	{3500, 0},
 	{3000, 0},
@@ -138,6 +137,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAX_HEALTH] = 5;
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
+	max_skill_levels[SKILL_UNDERWATER] = 2;
 	max_skill_levels[SKILL_RUN_SPEED] = 3;
 	
 	max_skill_levels[SKILL_UNIQUE_1] = 1;
@@ -240,6 +240,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
+	skill_names[SKILL_UNDERWATER] = "Underwater";
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
 
 	skill_names[SKILL_UNIQUE_1] = "Vertical DFA";
@@ -307,7 +308,6 @@ char* zyk_get_upgrade_name(zyk_upgrade_t upgrade_flag)
 		"Rockets Upgrade",
 		"Stun Baton Upgrade",
 		"Jetpack Upgrade",
-		"Swimming Upgrade",
 		"Gunner Radar",
 		"Thermal Vision",
 		"Gunner Items Upgrade",
@@ -419,9 +419,11 @@ char* zyk_skill_description(int skill_index)
 		return "Each level increases your health resistance by 5 per cent";
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio";
+	if (skill_index == SKILL_UNDERWATER)
+		return "Each level increases your air underwater";
 	if (skill_index == SKILL_RUN_SPEED)
 		return va("At level 0 your run speed is %f. Each level increases it by 50", g_speed.value);
-	
+
 	if (skill_index == SKILL_UNIQUE_1)
 		return "Bind with ^3/bind <key> unique 56 ^7to use it\nVertical DFA. Makes you jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force";
 	if (skill_index == SKILL_UNIQUE_2)
@@ -6385,7 +6387,6 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 		"Rockets Upgrade",
 		"Stun Baton Upgrade",
 		"Jetpack Upgrade",
-		"Swimming Upgrade",
 		"Gunner Radar",
 		"Thermal Vision",
 		"Gunner Items Upgrade",
@@ -6643,10 +6644,6 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases jetpack fuel consumption a bit and makes the jetpack more stable and faster\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == SELLER_SWIMMING_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7prevents drowning when using Gunner class\n\n\"", zyk_get_seller_item_name(i)));
-		}
 		else if (i == SELLER_GUNNER_RADAR)
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7if you have the New Zyk Mod client, a radar will be displayed in the screen showing positions of other players and npcs\n\n\"", zyk_get_seller_item_name(i)));
@@ -6775,11 +6772,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	else if (value == (SELLER_ROCKETS_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_ROCKETS))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_ROCKETS)));
-		return;
-	}
-	else if (value == (SELLER_SWIMMING_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_SWIMMING))
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_SWIMMING)));
 		return;
 	}
 	else if (value == (SELLER_STUN_BATON_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_STUN_BATON))
@@ -6972,10 +6964,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == (SELLER_ROCKETS_UPGRADE + 1))
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_ROCKETS);
-		}
-		else if (value == (SELLER_SWIMMING_UPGRADE + 1))
-		{
-			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_SWIMMING);
 		}
 		else if (value == (SELLER_FLAME_FUEL + 1))
 		{
