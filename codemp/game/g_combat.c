@@ -2157,25 +2157,25 @@ extern gentity_t *Zyk_NPC_SpawnType(char *npc_type, int x, int y, int z, int yaw
 extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
 extern void load_custom_quest_mission();
-void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
-	gentity_t	*ent;
+void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
+	gentity_t* ent;
 	int			anim;
 	int			killer;
 	int			i;
-	char		*killerName, *obit;
+	char* killerName, * obit;
 	qboolean	wasJediMaster = qfalse;
 	int			sPMType = 0;
-	char		buf[512] = {0};
+	char		buf[512] = { 0 };
 
-	if ( self->client->ps.pm_type == PM_DEAD ) {
+	if (self->client->ps.pm_type == PM_DEAD) {
 		return;
 	}
 
-	if ( level.intermissiontime ) {
+	if (level.intermissiontime) {
 		return;
 	}
 
-	if ( !attacker )
+	if (!attacker)
 		return;
 
 	// zyk: remove any quest_power status from this player
@@ -2229,7 +2229,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if (self->client->pers.race_position > 0) // zyk: if a player dies during a race, he loses the race
 	{
 		self->client->pers.race_position = 0;
-		trap->SendServerCommand( -1, va("chat \"^3Race System: ^7%s ^7died during the race!\n\"",self->client->pers.netname) );
+		trap->SendServerCommand(-1, va("chat \"^3Race System: ^7%s ^7died during the race!\n\"", self->client->pers.netname));
 		try_finishing_race();
 	}
 
@@ -2265,7 +2265,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	}
 
 	// zyk: player died in Duel Tournament
-	if (level.duel_tournament_mode == 4 && self->s.number < MAX_CLIENTS && level.duel_players[self->s.number] != -1 && 
+	if (level.duel_tournament_mode == 4 && self->s.number < MAX_CLIENTS && level.duel_players[self->s.number] != -1 &&
 		duel_tournament_is_duelist(self) == qtrue)
 	{
 		// zyk: restoring force to this player
@@ -2290,9 +2290,9 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			level.melee_players[attacker->s.number]++;
 		}
 	}
-	
+
 	if (self->client->sess.amrpgmode == 2)
-	{ 
+	{
 		// zyk: removing the armors from the player
 		self->client->pers.player_statuses &= ~(1 << 8);
 		self->client->pers.player_statuses &= ~(1 << 9);
@@ -2303,7 +2303,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 		// zyk: player has the Resurrection Power, after completing quests in Challenge Mode. Uses mp. Not allowed in CTF gametype
 		/* zyk: disabled for now
-		if (self->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && self->client->pers.universe_quest_counter & (1 << 29) && g_gametype.integer != GT_CTF && 
+		if (self->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && self->client->pers.universe_quest_counter & (1 << 29) && g_gametype.integer != GT_CTF &&
 			!(self->client->ps.eFlags2 & EF2_HELD_BY_MONSTER) && self->client->pers.magic_power >= 5)
 		{
 			qboolean zyk_allow_vehicle_resurrect = qtrue; // zyk: if player is riding a ship, do not allow resurrection to avoid invisible player bug
@@ -2337,7 +2337,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	{ //don't want to wait til later in the frame if this is the case
 		CheckExitRules();
 
-		if ( level.intermissiontime )
+		if (level.intermissiontime)
 		{
 			return;
 		}
@@ -2349,8 +2349,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		!self->m_pVehicle->m_pVehicleInfo->explosionDelay &&
 		(self->m_pVehicle->m_pPilot || self->m_pVehicle->m_iNumPassengers > 0 || self->m_pVehicle->m_pDroidUnit))
 	{ //kill everyone on board in the name of the attacker... if the vehicle has no death delay
-		gentity_t *murderer = NULL;
-		gentity_t *killEnt;
+		gentity_t* murderer = NULL;
+		gentity_t* killEnt;
 
 		if (self->client->ps.otherKillerTime >= level.time)
 		{ //use the last attacker
@@ -2367,7 +2367,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 					murderer->m_pVehicle &&
 					murderer->m_pVehicle->m_pPilot)
 				{
-					gentity_t *murderPilot = &g_entities[murderer->m_pVehicle->m_pPilot->s.number];
+					gentity_t* murderPilot = &g_entities[murderer->m_pVehicle->m_pPilot->s.number];
 					if (murderPilot->inuse && murderPilot->client)
 					{ //give the pilot of the offending vehicle credit for the kill
 						murderer = murderPilot;
@@ -2384,7 +2384,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 				attacker->m_pVehicle->m_pPilot)
 			{ //set vehicles pilot's killer as murderer
 				murderer = &g_entities[attacker->m_pVehicle->m_pPilot->s.number];
-				if (murderer->inuse && murderer->client &&murderer->client->ps.otherKillerTime >= level.time)
+				if (murderer->inuse && murderer->client && murderer->client->ps.otherKillerTime >= level.time)
 				{
 					murderer = &g_entities[murderer->client->ps.otherKiller];
 					if (!murderer->inuse || !murderer->client)
@@ -2404,7 +2404,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		}
 		else if (self->m_pVehicle->m_pPilot)
 		{
-			murderer = (gentity_t *)self->m_pVehicle->m_pPilot;
+			murderer = (gentity_t*)self->m_pVehicle->m_pPilot;
 			if (!murderer->inuse || !murderer->client)
 			{
 				murderer = NULL;
@@ -2417,24 +2417,24 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			murderer = self;
 		}
 
-		if ( self->m_pVehicle->m_pVehicleInfo->hideRider )
+		if (self->m_pVehicle->m_pVehicleInfo->hideRider)
 		{//pilot is *inside* me, so kill him, too
-			killEnt = (gentity_t *)self->m_pVehicle->m_pPilot;
+			killEnt = (gentity_t*)self->m_pVehicle->m_pPilot;
 			if (killEnt && killEnt->inuse && killEnt->client)
 			{
 				G_Damage(killEnt, murderer, murderer, NULL, killEnt->client->ps.origin, 99999, DAMAGE_NO_PROTECTION, MOD_BLASTER);
 			}
-			if ( self->m_pVehicle->m_pVehicleInfo )
+			if (self->m_pVehicle->m_pVehicleInfo)
 			{//FIXME: this wile got stuck in an endless loop, that's BAD!!  This method SUCKS (not initting "i", not incrementing it or using it directly, all sorts of badness), so I'm rewriting it
 				//while (i < self->m_pVehicle->m_iNumPassengers)
 				int numPass = self->m_pVehicle->m_iNumPassengers;
-				for ( i = 0; i < numPass && self->m_pVehicle->m_iNumPassengers; i++ )
+				for (i = 0; i < numPass && self->m_pVehicle->m_iNumPassengers; i++)
 				{//go through and eject the last passenger
-					killEnt = (gentity_t *)self->m_pVehicle->m_ppPassengers[self->m_pVehicle->m_iNumPassengers-1];
-					if ( killEnt )
+					killEnt = (gentity_t*)self->m_pVehicle->m_ppPassengers[self->m_pVehicle->m_iNumPassengers - 1];
+					if (killEnt)
 					{
-						self->m_pVehicle->m_pVehicleInfo->Eject(self->m_pVehicle, (bgEntity_t *)killEnt, qtrue);
-						if ( killEnt->inuse && killEnt->client )
+						self->m_pVehicle->m_pVehicleInfo->Eject(self->m_pVehicle, (bgEntity_t*)killEnt, qtrue);
+						if (killEnt->inuse && killEnt->client)
 						{
 							G_Damage(killEnt, murderer, murderer, NULL, killEnt->client->ps.origin, 99999, DAMAGE_NO_PROTECTION, MOD_BLASTER);
 						}
@@ -2442,7 +2442,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 				}
 			}
 		}
-		killEnt = (gentity_t *)self->m_pVehicle->m_pDroidUnit;
+		killEnt = (gentity_t*)self->m_pVehicle->m_pDroidUnit;
 		if (killEnt && killEnt->inuse && killEnt->client)
 		{
 			killEnt->flags &= ~FL_UNDYING;
@@ -2460,29 +2460,29 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	if (self->client->holdingObjectiveItem > 0)
 	{ //carrying a siege objective item - make sure it updates and removes itself from us now in case this is an instant death-respawn situation
-		gentity_t *objectiveItem = &g_entities[self->client->holdingObjectiveItem];
+		gentity_t* objectiveItem = &g_entities[self->client->holdingObjectiveItem];
 
 		if (objectiveItem->inuse && objectiveItem->think)
 		{
-            objectiveItem->think(objectiveItem);
+			objectiveItem->think(objectiveItem);
 		}
 	}
 
-	if ( (self->client->inSpaceIndex && self->client->inSpaceIndex != ENTITYNUM_NONE) ||
-		 (self->client->ps.eFlags2 & EF2_SHIP_DEATH) )
+	if ((self->client->inSpaceIndex && self->client->inSpaceIndex != ENTITYNUM_NONE) ||
+		(self->client->ps.eFlags2 & EF2_SHIP_DEATH))
 	{
 		self->client->noCorpse = qtrue;
 	}
 
-	if ( self->client->NPC_class != CLASS_VEHICLE
-		&& self->client->ps.m_iVehicleNum )
+	if (self->client->NPC_class != CLASS_VEHICLE
+		&& self->client->ps.m_iVehicleNum)
 	{ //I'm riding a vehicle
 		//tell it I'm getting off
-		gentity_t *veh = &g_entities[self->client->ps.m_iVehicleNum];
+		gentity_t* veh = &g_entities[self->client->ps.m_iVehicleNum];
 
 		if (veh->inuse && veh->client && veh->m_pVehicle)
 		{
-			veh->m_pVehicle->m_pVehicleInfo->Eject(veh->m_pVehicle, (bgEntity_t *)self, qtrue);
+			veh->m_pVehicle->m_pVehicleInfo->Eject(veh->m_pVehicle, (bgEntity_t*)self, qtrue);
 
 			if (veh->m_pVehicle->m_pVehicleInfo->type == VH_FIGHTER)
 			{ //go into "die in ship" mode with flag
@@ -2494,23 +2494,23 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			}
 		}
 		//droids throw heads if they haven't yet
-		switch(self->client->NPC_class)
+		switch (self->client->NPC_class)
 		{
 		case CLASS_R2D2:
-			if ( !trap->G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "head" ) )
+			if (!trap->G2API_GetSurfaceRenderStatus(self->ghoul2, 0, "head"))
 			{
 				vec3_t	up;
-				AngleVectors( self->r.currentAngles, NULL, NULL, up );
-				G_PlayEffectID( G_EffectIndex("chunks/r2d2head_veh"), self->r.currentOrigin, up );
+				AngleVectors(self->r.currentAngles, NULL, NULL, up);
+				G_PlayEffectID(G_EffectIndex("chunks/r2d2head_veh"), self->r.currentOrigin, up);
 			}
 			break;
 
 		case CLASS_R5D2:
-			if ( !trap->G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "head" ) )
+			if (!trap->G2API_GetSurfaceRenderStatus(self->ghoul2, 0, "head"))
 			{
 				vec3_t	up;
-				AngleVectors( self->r.currentAngles, NULL, NULL, up );
-				G_PlayEffectID( G_EffectIndex("chunks/r5d2head_veh"), self->r.currentOrigin, up );
+				AngleVectors(self->r.currentAngles, NULL, NULL, up);
+				G_PlayEffectID(G_EffectIndex("chunks/r5d2head_veh"), self->r.currentOrigin, up);
 			}
 			break;
 		default:
@@ -2518,23 +2518,23 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		}
 	}
 
-	if ( self->NPC )
+	if (self->NPC)
 	{
-		if ( self->client && Jedi_WaitingAmbush( self ) )
+		if (self->client && Jedi_WaitingAmbush(self))
 		{//ambushing trooper
 			self->client->noclip = qfalse;
 		}
-		NPC_FreeCombatPoint( self->NPC->combatPoint, qfalse );
-		if ( self->NPC->group )
+		NPC_FreeCombatPoint(self->NPC->combatPoint, qfalse);
+		if (self->NPC->group)
 		{
 			//lastInGroup = (self->NPC->group->numGroup < 2);
-			AI_GroupMemberKilled( self );
-			AI_DeleteSelfFromGroup( self );
+			AI_GroupMemberKilled(self);
+			AI_DeleteSelfFromGroup(self);
 		}
 
-		if ( self->NPC->tempGoal )
+		if (self->NPC->tempGoal)
 		{
-			G_FreeEntity( self->NPC->tempGoal );
+			G_FreeEntity(self->NPC->tempGoal);
 			self->NPC->tempGoal = NULL;
 		}
 		/*
@@ -2561,12 +2561,12 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			//self->owner = old;
 		}
 		*/
-		if ( self->client->NPC_class == CLASS_BOBAFETT && self->client->ps.eFlags2 & EF2_FLYING )
-			Boba_FlyStop( self );
-		if ( self->s.NPC_class == CLASS_RANCOR )
-			Rancor_DropVictim( self );
+		if (self->client->NPC_class == CLASS_BOBAFETT && self->client->ps.eFlags2 & EF2_FLYING)
+			Boba_FlyStop(self);
+		if (self->s.NPC_class == CLASS_RANCOR)
+			Rancor_DropVictim(self);
 	}
-	if ( attacker && attacker->NPC && attacker->NPC->group && attacker->NPC->group->enemy == self )
+	if (attacker && attacker->NPC && attacker->NPC->group && attacker->NPC->group->enemy == self)
 	{
 		attacker->NPC->group->enemy = NULL;
 	}
@@ -2590,7 +2590,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	}
 
 	//Use any target we had
-	G_UseTargets( self, self );
+	G_UseTargets(self, self);
 
 	if (g_slowmoDuelEnd.integer && (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) && attacker && attacker->inuse && attacker->client)
 	{
@@ -2614,7 +2614,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	self->client->ps.heldByClient = 0;
 	self->client->beingThrown = 0;
 	self->client->doingThrow = 0;
-	BG_ClearRocketLock( &self->client->ps );
+	BG_ClearRocketLock(&self->client->ps);
 	self->client->isHacking = 0;
 	self->client->ps.hackingTime = 0;
 
@@ -2634,8 +2634,8 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	G_MuteSound(self->s.number, CHAN_WEAPON);
 
 	//FIXME: this may not be enough
-	if ( level.gametype == GT_SIEGE && meansOfDeath == MOD_TEAM_CHANGE )
-		RemoveDetpacks( self );
+	if (level.gametype == GT_SIEGE && meansOfDeath == MOD_TEAM_CHANGE)
+		RemoveDetpacks(self);
 	else
 		BlowDetpacks(self); //blow detpacks if they're planted
 
@@ -2711,62 +2711,65 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	}
 
 	// check for an almost capture
-	CheckAlmostCapture( self, attacker );
+	CheckAlmostCapture(self, attacker);
 
 	self->client->ps.pm_type = PM_DEAD;
 	self->client->ps.pm_flags &= ~PMF_STUCK_TO_WALL;
 
-	if ( attacker ) {
+	if (attacker) {
 		killer = attacker->s.number;
-		if ( attacker->client ) {
+		if (attacker->client) {
 			killerName = attacker->client->pers.netname;
-		} else {
+		}
+		else {
 			killerName = "<non-client>";
 		}
-	} else {
+	}
+	else {
 		killer = ENTITYNUM_WORLD;
 		killerName = "<world>";
 	}
 
-	if ( killer < 0 || killer >= MAX_CLIENTS ) {
+	if (killer < 0 || killer >= MAX_CLIENTS) {
 		killer = ENTITYNUM_WORLD;
 		killerName = "<world>";
 	}
 
-	if ( meansOfDeath < 0 || meansOfDeath >= sizeof( modNames ) / sizeof( modNames[0] ) ) {
+	if (meansOfDeath < 0 || meansOfDeath >= sizeof(modNames) / sizeof(modNames[0])) {
 		obit = "<bad obituary>";
-	} else {
-		obit = modNames[ meansOfDeath ];
+	}
+	else {
+		obit = modNames[meansOfDeath];
 	}
 
 	// log the victim and attacker's names with the method of death
-	Com_sprintf( buf, sizeof( buf ), "Kill: %i %i %i: %s killed ", killer, self->s.number, meansOfDeath, killerName );
-	if ( self->s.eType == ET_NPC ) {
+	Com_sprintf(buf, sizeof(buf), "Kill: %i %i %i: %s killed ", killer, self->s.number, meansOfDeath, killerName);
+	if (self->s.eType == ET_NPC) {
 		// check for named NPCs
-		if ( self->targetname )
-			Q_strcat( buf, sizeof( buf ), va( "%s (%s) by %s\n", self->NPC_type, self->targetname, obit ) );
+		if (self->targetname)
+			Q_strcat(buf, sizeof(buf), va("%s (%s) by %s\n", self->NPC_type, self->targetname, obit));
 		else
-			Q_strcat( buf, sizeof( buf ), va( "%s by %s\n", self->NPC_type, obit ) );
+			Q_strcat(buf, sizeof(buf), va("%s by %s\n", self->NPC_type, obit));
 	}
 	else
-		Q_strcat( buf, sizeof( buf ), va( "%s by %s\n", self->client->pers.netname, obit ) );
-	G_LogPrintf( "%s", buf );
+		Q_strcat(buf, sizeof(buf), va("%s by %s\n", self->client->pers.netname, obit));
+	G_LogPrintf("%s", buf);
 
-	if ( g_austrian.integer
+	if (g_austrian.integer
 		&& level.gametype == GT_DUEL
-		&& level.numPlayingClients >= 2 )
+		&& level.numPlayingClients >= 2)
 	{
 		int spawnTime = (level.clients[level.sortedClients[0]].respawnTime > level.clients[level.sortedClients[1]].respawnTime) ? level.clients[level.sortedClients[0]].respawnTime : level.clients[level.sortedClients[1]].respawnTime;
 		G_LogPrintf("Duel Kill Details:\n");
-		G_LogPrintf("Kill Time: %d\n", level.time-spawnTime );
-		G_LogPrintf("victim: %s, hits on enemy %d\n", self->client->pers.netname, self->client->ps.persistant[PERS_HITS] );
-		if ( attacker && attacker->client )
+		G_LogPrintf("Kill Time: %d\n", level.time - spawnTime);
+		G_LogPrintf("victim: %s, hits on enemy %d\n", self->client->pers.netname, self->client->ps.persistant[PERS_HITS]);
+		if (attacker && attacker->client)
 		{
-			G_LogPrintf("killer: %s, hits on enemy %d, health: %d\n", attacker->client->pers.netname, attacker->client->ps.persistant[PERS_HITS], attacker->health );
+			G_LogPrintf("killer: %s, hits on enemy %d, health: %d\n", attacker->client->pers.netname, attacker->client->ps.persistant[PERS_HITS], attacker->health);
 			//also - if MOD_SABER, list the animation and saber style
-			if ( meansOfDeath == MOD_SABER )
+			if (meansOfDeath == MOD_SABER)
 			{
-				G_LogPrintf("killer saber style: %d, killer saber anim %s\n", attacker->client->ps.fd.saberAnimLevel, animTable[(attacker->client->ps.torsoAnim)].name );
+				G_LogPrintf("killer saber style: %d, killer saber anim %s\n", attacker->client->ps.fd.saberAnimLevel, animTable[(attacker->client->ps.torsoAnim)].name);
 			}
 		}
 	}
@@ -2781,7 +2784,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	// broadcast the death event to everyone
 	if (self->s.eType != ET_NPC && !g_noPDuelCheck)
 	{
-		ent = G_TempEntity( self->r.currentOrigin, EV_OBITUARY );
+		ent = G_TempEntity(self->r.currentOrigin, EV_OBITUARY);
 		ent->s.eventParm = meansOfDeath;
 		ent->s.otherEntityNum = self->s.number;
 		ent->s.otherEntityNum2 = killer;
@@ -2803,7 +2806,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 		G_CheckVictoryScript(attacker);
 
-		if ( attacker == self || OnSameTeam (self, attacker ) ) {
+		if (attacker == self || OnSameTeam(self, attacker)) {
 			if (level.gametype == GT_DUEL)
 			{ //in duel, if you kill yourself, the person you are dueling against gets a kill for it
 				int otherClNum = -1;
@@ -2820,16 +2823,16 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 					g_entities[otherClNum].inuse && g_entities[otherClNum].client &&
 					otherClNum != attacker->s.number)
 				{
-					AddScore( &g_entities[otherClNum], self->r.currentOrigin, 1 );
+					AddScore(&g_entities[otherClNum], self->r.currentOrigin, 1);
 				}
 				else
 				{
-					AddScore( attacker, self->r.currentOrigin, -1 );
+					AddScore(attacker, self->r.currentOrigin, -1);
 				}
 			}
 			else
 			{
-				AddScore( attacker, self->r.currentOrigin, -1 );
+				AddScore(attacker, self->r.currentOrigin, -1);
 			}
 			if (level.gametype == GT_JEDIMASTER)
 			{
@@ -2841,13 +2844,14 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 					self->client->ps.isJediMaster = qfalse;
 				}
 			}
-		} else {
+		}
+		else {
 			if (level.gametype == GT_JEDIMASTER)
 			{
 				if ((attacker->client && attacker->client->ps.isJediMaster) ||
 					(self->client && self->client->ps.isJediMaster))
 				{
-					AddScore( attacker, self->r.currentOrigin, 1 );
+					AddScore(attacker, self->r.currentOrigin, 1);
 
 					if (self->client && self->client->ps.isJediMaster)
 					{
@@ -2857,20 +2861,20 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				}
 				else
 				{
-					gentity_t *jmEnt = G_GetJediMaster();
+					gentity_t* jmEnt = G_GetJediMaster();
 
 					if (jmEnt && jmEnt->client)
 					{
-						AddScore( jmEnt, self->r.currentOrigin, 1 );
+						AddScore(jmEnt, self->r.currentOrigin, 1);
 					}
 				}
 			}
 			else
 			{
-				AddScore( attacker, self->r.currentOrigin, 1 );
+				AddScore(attacker, self->r.currentOrigin, 1);
 			}
 
-			if( meansOfDeath == MOD_STUN_BATON ) {
+			if (meansOfDeath == MOD_STUN_BATON) {
 
 				// play humiliation on player
 				attacker->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT]++;
@@ -2883,7 +2887,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 			// check for two kills in a short amount of time
 			// if this is close enough to the last kill, give a reward sound
-			if ( level.time - attacker->client->lastKillTime < CARNAGE_REWARD_TIME ) {
+			if (level.time - attacker->client->lastKillTime < CARNAGE_REWARD_TIME) {
 				// play excellent on player
 				attacker->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
 
@@ -2892,7 +2896,8 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			attacker->client->lastKillTime = level.time;
 
 		}
-	} else {
+	}
+	else {
 		if (self->client && self->client->ps.isJediMaster)
 		{ //killed ourself so return the saber to the original position
 		  //(to avoid people jumping off ledges and making the saber
@@ -2917,16 +2922,16 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				g_entities[otherClNum].inuse && g_entities[otherClNum].client &&
 				otherClNum != self->s.number)
 			{
-				AddScore( &g_entities[otherClNum], self->r.currentOrigin, 1 );
+				AddScore(&g_entities[otherClNum], self->r.currentOrigin, 1);
 			}
 			else
 			{
-				AddScore( self, self->r.currentOrigin, -1 );
+				AddScore(self, self->r.currentOrigin, -1);
 			}
 		}
 		else
 		{
-			AddScore( self, self->r.currentOrigin, -1 );
+			AddScore(self, self->r.currentOrigin, -1);
 		}
 	}
 
@@ -2935,61 +2940,61 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 	// if I committed suicide, the flag does not fall, it returns.
 	if (meansOfDeath == MOD_SUICIDE) {
-		if ( self->client->ps.powerups[PW_NEUTRALFLAG] ) {		// only happens in One Flag CTF
-			Team_ReturnFlag( TEAM_FREE );
+		if (self->client->ps.powerups[PW_NEUTRALFLAG]) {		// only happens in One Flag CTF
+			Team_ReturnFlag(TEAM_FREE);
 			self->client->ps.powerups[PW_NEUTRALFLAG] = 0;
 		}
-		else if ( self->client->ps.powerups[PW_REDFLAG] ) {		// only happens in standard CTF
-			Team_ReturnFlag( TEAM_RED );
+		else if (self->client->ps.powerups[PW_REDFLAG]) {		// only happens in standard CTF
+			Team_ReturnFlag(TEAM_RED);
 			self->client->ps.powerups[PW_REDFLAG] = 0;
 		}
-		else if ( self->client->ps.powerups[PW_BLUEFLAG] ) {	// only happens in standard CTF
-			Team_ReturnFlag( TEAM_BLUE );
+		else if (self->client->ps.powerups[PW_BLUEFLAG]) {	// only happens in standard CTF
+			Team_ReturnFlag(TEAM_BLUE);
 			self->client->ps.powerups[PW_BLUEFLAG] = 0;
 		}
 	}
 
-	if (!self->client->ps.fallingToDeath && (!self->NPC || self->client->NPC_class != CLASS_VEHICLE)) 
+	if (!self->client->ps.fallingToDeath && (!self->NPC || self->client->NPC_class != CLASS_VEHICLE))
 	{ // zyk: now npcs (that are not vehicles) also drop their weapons and powerups
-		TossClientItems( self );
+		TossClientItems(self);
 	}
 	else {
-		if ( self->client->ps.powerups[PW_NEUTRALFLAG] ) {		// only happens in One Flag CTF
-			Team_ReturnFlag( TEAM_FREE );
+		if (self->client->ps.powerups[PW_NEUTRALFLAG]) {		// only happens in One Flag CTF
+			Team_ReturnFlag(TEAM_FREE);
 			self->client->ps.powerups[PW_NEUTRALFLAG] = 0;
 		}
-		else if ( self->client->ps.powerups[PW_REDFLAG] ) {		// only happens in standard CTF
-			Team_ReturnFlag( TEAM_RED );
+		else if (self->client->ps.powerups[PW_REDFLAG]) {		// only happens in standard CTF
+			Team_ReturnFlag(TEAM_RED);
 			self->client->ps.powerups[PW_REDFLAG] = 0;
 		}
-		else if ( self->client->ps.powerups[PW_BLUEFLAG] ) {	// only happens in standard CTF
-			Team_ReturnFlag( TEAM_BLUE );
+		else if (self->client->ps.powerups[PW_BLUEFLAG]) {	// only happens in standard CTF
+			Team_ReturnFlag(TEAM_BLUE);
 			self->client->ps.powerups[PW_BLUEFLAG] = 0;
 		}
 	}
 
-	if ( MOD_TEAM_CHANGE == meansOfDeath )
+	if (MOD_TEAM_CHANGE == meansOfDeath)
 	{
 		// Give them back a point since they didn't really die.
-		AddScore( self, self->r.currentOrigin, 1 );
+		AddScore(self, self->r.currentOrigin, 1);
 	}
 	else
 	{
-		Cmd_Score_f( self );		// show scores
+		Cmd_Score_f(self);		// show scores
 	}
 
 	// send updated scores to any clients that are following this one,
 	// or they would get stale scoreboards
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		gclient_t *cl = &level.clients[i];
-		if ( cl->pers.connected != CON_CONNECTED ) {
+	for (i = 0; i < level.maxclients; i++) {
+		gclient_t* cl = &level.clients[i];
+		if (cl->pers.connected != CON_CONNECTED) {
 			continue;
 		}
-		if ( cl->sess.sessionTeam != TEAM_SPECTATOR ) {
+		if (cl->sess.sessionTeam != TEAM_SPECTATOR) {
 			continue;
 		}
-		if ( cl->sess.spectatorClient == self->s.number ) {
-			Cmd_Score_f( g_entities + i );
+		if (cl->sess.spectatorClient == self->s.number) {
+			Cmd_Score_f(g_entities + i);
 		}
 	}
 
@@ -3025,10 +3030,13 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	self->client->respawnTime = level.time + 1700;
 
 	// remove powerups
-	memset( self->client->ps.powerups, 0, sizeof(self->client->ps.powerups) );
+	memset(self->client->ps.powerups, 0, sizeof(self->client->ps.powerups));
 
-	self->client->ps.stats[STAT_HOLDABLE_ITEMS] = 0;
-	self->client->ps.stats[STAT_HOLDABLE_ITEM] = 0;
+	if (self->client->sess.amrpgmode < 2)
+	{ // zyk: RPG players must keep their inventory at respawn
+		self->client->ps.stats[STAT_HOLDABLE_ITEMS] = 0;
+		self->client->ps.stats[STAT_HOLDABLE_ITEM] = 0;
+	}
 
 	// NOTENOTE No gib deaths right now, this is star wars.
 	/*

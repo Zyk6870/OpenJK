@@ -55,7 +55,7 @@ const int seller_items_cost[MAX_SELLER_ITEMS][2] = {
 	{150, 80},
 	{140, 40},
 	{10, 5},
-	{100, 0},
+	{500, 0},
 	{90, 50},
 	{90, 45},
 	{90, 45},
@@ -2211,14 +2211,14 @@ void Cmd_FollowPrev_f( gentity_t *ent ) {
 void zyk_jetpack(gentity_t* ent)
 {
 	// zyk: player starts with jetpack if it is enabled in player settings, is not in Siege Mode, and does not have all force powers through /give command
-	if (((ent->client->sess.amrpgmode == 1 || (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_JETPACK] > 0)) && 
+	if ((ent->client->sess.amrpgmode == 1 && 
 		!(ent->client->pers.player_settings & (1 << SETTINGS_JETPACK))) && zyk_allow_jetpack_command.integer &&
 		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && 
 		level.gametype != GT_JEDIMASTER && !(ent->client->pers.player_statuses & (1 << 12)))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 	}
-	else
+	else if (ent->client->sess.amrpgmode < 2)
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_JETPACK);
 		if (ent->client->jetPackOn)
