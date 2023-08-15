@@ -113,8 +113,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_RAGE] = 4;
 	max_skill_levels[SKILL_TEAM_ENERGIZE] = 3;
 	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
-	max_skill_levels[SKILL_SHIELD_HEAL] = 3;
-	max_skill_levels[SKILL_TEAM_SHIELD_HEAL] = 3;
+	max_skill_levels[SKILL_SHIELD_HEALING] = 3;
 	max_skill_levels[SKILL_FASTER_FORCE_REGEN] = 2;
 	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
@@ -217,8 +216,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_RAGE] = "Rage";
 	skill_names[SKILL_TEAM_ENERGIZE] = "Team Energize";
 	skill_names[SKILL_SENSE_HEALTH] = "Sense Health";
-	skill_names[SKILL_SHIELD_HEAL] = "Shield Heal";
-	skill_names[SKILL_TEAM_SHIELD_HEAL] = "Team Shield Heal";
+	skill_names[SKILL_SHIELD_HEALING] = "Shield Healing";
 	skill_names[SKILL_FASTER_FORCE_REGEN] = "Faster Force Regen";
 	skill_names[SKILL_FORCE_POWER] = "Force Power";
 
@@ -375,10 +373,8 @@ char* zyk_skill_description(int skill_index)
 		return "restores some force power to players near you. Regens some blaster pack and power cell ammo of the target players";
 	if (skill_index == SKILL_SENSE_HEALTH)
 		return "allows you to see info about someone, including npcs. Level 1 shows current health. Level 2 shows name, health and shield. Level 3 shows name, health and max health, shield and max shield, force and max force, mp and max mp. To use it, when you are near a player or npc, use ^3Sense ^7force power";
-	if (skill_index == SKILL_SHIELD_HEAL)
-		return va("recovers 4 shield at level 1, 8 shield at level 2 and 12 shield at level 3. To use it, use Heal force power when you have full HP. This skill uses %d force power", zyk_max_force_power.integer / 2);
-	if (skill_index == SKILL_TEAM_SHIELD_HEAL)
-		return "recovers 3 shield at level 1, 6 shield at level 2 and 9 shield at level 3 to players near you. To use it, when near players, use Team Heal force power. It will heal their shield after they have full HP";
+	if (skill_index == SKILL_SHIELD_HEALING)
+		return va("Makes ^3Heal ^7restore some shield if your health is full by spending %d force. Makes ^3Team Heal ^7restore some shield to other players if their health is full", zyk_max_force_power.integer / 2);
 	if (skill_index == SKILL_FASTER_FORCE_REGEN)
 		return "increases how fast your force is recovered";
 	if (skill_index == SKILL_FORCE_POWER)

@@ -1182,12 +1182,15 @@ void ForceHeal( gentity_t *self )
 		return;
 	}
 
+	// zyk: Heal will have a cooldown time
+	self->client->ps.fd.forceHealTime = level.time + 500;
+
 	if ( self->health >= self->client->ps.stats[STAT_MAX_HEALTH])
 	{
 		// zyk: Shield Heal skill. Done when player has full HP
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_SHIELD_HEAL] > 0 && self->client->ps.fd.forcePower >= zyk_max_force_power.integer/2 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_SHIELD_HEALING] > 0 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
 		{
-			self->client->ps.stats[STAT_ARMOR] += 4 * self->client->pers.skill_levels[SKILL_SHIELD_HEAL];
+			self->client->ps.stats[STAT_ARMOR] += 4 * self->client->pers.skill_levels[SKILL_SHIELD_HEALING];
 
 			if (self->client->ps.stats[STAT_ARMOR] > self->client->pers.max_rpg_shield)
 				self->client->ps.stats[STAT_ARMOR] = self->client->pers.max_rpg_shield;
@@ -1252,9 +1255,6 @@ void ForceHeal( gentity_t *self )
 	}
 	*/
 	//NOTE: Decided to make all levels instant.
-
-	// zyk: Heal will have a cooldown time
-	self->client->ps.fd.forceHealTime = level.time + 500;
 
 	rpg_skill_counter(self, 100);
 
@@ -1338,7 +1338,7 @@ void ForceTeamHeal( gentity_t *self )
 			((!ent->NPC && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR) || 
 			 (ent->client->playerTeam != NPCTEAM_ENEMY && ent->s.NPC_class != CLASS_VEHICLE)) && 
 			 (ent->client->ps.stats[STAT_HEALTH] < ent->client->ps.stats[STAT_MAX_HEALTH] || 
-			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_TEAM_SHIELD_HEAL] > 0 &&
+			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_SHIELD_HEALING] > 0 &&
 			 !ent->NPC && ent->client->ps.stats[STAT_HEALTH] >= ent->client->ps.stats[STAT_MAX_HEALTH] && 
 			 ((ent->client->sess.amrpgmode < 2 && ent->client->ps.stats[STAT_ARMOR] < 100) || (ent->client->sess.amrpgmode == 2 && 
 			 ent->client->ps.stats[STAT_ARMOR] < max_shield)))) && ent->client->ps.stats[STAT_HEALTH] > 0 && ForcePowerUsableOn(self, ent, FP_TEAM_HEAL) &&
@@ -1390,11 +1390,11 @@ void ForceTeamHeal( gentity_t *self )
 				max_shield = g_entities[pl[i]].client->pers.max_rpg_shield;
 
 			// zyk: Team Shield Heal skill of RPG Mode
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_TEAM_SHIELD_HEAL] > 0 && 
+			if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_SHIELD_HEALING] > 0 &&
 				!g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.stats[STAT_HEALTH] >= g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH] && 
 				g_entities[pl[i]].client->ps.stats[STAT_ARMOR] < max_shield)
 			{ // zyk: can only be used on players with full health already
-				g_entities[pl[i]].client->ps.stats[STAT_ARMOR] += 3 * self->client->pers.skill_levels[SKILL_TEAM_SHIELD_HEAL];
+				g_entities[pl[i]].client->ps.stats[STAT_ARMOR] += 3 * self->client->pers.skill_levels[SKILL_SHIELD_HEALING];
 
 				if (g_entities[pl[i]].client->ps.stats[STAT_ARMOR] > max_shield)
 					g_entities[pl[i]].client->ps.stats[STAT_ARMOR] = max_shield;
