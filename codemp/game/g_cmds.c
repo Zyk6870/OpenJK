@@ -130,6 +130,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_ROCKET_LAUNCHER] = 2;
 	max_skill_levels[SKILL_CONCUSSION_RIFLE] = 2;
 	max_skill_levels[SKILL_BRYAR_PISTOL] = 2;
+	max_skill_levels[SKILL_MELEE_SPEED] = 3;
 	max_skill_levels[SKILL_MELEE] = 3;
 
 	max_skill_levels[SKILL_MAX_SHIELD] = 5;
@@ -233,6 +234,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_ROCKET_LAUNCHER] = "Rocket Launcher";
 	skill_names[SKILL_CONCUSSION_RIFLE] = "Concussion Rifle";
 	skill_names[SKILL_BRYAR_PISTOL] = "Bryar Pistol";
+	skill_names[SKILL_MELEE_SPEED] = "Melee Punch Speed";
 	skill_names[SKILL_MELEE] = "Melee";
 
 	skill_names[SKILL_MAX_SHIELD] = "Max Shield";
@@ -406,6 +408,8 @@ char* zyk_skill_description(int skill_index)
 		return va("it shoots a powerful shot that has a big damage area. Alt fire shoots a ray similar to disruptor shots, but it can go through force fields and can throw the enemy on the ground. Normal fire does %d damage and alt fire does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_concussion_damage.integer, zyk_concussion_alt_damage.integer);
 	if (skill_index == SKILL_BRYAR_PISTOL)
 		return va("very similar to the blaster pistol, but this one has a better fire rate with normal shot. Does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_blaster_pistol_damage.integer);
+	if (skill_index == SKILL_MELEE_SPEED)
+		return "Each level increases how fast you can punch with Melee";
 	if (skill_index == SKILL_MELEE)
 		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	

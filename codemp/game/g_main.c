@@ -9214,6 +9214,13 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime / 2;
 				}
 
+				// zyk: Melee Punch Speed skill
+				if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[SKILL_MELEE_SPEED] > 0 && 
+					ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * (1.0 - (0.2 * ent->client->pers.skill_levels[SKILL_MELEE_SPEED]))))
+				{
+					ent->client->ps.weaponTime = (weaponData[WP_MELEE].fireTime * (1.0 - (0.2 * ent->client->pers.skill_levels[SKILL_MELEE_SPEED])));
+				}
+
 				if (ent->client->pers.flame_thrower > level.time && ent->client->cloakDebReduce < level.time)
 				{ // zyk: fires the flame thrower
 					Player_FireFlameThrower(ent, qfalse);
