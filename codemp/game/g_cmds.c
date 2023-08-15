@@ -120,6 +120,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
 	max_skill_levels[SKILL_STUN_BATON] = 2;
+	max_skill_levels[SKILL_SABER] = 1;
 	max_skill_levels[SKILL_BLASTER_PISTOL] = 2;
 	max_skill_levels[SKILL_E11_BLASTER_RIFLE] = 2;
 	max_skill_levels[SKILL_DISRUPTOR] = 2;
@@ -221,6 +222,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_FORCE_POWER] = "Force Power";
 
 	skill_names[SKILL_STUN_BATON] = "Stun Baton";
+	skill_names[SKILL_SABER] = "Saber Damage";
 	skill_names[SKILL_BLASTER_PISTOL] = "Blaster Pistol";
 	skill_names[SKILL_E11_BLASTER_RIFLE] = "E11 Blaster Rifle";
 	skill_names[SKILL_DISRUPTOR] = "Disruptor";
@@ -382,6 +384,8 @@ char* zyk_skill_description(int skill_index)
 
 	if (skill_index == SKILL_STUN_BATON)
 		return va("attacks someone with a small electric charge. Has %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level. Can fire the flame thrower when using alternate fire. With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
+	if (skill_index == SKILL_SABER)
+		return "increases Saber damage based on your current level";
 	if (skill_index == SKILL_BLASTER_PISTOL)
 		return va("the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_blaster_pistol_damage.integer);
 	if (skill_index == SKILL_E11_BLASTER_RIFLE)
