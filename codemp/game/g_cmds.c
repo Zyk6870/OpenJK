@@ -4630,7 +4630,7 @@ void set_max_shield(gentity_t *ent)
 // zyk: sets the Max Weight of stuff the player can carry
 void set_max_weight(gentity_t* ent)
 {
-	ent->client->pers.max_weight = 200 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 80);
+	ent->client->pers.max_weight = 200 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 100);
 }
 
 // zyk: gives credits to the player
