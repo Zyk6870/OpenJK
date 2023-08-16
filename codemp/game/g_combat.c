@@ -4995,6 +4995,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 		}
 
+		if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
+		{ // zyk: Impact Reducer Armor
+			bonus_resistance += 0.05;
+		}
+
 		if (bonus_resistance >= 1.00)
 		{ // zyk: cannot make player fully absorb all damage
 			damage = 1;
@@ -5226,8 +5231,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	{
 		int new_knockback = knockback;
 
-		if (targ->client->pers.rpg_upgrades & (1 << UPGRADE_IMPACT_REDUCER))
+		if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
+		{
 			new_knockback -= knockback * 0.8;
+		}
 
 		knockback = new_knockback;
 	}
