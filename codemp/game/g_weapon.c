@@ -3785,7 +3785,7 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 
 	// zyk: starts flame thrower
 	if (ent->client && ent->client->sess.amrpgmode == 2 && alt_fire == qtrue && 
-		ent->client->pers.rpg_upgrades & (1 << UPGRADE_FLAME_THROWER) && ent->client->ps.cloakFuel > 0 && ent->waterlevel < 3)
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0 && ent->client->ps.cloakFuel > 0 && ent->waterlevel < 3)
 	{ // zyk: do not use flame thrower when underwater
 		int flame_thrower_fuel_usage = 2;
 

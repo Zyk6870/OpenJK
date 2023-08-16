@@ -246,7 +246,6 @@ char* zyk_skill_name(int skill_index)
 char* zyk_get_upgrade_name(zyk_upgrade_t upgrade_flag)
 {
 	char rpg_upgrade_names[MAX_RPG_UPGRAGES][32] = {
-		"Flame Thrower",
 		"Blaster Pack Upgrade",
 		"Powercell Upgrade",
 		"Metal Bolts Upgrade",
@@ -6441,7 +6440,7 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][1] = 1000;
 
 	seller_items_cost[SELLER_FLAME_THROWER][0] = 1000;
-	seller_items_cost[SELLER_FLAME_THROWER][1] = 0;
+	seller_items_cost[SELLER_FLAME_THROWER][1] = 700;
 
 	seller_items_cost[SELLER_BLASTER_PACK_UPGRADE][0] = 1800;
 	seller_items_cost[SELLER_BLASTER_PACK_UPGRADE][1] = 0;
@@ -6907,11 +6906,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_GUNNER_RADAR)));
 		return;
 	}
-	else if (value == (SELLER_FLAME_THROWER + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_FLAME_THROWER))
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_FLAME_THROWER)));
-		return;
-	}
 	else if (value == (SELLER_POWERCELL_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_POWERCELL)));
@@ -6960,6 +6954,11 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_IMPACT_REDUCER_ARMOR)));
+		return;
+	}
+	else if (value == (SELLER_FLAME_THROWER + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_FLAME_THROWER)));
 		return;
 	}
 	else if (value == (SELLER_GUNNER_ITEMS_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
@@ -7065,10 +7064,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 				ent->client->ps.powerups[PW_YSALAMIRI] = level.time + 60000;
 			else
 				ent->client->ps.powerups[PW_YSALAMIRI] += 60000;
-		}
-		else if (value == (SELLER_FLAME_THROWER + 1))
-		{
-			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_FLAME_THROWER);
 		}
 		else if (value == (SELLER_E11_BLASTER + 1))
 		{
@@ -7259,6 +7254,10 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1))
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR);
+		}
+		else if (value == (SELLER_FLAME_THROWER + 1))
+		{
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_FLAME_THROWER);
 		}
 		else if (value == (SELLER_ENERGY_MODULATOR + 1))
 		{
@@ -7546,6 +7545,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR);
+		sold = 1;
+	}
+	else if (value == (SELLER_FLAME_THROWER + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_FLAME_THROWER);
 		sold = 1;
 	}
 
