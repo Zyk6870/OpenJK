@@ -7795,6 +7795,9 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 300;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] = 20;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
@@ -9212,7 +9215,14 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.weaponTime = (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4;
 				}
 
-				if (ent->client->ps.weapon == WP_BRYAR_OLD && ent->client->pers.rpg_upgrades & (1 << UPGRADE_BLASTER_PACK) && ent->client->ps.weaponTime > (weaponData[WP_BRYAR_OLD].fireTime * 0.6))
+				if (ent->client->ps.weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
+					ent->client->ps.weaponTime > (weaponData[WP_BRYAR_PISTOL].fireTime * 0.6))
+				{
+					ent->client->ps.weaponTime = weaponData[WP_BRYAR_PISTOL].fireTime * 0.6;
+				}
+
+				if (ent->client->ps.weapon == WP_BRYAR_OLD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0 &&
+					ent->client->ps.weaponTime > (weaponData[WP_BRYAR_OLD].fireTime * 0.6))
 				{
 					ent->client->ps.weaponTime = weaponData[WP_BRYAR_OLD].fireTime * 0.6;
 				}

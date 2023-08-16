@@ -498,7 +498,7 @@ static void WP_FireBlaster( gentity_t *ent, qboolean altFire )
 	if ( altFire )
 	{
 		// add some slop to the alt-fire direction
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_BLASTER_PACK))
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0)
 		{ // zyk: Blaster Pack Upgrade improves accuracy
 			angs[PITCH] += Q_flrand(-1.0f, 1.0f) * (BLASTER_SPREAD/2.0);
 			angs[YAW]       += Q_flrand(-1.0f, 1.0f) * (BLASTER_SPREAD/2.0);
