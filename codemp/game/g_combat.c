@@ -4997,7 +4997,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
 		{ // zyk: Impact Reducer Armor
-			bonus_resistance += 0.05;
+			bonus_resistance += 0.15;
 		}
 
 		if (bonus_resistance >= 1.00)

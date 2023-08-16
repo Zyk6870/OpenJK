@@ -7792,7 +7792,7 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 7;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 80;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 300;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{

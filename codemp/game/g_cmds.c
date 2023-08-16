@@ -6777,7 +6777,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_IMPACT_REDUCER_ARMOR)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage by 5 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage by 15 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_FLAME_THROWER)
 		{
