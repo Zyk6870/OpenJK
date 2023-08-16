@@ -46,7 +46,7 @@ const int seller_items_cost[MAX_SELLER_ITEMS][2] = {
 	{25, 14},
 	{30, 18},
 	{300, 0},
-	{200, 0},
+	{20, 0},
 	{100, 0},
 	{150, 50},
 	{170, 70},
@@ -69,7 +69,7 @@ const int seller_items_cost[MAX_SELLER_ITEMS][2] = {
 	{200, 100},
 	{20, 10},
 	{200, 100},
-	{200, 0},
+	{20, 0},
 	{200, 50},
 	{100, 0},
 	{2000, 0},
@@ -5429,6 +5429,11 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 
 	if (ent->client->sess.amrpgmode == 2)
 	{
+		// zyk: in RPG Mode, player must actually buy these
+		ent->client->ps.jetpackFuel = 0;
+		ent->client->ps.cloakFuel = 0;
+		ent->client->pers.jetpack_fuel = 0;
+
 		initialize_rpg_skills(ent, qtrue);
 	}
 	else
@@ -6106,6 +6111,8 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_ITEM_FORCE_FIELD] = "Force Field";
 	inventory_item_names[RPG_INVENTORY_ITEM_CLOAK] = "Cloak Item";
 	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "Jetpack";
+	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "Jetpack Fuel";
+	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "Flame Thrower Fuel";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -6984,12 +6991,12 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == (SELLER_FLAME_FUEL + 1))
 		{
-			ent->client->ps.cloakFuel = 100;
+			ent->client->ps.cloakFuel += 10;
 		}
 		else if (value == (SELLER_JETPACK_FUEL + 1))
 		{
-			ent->client->pers.jetpack_fuel = MAX_JETPACK_FUEL;
-			ent->client->ps.jetpackFuel = 100;
+			ent->client->pers.jetpack_fuel += (10 * JETPACK_SCALE);
+			ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel / JETPACK_SCALE;
 		}
 		else if (value == (SELLER_STUN_BATON + 1))
 		{

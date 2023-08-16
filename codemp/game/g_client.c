@@ -3474,9 +3474,17 @@ void ClientSpawn(gentity_t *ent) {
 		wDisable = g_weaponDisable.integer;
 	}
 
-	//spawn with 100
-	client->ps.jetpackFuel = 100;
-	client->ps.cloakFuel = 100;
+	// zyk: in RPG Mode, it will not reset the fuel
+	if (client->sess.amrpgmode < 2)
+	{
+		//spawn with 100
+		client->ps.jetpackFuel = 100;
+		client->ps.cloakFuel = 100;
+
+		client->pers.jetpack_fuel = MAX_JETPACK_FUEL;
+	}
+
+	client->jetPackToggleTime = level.time;
 
 	if ( level.gametype != GT_HOLOCRON
 		&& level.gametype != GT_JEDIMASTER
@@ -3827,12 +3835,11 @@ void ClientSpawn(gentity_t *ent) {
 	G_SetOrigin( ent, spawn_origin );
 	VectorCopy( spawn_origin, client->ps.origin );
 
-	// zyk: initializing mind control attributes on spawn time
 	// zyk: loading default value of race_position
 	ent->client->pers.race_position = 0;
 
 	// zyk: initializing flame thrower timer
-	ent->client->pers.flame_thrower = 0;
+	ent->client->pers.flame_thrower_timer = 0;
 
 	// zyk: reset the Fire Bolt hits
 	client->pers.fire_bolt_hits_counter = 0;
@@ -3842,10 +3849,6 @@ void ClientSpawn(gentity_t *ent) {
 
 	// zyk: No Attack ability timer
 	ent->client->pers.no_attack_timer = 0;
-
-	// zyk: now we use this attribute as the real fuel and then scale and set it to the jetpackFuel above
-	client->pers.jetpack_fuel = MAX_JETPACK_FUEL;
-	client->jetPackToggleTime = level.time;
 
 	// zyk: if player is logged at spawn, load his skills
 	if (ent->client->sess.amrpgmode == 2)

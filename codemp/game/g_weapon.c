@@ -3796,7 +3796,7 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 
 		G_Sound( ent, CHAN_WEAPON, G_SoundIndex("sound/effects/fireout.mp3") );
 
-		ent->client->pers.flame_thrower = level.time + 1500;
+		ent->client->pers.flame_thrower_timer = level.time + 1500;
 
 		ent->client->ps.cloakFuel -= flame_thrower_fuel_usage;
 	}

@@ -5104,7 +5104,7 @@ void flame_burst(gentity_t *ent, int duration)
 		duration += 3000;
 	}
 
-	ent->client->pers.flame_thrower = level.time + duration;
+	ent->client->pers.flame_thrower_timer = level.time + duration;
 	ent->client->pers.quest_power_status |= (1 << 12);
 }
 
@@ -6100,10 +6100,10 @@ void Player_FireFlameThrower( gentity_t *self, qboolean is_magic)
 	dir[2] = self->client->ps.viewangles[2];
 	dir[1] = (-1) * (180 - self->client->ps.viewangles[1]);
 
-	if ((self->client->pers.flame_thrower - level.time) > 500)
+	if ((self->client->pers.flame_thrower_timer - level.time) > 500)
 		G_PlayEffectID( G_EffectIndex("boba/fthrw"), origin, dir);
 
-	if ((self->client->pers.flame_thrower - level.time) > 1250)
+	if ((self->client->pers.flame_thrower_timer - level.time) > 1250)
 		G_Sound( self, CHAN_WEAPON, G_SoundIndex("sound/effects/fire_lp") );
 
 	//Check for a direct usage on NPCs first
@@ -6486,7 +6486,7 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << 12))
 			{ // zyk: Flame Burst
-				if (ent->client->pers.flame_thrower < level.time)
+				if (ent->client->pers.flame_thrower_timer < level.time)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 12);
 				}
@@ -7787,6 +7787,8 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_FORCE_FIELD] = 9;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_CLOAK] = 7;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 30;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_JETPACK_FUEL] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = 1;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
@@ -9221,7 +9223,7 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.weaponTime = (weaponData[WP_MELEE].fireTime * (1.0 - (0.2 * ent->client->pers.skill_levels[SKILL_MELEE_SPEED])));
 				}
 
-				if (ent->client->pers.flame_thrower > level.time && ent->client->cloakDebReduce < level.time)
+				if (ent->client->pers.flame_thrower_timer > level.time && ent->client->cloakDebReduce < level.time)
 				{ // zyk: fires the flame thrower
 					Player_FireFlameThrower(ent, qfalse);
 				}
@@ -9266,6 +9268,20 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS] != ent->client->ps.ammo[AMMO_DETPACK])
 				{
 					ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS] = ent->client->ps.ammo[AMMO_DETPACK];
+					ent->client->pers.rpg_inventory_modified = qtrue;
+				}
+
+				// zyk: Jetpack Fuel changed. Update inventory
+				if (ent->client->ps.jetpackFuel != ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL])
+				{
+					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL] = ent->client->ps.jetpackFuel;
+					ent->client->pers.rpg_inventory_modified = qtrue;
+				}
+
+				// zyk: Flame Thrower Fuel changed. Update inventory
+				if (ent->client->ps.cloakFuel != ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL])
+				{
+					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = ent->client->ps.cloakFuel;
 					ent->client->pers.rpg_inventory_modified = qtrue;
 				}
 

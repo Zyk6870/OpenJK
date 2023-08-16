@@ -803,6 +803,8 @@ typedef enum {
 	RPG_INVENTORY_ITEM_FORCE_FIELD,
 	RPG_INVENTORY_ITEM_CLOAK,
 	RPG_INVENTORY_ITEM_JETPACK,
+	RPG_INVENTORY_MISC_JETPACK_FUEL,
+	RPG_INVENTORY_MISC_FLAME_THROWER_FUEL,
 	MAX_RPG_INVENTORY_ITEMS
 } zyk_inventory_t;
 
@@ -994,7 +996,7 @@ typedef struct clientPersistant_s {
 
 	int sense_health_timer; // zyk: used to periodically show health of player or npc with Sense Health skill
 
-	int flame_thrower; // zyk: used by stun baton. Its the flame thrower timer
+	int flame_thrower_timer; // zyk: used by stun baton. Its the flame thrower timer
 
 	// zyk: Upgrades bought from the seller
 	int rpg_upgrades;
