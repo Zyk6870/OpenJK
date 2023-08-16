@@ -8765,6 +8765,37 @@ void Cmd_Jetpack_f( gentity_t *ent ) {
 	{
 		if (ent->client->jetPackOn)
 			Jetpack_Off(ent);
+
+		// zyk: player in RPG Mode drops his jetpack
+		if (ent->client->sess.amrpgmode == 2 && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK))
+		{
+			vec3_t vel;
+			gitem_t* item = NULL;
+			gentity_t* launched = NULL;
+			vec3_t uorg, vecnorm, thispush_org;
+
+			VectorCopy(ent->client->ps.origin, thispush_org);
+
+			VectorCopy(ent->client->ps.origin, uorg);
+			uorg[2] += 64;
+
+			VectorSubtract(uorg, thispush_org, vecnorm);
+			VectorNormalize(vecnorm);
+
+			// zyk: velocity with which the item will be tossed
+			vel[0] = vecnorm[0] * 500;
+			vel[1] = vecnorm[1] * 500;
+			vel[2] = vecnorm[2] * 500;
+
+			item = BG_FindItemForHoldable(HI_JETPACK);
+
+			launched = LaunchItem(item, ent->client->ps.origin, vel);
+
+			// zyk: this player cannot get this item for 1 second
+			launched->genericValue10 = level.time + 1000;
+			launched->genericValue11 = ent->s.number;
+		}
+
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_JETPACK);
 	}
 }
