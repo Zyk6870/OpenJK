@@ -1213,8 +1213,8 @@ static void WP_FireRepeater( gentity_t *ent, qboolean altFire )
 	else
 	{
 		// add some slop to the alt-fire direction
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS))
-		{ // zyk: with Metal Bolts Weapons Upgrade, repeater will be more accurate
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0)
+		{ // zyk: with Repeater Upgrade, repeater will be more accurate
 			angs[PITCH] += Q_flrand(-1.0f, 1.0f) * (REPEATER_SPREAD/2);
 			angs[YAW]	+= Q_flrand(-1.0f, 1.0f) * (REPEATER_SPREAD/2);
 		}
@@ -1722,8 +1722,8 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 	int zyk_number_of_shots = FLECHETTE_SHOTS;
 	int damage = zyk_flechette_damage.integer;
 
-	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS))
-	{ // zyk: Metal Bolts Weapons Upgrade makes flechette have more shots
+	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0)
+	{ // zyk: Flechette Upgrade makes flechette have more shots
 		zyk_number_of_shots += 2;
 	}
 

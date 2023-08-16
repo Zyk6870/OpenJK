@@ -7801,6 +7801,9 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DISRUPTOR] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BOWCASTER] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEMP2] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_REPEATER] = 25;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLECHETTE] = 25;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CONCUSSION] = 30;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
@@ -9237,9 +9240,10 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.weaponTime = weaponData[WP_BRYAR_OLD].fireTime * 0.6;
 				}
 
-				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS) && ent->client->ps.weaponTime > weaponData[WP_REPEATER].altFireTime / 2)
+				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0 && 
+					ent->client->ps.weaponTime > (weaponData[WP_REPEATER].altFireTime * 0.5))
 				{
-					ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime / 2;
+					ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime * 0.5;
 				}
 
 				// zyk: Melee Punch Speed skill

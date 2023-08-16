@@ -4691,7 +4691,7 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 			return qtrue;
 		}
 	
-		if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && attacker->client->pers.rpg_upgrades & (1 << UPGRADE_METAL_BOLTS))
+		if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0)
 		{
 			return qtrue;
 		}
