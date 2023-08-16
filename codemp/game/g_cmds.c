@@ -7529,17 +7529,17 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		ent->client->ps.powerups[PW_FORCE_BOON] = 0;
 		sold = 1;
 	}
-	else if (value == (SELLER_BACTA_UPGRADE + 1))
+	else if (value == (SELLER_BACTA_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_BACTA);
 		sold = 1;
 	}
-	else if (value == (SELLER_FORCE_FIELD_UPGRADE + 1))
+	else if (value == (SELLER_FORCE_FIELD_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_FORCE_FIELD);
 		sold = 1;
 	}
-	else if (value == (SELLER_CLOAK_UPGRADE + 1))
+	else if (value == (SELLER_CLOAK_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_CLOAK);
 		sold = 1;
