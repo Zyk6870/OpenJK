@@ -4820,33 +4820,37 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	}
 
 	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
-	{
+	{ // zyk: bonus damage for RPG players
 		if (mod == MOD_SABER)
 		{ 
+			float bonus_saber_damage_factor = 1.00;
+
 			if (attacker->client->saber[0].saberFlags&SFL_TWO_HANDED || (attacker->client->saber[0].model[0] && attacker->client->saber[1].model[0]))
 			{ // zyk: player in RPG mode, with duals or staff, has a better damage depending on Saber Attack level
 				if (attacker->client->pers.skill_levels[SKILL_SABER_ATTACK] <= FORCE_LEVEL_1)
 				{
-					damage = (int)ceil(damage*0.2);
+					bonus_saber_damage_factor = 0.20;
 				}
 				else if (attacker->client->pers.skill_levels[SKILL_SABER_ATTACK] == FORCE_LEVEL_2)
 				{
-					damage = (int)ceil(damage*0.4);
+					bonus_saber_damage_factor = 0.40;
 				}
 				else if (attacker->client->pers.skill_levels[SKILL_SABER_ATTACK] == FORCE_LEVEL_3)
 				{
-					damage = (int)ceil(damage*0.6);
+					bonus_saber_damage_factor = 0.60;
 				}
 				else if (attacker->client->pers.skill_levels[SKILL_SABER_ATTACK] == FORCE_LEVEL_4)
 				{
-					damage = (int)ceil(damage*0.8);
+					bonus_saber_damage_factor = 0.80;
 				}
 			}
 
 			if (attacker->client->pers.skill_levels[SKILL_SABER] > 0)
 			{ // zyk: Saber Damage skill, increases damage based on current RPG level
-				damage = (int)ceil(damage * (1.0 + (0.005 * attacker->client->pers.level)));
+				bonus_saber_damage_factor += (0.005 * attacker->client->pers.level);
 			}
+
+			damage = (int)ceil(damage * bonus_saber_damage_factor);
 		}
 		else if (mod == MOD_MELEE)
 		{ // zyk: setting melee damage in RPG Mode
