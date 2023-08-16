@@ -4686,7 +4686,7 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 	{
 		if ((mod == MOD_ROCKET || mod == MOD_ROCKET_HOMING || mod == MOD_ROCKET_SPLASH || mod == MOD_ROCKET_HOMING_SPLASH) && 
-			attacker->client->pers.rpg_upgrades & (1 << UPGRADE_ROCKETS))
+			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0)
 		{
 			return qtrue;
 		}
@@ -4701,7 +4701,7 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 			return qtrue;
 		}
 
-		if (mod == MOD_DET_PACK_SPLASH && attacker->client->pers.rpg_upgrades & (1 << UPGRADE_ROCKETS))
+		if (mod == MOD_DET_PACK_SPLASH && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DETPACKS] > 0)
 		{ // zyk: detpacks
 			return qtrue;
 		}

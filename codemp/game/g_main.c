@@ -7804,6 +7804,8 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_REPEATER] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLECHETTE] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CONCUSSION] = 30;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DETPACKS] = 10;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
