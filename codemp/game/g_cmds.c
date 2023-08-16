@@ -36,59 +36,6 @@ void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *sab
 void Cmd_NPC_f( gentity_t *ent );
 void SetTeamQuick(gentity_t *ent, int team, qboolean doBegin);
 
-// zyk: costs to buy or sell for each seller item
-const int seller_items_cost[MAX_SELLER_ITEMS][2] = {
-	{10, 5},
-	{12, 7},
-	{15, 10},
-	{20, 12},
-	{22, 12},
-	{25, 14},
-	{30, 18},
-	{300, 0},
-	{20, 0},
-	{100, 0},
-	{150, 50},
-	{170, 70},
-	{180, 80},
-	{220, 100},
-	{150, 80},
-	{140, 40},
-	{10, 5},
-	{500, 0},
-	{90, 50},
-	{90, 45},
-	{90, 45},
-	{100, 50},
-	{120, 60},
-	{110, 50},
-	{150, 90},
-	{150, 80},
-	{170, 90},
-	{300, 150},
-	{200, 100},
-	{20, 10},
-	{200, 100},
-	{20, 0},
-	{200, 50},
-	{100, 0},
-	{2000, 0},
-	{2000, 0},
-	{3000, 0},
-	{3000, 0},
-	{3000, 0},
-	{1800, 0},
-	{2000, 0},
-	{2200, 0},
-	{2500, 0},
-	{1700, 0},
-	{8000, 0},
-	{4000, 0},
-	{3500, 0},
-	{3000, 0},
-	{7000, 0}
-};
-
 // zyk: returns the max level of a RPG skill
 int zyk_max_skill_level(int skill_index)
 {
@@ -6362,62 +6309,227 @@ void Cmd_CallSeller_f( gentity_t *ent ) {
 	}
 }
 
+int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
+{
+	// zyk: costs to buy or sell for each seller item
+	int seller_items_cost[MAX_SELLER_ITEMS][2];
+
+	seller_items_cost[SELLER_BLASTER_PACK][0] = 10;
+	seller_items_cost[SELLER_BLASTER_PACK][1] = 5;
+
+	seller_items_cost[SELLER_POWERCELL][0] = 12;
+	seller_items_cost[SELLER_POWERCELL][1] = 7;
+
+	seller_items_cost[SELLER_METAL_BOLTS][0] = 15;
+	seller_items_cost[SELLER_METAL_BOLTS][1] = 10;
+
+	seller_items_cost[SELLER_ROCKETS][0] = 20;
+	seller_items_cost[SELLER_ROCKETS][1] = 12;
+
+	seller_items_cost[SELLER_THERMALS][0] = 22;
+	seller_items_cost[SELLER_THERMALS][1] = 12;
+
+	seller_items_cost[SELLER_TRIPMINES][0] = 25;
+	seller_items_cost[SELLER_TRIPMINES][1] = 14;
+
+	seller_items_cost[SELLER_DETPACKS][0] = 30;
+	seller_items_cost[SELLER_DETPACKS][1] = 18;
+
+	seller_items_cost[SELLER_AMMO_ALL][0] = 300;
+	seller_items_cost[SELLER_AMMO_ALL][1] = 0;
+
+	seller_items_cost[SELLER_FLAME_FUEL][0] = 20;
+	seller_items_cost[SELLER_FLAME_FUEL][1] = 0;
+
+	seller_items_cost[SELLER_SHIELD_BOOSTER][0] = 50;
+	seller_items_cost[SELLER_SHIELD_BOOSTER][1] = 0;
+
+	seller_items_cost[SELLER_SENTRY_GUN][0] = 120;
+	seller_items_cost[SELLER_SENTRY_GUN][1] = 50;
+
+	seller_items_cost[SELLER_SEEKER_DRONE][0] = 140;
+	seller_items_cost[SELLER_SEEKER_DRONE][1] = 60;
+
+	seller_items_cost[SELLER_BACTA_CANISTER][0] = 150;
+	seller_items_cost[SELLER_BACTA_CANISTER][1] = 80;
+
+	seller_items_cost[SELLER_FORCE_FIELD][0] = 200;
+	seller_items_cost[SELLER_FORCE_FIELD][1] = 100;
+
+	seller_items_cost[SELLER_BIG_BACTA][0] = 300;
+	seller_items_cost[SELLER_BIG_BACTA][1] = 180;
+
+	seller_items_cost[SELLER_EWEB][0] = 140;
+	seller_items_cost[SELLER_EWEB][1] = 40;
+
+	seller_items_cost[SELLER_BINOCULARS][0] = 10;
+	seller_items_cost[SELLER_BINOCULARS][1] = 5;
+
+	seller_items_cost[SELLER_JETPACK][0] = 500;
+	seller_items_cost[SELLER_JETPACK][1] = 0;
+
+	seller_items_cost[SELLER_CLOAK_ITEM][0] = 90;
+	seller_items_cost[SELLER_CLOAK_ITEM][1] = 50;
+
+	seller_items_cost[SELLER_BLASTER_PISTOL][0] = 90;
+	seller_items_cost[SELLER_BLASTER_PISTOL][1] = 45;
+
+	seller_items_cost[SELLER_BRYAR_PISTOL][0] = 90;
+	seller_items_cost[SELLER_BRYAR_PISTOL][1] = 45;
+
+	seller_items_cost[SELLER_E11_BLASTER][0] = 100;
+	seller_items_cost[SELLER_E11_BLASTER][1] = 50;
+
+	seller_items_cost[SELLER_DISRUPTOR][0] = 120;
+	seller_items_cost[SELLER_DISRUPTOR][1] = 60;
+
+	seller_items_cost[SELLER_BOWCASTER][0] = 110;
+	seller_items_cost[SELLER_BOWCASTER][1] = 55;
+
+	seller_items_cost[SELLER_DEMP2][0] = 150;
+	seller_items_cost[SELLER_DEMP2][1] = 80;
+
+	seller_items_cost[SELLER_REPEATER][0] = 150;
+	seller_items_cost[SELLER_REPEATER][1] = 80;
+
+	seller_items_cost[SELLER_FLECHETTE][0] = 170;
+	seller_items_cost[SELLER_FLECHETTE][1] = 90;
+
+	seller_items_cost[SELLER_CONCUSSION][0] = 300;
+	seller_items_cost[SELLER_CONCUSSION][1] = 180;
+
+	seller_items_cost[SELLER_ROCKET_LAUNCHER][0] = 250;
+	seller_items_cost[SELLER_ROCKET_LAUNCHER][1] = 120;
+
+	seller_items_cost[SELLER_STUN_BATON][0] = 20;
+	seller_items_cost[SELLER_STUN_BATON][1] = 10;
+
+	seller_items_cost[SELLER_YSALAMIRI][0] = 200;
+	seller_items_cost[SELLER_YSALAMIRI][1] = 100;
+
+	seller_items_cost[SELLER_JETPACK_FUEL][0] = 20;
+	seller_items_cost[SELLER_JETPACK_FUEL][1] = 0;
+
+	seller_items_cost[SELLER_FORCE_BOON][0] = 200;
+	seller_items_cost[SELLER_FORCE_BOON][1] = 100;
+
+	seller_items_cost[SELLER_MAGIC_POTION][0] = 100;
+	seller_items_cost[SELLER_MAGIC_POTION][1] = 0;
+
+	seller_items_cost[SELLER_HEALING_CRYSTAL][0] = 2000;
+	seller_items_cost[SELLER_HEALING_CRYSTAL][1] = 0;
+
+	seller_items_cost[SELLER_ENERGY_CRYSTAL][0] = 2000;
+	seller_items_cost[SELLER_ENERGY_CRYSTAL][1] = 0;
+
+	seller_items_cost[SELLER_HOLDABLE_UPGRADE][0] = 3000;
+	seller_items_cost[SELLER_HOLDABLE_UPGRADE][1] = 0;
+
+	seller_items_cost[SELLER_IMPACT_REDUCER][0] = 3000;
+	seller_items_cost[SELLER_IMPACT_REDUCER][1] = 0;
+
+	seller_items_cost[SELLER_FLAME_THROWER][0] = 1000;
+	seller_items_cost[SELLER_FLAME_THROWER][1] = 0;
+
+	seller_items_cost[SELLER_BLASTER_PACK_UPGRADE][0] = 1800;
+	seller_items_cost[SELLER_BLASTER_PACK_UPGRADE][1] = 0;
+
+	seller_items_cost[SELLER_POWERCELL_UPGRADE][0] = 2000;
+	seller_items_cost[SELLER_POWERCELL_UPGRADE][1] = 0;
+
+	seller_items_cost[SELLER_METAL_BOLTS_UPGRADE][0] = 2200;
+	seller_items_cost[SELLER_METAL_BOLTS_UPGRADE][1] = 0;
+
+	seller_items_cost[SELLER_ROCKETS_UPGRADE][0] = 2500;
+	seller_items_cost[SELLER_ROCKETS_UPGRADE][1] = 0;
+
+	seller_items_cost[SELLER_STUN_BATON_UPGRADE][0] = 1500;
+	seller_items_cost[SELLER_STUN_BATON_UPGRADE][1] = 0;
+
+	seller_items_cost[SELLER_JETPACK_UPGRADE][0] = 5000;
+	seller_items_cost[SELLER_JETPACK_UPGRADE][1] = 0;
+
+	seller_items_cost[SELLER_GUNNER_RADAR][0] = 3000;
+	seller_items_cost[SELLER_GUNNER_RADAR][1] = 0;
+
+	seller_items_cost[SELLER_THERMAL_VISION][0] = 2300;
+	seller_items_cost[SELLER_THERMAL_VISION][1] = 0;
+
+	seller_items_cost[SELLER_GUNNER_ITEMS_UPGRADE][0] = 4000;
+	seller_items_cost[SELLER_GUNNER_ITEMS_UPGRADE][1] = 0;
+
+	seller_items_cost[SELLER_ENERGY_MODULATOR][0] = 7000;
+	seller_items_cost[SELLER_ENERGY_MODULATOR][1] = 0;
+
+	if (buy_item == qtrue)
+	{
+		return seller_items_cost[item_number][0];
+	}
+
+	return seller_items_cost[item_number][1];
+}
+
 // zyk: returns the seller item name
 char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 {
-	char seller_items[MAX_SELLER_ITEMS][32] = {
-		"Blaster Pack",
-		"Power Cell",
-		"Metal Bolts",
-		"Rockets",
-		"Thermals",
-		"Trip Mines",
-		"Det Packs",
-		"Ammo All",
-		"Flame Thrower Fuel",
-		"Shield Booster",
-		"Sentry Gun",
-		"Seeker Drone",
-		"Bacta Canister",
-		"Force Field",
-		"Big Bacta",
-		"E-Web",
-		"Binoculars",
-		"Jetpack",
-		"Cloak Item",
-		"Blaster Pistol",
-		"Bryar Pistol",
-		"E11 Blaster Rifle",
-		"Disruptor",
-		"Bowcaster",
-		"DEMP2",
-		"Repeater",
-		"Flechette",
-		"Concussion Rifle",
-		"Rocket Launcher",
-		"Stun Baton",
-		"Ysalamiri",
-		"Jetpack Fuel",
-		"Force Boon",
-		"Magic Potion",
-		"Healing Crystal",
-		"Energy Crystal",
-		"Holdable Items Upgrade",
-		"Impact Reducer",
-		"Flame Thrower",
-		"Blaster Pack Upgrade",
-		"Powercell Upgrade",
-		"Metal Bolts Upgrade",
-		"Rockets Upgrade",
-		"Stun Baton Upgrade",
-		"Jetpack Upgrade",
-		"Gunner Radar",
-		"Thermal Vision",
-		"Gunner Items Upgrade",
-		"Energy Modulator"
-	};
+	char* seller_items_names[MAX_SELLER_ITEMS];
 
-	return G_NewString(seller_items[item_number]);
+	seller_items_names[SELLER_BLASTER_PACK] = "Blaster Pack";
+	seller_items_names[SELLER_POWERCELL] = "Power Cell";
+	seller_items_names[SELLER_METAL_BOLTS] = "Metal Bolts";
+	seller_items_names[SELLER_ROCKETS] = "Rockets";
+	seller_items_names[SELLER_THERMALS] = "Thermals";
+	seller_items_names[SELLER_TRIPMINES] = "Trip Mines";
+	seller_items_names[SELLER_DETPACKS] = "Det Packs";
+	seller_items_names[SELLER_AMMO_ALL] = "Ammo All";
+	seller_items_names[SELLER_FLAME_FUEL] = "Flame Thrower Fuel";
+	seller_items_names[SELLER_SHIELD_BOOSTER] = "Shield Booster";
+	seller_items_names[SELLER_SENTRY_GUN] = "Sentry Gun";
+	seller_items_names[SELLER_SEEKER_DRONE] = "Seeker Drone";
+	seller_items_names[SELLER_BACTA_CANISTER] = "Bacta Canister";
+	seller_items_names[SELLER_FORCE_FIELD] = "Force Field";
+	seller_items_names[SELLER_BIG_BACTA] = "Big Bacta";
+	seller_items_names[SELLER_EWEB] = "E-Web";
+	seller_items_names[SELLER_BINOCULARS] = "Binoculars";
+	seller_items_names[SELLER_JETPACK] = "Jetpack";
+	seller_items_names[SELLER_CLOAK_ITEM] = "Cloak Item";
+	seller_items_names[SELLER_BLASTER_PISTOL] = "Blaster Pistol";
+	seller_items_names[SELLER_BRYAR_PISTOL] = "Bryar Pistol";
+	seller_items_names[SELLER_E11_BLASTER] = "E11 Blaster Rifle";
+	seller_items_names[SELLER_DISRUPTOR] = "Disruptor";
+	seller_items_names[SELLER_BOWCASTER] = "Bowcaster";
+	seller_items_names[SELLER_DEMP2] = "DEMP2";
+	seller_items_names[SELLER_REPEATER] = "Repeater";
+	seller_items_names[SELLER_FLECHETTE] = "Flechette";
+	seller_items_names[SELLER_CONCUSSION] = "Concussion Rifle";
+	seller_items_names[SELLER_ROCKET_LAUNCHER] = "Rocket Launcher";
+	seller_items_names[SELLER_STUN_BATON] = "Stun Baton";
+	seller_items_names[SELLER_YSALAMIRI] = "Ysalamiri";
+	seller_items_names[SELLER_JETPACK_FUEL] = "Jetpack Fuel";
+	seller_items_names[SELLER_FORCE_BOON] = "Force Boon";
+	seller_items_names[SELLER_MAGIC_POTION] = "Magic Potion";
+	seller_items_names[SELLER_HEALING_CRYSTAL] = "Healing Crystal";
+	seller_items_names[SELLER_ENERGY_CRYSTAL] = "Energy Crystal";
+	seller_items_names[SELLER_HOLDABLE_UPGRADE] = "Holdable Items Upgrade";
+	seller_items_names[SELLER_IMPACT_REDUCER] = "Impact Reducer";
+	seller_items_names[SELLER_FLAME_THROWER] = "Flame Thrower";
+	seller_items_names[SELLER_BLASTER_PACK_UPGRADE] = "Blaster Pack Upgrade";
+	seller_items_names[SELLER_POWERCELL_UPGRADE] = "Powercell Upgrade";
+	seller_items_names[SELLER_METAL_BOLTS_UPGRADE] = "Metal Bolts Upgrade";
+	seller_items_names[SELLER_ROCKETS_UPGRADE] = "Rockets Upgrade";
+	seller_items_names[SELLER_STUN_BATON_UPGRADE] = "Stun Baton Upgrade";
+	seller_items_names[SELLER_JETPACK_UPGRADE] = "Jetpack Upgrade";
+	seller_items_names[SELLER_GUNNER_RADAR] = "Gunner Radar";
+	seller_items_names[SELLER_THERMAL_VISION] = "Thermal Vision";
+	seller_items_names[SELLER_GUNNER_ITEMS_UPGRADE] = "Gunner Items Upgrade";
+	seller_items_names[SELLER_ENERGY_MODULATOR] = "Energy Modulator";
+
+	if (item_number >= 0 && item_number < MAX_SELLER_ITEMS)
+	{
+		return G_NewString(seller_items_names[item_number]);
+	}
+	
+	return "";
 }
 
 void zyk_show_stuff_category(gentity_t* ent, int min_item_index, int max_item_index)
@@ -6430,17 +6542,18 @@ void zyk_show_stuff_category(gentity_t* ent, int min_item_index, int max_item_in
 	for (i = min_item_index; i <= max_item_index; i++)
 	{
 		char sell_item_string[16];
+		int sell_cost = zyk_get_seller_item_cost(i, qfalse);
 
-		if (seller_items_cost[i][1] > 0)
+		if (sell_cost > 0)
 		{
-			strcpy(sell_item_string, va("%d", seller_items_cost[i][1]));
+			strcpy(sell_item_string, va("%d", sell_cost));
 		}
 		else
 		{
 			strcpy(sell_item_string, "^1no^7");
 		}
 
-		strcpy(content, va("%s\n^3%d - %s: ^7Buy: %d, Sell: %s", content, (i + 1), zyk_get_seller_item_name(i), seller_items_cost[i][0], sell_item_string));
+		strcpy(content, va("%s\n^3%d - %s: ^7Buy: %d, Sell: %s", content, (i + 1), zyk_get_seller_item_name(i), zyk_get_seller_item_cost(i, qtrue), sell_item_string));
 	}
 
 	trap->SendServerCommand(ent->s.number, va("print \"%s\n\n\"", content));
@@ -6470,23 +6583,23 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 
 		if (Q_stricmp(arg1, "ammo" ) == 0)
 		{
-			zyk_show_stuff_category(ent, 0, 8);
+			zyk_show_stuff_category(ent, SELLER_BLASTER_PACK, SELLER_FLAME_FUEL);
 		}
 		else if (Q_stricmp(arg1, "items" ) == 0)
 		{
-			zyk_show_stuff_category(ent, 9, 18);
+			zyk_show_stuff_category(ent, SELLER_SHIELD_BOOSTER, SELLER_CLOAK_ITEM);
 		}
 		else if (Q_stricmp(arg1, "weapons" ) == 0)
 		{
-			zyk_show_stuff_category(ent, 19, 29);
+			zyk_show_stuff_category(ent, SELLER_BLASTER_PISTOL, SELLER_STUN_BATON);
 		}
 		else if (Q_stricmp(arg1, "misc") == 0)
 		{
-			zyk_show_stuff_category(ent, 30, 35);
+			zyk_show_stuff_category(ent, SELLER_YSALAMIRI, SELLER_ENERGY_CRYSTAL);
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
-			zyk_show_stuff_category(ent, 36, 50);
+			zyk_show_stuff_category(ent, SELLER_HOLDABLE_UPGRADE, SELLER_ENERGY_MODULATOR);
 		}
 		else if (i == SELLER_BLASTER_PACK)
 		{
@@ -6830,7 +6943,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	}
 
 	// zyk: buying the item if player has enough credits
-	if (ent->client->pers.credits >= seller_items_cost[value - 1][0])
+	if (ent->client->pers.credits >= zyk_get_seller_item_cost((value - 1), qtrue))
 	{
 		if (value == (SELLER_BLASTER_PACK + 1))
 		{
@@ -7110,7 +7223,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-		ent->client->pers.credits -= seller_items_cost[value - 1][0];
+		ent->client->pers.credits -= zyk_get_seller_item_cost((value - 1), qtrue);
 		save_account(ent, qtrue);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
@@ -7176,7 +7289,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (value < 1 || value > MAX_SELLER_ITEMS || seller_items_cost[value - 1][1] == 0)
+	if (value < 1 || value > MAX_SELLER_ITEMS || zyk_get_seller_item_cost((value - 1), qfalse) == 0)
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"Invalid product number.\n\"" );
 		return;
@@ -7376,7 +7489,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 			
 	if (sold == 1)
 	{
-		add_credits(ent,seller_items_cost[value - 1][1]);
+		add_credits(ent, zyk_get_seller_item_cost((value - 1), qfalse));
 		save_account(ent, qtrue);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
