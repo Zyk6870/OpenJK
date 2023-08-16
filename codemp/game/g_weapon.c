@@ -1015,7 +1015,7 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 	missile->flags |= FL_BOUNCE;
 
 	// zyk: this is the bounce count used to count how many times the shot bounces, default: 3. In RPG Mode bounces more times with Upgrade
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL))
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0)
 		missile->bounceCount = 18;  
 	else
 		missile->bounceCount = 3;  
@@ -1048,10 +1048,10 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 	else if ( count > 5 )
 	{
 		// zyk: Bowcaster with Power Cell Weapons Upgrade in RPG Mode can shoot more missiles
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL))
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0)
 		{
-			if (count > 9)
-				count = 9;
+			if (count > 7)
+				count = 7;
 		}
 		else
 		{
@@ -1065,7 +1065,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 		count--;
 	}
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL))
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0)
 	{ // zyk: decrease spread
 		bowcaster_spread = BOWCASTER_ALT_SPREAD * 0.7;
 	}

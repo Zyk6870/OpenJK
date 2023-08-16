@@ -7798,6 +7798,9 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DISRUPTOR] = 25;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BOWCASTER] = 25;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEMP2] = 20;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
@@ -9210,9 +9213,16 @@ void G_RunFrame( int levelTime ) {
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
 
 				// zyk: Weapon Upgrades
-				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_upgrades & (1 << UPGRADE_POWERCELL) && ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4)
+				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0 &&
+					ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 0.6))
 				{
-					ent->client->ps.weaponTime = (weaponData[WP_DISRUPTOR].fireTime * 1.0)/1.4;
+					ent->client->ps.weaponTime = weaponData[WP_DISRUPTOR].fireTime * 0.6;
+				}
+
+				if (ent->client->ps.weapon == WP_DEMP2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0 &&
+					ent->client->ps.weaponTime > (weaponData[WP_DEMP2].fireTime * 0.7))
+				{
+					ent->client->ps.weaponTime = weaponData[WP_DEMP2].fireTime * 0.7;
 				}
 
 				if (ent->client->ps.weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
