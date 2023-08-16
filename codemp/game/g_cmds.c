@@ -246,7 +246,6 @@ char* zyk_skill_name(int skill_index)
 char* zyk_get_upgrade_name(zyk_upgrade_t upgrade_flag)
 {
 	char rpg_upgrade_names[MAX_RPG_UPGRAGES][32] = {
-		"Holdable Items Upgrade",
 		"Impact Reducer",
 		"Flame Thrower",
 		"Blaster Pack Upgrade",
@@ -6065,6 +6064,9 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "Jetpack";
 	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "Jetpack Fuel";
 	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "Flame Thrower Fuel";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BACTA] = "Bacta Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "Force Field Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -6427,8 +6429,14 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_ENERGY_CRYSTAL][0] = 2000;
 	seller_items_cost[SELLER_ENERGY_CRYSTAL][1] = 0;
 
-	seller_items_cost[SELLER_HOLDABLE_UPGRADE][0] = 3000;
-	seller_items_cost[SELLER_HOLDABLE_UPGRADE][1] = 0;
+	seller_items_cost[SELLER_BACTA_UPGRADE][0] = 1500;
+	seller_items_cost[SELLER_BACTA_UPGRADE][1] = 900;
+
+	seller_items_cost[SELLER_FORCE_FIELD_UPGRADE][0] = 1400;
+	seller_items_cost[SELLER_FORCE_FIELD_UPGRADE][1] = 800;
+
+	seller_items_cost[SELLER_CLOAK_UPGRADE][0] = 1100;
+	seller_items_cost[SELLER_CLOAK_UPGRADE][1] = 700;
 
 	seller_items_cost[SELLER_IMPACT_REDUCER][0] = 3000;
 	seller_items_cost[SELLER_IMPACT_REDUCER][1] = 0;
@@ -6488,6 +6496,7 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_DETPACKS] = "Det Packs";
 	seller_items_names[SELLER_AMMO_ALL] = "Ammo All";
 	seller_items_names[SELLER_FLAME_FUEL] = "Flame Thrower Fuel";
+
 	seller_items_names[SELLER_SHIELD_BOOSTER] = "Shield Booster";
 	seller_items_names[SELLER_SENTRY_GUN] = "Sentry Gun";
 	seller_items_names[SELLER_SEEKER_DRONE] = "Seeker Drone";
@@ -6498,6 +6507,7 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_BINOCULARS] = "Binoculars";
 	seller_items_names[SELLER_JETPACK] = "Jetpack";
 	seller_items_names[SELLER_CLOAK_ITEM] = "Cloak Item";
+
 	seller_items_names[SELLER_BLASTER_PISTOL] = "Blaster Pistol";
 	seller_items_names[SELLER_BRYAR_PISTOL] = "Bryar Pistol";
 	seller_items_names[SELLER_E11_BLASTER] = "E11 Blaster Rifle";
@@ -6509,13 +6519,17 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_CONCUSSION] = "Concussion Rifle";
 	seller_items_names[SELLER_ROCKET_LAUNCHER] = "Rocket Launcher";
 	seller_items_names[SELLER_STUN_BATON] = "Stun Baton";
+
 	seller_items_names[SELLER_YSALAMIRI] = "Ysalamiri";
 	seller_items_names[SELLER_JETPACK_FUEL] = "Jetpack Fuel";
 	seller_items_names[SELLER_FORCE_BOON] = "Force Boon";
 	seller_items_names[SELLER_MAGIC_POTION] = "Magic Potion";
 	seller_items_names[SELLER_HEALING_CRYSTAL] = "Healing Crystal";
 	seller_items_names[SELLER_ENERGY_CRYSTAL] = "Energy Crystal";
-	seller_items_names[SELLER_HOLDABLE_UPGRADE] = "Holdable Items Upgrade";
+
+	seller_items_names[SELLER_BACTA_UPGRADE] = "Bacta Upgrade";
+	seller_items_names[SELLER_FORCE_FIELD_UPGRADE] = "Force Field Upgrade";
+	seller_items_names[SELLER_CLOAK_UPGRADE] = "Cloak Item Upgrade";
 	seller_items_names[SELLER_IMPACT_REDUCER] = "Impact Reducer";
 	seller_items_names[SELLER_FLAME_THROWER] = "Flame Thrower";
 	seller_items_names[SELLER_BLASTER_PACK_UPGRADE] = "Blaster Pack Upgrade";
@@ -6604,7 +6618,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
-			zyk_show_stuff_category(ent, SELLER_HOLDABLE_UPGRADE, SELLER_ENERGY_MODULATOR);
+			zyk_show_stuff_category(ent, SELLER_BACTA_UPGRADE, SELLER_ENERGY_MODULATOR);
 		}
 		else if (i == SELLER_BLASTER_PACK)
 		{
@@ -6750,9 +6764,17 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7regens shield, blaster pack ammo and power cell ammo. If the player dies, he loses the crystal\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == SELLER_HOLDABLE_UPGRADE)
+		else if (i == SELLER_BACTA_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister recovers some Magic Power, Big Bacta recovers more HP, Force Field resists more and Cloak Item will be able to cloak vehicles\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister recovers some Magic Power and Big Bacta recovers more HP\n\n\"", zyk_get_seller_item_name(i)));
+		}
+		else if (i == SELLER_FORCE_FIELD_UPGRADE)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Force Field resists more\n\n\"", zyk_get_seller_item_name(i)));
+		}
+		else if (i == SELLER_CLOAK_UPGRADE)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Cloak Item will be able to cloak vehicles\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_IMPACT_REDUCER)
 		{
@@ -6926,9 +6948,19 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_THERMAL_VISION)));
 		return;
 	}
-	else if (value == (SELLER_HOLDABLE_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
+	else if (value == (SELLER_BACTA_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_HOLDABLE_ITEMS)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_BACTA_UPGRADE)));
+		return;
+	}
+	else if (value == (SELLER_FORCE_FIELD_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_FORCE_FIELD_UPGRADE)));
+		return;
+	}
+	else if (value == (SELLER_CLOAK_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_CLOAK_UPGRADE)));
 		return;
 	}
 	else if (value == (SELLER_GUNNER_ITEMS_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
@@ -7154,9 +7186,17 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		{
 			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_THERMAL_VISION);
 		}
-		else if (value == (SELLER_HOLDABLE_UPGRADE + 1))
+		else if (value == (SELLER_BACTA_UPGRADE + 1))
 		{
-			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_HOLDABLE_ITEMS);
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_BACTA);
+		}
+		else if (value == (SELLER_FORCE_FIELD_UPGRADE + 1))
+		{
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_FORCE_FIELD);
+		}
+		else if (value == (SELLER_CLOAK_UPGRADE + 1))
+		{
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_CLOAK);
 		}
 		else if (value == (SELLER_JETPACK + 1))
 		{
@@ -7223,7 +7263,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == (SELLER_ENERGY_MODULATOR + 1))
 		{
-		ent->client->pers.rpg_upgrades |= (1 << UPGRADE_ENERGY_MODULATOR);
+			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_ENERGY_MODULATOR);
 		}
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
@@ -7487,6 +7527,21 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (value == (SELLER_FORCE_BOON + 1) && ent->client->ps.powerups[PW_FORCE_BOON])
 	{
 		ent->client->ps.powerups[PW_FORCE_BOON] = 0;
+		sold = 1;
+	}
+	else if (value == (SELLER_BACTA_UPGRADE + 1))
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_BACTA);
+		sold = 1;
+	}
+	else if (value == (SELLER_FORCE_FIELD_UPGRADE + 1))
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_FORCE_FIELD);
+		sold = 1;
+	}
+	else if (value == (SELLER_CLOAK_UPGRADE + 1))
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_CLOAK);
 		sold = 1;
 	}
 

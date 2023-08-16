@@ -6434,7 +6434,7 @@ int PM_ItemUsable(playerState_t *ps, int forcedUse)
 	{
 	case HI_MEDPAC:
 #if defined( _GAME )
-		if (item_user && item_user->client && item_user->client->sess.amrpgmode == 2 && item_user->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
+		if (item_user && item_user->client && item_user->client->sess.amrpgmode == 2 && item_user->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 		{ // zyk: bacta canister with holdable items upgrade. Must allow even with max health to regen MP
 			if (ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] && item_user->client->pers.magic_power == zyk_max_magic_power(item_user))
 				return 0;

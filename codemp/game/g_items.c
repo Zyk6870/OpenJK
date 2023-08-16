@@ -359,7 +359,7 @@ void CreateShield(gentity_t *ent)
 	if ( level.gametype == GT_SIEGE || level.gametype == GT_CTF)
 	{ // zyk: added CTF condition
 		// zyk: Force Field gets double health
-		if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
+		if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
 		{
 			ent->health = SHIELD_SIEGE_HEALTH * 2;
 		}
@@ -370,7 +370,7 @@ void CreateShield(gentity_t *ent)
 	}
 	else
 	{ // zyk: Force Field gets double health
-		if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
+		if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
 		{
 			ent->health = SHIELD_HEALTH * 2;
 		}
@@ -478,7 +478,8 @@ qboolean PlaceShield(gentity_t *playerent)
 			// Set team number.
 			shield->s.otherEntityNum2 = playerent->client->sess.sessionTeam;
 
-			if (level.gametype < GT_TEAM && playerent->client && playerent->client->sess.amrpgmode == 2 && playerent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
+			if (level.gametype < GT_TEAM && playerent->client && playerent->client->sess.amrpgmode == 2 && 
+				playerent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
 			{
 				// zyk: setting shield red color if it has the upgrade
 				shield->s.otherEntityNum2 = TEAM_RED;
@@ -1317,7 +1318,7 @@ static void MedPackGive(gentity_t *ent, int amount)
 void ItemUse_MedPack_Big(gentity_t *ent)
 {
 	// zyk: RPG Mode Big Bacta. Recover 150 HP
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT * 3);
 	else
 		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
@@ -1328,9 +1329,9 @@ extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 void ItemUse_MedPack(gentity_t *ent)
 {
 	// zyk: RPG Mode Bacta Canister. Recovers some mp
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS))
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 	{
-		zyk_add_mp(ent, 230);
+		zyk_add_mp(ent, 200);
 	}
 	
 	MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);

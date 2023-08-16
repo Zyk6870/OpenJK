@@ -3531,7 +3531,7 @@ void ClientThink_real( gentity_t *ent ) {
 		{ //these are the only two where you wouldn't care about a delay between
 			if (ent->client->sess.amrpgmode == 2)
 			{
-				if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_HOLDABLE_ITEMS) && pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE && ent->client->ps.m_iVehicleNum)
+				if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0 && pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE && ent->client->ps.m_iVehicleNum)
 				{ // zyk: RPG Mode Cloak Item can cloak vehicles
 					if (!g_entities[ent->client->ps.m_iVehicleNum].client->ps.powerups[PW_CLOAKED])
 					{

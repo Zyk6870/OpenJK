@@ -7789,6 +7789,9 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_JETPACK_FUEL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 5;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 7;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
