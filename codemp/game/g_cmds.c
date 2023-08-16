@@ -250,7 +250,6 @@ char* zyk_get_upgrade_name(zyk_upgrade_t upgrade_flag)
 		"Powercell Upgrade",
 		"Metal Bolts Upgrade",
 		"Rockets Upgrade",
-		"Stun Baton Upgrade",
 		"Jetpack Upgrade",
 		"Gunner Radar",
 		"Thermal Vision",
@@ -6455,7 +6454,7 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_ROCKETS_UPGRADE][1] = 0;
 
 	seller_items_cost[SELLER_STUN_BATON_UPGRADE][0] = 1500;
-	seller_items_cost[SELLER_STUN_BATON_UPGRADE][1] = 0;
+	seller_items_cost[SELLER_STUN_BATON_UPGRADE][1] = 900;
 
 	seller_items_cost[SELLER_JETPACK_UPGRADE][0] = 5000;
 	seller_items_cost[SELLER_JETPACK_UPGRADE][1] = 0;
@@ -6926,11 +6925,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_ROCKETS)));
 		return;
 	}
-	else if (value == (SELLER_STUN_BATON_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_STUN_BATON))
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_STUN_BATON)));
-		return;
-	}
 	else if (value == (SELLER_THERMAL_VISION + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION))
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_THERMAL_VISION)));
@@ -6959,6 +6953,11 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	else if (value == (SELLER_FLAME_THROWER + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_FLAME_THROWER)));
+		return;
+	}
+	else if (value == (SELLER_STUN_BATON_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_STUN_BATON_UPGRADE)));
 		return;
 	}
 	else if (value == (SELLER_GUNNER_ITEMS_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
@@ -7144,10 +7143,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_STUN_BATON);
 		}
-		else if (value == (SELLER_STUN_BATON_UPGRADE + 1))
-		{
-			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_STUN_BATON);
-		}
 		else if (value == (SELLER_EWEB + 1))
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_EWEB);
@@ -7258,6 +7253,10 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == (SELLER_FLAME_THROWER + 1))
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_FLAME_THROWER);
+		}
+		else if (value == (SELLER_STUN_BATON_UPGRADE + 1))
+		{
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_STUN_BATON);
 		}
 		else if (value == (SELLER_ENERGY_MODULATOR + 1))
 		{
@@ -7550,6 +7549,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (value == (SELLER_FLAME_THROWER + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_FLAME_THROWER);
+		sold = 1;
+	}
+	else if (value == (SELLER_STUN_BATON_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_STUN_BATON);
 		sold = 1;
 	}
 

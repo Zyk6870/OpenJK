@@ -3809,8 +3809,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	tr_ent = &g_entities[tr.entityNum];
 
 	// zyk: Stun Baton with Stun Baton Upgrade in RPG Mode allows the player to open any door
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_STUN_BATON) && tr_ent->s.eType == ET_MOVER &&
-		zyk_allow_stun_baton_upgrade.integer == 1)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 && zyk_allow_stun_baton_upgrade.integer == 1 && 
+		Q_stricmp(tr_ent->classname, "func_door") == 0)
 	{
 		GlobalUse(tr_ent, ent, ent);
 	}
@@ -3862,14 +3862,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 			{
 				tr_ent->client->ps.electrifyTime = level.time + 700;
 
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_STUN_BATON) &&
-					tr_ent->client->ps.powerups[PW_CLOAKED])
-				{ // zyk: stun baton upgrade decloaks players
-					Jedi_Decloak(tr_ent);
-				}
-
 				// zyk: if the player has stun baton upgrade in RPG mode, enemy has its speed decreased
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_STUN_BATON))
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
 				{
 					// zyk: allies cant be hit by it
 					if (zyk_is_ally(ent,tr_ent) == qtrue)
@@ -3880,6 +3874,11 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 					if (zyk_can_hit_target(ent, tr_ent) == qfalse)
 					{ // zyk: testing if the target player can get hit by the stun baton
 						return;
+					}
+
+					if (tr_ent->client->ps.powerups[PW_CLOAKED])
+					{ // zyk: stun baton upgrade decloaks players
+						Jedi_Decloak(tr_ent);
 					}
 
 					tr_ent->client->pers.stun_baton_less_speed_timer = level.time + 1500;
