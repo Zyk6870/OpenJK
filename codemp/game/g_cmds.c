@@ -13091,7 +13091,6 @@ command_t commands[] = {
 //	{ "kylesmash",			TryGrapple,					0 },
 	{ "levelshot",			Cmd_LevelShot_f,			CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "list",				Cmd_ListAccount_f,			CMD_NOINTERMISSION },
-	{ "listaccount",		Cmd_ListAccount_f,			CMD_NOINTERMISSION },
 	{ "login",				Cmd_LoginAccount_f,			CMD_NOINTERMISSION },
 	{ "logout",				Cmd_LogoutAccount_f,		CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "magic",				Cmd_Magic_f,				CMD_RPG|CMD_NOINTERMISSION },
@@ -13144,9 +13143,13 @@ command_t commands[] = {
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			CMD_NOINTERMISSION },
 	{ "vote",				Cmd_Vote_f,					CMD_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				CMD_NOINTERMISSION },
+	{ "zykchars",			Cmd_ZykChars_f,				CMD_LOGGEDIN | CMD_NOINTERMISSION },
 	{ "zykfile",			Cmd_ZykFile_f,				CMD_NOINTERMISSION },
-	{ "zykchars",			Cmd_ZykChars_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
+	{ "zyklist",			Cmd_ListAccount_f,			CMD_NOINTERMISSION },
+	{ "zyklogin",			Cmd_LoginAccount_f,			CMD_NOINTERMISSION },
+	{ "zyklogout",			Cmd_LogoutAccount_f,		CMD_LOGGEDIN | CMD_NOINTERMISSION },
 	{ "zykmod",				Cmd_ZykMod_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
+	{ "zyknew",				Cmd_NewAccount_f,			CMD_NOINTERMISSION },
 	{ "zyksound",			Cmd_ZykSound_f,				CMD_NOINTERMISSION },
 };
 static const size_t numCommands = ARRAY_LEN( commands );
