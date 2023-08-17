@@ -2181,7 +2181,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	// zyk: remove any quest_power status from this player
 	self->client->pers.quest_power_status = 0;
 	self->client->pers.player_statuses &= ~(1 << 29);
-	self->client->pers.unique_skill_duration = 0;
 
 	if (self->client->pers.player_statuses & (1 << 28))
 	{ // zyk: custom quest npc defeated
@@ -6195,7 +6194,6 @@ G_RadiusDamage
 ============
 */
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
-extern qboolean zyk_unique_ability_can_hit_target(gentity_t *attacker, gentity_t *target);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, gentity_t *missile, int mod) {
 	float		points, dist;
@@ -6382,7 +6380,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_drain") == 0 ||
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_black_hole") == 0 ||
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_vertical_dfa") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_effect_fire_bolt_hit") == 0)
 					{
 						if (Q_stricmp(attacker->targetname, "zyk_quest_effect_flaming_area") == 0 && quest_power_user && quest_power_user != ent && ent->client)

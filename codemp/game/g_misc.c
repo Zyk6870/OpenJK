@@ -2814,6 +2814,7 @@ void fx_runner_think( gentity_t *ent )
 	}
 
 	// zyk: Super Beam. Traces enemies and damages them
+	/*
 	if (Q_stricmp(ent->targetname, "zyk_super_beam") == 0)
 	{
 		gentity_t *user_ent = ent->parent;
@@ -2852,6 +2853,7 @@ void fx_runner_think( gentity_t *ent )
 
 		ent->nextthink = level.time + 100;
 	}
+	*/
 }
 
 //----------------------------------------------------------
@@ -2988,18 +2990,7 @@ void fx_runner_link( gentity_t *ent )
 		// Let's get to work right now!
 		ent->think = fx_runner_think;
 
-		if (Q_stricmp(ent->targetname, "zyk_super_beam") == 0)
-		{ // zyk: starts the super beam effect right now
-			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
-			ent->nextthink = level.time + 100; // wait a small bit, then start working
-			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/artus/artus_gen.wav"));
-		}
-		else if (Q_stricmp(ent->targetname, "zyk_effect_force_dash") == 0)
-		{ // zyk: starts the Fast Dash effect right now
-			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
-			ent->nextthink = level.time + 100; // wait a small bit, then start working
-		}
-		else if (Q_stricmp(ent->targetname, "zyk_quest_effect_enemy_nerf") == 0)
+		if (Q_stricmp(ent->targetname, "zyk_quest_effect_enemy_nerf") == 0)
 		{ // zyk: starts the enemy weakening effect right now
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 100; // wait a small bit, then start working
@@ -3086,10 +3077,7 @@ void SP_fx_runner( gentity_t *ent )
 	ent->think = fx_runner_link;
 
 	// zyk: no need to wait 400 ms with these effects
-	if (Q_stricmp(ent->targetname, "zyk_super_beam") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_effect_force_dash") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_quest_effect_enemy_nerf") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_vertical_dfa") == 0 ||
+	if (Q_stricmp(ent->targetname, "zyk_quest_effect_enemy_nerf") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_quest_effect_flaming_area_hit") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_quest_effect_chaos") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0 || 

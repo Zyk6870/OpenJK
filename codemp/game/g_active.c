@@ -825,11 +825,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 	client = ent->client;
 	client->timeResidual += msec;
 
-	if (client->sess.amrpgmode == 2 && client->pers.unique_skill_duration < level.time)
-	{ // zyk: Unique Ability run out
-		client->pers.active_unique_skill = 0;
-	}
-
 	while ( client->timeResidual >= 1000 )
 	{
 		client->timeResidual -= 1000;

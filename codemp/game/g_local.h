@@ -721,8 +721,6 @@ typedef enum {
 	SKILL_MAX_WEIGHT,
 	SKILL_UNDERWATER,
 	SKILL_RUN_SPEED,
-	SKILL_UNIQUE_1,
-	SKILL_UNIQUE_12,
 	SKILL_MAGIC_FIST,
 	SKILL_MAX_MP,
 	SKILL_MAGIC_1,
@@ -951,21 +949,6 @@ typedef struct clientPersistant_s {
 	// zyk: turn on or off features of this player in his account file. It is a bit value attribute that uses the zyk_settings_t enum values
 	int player_settings;
 
-	// zyk: this is the cooldown timer of the Unique Skill used by some RPG classes
-	int unique_skill_timer;
-
-	// zyk: sets the Unique Skill number (between 1 and 6) of the current Unique Skill in use by the player
-	int active_unique_skill;
-
-	// zyk: used by Custom Quest npcs
-	int unique_skill_npc_timer_amount;
-
-	// zyk: used to set the duration that some unique skills or unique abilities are active
-	int unique_skill_duration;
-
-	// zyk: used by Aimed Shot ability
-	int unique_skill_user_id;
-
 	// zyk: stun baton timer. This entity has less run speed during this time
 	int stun_baton_less_speed_timer;
 
@@ -974,9 +957,6 @@ typedef struct clientPersistant_s {
 	qboolean thermal_vision;
 
 	int thermal_vision_cooldown_time;
-
-	// zyk: timer to show effect of Vertical DFA ability
-	int vertical_dfa_timer;
 
 	// zyk: RPG skills
 	int skill_levels[NUMBER_OF_SKILLS];
@@ -1117,7 +1097,6 @@ typedef struct clientPersistant_s {
 	// zyk: used to set magic powers and abilities to custom quest npcs
 	int custom_quest_magic;
 	int custom_quest_more_magic;
-	int custom_quest_unique_abilities;
 } clientPersistant_t;
 
 typedef struct renderInfo_s

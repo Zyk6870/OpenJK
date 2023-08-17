@@ -4337,13 +4337,6 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 				dmg = 0;
 		}
 
-		// zyk: Vertical DFA unique skill heavily increases saber damage
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.active_unique_skill == (SKILL_UNIQUE_1 + 1) && self->client->pers.unique_skill_duration > level.time)
-		{
-			if (self->client->ps.torsoAnim == BOTH_FORCELEAP2_T__B_)
-				dmg = 28;
-		}
-
 		idleDamage = qtrue;
 	}
 	else

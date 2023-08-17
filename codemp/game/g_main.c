@@ -4840,36 +4840,6 @@ qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target)
 	return qfalse;
 }
 
-qboolean zyk_unique_ability_can_hit_target(gentity_t *attacker, gentity_t *target)
-{
-	int i = target->s.number;
-
-	if (attacker && target && attacker->s.number != i && target->client && target->health > 0 && zyk_can_hit_target(attacker, target) == qtrue &&
-		(i > MAX_CLIENTS || (target->client->pers.connected == CON_CONNECTED && target->client->sess.sessionTeam != TEAM_SPECTATOR &&
-			target->client->ps.duelInProgress == qfalse)))
-	{ // zyk: target is a player or npc that can be hit by the attacker
-		int is_ally = 0;
-
-		if (i < level.maxclients && !attacker->NPC &&
-			zyk_is_ally(attacker, target) == qtrue)
-		{ // zyk: allies will not be hit by this power
-			is_ally = 1;
-		}
-
-		if (OnSameTeam(attacker, target) == qtrue || npcs_on_same_team(attacker, target) == qtrue)
-		{ // zyk: if one of them is npc, also check for allies
-			is_ally = 1;
-		}
-
-		if (is_ally == 0)
-		{
-			return qtrue;
-		}
-	}
-
-	return qfalse;
-}
-
 // zyk: tests if the target entity can be hit by the attacker special power
 qboolean zyk_special_power_can_hit_target(gentity_t *attacker, gentity_t *target, int i, int min_distance, int max_distance, qboolean hit_breakable, int *targets_hit)
 {
@@ -5335,55 +5305,6 @@ void flaming_rage(gentity_t* ent, int duration)
 	ent->client->pers.quest_power_status |= (1 << 3);
 	ent->client->pers.magic_power_timer[MAGIC_FLAMING_RAGE] = level.time + duration;
 	ent->client->pers.magic_power_debounce_timer[MAGIC_FLAMING_RAGE] = 0;
-}
-
-// zyk: used by Duelist Vertical DFA ability
-void zyk_vertical_dfa_effect(gentity_t *ent)
-{
-	gentity_t *new_ent = G_Spawn();
-
-	zyk_set_entity_field(new_ent, "classname", "fx_runner");
-	zyk_set_entity_field(new_ent, "spawnflags", "4");
-	zyk_set_entity_field(new_ent, "targetname", "zyk_vertical_dfa");
-
-	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->r.currentOrigin[0], (int)ent->r.currentOrigin[1], (int)ent->r.currentOrigin[2] - 20));
-
-	new_ent->s.modelindex = G_EffectIndex("ships/proton_impact");
-
-	zyk_spawn_entity(new_ent);
-
-	new_ent->splashDamage = 130;
-
-	new_ent->splashRadius = 600;
-
-	level.special_power_effects[new_ent->s.number] = ent->s.number;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + 600;
-}
-
-// zyk: Super Beam ability
-void zyk_super_beam(gentity_t *ent, int angle_yaw)
-{
-	gentity_t *new_ent = G_Spawn();
-
-	if (angle_yaw == 0)
-		angle_yaw = 1;
-
-	zyk_set_entity_field(new_ent, "classname", "fx_runner");
-	zyk_set_entity_field(new_ent, "spawnflags", "0");
-	zyk_set_entity_field(new_ent, "targetname", "zyk_super_beam");
-
-	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->client->ps.origin[0], (int)ent->client->ps.origin[1], ((int)ent->client->ps.origin[2] + ent->client->ps.viewheight)));
-	
-	zyk_set_entity_field(new_ent, "angles", va("%d %d 0", (int)ent->client->ps.viewangles[0], angle_yaw));
-
-	new_ent->s.modelindex = G_EffectIndex("env/hevil_bolt");
-
-	new_ent->parent = ent;
-
-	zyk_spawn_entity(new_ent);
-
-	level.special_power_effects[new_ent->s.number] = ent->s.number;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + 2000;
 }
 
 extern void Jedi_Decloak(gentity_t *self);
@@ -9339,15 +9260,6 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 				}
 
-				if (ent->client->pers.active_unique_skill == (SKILL_UNIQUE_1 + 1) &&
-						ent->client->pers.vertical_dfa_timer > 0 && ent->client->pers.vertical_dfa_timer < level.time && 
-						ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-				{ // zyk: Vertical DFA should appear when player hits the ground
-					ent->client->pers.vertical_dfa_timer = 0;
-
-					zyk_vertical_dfa_effect(ent);
-				}
-
 				if (level.quest_map > QUESTMAP_NONE && zyk_allow_quests.integer > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0 &&
 					level.quest_debounce_timer < level.time && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
@@ -9782,25 +9694,6 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					zyk_cast_magic(ent, first_magic_skill + random_magic);
-				}
-
-				// zyk: unique abilities
-				if (ent->client->pers.unique_skill_timer < level.time)
-				{
-					int random_number = Q_irand(0, 4);
-
-					if (ent->client->pers.custom_quest_unique_abilities & (1 << 0) && random_number == 0)
-					{
-						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
-
-						ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-						ent->client->ps.forceDodgeAnim = BOTH_FORCE_DRAIN_START;
-						ent->client->ps.forceHandExtendTime = level.time + 2000;
-
-						zyk_super_beam(ent, ent->client->ps.viewangles[1]);
-					}
-
-					ent->client->pers.unique_skill_timer = level.time + ent->client->pers.unique_skill_npc_timer_amount;
 				}
 			}
 

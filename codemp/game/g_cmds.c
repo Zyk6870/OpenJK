@@ -84,9 +84,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
 	max_skill_levels[SKILL_UNDERWATER] = 2;
 	max_skill_levels[SKILL_RUN_SPEED] = 3;
-	
-	max_skill_levels[SKILL_UNIQUE_1] = 1;
-	max_skill_levels[SKILL_UNIQUE_12] = 1;
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 5;
 	max_skill_levels[SKILL_MAX_MP] = 10;
@@ -175,9 +172,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
 	skill_names[SKILL_UNDERWATER] = "Underwater";
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
-
-	skill_names[SKILL_UNIQUE_1] = "Vertical DFA";
-	skill_names[SKILL_UNIQUE_12] = "Super Beam";
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAX_MP] = "Max Magic Points";
@@ -320,11 +314,6 @@ char* zyk_skill_description(int skill_index)
 		return "Each level increases your air underwater";
 	if (skill_index == SKILL_RUN_SPEED)
 		return va("At level 0 your run speed is %f. Each level increases it by 50", g_speed.value);
-
-	if (skill_index == SKILL_UNIQUE_1)
-		return "Bind with ^3/bind <key> unique 56 ^7to use it\nVertical DFA. Makes you jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force";
-	if (skill_index == SKILL_UNIQUE_12)
-		return "Bind with ^3/bind <key> unique 73 ^7to use it\nSuper Beam. A powerful beam with high damage. Spends 25 mp";
 	
 	if (skill_index == SKILL_MAGIC_FIST)
 		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key";
@@ -4970,10 +4959,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			// zyk: used to add a cooldown between each flame
 			ent->client->cloakDebReduce = 0;
 
-			ent->client->pers.unique_skill_duration = 0;
-			ent->client->pers.active_unique_skill = 0;
-			ent->client->pers.vertical_dfa_timer = 0;
-
 			ent->client->pers.energy_modulator_mode = 0;
 
 			ent->client->pers.credits_modifier = 0;
@@ -5580,7 +5565,6 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 	{
 		int i = 0;
 		char content[1024];
-		int unique_duration = 0;
 
 		strcpy(content,"");
 
@@ -5591,13 +5575,8 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 
 		strcpy(content, va("%s%s", content, zyk_get_settings_values(ent)));
 
-		if (ent->client->pers.unique_skill_duration > level.time)
-		{
-			unique_duration = ent->client->pers.unique_skill_duration - level.time;
-		}
-
-		strcpy(content, va("%s%d-%d-%d-%d-%d-", 
-			content, 0, unique_duration, ent->client->pers.main_quest_progress, ent->client->pers.side_quest_progress, MAX_QUEST_MISSIONS));
+		strcpy(content, va("%s%d-%d-%d-%d-", 
+			content, 0, ent->client->pers.main_quest_progress, ent->client->pers.side_quest_progress, MAX_QUEST_MISSIONS));
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-NOCLASS-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
 	}
@@ -5933,10 +5912,6 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	{
 		zyk_list_category_skills(ent, target_ent, "^7", SKILL_MAX_HEALTH, SKILL_RUN_SPEED, 15);
 	}
-	else if (Q_stricmp(arg1, "unique") == 0)
-	{
-		zyk_list_category_skills(ent, target_ent, "^6", SKILL_UNIQUE_1, SKILL_UNIQUE_12, 18);
-	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
 		zyk_list_category_skills(ent, target_ent, "^2", SKILL_MAGIC_FIST, SKILL_MAGIC_28, 18);
@@ -6058,10 +6033,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 			if (Q_stricmp( arg1, "rpg" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list unique: ^7lists unique skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list inventory: ^7shows player inventory\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list inventory: ^7shows player inventory\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n\n\"");
 			}
-			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || Q_stricmp( arg1, "other" ) == 0 || 
-					 Q_stricmp(arg1, "unique") == 0 || Q_stricmp(arg1, "magic") == 0)
+			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || 
+					Q_stricmp( arg1, "other" ) == 0 || Q_stricmp(arg1, "magic") == 0)
 			{
 				zyk_list_player_skills(ent, ent, G_NewString(arg1));
 			}
@@ -10789,8 +10764,8 @@ void Cmd_Players_f( gentity_t *ent ) {
 
 			trap->Argv( 2, arg2, sizeof( arg2 ) );
 
-			if (Q_stricmp(arg2, "force") == 0 || Q_stricmp(arg2, "weapons") == 0 || Q_stricmp(arg2, "other") == 0 || 
-				Q_stricmp(arg2, "unique") == 0 || Q_stricmp(arg2, "magic") == 0)
+			if (Q_stricmp(arg2, "force") == 0 || Q_stricmp(arg2, "weapons") == 0 || 
+				Q_stricmp(arg2, "other") == 0 || Q_stricmp(arg2, "magic") == 0)
 			{ // zyk: show skills of the player
 				zyk_list_player_skills(player_ent, ent, G_NewString(arg2));
 			}
@@ -11029,125 +11004,6 @@ qboolean zyk_can_deflect_shots(gentity_t *ent)
 	}
 
 	return qfalse;
-}
-
-qboolean zyk_can_use_unique(gentity_t *ent)
-{
-	if (ent->health < 1)
-	{ // zyk: must be alive to use unique skills or unique abilities
-		return qfalse;
-	}
-
-	if ((ent->client->ps.forceHandExtend != HANDEXTEND_NONE && ent->client->ps.forceHandExtend != HANDEXTEND_FORCE_HOLD) ||
-		 ent->client->pers.quest_power_status & (1 << 2))
-	{ // zyk: using emotes/anims, special moves, and hit by Time Power. Cannot use unique ability
-		return qfalse;
-	}
-
-	return qtrue;
-}
-
-/*
-==================
-Cmd_Unique_f
-==================
-*/
-extern void zyk_super_beam(gentity_t *ent, int angle_yaw);
-void Cmd_Unique_f(gentity_t *ent) {
-	char arg1[MAX_STRING_CHARS];
-	int unique_skill_number = 0;
-
-	if (zyk_can_use_unique(ent) == qfalse)
-	{
-		trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7cannot use Unique Skill now\"");
-		return;
-	}
-
-	if (trap->Argc() == 1)
-	{
-		trap->SendServerCommand(ent->s.number, "print \"You must pass a unique skill number. Example: ^3/unique <number from 57 to 74>^7\n\"");
-		return;
-	}
-
-	trap->Argv(1, arg1, sizeof(arg1));
-	unique_skill_number = atoi(arg1);
-
-	if (unique_skill_number < (SKILL_UNIQUE_1 + 1) || unique_skill_number > (SKILL_UNIQUE_12 + 1))
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"Must be a number between %d and %d\n\"", (SKILL_UNIQUE_1 + 1), (SKILL_UNIQUE_12 + 1)));
-		return;
-	}
-
-	if (ent->client->pers.skill_levels[unique_skill_number - 1] < 1)
-	{ // zyk: player did not upgrade the unique skill he is trying to use
-		trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7you don't have this Unique Skill\"");
-		return;
-	}
-
-	if (ent->client->pers.unique_skill_timer < level.time)
-	{
-		if (unique_skill_number == (SKILL_UNIQUE_1 + 1))
-		{ // zyk: Vertical DFA
-			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
-			{
-				ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
-
-				G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCELEAP2_T__B_, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-
-				ent->client->ps.velocity[2] = 350;
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2800;
-				ent->client->pers.unique_skill_duration = level.time + 2800;
-
-				ent->client->ps.weaponTime = 1800;
-
-				ent->client->pers.vertical_dfa_timer = level.time + 1000;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
-			}
-		}
-		else if (unique_skill_number == (SKILL_UNIQUE_12 + 1))
-		{ // zyk: Super Beam
-			if (ent->client->pers.magic_power >= 25)
-			{
-				ent->client->pers.magic_power -= 25;
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 2000;
-				ent->client->pers.unique_skill_duration = level.time + 2000;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-				ent->client->ps.forceDodgeAnim = BOTH_FORCE_DRAIN_START;
-				ent->client->ps.forceHandExtendTime = level.time + 2000;
-
-				zyk_super_beam(ent, ent->client->ps.viewangles[1]);
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs 25 mp to use it\"");
-			}
-		}
-
-		// zyk: Unique Skill cooldown time
-		ent->client->pers.unique_skill_timer = level.time + 25000;
-
-		send_rpg_events(2000);
-
-		Cmd_ZykMod_f(ent);
-	}
-	else
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7%d seconds left\"", ((ent->client->pers.unique_skill_timer - level.time) / 1000)));
-	}
 }
 
 /*
@@ -12577,12 +12433,8 @@ void zyk_set_quest_npc_abilities(gentity_t *zyk_npc)
 	// zyk: ultimate magic powers and quest powers
 	zyk_npc->client->pers.custom_quest_more_magic = 0;
 
-	// zyk: unique abilities
-	zyk_npc->client->pers.custom_quest_unique_abilities = 0;
-
 	// zyk: setting the timers
 	zyk_npc->client->pers.quest_power_usage_timer = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcfirsttimer%d", level.zyk_custom_quest_counter)));
-	zyk_npc->client->pers.unique_skill_npc_timer_amount = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcsecondtimer%d", level.zyk_custom_quest_counter)));
 
 	// zyk: setting default values of these timers
 	if (zyk_npc->client->pers.quest_power_usage_timer <= 0)
@@ -12613,10 +12465,6 @@ void zyk_set_quest_npc_abilities(gentity_t *zyk_npc)
 			else if (zyk_power < MAX_MAGIC_POWERS + 8)
 			{
 				zyk_npc->client->pers.custom_quest_more_magic |= (1 << (zyk_power - MAX_MAGIC_POWERS));
-			}
-			else if (zyk_power < MAX_MAGIC_POWERS + 13)
-			{
-				zyk_npc->client->pers.custom_quest_unique_abilities |= (1 << (zyk_power - MAX_MAGIC_POWERS - 8));
 			}
 
 			k = 0;
@@ -13292,7 +13140,6 @@ command_t commands[] = {
 	{ "thedestroyer",		Cmd_TheDestroyer_f,			CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "tutorial",			Cmd_Tutorial_f,				CMD_LOGGEDIN | CMD_NOINTERMISSION },
 	{ "t_use",				Cmd_TargetUse_f,			CMD_CHEAT|CMD_ALIVE },
-	{ "unique",				Cmd_Unique_f,				CMD_RPG | CMD_ALIVE | CMD_NOINTERMISSION },
 	{ "up",					Cmd_UpSkill_f,				CMD_RPG|CMD_NOINTERMISSION },
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			CMD_NOINTERMISSION },
 	{ "vote",				Cmd_Vote_f,					CMD_NOINTERMISSION },
