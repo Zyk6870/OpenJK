@@ -242,16 +242,6 @@ char* zyk_skill_name(int skill_index)
 	return "";
 }
 
-// zyk: return the name of a RPG Upgrade
-char* zyk_get_upgrade_name(zyk_upgrade_t upgrade_flag)
-{
-	char rpg_upgrade_names[MAX_RPG_UPGRAGES][32] = {
-		"Energy Modulator"
-	};
-
-	return G_NewString(rpg_upgrade_names[upgrade_flag]);
-}
-
 // zyk: return the Elemental Spirit name
 char* zyk_get_spirit_name(zyk_main_quest_t spirit_value)
 {
@@ -2323,10 +2313,6 @@ void load_account(gentity_t* ent)
 				ent->client->pers.rpg_inventory[i] = atoi(content);
 			}
 
-			// zyk: loading RPG Upgrades value
-			fscanf(account_file, "%s", content);
-			ent->client->pers.rpg_upgrades = atoi(content);
-
 			// zyk: loading credits value
 			fscanf(account_file, "%s", content);
 			ent->client->pers.credits = atoi(content);
@@ -2421,8 +2407,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n",
-				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.rpg_upgrades, client->pers.credits,
+			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n",
+				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.credits,
 				client->sess.magic_fist_selection, client->pers.main_quest_progress, client->pers.side_quest_progress);
 
 			fclose(account_file);
@@ -5247,9 +5233,19 @@ void add_new_char(gentity_t *ent)
 		ent->client->pers.skill_levels[i] = 0;
 	}
 
-	ent->client->pers.rpg_upgrades = 0;
+	// zyk: initializing RPG inventory
+	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+	{
+		ent->client->pers.rpg_inventory[i] = 0;
+	}
+
 	ent->client->pers.credits = 100;
 	ent->client->sess.magic_fist_selection = 0;
+
+	// zyk: in RPG Mode, player must actually buy these
+	ent->client->ps.jetpackFuel = 0;
+	ent->client->ps.cloakFuel = 0;
+	ent->client->pers.jetpack_fuel = 0;
 }
 
 // zyk: creates the directory correctly depending on the OS
@@ -5358,22 +5354,11 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	// zyk: saving the default char
 	strcpy(ent->client->sess.rpgchar, arg1);
 
-	// zyk: initializing RPG inventory
-	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
-	{
-		ent->client->pers.rpg_inventory[i] = 0;
-	}
-
 	save_account(ent, qfalse);
 	save_account(ent, qtrue);
 
 	if (ent->client->sess.amrpgmode == 2)
 	{
-		// zyk: in RPG Mode, player must actually buy these
-		ent->client->ps.jetpackFuel = 0;
-		ent->client->ps.cloakFuel = 0;
-		ent->client->pers.jetpack_fuel = 0;
-
 		initialize_rpg_skills(ent, qtrue);
 	}
 	else
@@ -5650,8 +5635,8 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 			unique_duration = ent->client->pers.unique_skill_duration - level.time;
 		}
 
-		strcpy(content, va("%s%d-%d-%d-%d-%d-%d-", 
-			content, ent->client->pers.rpg_upgrades, 0, unique_duration, ent->client->pers.main_quest_progress, ent->client->pers.side_quest_progress, MAX_QUEST_MISSIONS));
+		strcpy(content, va("%s%d-%d-%d-%d-%d-", 
+			content, 0, unique_duration, ent->client->pers.main_quest_progress, ent->client->pers.side_quest_progress, MAX_QUEST_MISSIONS));
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-NOCLASS-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
 	}
@@ -5997,23 +5982,6 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 }
 
-void zyk_list_stuff(gentity_t *ent, gentity_t *target_ent)
-{
-	int i = 0;
-	char stuff_message[1024];
-	strcpy(stuff_message, "");
-
-	for (i = 0; i < MAX_RPG_UPGRAGES; i++)
-	{
-		if (ent->client->pers.rpg_upgrades & (1 << i))
-			strcpy(stuff_message, va("%s^3\n%s - ^2yes", stuff_message, zyk_get_upgrade_name(i)));
-		else
-			strcpy(stuff_message, va("%s^3\n%s - ^1no", stuff_message, zyk_get_upgrade_name(i)));
-	}
-
-	trap->SendServerCommand(target_ent->s.number, va("print \"%s\n\n\"", stuff_message));
-}
-
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
 	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Level: ^7%d/%d\n^3Level Up Score: ^7%d/%d\n^3Skill Points: ^7%d\n^3Skill Counter: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.level, zyk_rpg_max_level.integer, ent->client->pers.level_up_score, (ent->client->pers.level * zyk_level_up_score_factor.integer), ent->client->pers.skillpoints, ent->client->pers.skill_counter, zyk_max_skill_counter.integer, ent->client->pers.magic_power, zyk_max_magic_power(ent), ent->client->pers.current_weight, ent->client->pers.max_weight, ent->client->pers.credits));
@@ -6056,6 +6024,27 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BACTA] = "Bacta Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "Force Field Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = "Impact Reducer Armor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "Flame Thrower";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "Stun Baton Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = "Blaster Pistol Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = "Bryar Pistol Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] = "E11 Blaster Rifle Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_DISRUPTOR] = "Disruptor Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BOWCASTER] = "Bowcaster Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_DEMP2] = "DEMP2 Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_REPEATER] = "Repeater Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_FLECHETTE] = "Flechette Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_CONCUSSION] = "Concussion Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = "Rocket Launcher Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_DETPACKS] = "Detpacks Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "Jetpack Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_RADAR] = "Radar";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = "Thermal Vision";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "Sentry Gun Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR] = "Energy Modulator";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -6103,7 +6092,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 			if (Q_stricmp( arg1, "rpg" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list unique: ^7lists unique skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list inventory: ^7shows player inventory\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n^2/list stuff: ^7lists upgrades bought from seller\n\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list unique: ^7lists unique skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list inventory: ^7shows player inventory\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n\n\"");
 			}
 			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || Q_stricmp( arg1, "other" ) == 0 || 
 					 Q_stricmp(arg1, "unique") == 0 || Q_stricmp(arg1, "magic") == 0)
@@ -6227,10 +6216,6 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			else if (Q_stricmp( arg1, "commands" ) == 0)
 			{
 				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/new [login] [password]: ^7creates a new account.\n^3/login [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill. Passing ^3all ^7as parameter upgrades all skills.\n^3/down [skill number]: ^7downgrades a skill.\n^3/resetaccount: ^7resets account stuff of the player.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/callseller: ^7calls the jawa seller.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/logout: ^7logs out the account.\n\n\"" );
-			}
-			else if (Q_stricmp( arg1, "stuff" ) == 0)
-			{
-				zyk_list_stuff(ent, ent);
 			}
 			else
 			{ // zyk: the player can also list the specific info of a skill passing the skill number as argument
@@ -6883,7 +6868,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_ENERGY_MODULATOR)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a Gunner class device that has two modes. Either increase damage by 30 per cent and reduce flame thrower fuel usage, or increase resistance to damage by 20 per cent and add gun shot deflection. Activate it by getting melee and pressing Saber Style key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a device that has two modes. First Mode increases damage by 30 per cent and reduces flame thrower fuel usage. Second Mode increases resistance to damage by 20 per cent and adds gun shot deflection. Activate it by getting melee and pressing Saber Style key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
 	}
 }
@@ -7079,9 +7064,9 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_EWEB_UPGRADE)));
 		return;
 	}
-	else if (value == (SELLER_ENERGY_MODULATOR + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_ENERGY_MODULATOR))
+	else if (value == (SELLER_ENERGY_MODULATOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_ENERGY_MODULATOR)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_ENERGY_MODULATOR)));
 		return;
 	}
 
@@ -7405,7 +7390,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == (SELLER_ENERGY_MODULATOR + 1))
 		{
-			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_ENERGY_MODULATOR);
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR);
 		}
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
@@ -7786,6 +7771,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_EWEB);
 		sold = 1;
 	}
+	else if (value == (SELLER_ENERGY_MODULATOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR);
+		sold = 1;
+	}
 
 	zyk_adjust_holdable_items(ent);
 	
@@ -7850,8 +7840,21 @@ void Cmd_ResetAccount_f( gentity_t *ent ) {
 	for (i = 0; i < NUMBER_OF_SKILLS; i++)
 		ent->client->pers.skill_levels[i] = 0;
 
+	// zyk: initializing RPG inventory
+	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+	{
+		ent->client->pers.rpg_inventory[i] = 0;
+	}
+
+	ent->client->pers.credits = 100;
+	ent->client->sess.magic_fist_selection = 0;
+
+	// zyk: in RPG Mode, player must actually buy these
+	ent->client->ps.jetpackFuel = 0;
+	ent->client->ps.cloakFuel = 0;
+	ent->client->pers.jetpack_fuel = 0;
+
 	ent->client->pers.max_rpg_shield = 0;
-	ent->client->pers.rpg_upgrades = 0;
 
 	ent->client->pers.level = 1;
 	ent->client->pers.level_up_score = 0;
@@ -10797,13 +10800,9 @@ void Cmd_Players_f( gentity_t *ent ) {
 			trap->Argv( 2, arg2, sizeof( arg2 ) );
 
 			if (Q_stricmp(arg2, "force") == 0 || Q_stricmp(arg2, "weapons") == 0 || Q_stricmp(arg2, "other") == 0 || 
-				Q_stricmp(arg2, "ammo") == 0 || Q_stricmp(arg2, "items") == 0 || Q_stricmp(arg2, "unique") == 0 || Q_stricmp(arg2, "magic") == 0)
+				Q_stricmp(arg2, "unique") == 0 || Q_stricmp(arg2, "magic") == 0)
 			{ // zyk: show skills of the player
 				zyk_list_player_skills(player_ent, ent, G_NewString(arg2));
-			}
-			else if (Q_stricmp(arg2, "stuff") == 0)
-			{ // zyk: lists stuff bought by the player
-				zyk_list_stuff(player_ent, ent);
 			}
 			else
 			{

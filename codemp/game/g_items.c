@@ -1234,20 +1234,18 @@ void ItemUse_Sentry( gentity_t *ent )
 
 	SP_PAS( sentry );
 
-	// zyk: Gunner sentry gun has more HP and with the Inventory Capacity upgrade, player can place more sentry guns
+	// zyk: sentry gun has more HP and with the Sentry Gun upgrade, player can place more sentry guns
 	if (ent->client->sess.amrpgmode == 2)
 	{
 		sentry->health = 150;
 
-		// zyk: validating quantity of sentry guns that the Gunner can place
+		// zyk: validating quantity of sentry guns that the player can place
 		ent->client->pers.bounty_hunter_placed_sentries++;
 
-		/*
-		if (ent->client->pers.rpg_upgrades & (1 << UPGRADE_INVENTORY_CAPACITY) && ent->client->pers.bounty_hunter_placed_sentries < NUMBER_OF_GUNNER_ITEMS)
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
 		{
 			ent->client->ps.fd.sentryDeployed = qfalse;
 		}
-		*/
 	}
 }
 

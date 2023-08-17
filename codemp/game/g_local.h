@@ -586,12 +586,6 @@ typedef enum {
 	MAX_PLAYER_SETTINGS
 } zyk_settings_t;
 
-// zyk: Upgrades bought from seller
-typedef enum {
-	UPGRADE_ENERGY_MODULATOR,
-	MAX_RPG_UPGRAGES
-} zyk_upgrade_t;
-
 typedef enum {
 	SELLER_BLASTER_PACK,
 	SELLER_POWERCELL,
@@ -827,6 +821,7 @@ typedef enum {
 	RPG_INVENTORY_UPGRADE_SENTRY_GUN,
 	RPG_INVENTORY_UPGRADE_SEEKER_DRONE,
 	RPG_INVENTORY_UPGRADE_EWEB,
+	RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR,
 	MAX_RPG_INVENTORY_ITEMS
 } zyk_inventory_t;
 
@@ -1019,9 +1014,6 @@ typedef struct clientPersistant_s {
 	int sense_health_timer; // zyk: used to periodically show health of player or npc with Sense Health skill
 
 	int flame_thrower_timer; // zyk: used by stun baton. Its the flame thrower timer
-
-	// zyk: Upgrades bought from the seller
-	int rpg_upgrades;
 
 	// zyk: amount of sentries placed in map
 	int bounty_hunter_placed_sentries;
