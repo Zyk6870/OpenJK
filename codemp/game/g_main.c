@@ -7577,6 +7577,7 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = 35;
 	rpg_inventory_weights[RPG_INVENTORY_WP_CONCUSSION] = 40;
 	rpg_inventory_weights[RPG_INVENTORY_WP_BRYAR_PISTOL] = 14;
+
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_BLASTER_PACK] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_POWERCELL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_METAL_BOLTS] = 1;
@@ -7584,6 +7585,7 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_THERMALS] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_TRIPMINES] = 7;
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_DETPACKS] = 10;
+
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_BINOCULARS] = 3;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_BACTA_CANISTER] = 4;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_SENTRY_GUN] = 6;
@@ -7592,9 +7594,11 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_BIG_BACTA] = 8;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_FORCE_FIELD] = 9;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_CLOAK] = 7;
-	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 40;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 100;
+
 	rpg_inventory_weights[RPG_INVENTORY_MISC_JETPACK_FUEL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = 1;
+
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 7;
@@ -7602,7 +7606,7 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 200;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 200;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 200;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 50;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 80;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = 10;
@@ -7615,13 +7619,13 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CONCUSSION] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DETPACKS] = 10;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 40;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_RADAR] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR] = 100;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR] = 80;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
