@@ -86,7 +86,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_RUN_SPEED] = 3;
 	
 	max_skill_levels[SKILL_UNIQUE_1] = 1;
-	max_skill_levels[SKILL_UNIQUE_2] = 1;
 	max_skill_levels[SKILL_UNIQUE_3] = 1;
 	max_skill_levels[SKILL_UNIQUE_4] = 1;
 	max_skill_levels[SKILL_UNIQUE_5] = 1;
@@ -187,7 +186,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
 
 	skill_names[SKILL_UNIQUE_1] = "Vertical DFA";
-	skill_names[SKILL_UNIQUE_2] = "No Attack";
 	skill_names[SKILL_UNIQUE_3] = "Fast Dash";
 	skill_names[SKILL_UNIQUE_4] = "Force Shield";
 	skill_names[SKILL_UNIQUE_5] = "Force Maelstrom";
@@ -343,8 +341,6 @@ char* zyk_skill_description(int skill_index)
 
 	if (skill_index == SKILL_UNIQUE_1)
 		return "Bind with ^3/bind <key> unique 56 ^7to use it\nVertical DFA. Makes you jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force";
-	if (skill_index == SKILL_UNIQUE_2)
-		return "Bind with ^3/bind <key> unique 57 ^7to use it\nNo Attack. Makes the nearby enemies not able to attack for some seconds. Spends 50 force";
 	if (skill_index == SKILL_UNIQUE_3)
 		return "Bind with ^3/bind <key> unique 58 ^7to use it\nFast Dash. Makes you do a dash towards where he is looking at. If he hits someone, damages and knocks the target down. Spends 50 force and 10 mp";
 	if (skill_index == SKILL_UNIQUE_4)
@@ -11097,7 +11093,6 @@ extern void Jedi_Cloak(gentity_t *self);
 extern void WP_AddAsMindtricked(forcedata_t *fd, int entNum);
 extern qboolean G_InGetUpAnim(playerState_t *ps);
 extern void zyk_WP_FireRocket(gentity_t *ent);
-extern void zyk_no_attack(gentity_t *ent);
 extern void zyk_super_beam(gentity_t *ent, int angle_yaw);
 extern void force_scream(gentity_t *ent);
 extern void zyk_force_storm(gentity_t *ent);
@@ -11154,25 +11149,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 				ent->client->pers.vertical_dfa_timer = level.time + 1000;
 
 				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
-			}
-		}
-		else if (unique_skill_number == (SKILL_UNIQUE_2 + 1))
-		{ // zyk: No Attack
-			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
-			{
-				ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
-
-				zyk_no_attack(ent);
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 
 				rpg_skill_counter(ent, 200);
 			}

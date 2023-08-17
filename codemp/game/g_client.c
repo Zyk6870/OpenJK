@@ -3847,9 +3847,6 @@ void ClientSpawn(gentity_t *ent) {
 	// zyk: initializing Quest Power attributes
 	ent->client->pers.quest_power_status = 0;
 
-	// zyk: No Attack ability timer
-	ent->client->pers.no_attack_timer = 0;
-
 	// zyk: if player is logged at spawn, load his skills
 	if (ent->client->sess.amrpgmode == 2)
 	{

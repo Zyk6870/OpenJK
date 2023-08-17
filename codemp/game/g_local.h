@@ -722,7 +722,6 @@ typedef enum {
 	SKILL_UNDERWATER,
 	SKILL_RUN_SPEED,
 	SKILL_UNIQUE_1,
-	SKILL_UNIQUE_2,
 	SKILL_UNIQUE_3,
 	SKILL_UNIQUE_4,
 	SKILL_UNIQUE_5,
@@ -999,9 +998,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: timer to show effect of Vertical DFA ability
 	int vertical_dfa_timer;
-
-	// zyk: timer to keep this player stunned by No Attack ability
-	int no_attack_timer;
 
 	// zyk: RPG skills
 	int skill_levels[NUMBER_OF_SKILLS];

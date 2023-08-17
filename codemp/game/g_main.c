@@ -5360,36 +5360,6 @@ void zyk_vertical_dfa_effect(gentity_t *ent)
 	level.special_power_effects_timer[new_ent->s.number] = level.time + 600;
 }
 
-// zyk: No Attack ability
-void zyk_no_attack(gentity_t *ent)
-{
-	int i = 0;
-
-	for (i = 0; i < level.num_entities; i++)
-	{
-		gentity_t *player_ent = &g_entities[i];
-
-		if (player_ent && player_ent->client && ent != player_ent &&
-			zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue &&
-			Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 300)
-		{
-			G_Damage(player_ent, ent, ent, NULL, NULL, 15, 0, MOD_UNKNOWN);
-
-			player_ent->client->ps.weaponTime = 3000;
-			player_ent->client->ps.electrifyTime = level.time + 3000;
-			player_ent->client->pers.no_attack_timer = level.time + 3000;
-
-			if (player_ent->client->ps.weaponstate == WEAPON_CHARGING ||
-				player_ent->client->ps.weaponstate == WEAPON_CHARGING_ALT)
-			{
-				player_ent->client->ps.weaponstate = WEAPON_READY;
-			}
-		}
-	}
-
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/hologram_off.mp3"));
-}
-
 // zyk: Super Beam ability
 void zyk_super_beam(gentity_t *ent, int angle_yaw)
 {
@@ -9916,12 +9886,8 @@ void G_RunFrame( int levelTime ) {
 
 						zyk_super_beam(ent, ent->client->ps.viewangles[1]);
 					}
-					if (ent->client->pers.custom_quest_unique_abilities & (1 << 2) && random_number == 2)
-					{
-						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-						zyk_no_attack(ent);
-					}
-					else if (ent->client->pers.custom_quest_unique_abilities & (1 << 3) && random_number == 3)
+
+					if (ent->client->pers.custom_quest_unique_abilities & (1 << 3) && random_number == 3)
 					{
 						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 						force_scream(ent);
