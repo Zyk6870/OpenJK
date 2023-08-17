@@ -570,13 +570,6 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 		return 0;
 	}
 
-	if (other && other->client && other->client->sess.amrpgmode == 2 && 
-		other->client->pers.unique_skill_duration > level.time && 
-		other->client->pers.active_unique_skill == (SKILL_UNIQUE_4 + 1))
-	{ // zyk: Force Shield protects against force powers
-		return 0;
-	}
-
 	if (forcePower != FP_TEAM_HEAL && forcePower != FP_TEAM_FORCE && attacker && attacker->client && other && other->client && 
 		attacker->client->sess.amrpgmode > 0 && other->client->sess.amrpgmode > 0 && other->client->pers.player_settings & (1 << SETTINGS_FORCE_FROM_ALLIES) &&
 		zyk_is_ally(attacker,other) == qtrue)

@@ -723,7 +723,6 @@ typedef enum {
 	SKILL_RUN_SPEED,
 	SKILL_UNIQUE_1,
 	SKILL_UNIQUE_3,
-	SKILL_UNIQUE_4,
 	SKILL_UNIQUE_7,
 	SKILL_UNIQUE_8,
 	SKILL_UNIQUE_10,
@@ -881,7 +880,7 @@ typedef struct clientPersistant_s {
 	// 4 - Scaled player
 	// 5 - Chat protection activated for this player
 	// 6 - Paralyzed by an admin
-	// 7 - send event so client-side mod knows if this is a Force User or not, to render the Force Shield effect
+	// 7 - unused
 	// 8 - unused
 	// 9 - unused
 	// 10 - using Healing Crystal

@@ -4987,11 +4987,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	{ // zyk: damage resistance
 		float bonus_resistance = 0.00;
 
-		if (targ->client->pers.active_unique_skill == (SKILL_UNIQUE_4 + 1) && targ->client->pers.unique_skill_duration > level.time)
-		{ // zyk: Force Shield
-			bonus_resistance += 0.70;
-		}
-
 		if (targ->client->pers.energy_modulator_mode == 2)
 		{ // zyk: Energy Modulator mode 2
 			bonus_resistance += 0.20;
