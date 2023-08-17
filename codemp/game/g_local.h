@@ -483,9 +483,8 @@ typedef struct clientSession_s {
 	
 	// zyk: activates Magic Fist types
 	// Possible values are:
-	// 0 - Normal Bolt
-	// 1 - Electric Bolt
-	// 2 - Instant-Hit Bolt
+	// 1 - Normal Bolt
+	// 2 - Electric Bolt
 	// 3 - Fire Bolt
 	// 4 - Ultra Bolt
 	// 5 - None

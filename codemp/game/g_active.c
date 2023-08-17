@@ -3458,27 +3458,23 @@ void ClientThink_real( gentity_t *ent ) {
 
 						if (ent->client->sess.magic_fist_selection == 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7Normal Bolt       ^3MP: ^7%d\"", ent->client->pers.magic_power));
+							trap->SendServerCommand(ent->s.number, va("chat \"^7Normal Bolt       ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer));
 						}
 						else if (ent->client->sess.magic_fist_selection == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7Electric Bolt     ^3MP: ^7%d\"", ent->client->pers.magic_power));
+							trap->SendServerCommand(ent->s.number, va("chat \"^7Electric Bolt     ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer * 2));
 						}
 						else if (ent->client->sess.magic_fist_selection == 3)
 						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7Instant-Hit Bolt  ^3MP: ^7%d\"", ent->client->pers.magic_power));
+							trap->SendServerCommand(ent->s.number, va("chat \"^7Fire Bolt         ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer * 2));
 						}
 						else if (ent->client->sess.magic_fist_selection == 4)
 						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7Fire Bolt         ^3MP: ^7%d\"", ent->client->pers.magic_power));
-						}
-						else if (ent->client->sess.magic_fist_selection == 5)
-						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7Ultra Bolt        ^3MP: ^7%d\"", ent->client->pers.magic_power));
+							trap->SendServerCommand(ent->s.number, va("chat \"^7Ultra Bolt        ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer * 2));
 						}
 						else
 						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7None              ^3MP: ^7%d\"", ent->client->pers.magic_power));
+							trap->SendServerCommand(ent->s.number, "chat \"^7None              ^3MP cost: ^70\"");
 						}
 					}
 				}

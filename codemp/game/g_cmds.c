@@ -85,7 +85,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_UNDERWATER] = 2;
 	max_skill_levels[SKILL_RUN_SPEED] = 3;
 
-	max_skill_levels[SKILL_MAGIC_FIST] = 5;
+	max_skill_levels[SKILL_MAGIC_FIST] = 4;
 	max_skill_levels[SKILL_MAX_MP] = 10;
 	max_skill_levels[SKILL_MAGIC_1] = 2;
 	max_skill_levels[SKILL_MAGIC_2] = 2;
