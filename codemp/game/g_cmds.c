@@ -12175,14 +12175,12 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 	if (argc == 1)
 	{ // zyk: lists the chars and commands
-		trap->SendServerCommand(ent->s.number, va("print \"\n^7Using %s\n\n^7%s\n^3/rpgchar new <charname>: ^7creates a new char\n^3/rpgchar rename <new name>: ^7renames current char\n^3/rpgchar use <charname>: ^7uses this char\n^3/rpgchar delete <charname>: ^7removes this char\n^3/rpgchar migrate <charname> <login> <password>: ^7moves char to account with this login and password\n\"", ent->client->sess.rpgchar, zyk_get_rpg_chars(ent, "\n")));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^7Using %s\n\n^7%s\n^3/rpgchar new <charname>: ^7creates a new char\n^3/rpgchar rename <new name>: ^7renames current char\n^3/rpgchar use <charname>: ^7uses this char\n^3/rpgchar delete <charname>: ^7removes this char\n\"", ent->client->sess.rpgchar, zyk_get_rpg_chars(ent, "\n")));
 	}
 	else
 	{
 		char arg1[MAX_STRING_CHARS];
 		char arg2[MAX_STRING_CHARS];
-		char arg3[MAX_STRING_CHARS];
-		char arg4[MAX_STRING_CHARS];
 
 		trap->Argv(1, arg1, sizeof(arg1));
 
@@ -12351,88 +12349,6 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 			remove(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, arg2));
 
 			trap->SendServerCommand(ent->s.number, va("print \"Char %s ^7deleted!\n\"", arg2));
-		}
-		else if (Q_stricmp(arg1, "migrate") == 0)
-		{
-			if (argc < 5)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"This command requires more arguments\n\"");
-				return;
-			}
-
-			trap->Argv(3, arg3, sizeof(arg3));
-			trap->Argv(4, arg4, sizeof(arg4));
-
-			if (zyk_check_user_input(arg2, strlen(arg2)) == qfalse)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"Invalid charname. Only letters and numbers allowed.\n\"");
-				return;
-			}
-
-			if (zyk_check_user_input(arg3, strlen(arg3)) == qfalse)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"Invalid charname. Only letters and numbers allowed.\n\"");
-				return;
-			}
-
-			chars_file = fopen(va("zykmod/accounts/%s.txt", arg3), "r");
-			if (chars_file == NULL)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"This account does not exist\n\"");
-				return;
-			}
-
-			// zyk: getting the password
-			fscanf(chars_file, "%s", content);
-			fclose(chars_file);
-
-			if (strlen(content) != strlen(arg4) || Q_strncmp(content, arg4, strlen(content)) != 0)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"The password is incorrect\n\"");
-				return;
-			}
-
-			chars_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, arg2), "r");
-			if (chars_file == NULL)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"This char does not exist\n\"");
-				return;
-			}
-			fclose(chars_file);
-
-			chars_file = fopen(va("zykmod/accounts/%s_%s.txt", arg3, arg2), "r");
-			if (chars_file)
-			{
-				fclose(chars_file);
-				trap->SendServerCommand(ent->s.number, "print \"Cannot overwrite existing char of that account\n\"");
-				return;
-			}
-
-			if (Q_stricmp(arg2, arg3) == 0)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"Cannot overwrite the default char of that account\n\"");
-				return;
-			}
-
-			if (Q_stricmp(arg2, ent->client->sess.filename) == 0)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"Cannot migrate the default char\n\"");
-				return;
-			}
-
-			if (Q_stricmp(arg2, ent->client->sess.rpgchar) == 0)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"Cannot migrate char you are using now\n\"");
-				return;
-			}
-
-#if defined(__linux__)
-			system(va("mv zykmod/accounts/%s_%s.txt zykmod/accounts/%s_%s.txt", ent->client->sess.filename, arg2, arg3, arg2));
-#else
-			system(va("cd \"zykmod/accounts\" & MOVE %s_%s.txt %s_%s.txt", ent->client->sess.filename, arg2, arg3, arg2));
-#endif
-
-			trap->SendServerCommand(ent->s.number, va("print \"Char %s ^7moved!\n\"", arg2));
 		}
 
 		// zyk: syncronize info to the client menu
