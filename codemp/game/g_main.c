@@ -7808,6 +7808,7 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DETPACKS] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 40;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_RADAR] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = 10;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
@@ -9427,7 +9428,7 @@ void G_RunFrame( int levelTime ) {
 				zyk_calculate_current_weight(ent);
 				
 				if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
-				{ // zyk: if Gunner stops using sniper scope or binoculars, stop the Thermal Vision
+				{ // zyk: if player stops using binoculars, stop the Thermal Vision
 					ent->client->pers.thermal_vision = qfalse;
 					ent->client->ps.fd.forcePowersActive &= ~(1 << FP_SEE);
 					ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
@@ -9435,8 +9436,9 @@ void G_RunFrame( int levelTime ) {
 
 					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 				}
-				else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION))
-				{ // zyk: Gunner with Thermal Vision Upgrade, activate the Thermal Vision
+				else if (ent->client->pers.thermal_vision == qfalse && ent->client->ps.zoomMode == 2 && 
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0)
+				{ // zyk: Thermal Vision Upgrade, activate the Thermal Vision
 					ent->client->pers.thermal_vision = qtrue;
 					ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
 					ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_3;

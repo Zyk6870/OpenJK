@@ -548,7 +548,7 @@ void ItemUse_Binoculars(gentity_t *ent)
 	*/
 
 	// zyk: with Thermal Vision, sets the cooldown between activating and deactivating Binoculars to avoid problem in which it gets instantly on and off
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION) &&
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0 &&
 		ent->client->pers.thermal_vision_cooldown_time > level.time)
 	{
 		return;
