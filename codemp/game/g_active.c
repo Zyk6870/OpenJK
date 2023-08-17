@@ -201,10 +201,10 @@ void P_WorldEffects( gentity_t *ent ) {
 		ent->client->airOutTime = level.time + 12000;
 		ent->damage = 2;
 
-		// zyk: Swimming skill
+		// zyk: Underwater skill
 		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_UNDERWATER] > 0)
 		{
-			ent->client->airOutTime = level.time + (12000 * (ent->client->pers.skill_levels[SKILL_UNDERWATER] * 2));
+			ent->client->airOutTime = level.time + (12000 * (ent->client->pers.skill_levels[SKILL_UNDERWATER] * 10));
 		}
 	}
 
