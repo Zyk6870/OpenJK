@@ -5443,6 +5443,11 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 
 			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
+				if (ent && ent->client)
+				{
+					ent->client->pers.player_statuses |= (1 << 24);
+				}
+
 				G_Kill(ent);
 			}
 		}
@@ -6053,7 +6058,7 @@ char* zyk_add_inventory_whitespaces(int inventory_index, int biggest_inventory_i
 void zyk_list_inventory(gentity_t* ent, int page)
 {
 	int inventory_it = 0;
-	int results_per_page = zyk_list_cmds_results_per_page.integer; // zyk: number of results per page
+	int results_per_page = 20; // zyk: number of results per page
 
 	char message[MAX_STRING_CHARS];
 	char final_chars[32];
@@ -8594,6 +8599,11 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 
 	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)
 	{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
+		if (ent && ent->client)
+		{
+			ent->client->pers.player_statuses |= (1 << 24);
+		}
+
 		G_Kill(ent);
 	}
 }
