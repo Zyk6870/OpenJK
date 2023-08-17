@@ -5551,10 +5551,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	{ // zyk: check shields if the damage is greater than 0
 		int scaled_damage = take;
 
+		/*
 		if (targ->client->sess.amrpgmode == 2) // zyk: Shield Strength skill
 		{
 			scaled_damage = (int)ceil(take * (1.0 - (0.05 * targ->client->pers.skill_levels[SKILL_SHIELD_STRENGTH])));
 		}
+		*/
 
 		if (targ->client->ps.stats[STAT_ARMOR] >= scaled_damage)
 		{

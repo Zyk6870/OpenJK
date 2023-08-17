@@ -79,8 +79,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
 	max_skill_levels[SKILL_MELEE] = 3;
 
-	max_skill_levels[SKILL_MAX_SHIELD] = 5;
-	max_skill_levels[SKILL_SHIELD_STRENGTH] = 5;
 	max_skill_levels[SKILL_MAX_HEALTH] = 5;
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
@@ -182,8 +180,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MELEE_SPEED] = "Melee Punch Speed";
 	skill_names[SKILL_MELEE] = "Melee";
 
-	skill_names[SKILL_MAX_SHIELD] = "Max Shield";
-	skill_names[SKILL_SHIELD_STRENGTH] = "Shield Strength";
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
@@ -334,10 +330,6 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MELEE)
 		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	
-	if (skill_index == SKILL_MAX_SHIELD)
-		return "The max shield (armor) the player can have. Each level increases 20 per cent of max shield the player can have";
-	if (skill_index == SKILL_SHIELD_STRENGTH)
-		return "Each level increases your shield resistance by 5 per cent";
 	if (skill_index == SKILL_MAX_HEALTH)
 		return "Each level increases your max health by 80";
 	if (skill_index == SKILL_HEALTH_STRENGTH)
@@ -4545,7 +4537,16 @@ void set_max_health(gentity_t *ent)
 // zyk: sets the Max Shield a player can have in RPG Mode
 void set_max_shield(gentity_t *ent)
 {
-	ent->client->pers.max_rpg_shield = (int)ceil(((ent->client->pers.skill_levels[SKILL_MAX_SHIELD] * 1.0)/5) * ent->client->pers.max_rpg_health);
+	// ent->client->pers.max_rpg_shield = (int)ceil(((ent->client->pers.skill_levels[SKILL_MAX_SHIELD] * 1.0)/5) * ent->client->pers.max_rpg_health);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] > 0)
+	{ // zyk: Shield Generator Upgrade. With it, player can have shield
+		ent->client->pers.max_rpg_shield = ent->client->pers.max_rpg_health;
+	}
+	else
+	{
+		ent->client->pers.max_rpg_shield = 0;
+	}
 }
 
 void set_max_force(gentity_t* ent)
@@ -5970,7 +5971,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp( arg1, "other" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^7", SKILL_MAX_SHIELD, SKILL_RUN_SPEED, 15);
+		zyk_list_category_skills(ent, target_ent, "^7", SKILL_MAX_HEALTH, SKILL_RUN_SPEED, 15);
 	}
 	else if (Q_stricmp(arg1, "unique") == 0)
 	{
@@ -6003,6 +6004,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = "Rocket Launcher";
 	inventory_item_names[RPG_INVENTORY_WP_CONCUSSION] = "Concussion";
 	inventory_item_names[RPG_INVENTORY_WP_BRYAR_PISTOL] = "Bryar Pistol";
+
 	inventory_item_names[RPG_INVENTORY_AMMO_BLASTER_PACK] = "Blaster Pack Ammo";
 	inventory_item_names[RPG_INVENTORY_AMMO_POWERCELL] = "Powercell Ammo";
 	inventory_item_names[RPG_INVENTORY_AMMO_METAL_BOLTS] = "Metal Bolts Ammo";
@@ -6010,6 +6012,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_AMMO_THERMALS] = "Thermals";
 	inventory_item_names[RPG_INVENTORY_AMMO_TRIPMINES] = "Trip Mines";
 	inventory_item_names[RPG_INVENTORY_AMMO_DETPACKS] = "Detpacks";
+
 	inventory_item_names[RPG_INVENTORY_ITEM_BINOCULARS] = "Binoculars";
 	inventory_item_names[RPG_INVENTORY_ITEM_BACTA_CANISTER] = "Bacta Canister";
 	inventory_item_names[RPG_INVENTORY_ITEM_SENTRY_GUN] = "Sentry Gun";
@@ -6019,11 +6022,14 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_ITEM_FORCE_FIELD] = "Force Field";
 	inventory_item_names[RPG_INVENTORY_ITEM_CLOAK] = "Cloak Item";
 	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "Jetpack";
+
 	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "Jetpack Fuel";
 	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "Flame Thrower Fuel";
+
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BACTA] = "Bacta Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "Force Field Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "Shield Generator";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = "Impact Reducer Armor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "Flame Thrower";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "Stun Baton Upgrade";
@@ -6412,6 +6418,9 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_CLOAK_UPGRADE][0] = 1100;
 	seller_items_cost[SELLER_CLOAK_UPGRADE][1] = 700;
 
+	seller_items_cost[SELLER_SHIELD_GENERATOR_UPGRADE][0] = 500;
+	seller_items_cost[SELLER_SHIELD_GENERATOR_UPGRADE][1] = 300;
+
 	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][0] = 3000;
 	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][1] = 1000;
 
@@ -6531,6 +6540,7 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_BACTA_UPGRADE] = "Bacta Upgrade";
 	seller_items_names[SELLER_FORCE_FIELD_UPGRADE] = "Force Field Upgrade";
 	seller_items_names[SELLER_CLOAK_UPGRADE] = "Cloak Item Upgrade";
+	seller_items_names[SELLER_SHIELD_GENERATOR_UPGRADE] = "Shield Generator";
 	seller_items_names[SELLER_IMPACT_REDUCER_ARMOR] = "Impact Reducer Armor";
 	seller_items_names[SELLER_FLAME_THROWER] = "Flame Thrower";
 	seller_items_names[SELLER_STUN_BATON_UPGRADE] = "Stun Baton Upgrade";
@@ -6786,6 +6796,10 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Cloak Item will be able to cloak vehicles\n\n\"", zyk_get_seller_item_name(i)));
 		}
+		else if (i == SELLER_SHIELD_GENERATOR_UPGRADE)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to restore his shield. The max shield will be the same as the max health\n\n\"", zyk_get_seller_item_name(i)));
+		}
 		else if (i == SELLER_IMPACT_REDUCER_ARMOR)
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage by 15 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_seller_item_name(i)));
@@ -6962,6 +6976,11 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	else if (value == (SELLER_CLOAK_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_CLOAK_UPGRADE)));
+		return;
+	}
+	else if (value == (SELLER_SHIELD_GENERATOR_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] > 0)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_SHIELD_GENERATOR_UPGRADE)));
 		return;
 	}
 	else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
@@ -7301,6 +7320,12 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == (SELLER_CLOAK_UPGRADE + 1))
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_CLOAK);
+		}
+		else if (value == (SELLER_SHIELD_GENERATOR_UPGRADE + 1))
+		{
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR);
+
+			set_max_shield(ent);
 		}
 		else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1))
 		{
@@ -7669,6 +7694,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (value == (SELLER_CLOAK_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_CLOAK);
+		sold = 1;
+	}
+	else if (value == (SELLER_SHIELD_GENERATOR_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR);
 		sold = 1;
 	}
 	else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
