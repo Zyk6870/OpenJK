@@ -609,9 +609,9 @@ void pas_fire( gentity_t *ent )
 	myOrg[2] += fwd[2]*16;
 
 	// zyk: changed sentry gun shotspeed from 2300 to 2800
-	// zyk: Gunner Items Upgrade makes sentry gun have more damage
+	// zyk: Sentry Gun Upgrade makes sentry gun have more damage
 	if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && 
-		ent->parent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+		ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
 		WP_FireTurretMissile(&g_entities[ent->genericValue3], myOrg, fwd, qfalse, 12, 2800, MOD_SENTRY, ent );
 	else
 		WP_FireTurretMissile(&g_entities[ent->genericValue3], myOrg, fwd, qfalse, 10, 2800, MOD_SENTRY, ent );
@@ -647,9 +647,9 @@ static qboolean pas_find_enemies( gentity_t *self )
 
 	VectorCopy(self->s.pos.trBase, org2);
 
-	// zyk: Gunner Items Upgrade allows it to find enemies in a greater distance
+	// zyk: Sentry Gun Upgrade allows it to find enemies in a greater distance
 	if (self->parent && self->parent->client && self->parent->client->sess.amrpgmode == 2 && 
-		self->parent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+		self->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
 	{
 		distance_to_find_enemies *= 2;
 		bestDist = distance_to_find_enemies*distance_to_find_enemies;
@@ -1279,7 +1279,7 @@ void ItemUse_Seeker(gentity_t *ent)
 	{
 		ent->client->ps.eFlags |= EF_SEEKERDRONE;
 		// zyk: Gunner Items Upgrade increases seeker drone lifetime
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
 			ent->client->ps.droneExistTime = level.time + 80000;
 		else
 			ent->client->ps.droneExistTime = level.time + 60000; // zyk: the seeker drone lifetime, changed from 30000 to 60000
@@ -1828,8 +1828,8 @@ void EWebFire(gentity_t *owner, gentity_t *eweb)
 	missile->classname = "generic_proj";
 	missile->s.weapon = WP_TURRET;
 
-	// zyk: Gunner Items Upgrade makes EWeb have more damage
-	if (owner && owner->client && owner->client->sess.amrpgmode == 2 && owner->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+	// zyk: E-Web Upgrade makes E-Web have more damage
+	if (owner && owner->client && owner->client->sess.amrpgmode == 2 && owner->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
 		missile->damage = EWEB_MISSILE_DAMAGE + 5;
 	else
 		missile->damage = EWEB_MISSILE_DAMAGE;
@@ -2108,8 +2108,8 @@ gentity_t *EWeb_Create(gentity_t *spawner)
 
 	ent->takedamage = qtrue;
 
-	// zyk: EWeb with Gunner Items Upgrade has more health
-	if (spawner->client->sess.amrpgmode == 2 && spawner->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+	// zyk: E-Web Upgrade gives E-Web more health
+	if (spawner->client->sess.amrpgmode == 2 && spawner->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
 	{
 		eweb_health = eweb_health * 2;
 	}

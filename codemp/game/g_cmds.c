@@ -246,7 +246,6 @@ char* zyk_skill_name(int skill_index)
 char* zyk_get_upgrade_name(zyk_upgrade_t upgrade_flag)
 {
 	char rpg_upgrade_names[MAX_RPG_UPGRAGES][32] = {
-		"Gunner Items Upgrade",
 		"Energy Modulator"
 	};
 
@@ -6479,11 +6478,17 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_THERMAL_VISION][0] = 1000;
 	seller_items_cost[SELLER_THERMAL_VISION][1] = 600;
 
-	seller_items_cost[SELLER_GUNNER_ITEMS_UPGRADE][0] = 4000;
-	seller_items_cost[SELLER_GUNNER_ITEMS_UPGRADE][1] = 0;
+	seller_items_cost[SELLER_SENTRY_GUN_UPGRADE][0] = 1800;
+	seller_items_cost[SELLER_SENTRY_GUN_UPGRADE][1] = 1000;
+
+	seller_items_cost[SELLER_SEEKER_DRONE_UPGRADE][0] = 16000;
+	seller_items_cost[SELLER_SEEKER_DRONE_UPGRADE][1] = 900;
+
+	seller_items_cost[SELLER_EWEB_UPGRADE][0] = 1200;
+	seller_items_cost[SELLER_EWEB_UPGRADE][1] = 500;
 
 	seller_items_cost[SELLER_ENERGY_MODULATOR][0] = 7000;
-	seller_items_cost[SELLER_ENERGY_MODULATOR][1] = 0;
+	seller_items_cost[SELLER_ENERGY_MODULATOR][1] = 5000;
 
 	if (buy_item == qtrue)
 	{
@@ -6558,7 +6563,9 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_JETPACK_UPGRADE] = "Jetpack Upgrade";
 	seller_items_names[SELLER_GUNNER_RADAR] = "Radar";
 	seller_items_names[SELLER_THERMAL_VISION] = "Thermal Vision";
-	seller_items_names[SELLER_GUNNER_ITEMS_UPGRADE] = "Gunner Items Upgrade";
+	seller_items_names[SELLER_SENTRY_GUN_UPGRADE] = "Sentry Gun Upgrade";
+	seller_items_names[SELLER_SEEKER_DRONE_UPGRADE] = "Seeker Drone Upgrade";
+	seller_items_names[SELLER_EWEB_UPGRADE] = "E-Web Upgrade";
 	seller_items_names[SELLER_ENERGY_MODULATOR] = "Energy Modulator";
 
 	if (item_number >= 0 && item_number < MAX_SELLER_ITEMS)
@@ -6788,7 +6795,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_FORCE_FIELD_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Force Field resists more\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Force Field resists more damage. Allows getting them back pressing Use Key on them. Doing so requires some powercell ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_CLOAK_UPGRADE)
 		{
@@ -6862,9 +6869,17 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes binoculars detect enemies through a thermal vision system\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == SELLER_GUNNER_ITEMS_UPGRADE)
+		else if (i == SELLER_SENTRY_GUN_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes sentry gun, seeker drone and e-web stronger. Can get sentry guns and force fields back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes Sentry Gun stronger. Allows getting sentry guns back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
+		}
+		else if (i == SELLER_SEEKER_DRONE_UPGRADE)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes seeker drone stronger\n\n\"", zyk_get_seller_item_name(i)));
+		}
+		else if (i == SELLER_EWEB_UPGRADE)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes E-Web stronger\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_ENERGY_MODULATOR)
 		{
@@ -7049,9 +7064,19 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_THERMAL_VISION)));
 		return;
 	}
-	else if (value == (SELLER_GUNNER_ITEMS_UPGRADE + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+	else if (value == (SELLER_SENTRY_GUN_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_GUNNER_ITEMS)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_SENTRY_GUN_UPGRADE)));
+		return;
+	}
+	else if (value == (SELLER_SEEKER_DRONE_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_SEEKER_DRONE_UPGRADE)));
+		return;
+	}
+	else if (value == (SELLER_EWEB_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_EWEB_UPGRADE)));
 		return;
 	}
 	else if (value == (SELLER_ENERGY_MODULATOR + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_ENERGY_MODULATOR))
@@ -7251,10 +7276,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		{
 			zyk_add_mp(ent, 100);
 		}
-		else if (value == (SELLER_GUNNER_ITEMS_UPGRADE + 1))
-		{
-			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_GUNNER_ITEMS);
-		}
 		else if (value == (SELLER_AMMO_ALL + 1))
 		{
 			Add_Ammo(ent,AMMO_BLASTER,100);
@@ -7369,6 +7390,18 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == (SELLER_THERMAL_VISION + 1))
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_THERMAL_VISION);
+		}
+		else if (value == (SELLER_SENTRY_GUN_UPGRADE + 1))
+		{
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_SENTRY_GUN);
+		}
+		else if (value == (SELLER_SEEKER_DRONE_UPGRADE + 1))
+		{
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_SEEKER_DRONE);
+		}
+		else if (value == (SELLER_EWEB_UPGRADE + 1))
+		{
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_EWEB);
 		}
 		else if (value == (SELLER_ENERGY_MODULATOR + 1))
 		{
@@ -7738,9 +7771,24 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_THERMAL_VISION);
 		sold = 1;
 	}
+	else if (value == (SELLER_SENTRY_GUN_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_SENTRY_GUN);
+		sold = 1;
+	}
+	else if (value == (SELLER_SEEKER_DRONE_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_SEEKER_DRONE);
+		sold = 1;
+	}
+	else if (value == (SELLER_EWEB_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_EWEB);
+		sold = 1;
+	}
 
 	zyk_adjust_holdable_items(ent);
-			
+	
 	if (sold == 1)
 	{
 		add_credits(ent, zyk_get_seller_item_cost((value - 1), qfalse));

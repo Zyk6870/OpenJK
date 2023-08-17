@@ -1798,10 +1798,10 @@ void TryUse( gentity_t *ent )
 
 		return;
 	}
-	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) &&
+	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0 &&
 			target && Q_stricmp(target->classname, "sentryGun") == 0 && target->parent && target->parent == ent && 
 			ent->client->ps.ammo[AMMO_POWERCELL] >= 2)
-	{ // zyk: Gunner Items Upgrade allows recovering sentry guns. Uses some power cell ammo
+	{ // zyk: Sentry Gun Upgrade allows recovering sentry guns. Uses some power cell ammo
 		ent->client->pers.bounty_hunter_placed_sentries--;
 		ent->client->ps.fd.sentryDeployed = qfalse;
 
@@ -1811,10 +1811,10 @@ void TryUse( gentity_t *ent )
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));
 		return;
 	}
-	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS) &&
+	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0 &&
 			target && target->s.eType == ET_SPECIAL && target->s.modelindex == HI_SHIELD && target->parent && target->parent == ent &&
 			ent->client->ps.ammo[AMMO_POWERCELL] >= 3)
-	{ // zyk: Gunner Items Upgrade allows recovering force fields. Uses some power cell ammo
+	{ // zyk: Force Field Upgrade allows recovering force fields. Uses some power cell ammo
 		ent->client->ps.ammo[AMMO_POWERCELL] -= 3;
 
 		G_FreeEntity(target);

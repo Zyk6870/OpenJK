@@ -5104,16 +5104,16 @@ void SeekerDroneUpdate(gentity_t *self)
 				VectorNormalize(endir);
 
 				// zyk: changed shot speed from 2000 to 4000
-				// zyk: Gunner Items Upgrade increase seeker drone damage
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+				// zyk: Seeker Drone Upgrade increases seeker drone damage
+				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
 					WP_FireGenericBlasterMissile(self, org, endir, qfalse, 20, 4000, MOD_BLASTER);
 				else
 					WP_FireGenericBlasterMissile(self, org, endir, qfalse, 15, 4000, MOD_BLASTER);
 
 				G_SoundAtLoc( org, CHAN_WEAPON, G_SoundIndex("sound/weapons/bryar/fire.wav") );
 
-				// zyk: Gunner Items Upgrade makes a fast-shooting seeker drone
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_ITEMS))
+				// zyk: Seeker Drone Upgrade makes a fast-shooting seeker drone
+				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
 					self->client->ps.droneFireTime = level.time + Q_irand(200, 300);
 				else
 					self->client->ps.droneFireTime = level.time + Q_irand(400, 700);
