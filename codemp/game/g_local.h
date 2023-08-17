@@ -722,7 +722,6 @@ typedef enum {
 	SKILL_UNDERWATER,
 	SKILL_RUN_SPEED,
 	SKILL_UNIQUE_1,
-	SKILL_UNIQUE_3,
 	SKILL_UNIQUE_12,
 	SKILL_MAGIC_FIST,
 	SKILL_MAX_MP,
@@ -963,9 +962,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: used to set the duration that some unique skills or unique abilities are active
 	int unique_skill_duration;
-
-	// zyk: used by Fast Dash ability
-	int fast_dash_timer;
 
 	// zyk: used by Aimed Shot ability
 	int unique_skill_user_id;

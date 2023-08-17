@@ -86,7 +86,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_RUN_SPEED] = 3;
 	
 	max_skill_levels[SKILL_UNIQUE_1] = 1;
-	max_skill_levels[SKILL_UNIQUE_3] = 1;
 	max_skill_levels[SKILL_UNIQUE_12] = 1;
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 5;
@@ -178,7 +177,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
 
 	skill_names[SKILL_UNIQUE_1] = "Vertical DFA";
-	skill_names[SKILL_UNIQUE_3] = "Fast Dash";
 	skill_names[SKILL_UNIQUE_12] = "Super Beam";
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
@@ -325,8 +323,6 @@ char* zyk_skill_description(int skill_index)
 
 	if (skill_index == SKILL_UNIQUE_1)
 		return "Bind with ^3/bind <key> unique 56 ^7to use it\nVertical DFA. Makes you jump and hit the ground with the saber, with high damage, and creating a powerful shockwave that damages enemies. Spends 50 force";
-	if (skill_index == SKILL_UNIQUE_3)
-		return "Bind with ^3/bind <key> unique 58 ^7to use it\nFast Dash. Makes you do a dash towards where he is looking at. If he hits someone, damages and knocks the target down. Spends 50 force and 10 mp";
 	if (skill_index == SKILL_UNIQUE_12)
 		return "Bind with ^3/bind <key> unique 73 ^7to use it\nSuper Beam. A powerful beam with high damage. Spends 25 mp";
 	
@@ -11056,13 +11052,7 @@ qboolean zyk_can_use_unique(gentity_t *ent)
 Cmd_Unique_f
 ==================
 */
-extern qboolean zyk_can_hit_target(gentity_t* attacker, gentity_t* target);
-extern void Jedi_Cloak(gentity_t *self);
-extern void WP_AddAsMindtricked(forcedata_t *fd, int entNum);
-extern qboolean G_InGetUpAnim(playerState_t *ps);
 extern void zyk_super_beam(gentity_t *ent, int angle_yaw);
-extern qboolean zyk_unique_ability_can_hit_target(gentity_t *attacker, gentity_t *target);
-extern void zyk_force_dash(gentity_t *ent);
 void Cmd_Unique_f(gentity_t *ent) {
 	char arg1[MAX_STRING_CHARS];
 	int unique_skill_number = 0;
@@ -11120,27 +11110,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 			else
 			{
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
-			}
-		}
-		else if (unique_skill_number == (SKILL_UNIQUE_3 + 1))
-		{ // zyk: Fast Dash
-			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4) && ent->client->pers.magic_power >= 10)
-			{
-				ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
-				ent->client->pers.magic_power -= 10;
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 1700;
-				ent->client->pers.unique_skill_duration = level.time + 1700;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				zyk_force_dash(ent);
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force and 10 mp to use it\"", (zyk_max_force_power.integer / 4)));
 			}
 		}
 		else if (unique_skill_number == (SKILL_UNIQUE_12 + 1))

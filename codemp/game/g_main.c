@@ -5388,21 +5388,6 @@ void zyk_super_beam(gentity_t *ent, int angle_yaw)
 
 extern void Jedi_Decloak(gentity_t *self);
 
-void zyk_force_dash_effect(gentity_t *ent)
-{
-	zyk_quest_effect_spawn(ent, ent, "zyk_effect_force_dash", "0", "force/rage2", 0, 0, 0, 200);
-}
-
-// zyk: Fast Dash ability
-void zyk_force_dash(gentity_t *ent)
-{
-	G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCELONGLEAP_START, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh9.mp3"));
-
-	ent->client->pers.fast_dash_timer = 0;
-}
-
 void energy_modulator_think(gentity_t* self)
 {
 	if (self)
