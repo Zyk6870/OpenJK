@@ -933,7 +933,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		else if (!(client->pers.player_statuses & (1 << 3)))
 		{
 			// zyk: event to set the blue jetpack flame
-			if (client->sess.amrpgmode == 2 && client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK))
+			if (client->sess.amrpgmode == 2 && client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 				G_AddEvent(ent, EV_ITEMUSEFAIL, 7);
 			else
 				G_AddEvent(ent, EV_ITEMUSEFAIL, 8);

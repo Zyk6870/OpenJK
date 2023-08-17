@@ -7806,6 +7806,7 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CONCUSSION] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DETPACKS] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 40;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
@@ -8972,7 +8973,7 @@ void G_RunFrame( int levelTime ) {
 			{
 				int jetpack_debounce_amount = 20;
 
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_upgrades & (1 << UPGRADE_JETPACK))
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 				{ // zyk: Jetpack Upgrade decreases fuel debounce
 					jetpack_debounce_amount -= 4;
 				}
