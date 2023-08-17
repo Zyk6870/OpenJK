@@ -7863,54 +7863,6 @@ void Cmd_ChangePassword_f( gentity_t *ent ) {
 	trap->SendServerCommand( ent-g_entities, "print \"Your password was changed successfully.\n\"" );
 }
 
-/*
-==================
-Cmd_ResetAccount_f
-==================
-*/
-void Cmd_ResetAccount_f( gentity_t *ent ) {
-	int i = 0;
-
-	for (i = 0; i < NUMBER_OF_SKILLS; i++)
-		ent->client->pers.skill_levels[i] = 0;
-
-	// zyk: initializing RPG inventory
-	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
-	{
-		ent->client->pers.rpg_inventory[i] = 0;
-	}
-
-	ent->client->pers.credits = 100;
-	ent->client->sess.magic_fist_selection = 0;
-
-	// zyk: in RPG Mode, player must actually buy these
-	ent->client->ps.jetpackFuel = 0;
-	ent->client->ps.cloakFuel = 0;
-	ent->client->pers.jetpack_fuel = 0;
-
-	ent->client->pers.max_rpg_shield = 0;
-
-	ent->client->pers.level = 1;
-	ent->client->pers.level_up_score = 0;
-	ent->client->pers.skillpoints = 1;
-
-	ent->client->pers.credits = 100;
-
-	ent->client->sess.magic_fist_selection = 0;
-
-	ent->client->pers.main_quest_progress = 0;
-	ent->client->pers.side_quest_progress = 0;
-
-	save_account(ent, qtrue);
-
-	trap->SendServerCommand(ent->s.number, "print \"Your account is reset.\n\"");
-
-	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
-	{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
-		G_Kill(ent);
-	}
-}
-
 extern void zyk_TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles );
 
 /*
@@ -12175,7 +12127,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 	if (argc == 1)
 	{ // zyk: lists the chars and commands
-		trap->SendServerCommand(ent->s.number, va("print \"\n^7Using %s\n\n^7%s\n^3/rpgchar new <charname>: ^7creates a new char\n^3/rpgchar rename <new name>: ^7renames current char\n^3/rpgchar use <charname>: ^7uses this char\n^3/rpgchar delete <charname>: ^7removes this char\n\"", ent->client->sess.rpgchar, zyk_get_rpg_chars(ent, "\n")));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^7Using %s\n\n^7%s\n^3/rpgchar new <charname>: ^7creates a new char\n^3/rpgchar rename <new name>: ^7renames current char\n^3/rpgchar use <charname>: ^7uses this char\n^3/rpgchar delete <charname>: ^7removes this char\n^3/rpgchar reset <quests or levels>: ^7resets either quests or levels of the current char\n\"", ent->client->sess.rpgchar, zyk_get_rpg_chars(ent, "\n")));
 	}
 	else
 	{
@@ -12349,6 +12301,62 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 			remove(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, arg2));
 
 			trap->SendServerCommand(ent->s.number, va("print \"Char %s ^7deleted!\n\"", arg2));
+		}
+		else if (Q_stricmp(arg1, "reset") == 0)
+		{
+			int i = 0;
+
+			if (Q_stricmp(arg2, "quests") == 0)
+			{
+				ent->client->pers.main_quest_progress = 0;
+				ent->client->pers.side_quest_progress = 0;
+
+				save_account(ent, qtrue);
+
+				trap->SendServerCommand(ent->s.number, "print \"Quests resetted.\n\"");
+
+				if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+				{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
+					G_Kill(ent);
+				}
+			}
+			else if (Q_stricmp(arg2, "levels") == 0)
+			{
+				for (i = 0; i < NUMBER_OF_SKILLS; i++)
+					ent->client->pers.skill_levels[i] = 0;
+
+				// zyk: initializing RPG inventory
+				for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+				{
+					ent->client->pers.rpg_inventory[i] = 0;
+				}
+
+				ent->client->pers.level = 1;
+				ent->client->pers.level_up_score = 0;
+				ent->client->pers.skillpoints = 1;
+
+				ent->client->pers.credits = 100;
+
+				ent->client->sess.magic_fist_selection = 0;
+
+				// zyk: in RPG Mode, player must actually buy these
+				ent->client->ps.jetpackFuel = 0;
+				ent->client->ps.cloakFuel = 0;
+				ent->client->pers.jetpack_fuel = 0;
+
+				save_account(ent, qtrue);
+
+				trap->SendServerCommand(ent->s.number, "print \"Levels resetted.\n\"");
+
+				if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+				{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
+					G_Kill(ent);
+				}
+			}
+			else
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Invalid argument. Must be either ^3quests ^7or ^3levels^7\n\"");
+			}
 		}
 
 		// zyk: syncronize info to the client menu
@@ -13100,7 +13108,6 @@ command_t commands[] = {
 	{ "remaplist",			Cmd_RemapList_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "remapload",			Cmd_RemapLoad_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "remapsave",			Cmd_RemapSave_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
-	{ "resetaccount",		Cmd_ResetAccount_f,			CMD_RPG|CMD_NOINTERMISSION },
 	{ "rpgchar",			Cmd_RpgChar_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "rpglmsmode",			Cmd_RpgLmsMode_f,			CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "rpglmstable",		Cmd_RpgLmsTable_f,			CMD_NOINTERMISSION },
