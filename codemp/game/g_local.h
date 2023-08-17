@@ -893,13 +893,22 @@ typedef struct clientPersistant_s {
 	// 21 - unused
 	// 22 - unused
 	// 23 - unused
-	// 24 - unused
+	// 24 - Self-killed. Do not reload his health, shield and mp from account
 	// 25 - RPG Mode tutorial
 	// 26 - Using nofight command
 	// 27 - Has just lost his duel in Duel Tournament
 	// 28 - Custom Quest npc
 	// 29 - hit by Fire Bolt/Flame Thrower
 	int player_statuses;
+
+	// zyk: last health, shield and mp are saved into account
+	int last_health;
+	int last_shield;
+	int last_mp;
+
+	// zyk: if health, shield or mp changes, save it into account after this time in miliseconds
+	int save_stat_changes_timer;
+	qboolean save_stats_changes;
 
 	// zyk: setting this to 1 means the npc has the npcboss Custom Quest field
 	int custom_quest_boss_npc;

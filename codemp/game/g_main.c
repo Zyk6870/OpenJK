@@ -9045,6 +9045,27 @@ void G_RunFrame( int levelTime ) {
 			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
 
+				if (!(ent->client->pers.player_statuses & (1 << 24)) && 
+					(ent->client->pers.last_health != ent->health || 
+					 ent->client->pers.last_shield != ent->client->ps.stats[STAT_ARMOR] || 
+					 ent->client->pers.last_mp != ent->client->pers.magic_power))
+				{
+					ent->client->pers.last_health = ent->health;
+					ent->client->pers.last_shield = ent->client->ps.stats[STAT_ARMOR];
+					ent->client->pers.last_mp = ent->client->pers.magic_power;
+
+					ent->client->pers.save_stats_changes = qtrue;
+				}
+
+				if (ent->client->pers.save_stats_changes == qtrue && ent->client->pers.save_stat_changes_timer < level.time)
+				{
+					save_account(ent, qtrue);
+
+					// zyk: timer to save account to prevent too much file IO
+					ent->client->pers.save_stats_changes = qfalse;
+					ent->client->pers.save_stat_changes_timer = level.time + 400;
+				}
+
 				// zyk: Weapon Upgrades
 				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0 &&
 					ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 0.6))

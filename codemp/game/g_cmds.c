@@ -1099,6 +1099,11 @@ Cmd_Kill_f
 =================
 */
 void Cmd_Kill_f( gentity_t *ent ) {
+	if (ent && ent->client)
+	{
+		ent->client->pers.player_statuses |= (1 << 24);
+	}
+
 	G_Kill( ent );
 }
 
@@ -2280,6 +2285,18 @@ void load_account(gentity_t* ent)
 			fscanf(account_file, "%s", content);
 			ent->client->pers.side_quest_progress = atoi(content);
 
+			// zyk: last health
+			fscanf(account_file, "%s", content);
+			ent->client->pers.last_health = atoi(content);
+
+			// zyk: last shield
+			fscanf(account_file, "%s", content);
+			ent->client->pers.last_shield = atoi(content);
+
+			// zyk: last mp
+			fscanf(account_file, "%s", content);
+			ent->client->pers.last_mp = atoi(content);
+
 			if (ent->client->sess.amrpgmode == 1)
 			{
 				ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
@@ -2348,9 +2365,10 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n",
+			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
 				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.credits,
-				client->sess.magic_fist_selection, client->pers.main_quest_progress, client->pers.side_quest_progress);
+				client->sess.magic_fist_selection, client->pers.main_quest_progress, client->pers.side_quest_progress,
+				client->pers.last_health, client->pers.last_shield, client->pers.last_mp);
 
 			fclose(account_file);
 		}
@@ -4969,18 +4987,33 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.current_quest_event = 0;
 			ent->client->pers.quest_event_timer = 0;
 
-			// zyk: loading initial health
-			ent->health = ent->client->pers.max_rpg_health;
-			ent->client->ps.stats[STAT_HEALTH] = ent->health;
-
-			// zyk: loading initial shield
-			ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
-
 			// zyk: loading initial force
 			ent->client->ps.fd.forcePower = ent->client->pers.max_force_power;
 
-			// zyk: loading initial MP
-			ent->client->pers.magic_power = zyk_max_magic_power(ent);
+			if (!(ent->client->pers.player_statuses & (1 << 24)) && 
+				ent->client->pers.last_health <= 0)
+			{ // zyk: reload player stats if he died and he did not use /kill command
+				// zyk: loading initial health
+				ent->health = ent->client->pers.max_rpg_health;
+				ent->client->ps.stats[STAT_HEALTH] = ent->health;
+
+				// zyk: loading initial shield
+				ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
+
+				// zyk: loading initial MP
+				ent->client->pers.magic_power = zyk_max_magic_power(ent);
+			}
+			else
+			{ // zyk: reload the last stats
+				ent->health = ent->client->pers.last_health;
+				ent->client->ps.stats[STAT_HEALTH] = ent->health;
+
+				// zyk: loading initial shield
+				ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.last_shield;
+
+				// zyk: loading initial MP
+				ent->client->pers.magic_power = ent->client->pers.last_mp;
+			}
 		}
 		else
 		{ // it is possible to have above max of these if player downgrades these skills
@@ -5192,6 +5225,9 @@ void add_new_char(gentity_t *ent)
 	ent->client->ps.jetpackFuel = 0;
 	ent->client->ps.cloakFuel = 0;
 	ent->client->pers.jetpack_fuel = 0;
+
+	// zyk: so the char starts with the original health
+	ent->client->pers.last_health = 100;
 }
 
 // zyk: creates the directory correctly depending on the OS

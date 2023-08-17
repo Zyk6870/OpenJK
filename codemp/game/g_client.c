@@ -2722,6 +2722,13 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	VectorSet(client->pers.teleport_point,0,0,0);
 	VectorCopy(client->ps.viewangles,client->pers.teleport_angles);
 
+	// zyk: initialize timer when health, shield and mp changes
+	client->pers.save_stat_changes_timer = 0;
+	client->pers.save_stats_changes = qfalse;
+	client->pers.last_health = 100;
+	client->pers.last_shield = 0;
+	client->pers.last_mp = 0;
+
 	if (ent->client->sess.amrpgmode > 0)
 	{
 		// zyk: if the target goes to spec or something, then the server must choose another target
@@ -3847,6 +3854,11 @@ void ClientSpawn(gentity_t *ent) {
 	if (ent->client->sess.amrpgmode == 2)
 	{
 		initialize_rpg_skills(ent, qtrue);
+
+		if (ent->client->pers.player_statuses & (1 << 24))
+		{
+			ent->client->pers.player_statuses &= ~(1 << 24);
+		}
 	}
 	else if (ent->client->pers.player_statuses & (1 << 12))
 	{ // zyk: player received force powers from admin
