@@ -5966,6 +5966,8 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "Shield Generator";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = "Impact Reducer Armor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = "Deflective Armor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = "Saber Armor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "Flame Thrower";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "Stun Baton Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = "Blaster Pistol Upgrade";
@@ -6356,8 +6358,14 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_SHIELD_GENERATOR_UPGRADE][0] = 500;
 	seller_items_cost[SELLER_SHIELD_GENERATOR_UPGRADE][1] = 300;
 
-	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][0] = 3000;
+	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][0] = 2000;
 	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][1] = 1000;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR][0] = 2000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR][1] = 1000;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SABER_ARMOR][0] = 2000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SABER_ARMOR][1] = 1000;
 
 	seller_items_cost[SELLER_FLAME_THROWER][0] = 1000;
 	seller_items_cost[SELLER_FLAME_THROWER][1] = 700;
@@ -6477,6 +6485,8 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_CLOAK_UPGRADE] = "Cloak Item Upgrade";
 	seller_items_names[SELLER_SHIELD_GENERATOR_UPGRADE] = "Shield Generator";
 	seller_items_names[SELLER_IMPACT_REDUCER_ARMOR] = "Impact Reducer Armor";
+	seller_items_names[SELLER_DEFLECTIVE_ARMOR] = "Deflective Armor";
+	seller_items_names[SELLER_SABER_ARMOR] = "Saber Armor";
 	seller_items_names[SELLER_FLAME_THROWER] = "Flame Thrower";
 	seller_items_names[SELLER_STUN_BATON_UPGRADE] = "Stun Baton Upgrade";
 	seller_items_names[SELLER_BLASTER_PISTOL_UPGRADE] = "Blaster Pistol Upgrade";
@@ -6737,7 +6747,15 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_IMPACT_REDUCER_ARMOR)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage by 15 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage from any source by 15 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_seller_item_name(i)));
+		}
+		else if (i == SELLER_DEFLECTIVE_ARMOR)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 40 per cent weapon/melee damage (only 5 per cent from saber) and deflects some weapon shots\n\n\"", zyk_get_seller_item_name(i)));
+		}
+		else if (i == SELLER_SABER_ARMOR)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 5 per cent weapon/melee damage (40 per cent from saber)\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_FLAME_THROWER)
 		{
@@ -6817,7 +6835,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_ENERGY_MODULATOR)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a device that has two modes. First Mode increases damage by 30 per cent and reduces flame thrower fuel usage. Second Mode increases resistance to damage by 20 per cent and adds gun shot deflection. Activate it by getting melee and pressing Saber Style key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a device that has two modes. First Mode increases damage by 30 per cent and reduces flame thrower fuel usage. Second Mode increases resistance to damage by 30 per cent. Activate it by getting melee and pressing Saber Style key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
 	}
 }
@@ -6921,6 +6939,16 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_IMPACT_REDUCER_ARMOR)));
+		return;
+	}
+	else if (value == (SELLER_DEFLECTIVE_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_DEFLECTIVE_ARMOR)));
+		return;
+	}
+	else if (value == (SELLER_SABER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_SABER_ARMOR)));
 		return;
 	}
 	else if (value == (SELLER_FLAME_THROWER + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0)
@@ -7265,6 +7293,14 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1))
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR);
+		}
+		else if (value == (SELLER_DEFLECTIVE_ARMOR + 1))
+		{
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR);
+		}
+		else if (value == (SELLER_SABER_ARMOR + 1))
+		{
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_SABER_ARMOR);
 		}
 		else if (value == (SELLER_FLAME_THROWER + 1))
 		{
@@ -7639,6 +7675,16 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR);
+		sold = 1;
+	}
+	else if (value == (SELLER_DEFLECTIVE_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR);
+		sold = 1;
+	}
+	else if (value == (SELLER_SABER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_SABER_ARMOR);
 		sold = 1;
 	}
 	else if (value == (SELLER_FLAME_THROWER + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0)
@@ -10993,12 +11039,14 @@ void Cmd_Saber_f( gentity_t *ent ) {
 	}
 }
 
+// zyk: tests if some weapon shots will be deflected when hitting this player
 qboolean zyk_can_deflect_shots(gentity_t *ent)
 {
 	if (ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		if (ent->client->pers.energy_modulator_mode == 2)
-		{ // zyk: Gunner Energy Modulator at mode 2 deflects shots
+		// zyk: Deflective Armor
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
+		{
 			return qtrue;
 		}
 	}

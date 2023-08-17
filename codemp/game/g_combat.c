@@ -4721,6 +4721,18 @@ int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int skill_inde
 	return final_dmg;
 }
 
+qboolean zyk_source_is_non_saber_weapon(int mod)
+{
+	if ((mod >= MOD_STUN_BATON && mod <= MOD_CONC_ALT) || 
+		mod == MOD_SENTRY || 
+		mod == MOD_TARGET_LASER)
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 /*
 ============
 G_Damage
@@ -4960,7 +4972,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	// zyk: hit by Time Power. Receive less damage
 	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 2))
 	{
-		damage = (int)ceil(damage * 0.1);
+		damage = (int)ceil(damage * 0.2);
 	}
 
 	// zyk: Rock Shield. Prevents almost all damage
@@ -4987,7 +4999,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (targ->client->pers.energy_modulator_mode == 2)
 		{ // zyk: Energy Modulator mode 2
-			bonus_resistance += 0.20;
+			bonus_resistance += 0.30;
 
 			targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 		}
@@ -4995,6 +5007,30 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
 		{ // zyk: Impact Reducer Armor
 			bonus_resistance += 0.15;
+		}
+
+		if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
+		{ // zyk: Deflective Armor
+			if (zyk_source_is_non_saber_weapon(mod) == qtrue)
+			{
+				bonus_resistance += 0.40;
+			}
+			else if (mod == MOD_SABER)
+			{
+				bonus_resistance += 0.05;
+			}
+		}
+
+		if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
+		{ // zyk: Saber Armor
+			if (zyk_source_is_non_saber_weapon(mod) == qtrue)
+			{
+				bonus_resistance += 0.05;
+			}
+			else if (mod == MOD_SABER)
+			{
+				bonus_resistance += 0.40;
+			}
 		}
 
 		if (bonus_resistance >= 1.00)
