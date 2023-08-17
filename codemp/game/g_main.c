@@ -5386,46 +5386,7 @@ void zyk_super_beam(gentity_t *ent, int angle_yaw)
 	level.special_power_effects_timer[new_ent->s.number] = level.time + 2000;
 }
 
-// zyk: Force Storm ability
-extern void Boba_FlyStop(gentity_t *self);
 extern void Jedi_Decloak(gentity_t *self);
-void zyk_force_storm(gentity_t *ent)
-{
-	int i = 0;
-
-	zyk_quest_effect_spawn(ent, ent, "zyk_force_storm", "4", "env/huge_lightning", 0, 20, 120, 3000);
-
-	for (i = 0; i < level.num_entities; i++)
-	{
-		gentity_t *player_ent = &g_entities[i];
-
-		if (player_ent && player_ent->client && ent != player_ent &&
-			zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue &&
-			Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 380)
-		{
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_force_storm", "4", "env/huge_lightning", 0, 20, 120, 3000);
-
-			// zyk: decrease enemy movement speed
-			player_ent->client->pers.stun_baton_less_speed_timer = level.time + 2500;
-
-			if (!player_ent->NPC)
-			{ //disable jetpack temporarily
-				if (player_ent->client->jetPackOn)
-					Jetpack_Off(player_ent);
-				player_ent->client->jetPackToggleTime = level.time + 5000;
-			}
-			else if (player_ent->NPC && player_ent->client->NPC_class == CLASS_BOBAFETT)
-			{ // zyk: also disables npc jetpack
-				Boba_FlyStop(player_ent);
-			}
-
-			if (player_ent->client->ps.powerups[PW_CLOAKED])
-			{ // zyk: disables cloak of enemies
-				Jedi_Decloak(player_ent);
-			}
-		}
-	}
-}
 
 void zyk_force_dash_effect(gentity_t *ent)
 {
@@ -9852,12 +9813,6 @@ void G_RunFrame( int levelTime ) {
 						ent->client->ps.forceHandExtendTime = level.time + 2000;
 
 						zyk_super_beam(ent, ent->client->ps.viewangles[1]);
-					}
-
-					if (ent->client->pers.custom_quest_unique_abilities & (1 << 4) && random_number == 4)
-					{
-						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-						zyk_force_storm(ent);
 					}
 
 					ent->client->pers.unique_skill_timer = level.time + ent->client->pers.unique_skill_npc_timer_amount;

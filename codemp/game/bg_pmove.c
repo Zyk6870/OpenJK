@@ -10909,17 +10909,7 @@ void PmoveSingle (pmove_t *pmove) {
 	*/
 
 #if defined( _GAME )
-	if (player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == (SKILL_UNIQUE_12 + 1))
-	{ // zyk: Super Beam ability does not allow him to move
-		stiffenedUp = qtrue;
-	}
-	else if (player_ent && player_ent->client &&
-		player_ent->client->pers.unique_skill_duration > level.time && player_ent->client->pers.active_unique_skill == (SKILL_UNIQUE_8 + 1))
-	{ // zyk: Force Storm ability does not allow him to move
-		stiffenedUp = qtrue;
-	}
-	else if (level.duel_tournament_mode == 4 && player_ent && player_ent->s.number < MAX_CLIENTS && duel_tournament_is_duelist(player_ent) == qtrue && 
+	if (level.duel_tournament_mode == 4 && player_ent && player_ent->s.number < MAX_CLIENTS && duel_tournament_is_duelist(player_ent) == qtrue && 
 			 (level.duel_tournament_timer - level.time) > (zyk_duel_tournament_duel_time.integer - DUEL_TOURNAMENT_PROTECTION_TIME))
 	{ // zyk: Duel Tournament duelist that has just been placed in arena. Wait some time before moving
 		stiffenedUp = qtrue;

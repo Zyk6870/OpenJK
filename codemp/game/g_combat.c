@@ -6383,7 +6383,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_black_hole") == 0 ||
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_vertical_dfa") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_force_storm") == 0 ||
 						Q_stricmp(attacker->targetname, "zyk_effect_fire_bolt_hit") == 0)
 					{
 						if (Q_stricmp(attacker->targetname, "zyk_quest_effect_flaming_area") == 0 && quest_power_user && quest_power_user != ent && ent->client)
