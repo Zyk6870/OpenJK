@@ -88,10 +88,8 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_UNIQUE_1] = 1;
 	max_skill_levels[SKILL_UNIQUE_3] = 1;
 	max_skill_levels[SKILL_UNIQUE_4] = 1;
-	max_skill_levels[SKILL_UNIQUE_6] = 1;
 	max_skill_levels[SKILL_UNIQUE_7] = 1;
 	max_skill_levels[SKILL_UNIQUE_8] = 1;
-	max_skill_levels[SKILL_UNIQUE_9] = 1;
 	max_skill_levels[SKILL_UNIQUE_10] = 1;
 	max_skill_levels[SKILL_UNIQUE_11] = 1;
 	max_skill_levels[SKILL_UNIQUE_12] = 1;
@@ -187,10 +185,8 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_UNIQUE_1] = "Vertical DFA";
 	skill_names[SKILL_UNIQUE_3] = "Fast Dash";
 	skill_names[SKILL_UNIQUE_4] = "Force Shield";
-	skill_names[SKILL_UNIQUE_6] = "Force Repulse";
 	skill_names[SKILL_UNIQUE_7] = "Force Scream";
 	skill_names[SKILL_UNIQUE_8] = "Force Storm";
-	skill_names[SKILL_UNIQUE_9] = "Force Attraction";
 	skill_names[SKILL_UNIQUE_10] = "Poison Darts";
 	skill_names[SKILL_UNIQUE_11] = "Homing Rocket";
 	skill_names[SKILL_UNIQUE_12] = "Super Beam";
@@ -343,14 +339,10 @@ char* zyk_skill_description(int skill_index)
 		return "Bind with ^3/bind <key> unique 58 ^7to use it\nFast Dash. Makes you do a dash towards where he is looking at. If he hits someone, damages and knocks the target down. Spends 50 force and 10 mp";
 	if (skill_index == SKILL_UNIQUE_4)
 		return "Bind with ^3/bind <key> unique 59 ^7to use it\nForce Shield. Greatly reduces damage and protects against force powers. Spends 50 force";
-	if (skill_index == SKILL_UNIQUE_6)
-		return "Bind with ^3/bind <key> unique 61 ^7to use it\nForce Repulse. Damages and pushes everyone away from you. Spends 50 force";
 	if (skill_index == SKILL_UNIQUE_7)
 		return "Bind with ^3/bind <key> unique 62 ^7to use it\nForce Scream. Player makes a scream that damages nearby enemies and may cause stun anim on them. Spends 50 force";
 	if (skill_index == SKILL_UNIQUE_8)
 		return "Bind with ^3/bind <key> unique 63 ^7to use it\nForce Storm. Attacks enemies nearby with powerful lightning strikes. The strikes slows down enemies and disable jetpack and cloak item. Spends 50 force";
-	if (skill_index == SKILL_UNIQUE_9)
-		return "Bind with ^3/bind <key> unique 64 ^7to use it\nForce Attraction. Damages and pulls enemies towards the user. Spends 50 force";
 	if (skill_index == SKILL_UNIQUE_10)
 		return "Bind with ^3/bind <key> unique 65 ^7to use it\nPoison Darts. Fires poison darts with melee by spending metal bolts ammo";
 	if (skill_index == SKILL_UNIQUE_11)
@@ -11192,76 +11184,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
 			}
 		}
-		else if (unique_skill_number == (SKILL_UNIQUE_6 + 1))
-		{ // zyk: Force Repulse
-			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
-			{
-				int i = 0;
-				int push_scale = 700;
-
-				ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				for (i = 0; i < level.num_entities; i++)
-				{
-					gentity_t* player_ent = &g_entities[i];
-
-					if (player_ent && player_ent->client && ent != player_ent &&
-						zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue &&
-						Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 350)
-					{
-						vec3_t dir;
-
-						VectorSubtract(player_ent->client->ps.origin, ent->client->ps.origin, dir);
-						VectorNormalize(dir);
-
-						// zyk: if using Meditate taunt, remove it
-						if (player_ent->client->ps.legsAnim == BOTH_MEDITATE && player_ent->client->ps.torsoAnim == BOTH_MEDITATE)
-						{
-							player_ent->client->ps.legsAnim = player_ent->client->ps.torsoAnim = BOTH_MEDITATE_END;
-						}
-
-						player_ent->client->ps.velocity[0] = dir[0] * push_scale;
-						player_ent->client->ps.velocity[1] = dir[1] * push_scale;
-						player_ent->client->ps.velocity[2] = 250;
-
-						player_ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-						player_ent->client->ps.forceHandExtendTime = level.time + 1000;
-						player_ent->client->ps.forceDodgeAnim = 0; //this toggles between 1 and 0, when it's 1 we should play the get up anim
-						player_ent->client->ps.quickerGetup = qtrue;
-
-						G_Damage(player_ent, ent, ent, NULL, NULL, 40, 0, MOD_UNKNOWN);
-					}
-				}
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-				ent->client->pers.unique_skill_duration = level.time + 500;
-
-				G_Sound(ent, CHAN_BODY, G_SoundIndex("sound/weapons/force/push.wav"));
-				if (ent->client->ps.forceHandExtend == HANDEXTEND_NONE)
-				{
-					ent->client->ps.forceHandExtend = HANDEXTEND_FORCEPUSH;
-					ent->client->ps.forceHandExtendTime = level.time + 1000;
-				}
-				else if (ent->client->ps.forceHandExtend == HANDEXTEND_KNOCKDOWN && G_InGetUpAnim(&ent->client->ps))
-				{
-					if (ent->client->ps.forceDodgeAnim > 4)
-					{
-						ent->client->ps.forceDodgeAnim -= 8;
-					}
-					ent->client->ps.forceDodgeAnim += 8; //special case, play push on upper torso, but keep playing current knockdown anim on legs
-				}
-				ent->client->ps.powerups[PW_DISINT_4] = level.time + 1100;
-				ent->client->ps.powerups[PW_PULL] = 0;
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
-			}
-		}
 		else if (unique_skill_number == (SKILL_UNIQUE_7 + 1))
 		{ // zyk: Force Scream
 			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
@@ -11298,68 +11220,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 				ent->client->ps.forceHandExtendTime = level.time + 3000;
 
 				zyk_force_storm(ent);
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
-			}
-		}
-		else if (unique_skill_number == (SKILL_UNIQUE_9 + 1))
-		{ // zyk: Force Attraction
-			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
-			{
-				int i = 0;
-				int push_scale = 700;
-
-				ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				for (i = 0; i < level.num_entities; i++)
-				{
-					gentity_t* player_ent = &g_entities[i];
-
-					if (player_ent && player_ent->client && ent != player_ent &&
-						zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue &&
-						Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 400)
-					{
-						vec3_t dir;
-
-						VectorSubtract(ent->client->ps.origin, player_ent->client->ps.origin, dir);
-						VectorNormalize(dir);
-
-						// zyk: if using Meditate taunt, remove it
-						if (player_ent->client->ps.legsAnim == BOTH_MEDITATE && player_ent->client->ps.torsoAnim == BOTH_MEDITATE)
-						{
-							player_ent->client->ps.legsAnim = player_ent->client->ps.torsoAnim = BOTH_MEDITATE_END;
-						}
-
-						player_ent->client->ps.velocity[0] = dir[0] * push_scale;
-						player_ent->client->ps.velocity[1] = dir[1] * push_scale;
-						player_ent->client->ps.velocity[2] = 250;
-
-						player_ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-						player_ent->client->ps.forceHandExtendTime = level.time + 1000;
-						player_ent->client->ps.forceDodgeAnim = 0; //this toggles between 1 and 0, when it's 1 we should play the get up anim
-						player_ent->client->ps.quickerGetup = qtrue;
-
-						G_Damage(player_ent, ent, ent, NULL, NULL, 20, 0, MOD_UNKNOWN);
-					}
-				}
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-				ent->client->pers.unique_skill_duration = level.time + 500;
-
-				G_Sound(ent, CHAN_BODY, G_SoundIndex("sound/weapons/force/pull.wav"));
-				if (ent->client->ps.forceHandExtend == HANDEXTEND_NONE)
-				{
-					ent->client->ps.forceHandExtend = HANDEXTEND_FORCEPULL;
-					ent->client->ps.forceHandExtendTime = level.time + 400;
-				}
-				ent->client->ps.powerups[PW_DISINT_4] = ent->client->ps.forceHandExtendTime + 200;
-				ent->client->ps.powerups[PW_PULL] = ent->client->ps.powerups[PW_DISINT_4];
 
 				rpg_skill_counter(ent, 200);
 			}
