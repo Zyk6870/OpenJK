@@ -6640,25 +6640,6 @@ void quest_power_events(gentity_t *ent)
 	}
 }
 
-// zyk: damages target player with poison hits
-void poison_dart_hits(gentity_t *ent)
-{
-	if (ent && ent->client && ent->health > 0 && ent->client->pers.player_statuses & (1 << 20) && ent->client->pers.poison_dart_hit_counter > 0 && 
-		ent->client->pers.poison_dart_hit_timer < level.time)
-	{
-		gentity_t *poison_user = &g_entities[ent->client->pers.poison_dart_user_id];
-
-		G_Damage(ent,poison_user,poison_user,NULL,NULL,5,0,MOD_UNKNOWN);
-
-		ent->client->pers.poison_dart_hit_counter--;
-		ent->client->pers.poison_dart_hit_timer = level.time + 200;
-
-		// zyk: no more do poison damage if counter is 0
-		if (ent->client->pers.poison_dart_hit_counter == 0)
-			ent->client->pers.player_statuses &= ~(1 << 20);
-	}
-}
-
 // zyk: damages target player with Fire Bolt flames
 void fire_bolt_hits(gentity_t* ent)
 {
@@ -9141,7 +9122,6 @@ void G_RunFrame( int levelTime ) {
 			}
 
 			quest_power_events(ent);
-			poison_dart_hits(ent);
 			fire_bolt_hits(ent);
 
 			if (zyk_chat_protection_timer.integer > 0)
@@ -9777,7 +9757,6 @@ void G_RunFrame( int levelTime ) {
 			WP_SaberStartMissileBlockCheck(ent, &ent->client->pers.cmd);
 
 			quest_power_events(ent);
-			poison_dart_hits(ent);
 			fire_bolt_hits(ent);
 
 			// zyk: npcs cannot enter the Duel Tournament arena

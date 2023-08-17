@@ -88,7 +88,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_UNIQUE_1] = 1;
 	max_skill_levels[SKILL_UNIQUE_3] = 1;
 	max_skill_levels[SKILL_UNIQUE_8] = 1;
-	max_skill_levels[SKILL_UNIQUE_10] = 1;
 	max_skill_levels[SKILL_UNIQUE_12] = 1;
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 5;
@@ -182,7 +181,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_UNIQUE_1] = "Vertical DFA";
 	skill_names[SKILL_UNIQUE_3] = "Fast Dash";
 	skill_names[SKILL_UNIQUE_8] = "Force Storm";
-	skill_names[SKILL_UNIQUE_10] = "Poison Darts";
 	skill_names[SKILL_UNIQUE_12] = "Super Beam";
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
@@ -333,8 +331,6 @@ char* zyk_skill_description(int skill_index)
 		return "Bind with ^3/bind <key> unique 58 ^7to use it\nFast Dash. Makes you do a dash towards where he is looking at. If he hits someone, damages and knocks the target down. Spends 50 force and 10 mp";
 	if (skill_index == SKILL_UNIQUE_8)
 		return "Bind with ^3/bind <key> unique 63 ^7to use it\nForce Storm. Attacks enemies nearby with powerful lightning strikes. The strikes slows down enemies and disable jetpack and cloak item. Spends 50 force";
-	if (skill_index == SKILL_UNIQUE_10)
-		return "Bind with ^3/bind <key> unique 65 ^7to use it\nPoison Darts. Fires poison darts with melee by spending metal bolts ammo";
 	if (skill_index == SKILL_UNIQUE_12)
 		return "Bind with ^3/bind <key> unique 73 ^7to use it\nSuper Beam. A powerful beam with high damage. Spends 25 mp";
 	
@@ -11174,24 +11170,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 			else
 			{
 				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
-			}
-		}
-		else if (unique_skill_number == (SKILL_UNIQUE_10 + 1))
-		{ // zyk: Poison Darts
-			if (ent->client->ps.ammo[AMMO_METAL_BOLTS] >= 2)
-			{
-				ent->client->ps.ammo[AMMO_METAL_BOLTS] -= 2;
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-				ent->client->pers.unique_skill_duration = level.time + 25000;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs 2 metal bolts ammo to use it\"");
 			}
 		}
 		else if (unique_skill_number == (SKILL_UNIQUE_12 + 1))

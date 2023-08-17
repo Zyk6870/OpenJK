@@ -724,7 +724,6 @@ typedef enum {
 	SKILL_UNIQUE_1,
 	SKILL_UNIQUE_3,
 	SKILL_UNIQUE_8,
-	SKILL_UNIQUE_10,
 	SKILL_UNIQUE_12,
 	SKILL_MAGIC_FIST,
 	SKILL_MAX_MP,
@@ -891,7 +890,7 @@ typedef struct clientPersistant_s {
 	// 17 - unused
 	// 18 - NPC has the guard order
 	// 19 - NPC has the cover order
-	// 20 - hit by poison dart
+	// 20 - unused
 	// 21 - unused
 	// 22 - unused
 	// 23 - unused
@@ -913,16 +912,7 @@ typedef struct clientPersistant_s {
 	// zyk: time in which quest player is afk during a quest
 	int quest_afk_timer;
 
-	// zyk: amount of times player must be hit by poison
-	int poison_dart_hit_counter;
-
-	// zyk: player who hit the target with poison dart
-	int poison_dart_user_id;
-
-	// zyk: timer of the poison darts
-	int poison_dart_hit_timer;
-
-	// zyk: timer used to keep spawning fire effects on player who cath fire after neing hit by Fire Bolt
+	// zyk: timer used to keep spawning fire effects on player who catch fire after being hit by Fire Bolt
 	int fire_bolt_timer;
 	int fire_bolt_user_id;
 	int fire_bolt_hits_counter;

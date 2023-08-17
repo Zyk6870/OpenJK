@@ -2180,7 +2180,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 	// zyk: remove any quest_power status from this player
 	self->client->pers.quest_power_status = 0;
-	self->client->pers.player_statuses &= ~(1 << 20);
 	self->client->pers.player_statuses &= ~(1 << 29);
 	self->client->pers.unique_skill_duration = 0;
 
@@ -5030,16 +5029,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				targ->client->ps.electrifyTime = level.time + Q_irand( 300, 800 );
 			}
 		}
-	}
-
-	if (inflictor && inflictor->s.weapon == WP_FLECHETTE && inflictor->methodOfDeath == MOD_MELEE && Q_stricmp(inflictor->classname, "flech_proj") == 0 &&
-		targ && targ->client && targ->health > 0 && attacker && attacker->client &&
-		(targ->s.number < MAX_CLIENTS || targ->client->NPC_class != CLASS_VEHICLE))
-	{ // zyk: hit by poison dart
-		targ->client->pers.poison_dart_hit_counter = 40;
-		targ->client->pers.poison_dart_user_id = attacker->s.number;
-		targ->client->pers.poison_dart_hit_timer = level.time + 100;
-		targ->client->pers.player_statuses |= (1 << 20);
 	}
 
 	if (inflictor && inflictor->s.weapon == WP_FLECHETTE && inflictor->methodOfDeath == MOD_MELEE && Q_stricmp(inflictor->classname, "flech_alt") == 0 &&
