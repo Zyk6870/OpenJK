@@ -2222,68 +2222,6 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 	missile->bounceCount = 0;
 }
 
-// zyk: used by Homing Rocket ability
-//---------------------------------------------------------
-void zyk_WP_FireRocket(gentity_t *ent)
-//---------------------------------------------------------
-{
-	int	damage = zyk_rocket_damage.integer * 2.1;
-	int splash_damage = zyk_rocket_splash_damage.integer * 2.1;
-	int	vel = zyk_rocket_velocity.integer * 1.2;
-	gentity_t *missile;
-	vec3_t zyk_origin, dir, zyk_forward;
-
-	// zyk: subtracts 90 to make rocket go up before targetting the enemy
-	VectorSet(dir, ent->client->ps.viewangles[0] - 90, ent->client->ps.viewangles[1], 0);
-	VectorSet(zyk_origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 20);
-
-	AngleVectors(dir, zyk_forward, NULL, NULL);
-
-	missile = CreateMissile(zyk_origin, zyk_forward, vel, 30000, ent, qfalse);
-
-	// zyk: sets the target
-	if (ent->client && ent->client->ps.rocketLockIndex != ENTITYNUM_NONE)
-	{
-		missile->enemy = &g_entities[ent->client->ps.rocketLockIndex];
-
-		missile->angle = 0.5f;
-		missile->think = rocketThink;
-		missile->nextthink = level.time + ROCKET_ALT_THINK_TIME;
-
-		ent->client->ps.rocketLockIndex = ENTITYNUM_NONE;
-		ent->client->ps.rocketLockTime = 0;
-		ent->client->ps.rocketTargetTime = 0;
-	}
-
-	missile->classname = "rocket_proj";
-	missile->s.weapon = WP_ROCKET_LAUNCHER;
-
-	// Make it easier to hit things
-	VectorSet(missile->r.maxs, ROCKET_SIZE, ROCKET_SIZE, ROCKET_SIZE);
-	VectorScale(missile->r.maxs, -1, missile->r.mins);
-
-	missile->damage = damage;
-	missile->dflags = DAMAGE_DEATH_KNOCKBACK;
-
-	missile->methodOfDeath = MOD_ROCKET_HOMING;
-	missile->splashMethodOfDeath = MOD_ROCKET_HOMING_SPLASH;
-
-	//===testing being able to shoot rockets out of the air==================================
-	missile->health = 10;
-	missile->takedamage = qtrue;
-	missile->r.contents = MASK_SHOT;
-	missile->die = RocketDie;
-	//===testing being able to shoot rockets out of the air==================================
-
-	missile->clipmask = MASK_SHOT;
-
-	missile->splashDamage = splash_damage;
-	missile->splashRadius = ROCKET_SPLASH_RADIUS;
-
-	// we don't want it to ever bounce
-	missile->bounceCount = 0;
-}
-
 /*
 ======================================================================
 

@@ -89,7 +89,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_UNIQUE_3] = 1;
 	max_skill_levels[SKILL_UNIQUE_8] = 1;
 	max_skill_levels[SKILL_UNIQUE_10] = 1;
-	max_skill_levels[SKILL_UNIQUE_11] = 1;
 	max_skill_levels[SKILL_UNIQUE_12] = 1;
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 5;
@@ -184,7 +183,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_UNIQUE_3] = "Fast Dash";
 	skill_names[SKILL_UNIQUE_8] = "Force Storm";
 	skill_names[SKILL_UNIQUE_10] = "Poison Darts";
-	skill_names[SKILL_UNIQUE_11] = "Homing Rocket";
 	skill_names[SKILL_UNIQUE_12] = "Super Beam";
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
@@ -337,8 +335,6 @@ char* zyk_skill_description(int skill_index)
 		return "Bind with ^3/bind <key> unique 63 ^7to use it\nForce Storm. Attacks enemies nearby with powerful lightning strikes. The strikes slows down enemies and disable jetpack and cloak item. Spends 50 force";
 	if (skill_index == SKILL_UNIQUE_10)
 		return "Bind with ^3/bind <key> unique 65 ^7to use it\nPoison Darts. Fires poison darts with melee by spending metal bolts ammo";
-	if (skill_index == SKILL_UNIQUE_11)
-		return "Bind with ^3/bind <key> unique 66 ^7to use it\nHoming Rocket. Shoots a powerful rocket that automatically goes after the nearest target. Spends 2 rockets and 2 power cell ammo";
 	if (skill_index == SKILL_UNIQUE_12)
 		return "Bind with ^3/bind <key> unique 73 ^7to use it\nSuper Beam. A powerful beam with high damage. Spends 25 mp";
 	
@@ -11072,7 +11068,6 @@ extern qboolean zyk_can_hit_target(gentity_t* attacker, gentity_t* target);
 extern void Jedi_Cloak(gentity_t *self);
 extern void WP_AddAsMindtricked(forcedata_t *fd, int entNum);
 extern qboolean G_InGetUpAnim(playerState_t *ps);
-extern void zyk_WP_FireRocket(gentity_t *ent);
 extern void zyk_super_beam(gentity_t *ent, int angle_yaw);
 extern void zyk_force_storm(gentity_t *ent);
 extern qboolean zyk_unique_ability_can_hit_target(gentity_t *attacker, gentity_t *target);
@@ -11197,55 +11192,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 			else
 			{
 				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs 2 metal bolts ammo to use it\"");
-			}
-		}
-		else if (unique_skill_number == (SKILL_UNIQUE_11 + 1))
-		{ // zyk: Homing Rocket
-			if (ent->client->ps.ammo[AMMO_ROCKETS] >= 2 && ent->client->ps.ammo[AMMO_POWERCELL] >= 2)
-			{
-				int i = 0;
-				int min_dist = 1000;
-				gentity_t* chosen_ent = NULL;
-
-				ent->client->ps.ammo[AMMO_ROCKETS] -= 2;
-				ent->client->ps.ammo[AMMO_POWERCELL] -= 2;
-
-				for (i = 0; i < level.num_entities; i++)
-				{
-					gentity_t* player_ent = &g_entities[i];
-
-					if (player_ent && player_ent->client && ent != player_ent && player_ent->health > 0 &&
-						zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue)
-					{
-						int player_dist = Distance(ent->client->ps.origin, player_ent->client->ps.origin);
-
-						if (player_dist < min_dist)
-						{
-							min_dist = player_dist;
-
-							chosen_ent = player_ent;
-						}
-					}
-				}
-
-				if (chosen_ent)
-				{ // zyk: if we have a target, shoot a rocket at him
-					ent->client->ps.rocketLockIndex = chosen_ent->s.number;
-					ent->client->ps.rocketLockTime = level.time;
-				}
-
-				zyk_WP_FireRocket(ent);
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-				ent->client->pers.unique_skill_duration = level.time + 500;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, "chat \"^3Unique Skill: ^7needs 2 rockets and 2 powercell ammo to use it\"");
 			}
 		}
 		else if (unique_skill_number == (SKILL_UNIQUE_12 + 1))
