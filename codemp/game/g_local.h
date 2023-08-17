@@ -898,7 +898,7 @@ typedef struct clientPersistant_s {
 	// 26 - Using nofight command
 	// 27 - Has just lost his duel in Duel Tournament
 	// 28 - Custom Quest npc
-	// 29 - hit by Fire Bolt
+	// 29 - hit by Fire Bolt/Flame Thrower
 	int player_statuses;
 
 	// zyk: setting this to 1 means the npc has the npcboss Custom Quest field

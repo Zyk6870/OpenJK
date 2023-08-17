@@ -5982,6 +5982,15 @@ void Player_FireFlameThrower( gentity_t *self, qboolean is_magic)
 		if (traceEnt && traceEnt != self)
 		{
 			G_Damage( traceEnt, self, self, self->client->ps.viewangles, tr.endpos, damage, DAMAGE_NO_KNOCKBACK|DAMAGE_IGNORE_TEAM, MOD_LAVA );
+
+			// zyk: make target catch fire
+			if (traceEnt->client)
+			{
+				traceEnt->client->pers.fire_bolt_hits_counter += 10;
+				traceEnt->client->pers.fire_bolt_user_id = self->s.number;
+				traceEnt->client->pers.fire_bolt_timer = level.time + 100;
+				traceEnt->client->pers.player_statuses |= (1 << 29);
+			}
 		}
 		e++;
 	}
