@@ -6395,7 +6395,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_vertical_dfa") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_force_storm") == 0 ||
-						Q_stricmp(attacker->targetname, "zyk_effect_scream") == 0 ||
 						Q_stricmp(attacker->targetname, "zyk_effect_fire_bolt_hit") == 0)
 					{
 						if (Q_stricmp(attacker->targetname, "zyk_quest_effect_flaming_area") == 0 && quest_power_user && quest_power_user != ent && ent->client)
@@ -6412,13 +6411,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							ent->client->pers.magic_power_user_id[MAGIC_ULTRA_FLAME] = quest_power_user->s.number;
 							ent->client->pers.magic_power_hit_counter[MAGIC_ULTRA_FLAME] = 10;
 							ent->client->pers.magic_power_target_timer[MAGIC_ULTRA_FLAME] = level.time + 200;
-						}
-						else if (Q_stricmp(attacker->targetname, "zyk_effect_scream") == 0 && ent->client && Q_irand(0, 3) == 0 && 
-							zyk_unique_ability_can_hit_target(quest_power_user, ent) == qtrue)
-						{ // zyk: it has a chance of setting a stun anim on the target
-							ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-							ent->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
-							ent->client->ps.forceHandExtendTime = level.time + 3000;
 						}
 
 						G_Damage (ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);

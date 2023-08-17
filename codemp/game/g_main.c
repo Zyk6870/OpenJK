@@ -5427,18 +5427,6 @@ void zyk_force_storm(gentity_t *ent)
 	}
 }
 
-// zyk: Force Scream ability
-void force_scream(gentity_t *ent)
-{
-	zyk_quest_effect_spawn(ent, ent, "zyk_effect_scream", "4", "howler/sonic", 0, 18, 300, 6000);
-
-	ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-	ent->client->ps.forceDodgeAnim = BOTH_FORCE_RAGE;
-	ent->client->ps.forceHandExtendTime = level.time + 4500;
-
-	G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/chars/howler/howl.mp3"));
-}
-
 void zyk_force_dash_effect(gentity_t *ent)
 {
 	zyk_quest_effect_spawn(ent, ent, "zyk_effect_force_dash", "0", "force/rage2", 0, 0, 0, 200);
@@ -9887,12 +9875,7 @@ void G_RunFrame( int levelTime ) {
 						zyk_super_beam(ent, ent->client->ps.viewangles[1]);
 					}
 
-					if (ent->client->pers.custom_quest_unique_abilities & (1 << 3) && random_number == 3)
-					{
-						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
-						force_scream(ent);
-					}
-					else if (ent->client->pers.custom_quest_unique_abilities & (1 << 4) && random_number == 4)
+					if (ent->client->pers.custom_quest_unique_abilities & (1 << 4) && random_number == 4)
 					{
 						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
 						zyk_force_storm(ent);
