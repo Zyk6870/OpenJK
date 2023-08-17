@@ -88,7 +88,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_UNIQUE_1] = 1;
 	max_skill_levels[SKILL_UNIQUE_3] = 1;
 	max_skill_levels[SKILL_UNIQUE_4] = 1;
-	max_skill_levels[SKILL_UNIQUE_5] = 1;
 	max_skill_levels[SKILL_UNIQUE_6] = 1;
 	max_skill_levels[SKILL_UNIQUE_7] = 1;
 	max_skill_levels[SKILL_UNIQUE_8] = 1;
@@ -188,7 +187,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_UNIQUE_1] = "Vertical DFA";
 	skill_names[SKILL_UNIQUE_3] = "Fast Dash";
 	skill_names[SKILL_UNIQUE_4] = "Force Shield";
-	skill_names[SKILL_UNIQUE_5] = "Force Maelstrom";
 	skill_names[SKILL_UNIQUE_6] = "Force Repulse";
 	skill_names[SKILL_UNIQUE_7] = "Force Scream";
 	skill_names[SKILL_UNIQUE_8] = "Force Storm";
@@ -345,8 +343,6 @@ char* zyk_skill_description(int skill_index)
 		return "Bind with ^3/bind <key> unique 58 ^7to use it\nFast Dash. Makes you do a dash towards where he is looking at. If he hits someone, damages and knocks the target down. Spends 50 force and 10 mp";
 	if (skill_index == SKILL_UNIQUE_4)
 		return "Bind with ^3/bind <key> unique 59 ^7to use it\nForce Shield. Greatly reduces damage and protects against force powers. Spends 50 force";
-	if (skill_index == SKILL_UNIQUE_5)
-		return "Bind with ^3/bind <key> unique 60 ^7to use it\nForce Maelstrom. Grips enemies nearby, damages them, sets force shield and uses lightning if player has the force power. Spends 50 force";
 	if (skill_index == SKILL_UNIQUE_6)
 		return "Bind with ^3/bind <key> unique 61 ^7to use it\nForce Repulse. Damages and pushes everyone away from you. Spends 50 force";
 	if (skill_index == SKILL_UNIQUE_7)
@@ -11186,49 +11182,6 @@ void Cmd_Unique_f(gentity_t *ent) {
 
 				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 10000;
 				ent->client->pers.unique_skill_duration = level.time + 10000;
-
-				ent->client->pers.active_unique_skill = unique_skill_number;
-
-				rpg_skill_counter(ent, 200);
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, va("chat \"^3Unique Skill: ^7needs %d force to use it\"", (zyk_max_force_power.integer / 4)));
-			}
-		}
-		else if (unique_skill_number == (SKILL_UNIQUE_5 + 1))
-		{ // zyk: Force Maelstrom
-			if (ent->client->ps.fd.forcePower >= (zyk_max_force_power.integer / 4))
-			{
-				int i = 0;
-
-				ent->client->ps.fd.forcePower -= (zyk_max_force_power.integer / 4);
-
-				for (i = 0; i < level.num_entities; i++)
-				{
-					gentity_t* player_ent = &g_entities[i];
-
-					if (player_ent && player_ent->client && ent != player_ent && zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue &&
-						Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 300)
-					{
-						G_Damage(player_ent, ent, ent, NULL, NULL, 70, 0, MOD_FORCE_DARK);
-
-						//Must play custom sounds on the actual entity. Don't use G_Sound (it creates a temp entity for the sound)
-						G_EntitySound(player_ent, CHAN_VOICE, G_SoundIndex(va("*choke%d.wav", Q_irand(1, 3))));
-
-						player_ent->client->ps.forceHandExtend = HANDEXTEND_CHOKE;
-						player_ent->client->ps.forceHandExtendTime = level.time + 4000;
-
-						player_ent->client->ps.fd.forceGripBeingGripped = level.time + 4000;
-					}
-				}
-
-				// zyk: activating Force Lightning
-				ent->client->ps.fd.forcePowersActive |= (1 << FP_LIGHTNING);
-				ent->client->ps.fd.forcePowerDuration[FP_LIGHTNING] = level.time + 4000;
-
-				ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 4000;
-				ent->client->pers.unique_skill_duration = level.time + 4000;
 
 				ent->client->pers.active_unique_skill = unique_skill_number;
 

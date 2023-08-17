@@ -5790,9 +5790,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 		}
 	}
 
-	if ( ucmd->buttons & BUTTON_FORCE_LIGHTNING || 
-		(self->client->sess.amrpgmode == 2 && 
-		 self->client->pers.active_unique_skill == (SKILL_UNIQUE_5 + 1) && self->client->pers.unique_skill_duration > level.time))
+	if ( ucmd->buttons & BUTTON_FORCE_LIGHTNING)
 	{ //lightning
 		WP_DoSpecificPower(self, ucmd, FP_LIGHTNING);
 	}
