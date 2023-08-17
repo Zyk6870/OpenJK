@@ -921,7 +921,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		else if (!(client->pers.player_statuses & (1 << 2)))
 		{ // zyk: send this event after some seconds in map and if the player did not received this event yet
 			// must wait some seconds because after a map change, sometimes the event is not received by the client-side game right away
-			if (client->sess.amrpgmode == 2 && client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_RADAR))
+			if (client->sess.amrpgmode == 2 && client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_RADAR] > 0)
 			{
 				G_AddEvent(ent, EV_ITEMUSEFAIL, 5);
 			}

@@ -246,7 +246,6 @@ char* zyk_skill_name(int skill_index)
 char* zyk_get_upgrade_name(zyk_upgrade_t upgrade_flag)
 {
 	char rpg_upgrade_names[MAX_RPG_UPGRAGES][32] = {
-		"Gunner Radar",
 		"Thermal Vision",
 		"Gunner Items Upgrade",
 		"Energy Modulator"
@@ -6475,8 +6474,8 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_JETPACK_UPGRADE][0] = 5000;
 	seller_items_cost[SELLER_JETPACK_UPGRADE][1] = 3000;
 
-	seller_items_cost[SELLER_GUNNER_RADAR][0] = 3000;
-	seller_items_cost[SELLER_GUNNER_RADAR][1] = 0;
+	seller_items_cost[SELLER_GUNNER_RADAR][0] = 1000;
+	seller_items_cost[SELLER_GUNNER_RADAR][1] = 500;
 
 	seller_items_cost[SELLER_THERMAL_VISION][0] = 2300;
 	seller_items_cost[SELLER_THERMAL_VISION][1] = 0;
@@ -6558,7 +6557,7 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_ROCKETS_UPGRADE] = "Rocket Launcher Upgrade";
 	seller_items_names[SELLER_DETPACKS_UPGRADE] = "Detpacks Upgrade";
 	seller_items_names[SELLER_JETPACK_UPGRADE] = "Jetpack Upgrade";
-	seller_items_names[SELLER_GUNNER_RADAR] = "Gunner Radar";
+	seller_items_names[SELLER_GUNNER_RADAR] = "Radar";
 	seller_items_names[SELLER_THERMAL_VISION] = "Thermal Vision";
 	seller_items_names[SELLER_GUNNER_ITEMS_UPGRADE] = "Gunner Items Upgrade";
 	seller_items_names[SELLER_ENERGY_MODULATOR] = "Energy Modulator";
@@ -6858,7 +6857,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_GUNNER_RADAR)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7if you have the New Zyk Mod client, a radar will be displayed in the screen showing positions of other players and npcs\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7if you have the client plugin, a radar will be displayed in the screen showing positions of other players and npcs\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_THERMAL_VISION)
 		{
@@ -7041,9 +7040,9 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_JETPACK_UPGRADE)));
 		return;
 	}
-	else if (value == (SELLER_GUNNER_RADAR + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_GUNNER_RADAR))
+	else if (value == (SELLER_GUNNER_RADAR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_RADAR] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_upgrade_name(UPGRADE_GUNNER_RADAR)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_GUNNER_RADAR)));
 		return;
 	}
 	else if (value == (SELLER_THERMAL_VISION + 1) && ent->client->pers.rpg_upgrades & (1 << UPGRADE_THERMAL_VISION))
@@ -7095,13 +7094,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
 			Add_Ammo(ent,AMMO_DETPACK,2);
-		}
-		else if (value == (SELLER_GUNNER_RADAR + 1))
-		{
-			ent->client->pers.rpg_upgrades |= (1 << UPGRADE_GUNNER_RADAR);
-
-			// zyk: update the rpg stuff info at the client-side game
-			send_rpg_events(10000);
 		}
 		else if (value == (SELLER_SHIELD_BOOSTER + 1))
 		{
@@ -7368,6 +7360,13 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == (SELLER_JETPACK_UPGRADE + 1))
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_JETPACK);
+
+			// zyk: update the rpg stuff info at the client-side game
+			send_rpg_events(10000);
+		}
+		else if (value == (SELLER_GUNNER_RADAR + 1))
+		{
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_RADAR);
 
 			// zyk: update the rpg stuff info at the client-side game
 			send_rpg_events(10000);
@@ -7728,6 +7727,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (value == (SELLER_JETPACK_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_JETPACK);
+		sold = 1;
+	}
+	else if (value == (SELLER_GUNNER_RADAR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_RADAR] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_RADAR);
 		sold = 1;
 	}
 
