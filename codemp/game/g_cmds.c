@@ -6014,6 +6014,38 @@ char* zyk_add_inventory_whitespaces(int inventory_index, int biggest_inventory_i
 	return G_NewString(result_text);
 }
 
+void zyk_list_inventory(gentity_t* ent, int page)
+{
+	int inventory_it = 0;
+	int results_per_page = zyk_list_cmds_results_per_page.integer; // zyk: number of results per page
+
+	char message[MAX_STRING_CHARS];
+	char final_chars[32];
+
+	strcpy(message, "");
+	strcpy(final_chars, "");
+
+	for (inventory_it = 0; inventory_it < MAX_RPG_INVENTORY_ITEMS; inventory_it++)
+	{
+		if (inventory_it >= ((page - 1) * results_per_page) && inventory_it < (page * results_per_page))
+		{
+			if ((inventory_it % 2) == 0)
+			{ // zyk: adds whitespaces in first column
+				strcpy(final_chars, va("%s ", zyk_add_inventory_whitespaces(inventory_it, 30)));
+			}
+			else
+			{
+				strcpy(final_chars, "\n");
+			}
+
+			strcpy(message, va("%s^3%s: ^7%d%s", message, zyk_get_inventory_item_name(inventory_it),
+				ent->client->pers.rpg_inventory[inventory_it], final_chars));
+		}
+	}
+
+	trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", message));
+}
+
 /*
 ==================
 Cmd_ListAccount_f
@@ -6044,35 +6076,26 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			}
 			else if (Q_stricmp(arg1, "inventory") == 0)
 			{
-				int inventory_it = 0;
-
-				char message[MAX_STRING_CHARS];
-				char final_chars[32];
-
-				strcpy(message, "");
-				strcpy(final_chars, "");
-
-				for (inventory_it = 0; inventory_it < MAX_RPG_INVENTORY_ITEMS; inventory_it++)
+				if (trap->Argc() == 2)
 				{
-					if ((inventory_it % 2) == 0)
-					{ // zyk: adds whitespaces in first column
-						strcpy(final_chars, va("%s ", zyk_add_inventory_whitespaces(inventory_it, 30)));
-					}
-					else
-					{
-						strcpy(final_chars, "\n");
-					}
-
-					strcpy(message, va("%s^3%s: ^7%d%s", message, zyk_get_inventory_item_name(inventory_it),
-						ent->client->pers.rpg_inventory[inventory_it], final_chars));
+					trap->SendServerCommand(ent->s.number, "print \"Must pass a page number. Example: ^3/list inventory 1^7\n\"");
 				}
+				else
+				{
+					int page = 1; // zyk: page the user wants to see
+					char arg2[MAX_STRING_CHARS];
 
-				if ((inventory_it % 2) != 0)
-				{ // zyk: if this category has an odd number of skills, add a final line break
-					strcpy(message, va("%s\n", message));
+					strcpy(arg2, "");
+
+					trap->Argv(2, arg2, sizeof(arg2));
+
+					page = atoi(arg2);
+
+					if (page <= 0)
+						page = 1;
+
+					zyk_list_inventory(ent, page);
 				}
-
-				trap->SendServerCommand(ent->s.number, va("print \"%s\"", message));
 			}
 			else if (Q_stricmp( arg1, "quests" ) == 0)
 			{
