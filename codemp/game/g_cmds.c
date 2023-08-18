@@ -4945,8 +4945,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		set_max_weight(ent);
 		set_max_stamina(ent);
 
-		zyk_load_common_settings(ent);
-
 		// zyk: setting rpg control attributes
 
 		if (ent->client->sess.magic_fist_selection > ent->client->pers.skill_levels[SKILL_MAGIC_FIST])
@@ -4966,6 +4964,8 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 		if (init_all == qtrue)
 		{
+			zyk_load_common_settings(ent);
+
 			ent->client->pers.sense_health_timer = 0;
 
 			ent->client->pers.thermal_vision = qfalse;
