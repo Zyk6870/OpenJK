@@ -4504,7 +4504,7 @@ void set_max_weight(gentity_t* ent)
 // zyk: set the Max Stamina of this player
 void set_max_stamina(gentity_t* ent)
 {
-	ent->client->pers.max_stamina = 5000 + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 5000);
+	ent->client->pers.max_stamina = RPG_DEFAULT_STAMINA + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * RPG_DEFAULT_STAMINA);
 }
 
 // zyk: increases or decreases RPG player stamina
@@ -5244,6 +5244,8 @@ void add_new_char(gentity_t *ent)
 
 	// zyk: so the char starts with the original health
 	ent->client->pers.last_health = 100;
+	ent->client->pers.current_stamina = RPG_DEFAULT_STAMINA;
+	ent->client->pers.last_stamina = RPG_DEFAULT_STAMINA;
 }
 
 // zyk: creates the directory correctly depending on the OS

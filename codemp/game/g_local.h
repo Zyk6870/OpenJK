@@ -805,6 +805,7 @@ typedef enum {
 
 // zyk: Minimum Stamina before player starts to get tired
 #define RPG_MIN_STAMINA 1000.0
+#define RPG_DEFAULT_STAMINA 5000
 
 // zyk: when casting magic, use anim for this amount of time in miliseconds
 #define MAGIC_ANIM_TIME 2000
