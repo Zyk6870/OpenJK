@@ -3005,6 +3005,11 @@ void fx_runner_link( gentity_t *ent )
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 100;
 		}
+		else if (Q_stricmp(ent->targetname, "zyk_quest_effect_dome") == 0)
+		{ // zyk: starts the Dome of Damage effect right now
+			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
+			ent->nextthink = level.time + 100;
+		}
 		else if (Q_stricmp(ent->targetname, "zyk_magic_element") == 0)
 		{ // zyk: starts the Magic Element effect right now
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
@@ -3085,6 +3090,7 @@ void SP_fx_runner( gentity_t *ent )
 	if (Q_stricmp(ent->targetname, "zyk_quest_effect_enemy_nerf") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_quest_effect_flaming_area_hit") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_quest_effect_flame") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_quest_effect_dome") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_quest_effect_chaos") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_quest_effect_flaming_rage") == 0)

@@ -4752,9 +4752,6 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 
 		level.special_power_effects[new_ent->s.number] = ent->s.number;
 		level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
-
-		if (Q_stricmp(targetname, "zyk_quest_effect_drain") == 0)
-			G_Sound(new_ent, CHAN_AUTO, G_SoundIndex("sound/effects/arc_lp.wav"));
 	}
 	else
 	{ // zyk: model power
@@ -5438,26 +5435,21 @@ void rock_smash(gentity_t *ent, int distance, int damage)
 }
 
 // zyk: Dome of Damage
-void dome_of_damage(gentity_t *ent, int distance, int damage)
+void dome_of_damage(gentity_t *ent, int damage)
 {
-	int i = 0;
-	int targets_hit = 0;
+	int duration = 7000;
 
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_DOME_OF_DAMAGE] > 1)
 	{
-		distance += 100;
-		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_dome", "4", "env/dome", 1000, damage, 290, 8000);
+		damage += 5;
+		duration += 1000;
 	}
 
-	for (i = 0; i < level.num_entities; i++)
-	{
-		gentity_t *player_ent = &g_entities[i];
+	ent->client->pers.dome_of_damage_dmg = damage;
 
-		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qtrue, &targets_hit) == qtrue)
-		{
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_dome", "4", "env/dome", 1000, damage, 290, 8000);
-		}
-	}
+	ent->client->pers.quest_power_status |= (1 << 4);
+	ent->client->pers.magic_power_timer[MAGIC_DOME_OF_DAMAGE] = level.time + duration;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] = 0;
 }
 
 // zyk: Magic Shield
@@ -5574,7 +5566,7 @@ void black_hole(gentity_t* ent, int radius, int damage, int duration)
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_BLACK_HOLE] > 1)
 	{
 		damage += 15;
-		duration += 2000;
+		duration += 1000;
 	}
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_black_hole", "4", "ships/proton_impact", 500, damage, radius, duration);
@@ -5593,7 +5585,7 @@ void light_of_judgement(gentity_t* ent, int radius, int duration)
 {
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_LIGHT_OF_JUDGEMENT] > 1)
 	{
-		duration += 3000;
+		duration += 1000;
 	}
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_light_of_judgement", "0", "ships/sd_exhaust", 500, 0, 0, duration);
@@ -5875,6 +5867,21 @@ void quest_power_events(gentity_t *ent)
 				if (ent->client->pers.magic_power_timer[MAGIC_FLAMING_RAGE] < level.time)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 3);
+				}
+			}
+
+			if (ent->client->pers.quest_power_status & (1 << 4))
+			{ // zyk: Dome of Damage. Makes the Dome effect always be at the player origin
+				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] < level.time)
+				{
+					zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_dome", "4", "env/dome", 0, ent->client->pers.dome_of_damage_dmg, 290, 1000);
+
+					ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] = level.time + 500;
+				}
+				
+				if (ent->client->pers.magic_power_timer[MAGIC_DOME_OF_DAMAGE] < level.time)
+				{ // zyk: Dome of Damage run out
+					ent->client->pers.quest_power_status &= ~(1 << 4);
 				}
 			}
 

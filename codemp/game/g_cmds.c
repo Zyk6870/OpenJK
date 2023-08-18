@@ -342,7 +342,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_BLACK_HOLE)
 		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
 	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
-		return "an energy dome appears at enemies, damaging anyone inside it";
+		return "an energy dome appears at your position each half second, damaging enemies inside it";
 	if (skill_index == SKILL_MAGIC_CHAOS_POWER)
 		return "damages, stuns, slowers and electrifies enemies";
 	if (skill_index == SKILL_MAGIC_LIGHT_OF_JUDGEMENT)
@@ -4286,7 +4286,7 @@ extern void chaos_power(gentity_t *ent, int distance, int duration);
 extern void water_splash(gentity_t *ent, int distance, int damage);
 extern void ultra_flame(gentity_t *ent, int distance, int damage);
 extern void rock_smash(gentity_t *ent, int distance, int damage);
-extern void dome_of_damage(gentity_t *ent, int distance, int damage);
+extern void dome_of_damage(gentity_t *ent, int damage);
 extern void slow_motion(gentity_t *ent, int distance, int duration);
 extern void magic_shield(gentity_t *ent, int duration);
 extern void healing_area(gentity_t *ent, int damage, int duration);
@@ -11220,12 +11220,12 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			}
 			else if (magic_number == MAGIC_BLACK_HOLE)
 			{
-				black_hole(ent, 540, 30, 7000);
-				zyk_set_magic_power_cooldown_time(ent, 48000);
+				black_hole(ent, 540, 40, 5000);
+				zyk_set_magic_power_cooldown_time(ent, 30000);
 			}
 			else if (magic_number == MAGIC_DOME_OF_DAMAGE)
 			{
-				dome_of_damage(ent, 500, 25);
+				dome_of_damage(ent, 30);
 				zyk_set_magic_power_cooldown_time(ent, 16000);
 			}
 			else if (magic_number == MAGIC_CHAOS_POWER)
@@ -11235,8 +11235,8 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			}
 			else if (magic_number == MAGIC_LIGHT_OF_JUDGEMENT)
 			{
-				light_of_judgement(ent, 540, 7000);
-				zyk_set_magic_power_cooldown_time(ent, 48000);
+				light_of_judgement(ent, 540, 5000);
+				zyk_set_magic_power_cooldown_time(ent, 30000);
 			}
 			else if (magic_number == MAGIC_MAGIC_SHIELD)
 			{

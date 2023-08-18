@@ -1028,7 +1028,7 @@ typedef struct clientPersistant_s {
 	//  1 - hit by Chaos Power
 	//  2 - unused
 	//  3 - using Flaming Rage
-	//  4 - unused
+	//  4 - using Dome of Damage
 	//  5 - using Black Hole
 	//  6 - hit by Slow Motion
 	//  7 - using Light of Judgement
@@ -1071,8 +1071,7 @@ typedef struct clientPersistant_s {
 	// zyk: player ids which are hitting the target player with magic
 	int magic_power_user_id[MAX_MAGIC_POWERS];
 
-	// zyk: sets the model of a magic used by this player
-	int quest_power_model1_id;
+	int dome_of_damage_dmg;
 
 	float black_hole_distance;
 	vec3_t black_hole_origin;
