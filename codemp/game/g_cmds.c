@@ -88,27 +88,27 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 4;
 	max_skill_levels[SKILL_MAX_MP] = 10;
-	max_skill_levels[SKILL_MAGIC_1] = 3;
-	max_skill_levels[SKILL_MAGIC_2] = 3;
-	max_skill_levels[SKILL_MAGIC_3] = 3;
-	max_skill_levels[SKILL_MAGIC_5] = 3;
-	max_skill_levels[SKILL_MAGIC_6] = 3;
-	max_skill_levels[SKILL_MAGIC_8] = 3;
-	max_skill_levels[SKILL_MAGIC_9] = 3;
-	max_skill_levels[SKILL_MAGIC_10] = 3;
-	max_skill_levels[SKILL_MAGIC_12] = 3;
-	max_skill_levels[SKILL_MAGIC_13] = 3;
-	max_skill_levels[SKILL_MAGIC_14] = 3;
-	max_skill_levels[SKILL_MAGIC_16] = 3;
-	max_skill_levels[SKILL_MAGIC_17] = 3;
-	max_skill_levels[SKILL_MAGIC_18] = 3;
-	max_skill_levels[SKILL_MAGIC_20] = 3;
-	max_skill_levels[SKILL_MAGIC_21] = 3;
-	max_skill_levels[SKILL_MAGIC_22] = 3;
-	max_skill_levels[SKILL_MAGIC_23] = 3;
-	max_skill_levels[SKILL_MAGIC_25] = 3;
-	max_skill_levels[SKILL_MAGIC_26] = 3;
-	max_skill_levels[SKILL_MAGIC_27] = 3;
+	max_skill_levels[SKILL_MAGIC_MAGIC_SENSE] = 3;
+	max_skill_levels[SKILL_MAGIC_HEALING_AREA] = 3;
+	max_skill_levels[SKILL_MAGIC_ENEMY_WEAKENING] = 3;
+	max_skill_levels[SKILL_MAGIC_WATER_SPLASH] = 3;
+	max_skill_levels[SKILL_MAGIC_WATER_ATTACK] = 3;
+	max_skill_levels[SKILL_MAGIC_ICE_BLOCK] = 3;
+	max_skill_levels[SKILL_MAGIC_EARTHQUAKE] = 3;
+	max_skill_levels[SKILL_MAGIC_ROCK_SMASH] = 3;
+	max_skill_levels[SKILL_MAGIC_TREE_OF_LIFE] = 3;
+	max_skill_levels[SKILL_MAGIC_FLAME_BURST] = 3;
+	max_skill_levels[SKILL_MAGIC_ULTRA_FLAME] = 3;
+	max_skill_levels[SKILL_MAGIC_FLAMING_RAGE] = 3;
+	max_skill_levels[SKILL_MAGIC_BLOWING_WIND] = 3;
+	max_skill_levels[SKILL_MAGIC_REVERSE_WIND] = 3;
+	max_skill_levels[SKILL_MAGIC_SLOW_MOTION] = 3;
+	max_skill_levels[SKILL_MAGIC_BLACK_HOLE] = 3;
+	max_skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 3;
+	max_skill_levels[SKILL_MAGIC_CHAOS_POWER] = 3;
+	max_skill_levels[SKILL_MAGIC_LIGHT_OF_JUDGEMENT] = 3;
+	max_skill_levels[SKILL_MAGIC_MAGIC_SHIELD] = 3;
+	max_skill_levels[SKILL_MAGIC_LIGHTNING_DOME] = 3;
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
@@ -170,27 +170,27 @@ char* zyk_skill_name(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAX_MP] = "Max Magic Points";
-	skill_names[SKILL_MAGIC_1] = "Magic Sense";
-	skill_names[SKILL_MAGIC_2] = "Healing Area";
-	skill_names[SKILL_MAGIC_3] = "Enemy Weakening";
-	skill_names[SKILL_MAGIC_5] = "Water Splash";
-	skill_names[SKILL_MAGIC_6] = "Water Attack";
-	skill_names[SKILL_MAGIC_8] = "Ice Block";
-	skill_names[SKILL_MAGIC_9] = "Earthquake";
-	skill_names[SKILL_MAGIC_10] = "Rock Smash";
-	skill_names[SKILL_MAGIC_12] = "Tree of Life";
-	skill_names[SKILL_MAGIC_13] = "Flame Burst";
-	skill_names[SKILL_MAGIC_14] = "Ultra Flame";
-	skill_names[SKILL_MAGIC_16] = "Flaming Rage";
-	skill_names[SKILL_MAGIC_17] = "Blowing Wind";
-	skill_names[SKILL_MAGIC_18] = "Reverse Wind";
-	skill_names[SKILL_MAGIC_20] = "Slow Motion";
-	skill_names[SKILL_MAGIC_21] = "Black Hole";
-	skill_names[SKILL_MAGIC_22] = "Dome of Damage";
-	skill_names[SKILL_MAGIC_23] = "Chaos Power";
-	skill_names[SKILL_MAGIC_25] = "Light of Judgement";
-	skill_names[SKILL_MAGIC_26] = "Magic Shield";
-	skill_names[SKILL_MAGIC_27] = "Lightning Dome";
+	skill_names[SKILL_MAGIC_MAGIC_SENSE] = "Magic Sense";
+	skill_names[SKILL_MAGIC_HEALING_AREA] = "Healing Area";
+	skill_names[SKILL_MAGIC_ENEMY_WEAKENING] = "Enemy Weakening";
+	skill_names[SKILL_MAGIC_WATER_SPLASH] = "Water Splash";
+	skill_names[SKILL_MAGIC_WATER_ATTACK] = "Water Attack";
+	skill_names[SKILL_MAGIC_ICE_BLOCK] = "Ice Block";
+	skill_names[SKILL_MAGIC_EARTHQUAKE] = "Earthquake";
+	skill_names[SKILL_MAGIC_ROCK_SMASH] = "Rock Smash";
+	skill_names[SKILL_MAGIC_TREE_OF_LIFE] = "Tree of Life";
+	skill_names[SKILL_MAGIC_FLAME_BURST] = "Flame Burst";
+	skill_names[SKILL_MAGIC_ULTRA_FLAME] = "Ultra Flame";
+	skill_names[SKILL_MAGIC_FLAMING_RAGE] = "Flaming Rage";
+	skill_names[SKILL_MAGIC_BLOWING_WIND] = "Blowing Wind";
+	skill_names[SKILL_MAGIC_REVERSE_WIND] = "Reverse Wind";
+	skill_names[SKILL_MAGIC_SLOW_MOTION] = "Slow Motion";
+	skill_names[SKILL_MAGIC_BLACK_HOLE] = "Black Hole";
+	skill_names[SKILL_MAGIC_DOME_OF_DAMAGE] = "Dome of Damage";
+	skill_names[SKILL_MAGIC_CHAOS_POWER] = "Chaos Power";
+	skill_names[SKILL_MAGIC_LIGHT_OF_JUDGEMENT] = "Light of Judgement";
+	skill_names[SKILL_MAGIC_MAGIC_SHIELD] = "Magic Shield";
+	skill_names[SKILL_MAGIC_LIGHTNING_DOME] = "Lightning Dome";
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
@@ -309,47 +309,47 @@ char* zyk_skill_description(int skill_index)
 		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key";
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have";
-	if (skill_index == SKILL_MAGIC_1)
+	if (skill_index == SKILL_MAGIC_MAGIC_SENSE)
 		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense and Sense Health skill levels";
-	if (skill_index == SKILL_MAGIC_2)
+	if (skill_index == SKILL_MAGIC_HEALING_AREA)
 		return "creates an energy area that heals you and your allies and damage enemies";
-	if (skill_index == SKILL_MAGIC_3)
+	if (skill_index == SKILL_MAGIC_ENEMY_WEAKENING)
 		return "decreases damage and resistance of enemies nearby";
-	if (skill_index == SKILL_MAGIC_5)
+	if (skill_index == SKILL_MAGIC_WATER_SPLASH)
 		return "damages enemies, draining their hp and healing you";
-	if (skill_index == SKILL_MAGIC_6)
+	if (skill_index == SKILL_MAGIC_WATER_ATTACK)
 		return "attacks enemies nearby with water, causing high damage";
-	if (skill_index == SKILL_MAGIC_8)
+	if (skill_index == SKILL_MAGIC_ICE_BLOCK)
 		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
-	if (skill_index == SKILL_MAGIC_9)
+	if (skill_index == SKILL_MAGIC_EARTHQUAKE)
 		return "knocks people down causing damage";
-	if (skill_index == SKILL_MAGIC_10)
+	if (skill_index == SKILL_MAGIC_ROCK_SMASH)
 		return "rocks keep falling at the enemies, causing high damage";
-	if (skill_index == SKILL_MAGIC_12)
+	if (skill_index == SKILL_MAGIC_TREE_OF_LIFE)
 		return "a big tree appears, protecting you from attacks and healing you";
-	if (skill_index == SKILL_MAGIC_13)
+	if (skill_index == SKILL_MAGIC_FLAME_BURST)
 		return "fires a flame burst for some seconds";
-	if (skill_index == SKILL_MAGIC_14)
+	if (skill_index == SKILL_MAGIC_ULTRA_FLAME)
 		return "a flame jet appears at the enemies and damages them. If the flame hits the target, it will catch fire. Each level increases how much time the enemy will catch fire";
-	if (skill_index == SKILL_MAGIC_16)
+	if (skill_index == SKILL_MAGIC_FLAMING_RAGE)
 		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
-	if (skill_index == SKILL_MAGIC_17)
+	if (skill_index == SKILL_MAGIC_BLOWING_WIND)
 		return "blows people away for some seconds";
-	if (skill_index == SKILL_MAGIC_18)
+	if (skill_index == SKILL_MAGIC_REVERSE_WIND)
 		return "makes people go towards you";
-	if (skill_index == SKILL_MAGIC_20)
+	if (skill_index == SKILL_MAGIC_SLOW_MOTION)
 		return "decreases run speed of enemies nearby";
-	if (skill_index == SKILL_MAGIC_21)
+	if (skill_index == SKILL_MAGIC_BLACK_HOLE)
 		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
-	if (skill_index == SKILL_MAGIC_22)
+	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
 		return "an energy dome appears at enemies, damaging anyone inside it";
-	if (skill_index == SKILL_MAGIC_23)
+	if (skill_index == SKILL_MAGIC_CHAOS_POWER)
 		return "damages, stuns, slowers and electrifies enemies";
-	if (skill_index == SKILL_MAGIC_25)
+	if (skill_index == SKILL_MAGIC_LIGHT_OF_JUDGEMENT)
 		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
-	if (skill_index == SKILL_MAGIC_26)
+	if (skill_index == SKILL_MAGIC_MAGIC_SHIELD)
 		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
-	if (skill_index == SKILL_MAGIC_27)
+	if (skill_index == SKILL_MAGIC_LIGHTNING_DOME)
 		return "creates a dome that does lightning damage";
 
 	return "";
@@ -5971,7 +5971,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^2", SKILL_MAGIC_FIST, SKILL_MAGIC_27, 18);
+		zyk_list_category_skills(ent, target_ent, "^2", SKILL_MAGIC_FIST, SKILL_MAGIC_LIGHTNING_DOME, 18);
 	}
 }
 

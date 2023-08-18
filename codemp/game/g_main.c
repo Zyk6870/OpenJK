@@ -5691,7 +5691,7 @@ void Player_FireFlameThrower( gentity_t *self, qboolean is_magic)
 	// zyk: Flame Burst magic power has more damage
 	if (is_magic == qtrue)
 	{
-		damage += (2 * self->client->pers.skill_levels[SKILL_MAGIC_13]);
+		damage += (2 * self->client->pers.skill_levels[SKILL_MAGIC_FLAME_BURST]);
 	}
 
 	origin[0] = self->r.currentOrigin[0];
