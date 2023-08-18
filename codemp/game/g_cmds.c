@@ -233,7 +233,7 @@ char* zyk_get_spirit_name(zyk_main_quest_t spirit_value)
 char* zyk_skill_description(int skill_index)
 {
 	if (skill_index == SKILL_JUMP)
-		return "increases force Jump. Level 5 has no height limit, and it lets you jump out of water";
+		return "increases force Jump. Max Level has no height limit, and it lets you jump out of water";
 	if (skill_index == SKILL_PUSH)
 		return "pushes the opponent forward";
 	if (skill_index == SKILL_PULL)
@@ -241,7 +241,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_SPEED)
 		return "increases your speed by 1.7 times at level 1 and +0.4 at other levels";
 	if (skill_index == SKILL_SENSE)
-		return "See people through walls, invisible people or cloaked people. Dodge disruptor shots. Increases your mind strength to resist Mind Control if your sense level is equal or higher than the enemy's mind trick level";
+		return "See people through walls, invisible people or cloaked people. Dodge disruptor shots";
 	if (skill_index == SKILL_SABER_ATTACK)
 		return va("gives you the saber. If you are using Single Saber, gives you the saber styles. If using duals or staff, increases saber damage, which is increased by 20 per cent for each level. Saber damage scale is %.2f", g_saberDamageScale.value);
 	if (skill_index == SKILL_SABER_DEFENSE)
@@ -278,7 +278,7 @@ char* zyk_skill_description(int skill_index)
 		return "increases the max force power you have. Necessary to allow you to use force powers and force-based skills";
 
 	if (skill_index == SKILL_STUN_BATON)
-		return va("attacks someone with a small electric charge. Has %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level. Can fire the flame thrower when using alternate fire. With Stun Baton Upgrade, it opens any door, even locked ones, and can destroy or move some other objects, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
+		return va("attacks someone with a small electric charge. Has %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level. Can fire the flame thrower when using alternate fire. With Stun Baton Upgrade, it opens any door, even locked ones, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
 	if (skill_index == SKILL_SABER)
 		return "increases Saber damage based on your current level";
 	if (skill_index == SKILL_BLASTER_PISTOL)
@@ -307,13 +307,13 @@ char* zyk_skill_description(int skill_index)
 		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	
 	if (skill_index == SKILL_MAX_HEALTH)
-		return "Each level increases your max health by 80";
+		return "Each level increases your max health";
 	if (skill_index == SKILL_HEALTH_STRENGTH)
 		return "Each level increases your health resistance by 5 per cent";
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio";
 	if (skill_index == SKILL_MAX_STAMINA)
-		return "Each level increases your max stamina and recovers stamina faster. Stamina is used by any action the player does. Low stamina makes run speed slower. If Stamina runs out you will pass out for some seconds. Slowly recovers if standing idle. Meditating recovers stamina faster. Use bacta canister or big bacta items to regen stamina";
+		return "Each level increases your max stamina. Stamina is used by any action the player does. Low stamina makes run speed slower. If Stamina runs out you will pass out for some seconds. Each skill level decreases time you need to rest. Meditating recovers stamina faster, and the amount recovered increases with each skill level. Use bacta canister or big bacta items to regen stamina";
 	if (skill_index == SKILL_UNDERWATER)
 		return "Each level increases your air underwater";
 	if (skill_index == SKILL_RUN_SPEED)
@@ -322,9 +322,9 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FIST)
 		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key";
 	if (skill_index == SKILL_MAX_MP)
-		return "increases the max amount of Magic Points the player can have. It is based on the current player level";
+		return "increases the max amount of Magic Points the player can have";
 	if (skill_index == SKILL_MAGIC_1)
-		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense, Sense Health and Improvements skill levels";
+		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense and Sense Health skill levels";
 	if (skill_index == SKILL_MAGIC_2)
 		return "creates an energy area that heals you and your allies and damage enemies";
 	if (skill_index == SKILL_MAGIC_3)
@@ -6706,31 +6706,31 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_BLASTER_PACK)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 100 ammo of E11 Blaster Rifle, Blaster Pistol and Bryar Pistol weapons\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of E11 Blaster Rifle, Blaster Pistol and Bryar Pistol weapons\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_POWERCELL)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 100 ammo of Disruptor, Bowcaster and DEMP2 weapons\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of Disruptor, Bowcaster and DEMP2 weapons\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_METAL_BOLTS)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 100 ammo of Repeater, Flechette and Concussion Rifle weapons\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of Repeater, Flechette and Concussion Rifle weapons\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_ROCKETS)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 10 ammo of Rocket Launcher weapon\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of Rocket Launcher weapon\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_THERMALS)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 4 ammo of thermals\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of thermals\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_TRIPMINES)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 3 ammo of trip mines\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of trip mines\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_DETPACKS)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 2 ammo of det packs\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of det packs\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_AMMO_ALL)
 		{
@@ -6754,7 +6754,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_BACTA_CANISTER)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 25 HP\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers 25 HP. With Bacta Upgrade, also regen Magic Points and Stamina\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_FORCE_FIELD)
 		{
@@ -6762,7 +6762,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_BIG_BACTA)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 50 HP\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers 50 HP. With Bacta Upgrade, also regen Stamina\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_EWEB)
 		{
@@ -6850,7 +6850,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_BACTA_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister recovers some Magic Power and Big Bacta recovers more HP\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister recovers some Magic Power and some Stamina and Big Bacta recovers more HP and some Stamina\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_FORCE_FIELD_UPGRADE)
 		{
@@ -6882,7 +6882,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_STUN_BATON_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows stun baton to open any door, including locked ones, move elevators, and move or destroy other objects. Also makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows stun baton to open any door, including locked ones. Also makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_BLASTER_PISTOL_UPGRADE)
 		{
@@ -6902,7 +6902,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_BOWCASTER_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bowcaster main fire can do up to 7 shots when charged. Bowcaster altfire bolt can bounce more times\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_DEMP2_UPGRADE)
 		{
