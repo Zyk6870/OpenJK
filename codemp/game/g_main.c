@@ -4945,7 +4945,6 @@ zyk_magic_element_t zyk_get_magic_element(int magic_number)
 		MAGICELEMENT_WATER,
 		MAGICELEMENT_WATER,
 		MAGICELEMENT_WATER,
-		MAGICELEMENT_WATER,
 		MAGICELEMENT_EARTH,
 		MAGICELEMENT_EARTH,
 		MAGICELEMENT_EARTH,
@@ -5590,38 +5589,6 @@ void tree_of_life(gentity_t *ent)
 	zyk_quest_effect_spawn(ent, ent, "zyk_tree_of_life", "1", "models/map_objects/yavin/tree10_b.md3", 0, 0, 0, 4000);
 }
 
-// zyk: Ice Stalagmite
-void ice_stalagmite(gentity_t *ent, int distance, int damage)
-{
-	int i = 0;
-	int targets_hit = 0;
-	int min_distance = 50;
-
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ICE_STALAGMITE] > 1)
-	{
-		damage += 50;
-	}
-
-	for (i = 0; i < level.num_entities; i++)
-	{
-		gentity_t *player_ent = &g_entities[i];
-
-		if (zyk_special_power_can_hit_target(ent, player_ent, i, min_distance, distance, qfalse, &targets_hit) == qtrue)
-		{
-			if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ICE_STALAGMITE] > 1)
-			{ // zyk: spawns a solid model that traps the enemy
-				zyk_quest_effect_spawn(ent, player_ent, "zyk_ice_stalagmite_2", "1", "models/map_objects/hoth/stalagmite_small.md3", 0, 0, 0, 2000);
-			}
-			else
-			{
-				zyk_quest_effect_spawn(ent, player_ent, "zyk_ice_stalagmite", "0", "models/map_objects/hoth/stalagmite_small.md3", 0, 0, 0, 2000);
-			}
-			
-			G_Damage(player_ent,ent,ent,NULL,player_ent->client->ps.origin,damage,DAMAGE_NO_PROTECTION,MOD_UNKNOWN);
-		}
-	}
-}
-
 void zyk_spawn_ice_block(gentity_t *ent, int duration, int pitch, int yaw, int x_offset, int y_offset, int z_offset)
 {
 	gentity_t *new_ent = G_Spawn();
@@ -5902,7 +5869,7 @@ void Player_FireFlameThrower( gentity_t *self, qboolean is_magic)
 	// zyk: Flame Burst magic power has more damage
 	if (is_magic == qtrue)
 	{
-		damage += 2;
+		damage += (2 * self->client->pers.skill_levels[SKILL_MAGIC_13]);
 	}
 
 	origin[0] = self->r.currentOrigin[0];

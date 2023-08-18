@@ -533,7 +533,6 @@ typedef enum {
 	MAGIC_ENEMY_WEAKENING,
 	MAGIC_WATER_SPLASH,
 	MAGIC_WATER_ATTACK,
-	MAGIC_ICE_STALAGMITE,
 	MAGIC_ICE_BLOCK,
 	MAGIC_EARTHQUAKE,
 	MAGIC_ROCK_SMASH,
@@ -729,7 +728,6 @@ typedef enum {
 	SKILL_MAGIC_3,
 	SKILL_MAGIC_5,
 	SKILL_MAGIC_6,
-	SKILL_MAGIC_7,
 	SKILL_MAGIC_8,
 	SKILL_MAGIC_9,
 	SKILL_MAGIC_10,
@@ -817,6 +815,9 @@ typedef enum {
 
 // zyk: Minimum Stamina before player starts to get tired
 #define RPG_MIN_STAMINA 1000.0
+
+// zyk: when casting magic, use anim for this amount of time in miliseconds
+#define MAGIC_ANIM_TIME 2000
 
 // zyk: number of Elemental Spirits
 #define NUMBER_OF_MAGIC_SPIRITS 6

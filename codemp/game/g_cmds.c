@@ -93,7 +93,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAGIC_3] = 3;
 	max_skill_levels[SKILL_MAGIC_5] = 3;
 	max_skill_levels[SKILL_MAGIC_6] = 3;
-	max_skill_levels[SKILL_MAGIC_7] = 3;
 	max_skill_levels[SKILL_MAGIC_8] = 3;
 	max_skill_levels[SKILL_MAGIC_9] = 3;
 	max_skill_levels[SKILL_MAGIC_10] = 3;
@@ -181,7 +180,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAGIC_3] = "Enemy Weakening";
 	skill_names[SKILL_MAGIC_5] = "Water Splash";
 	skill_names[SKILL_MAGIC_6] = "Water Attack";
-	skill_names[SKILL_MAGIC_7] = "Ice Stalagmite";
 	skill_names[SKILL_MAGIC_8] = "Ice Block";
 	skill_names[SKILL_MAGIC_9] = "Earthquake";
 	skill_names[SKILL_MAGIC_10] = "Rock Smash";
@@ -331,8 +329,6 @@ char* zyk_skill_description(int skill_index)
 		return "damages enemies, draining their hp and healing you";
 	if (skill_index == SKILL_MAGIC_6)
 		return "attacks enemies nearby with water, causing high damage";
-	if (skill_index == SKILL_MAGIC_7)
-		return "greatly damages enemies nearby with a stalagmite";
 	if (skill_index == SKILL_MAGIC_8)
 		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
 	if (skill_index == SKILL_MAGIC_9)
@@ -4312,7 +4308,6 @@ extern void water_splash(gentity_t *ent, int distance, int damage);
 extern void ultra_flame(gentity_t *ent, int distance, int damage);
 extern void rock_smash(gentity_t *ent, int distance, int damage);
 extern void dome_of_damage(gentity_t *ent, int distance, int damage);
-extern void ice_stalagmite(gentity_t *ent, int distance, int damage);
 extern void slow_motion(gentity_t *ent, int distance, int duration);
 extern void ultra_speed(gentity_t *ent, int duration);
 extern void ultra_drain(gentity_t *ent, int radius, int damage, int duration);
@@ -11138,7 +11133,6 @@ int zyk_get_magic_cost(int magic_number)
 		18, // Enemy Weakening
 		20, // Water Splash
 		21, // Water Attack
-		20, // Ice Stalagmite
 		20, // Ice Block
 		18, // Earthquake
 		18, // Rock Smash
@@ -11186,8 +11180,10 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			zyk_spawn_magic_element_effect(ent, magic_number);
 
 			// zyk: magic usage anim
-			G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCELIGHTNING_HOLD, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-			ent->client->ps.weaponTime = 1000;
+			G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCE_RAGE, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+			ent->client->ps.torsoTimer = MAGIC_ANIM_TIME;
+			ent->client->ps.legsTimer = MAGIC_ANIM_TIME;
+			ent->client->ps.weaponTime = MAGIC_ANIM_TIME;
 
 			if (magic_number == MAGIC_MAGIC_SENSE)
 			{
@@ -11213,11 +11209,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			{
 				water_attack(ent, 500, 45);
 				zyk_set_magic_power_cooldown_time(ent, 12000);
-			}
-			else if (magic_number == MAGIC_ICE_STALAGMITE)
-			{
-				ice_stalagmite(ent, 500, 130);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_ICE_BLOCK)
 			{
