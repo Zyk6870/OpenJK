@@ -4954,12 +4954,9 @@ zyk_magic_element_t zyk_get_magic_element(int magic_number)
 		MAGICELEMENT_AIR,
 		MAGICELEMENT_AIR,
 		MAGICELEMENT_AIR,
-		MAGICELEMENT_AIR,
 		MAGICELEMENT_DARK,
 		MAGICELEMENT_DARK,
 		MAGICELEMENT_DARK,
-		MAGICELEMENT_DARK,
-		MAGICELEMENT_LIGHT,
 		MAGICELEMENT_LIGHT,
 		MAGICELEMENT_LIGHT,
 		MAGICELEMENT_LIGHT
@@ -5393,53 +5390,6 @@ void water_attack(gentity_t *ent, int distance, int damage)
 
 // zyk: Time Stop
 extern void display_yellow_bar(gentity_t *ent, int duration);
-void time_power(gentity_t *ent, int distance, int duration)
-{
-	int i = 0;
-	int targets_hit = 0;
-
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_TIME_STOP] > 1)
-	{
-		duration += 1500;
-	}
-
-	for (i = 0; i < level.num_entities; i++)
-	{
-		gentity_t *player_ent = &g_entities[i];
-					
-		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, distance, qfalse, &targets_hit) == qtrue)
-		{
-			player_ent->client->pers.quest_power_status |= (1 << 2);
-			player_ent->client->pers.magic_power_target_timer[MAGIC_TIME_STOP] = level.time + duration;
-
-			// zyk: target wont be able to use magic for some time
-			if (player_ent->client->pers.quest_power_usage_timer < level.time)
-			{
-				player_ent->client->pers.quest_power_usage_timer = level.time + duration;
-			}
-			else
-			{ // zyk: already used a power, so increase the cooldown time
-				player_ent->client->pers.quest_power_usage_timer += duration;
-			}
-
-			if (i < MAX_CLIENTS)
-			{
-				display_yellow_bar(player_ent, (player_ent->client->pers.quest_power_usage_timer - level.time));
-			}
-
-			player_ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-			player_ent->client->ps.forceDodgeAnim = player_ent->client->ps.torsoAnim;
-			player_ent->client->ps.forceHandExtendTime = level.time + duration;
-
-			// zyk: disabled force powers
-			player_ent->client->ps.fd.forceDeactivateAll = 1;
-
-			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_time", "0", "misc/genrings", 0, 0, 0, duration);
-
-			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/electric_beam_lp.wav"));
-		}
-	}
-}
 
 // zyk: Water Splash. Damages the targets and heals the user
 void water_splash(gentity_t *ent, int distance, int damage)
@@ -5618,17 +5568,6 @@ void zyk_spawn_black_hole_model(gentity_t* ent, int duration, int model_scale)
 	trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
 }
 
-// zyk: Ultra Drain
-void ultra_drain(gentity_t *ent, int radius, int damage, int duration)
-{
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ULTRA_DRAIN] > 1)
-	{
-		damage += 8;
-	}
-
-	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_drain", "4", "misc/possession", 500, damage, radius, duration);
-}
-
 // zyk: Black Hole
 void black_hole(gentity_t* ent, int radius, int damage, int duration)
 {
@@ -5658,6 +5597,7 @@ void light_of_judgement(gentity_t* ent, int radius, int duration)
 	}
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_light_of_judgement", "0", "ships/sd_exhaust", 500, 0, 0, duration);
+	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_drain", "0", "misc/possession", 500, 0, 0, duration);
 
 	ent->client->pers.light_of_judgement_distance = radius;
 
@@ -5702,20 +5642,6 @@ void slow_motion(gentity_t *ent, int distance, int duration)
 			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh10.mp3"));
 		}
 	}
-}
-
-// zyk: Ultra Speed
-void ultra_speed(gentity_t *ent, int duration)
-{
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ULTRA_SPEED] > 1)
-	{
-		duration += 3000;
-	}
-
-	ent->client->pers.quest_power_status |= (1 << 9);
-	ent->client->pers.magic_power_timer[MAGIC_ULTRA_SPEED] = level.time + duration;
-
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh1.mp3"));
 }
 
 // zyk: Ultra Flame
@@ -5935,11 +5861,6 @@ void quest_power_events(gentity_t *ent)
 				}
 			}
 
-			if (ent->client->pers.quest_power_status & (1 << 2) && ent->client->pers.magic_power_target_timer[MAGIC_TIME_STOP] < level.time)
-			{ // zyk: Time Power. Remove it from target when duration ends
-				ent->client->pers.quest_power_status &= ~(1 << 2);
-			}
-
 			if (ent->client->pers.quest_power_status & (1 << 3))
 			{ // zyk: Flaming Rage. Spawns fire effects
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_FLAMING_RAGE] < level.time)
@@ -6149,11 +6070,6 @@ void quest_power_events(gentity_t *ent)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 8);
 				}
-			}
-
-			if (ent->client->pers.quest_power_status & (1 << 9) && ent->client->pers.magic_power_timer[MAGIC_ULTRA_SPEED] < level.time)
-			{ // zyk: Ultra Speed
-				ent->client->pers.quest_power_status &= ~(1 << 9);
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << 11))

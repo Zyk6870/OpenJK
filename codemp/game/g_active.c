@@ -840,8 +840,8 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_TRIP_MINE);
 		}
 
-		if (client->sess.amrpgmode == 2 && !(client->pers.quest_power_status & (1 << 2)))
-		{ // zyk: healing abilities will only work if player is not hit by Time Power
+		if (client->sess.amrpgmode == 2)
+		{ // zyk: healing abilities
 			if (client->pers.energy_modulator_mode > 0)
 			{ // zyk: Energy Modulator consumes ammo while active
 				if (ent->health < 1)
@@ -2365,30 +2365,6 @@ void ClientThink_real( gentity_t *ent ) {
 				client->ps.pm_type = PM_NORMAL;
 			}
 
-			if (client->pers.quest_power_status & (1 << 2))
-			{ // zyk: player hit by Time Power
-				if (client->jetPackOn)
-				{
-					Jetpack_Off(ent);
-				}
-
-				if ( client->ps.saberHolstered < 2 )
-				{
-					client->ps.saberHolstered = 2;
-					if (client->saber[0].soundOff)
-					{
-						G_Sound(ent, CHAN_AUTO, client->saber[0].soundOff);
-					}
-					if (client->saber[1].soundOff &&
-						client->saber[1].model[0])
-					{
-						G_Sound(ent, CHAN_AUTO, client->saber[1].soundOff);
-					}
-					//prevent anything from being done for 400ms after holster
-					client->ps.weaponTime = 400;
-				}
-			}
-
 			if (client->pers.player_statuses & (1 << 6))
 			{ // zyk: paralyzed by an admin. Keep him this way
 				client->ps.forceHandExtendTime = level.time + 500;
@@ -2629,16 +2605,6 @@ void ClientThink_real( gentity_t *ent ) {
 			client->ps.speed /= 2;
 		}
 
-		if (client->pers.quest_power_status & (1 << 2))
-		{ // zyk: hit by Time Power. Do not move at all
-			client->ps.speed = 0;
-		}
-		
-		if (client->pers.quest_power_status & (1 << 9))
-		{ // zyk: using Ultra Speed. Increase speed
-			client->ps.speed *= 2;
-		}
-
 		if (client->pers.quest_power_status & (1 << 3))
 		{ // zyk: using Flaming Rage. Increase speed
 			client->ps.speed *= 1.5;
@@ -2683,16 +2649,6 @@ void ClientThink_real( gentity_t *ent ) {
 		if (client->pers.quest_power_status & (1 << 1))
 		{ // zyk: hit by Chaos Power. Decrease speed
 			zyk_player_speed /= 2;
-		}
-
-		if (client->pers.quest_power_status & (1 << 2))
-		{ // zyk: hit by Time Power. Do not move at all
-			zyk_player_speed = 0;
-		}
-		
-		if (client->pers.quest_power_status & (1 << 9))
-		{ // zyk: using Ultra Speed. Increase speed
-			zyk_player_speed *= 2;
 		}
 
 		if (client->pers.quest_power_status & (1 << 3))
@@ -2750,11 +2706,6 @@ void ClientThink_real( gentity_t *ent ) {
 			{
 				if (client->ps.eFlags2 & EF2_SHIP_DEATH)
 				{ //float there
-					VectorClear(client->ps.velocity);
-					client->ps.gravity = 1.0f;
-				}
-				else if (client->pers.quest_power_status & (1 << 2) && client->pers.magic_power_target_timer[MAGIC_TIME_STOP] > level.time)
-				{ // zyk: hit by Time Power
 					VectorClear(client->ps.velocity);
 					client->ps.gravity = 1.0f;
 				}

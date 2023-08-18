@@ -740,12 +740,6 @@ qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower )
 		return qfalse;
 	}
 
-	// zyk: Time Power affected players cannot use force powers
-	if (self->client->pers.quest_power_status & (1 << 2))
-	{
-		return qfalse;
-	}
-
 	if ( (self->client->ps.fd.forcePowersActive & ( 1 << forcePower )) )
 	{//already using this power
 		if (forcePower != FP_LEVITATION)
@@ -912,11 +906,6 @@ void WP_ForcePowerRegenerate( gentity_t *self, int overrideAmt )
 { //called on a regular interval to regenerate force power.
 	if ( !self->client )
 	{
-		return;
-	}
-
-	if (self->client->pers.quest_power_status & (1 << 2))
-	{ // zyk: hit by Time Power. Cannot regen force
 		return;
 	}
 

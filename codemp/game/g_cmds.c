@@ -102,16 +102,13 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAGIC_16] = 3;
 	max_skill_levels[SKILL_MAGIC_17] = 3;
 	max_skill_levels[SKILL_MAGIC_18] = 3;
-	max_skill_levels[SKILL_MAGIC_19] = 3;
 	max_skill_levels[SKILL_MAGIC_20] = 3;
 	max_skill_levels[SKILL_MAGIC_21] = 3;
 	max_skill_levels[SKILL_MAGIC_22] = 3;
 	max_skill_levels[SKILL_MAGIC_23] = 3;
-	max_skill_levels[SKILL_MAGIC_24] = 3;
 	max_skill_levels[SKILL_MAGIC_25] = 3;
 	max_skill_levels[SKILL_MAGIC_26] = 3;
 	max_skill_levels[SKILL_MAGIC_27] = 3;
-	max_skill_levels[SKILL_MAGIC_28] = 3;
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
@@ -187,16 +184,13 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAGIC_16] = "Flaming Rage";
 	skill_names[SKILL_MAGIC_17] = "Blowing Wind";
 	skill_names[SKILL_MAGIC_18] = "Reverse Wind";
-	skill_names[SKILL_MAGIC_19] = "Ultra Speed";
 	skill_names[SKILL_MAGIC_20] = "Slow Motion";
 	skill_names[SKILL_MAGIC_21] = "Black Hole";
 	skill_names[SKILL_MAGIC_22] = "Dome of Damage";
 	skill_names[SKILL_MAGIC_23] = "Chaos Power";
-	skill_names[SKILL_MAGIC_24] = "Ultra Drain";
 	skill_names[SKILL_MAGIC_25] = "Light of Judgement";
 	skill_names[SKILL_MAGIC_26] = "Magic Shield";
 	skill_names[SKILL_MAGIC_27] = "Lightning Dome";
-	skill_names[SKILL_MAGIC_28] = "Time Stop";
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
@@ -343,8 +337,6 @@ char* zyk_skill_description(int skill_index)
 		return "blows people away for some seconds";
 	if (skill_index == SKILL_MAGIC_18)
 		return "makes people go towards you";
-	if (skill_index == SKILL_MAGIC_19)
-		return "increases your run speed";
 	if (skill_index == SKILL_MAGIC_20)
 		return "decreases run speed of enemies nearby";
 	if (skill_index == SKILL_MAGIC_21)
@@ -353,16 +345,12 @@ char* zyk_skill_description(int skill_index)
 		return "an energy dome appears at enemies, damaging anyone inside it";
 	if (skill_index == SKILL_MAGIC_23)
 		return "damages, stuns, slowers and electrifies enemies";
-	if (skill_index == SKILL_MAGIC_24)
-		return "damages enemies in the area and recovers your hp";
 	if (skill_index == SKILL_MAGIC_25)
 		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
 	if (skill_index == SKILL_MAGIC_26)
 		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
 	if (skill_index == SKILL_MAGIC_27)
 		return "creates a dome that does lightning damage";
-	if (skill_index == SKILL_MAGIC_28)
-		return "paralyzes enemies for some seconds. Disables their force powers, force regen, mp regen and hp/shield regen. Increases their magic cooldown. They take less damage while paralyzed";
 
 	return "";
 }
@@ -4294,15 +4282,12 @@ void zyk_set_magic_power_cooldown_time(gentity_t *ent, int duration)
 extern void magic_sense(gentity_t *ent, int duration);
 extern void earthquake(gentity_t *ent, int stun_time, int strength, int distance);
 extern void blowing_wind(gentity_t *ent, int distance, int duration);
-extern void time_power(gentity_t *ent, int distance, int duration);
 extern void chaos_power(gentity_t *ent, int distance, int duration);
 extern void water_splash(gentity_t *ent, int distance, int damage);
 extern void ultra_flame(gentity_t *ent, int distance, int damage);
 extern void rock_smash(gentity_t *ent, int distance, int damage);
 extern void dome_of_damage(gentity_t *ent, int distance, int damage);
 extern void slow_motion(gentity_t *ent, int distance, int duration);
-extern void ultra_speed(gentity_t *ent, int duration);
-extern void ultra_drain(gentity_t *ent, int radius, int damage, int duration);
 extern void magic_shield(gentity_t *ent, int duration);
 extern void healing_area(gentity_t *ent, int damage, int duration);
 extern void lightning_dome(gentity_t *ent, int damage);
@@ -5986,7 +5971,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^2", SKILL_MAGIC_FIST, SKILL_MAGIC_28, 18);
+		zyk_list_category_skills(ent, target_ent, "^2", SKILL_MAGIC_FIST, SKILL_MAGIC_27, 18);
 	}
 }
 
@@ -6980,12 +6965,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (ent->client->pers.quest_power_status & (1 << 2))
-	{
-		trap->SendServerCommand(ent->s.number, "print \"Cannot buy while frozen by Time Power.\n\"");
-		return;
-	}
-
 	if (value < 1 || value > MAX_SELLER_ITEMS)
 	{
 		trap->SendServerCommand( ent->s.number, "print \"Invalid product number.\n\"" );
@@ -7547,12 +7526,6 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	if (ent->client->pers.buy_sell_timer > level.time)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"In Buy/Sell cooldown time.\n\"");
-		return;
-	}
-
-	if (ent->client->pers.quest_power_status & (1 << 2))
-	{
-		trap->SendServerCommand(ent->s.number, "print \"Cannot sell while frozen by Time Power.\n\"");
 		return;
 	}
 
@@ -11131,17 +11104,14 @@ int zyk_get_magic_cost(int magic_number)
 		22, // Ultra Flame
 		15, // Flaming Rage
 		20, // Blowing Wind
-		23, // Reverse Wind
-		17, // Ultra Speed
+		20, // Reverse Wind
 		17, // Slow Motion
 		40, // Black Hole
 		22, // Dome of Damage
 		30, // Chaos Power
-		30, // Ultra Drain
 		40, // Light of Judgement
 		25, // Magic Shield
 		15, // Lightning Dome
-		30 // Time Stop
 	};
 
 	return magic_costs[magic_number];
@@ -11243,11 +11213,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				reverse_wind(ent, 700, 5000);
 				zyk_set_magic_power_cooldown_time(ent, 12000);
 			}
-			else if (magic_number == MAGIC_ULTRA_SPEED)
-			{
-				ultra_speed(ent, 15000);
-				zyk_set_magic_power_cooldown_time(ent, 9000);
-			}
 			else if (magic_number == MAGIC_SLOW_MOTION)
 			{
 				slow_motion(ent, 400, 15000);
@@ -11268,11 +11233,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				chaos_power(ent, 400, 3000);
 				zyk_set_magic_power_cooldown_time(ent, 28000);
 			}
-			else if (magic_number == MAGIC_ULTRA_DRAIN)
-			{
-				ultra_drain(ent, 450, 22, 8000);
-				zyk_set_magic_power_cooldown_time(ent, 28000);
-			}
 			else if (magic_number == MAGIC_LIGHT_OF_JUDGEMENT)
 			{
 				light_of_judgement(ent, 540, 7000);
@@ -11287,11 +11247,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			{
 				lightning_dome(ent, 70);
 				zyk_set_magic_power_cooldown_time(ent, 25000);
-			}
-			else if (magic_number == MAGIC_TIME_STOP)
-			{
-				time_power(ent, 400, 3000);
-				zyk_set_magic_power_cooldown_time(ent, 28000);
 			}
 
 			// zyk: magic powers cost mp

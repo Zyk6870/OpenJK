@@ -4969,12 +4969,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		damage = (int)ceil(damage * 0.2);
 	}
 
-	// zyk: hit by Time Power. Receive less damage
-	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 2))
-	{
-		damage = (int)ceil(damage * 0.2);
-	}
-
 	if (targ && targ->client && targ->client->sess.amrpgmode == 2)
 	{ // zyk: damage resistance
 		float bonus_resistance = 0.00;

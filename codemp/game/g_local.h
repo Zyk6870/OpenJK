@@ -542,16 +542,13 @@ typedef enum {
 	MAGIC_FLAMING_RAGE,
 	MAGIC_BLOWING_WIND,
 	MAGIC_REVERSE_WIND,
-	MAGIC_ULTRA_SPEED,
 	MAGIC_SLOW_MOTION,
 	MAGIC_BLACK_HOLE,
 	MAGIC_DOME_OF_DAMAGE,
 	MAGIC_CHAOS_POWER,
-	MAGIC_ULTRA_DRAIN,
 	MAGIC_LIGHT_OF_JUDGEMENT,
 	MAGIC_MAGIC_SHIELD,
 	MAGIC_LIGHTNING_DOME,
-	MAGIC_TIME_STOP,
 	MAX_MAGIC_POWERS
 } zyk_magic_t;
 
@@ -735,16 +732,13 @@ typedef enum {
 	SKILL_MAGIC_16,
 	SKILL_MAGIC_17,
 	SKILL_MAGIC_18,
-	SKILL_MAGIC_19,
 	SKILL_MAGIC_20,
 	SKILL_MAGIC_21,
 	SKILL_MAGIC_22,
 	SKILL_MAGIC_23,
-	SKILL_MAGIC_24,
 	SKILL_MAGIC_25,
 	SKILL_MAGIC_26,
 	SKILL_MAGIC_27,
-	SKILL_MAGIC_28,
 	NUMBER_OF_SKILLS
 } zyk_rpg_skill_t;
 
@@ -1032,14 +1026,14 @@ typedef struct clientPersistant_s {
 	// Possible values are:
 	//  0 - unused
 	//  1 - hit by Chaos Power
-	//  2 - hit by Time Power
+	//  2 - unused
 	//  3 - using Flaming Rage
 	//  4 - unused
 	//  5 - using Black Hole
 	//  6 - hit by Slow Motion
 	//  7 - using Light of Judgement
 	//  8 - hit by Blowing Wind
-	//  9 - using Ultra Speed
+	//  9 - unused
 	// 10 - using Resurrection Power
 	// 11 - using Magic Shield
 	// 12 - using Flame Burst
