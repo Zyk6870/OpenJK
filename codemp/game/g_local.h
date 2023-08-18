@@ -905,10 +905,11 @@ typedef struct clientPersistant_s {
 	// 29 - hit by Fire Bolt/Flame Thrower
 	int player_statuses;
 
-	// zyk: last health, shield and mp are saved into account
+	// zyk: last health, shield, mp and stamina are saved into account
 	int last_health;
 	int last_shield;
 	int last_mp;
+	int last_stamina;
 
 	// zyk: if health, shield or mp changes, save it into account after this time in miliseconds
 	int save_stat_changes_timer;

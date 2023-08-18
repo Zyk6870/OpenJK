@@ -2728,6 +2728,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	client->pers.last_health = 100;
 	client->pers.last_shield = 0;
 	client->pers.last_mp = 0;
+	client->pers.last_stamina = 0;
 
 	if (ent->client->sess.amrpgmode > 0)
 	{

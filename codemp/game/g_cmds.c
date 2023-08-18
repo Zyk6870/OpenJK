@@ -2301,6 +2301,10 @@ void load_account(gentity_t* ent)
 			fscanf(account_file, "%s", content);
 			ent->client->pers.last_mp = atoi(content);
 
+			// zyk: last stamina
+			fscanf(account_file, "%s", content);
+			ent->client->pers.last_stamina = atoi(content);
+
 			if (ent->client->sess.amrpgmode == 1)
 			{
 				ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
@@ -2369,10 +2373,10 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
 				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.credits,
 				client->sess.magic_fist_selection, client->pers.main_quest_progress, client->pers.side_quest_progress,
-				client->pers.last_health, client->pers.last_shield, client->pers.last_mp);
+				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
 		}
@@ -5017,8 +5021,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.current_quest_event = 0;
 			ent->client->pers.quest_event_timer = 0;
 
-			// zyk: loading initial Stamina
-			ent->client->pers.current_stamina = ent->client->pers.max_stamina;
 			ent->client->pers.stamina_timer = 0;
 			ent->client->pers.stamina_out_timer = 0;
 
@@ -5037,6 +5039,9 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 				// zyk: loading initial MP
 				ent->client->pers.magic_power = zyk_max_magic_power(ent);
+
+				// zyk: loading initial Stamina
+				ent->client->pers.current_stamina = ent->client->pers.max_stamina;
 			}
 			else
 			{ // zyk: reload the last stats
@@ -5046,6 +5051,8 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 				ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.last_shield;
 
 				ent->client->pers.magic_power = ent->client->pers.last_mp;
+
+				ent->client->pers.current_stamina = ent->client->pers.last_stamina;
 			}
 		}
 		else

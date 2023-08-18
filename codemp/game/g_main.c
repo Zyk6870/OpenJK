@@ -9048,11 +9048,13 @@ void G_RunFrame( int levelTime ) {
 				if (!(ent->client->pers.player_statuses & (1 << 24)) && 
 					(ent->client->pers.last_health != ent->health || 
 					 ent->client->pers.last_shield != ent->client->ps.stats[STAT_ARMOR] || 
-					 ent->client->pers.last_mp != ent->client->pers.magic_power))
+					 ent->client->pers.last_mp != ent->client->pers.magic_power || 
+					 ent->client->pers.last_stamina != ent->client->pers.current_stamina))
 				{
 					ent->client->pers.last_health = ent->health;
 					ent->client->pers.last_shield = ent->client->ps.stats[STAT_ARMOR];
 					ent->client->pers.last_mp = ent->client->pers.magic_power;
+					ent->client->pers.last_stamina = ent->client->pers.current_stamina;
 
 					ent->client->pers.save_stats_changes = qtrue;
 				}
