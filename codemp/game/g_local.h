@@ -720,6 +720,7 @@ typedef enum {
 	SKILL_MAX_HEALTH,
 	SKILL_HEALTH_STRENGTH,
 	SKILL_MAX_WEIGHT,
+	SKILL_MAX_STAMINA,
 	SKILL_UNDERWATER,
 	SKILL_RUN_SPEED,
 	SKILL_MAGIC_FIST,
@@ -815,6 +816,9 @@ typedef enum {
 	RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR,
 	MAX_RPG_INVENTORY_ITEMS
 } zyk_inventory_t;
+
+// zyk: Minimum Stamina before player starts to get tired
+#define RPG_MIN_STAMINA 1000.0
 
 // zyk: number of Elemental Spirits
 #define NUMBER_OF_MAGIC_SPIRITS 6
@@ -975,6 +979,14 @@ typedef struct clientPersistant_s {
 
 	int max_rpg_health; // zyk: max health the player can have in RPG Mode. This is set to STAT_MAX_HEALTH for RPG players
 	int max_rpg_shield; // zyk: max shield the player can have in RPG Mode based in the skill_levels[30] value
+
+	// zyk: RPG Stamina
+	int current_stamina;
+	int max_stamina;
+	int stamina_out_timer;
+
+	// zyk: in time, player Stamina changes
+	int stamina_timer;
 
 	int jetpack_fuel; // zyk: now this is the fuel that is spent. Then we scale this value to the 0 - 100 range to set it in the jetpackFuel attribute to show the fuel bar correctly to the client
 

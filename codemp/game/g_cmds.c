@@ -82,6 +82,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAX_HEALTH] = 5;
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
+	max_skill_levels[SKILL_MAX_STAMINA] = 5;
 	max_skill_levels[SKILL_UNDERWATER] = 2;
 	max_skill_levels[SKILL_RUN_SPEED] = 3;
 
@@ -170,6 +171,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
+	skill_names[SKILL_MAX_STAMINA] = "Max Stamina";
 	skill_names[SKILL_UNDERWATER] = "Underwater";
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
 
@@ -310,6 +312,8 @@ char* zyk_skill_description(int skill_index)
 		return "Each level increases your health resistance by 5 per cent";
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio";
+	if (skill_index == SKILL_MAX_STAMINA)
+		return "Each level increases your max stamina and recovers stamina faster. Stamina is used by any action the player does. Low stamina makes run speed slower. If Stamina runs out you will pass out for some seconds. Slowly recovers if standing idle. Meditating recovers stamina faster. Use bacta canister or big bacta items to regen stamina";
 	if (skill_index == SKILL_UNDERWATER)
 		return "Each level increases your air underwater";
 	if (skill_index == SKILL_RUN_SPEED)
@@ -4528,6 +4532,31 @@ void set_max_weight(gentity_t* ent)
 	ent->client->pers.max_weight = 200 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 100);
 }
 
+// zyk: set the Max Stamina of this player
+void set_max_stamina(gentity_t* ent)
+{
+	ent->client->pers.max_stamina = 5000 + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 5000);
+}
+
+// zyk: increases or decreases RPG player stamina
+void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
+{
+	if (add == qtrue)
+	{
+		ent->client->pers.current_stamina += amount;
+
+		if (ent->client->pers.current_stamina > ent->client->pers.max_stamina)
+		{
+			ent->client->pers.current_stamina = ent->client->pers.max_stamina;
+		}
+	}
+	else
+	{
+		if (ent->client->pers.stamina_out_timer <= level.time)
+			ent->client->pers.current_stamina -= amount;
+	}
+}
+
 // zyk: gives credits to the player
 void add_credits(gentity_t *ent, int credits)
 {
@@ -4945,6 +4974,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		set_max_shield(ent);
 		set_max_force(ent);
 		set_max_weight(ent);
+		set_max_stamina(ent);
 
 		zyk_load_common_settings(ent);
 
@@ -4987,6 +5017,11 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.current_quest_event = 0;
 			ent->client->pers.quest_event_timer = 0;
 
+			// zyk: loading initial Stamina
+			ent->client->pers.current_stamina = ent->client->pers.max_stamina;
+			ent->client->pers.stamina_timer = 0;
+			ent->client->pers.stamina_out_timer = 0;
+
 			// zyk: loading initial force
 			ent->client->ps.fd.forcePower = ent->client->pers.max_force_power;
 
@@ -5008,10 +5043,8 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 				ent->health = ent->client->pers.last_health;
 				ent->client->ps.stats[STAT_HEALTH] = ent->health;
 
-				// zyk: loading initial shield
 				ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.last_shield;
 
-				// zyk: loading initial MP
 				ent->client->pers.magic_power = ent->client->pers.last_mp;
 			}
 		}
@@ -5036,6 +5069,11 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			if (ent->client->pers.magic_power > zyk_max_magic_power(ent))
 			{
 				ent->client->pers.magic_power = zyk_max_magic_power(ent);
+			}
+
+			if (ent->client->pers.current_stamina > ent->client->pers.max_stamina)
+			{
+				ent->client->pers.current_stamina = ent->client->pers.max_stamina;
 			}
 		}
 
@@ -5091,18 +5129,24 @@ void rpg_score(gentity_t *ent)
 // zyk: increases the RPG skill counter by this amount
 void rpg_skill_counter(gentity_t *ent, int amount)
 {
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.level < zyk_rpg_max_level.integer)
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{ // zyk: now RPG mode increases level up score after a certain amount of attacks
-		ent->client->pers.skill_counter += amount;
+		// zyk: when player does things, it will decrease Stamina
+		zyk_set_stamina(ent, amount, qfalse);
 
-		if (ent->client->pers.skill_counter >= zyk_max_skill_counter.integer)
+		if (ent->client->pers.level < zyk_rpg_max_level.integer)
 		{
-			ent->client->pers.skill_counter = 0;
+			ent->client->pers.skill_counter += amount;
 
-			// zyk: skill counter does not give credits, only Level Up Score
-			ent->client->pers.credits_modifier = -10;
+			if (ent->client->pers.skill_counter >= zyk_max_skill_counter.integer)
+			{
+				ent->client->pers.skill_counter = 0;
 
-			rpg_score(ent);
+				// zyk: skill counter does not give credits, only Level Up Score
+				ent->client->pers.credits_modifier = -10;
+
+				rpg_score(ent);
+			}
 		}
 	}
 }
@@ -5961,7 +6005,11 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Level: ^7%d/%d\n^3Level Up Score: ^7%d/%d\n^3Skill Points: ^7%d\n^3Skill Counter: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.level, zyk_rpg_max_level.integer, ent->client->pers.level_up_score, (ent->client->pers.level * zyk_level_up_score_factor.integer), ent->client->pers.skillpoints, ent->client->pers.skill_counter, zyk_max_skill_counter.integer, ent->client->pers.magic_power, zyk_max_magic_power(ent), ent->client->pers.current_weight, ent->client->pers.max_weight, ent->client->pers.credits));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Level: ^7%d/%d\n^3Level Up Score: ^7%d/%d\n^3Skill Points: ^7%d\n^3Skill Counter: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Stamina: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
+		ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.level, zyk_rpg_max_level.integer, 
+		ent->client->pers.level_up_score, (ent->client->pers.level * zyk_level_up_score_factor.integer), ent->client->pers.skillpoints, 
+		ent->client->pers.skill_counter, zyk_max_skill_counter.integer, ent->client->pers.magic_power, zyk_max_magic_power(ent), 
+		ent->client->pers.current_weight, ent->client->pers.max_weight, ent->client->pers.current_stamina, ent->client->pers.max_stamina, ent->client->pers.credits));
 }
 
 char* zyk_get_inventory_item_name(int inventory_index)

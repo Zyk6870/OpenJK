@@ -5128,7 +5128,7 @@ void FireWeapon( gentity_t *ent, qboolean altFire ) {
 		CalcMuzzlePoint ( ent, forward, vright, up, muzzle );
 
 		// zyk: weapon counter
-		rpg_skill_counter(ent,50);
+		rpg_skill_counter(ent, 30);
 
 		// fire the specific weapon
 		switch( ent->s.weapon ) {

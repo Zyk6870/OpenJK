@@ -1313,27 +1313,54 @@ static void MedPackGive(gentity_t *ent, int amount)
 	}
 }
 
+extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
+extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 void ItemUse_MedPack_Big(gentity_t *ent)
 {
 	// zyk: RPG Mode Big Bacta. Recover 150 HP
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
-		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT * 3);
-	else
-		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	{
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
+		{
+			MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT * 3);
 
+			// zyk: Big Bacta can regen some stamina
+			zyk_set_stamina(ent, 3000, qtrue);
+		}
+		else
+		{
+			MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
+
+			// zyk: Big Bacta can regen some stamina
+			zyk_set_stamina(ent, 1000, qtrue);
+		}
+	}
+	else
+	{
+		MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
+	}
 }
 
-extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 void ItemUse_MedPack(gentity_t *ent)
 {
 	// zyk: RPG Mode Bacta Canister. Recovers some mp
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		zyk_add_mp(ent, 200);
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
+		{
+			zyk_add_mp(ent, 200);
+
+			// zyk: Bacta Canister can regen some stamina
+			zyk_set_stamina(ent, 500, qtrue);
+		}
+		else
+		{
+			// zyk: Bacta Canister can regen some stamina
+			zyk_set_stamina(ent, 200, qtrue);
+		}
 	}
 	
 	MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);
-
 }
 
 #define JETPACK_TOGGLE_TIME			900 // zyk: default 1000

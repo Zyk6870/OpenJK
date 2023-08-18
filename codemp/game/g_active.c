@@ -1391,6 +1391,31 @@ qboolean G_ActionButtonPressed(int buttons)
 	return qfalse;
 }
 
+extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
+
+// zyk: if Stamina runs out, player must rest for some seconds
+void zyk_stamina_out(gentity_t* ent)
+{
+	if (ent->client->pers.current_stamina <= 0 && ent->client->pers.stamina_out_timer <= level.time)
+	{ // zyk: if run out of stamina, knock out the player until stamina recovers a bit
+		int stamina_out_time = 8000 - (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 1000);
+
+		if (ent->client->jetPackOn)
+		{
+			Jetpack_Off(ent);
+		}
+
+		G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_DEATH22, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+		ent->client->ps.torsoTimer = stamina_out_time;
+		ent->client->ps.legsTimer = stamina_out_time;
+		ent->client->ps.weaponTime = stamina_out_time;
+
+		ent->client->pers.stamina_out_timer = level.time + stamina_out_time;
+
+		trap->SendServerCommand(ent->s.number, va("chat \"^3%s: ^7I am tired...\"", ent->client->pers.netname));
+	}
+}
+
 void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 {
 	vec3_t viewChange;
@@ -1415,6 +1440,45 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 	if (!ent->NPC && ent->client->pers.player_statuses & (1 << 1))
 	{
 		ent->client->ps.forceHandExtendTime = level.time + 1000;
+	}
+
+	// zyk: Stamina
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.stamina_timer < level.time && ent->health > 0)
+	{
+		if (ent->client->pers.stamina_out_timer > level.time ||
+			(!(ent->client->ps.pm_flags & PMF_DUCKED) &&
+			   ucmd->forwardmove == 0 && ucmd->rightmove == 0 && ucmd->upmove == 0 &&
+			   actionPressed == qfalse &&
+			   ent->client->ps.weaponstate == WEAPON_READY))
+		{ // zyk: Idle player, recovering Stamina
+			int stamina_recovery = 1 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA];
+
+			if (ent->client->pers.stamina_out_timer <= level.time)
+			{ // zyk: only consume or recover stamina if player did not pass out
+				if (ent->client->ps.legsAnim == BOTH_MEDITATE)
+				{ // zyk: meditating recovers stamina
+					zyk_set_stamina(ent, 10 * stamina_recovery, qtrue);
+				}
+				else
+				{ // zyk: idle, consumes a bit of stamina
+					zyk_set_stamina(ent, 1, qfalse);
+
+					zyk_stamina_out(ent);
+				}
+			}
+			else
+			{ // zyk: player passed out, recover some stamina
+				zyk_set_stamina(ent, 100 * stamina_recovery, qtrue);
+			}
+		}
+		else if (ent->client->pers.stamina_out_timer <= level.time)
+		{ // zyk: not Idle, reducing Stamina
+			zyk_set_stamina(ent, 1, qfalse);
+
+			zyk_stamina_out(ent);
+		}
+
+		ent->client->pers.stamina_timer = level.time + 200;
 	}
 
 	VectorSubtract(ent->client->ps.viewangles, ent->client->idleViewAngles, viewChange);
@@ -1445,14 +1509,19 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			ent->client->ps.forceHandExtendTime = level.time;
 		}
 
-		if (ent->client->sess.amrpgmode == 2 &&
-			(actionPressed || ucmd->forwardmove || ucmd->rightmove || ucmd->upmove ||
-				!G_StandingAnim(ent->client->ps.legsAnim) || (ent->client->ps.weaponstate != WEAPON_READY && ent->client->ps.weapon !=
-					WP_SABER) ||
+		if (ent->client->sess.amrpgmode == 2)
+		{ // zyk: tests if RPG player is idle/afk
+			if (actionPressed || ucmd->forwardmove || ucmd->rightmove || ucmd->upmove || 
+				(!G_StandingAnim(ent->client->ps.legsAnim) && ent->client->ps.legsAnim != BOTH_MEDITATE) ||
+				(ent->client->ps.weaponstate != WEAPON_READY && ent->client->ps.weaponstate != WEAPON_RAISING && ent->client->ps.weapon != WP_SABER) ||
 				(ent->client->ps.weaponTime > 0 && ent->client->ps.weapon == WP_SABER) ||
-				ent->client->ps.weaponstate == WEAPON_CHARGING || ent->client->ps.weaponstate == WEAPON_CHARGING_ALT))
-		{ // zyk: in these situations, player in rpg is no longer afk
-			ent->client->pers.quest_afk_timer = level.time + zyk_quest_afk_timer.integer;
+				ent->client->ps.weaponstate == WEAPON_CHARGING || 
+				ent->client->ps.weaponstate == WEAPON_CHARGING_ALT
+				)
+			{ // zyk: player is not idle
+				// zyk: player is not idle/afk, reset timer
+				ent->client->pers.quest_afk_timer = level.time + zyk_quest_afk_timer.integer;
+			}
 		}
 
 		if ( !VectorCompare( vec3_origin, ent->client->ps.velocity )
@@ -2636,9 +2705,24 @@ void ClientThink_real( gentity_t *ent ) {
 			zyk_player_speed /= 2;
 		}
 
-		if (client->pers.current_weight > client->pers.max_weight)
+		if (client->sess.amrpgmode == 2 && client->pers.current_weight > client->pers.max_weight)
 		{ // zyk: too much weight decreases player speed
 			zyk_player_speed -= (client->pers.current_weight - client->pers.max_weight);
+
+			if (zyk_player_speed < 1)
+			{
+				zyk_player_speed = 1;
+			}
+		}
+
+		if (client->sess.amrpgmode == 2 && client->pers.current_stamina > 0 && client->pers.current_stamina < RPG_MIN_STAMINA)
+		{ // zyk: low Stamina decreases player speed
+			zyk_player_speed = zyk_player_speed * (client->pers.current_stamina / RPG_MIN_STAMINA);
+
+			if (zyk_player_speed < 1)
+			{
+				zyk_player_speed = 1;
+			}
 		}
 
 		client->ps.speed = zyk_player_speed;
