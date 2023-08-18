@@ -88,34 +88,33 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 4;
 	max_skill_levels[SKILL_MAX_MP] = 10;
-	max_skill_levels[SKILL_MAGIC_1] = 2;
-	max_skill_levels[SKILL_MAGIC_2] = 2;
-	max_skill_levels[SKILL_MAGIC_3] = 2;
-	max_skill_levels[SKILL_MAGIC_4] = 2;
-	max_skill_levels[SKILL_MAGIC_5] = 2;
-	max_skill_levels[SKILL_MAGIC_6] = 2;
-	max_skill_levels[SKILL_MAGIC_7] = 2;
-	max_skill_levels[SKILL_MAGIC_8] = 2;
-	max_skill_levels[SKILL_MAGIC_9] = 2;
-	max_skill_levels[SKILL_MAGIC_10] = 2;
-	max_skill_levels[SKILL_MAGIC_11] = 2;
-	max_skill_levels[SKILL_MAGIC_12] = 2;
-	max_skill_levels[SKILL_MAGIC_13] = 2;
-	max_skill_levels[SKILL_MAGIC_14] = 2;
-	max_skill_levels[SKILL_MAGIC_15] = 2;
-	max_skill_levels[SKILL_MAGIC_16] = 2;
-	max_skill_levels[SKILL_MAGIC_17] = 2;
-	max_skill_levels[SKILL_MAGIC_18] = 2;
-	max_skill_levels[SKILL_MAGIC_19] = 2;
-	max_skill_levels[SKILL_MAGIC_20] = 2;
-	max_skill_levels[SKILL_MAGIC_21] = 2;
-	max_skill_levels[SKILL_MAGIC_22] = 2;
-	max_skill_levels[SKILL_MAGIC_23] = 2;
-	max_skill_levels[SKILL_MAGIC_24] = 2;
-	max_skill_levels[SKILL_MAGIC_25] = 2;
-	max_skill_levels[SKILL_MAGIC_26] = 2;
-	max_skill_levels[SKILL_MAGIC_27] = 2;
-	max_skill_levels[SKILL_MAGIC_28] = 2;
+	max_skill_levels[SKILL_MAGIC_1] = 3;
+	max_skill_levels[SKILL_MAGIC_2] = 3;
+	max_skill_levels[SKILL_MAGIC_3] = 3;
+	max_skill_levels[SKILL_MAGIC_5] = 3;
+	max_skill_levels[SKILL_MAGIC_6] = 3;
+	max_skill_levels[SKILL_MAGIC_7] = 3;
+	max_skill_levels[SKILL_MAGIC_8] = 3;
+	max_skill_levels[SKILL_MAGIC_9] = 3;
+	max_skill_levels[SKILL_MAGIC_10] = 3;
+	max_skill_levels[SKILL_MAGIC_11] = 3;
+	max_skill_levels[SKILL_MAGIC_12] = 3;
+	max_skill_levels[SKILL_MAGIC_13] = 3;
+	max_skill_levels[SKILL_MAGIC_14] = 3;
+	max_skill_levels[SKILL_MAGIC_15] = 3;
+	max_skill_levels[SKILL_MAGIC_16] = 3;
+	max_skill_levels[SKILL_MAGIC_17] = 3;
+	max_skill_levels[SKILL_MAGIC_18] = 3;
+	max_skill_levels[SKILL_MAGIC_19] = 3;
+	max_skill_levels[SKILL_MAGIC_20] = 3;
+	max_skill_levels[SKILL_MAGIC_21] = 3;
+	max_skill_levels[SKILL_MAGIC_22] = 3;
+	max_skill_levels[SKILL_MAGIC_23] = 3;
+	max_skill_levels[SKILL_MAGIC_24] = 3;
+	max_skill_levels[SKILL_MAGIC_25] = 3;
+	max_skill_levels[SKILL_MAGIC_26] = 3;
+	max_skill_levels[SKILL_MAGIC_27] = 3;
+	max_skill_levels[SKILL_MAGIC_28] = 3;
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
@@ -180,7 +179,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAGIC_1] = "Magic Sense";
 	skill_names[SKILL_MAGIC_2] = "Healing Area";
 	skill_names[SKILL_MAGIC_3] = "Enemy Weakening";
-	skill_names[SKILL_MAGIC_4] = "Magic Explosion";
 	skill_names[SKILL_MAGIC_5] = "Water Splash";
 	skill_names[SKILL_MAGIC_6] = "Water Attack";
 	skill_names[SKILL_MAGIC_7] = "Ice Stalagmite";
@@ -329,8 +327,6 @@ char* zyk_skill_description(int skill_index)
 		return "creates an energy area that heals you and your allies and damage enemies";
 	if (skill_index == SKILL_MAGIC_3)
 		return "decreases damage and resistance of enemies nearby";
-	if (skill_index == SKILL_MAGIC_4)
-		return "creates an explosion that does a lot of damage";
 	if (skill_index == SKILL_MAGIC_5)
 		return "damages enemies, draining their hp and healing you";
 	if (skill_index == SKILL_MAGIC_6)
@@ -4323,7 +4319,6 @@ extern void ultra_drain(gentity_t *ent, int radius, int damage, int duration);
 extern void magic_shield(gentity_t *ent, int duration);
 extern void healing_area(gentity_t *ent, int damage, int duration);
 extern void lightning_dome(gentity_t *ent, int damage);
-extern void magic_explosion(gentity_t *ent, int radius, int damage, int duration);
 extern void flame_burst(gentity_t *ent, int duration);
 extern void water_attack(gentity_t *ent, int distance, int damage);
 extern void rock_shield(gentity_t* ent, int health, int duration);
@@ -11141,7 +11136,6 @@ int zyk_get_magic_cost(int magic_number)
 		5, // Magic Sense
 		5, // Healing Area
 		18, // Enemy Weakening
-		10, // Magic Explosion
 		20, // Water Splash
 		21, // Water Attack
 		20, // Ice Stalagmite
@@ -11209,11 +11203,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			{
 				enemy_nerf(ent, 450);
 				zyk_set_magic_power_cooldown_time(ent, 12000);
-			}
-			else if (magic_number == MAGIC_MAGIC_EXPLOSION)
-			{
-				magic_explosion(ent, 320, 130, 900);
-				zyk_set_magic_power_cooldown_time(ent, 24000);
 			}
 			else if (magic_number == MAGIC_WATER_SPLASH)
 			{

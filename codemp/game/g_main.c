@@ -4942,7 +4942,6 @@ zyk_magic_element_t zyk_get_magic_element(int magic_number)
 		MAGICELEMENT_NONE,
 		MAGICELEMENT_NONE,
 		MAGICELEMENT_NONE,
-		MAGICELEMENT_NONE,
 		MAGICELEMENT_WATER,
 		MAGICELEMENT_WATER,
 		MAGICELEMENT_WATER,
@@ -5725,7 +5724,7 @@ void black_hole(gentity_t* ent, int radius, int damage, int duration)
 	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_BLACK_HOLE] > 1)
 	{
 		damage += 15;
-		duration += 3000;
+		duration += 2000;
 	}
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_black_hole", "4", "ships/proton_impact", 500, damage, radius, duration);
@@ -5756,17 +5755,6 @@ void light_of_judgement(gentity_t* ent, int radius, int duration)
 	ent->client->pers.quest_power_status |= (1 << 7);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_OF_JUDGEMENT] = 0;
 	ent->client->pers.magic_power_timer[MAGIC_LIGHT_OF_JUDGEMENT] = level.time + duration;
-}
-
-// zyk: Magic Explosion
-void magic_explosion(gentity_t *ent, int radius, int damage, int duration)
-{
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_MAGIC_EXPLOSION] > 1)
-	{
-		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_explosion", "4", "explosions/hugeexplosion1", 1500, damage, radius, duration + 1000);
-	}
-
-	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_explosion", "4", "explosions/hugeexplosion1", 500, damage, radius, duration);
 }
 
 // zyk: Healing Area
