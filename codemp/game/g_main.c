@@ -4948,8 +4948,6 @@ zyk_magic_element_t zyk_get_magic_element(int magic_number)
 		MAGICELEMENT_EARTH,
 		MAGICELEMENT_EARTH,
 		MAGICELEMENT_EARTH,
-		MAGICELEMENT_EARTH,
-		MAGICELEMENT_FIRE,
 		MAGICELEMENT_FIRE,
 		MAGICELEMENT_FIRE,
 		MAGICELEMENT_FIRE,
@@ -5443,60 +5441,6 @@ void time_power(gentity_t *ent, int distance, int duration)
 	}
 }
 
-// zyk: Rock Shield. Spawns a rock around the player that absorbs all damage
-void rock_shield(gentity_t *ent, int health, int duration)
-{
-	gentity_t* new_ent = G_Spawn();
-
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ROCK_SHIELD] > 1)
-	{
-		health *= 2;
-	}
-
-	// zyk: if player was already using a Rock Shield (Wizard has less magic cooldown, it may be possible for him), remove old model
-	if (ent->client->pers.quest_power_model1_id != -1)
-	{
-		gentity_t* rock_ent = &g_entities[ent->client->pers.quest_power_model1_id];
-
-		ent->client->pers.quest_power_model1_id = -1;
-
-		level.special_power_effects_timer[rock_ent->s.number] = 0;
-	}
-
-	zyk_main_set_entity_field(new_ent, "classname", "misc_model_breakable");
-	zyk_main_set_entity_field(new_ent, "spawnflags", "8");
-	zyk_main_set_entity_field(new_ent, "health", "10000");
-	zyk_main_set_entity_field(new_ent, "model", "models/map_objects/desert/rock.md3");
-	zyk_main_set_entity_field(new_ent, "origin", va("%f %f %f", ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2]));
-	zyk_main_set_entity_field(new_ent, "angles", "0 0 90");
-	zyk_main_set_entity_field(new_ent, "zykmodelscale", "55");
-
-	zyk_main_spawn_entity(new_ent);
-
-	// zyk: Rock health
-	new_ent->count = health;
-
-	new_ent->material = 4;
-
-	// zyk: chunk model
-	new_ent->s.modelGhoul2 = G_ModelIndex("models/chunks/rock/rock1_1.md3");
-
-	ent->client->pers.quest_power_model1_id = new_ent->s.number;
-	ent->client->pers.quest_power_status |= (1 << 17);
-	ent->client->pers.magic_power_timer[MAGIC_ROCK_SHIELD] = level.time + duration;
-
-	ent->client->pers.magic_power_debounce_timer[MAGIC_ROCK_SHIELD] = level.time;
-
-	level.special_power_effects[new_ent->s.number] = ent->s.number;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
-
-	new_ent->s.pos.trTime = level.time;
-	new_ent->s.pos.trType = TR_LINEAR;
-	VectorCopy(ent->r.currentOrigin, new_ent->s.pos.trBase);
-
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_drop_small.mp3.wav"));
-}
-
 // zyk: Water Splash. Damages the targets and heals the user
 void water_splash(gentity_t *ent, int distance, int damage)
 {
@@ -5794,54 +5738,6 @@ void ultra_flame(gentity_t *ent, int distance, int damage)
 			zyk_quest_effect_spawn(ent, player_ent, "zyk_quest_effect_flame", "4", "env/flame_jet", 200, damage, 35, 15000);
 		}
 	}
-}
-
-// zyk: spawns the flames around the player
-void flaming_area_flames(gentity_t *ent, char *targetname, char *spawnflags, char *effect_path, int start_time, int damage, int radius, int duration, int xoffset, int yoffset)
-{
-	gentity_t *new_ent = G_Spawn();
-
-	zyk_set_entity_field(new_ent, "classname", "fx_runner");
-	zyk_set_entity_field(new_ent, "spawnflags", spawnflags);
-	zyk_set_entity_field(new_ent, "targetname", targetname);
-	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->r.currentOrigin[0] + xoffset, (int)ent->r.currentOrigin[1] + yoffset, (int)ent->r.currentOrigin[2]));
-
-	new_ent->s.modelindex = G_EffectIndex(effect_path);
-
-	zyk_spawn_entity(new_ent);
-
-	if (damage > 0)
-		new_ent->splashDamage = damage;
-
-	if (radius > 0)
-		new_ent->splashRadius = radius;
-
-	if (start_time > 0)
-		new_ent->nextthink = level.time + start_time;
-
-	G_Sound(new_ent, CHAN_AUTO, G_SoundIndex("sound/effects/fire_lp.wav"));
-
-	level.special_power_effects[new_ent->s.number] = ent->s.number;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
-}
-
-// zyk: Flaming Area
-void flaming_area(gentity_t *ent, int damage)
-{
-	if (ent->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_FLAMING_AREA] > 1)
-	{
-		damage *= 1.4;
-	}
-
-	flaming_area_flames(ent, "zyk_quest_effect_flaming_area", "4", "env/fire", 0, damage, 60, 6000, -60, -60);
-	flaming_area_flames(ent, "zyk_quest_effect_flaming_area", "4", "env/fire", 0, damage, 60, 6000, -60, 0);
-	flaming_area_flames(ent, "zyk_quest_effect_flaming_area", "4", "env/fire", 0, damage, 60, 6000, -60, 60);
-	flaming_area_flames(ent, "zyk_quest_effect_flaming_area", "4", "env/fire", 0, damage, 60, 6000, 0, -60);
-	flaming_area_flames(ent, "zyk_quest_effect_flaming_area", "4", "env/fire", 0, damage, 60, 6000, 0, 0);
-	flaming_area_flames(ent, "zyk_quest_effect_flaming_area", "4", "env/fire", 0, damage, 60, 6000, 0, 60);
-	flaming_area_flames(ent, "zyk_quest_effect_flaming_area", "4", "env/fire", 0, damage, 60, 6000, 50, -60);
-	flaming_area_flames(ent, "zyk_quest_effect_flaming_area", "4", "env/fire", 0, damage, 60, 6000, 60, 0);
-	flaming_area_flames(ent, "zyk_quest_effect_flaming_area", "4", "env/fire", 0, damage, 60, 6000, 60, 60);
 }
 
 // zyk: fires the Boba Fett flame thrower
@@ -6310,39 +6206,6 @@ void quest_power_events(gentity_t *ent)
 				}
 			}
 
-			if (ent->client->pers.quest_power_status & (1 << 17))
-			{ // zyk: Rock Shield
-				if (ent->client->pers.quest_power_model1_id != -1)
-				{
-					if (ent->client->pers.magic_power_debounce_timer[MAGIC_ROCK_SHIELD] < level.time)
-					{
-						gentity_t* rock_ent = &g_entities[ent->client->pers.quest_power_model1_id];
-						vec3_t rock_origin;
-
-						// zyk: move the Rock so it is always in the player origin
-						VectorSet(rock_origin, ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-
-						VectorCopy(rock_origin, rock_ent->s.pos.trBase);
-						VectorCopy(rock_origin, rock_ent->s.origin);
-						VectorCopy(rock_origin, rock_ent->r.currentOrigin);
-
-						// zyk: do this so the Rock model will not disappear in some places
-						trap->LinkEntity((sharedEntity_t*)rock_ent);
-
-						ent->client->pers.magic_power_debounce_timer[MAGIC_ROCK_SHIELD] = level.time + 40;
-					}
-				}
-				else
-				{ // zyk: Rock was destroyed. Stop using this magic
-					ent->client->pers.quest_power_status &= ~(1 << 17);
-				}
-
-				if (ent->client->pers.magic_power_timer[MAGIC_ROCK_SHIELD] < level.time)
-				{ // zyk: Rock Shield run out
-					ent->client->pers.quest_power_status &= ~(1 << 17);
-				}
-			}
-
 			if (ent->client->pers.quest_power_status & (1 << 19))
 			{ // zyk: Tree of Life
 				if (ent->client->pers.magic_power_hit_counter[MAGIC_TREE_OF_LIFE] > 0)
@@ -6421,31 +6284,6 @@ void quest_power_events(gentity_t *ent)
 				if (ent->client->pers.magic_power_timer[MAGIC_ICE_BLOCK] < level.time)
 				{
 					ent->client->pers.quest_power_status &= ~(1 << 22);
-				}
-			}
-
-			if (ent->client->pers.quest_power_status & (1 << 23))
-			{ // zyk: hit by Flaming Area
-				if (ent->client->pers.magic_power_hit_counter[MAGIC_FLAMING_AREA] > 0 && ent->client->pers.magic_power_target_timer[MAGIC_FLAMING_AREA] < level.time)
-				{
-					gentity_t *flaming_area_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_FLAMING_AREA]];
-
-					if (flaming_area_user && flaming_area_user->client)
-					{
-						zyk_quest_effect_spawn(flaming_area_user, ent, "zyk_quest_effect_flaming_area_hit", "0", "env/fire", 0, 0, 0, 300);
-
-						if (flaming_area_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_FLAMING_AREA] > 1)
-							G_Damage(ent, flaming_area_user, flaming_area_user, NULL, NULL, 3, 0, MOD_UNKNOWN);
-						else
-							G_Damage(ent, flaming_area_user, flaming_area_user, NULL, NULL, 2, 0, MOD_UNKNOWN);
-					}
-
-					ent->client->pers.magic_power_hit_counter[MAGIC_FLAMING_AREA]--;
-					ent->client->pers.magic_power_target_timer[MAGIC_FLAMING_AREA] = level.time + 200;
-				}
-				else if (ent->client->pers.magic_power_hit_counter[MAGIC_FLAMING_AREA] == 0 && ent->client->pers.magic_power_target_timer[MAGIC_FLAMING_AREA] < level.time)
-				{
-					ent->client->pers.quest_power_status &= ~(1 << 23);
 				}
 			}
 		}

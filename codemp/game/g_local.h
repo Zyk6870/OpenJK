@@ -536,11 +536,9 @@ typedef enum {
 	MAGIC_ICE_BLOCK,
 	MAGIC_EARTHQUAKE,
 	MAGIC_ROCK_SMASH,
-	MAGIC_ROCK_SHIELD,
 	MAGIC_TREE_OF_LIFE,
 	MAGIC_FLAME_BURST,
 	MAGIC_ULTRA_FLAME,
-	MAGIC_FLAMING_AREA,
 	MAGIC_FLAMING_RAGE,
 	MAGIC_BLOWING_WIND,
 	MAGIC_REVERSE_WIND,
@@ -731,11 +729,9 @@ typedef enum {
 	SKILL_MAGIC_8,
 	SKILL_MAGIC_9,
 	SKILL_MAGIC_10,
-	SKILL_MAGIC_11,
 	SKILL_MAGIC_12,
 	SKILL_MAGIC_13,
 	SKILL_MAGIC_14,
-	SKILL_MAGIC_15,
 	SKILL_MAGIC_16,
 	SKILL_MAGIC_17,
 	SKILL_MAGIC_18,
@@ -1051,13 +1047,13 @@ typedef struct clientPersistant_s {
 	// 14 - unused
 	// 15 - unused
 	// 16 - unused
-	// 17 - using Rock Shield
+	// 17 - unused
 	// 18 - unused
 	// 19 - using Tree of Life
 	// 20 - hit by Reverse Wind
 	// 21 - hit by Enemy Nerf
 	// 22 - using Ice Block
-	// 23 - hit by Flaming Area
+	// 23 - unused
 	// 24 - unused
 	// 25 - unused
 	// 26 - hit by Elemental Attack

@@ -96,11 +96,9 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAGIC_8] = 3;
 	max_skill_levels[SKILL_MAGIC_9] = 3;
 	max_skill_levels[SKILL_MAGIC_10] = 3;
-	max_skill_levels[SKILL_MAGIC_11] = 3;
 	max_skill_levels[SKILL_MAGIC_12] = 3;
 	max_skill_levels[SKILL_MAGIC_13] = 3;
 	max_skill_levels[SKILL_MAGIC_14] = 3;
-	max_skill_levels[SKILL_MAGIC_15] = 3;
 	max_skill_levels[SKILL_MAGIC_16] = 3;
 	max_skill_levels[SKILL_MAGIC_17] = 3;
 	max_skill_levels[SKILL_MAGIC_18] = 3;
@@ -183,11 +181,9 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAGIC_8] = "Ice Block";
 	skill_names[SKILL_MAGIC_9] = "Earthquake";
 	skill_names[SKILL_MAGIC_10] = "Rock Smash";
-	skill_names[SKILL_MAGIC_11] = "Rock Shield";
 	skill_names[SKILL_MAGIC_12] = "Tree of Life";
 	skill_names[SKILL_MAGIC_13] = "Flame Burst";
 	skill_names[SKILL_MAGIC_14] = "Ultra Flame";
-	skill_names[SKILL_MAGIC_15] = "Flaming Area";
 	skill_names[SKILL_MAGIC_16] = "Flaming Rage";
 	skill_names[SKILL_MAGIC_17] = "Blowing Wind";
 	skill_names[SKILL_MAGIC_18] = "Reverse Wind";
@@ -335,16 +331,12 @@ char* zyk_skill_description(int skill_index)
 		return "knocks people down causing damage";
 	if (skill_index == SKILL_MAGIC_10)
 		return "rocks keep falling at the enemies, causing high damage";
-	if (skill_index == SKILL_MAGIC_11)
-		return "a rock appears around you, absorbing 99 per cent of any damage you take. It the rock takes a certain amount of damage, it breaks. At level 2, the rock absorbs more damage";
 	if (skill_index == SKILL_MAGIC_12)
 		return "a big tree appears, protecting you from attacks and healing you";
 	if (skill_index == SKILL_MAGIC_13)
 		return "fires a flame burst for some seconds";
 	if (skill_index == SKILL_MAGIC_14)
-		return "a flame jet appears at the enemies and damages them. At level 2, if the flame hits the target, it will catch fire";
-	if (skill_index == SKILL_MAGIC_15)
-		return "creates a big area of flames around you, with high damage to enemies. Makes targets who touch the flames catch fire for some seconds";
+		return "a flame jet appears at the enemies and damages them. If the flame hits the target, it will catch fire. Each level increases how much time the enemy will catch fire";
 	if (skill_index == SKILL_MAGIC_16)
 		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
 	if (skill_index == SKILL_MAGIC_17)
@@ -4316,9 +4308,7 @@ extern void healing_area(gentity_t *ent, int damage, int duration);
 extern void lightning_dome(gentity_t *ent, int damage);
 extern void flame_burst(gentity_t *ent, int duration);
 extern void water_attack(gentity_t *ent, int distance, int damage);
-extern void rock_shield(gentity_t* ent, int health, int duration);
 extern void tree_of_life(gentity_t *ent);
-extern void flaming_area(gentity_t *ent, int damage);
 extern void reverse_wind(gentity_t *ent, int distance, int duration);
 extern void enemy_nerf(gentity_t *ent, int distance);
 extern void ice_block(gentity_t *ent, int duration);
@@ -11136,11 +11126,9 @@ int zyk_get_magic_cost(int magic_number)
 		20, // Ice Block
 		18, // Earthquake
 		18, // Rock Smash
-		18, // Rock Shield
 		17, // Tree of Life
 		23, // Flame Burst
-		21, // Ultra Flame
-		22, // Flaming Area
+		22, // Ultra Flame
 		15, // Flaming Rage
 		20, // Blowing Wind
 		23, // Reverse Wind
@@ -11225,11 +11213,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				rock_smash(ent, 500, 40);
 				zyk_set_magic_power_cooldown_time(ent, 11000);
 			}
-			else if (magic_number == MAGIC_ROCK_SHIELD)
-			{
-				rock_shield(ent, 500, 20000);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
-			}
 			else if (magic_number == MAGIC_TREE_OF_LIFE)
 			{
 				tree_of_life(ent);
@@ -11244,11 +11227,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			{
 				ultra_flame(ent, 600, 35);
 				zyk_set_magic_power_cooldown_time(ent, 10000);
-			}
-			else if (magic_number == MAGIC_FLAMING_AREA)
-			{
-				flaming_area(ent, 20);
-				zyk_set_magic_power_cooldown_time(ent, 18000);
 			}
 			else if (magic_number == MAGIC_FLAMING_RAGE)
 			{
