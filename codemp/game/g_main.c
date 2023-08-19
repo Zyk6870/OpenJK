@@ -5735,7 +5735,7 @@ void quest_power_events(gentity_t *ent)
 							static vec3_t forward;
 							vec3_t dir;
 
-							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_wind", "4", "misc/genrings", 0, damage, 120, 500);
+							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_air", "4", "env/water_steam3", 0, damage, 100, 500);
 
 							AngleVectors(ent->client->ps.viewangles, forward, NULL, NULL);
 
