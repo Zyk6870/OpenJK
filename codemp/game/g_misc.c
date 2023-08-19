@@ -2990,37 +2990,22 @@ void fx_runner_link( gentity_t *ent )
 		// Let's get to work right now!
 		ent->think = fx_runner_think;
 
-		if (Q_stricmp(ent->targetname, "zyk_quest_effect_enemy_nerf") == 0)
-		{ // zyk: starts the enemy weakening effect right now
+		if (Q_stricmp(ent->targetname, "zyk_magic_healing_area") == 0 || 
+			Q_stricmp(ent->targetname, "zyk_magic_enemy_weakening") == 0 || 
+			Q_stricmp(ent->targetname, "zyk_magic_dome") == 0 ||
+			Q_stricmp(ent->targetname, "zyk_magic_water") == 0 || Q_stricmp(ent->targetname, "zyk_magic_earth") == 0 ||
+			Q_stricmp(ent->targetname, "zyk_magic_fire") == 0 || Q_stricmp(ent->targetname, "zyk_magic_air") == 0 ||
+			Q_stricmp(ent->targetname, "zyk_magic_dark") == 0 || Q_stricmp(ent->targetname, "zyk_magic_light") == 0)
+		{ // zyk: effects from magic powers start right now
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 100; // wait a small bit, then start working
-		}
-		else if (Q_stricmp(ent->targetname, "zyk_quest_effect_rock_smash") == 0)
-		{ // zyk: starts the Rock Smash effect right now
-			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
-			ent->nextthink = level.time + 100;
-		}
-		else if (Q_stricmp(ent->targetname, "zyk_quest_effect_flame") == 0)
-		{ // zyk: starts the Ultra Flame effect right now
-			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
-			ent->nextthink = level.time + 100;
-		}
-		else if (Q_stricmp(ent->targetname, "zyk_quest_effect_dome") == 0)
-		{ // zyk: starts the Dome of Damage effect right now
-			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
-			ent->nextthink = level.time + 100;
 		}
 		else if (Q_stricmp(ent->targetname, "zyk_magic_element") == 0)
 		{ // zyk: starts the Magic Element effect right now
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 100;
 		}
-		else if (Q_stricmp(ent->targetname, "zyk_quest_effect_watersplash") == 0 || 
-				 Q_stricmp(ent->targetname, "zyk_quest_effect_time") == 0 || 
-				 Q_stricmp(ent->targetname, "zyk_quest_effect_flaming_area_hit") == 0 || 
-				 Q_stricmp(ent->targetname, "zyk_quest_effect_chaos") == 0 || 
-				 Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0 || 
-			     Q_stricmp(ent->targetname, "zyk_quest_effect_flaming_rage") == 0)
+		else if (Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0)
 		{ // zyk: starts the effect imediately for these magic powers
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 200; // wait a small bit, then start working
@@ -3087,13 +3072,13 @@ void SP_fx_runner( gentity_t *ent )
 	ent->think = fx_runner_link;
 
 	// zyk: no need to wait 400 ms with these effects
-	if (Q_stricmp(ent->targetname, "zyk_quest_effect_enemy_nerf") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_quest_effect_flaming_area_hit") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_quest_effect_flame") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_quest_effect_dome") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_quest_effect_chaos") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_quest_effect_flaming_rage") == 0)
+	if (Q_stricmp(ent->targetname, "zyk_magic_healing_area") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_magic_enemy_weakening") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_magic_dome") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_magic_water") == 0 || Q_stricmp(ent->targetname, "zyk_magic_earth") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_magic_fire") == 0 || Q_stricmp(ent->targetname, "zyk_magic_air") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_magic_dark") == 0 || Q_stricmp(ent->targetname, "zyk_magic_light") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0)
 	{
 		ent->nextthink = level.time;
 	}

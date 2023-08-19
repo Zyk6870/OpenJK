@@ -88,27 +88,16 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 4;
 	max_skill_levels[SKILL_MAX_MP] = 10;
-	max_skill_levels[SKILL_MAGIC_MAGIC_SENSE] = 3;
-	max_skill_levels[SKILL_MAGIC_HEALING_AREA] = 3;
-	max_skill_levels[SKILL_MAGIC_ENEMY_WEAKENING] = 3;
-	max_skill_levels[SKILL_MAGIC_WATER_SPLASH] = 3;
-	max_skill_levels[SKILL_MAGIC_WATER_ATTACK] = 3;
-	max_skill_levels[SKILL_MAGIC_ICE_BLOCK] = 3;
-	max_skill_levels[SKILL_MAGIC_EARTHQUAKE] = 3;
-	max_skill_levels[SKILL_MAGIC_ROCK_SMASH] = 3;
-	max_skill_levels[SKILL_MAGIC_TREE_OF_LIFE] = 3;
-	max_skill_levels[SKILL_MAGIC_FLAME_BURST] = 3;
-	max_skill_levels[SKILL_MAGIC_ULTRA_FLAME] = 3;
-	max_skill_levels[SKILL_MAGIC_FLAMING_RAGE] = 3;
-	max_skill_levels[SKILL_MAGIC_BLOWING_WIND] = 3;
-	max_skill_levels[SKILL_MAGIC_REVERSE_WIND] = 3;
-	max_skill_levels[SKILL_MAGIC_SLOW_MOTION] = 3;
-	max_skill_levels[SKILL_MAGIC_BLACK_HOLE] = 3;
-	max_skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 3;
-	max_skill_levels[SKILL_MAGIC_CHAOS_POWER] = 3;
-	max_skill_levels[SKILL_MAGIC_LIGHT_OF_JUDGEMENT] = 3;
-	max_skill_levels[SKILL_MAGIC_MAGIC_SHIELD] = 3;
-	max_skill_levels[SKILL_MAGIC_LIGHTNING_DOME] = 3;
+	max_skill_levels[SKILL_MAGIC_MAGIC_SENSE] = 7;
+	max_skill_levels[SKILL_MAGIC_HEALING_AREA] = 7;
+	max_skill_levels[SKILL_MAGIC_ENEMY_WEAKENING] = 7;
+	max_skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 7;
+	max_skill_levels[SKILL_MAGIC_WATER_MAGIC] = 7;
+	max_skill_levels[SKILL_MAGIC_EARTH_MAGIC] = 7;
+	max_skill_levels[SKILL_MAGIC_FIRE_MAGIC] = 7;
+	max_skill_levels[SKILL_MAGIC_AIR_MAGIC] = 7;
+	max_skill_levels[SKILL_MAGIC_DARK_MAGIC] = 7;
+	max_skill_levels[SKILL_MAGIC_LIGHT_MAGIC] = 7;
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
@@ -173,24 +162,13 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAGIC_MAGIC_SENSE] = "Magic Sense";
 	skill_names[SKILL_MAGIC_HEALING_AREA] = "Healing Area";
 	skill_names[SKILL_MAGIC_ENEMY_WEAKENING] = "Enemy Weakening";
-	skill_names[SKILL_MAGIC_WATER_SPLASH] = "Water Splash";
-	skill_names[SKILL_MAGIC_WATER_ATTACK] = "Water Attack";
-	skill_names[SKILL_MAGIC_ICE_BLOCK] = "Ice Block";
-	skill_names[SKILL_MAGIC_EARTHQUAKE] = "Earthquake";
-	skill_names[SKILL_MAGIC_ROCK_SMASH] = "Rock Smash";
-	skill_names[SKILL_MAGIC_TREE_OF_LIFE] = "Tree of Life";
-	skill_names[SKILL_MAGIC_FLAME_BURST] = "Flame Burst";
-	skill_names[SKILL_MAGIC_ULTRA_FLAME] = "Ultra Flame";
-	skill_names[SKILL_MAGIC_FLAMING_RAGE] = "Flaming Rage";
-	skill_names[SKILL_MAGIC_BLOWING_WIND] = "Blowing Wind";
-	skill_names[SKILL_MAGIC_REVERSE_WIND] = "Reverse Wind";
-	skill_names[SKILL_MAGIC_SLOW_MOTION] = "Slow Motion";
-	skill_names[SKILL_MAGIC_BLACK_HOLE] = "Black Hole";
 	skill_names[SKILL_MAGIC_DOME_OF_DAMAGE] = "Dome of Damage";
-	skill_names[SKILL_MAGIC_CHAOS_POWER] = "Chaos Power";
-	skill_names[SKILL_MAGIC_LIGHT_OF_JUDGEMENT] = "Light of Judgement";
-	skill_names[SKILL_MAGIC_MAGIC_SHIELD] = "Magic Shield";
-	skill_names[SKILL_MAGIC_LIGHTNING_DOME] = "Lightning Dome";
+	skill_names[SKILL_MAGIC_WATER_MAGIC] = "Water Magic";
+	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "Earth Magic";
+	skill_names[SKILL_MAGIC_FIRE_MAGIC] = "Fire Magic";
+	skill_names[SKILL_MAGIC_AIR_MAGIC] = "Air Magic";
+	skill_names[SKILL_MAGIC_DARK_MAGIC] = "Dark Magic";
+	skill_names[SKILL_MAGIC_LIGHT_MAGIC] = "Light Magic";
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
@@ -312,45 +290,23 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_MAGIC_SENSE)
 		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense and Sense Health skill levels";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
-		return "creates an energy area that heals you and your allies and damage enemies";
+		return "creates an energy area that recovers health and shield to you and your allies. It also does a little damage to enemies";
 	if (skill_index == SKILL_MAGIC_ENEMY_WEAKENING)
 		return "decreases damage and resistance of enemies nearby";
-	if (skill_index == SKILL_MAGIC_WATER_SPLASH)
-		return "damages enemies, draining their hp and healing you";
-	if (skill_index == SKILL_MAGIC_WATER_ATTACK)
-		return "attacks enemies nearby with water, causing high damage";
-	if (skill_index == SKILL_MAGIC_ICE_BLOCK)
-		return "creates a block of ice around you, protecting you from attacks and increasing your resistance to damage";
-	if (skill_index == SKILL_MAGIC_EARTHQUAKE)
-		return "knocks people down causing damage";
-	if (skill_index == SKILL_MAGIC_ROCK_SMASH)
-		return "rocks keep falling at the enemies, causing high damage";
-	if (skill_index == SKILL_MAGIC_TREE_OF_LIFE)
-		return "a big tree appears, protecting you from attacks and healing you";
-	if (skill_index == SKILL_MAGIC_FLAME_BURST)
-		return "fires a flame burst for some seconds";
-	if (skill_index == SKILL_MAGIC_ULTRA_FLAME)
-		return "a flame jet appears at the enemies and damages them. If the flame hits the target, it will catch fire. Each level increases how much time the enemy will catch fire";
-	if (skill_index == SKILL_MAGIC_FLAMING_RAGE)
-		return "the power of the Fire element boosts you, making you cause more damage with your attacks and receive less damage. Also increases your run speed";
-	if (skill_index == SKILL_MAGIC_BLOWING_WIND)
-		return "blows people away for some seconds";
-	if (skill_index == SKILL_MAGIC_REVERSE_WIND)
-		return "makes people go towards you";
-	if (skill_index == SKILL_MAGIC_SLOW_MOTION)
-		return "decreases run speed of enemies nearby";
-	if (skill_index == SKILL_MAGIC_BLACK_HOLE)
-		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
 	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
 		return "an energy dome appears at your position each half second, damaging enemies inside it";
-	if (skill_index == SKILL_MAGIC_CHAOS_POWER)
-		return "damages, stuns, slowers and electrifies enemies";
-	if (skill_index == SKILL_MAGIC_LIGHT_OF_JUDGEMENT)
-		return "creates a big shining light around you. While inside the light, enemies will get confused and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets 'judged by the Light' (knocked down)";
-	if (skill_index == SKILL_MAGIC_MAGIC_SHIELD)
-		return "creates a shield that makes you take very little damage from enemies for a short time. Also protects from Push, Pull and Grip force powers";
-	if (skill_index == SKILL_MAGIC_LIGHTNING_DOME)
-		return "creates a dome that does lightning damage";
+	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
+		return "creates an ice block that protects you, and hits enemies around you with Water damage. Enemies hit by Water get their hp drained to restore your health";
+	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
+		return "creates a tree that recovers your health. Creates earthquakes and hits enemies with Earth damage";
+	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
+		return "fires a flame burst and hits enemies around you with Fire damage. Enemies hit by it will catch fire for some seconds";
+	if (skill_index == SKILL_MAGIC_AIR_MAGIC)
+		return "blows people away with a strong wind, and does a little Air damage to them. Enemies hit by Air will have their run speed decreased";
+	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
+		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive. Enemies are hit with Dark damage and will get confused/stunned and their health drained";
+	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
+		return "creates a lightning dome that damages enemies nearby. Protects you with a shield that reduces damage and protects from some force powers. Creates a big shining light around you. While inside the light, enemies will get confused/stunned and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets knocked down";
 
 	return "";
 }
@@ -4261,10 +4217,30 @@ int zyk_max_magic_power(gentity_t *ent)
 	return max_mp;
 }
 
-void zyk_show_magic_in_chat(gentity_t *ent, int magic_power)
+// zyk: tests if this skill is one of the magic powers
+qboolean zyk_is_magic_power_skill(int skill_index)
 {
-	int skill_index = (magic_power + (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS));
+	if (skill_index >= SKILL_MAGIC_MAGIC_SENSE && skill_index <= SKILL_MAGIC_LIGHT_MAGIC)
+	{
+		return qtrue;
+	}
 
+	return qfalse;
+}
+
+// zyk: get the index of the Magic Power of this magic skill
+int zyk_get_magic_index(int skill_index)
+{
+	if (zyk_is_magic_power_skill(skill_index) == qtrue)
+	{
+		return (skill_index - SKILL_MAGIC_MAGIC_SENSE);
+	}
+
+	return -1;
+}
+
+void zyk_show_magic_in_chat(gentity_t *ent, int skill_index)
+{
 	if (ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_IN_CHAT))
 	{ // zyk: do not show magic cast in chat
 		return;
@@ -4279,27 +4255,6 @@ void zyk_set_magic_power_cooldown_time(gentity_t *ent, int duration)
 	ent->client->pers.quest_power_usage_timer = level.time + duration;
 }
 
-extern void magic_sense(gentity_t *ent, int duration);
-extern void earthquake(gentity_t *ent, int stun_time, int strength, int distance);
-extern void blowing_wind(gentity_t *ent, int distance, int duration);
-extern void chaos_power(gentity_t *ent, int distance, int duration);
-extern void water_splash(gentity_t *ent, int distance, int damage);
-extern void ultra_flame(gentity_t *ent, int distance, int damage);
-extern void rock_smash(gentity_t *ent, int distance, int damage);
-extern void dome_of_damage(gentity_t *ent, int damage);
-extern void slow_motion(gentity_t *ent, int distance, int duration);
-extern void magic_shield(gentity_t *ent, int duration);
-extern void healing_area(gentity_t *ent, int damage, int duration);
-extern void lightning_dome(gentity_t *ent, int damage);
-extern void flame_burst(gentity_t *ent, int duration);
-extern void water_attack(gentity_t *ent, int distance, int damage);
-extern void tree_of_life(gentity_t *ent);
-extern void reverse_wind(gentity_t *ent, int distance, int duration);
-extern void enemy_nerf(gentity_t *ent, int distance);
-extern void ice_block(gentity_t *ent, int duration);
-extern void flaming_rage(gentity_t* ent, int duration);
-extern void black_hole(gentity_t* ent, int radius, int damage, int duration);
-extern void light_of_judgement(gentity_t* ent, int radius, int duration);
 qboolean TryGrapple(gentity_t *ent)
 {
 	if (ent->client->ps.weaponTime > 0)
@@ -5973,7 +5928,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^2", SKILL_MAGIC_FIST, SKILL_MAGIC_LIGHTNING_DOME, 18);
+		zyk_list_category_skills(ent, target_ent, "^2", SKILL_MAGIC_FIST, SKILL_MAGIC_LIGHT_MAGIC, 18);
 	}
 }
 
@@ -11096,33 +11051,35 @@ int zyk_get_magic_cost(int magic_number)
 		5, // Magic Sense
 		5, // Healing Area
 		18, // Enemy Weakening
-		20, // Water Splash
-		21, // Water Attack
-		20, // Ice Block
-		18, // Earthquake
-		18, // Rock Smash
-		17, // Tree of Life
-		23, // Flame Burst
-		22, // Ultra Flame
-		15, // Flaming Rage
-		20, // Blowing Wind
-		20, // Reverse Wind
-		17, // Slow Motion
-		40, // Black Hole
 		22, // Dome of Damage
-		30, // Chaos Power
-		40, // Light of Judgement
-		25, // Magic Shield
-		15, // Lightning Dome
+		20, // Water Magic
+		20, // Earth Magic
+		20, // Fire Magic
+		20, // Air Magic
+		20, // Dark Magic
+		20, // Light Magic
+		0,
+		0,
+		0
 	};
 
 	return magic_costs[magic_number];
 }
 
 extern void zyk_spawn_magic_element_effect(gentity_t* ent, int magic_number);
+extern void magic_sense(gentity_t* ent);
+extern void healing_area(gentity_t* ent);
+extern void enemy_weakening(gentity_t* ent);
+extern void dome_of_damage(gentity_t* ent);
+extern void water_magic(gentity_t* ent);
+extern void earth_magic(gentity_t* ent);
+extern void fire_magic(gentity_t* ent);
+extern void air_magic(gentity_t* ent);
+extern void dark_magic(gentity_t* ent);
+extern void light_magic(gentity_t* ent);
 void zyk_cast_magic(gentity_t* ent, int skill_index)
 {
-	int magic_number = (skill_index - (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS));
+	int magic_number = zyk_get_magic_index(skill_index);
 
 	if (ent->client->pers.skill_levels[skill_index] < 1)
 	{
@@ -11147,108 +11104,53 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 
 			if (magic_number == MAGIC_MAGIC_SENSE)
 			{
-				magic_sense(ent, 3000);
-				zyk_set_magic_power_cooldown_time(ent, 14000);
+				magic_sense(ent);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_HEALING_AREA)
 			{
-				healing_area(ent, 2, 5000);
+				healing_area(ent);
 				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_ENEMY_WEAKENING)
 			{
-				enemy_nerf(ent, 450);
-				zyk_set_magic_power_cooldown_time(ent, 12000);
-			}
-			else if (magic_number == MAGIC_WATER_SPLASH)
-			{
-				water_splash(ent, 400, 15);
-				zyk_set_magic_power_cooldown_time(ent, 11000);
-			}
-			else if (magic_number == MAGIC_WATER_ATTACK)
-			{
-				water_attack(ent, 500, 45);
-				zyk_set_magic_power_cooldown_time(ent, 12000);
-			}
-			else if (magic_number == MAGIC_ICE_BLOCK)
-			{
-				ice_block(ent, 3500);
+				enemy_weakening(ent);
 				zyk_set_magic_power_cooldown_time(ent, 20000);
-			}
-			else if (magic_number == MAGIC_EARTHQUAKE)
-			{
-				earthquake(ent, 2000, 300, 500);
-				zyk_set_magic_power_cooldown_time(ent, 11000);
-			}
-			else if (magic_number == MAGIC_ROCK_SMASH)
-			{
-				rock_smash(ent, 500, 40);
-				zyk_set_magic_power_cooldown_time(ent, 11000);
-			}
-			else if (magic_number == MAGIC_TREE_OF_LIFE)
-			{
-				tree_of_life(ent);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
-			}
-			else if (magic_number == MAGIC_FLAME_BURST)
-			{
-				flame_burst(ent, 5000);
-				zyk_set_magic_power_cooldown_time(ent, 10000);
-			}
-			else if (magic_number == MAGIC_ULTRA_FLAME)
-			{
-				ultra_flame(ent, 600, 35);
-				zyk_set_magic_power_cooldown_time(ent, 10000);
-			}
-			else if (magic_number == MAGIC_FLAMING_RAGE)
-			{
-				flaming_rage(ent, 7000);
-				zyk_set_magic_power_cooldown_time(ent, 16000);
-			}
-			else if (magic_number == MAGIC_BLOWING_WIND)
-			{
-				blowing_wind(ent, 700, 5000);
-				zyk_set_magic_power_cooldown_time(ent, 12000);
-			}
-			else if (magic_number == MAGIC_REVERSE_WIND)
-			{
-				reverse_wind(ent, 700, 5000);
-				zyk_set_magic_power_cooldown_time(ent, 12000);
-			}
-			else if (magic_number == MAGIC_SLOW_MOTION)
-			{
-				slow_motion(ent, 400, 15000);
-				zyk_set_magic_power_cooldown_time(ent, 9000);
-			}
-			else if (magic_number == MAGIC_BLACK_HOLE)
-			{
-				black_hole(ent, 540, 40, 5000);
-				zyk_set_magic_power_cooldown_time(ent, 30000);
 			}
 			else if (magic_number == MAGIC_DOME_OF_DAMAGE)
 			{
-				dome_of_damage(ent, 30);
-				zyk_set_magic_power_cooldown_time(ent, 16000);
+				dome_of_damage(ent);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
-			else if (magic_number == MAGIC_CHAOS_POWER)
+			else if (magic_number == MAGIC_WATER_MAGIC)
 			{
-				chaos_power(ent, 400, 3000);
-				zyk_set_magic_power_cooldown_time(ent, 28000);
+				water_magic(ent);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
-			else if (magic_number == MAGIC_LIGHT_OF_JUDGEMENT)
+			else if (magic_number == MAGIC_EARTH_MAGIC)
 			{
-				light_of_judgement(ent, 540, 5000);
-				zyk_set_magic_power_cooldown_time(ent, 30000);
+				earth_magic(ent);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
-			else if (magic_number == MAGIC_MAGIC_SHIELD)
+			else if (magic_number == MAGIC_FIRE_MAGIC)
 			{
-				magic_shield(ent, 6000);
-				zyk_set_magic_power_cooldown_time(ent, 24000);
+				fire_magic(ent);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
-			else if (magic_number == MAGIC_LIGHTNING_DOME)
+			else if (magic_number == MAGIC_AIR_MAGIC)
 			{
-				lightning_dome(ent, 70);
-				zyk_set_magic_power_cooldown_time(ent, 25000);
+				air_magic(ent);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
+			}
+			else if (magic_number == MAGIC_DARK_MAGIC)
+			{
+				dark_magic(ent);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
+			}
+			else if (magic_number == MAGIC_LIGHT_MAGIC)
+			{
+				light_magic(ent);
+				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 
 			// zyk: magic powers cost mp
@@ -11256,7 +11158,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 
 			if (ent->s.number < MAX_CLIENTS)
 			{
-				zyk_show_magic_in_chat(ent, magic_number);
+				zyk_show_magic_in_chat(ent, skill_index);
 				display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
 				send_rpg_events(2000);
 			}
@@ -11284,16 +11186,15 @@ void Cmd_Magic_f( gentity_t *ent ) {
 	}
 	else
 	{
-		int magic_power_skill_number = 0;
-		int skill_index = (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS);
+		int magic_power_skill_number = 1;
+		int skill_index = 0;
 
 		trap->Argv( 1, arg1, sizeof( arg1 ) );
-
 		magic_power_skill_number = atoi(arg1);
 
 		skill_index = magic_power_skill_number - 1;
 
-		if (magic_power_skill_number <= (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) || magic_power_skill_number > NUMBER_OF_SKILLS)
+		if (zyk_is_magic_power_skill(skill_index) == qfalse)
 		{
 			trap->SendServerCommand(ent->s.number, "print \"Invalid magic skill number.\n\"" );
 			return;

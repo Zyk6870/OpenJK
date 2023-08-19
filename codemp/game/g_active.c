@@ -2595,19 +2595,9 @@ void ClientThink_real( gentity_t *ent ) {
 			//ent->client->ps.speed = ent->client->ps.basespeed = NPC_GetRunSpeed( ent );
 		}
 
-		if (client->pers.quest_power_status & (1 << 6))
-		{ // zyk: hit by Slow Motion. Decrease speed
+		if (client->pers.quest_power_status & (1 << MAGIC_HIT_BY_AIR))
+		{ // zyk: hit by Air Magic. Decrease speed
 			client->ps.speed /= 2;
-		}
-
-		if (client->pers.quest_power_status & (1 << 1))
-		{ // zyk: hit by Chaos Power. Decrease speed
-			client->ps.speed /= 2;
-		}
-
-		if (client->pers.quest_power_status & (1 << 3))
-		{ // zyk: using Flaming Rage. Increase speed
-			client->ps.speed *= 1.5;
 		}
 
 		if (client->pers.stun_baton_less_speed_timer > level.time)
@@ -2641,19 +2631,9 @@ void ClientThink_real( gentity_t *ent ) {
 			zyk_player_speed *= 0.2f;
 		}
 
-		if (client->pers.quest_power_status & (1 << 6))
+		if (client->pers.quest_power_status & (1 << MAGIC_HIT_BY_AIR))
 		{ // zyk: hit by Slow Motion. Decrease speed
 			zyk_player_speed /= 2;
-		}
-
-		if (client->pers.quest_power_status & (1 << 1))
-		{ // zyk: hit by Chaos Power. Decrease speed
-			zyk_player_speed /= 2;
-		}
-
-		if (client->pers.quest_power_status & (1 << 3))
-		{ // zyk: using Flaming Rage. Increase speed
-			zyk_player_speed *= 1.5;
 		}
 
 		if (client->pers.stun_baton_less_speed_timer > level.time)

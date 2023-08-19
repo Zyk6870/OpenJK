@@ -526,44 +526,6 @@ typedef enum {
 	ADM_NUM_CMDS
 } zyk_admin_t;
 
-// zyk: magic powers values
-typedef enum {
-	MAGIC_MAGIC_SENSE,
-	MAGIC_HEALING_AREA,
-	MAGIC_ENEMY_WEAKENING,
-	MAGIC_WATER_SPLASH,
-	MAGIC_WATER_ATTACK,
-	MAGIC_ICE_BLOCK,
-	MAGIC_EARTHQUAKE,
-	MAGIC_ROCK_SMASH,
-	MAGIC_TREE_OF_LIFE,
-	MAGIC_FLAME_BURST,
-	MAGIC_ULTRA_FLAME,
-	MAGIC_FLAMING_RAGE,
-	MAGIC_BLOWING_WIND,
-	MAGIC_REVERSE_WIND,
-	MAGIC_SLOW_MOTION,
-	MAGIC_BLACK_HOLE,
-	MAGIC_DOME_OF_DAMAGE,
-	MAGIC_CHAOS_POWER,
-	MAGIC_LIGHT_OF_JUDGEMENT,
-	MAGIC_MAGIC_SHIELD,
-	MAGIC_LIGHTNING_DOME,
-	MAX_MAGIC_POWERS
-} zyk_magic_t;
-
-// zyk: Elements of each Magic power
-typedef enum {
-	MAGICELEMENT_NONE,
-	MAGICELEMENT_WATER,
-	MAGICELEMENT_EARTH,
-	MAGICELEMENT_FIRE,
-	MAGICELEMENT_AIR,
-	MAGICELEMENT_DARK,
-	MAGICELEMENT_LIGHT,
-	NUM_MAGIC_ELEMENTS
-} zyk_magic_element_t;
-
 // zyk: settings values
 typedef enum {
 	SETTINGS_RPG_QUESTS, 
@@ -673,6 +635,36 @@ typedef enum {
 	NUM_MAP_MUSIC
 } zyk_map_music_t;
 
+// zyk: Elements of each Magic power
+typedef enum {
+	MAGICELEMENT_NONE,
+	MAGICELEMENT_WATER,
+	MAGICELEMENT_EARTH,
+	MAGICELEMENT_FIRE,
+	MAGICELEMENT_AIR,
+	MAGICELEMENT_DARK,
+	MAGICELEMENT_LIGHT,
+	NUM_MAGIC_ELEMENTS
+} zyk_magic_element_t;
+
+// zyk: magic powers values
+typedef enum {
+	MAGIC_MAGIC_SENSE,
+	MAGIC_HEALING_AREA,
+	MAGIC_ENEMY_WEAKENING,
+	MAGIC_DOME_OF_DAMAGE,
+	MAGIC_WATER_MAGIC,
+	MAGIC_EARTH_MAGIC,
+	MAGIC_FIRE_MAGIC,
+	MAGIC_AIR_MAGIC,
+	MAGIC_DARK_MAGIC,
+	MAGIC_LIGHT_MAGIC,
+	MAGIC_HIT_BY_FIRE,
+	MAGIC_HIT_BY_AIR,
+	MAGIC_HIT_BY_ENEMY_WEAKENING,
+	MAX_MAGIC_POWERS
+} zyk_magic_t;
+
 typedef enum {
 	SKILL_JUMP,
 	SKILL_PUSH,
@@ -721,24 +713,13 @@ typedef enum {
 	SKILL_MAGIC_MAGIC_SENSE,
 	SKILL_MAGIC_HEALING_AREA,
 	SKILL_MAGIC_ENEMY_WEAKENING,
-	SKILL_MAGIC_WATER_SPLASH,
-	SKILL_MAGIC_WATER_ATTACK,
-	SKILL_MAGIC_ICE_BLOCK,
-	SKILL_MAGIC_EARTHQUAKE,
-	SKILL_MAGIC_ROCK_SMASH,
-	SKILL_MAGIC_TREE_OF_LIFE,
-	SKILL_MAGIC_FLAME_BURST,
-	SKILL_MAGIC_ULTRA_FLAME,
-	SKILL_MAGIC_FLAMING_RAGE,
-	SKILL_MAGIC_BLOWING_WIND,
-	SKILL_MAGIC_REVERSE_WIND,
-	SKILL_MAGIC_SLOW_MOTION,
-	SKILL_MAGIC_BLACK_HOLE,
 	SKILL_MAGIC_DOME_OF_DAMAGE,
-	SKILL_MAGIC_CHAOS_POWER,
-	SKILL_MAGIC_LIGHT_OF_JUDGEMENT,
-	SKILL_MAGIC_MAGIC_SHIELD,
-	SKILL_MAGIC_LIGHTNING_DOME,
+	SKILL_MAGIC_WATER_MAGIC,
+	SKILL_MAGIC_EARTH_MAGIC,
+	SKILL_MAGIC_FIRE_MAGIC,
+	SKILL_MAGIC_AIR_MAGIC,
+	SKILL_MAGIC_DARK_MAGIC,
+	SKILL_MAGIC_LIGHT_MAGIC,
 	NUMBER_OF_SKILLS
 } zyk_rpg_skill_t;
 
@@ -1024,34 +1005,6 @@ typedef struct clientPersistant_s {
 	qboolean rpg_inventory_modified;
 
 	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
-	// Possible values are:
-	//  0 - unused
-	//  1 - hit by Chaos Power
-	//  2 - unused
-	//  3 - using Flaming Rage
-	//  4 - using Dome of Damage
-	//  5 - using Black Hole
-	//  6 - hit by Slow Motion
-	//  7 - using Light of Judgement
-	//  8 - hit by Blowing Wind
-	//  9 - unused
-	// 10 - using Resurrection Power
-	// 11 - using Magic Shield
-	// 12 - using Flame Burst
-	// 13 - hit by Ultra Flame
-	// 14 - unused
-	// 15 - unused
-	// 16 - unused
-	// 17 - unused
-	// 18 - unused
-	// 19 - using Tree of Life
-	// 20 - hit by Reverse Wind
-	// 21 - hit by Enemy Nerf
-	// 22 - using Ice Block
-	// 23 - unused
-	// 24 - unused
-	// 25 - unused
-	// 26 - hit by Elemental Attack
 	int quest_power_status;
 
 	// zyk: cooldown between quest power uses

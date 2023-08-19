@@ -565,8 +565,8 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 
 	if (other && other->client && (other->NPC || other->client->sess.amrpgmode == 2) && 
 		(forcePower == FP_PUSH || forcePower == FP_PULL || forcePower == FP_GRIP) && 
-		other->client->pers.quest_power_status & (1 << 11))
-	{ // zyk: Magic Shield protects against some force powers
+		other->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC))
+	{ // zyk: Light Magic protects against some force powers
 		return 0;
 	}
 

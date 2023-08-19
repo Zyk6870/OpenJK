@@ -4898,9 +4898,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
-	if (attacker && attacker->client && attacker->client->pers.quest_power_status & (1 << 21))
+	if (attacker && attacker->client && attacker->client->pers.quest_power_status & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
 	{ // zyk: Enemy Weakening decreases damage
-		damage = (int)ceil(damage*0.92);
+		damage = (int)ceil(damage*0.90);
 	}
 
 	if (level.gametype == GT_SIEGE)
@@ -4908,30 +4908,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		damage = (int)ceil(damage*zyk_scale_siege_damage.value);
 	}
 
-	if (attacker && attacker->client && attacker->client->pers.quest_power_status & (1 << 3))
-	{ // zyk: Flaming Rage increases damage
-		damage = (int)ceil(damage * 1.08);
-	}
-
-	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 3))
-	{ // zyk: Flaming Rage decreases damage taken
-		damage = (int)ceil(damage * 0.92);
-	}
-
-	if (attacker && attacker->client && targ && targ->client && targ->client->pers.quest_power_status & (1 << 7) && attacker != targ &&
+	if (attacker && attacker->client && targ && targ->client && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC) && attacker != targ &&
 		Distance(targ->client->ps.origin, targ->client->pers.light_of_judgement_origin) < targ->client->pers.light_of_judgement_distance)
-	{ // zyk: target is using Light of Judgement. Decreases damage taken and knocks down the attacker if target is inside the light
-		int light_of_judgement_stun_time = 1000;
+	{ // zyk: target is using Light Magic. Decreases damage taken and knocks down the attacker if target is inside the light
+		int light_of_judgement_stun_time = 1000 * targ->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 
-		if (targ->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_LIGHT_OF_JUDGEMENT] > 1)
-		{
-			damage = (int)ceil(damage * 0.5);
-			light_of_judgement_stun_time = 2000;
-		}
-		else
-		{
-			damage = (int)ceil(damage * 0.75);
-		}
+		damage = (int)ceil(damage * (1.0 - (0.05 * targ->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC])));
 
 		// zyk: removing emotes to prevent exploits
 		if (attacker->client->pers.player_statuses & (1 << 1))
@@ -4953,20 +4935,15 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		attacker->client->ps.quickerGetup = qtrue;
 	}
 
-	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << 21))
+	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
 	{ // zyk: Enemy Weakening increases damage taken
-		damage = (int)ceil(damage*1.08);
+		damage = (int)ceil(damage*1.10);
 	}
 
-	if (targ && targ->client && (targ->NPC || targ->client->sess.amrpgmode == 2) && targ->client->pers.quest_power_status & (1 << 22))
-	{ // zyk: Ice Block decreases damage taken
-		damage = (int)ceil(damage*0.2);
-	}
-
-	// zyk: player or npc with Magic Shield takes little damage
-	if (targ && targ->client && (targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.quest_power_status & (1 << 11))
+	// zyk: player or npc with Light Magic takes little damage
+	if (targ && targ->client && (targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC))
 	{
-		damage = (int)ceil(damage * 0.2);
+		damage = (int)ceil(damage * 0.50);
 	}
 
 	if (targ && targ->client && targ->client->sess.amrpgmode == 2)
@@ -5225,7 +5202,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		knockback = 0;
 	}
 
-	// zyk: if player is in RPG Mode, reduce knockback based on the Impact Reducer item of the player
+	// zyk: if player is in RPG Mode, reduce knockback based on the Impact Reducer Armor of the player
 	if (targ && targ->client && targ->client->sess.amrpgmode == 2)
 	{
 		int new_knockback = knockback;
@@ -5452,8 +5429,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				targ->client->ps.eFlags &= ~EF_INVULNERABLE;
 			}
-			else if (!((targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.quest_power_status & (1 << 11)))
-			{ // zyk: added condition to not consider clients using Magic Shield
+			else if (!((targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC)))
+			{ // zyk: added condition to not consider clients using Light Magic
 				return;
 			}
 		}
@@ -6305,7 +6282,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 			else
 			{
 				if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 && 
-					Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0)
+					Q_stricmp(attacker->targetname, "zyk_magic_healing_area") == 0)
 				{ // zyk: Healing Area. Heals the user and his allies
 					gentity_t *quest_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
 
@@ -6314,14 +6291,8 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						(level.special_power_effects[attacker->s.number] == ent->s.number || OnSameTeam(quest_power_user, ent) == qtrue || 
 						npcs_on_same_team(quest_power_user, ent) == qtrue || zyk_is_ally(quest_power_user,ent) == qtrue))
 					{
-						int heal_amount = 8;
-						int shield_amount = 4;
-
-						if (quest_power_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_HEALING_AREA] > 1)
-						{
-							heal_amount += 4;
-							shield_amount += 2;
-						}
+						int heal_amount = 2 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
+						int shield_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 
 						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
 							ent->health += heal_amount;
@@ -6366,9 +6337,8 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						continue;
 					}
 
-					if (Q_stricmp(attacker->targetname, "zyk_quest_effect_drain") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_quest_effect_watersplash") == 0)
-					{ // zyk: Ultra Drain heals the power user
+					if (Q_stricmp(attacker->targetname, "zyk_magic_water") == 0 || Q_stricmp(attacker->targetname, "zyk_magic_dark") == 0)
+					{ // zyk: Water Magic and Dark Magic drain from target and heal the magic user
 						if (quest_power_user && quest_power_user->client && quest_power_user->health > 0 && 
 							zyk_can_hit_target(quest_power_user, ent) == qtrue && zyk_is_ally(quest_power_user, ent) == qfalse && ent->health > 0)
 						{
@@ -6381,30 +6351,36 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						}
 					}
 
-					// zyk: target will not be knocked back by Rock Smash, Dome of Damage, Ultra Flame, Ultra Drain, Black Hole, Water Splash, 
-					// Acid Water, Flaming Area, Healing Area, Vertical DFA and Force Storm
-					if (Q_stricmp(attacker->targetname, "zyk_quest_effect_rock_smash") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_quest_effect_watersplash") == 0 ||
-						Q_stricmp(attacker->targetname, "zyk_quest_effect_dome") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_quest_effect_flame") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_quest_effect_acid") == 0 ||
-						Q_stricmp(attacker->targetname, "zyk_quest_effect_drain") == 0 ||
-						Q_stricmp(attacker->targetname, "zyk_quest_effect_black_hole") == 0 ||
-						Q_stricmp(attacker->targetname, "zyk_quest_effect_healing") == 0 || 
+					// zyk: target will not be knocked back by these powers
+					if (Q_stricmp(attacker->targetname, "zyk_magic_healing_area") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_magic_dome") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_magic_water") == 0 ||
+						Q_stricmp(attacker->targetname, "zyk_magic_earth") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_magic_fire") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_magic_air") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_magic_dark") == 0 || 
+						Q_stricmp(attacker->targetname, "zyk_magic_light") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_effect_fire_bolt_hit") == 0)
 					{
-						if (Q_stricmp(attacker->targetname, "zyk_quest_effect_flame") == 0 && quest_power_user && quest_power_user != ent && ent->client &&  
+						if (Q_stricmp(attacker->targetname, "zyk_magic_fire") == 0 && quest_power_user && quest_power_user != ent && ent->client &&  
 								 quest_power_user->client)
-						{ // zyk: Ultra Flame. If target touches the flame, will keep catching fire for some seconds
-							ent->client->pers.quest_power_status |= (1 << 13);
-							ent->client->pers.magic_power_user_id[MAGIC_ULTRA_FLAME] = quest_power_user->s.number;
-							ent->client->pers.magic_power_hit_counter[MAGIC_ULTRA_FLAME] = 10 * quest_power_user->client->pers.skill_levels[(NUMBER_OF_SKILLS - MAX_MAGIC_POWERS) + MAGIC_ULTRA_FLAME];
-							ent->client->pers.magic_power_target_timer[MAGIC_ULTRA_FLAME] = level.time + 200;
+						{ // zyk: Fire Magic. If target touches the flame, will keep catching fire for some seconds
+							ent->client->pers.quest_power_status |= (1 << MAGIC_HIT_BY_FIRE);
+							ent->client->pers.magic_power_user_id[MAGIC_HIT_BY_FIRE] = quest_power_user->s.number;
+							ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] = 2 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
+							ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_FIRE] = level.time + 200;
+						}
+						else if (Q_stricmp(attacker->targetname, "zyk_magic_air") == 0 && quest_power_user && quest_power_user != ent && ent->client &&
+							quest_power_user->client)
+						{ // zyk: hit by Air Magic. It will make target have lower run speed
+							ent->client->pers.quest_power_status |= (1 << MAGIC_HIT_BY_AIR);
+
+							ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_AIR] = level.time + 500;
 						}
 
 						G_Damage (ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
 
-						if (Q_stricmp(attacker->targetname, "zyk_quest_effect_black_hole") == 0 && ent && ent->client && ent->health < 1)
+						if (Q_stricmp(attacker->targetname, "zyk_magic_dark") == 0 && ent && ent->client && ent->health < 1)
 						{ // zyk: Black Hole disintegrates enemies who got killed by it
 							ent->client->ps.eFlags |= EF_DISINTEGRATION;
 						}
