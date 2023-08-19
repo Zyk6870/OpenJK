@@ -296,7 +296,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
 		return "an energy dome appears at your position each half second, damaging enemies inside it";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
-		return "creates an ice block that protects you, and hits enemies around you with Water damage. Enemies hit by Water get their hp drained to restore your health";
+		return "creates an ice block that protects you and restores some health. Hits enemies around you with Water damage. Enemies hit by Water get their hp drained to restore your health";
 	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
 		return "creates a tree that recovers your health. Creates earthquakes and hits enemies with Earth damage";
 	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
