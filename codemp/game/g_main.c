@@ -5320,7 +5320,7 @@ void clear_special_power_effect(gentity_t* ent)
 // zyk: Magic Sense
 void magic_sense(gentity_t* ent)
 {
-	int duration = 3000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_SENSE]);
+	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_SENSE]);
 
 	// zyk: Magic Sense gets more duration based on Sense skill level
 	duration += (ent->client->pers.skill_levels[SKILL_SENSE] * 1000);
@@ -5347,7 +5347,7 @@ void enemy_weakening(gentity_t* ent)
 {
 	int i = 0;
 	int targets_hit = 0;
-	int duration = 6000 + (2000 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]);
+	int duration = 8000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]);
 
 	for (i = 0; i < level.num_entities; i++)
 	{
@@ -5367,8 +5367,8 @@ void enemy_weakening(gentity_t* ent)
 // zyk: Dome of Damage
 void dome_of_damage(gentity_t* ent)
 {
-	int duration = 2000 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE];
-	int damage = 10 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE];
+	int duration = 3000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]);
+	int damage = 5 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE];
 
 	ent->client->pers.dome_of_damage_dmg = damage;
 
@@ -5380,7 +5380,7 @@ void dome_of_damage(gentity_t* ent)
 // zyk: Water Magic
 void water_magic(gentity_t* ent)
 {
-	int duration = 2000 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
+	int duration = 3000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]);
 	int heal_amount = 20 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
 
 	if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
@@ -5406,7 +5406,7 @@ void water_magic(gentity_t* ent)
 // zyk: Earth Magic
 void earth_magic(gentity_t* ent)
 {
-	int duration = 2000 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
+	int duration = 3000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]);
 	int heal_amount = 5 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_tree_of_life", "1", "models/map_objects/yavin/tree10_b.md3", 0, 0, 0, 2000);
@@ -5426,7 +5426,7 @@ void earth_magic(gentity_t* ent)
 // zyk: Fire Magic
 void fire_magic(gentity_t* ent) 
 {
-	int duration = 2000 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
+	int duration = 3000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
 
 	ent->client->pers.flame_thrower_timer = level.time + duration;
 
@@ -5438,7 +5438,7 @@ void fire_magic(gentity_t* ent)
 // zyk: Air Magic
 void air_magic(gentity_t* ent)
 {
-	int duration = 2000 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC];
+	int duration = 3000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
 
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/vacuum.mp3"));
 
@@ -5450,7 +5450,7 @@ void air_magic(gentity_t* ent)
 // zyk: Dark Magic
 void dark_magic(gentity_t* ent)
 {
-	int duration = 2000 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
+	int duration = 3000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
 	int damage = 10 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
 	int radius = 340 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]); // zyk: default distace for this effect is 540
 
@@ -5512,7 +5512,7 @@ void lightning_dome(gentity_t* ent, int damage)
 //zyk: Light Magic
 void light_magic(gentity_t* ent)
 {
-	int duration = 2000 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
+	int duration = 3000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]);
 	int radius = 340 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]); // zyk: default distace for this effect is 540
 	int damage = ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 
