@@ -865,29 +865,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 					client->ps.ammo[AMMO_BLASTER] -= 2;
 				}
 			}
-
-			if (client->pers.player_statuses & (1 << 10))
-			{ // zyk: Healing Crystal
-				if (ent->health < client->pers.max_rpg_health)
-					ent->health += 1;
-
-				if (client->pers.magic_power < zyk_max_magic_power(ent))
-					client->pers.magic_power += 1;
-
-				if (client->ps.fd.forcePower < client->pers.max_force_power)
-					client->ps.fd.forcePower += 1;
-
-				send_rpg_events(1000);
-			}
-
-			if (client->pers.player_statuses & (1 << 11))
-			{ // zyk: Energy Crystal
-				if (client->ps.stats[STAT_ARMOR] < client->pers.max_rpg_shield)
-					client->ps.stats[STAT_ARMOR] += 1;
-
-				Add_Ammo(ent, AMMO_BLASTER, 1);
-				Add_Ammo(ent, AMMO_POWERCELL, 1);
-			}
 		}
 
 		if (zyk_vote_timer.integer > 0 && client->sess.vote_timer > 0)

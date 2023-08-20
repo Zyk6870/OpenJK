@@ -575,8 +575,6 @@ typedef enum {
 	SELLER_JETPACK_FUEL,
 	SELLER_FORCE_BOON,
 	SELLER_MAGIC_POTION,
-	SELLER_HEALING_CRYSTAL,
-	SELLER_ENERGY_CRYSTAL,
 	SELLER_BACTA_UPGRADE,
 	SELLER_FORCE_FIELD_UPGRADE,
 	SELLER_CLOAK_UPGRADE,
@@ -854,8 +852,8 @@ typedef struct clientPersistant_s {
 	// 7 - unused
 	// 8 - unused
 	// 9 - unused
-	// 10 - using Healing Crystal
-	// 11 - using Energy Crystal
+	// 10 - unused
+	// 11 - unused
 	// 12 - Give Command - Force
 	// 13 - Give Command - Guns
 	// 14 - Sending scaled current Magic Power event

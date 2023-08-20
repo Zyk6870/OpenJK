@@ -2291,14 +2291,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 	if (self->client->sess.amrpgmode == 2)
 	{
-		// zyk: removing the armors from the player
-		self->client->pers.player_statuses &= ~(1 << 8);
-		self->client->pers.player_statuses &= ~(1 << 9);
-
-		// zyk: removing the crystals from the player
-		self->client->pers.player_statuses &= ~(1 << 10);
-		self->client->pers.player_statuses &= ~(1 << 11);
-
 		// zyk: player has the Resurrection Power, after completing quests in Challenge Mode. Uses mp. Not allowed in CTF gametype
 		/* zyk: disabled for now
 		if (self->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && self->client->pers.universe_quest_counter & (1 << 29) && g_gametype.integer != GT_CTF &&

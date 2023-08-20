@@ -6381,12 +6381,6 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_MAGIC_POTION][0] = 100;
 	seller_items_cost[SELLER_MAGIC_POTION][1] = 0;
 
-	seller_items_cost[SELLER_HEALING_CRYSTAL][0] = 2000;
-	seller_items_cost[SELLER_HEALING_CRYSTAL][1] = 0;
-
-	seller_items_cost[SELLER_ENERGY_CRYSTAL][0] = 2000;
-	seller_items_cost[SELLER_ENERGY_CRYSTAL][1] = 0;
-
 	seller_items_cost[SELLER_BACTA_UPGRADE][0] = 1500;
 	seller_items_cost[SELLER_BACTA_UPGRADE][1] = 900;
 
@@ -6518,8 +6512,6 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_JETPACK_FUEL] = "Jetpack Fuel";
 	seller_items_names[SELLER_FORCE_BOON] = "Force Boon";
 	seller_items_names[SELLER_MAGIC_POTION] = "Magic Potion";
-	seller_items_names[SELLER_HEALING_CRYSTAL] = "Healing Crystal";
-	seller_items_names[SELLER_ENERGY_CRYSTAL] = "Energy Crystal";
 
 	seller_items_names[SELLER_BACTA_UPGRADE] = "Bacta Upgrade";
 	seller_items_names[SELLER_FORCE_FIELD_UPGRADE] = "Force Field Upgrade";
@@ -6620,7 +6612,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "misc") == 0)
 		{
-			zyk_show_stuff_category(ent, SELLER_YSALAMIRI, SELLER_ENERGY_CRYSTAL);
+			zyk_show_stuff_category(ent, SELLER_YSALAMIRI, SELLER_MAGIC_POTION);
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
@@ -6792,14 +6784,6 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		else if (i == SELLER_MAGIC_POTION)
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some MP\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_HEALING_CRYSTAL)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7regens hp, mp and force. If the player dies, he loses the crystal\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_ENERGY_CRYSTAL)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7regens shield, blaster pack ammo and power cell ammo. If the player dies, he loses the crystal\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_BACTA_UPGRADE)
 		{
@@ -7329,14 +7313,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			Add_Ammo(ent,AMMO_DETPACK,2);
 
 			ent->client->ps.cloakFuel = 100;
-		}
-		else if (value == (SELLER_HEALING_CRYSTAL + 1))
-		{
-			ent->client->pers.player_statuses |= (1 << 10);
-		}
-		else if (value == (SELLER_ENERGY_CRYSTAL + 1))
-		{
-			ent->client->pers.player_statuses |= (1 << 11);
 		}
 		else if (value == (SELLER_BACTA_UPGRADE + 1))
 		{
