@@ -4425,18 +4425,15 @@ void send_rpg_events(int send_event_timer)
 // zyk: sets the Max HP a player can have in RPG Mode
 void set_max_health(gentity_t *ent)
 {
-	ent->client->pers.max_rpg_health = 100 + (ent->client->pers.skill_levels[SKILL_MAX_HEALTH] * 80);
-	ent->client->ps.stats[STAT_MAX_HEALTH] = ent->client->pers.max_rpg_health;
+	ent->client->pers.max_rpg_health = 100 + (ent->client->pers.skill_levels[SKILL_MAX_HEALTH] * RPG_MAX_HEALTH_INCREASE);
 }
 
 // zyk: sets the Max Shield a player can have in RPG Mode
 void set_max_shield(gentity_t *ent)
 {
-	// ent->client->pers.max_rpg_shield = (int)ceil(((ent->client->pers.skill_levels[SKILL_MAX_SHIELD] * 1.0)/5) * ent->client->pers.max_rpg_health);
-
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] > 0)
-	{ // zyk: Shield Generator Upgrade. With it, player can have shield
-		ent->client->pers.max_rpg_shield = ent->client->pers.max_rpg_health;
+	{ // zyk: Shield Generator Upgrade. With it, player can have shield. Set it to the max shield possible
+		ent->client->pers.max_rpg_shield = 100 + (zyk_max_skill_level(SKILL_MAX_HEALTH) * RPG_MAX_HEALTH_INCREASE);
 	}
 	else
 	{
@@ -7726,6 +7723,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (value == (SELLER_SHIELD_GENERATOR_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR);
+		set_max_shield(ent);
 		sold = 1;
 	}
 	else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)

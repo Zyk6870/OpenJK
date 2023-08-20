@@ -7112,6 +7112,7 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time );
 
 extern void remove_credits(gentity_t *ent, int credits);
 extern void try_finishing_race();
+extern int zyk_max_skill_level(int skill_index);
 extern void set_max_health(gentity_t *ent);
 extern void set_max_shield(gentity_t *ent);
 extern void duel_show_table(gentity_t *ent);
@@ -8492,6 +8493,23 @@ void G_RunFrame( int levelTime ) {
 
 			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
+				
+				/* zyk: Max Health used by jka code must be set by the max amount possible, so player can restore shield to the max possible shield as soon as
+						he has the Shield Generator Upgrade
+				*/
+				ent->client->ps.stats[STAT_MAX_HEALTH] = 100 + (zyk_max_skill_level(SKILL_MAX_HEALTH) * RPG_MAX_HEALTH_INCREASE);
+
+				// zyk: if player gets a medpac or shield booster, it may go above max because of STAT_MAX_HEALTH, so limit it here
+				if (ent->health > ent->client->pers.max_rpg_health)
+				{
+					ent->health = ent->client->pers.max_rpg_health;
+					ent->client->ps.stats[STAT_HEALTH] = ent->health;
+				}
+
+				if (ent->client->ps.stats[STAT_ARMOR] > ent->client->pers.max_rpg_shield)
+				{
+					ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
+				}
 
 				if (!(ent->client->pers.player_statuses & (1 << 24)) && 
 					(ent->client->pers.last_health != ent->health || 

@@ -790,6 +790,9 @@ typedef enum {
 // zyk: initial credits in RPG Mode
 #define RPG_INITIAL_CREDITS 200
 
+// zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
+#define RPG_MAX_HEALTH_INCREASE 80
+
 // zyk: when casting magic, use anim for this amount of time in miliseconds
 #define MAGIC_ANIM_TIME 2000
 
