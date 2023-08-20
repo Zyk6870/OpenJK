@@ -6624,7 +6624,38 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "upgrades" ) == 0)
 		{
-			zyk_show_stuff_category(ent, SELLER_BACTA_UPGRADE, SELLER_ENERGY_MODULATOR);
+			if (trap->Argc() == 2)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Must pass a page number. Example: ^3/stuff upgrades 1^7\n\"");
+			}
+			else
+			{
+				int page = 1; // zyk: page the user wants to see
+				int last_item_offset = 9;
+				int first_item_index = SELLER_BACTA_UPGRADE;
+				int last_item_index = SELLER_BACTA_UPGRADE;
+				char arg2[MAX_STRING_CHARS];
+
+				strcpy(arg2, "");
+
+				trap->Argv(2, arg2, sizeof(arg2));
+
+				page = atoi(arg2);
+
+				if (page <= 0)
+					page = 1;
+
+				first_item_index += (last_item_offset * (page - 1));
+				last_item_index += (last_item_offset * page);
+
+				if (first_item_index >= MAX_SELLER_ITEMS)
+					return;
+
+				if (last_item_index >= MAX_SELLER_ITEMS)
+					last_item_index = MAX_SELLER_ITEMS - 1;
+
+				zyk_show_stuff_category(ent, first_item_index, last_item_index);
+			}
 		}
 		else if (i == SELLER_BLASTER_PACK)
 		{
