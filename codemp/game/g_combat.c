@@ -4949,42 +4949,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 		}
 
-		if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
-		{ // zyk: Impact Reducer Armor
-			bonus_resistance += 0.15;
-		}
+		damage = (int)ceil(damage * (1.00 - bonus_resistance));
 
-		if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
-		{ // zyk: Deflective Armor
-			if (zyk_source_is_non_saber_weapon(mod) == qtrue)
-			{
-				bonus_resistance += 0.40;
-			}
-			else if (mod == MOD_SABER)
-			{
-				bonus_resistance += 0.05;
-			}
-		}
-
-		if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
-		{ // zyk: Saber Armor
-			if (zyk_source_is_non_saber_weapon(mod) == qtrue)
-			{
-				bonus_resistance += 0.05;
-			}
-			else if (mod == MOD_SABER)
-			{
-				bonus_resistance += 0.40;
-			}
-		}
-
-		if (bonus_resistance >= 1.00)
+		if (damage < 1)
 		{ // zyk: cannot make player fully absorb all damage
 			damage = 1;
-		}
-		else
-		{
-			damage = (int)ceil(damage * (1.00 - bonus_resistance));
 		}
 	}
 
@@ -5953,7 +5922,43 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (!targ->NPC && targ->client && targ->client->sess.amrpgmode == 2)
 		{ // zyk: Health Strength skill decreases damage taken
-			take = (int)ceil(take * (1.0 - (0.05 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH])));
+			float bonus_health_resistance = 0.00;
+
+			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
+			{ // zyk: Impact Reducer Armor
+				bonus_health_resistance += 0.15;
+			}
+
+			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
+			{ // zyk: Deflective Armor
+				if (zyk_source_is_non_saber_weapon(mod) == qtrue)
+				{
+					bonus_health_resistance += 0.40;
+				}
+				else if (mod == MOD_SABER)
+				{
+					bonus_health_resistance += 0.05;
+				}
+			}
+
+			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
+			{ // zyk: Saber Armor
+				if (zyk_source_is_non_saber_weapon(mod) == qtrue)
+				{
+					bonus_health_resistance += 0.05;
+				}
+				else if (mod == MOD_SABER)
+				{
+					bonus_health_resistance += 0.40;
+				}
+			}
+
+			take = (int)ceil(take * (1.00 - bonus_health_resistance - (0.05 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH])));
+
+			if (take < 1)
+			{ // zyk: cannot make player fully absorb all damage
+				take = 1;
+			}
 		}
 
 		targ->health = targ->health - take;
