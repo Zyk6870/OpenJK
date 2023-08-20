@@ -8621,6 +8621,11 @@ void G_RunFrame( int levelTime ) {
 					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_STUN_BATON);
 				}
 
+				if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER)))
+				{
+					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_SABER);
+				}
+
 				if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_BLASTER_PISTOL] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_PISTOL)))
 				{
 					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_BLASTER_PISTOL);

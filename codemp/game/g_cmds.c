@@ -4651,6 +4651,9 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_STUN_BATON] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
 
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 0)
+			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
+
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_BLASTER_PISTOL] > 0)
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
 
@@ -4777,18 +4780,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SABER_OFFENSE);
 		}
 		ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] = ent->client->pers.skill_levels[SKILL_SABER_ATTACK];
-
-		// zyk: giving the saber if he has Saber Attack skill level greater than 0
-		if (ent->client->pers.skill_levels[SKILL_SABER_ATTACK] > 0)
-		{
-			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
-			ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] = 1;
-		}
-		else
-		{
-			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_SABER);
-			ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] = 0;
-		}
 
 		// zyk: loading Saber Defense value
 		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABER_DEFENSE)) && ent->client->pers.skill_levels[SKILL_SABER_DEFENSE] > 0)
@@ -5093,6 +5084,9 @@ void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_invent
 			if (item == RPG_INVENTORY_WP_STUN_BATON)
 				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
 
+			if (item == RPG_INVENTORY_WP_SABER)
+				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
+
 			if (item == RPG_INVENTORY_WP_BLASTER_PISTOL)
 				ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
 
@@ -5189,7 +5183,7 @@ void add_new_char(gentity_t *ent)
 		ent->client->pers.rpg_inventory[i] = 0;
 	}
 
-	ent->client->pers.credits = 100;
+	ent->client->pers.credits = RPG_INITIAL_CREDITS;
 	ent->client->sess.magic_fist_selection = 0;
 
 	// zyk: in RPG Mode, player must actually buy these
@@ -6366,6 +6360,9 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_ROCKET_LAUNCHER][0] = 250;
 	seller_items_cost[SELLER_ROCKET_LAUNCHER][1] = 120;
 
+	seller_items_cost[SELLER_LIGHTSABER][0] = 200;
+	seller_items_cost[SELLER_LIGHTSABER][1] = 100;
+
 	seller_items_cost[SELLER_STUN_BATON][0] = 20;
 	seller_items_cost[SELLER_STUN_BATON][1] = 10;
 
@@ -6506,6 +6503,7 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_FLECHETTE] = "Flechette";
 	seller_items_names[SELLER_CONCUSSION] = "Concussion Rifle";
 	seller_items_names[SELLER_ROCKET_LAUNCHER] = "Rocket Launcher";
+	seller_items_names[SELLER_LIGHTSABER] = "Saber";
 	seller_items_names[SELLER_STUN_BATON] = "Stun Baton";
 
 	seller_items_names[SELLER_YSALAMIRI] = "Ysalamiri";
@@ -6765,6 +6763,10 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots rockets and a homing missile with alternate fire. Uses rockets ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
+		else if (i == SELLER_LIGHTSABER)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the weapon of a Jedi/Sith. With single, each Saber Attack skill level gives new saber stances. With duals/staff the Saber Attack skill level gives more damage\n\n\"", zyk_get_seller_item_name(i)));
+		}
 		else if (i == SELLER_STUN_BATON)
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that fires a small electric charge\n\n\"", zyk_get_seller_item_name(i)));
@@ -6966,7 +6968,12 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	}
 
 	// zyk: general validations. Some items require certain conditions to be bought
-	if (value == (SELLER_BACTA_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
+	if (value == (SELLER_LIGHTSABER + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 0)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_LIGHTSABER)));
+		return;
+	}
+	else if (value == (SELLER_BACTA_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_BACTA_UPGRADE)));
 		return;
@@ -7239,6 +7246,12 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		{
 			ent->client->pers.jetpack_fuel += (10 * JETPACK_SCALE);
 			ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel / JETPACK_SCALE;
+		}
+		else if (value == (SELLER_LIGHTSABER + 1))
+		{
+			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
+
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_SABER);
 		}
 		else if (value == (SELLER_STUN_BATON + 1))
 		{
@@ -7644,6 +7657,13 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_CONCUSSION);
 		if (ent->client->ps.weapon == WP_CONCUSSION)
+			ent->client->ps.weapon = WP_MELEE;
+		sold = 1;
+	}
+	else if (value == (SELLER_LIGHTSABER + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER)))
+	{
+		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_SABER);
+		if (ent->client->ps.weapon == WP_SABER)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
@@ -12259,7 +12279,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 				ent->client->pers.level_up_score = 0;
 				ent->client->pers.skillpoints = 1;
 
-				ent->client->pers.credits = 100;
+				ent->client->pers.credits = RPG_INITIAL_CREDITS;
 
 				ent->client->sess.magic_fist_selection = 0;
 

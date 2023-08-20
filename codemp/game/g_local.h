@@ -570,6 +570,7 @@ typedef enum {
 	SELLER_FLECHETTE,
 	SELLER_CONCUSSION,
 	SELLER_ROCKET_LAUNCHER,
+	SELLER_LIGHTSABER,
 	SELLER_STUN_BATON,
 	SELLER_YSALAMIRI,
 	SELLER_JETPACK_FUEL,
@@ -785,6 +786,9 @@ typedef enum {
 // zyk: Minimum Stamina before player starts to get tired
 #define RPG_MIN_STAMINA 1000.0
 #define RPG_DEFAULT_STAMINA 5000
+
+// zyk: initial credits in RPG Mode
+#define RPG_INITIAL_CREDITS 200
 
 // zyk: when casting magic, use anim for this amount of time in miliseconds
 #define MAGIC_ANIM_TIME 2000
