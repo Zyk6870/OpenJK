@@ -5374,13 +5374,13 @@ void enemy_weakening(gentity_t* ent)
 void dome_of_damage(gentity_t* ent)
 {
 	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]);
-	int damage = 5 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE];
+	int damage = 4 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE];
 
 	ent->client->pers.dome_of_damage_dmg = damage;
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_DOME_OF_DAMAGE);
-	ent->client->pers.magic_power_timer[MAGIC_DOME_OF_DAMAGE] = level.time + duration;
 	ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] = 0;
+	ent->client->pers.magic_power_timer[MAGIC_DOME_OF_DAMAGE] = level.time + duration;
 
 	ent->client->pers.quest_power_usage_timer = level.time + (18000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]));
 }
@@ -5389,25 +5389,10 @@ void dome_of_damage(gentity_t* ent)
 void water_magic(gentity_t* ent)
 {
 	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]);
-	int heal_amount = 20 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
-
-	if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
-		ent->health += heal_amount;
-	else
-		ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-	// zyk: ice block around the player
-	zyk_spawn_ice_block(ent, duration, 0, 0, -140, 0, 0);
-	zyk_spawn_ice_block(ent, duration, 0, 90, 140, 0, 0);
-	zyk_spawn_ice_block(ent, duration, 0, 179, 0, -140, 0);
-	zyk_spawn_ice_block(ent, duration, 0, -90, 0, 140, 0);
-	zyk_spawn_ice_block(ent, duration, 90, 0, 0, 0, -140);
-	zyk_spawn_ice_block(ent, duration, -90, 0, 0, 0, 140);
-
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_WATER_MAGIC);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = 0;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 500;
+	ent->client->pers.magic_power_hit_counter[MAGIC_WATER_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_WATER_MAGIC] = level.time + duration;
 
 	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]));
@@ -5417,19 +5402,10 @@ void water_magic(gentity_t* ent)
 void earth_magic(gentity_t* ent)
 {
 	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]);
-	int heal_amount = 5 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
-
-	zyk_quest_effect_spawn(ent, ent, "zyk_tree_of_life", "1", "models/map_objects/yavin/tree10_b.md3", 0, 0, 0, 2000);
-
-	if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
-		ent->health += heal_amount;
-	else
-		ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-	G_Sound(ent, CHAN_ITEM, G_SoundIndex("sound/weapons/force/heal.wav"));
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_EARTH_MAGIC);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = 0;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 500;
+	ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_EARTH_MAGIC] = level.time + duration;
 
 	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]));
@@ -5440,10 +5416,9 @@ void fire_magic(gentity_t* ent)
 {
 	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
 
-	ent->client->pers.flame_thrower_timer = level.time + duration;
-
 	ent->client->pers.quest_power_status |= (1 << MAGIC_FIRE_MAGIC);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] = 0;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] = level.time + 500;
+	ent->client->pers.magic_power_hit_counter[MAGIC_FIRE_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_FIRE_MAGIC] = level.time + duration;
 
 	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]));
@@ -5454,10 +5429,9 @@ void air_magic(gentity_t* ent)
 {
 	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
 
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/vacuum.mp3"));
-
 	ent->client->pers.quest_power_status |= (1 << MAGIC_AIR_MAGIC);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = 0;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 500;
+	ent->client->pers.magic_power_hit_counter[MAGIC_AIR_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_AIR_MAGIC] = level.time + duration;
 
 	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]));
@@ -5467,17 +5441,10 @@ void air_magic(gentity_t* ent)
 void dark_magic(gentity_t* ent)
 {
 	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
-	int damage = 10 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
-	int radius = 340 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]); // zyk: default distace for this effect is 540
-
-	zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "ships/proton_impact", 100, damage, radius, duration);
-
-	zyk_spawn_black_hole_model(ent, duration, 78);
-
-	ent->client->pers.black_hole_distance = radius;
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_DARK_MAGIC);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = 0;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = level.time + 500;
+	ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_DARK_MAGIC] = level.time + duration;
 
 	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]));
@@ -5531,21 +5498,10 @@ void lightning_dome(gentity_t* ent, int damage)
 void light_magic(gentity_t* ent)
 {
 	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]);
-	int radius = 340 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]); // zyk: default distace for this effect is 540
-	int damage = ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
-
-	zyk_quest_effect_spawn(ent, ent, "zyk_magic_light_effect", "0", "ships/sd_exhaust", 500, 0, 0, duration);
-	zyk_quest_effect_spawn(ent, ent, "zyk_magic_light", "4", "misc/possession", 500, damage, radius, duration);
-
-	ent->client->pers.light_of_judgement_distance = radius;
-
-	VectorCopy(ent->client->ps.origin, ent->client->pers.light_of_judgement_origin);
-
-	// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
-	lightning_dome(ent, damage * 10);
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_LIGHT_MAGIC);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = 0;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 500;
+	ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC] = level.time + duration;
 
 	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]));
@@ -5599,6 +5555,29 @@ void quest_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] < level.time)
 				{
+					if (ent->client->pers.magic_power_hit_counter[MAGIC_WATER_MAGIC] > 0)
+					{
+						int duration = (ent->client->pers.magic_power_timer[MAGIC_WATER_MAGIC] - level.time)/2;
+						int heal_amount = 20 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
+
+						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
+							ent->health += heal_amount;
+						else
+							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
+
+						// zyk: ice block around the player
+						zyk_spawn_ice_block(ent, duration, 0, 0, -140, 0, 0);
+						zyk_spawn_ice_block(ent, duration, 0, 90, 140, 0, 0);
+						zyk_spawn_ice_block(ent, duration, 0, 179, 0, -140, 0);
+						zyk_spawn_ice_block(ent, duration, 0, -90, 0, 140, 0);
+						zyk_spawn_ice_block(ent, duration, 90, 0, 0, 0, -140);
+						zyk_spawn_ice_block(ent, duration, -90, 0, 0, 0, 140);
+
+						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
+
+						ent->client->pers.magic_power_hit_counter[MAGIC_WATER_MAGIC]--;
+					}
+
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
 						target_ent = &g_entities[zyk_it];
@@ -5631,6 +5610,22 @@ void quest_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] < level.time)
 				{
+					if (ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC] > 0)
+					{
+						int heal_amount = 5 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
+
+						zyk_quest_effect_spawn(ent, ent, "zyk_tree_of_life", "1", "models/map_objects/yavin/tree10_b.md3", 0, 0, 0, 2000);
+
+						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
+							ent->health += heal_amount;
+						else
+							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
+
+						G_Sound(ent, CHAN_ITEM, G_SoundIndex("sound/weapons/force/heal.wav"));
+
+						ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC]--;
+					}
+
 					G_ScreenShake(ent->client->ps.origin, ent, 10.0f, 2000, qtrue);
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
 
@@ -5690,6 +5685,13 @@ void quest_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] < level.time)
 				{
+					if (ent->client->pers.magic_power_hit_counter[MAGIC_FIRE_MAGIC] > 0)
+					{
+						ent->client->pers.flame_thrower_timer = ent->client->pers.magic_power_timer[MAGIC_FIRE_MAGIC];
+
+						ent->client->pers.magic_power_hit_counter[MAGIC_FIRE_MAGIC]--;
+					}
+
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
 						target_ent = &g_entities[zyk_it];
@@ -5752,6 +5754,13 @@ void quest_power_events(gentity_t *ent)
 					int max_distance = 200 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
 					int damage = 1 + (ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] / 3);
 
+					if (ent->client->pers.magic_power_hit_counter[MAGIC_AIR_MAGIC] > 0)
+					{
+						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/vacuum.mp3"));
+
+						ent->client->pers.magic_power_hit_counter[MAGIC_AIR_MAGIC]--;
+					}
+
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
 						target_ent = &g_entities[zyk_it];
@@ -5802,6 +5811,21 @@ void quest_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] < level.time)
 				{
+					if (ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] > 0)
+					{
+						int duration = ent->client->pers.magic_power_timer[MAGIC_DARK_MAGIC] - level.time;
+						int damage = 10 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
+						int radius = 340 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]); // zyk: default distace for this effect is 540
+
+						zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "ships/proton_impact", 100, damage, radius, duration);
+
+						zyk_spawn_black_hole_model(ent, duration, 80);
+
+						ent->client->pers.black_hole_distance = radius;
+
+						ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC]--;
+					}
+					
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
 						black_hole_target = &g_entities[zyk_it];
@@ -5891,12 +5915,31 @@ void quest_power_events(gentity_t *ent)
 				gentity_t* light_of_judgement_target = NULL;
 				int zyk_it = 0;
 
-				// zyk: protective bubble around the player
-				ent->client->ps.eFlags |= EF_INVULNERABLE;
-				ent->client->invulnerableTimer = ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC];
-
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] < level.time)
 				{
+					// zyk: protective bubble around the player
+					ent->client->ps.eFlags |= EF_INVULNERABLE;
+					ent->client->invulnerableTimer = ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC];
+
+					if (ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] > 0)
+					{
+						int duration = ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC] - level.time;
+						int radius = 340 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]); // zyk: default distace for this effect is 540
+						int damage = ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
+
+						zyk_quest_effect_spawn(ent, ent, "zyk_magic_light_effect", "0", "ships/sd_exhaust", 500, 0, 0, duration);
+						zyk_quest_effect_spawn(ent, ent, "zyk_magic_light", "4", "misc/possession", 500, damage, radius, duration);
+
+						ent->client->pers.light_of_judgement_distance = radius;
+
+						VectorCopy(ent->client->ps.origin, ent->client->pers.light_of_judgement_origin);
+
+						// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
+						lightning_dome(ent, damage * 10);
+
+						ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC]--;
+					}
+
 					if (Distance(ent->client->ps.origin, ent->client->pers.light_of_judgement_origin) < ent->client->pers.light_of_judgement_distance)
 					{ // zyk: while inside the light, you slowly regen health
 						int heal_amount = 1 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];

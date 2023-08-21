@@ -1015,7 +1015,7 @@ typedef struct clientPersistant_s {
 	// zyk: cooldown between quest power uses
 	int quest_power_usage_timer;
 
-	// zyk: powers that hits the target player more than once need a hit counter
+	// zyk: powers that hits the target player more than once need a hit counter or powers that need a counter to start an effect
 	int magic_power_hit_counter[MAX_MAGIC_POWERS];
 
 	// zyk: timers of the magic powers used by this player
