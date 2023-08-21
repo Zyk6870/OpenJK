@@ -4260,11 +4260,6 @@ void zyk_show_magic_in_chat(gentity_t *ent, int skill_index)
 		ent->client->pers.netname, zyk_skill_name(skill_index)));
 }
 
-void zyk_set_magic_power_cooldown_time(gentity_t *ent, int duration)
-{
-	ent->client->pers.quest_power_usage_timer = level.time + duration;
-}
-
 qboolean TryGrapple(gentity_t *ent)
 {
 	if (ent->client->ps.weaponTime > 0)
@@ -11097,15 +11092,15 @@ int zyk_get_magic_cost(int magic_number)
 {
 	int magic_costs[MAX_MAGIC_POWERS] = {
 		5, // Magic Sense
-		5, // Healing Area
-		18, // Enemy Weakening
-		22, // Dome of Damage
-		20, // Water Magic
-		20, // Earth Magic
-		20, // Fire Magic
-		20, // Air Magic
-		20, // Dark Magic
-		20, // Light Magic
+		20, // Healing Area
+		20, // Enemy Weakening
+		25, // Dome of Damage
+		30, // Water Magic
+		30, // Earth Magic
+		30, // Fire Magic
+		30, // Air Magic
+		30, // Dark Magic
+		30, // Light Magic
 		0,
 		0,
 		0
@@ -11153,52 +11148,42 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			if (magic_number == MAGIC_MAGIC_SENSE)
 			{
 				magic_sense(ent);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_HEALING_AREA)
 			{
 				healing_area(ent);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_ENEMY_WEAKENING)
 			{
 				enemy_weakening(ent);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_DOME_OF_DAMAGE)
 			{
 				dome_of_damage(ent);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_WATER_MAGIC)
 			{
 				water_magic(ent);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_EARTH_MAGIC)
 			{
 				earth_magic(ent);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_FIRE_MAGIC)
 			{
 				fire_magic(ent);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_AIR_MAGIC)
 			{
 				air_magic(ent);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_DARK_MAGIC)
 			{
 				dark_magic(ent);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 			else if (magic_number == MAGIC_LIGHT_MAGIC)
 			{
 				light_magic(ent);
-				zyk_set_magic_power_cooldown_time(ent, 20000);
 			}
 
 			// zyk: magic powers cost mp
