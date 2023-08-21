@@ -36,6 +36,16 @@ void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *sab
 void Cmd_NPC_f( gentity_t *ent );
 void SetTeamQuick(gentity_t *ent, int team, qboolean doBegin);
 
+void password_encrypt(char password[], int key)
+{
+	int i = 0;
+
+	for (i = 0; i < strlen(password); i++)
+	{
+		password[i] = password[i] - key;
+	}
+}
+
 // zyk: returns the max level of a RPG skill
 int zyk_max_skill_level(int skill_index)
 {
@@ -5280,6 +5290,8 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	}
 
 	strcpy(ent->client->sess.filename, arg1);
+
+	password_encrypt(arg2, 0xFACE);
 	strcpy(ent->client->pers.password, arg2);
 
 	// zyk: setting the values to be saved in the account file
@@ -5384,6 +5396,9 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 		// zyk: validating password
 		fscanf(account_file,"%s",password);
 		fclose(account_file);
+
+		password_encrypt(arg2, 0xFACE);
+
 		if (strlen(password) != strlen(arg2) || Q_strncmp(password, arg2, strlen(password)) != 0)
 		{
 			trap->SendServerCommand( ent->s.number, "print \"The password is incorrect.\n\"" );
@@ -7869,29 +7884,30 @@ void Cmd_ChangePassword_f( gentity_t *ent ) {
 
 	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You must be at Spectator Mode to change password.\n\"" );
+		trap->SendServerCommand(ent->s.number, "print \"You must be at Spectator Mode to change password.\n\"" );
 		return;
 	}
 
 	if (trap->Argc() != 2)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"Use ^3changepassword <new_password> ^7to change it.\n\"" );
+		trap->SendServerCommand(ent->s.number, "print \"Use ^3/changepassword <new password> ^7to change it.\n\"" );
 		return;
 	}
 
 	// zyk: gets the new password
 	trap->Argv(1, arg1, sizeof( arg1 ));
 
-	if (strlen(arg1) > 30)
+	if (strlen(arg1) > MAX_ACC_NAME_SIZE)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"The password must have a maximum of 30 characters.\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"The password must have a maximum of %d characters.\n\"", MAX_ACC_NAME_SIZE) );
 		return;
 	}
 
+	password_encrypt(arg1, 0xFACE);
 	strcpy(ent->client->pers.password,arg1);
 	save_account(ent, qfalse);
 
-	trap->SendServerCommand( ent-g_entities, "print \"Your password was changed successfully.\n\"" );
+	trap->SendServerCommand(ent->s.number, "print \"Your password was changed successfully.\n\"" );
 }
 
 extern void zyk_TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles );
