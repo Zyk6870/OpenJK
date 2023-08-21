@@ -4249,17 +4249,6 @@ int zyk_get_magic_index(int skill_index)
 	return -1;
 }
 
-void zyk_show_magic_in_chat(gentity_t *ent, int skill_index)
-{
-	if (ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_IN_CHAT))
-	{ // zyk: do not show magic cast in chat
-		return;
-	}
-
-	trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ^2%s!\"", 
-		ent->client->pers.netname, zyk_skill_name(skill_index)));
-}
-
 qboolean TryGrapple(gentity_t *ent)
 {
 	if (ent->client->ps.weaponTime > 0)
@@ -8337,15 +8326,6 @@ void Cmd_Settings_f( gentity_t *ent ) {
 			strcpy(message, va("%s\n^3 %d - Allow Force Powers from allies - ^2ON", message, SETTINGS_FORCE_FROM_ALLIES));
 		}
 
-		if (ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_IN_CHAT))
-		{
-			strcpy(message, va("%s\n^3 %d - Show magic cast in chat - ^1OFF", message, SETTINGS_MAGIC_IN_CHAT));
-		}
-		else
-		{
-			strcpy(message, va("%s\n^3 %d - Show magic cast in chat - ^2ON", message, SETTINGS_MAGIC_IN_CHAT));
-		}
-
 		if (ent->client->pers.player_settings & (1 << SETTINGS_SCREEN_MESSAGE))
 		{
 			strcpy(message, va("%s\n^3 %d - Allow Screen Message - ^1OFF", message, SETTINGS_SCREEN_MESSAGE));
@@ -8437,10 +8417,6 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		else if (value == SETTINGS_FORCE_FROM_ALLIES)
 		{
 			trap->SendServerCommand( ent->s.number, va("print \"Allow Force Powers from allies %s\n\"", new_status) );
-		}
-		else if (value == SETTINGS_MAGIC_IN_CHAT)
-		{
-			trap->SendServerCommand( ent->s.number, va("print \"Show magic cast in chat %s\n\"", new_status) );
 		}
 		else if (value == SETTINGS_SCREEN_MESSAGE)
 		{
@@ -11191,7 +11167,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 
 			if (ent->s.number < MAX_CLIENTS)
 			{
-				zyk_show_magic_in_chat(ent, skill_index);
 				display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
 				send_rpg_events(2000);
 			}
