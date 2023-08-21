@@ -312,7 +312,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
 		return "fires a flame burst and hits enemies around you with Fire damage. Enemies hit by it will catch fire for some seconds";
 	if (skill_index == SKILL_MAGIC_AIR_MAGIC)
-		return "blows people away with a strong wind, and does a little Air damage to them. Enemies hit by Air will have their run speed decreased";
+		return "blows people away with a strong wind, and does a little Air damage to them. Increases your run speed. Enemies hit by Air will have their run speed decreased";
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
 		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive. Enemies are hit with Dark damage and will get confused/stunned and their health drained";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)

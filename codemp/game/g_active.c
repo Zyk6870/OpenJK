@@ -2572,6 +2572,11 @@ void ClientThink_real( gentity_t *ent ) {
 			//ent->client->ps.speed = ent->client->ps.basespeed = NPC_GetRunSpeed( ent );
 		}
 
+		if (client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))
+		{ // zyk: using Air Magic. Increase speed
+			client->ps.speed *= 2;
+		}
+
 		if (client->pers.quest_power_status & (1 << MAGIC_HIT_BY_AIR))
 		{ // zyk: hit by Air Magic. Decrease speed
 			client->ps.speed /= 2;
@@ -2603,13 +2608,18 @@ void ClientThink_real( gentity_t *ent ) {
 			zyk_player_speed += (client->pers.skill_levels[SKILL_RUN_SPEED] * 50.0f);
 		}
 
+		if (client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))
+		{ // zyk: using Air Magic. Increase speed
+			zyk_player_speed *= 2;
+		}
+
 		if (client->bodyGrabIndex != ENTITYNUM_NONE)
 		{ //can't go nearly as fast when dragging a body around
 			zyk_player_speed *= 0.2f;
 		}
 
 		if (client->pers.quest_power_status & (1 << MAGIC_HIT_BY_AIR))
-		{ // zyk: hit by Slow Motion. Decrease speed
+		{ // zyk: hit by Air Magic. Decrease speed
 			zyk_player_speed /= 2;
 		}
 
