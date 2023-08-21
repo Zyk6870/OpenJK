@@ -298,7 +298,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have";
 	if (skill_index == SKILL_MAGIC_MAGIC_SENSE)
-		return "similar to Sense and Sense Health skills, but with less duration. Benefits from Sense and Sense Health skill levels";
+		return "similar to Sense at max level. Sense Health works with it";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
 		return "creates an energy area that recovers health and shield to you and your allies. It also does a little damage to enemies";
 	if (skill_index == SKILL_MAGIC_ENEMY_WEAKENING)

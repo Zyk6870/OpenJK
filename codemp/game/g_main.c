@@ -5322,15 +5322,10 @@ void magic_sense(gentity_t* ent)
 {
 	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_SENSE]);
 
-	// zyk: Magic Sense gets more duration based on Sense skill level
-	duration += (ent->client->pers.skill_levels[SKILL_SENSE] * 1000);
-
-	ent->client->ps.forceAllowDeactivateTime = level.time + duration;
-	ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[SKILL_SENSE];
-	ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
-	ent->client->ps.fd.forcePowerDuration[FP_SEE] = level.time + duration;
-
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/force/see.wav"));
+	ent->client->pers.quest_power_status |= (1 << MAGIC_MAGIC_SENSE);
+	ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SENSE] = 0;
+	ent->client->pers.magic_power_hit_counter[MAGIC_MAGIC_SENSE] = 1;
+	ent->client->pers.magic_power_timer[MAGIC_MAGIC_SENSE] = level.time + duration;
 
 	ent->client->pers.quest_power_usage_timer = level.time + (9000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_SENSE]));
 }
@@ -5516,6 +5511,33 @@ void quest_power_events(gentity_t *ent)
 	{
 		if (ent->health > 0)
 		{
+			if (ent->client->pers.quest_power_status & (1 << MAGIC_MAGIC_SENSE))
+			{
+				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SENSE] < level.time)
+				{
+					if (ent->client->pers.magic_power_hit_counter[MAGIC_MAGIC_SENSE] > 0)
+					{
+						ent->client->ps.forceAllowDeactivateTime = ent->client->pers.magic_power_timer[MAGIC_MAGIC_SENSE];
+						ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
+						ent->client->ps.fd.forcePowerDuration[FP_SEE] = ent->client->pers.magic_power_timer[MAGIC_MAGIC_SENSE];
+
+						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/force/see.wav"));
+
+						ent->client->pers.magic_power_hit_counter[MAGIC_MAGIC_SENSE]--;
+					}
+
+					ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_3;
+
+					ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SENSE] = level.time + 100;
+				}
+
+				if (ent->client->pers.magic_power_timer[MAGIC_MAGIC_SENSE] < level.time)
+				{
+					ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[SKILL_SENSE];
+					ent->client->pers.quest_power_status &= ~(1 << MAGIC_MAGIC_SENSE);
+				}
+			}
+
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
 			{
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] < level.time)
