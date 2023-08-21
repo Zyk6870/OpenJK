@@ -302,7 +302,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
 		return "creates an energy area that recovers health and shield to you and your allies. It also does a little damage to enemies";
 	if (skill_index == SKILL_MAGIC_ENEMY_WEAKENING)
-		return "decreases damage and resistance of enemies nearby";
+		return "decreases damage and resistance of enemies nearby. Also makes enemy Stamina decrease faster";
 	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
 		return "an energy dome appears at your position each half second, damaging enemies inside it";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
@@ -4483,8 +4483,15 @@ void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
 	}
 	else
 	{
+		if (ent->client->pers.quest_power_status & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
+		{ // zyk: Enemy Weakening decreases Stamina faster
+			amount *= 2;
+		}
+
 		if (ent->client->pers.stamina_out_timer <= level.time)
+		{
 			ent->client->pers.current_stamina -= amount;
+		}
 	}
 }
 
