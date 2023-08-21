@@ -1374,6 +1374,13 @@ void Jetpack_Off(gentity_t *ent)
 	}
 
 	ent->client->jetPackOn = qfalse;
+
+	// zyk: setting the forceJumpZStart so turning off jetpack midair may cause fall damage
+	ent->client->ps.fd.forceJumpZStart = ent->client->ps.origin[2];
+	if (!ent->client->ps.fd.forceJumpZStart)
+	{
+		ent->client->ps.fd.forceJumpZStart -= 0.1f;
+	}
 }
 
 void Jetpack_On(gentity_t *ent)
