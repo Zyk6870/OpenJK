@@ -3266,6 +3266,7 @@ spawnflags:
 2 -  regens shield
 4 -  regens force
 8 -  regens mp (magic)
+16 - regens Stamina
 
 "count" amount to regen
 "wait" amount of time between regens (in miliseconds)
@@ -3334,6 +3335,18 @@ void zyk_regen_unit_think(gentity_t *ent)
 				{
 					this_ent->client->pers.magic_power = max_magic_power;
 					send_rpg_events(2000);
+				}
+			}
+
+			if (ent->spawnflags & 16 && this_ent->client->sess.amrpgmode == 2)
+			{
+				if ((this_ent->client->pers.current_stamina + ent->count) < this_ent->client->pers.max_stamina)
+				{
+					this_ent->client->pers.current_stamina += ent->count;
+				}
+				else if (this_ent->client->pers.current_stamina < this_ent->client->pers.max_stamina)
+				{
+					this_ent->client->pers.current_stamina = this_ent->client->pers.max_stamina;
 				}
 			}
 		}
