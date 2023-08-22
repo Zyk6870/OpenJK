@@ -89,7 +89,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
 	max_skill_levels[SKILL_MELEE] = 3;
 
-	max_skill_levels[SKILL_MAX_HEALTH] = 5;
+	max_skill_levels[SKILL_MAX_HEALTH] = 10;
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
 	max_skill_levels[SKILL_MAX_STAMINA] = 5;
