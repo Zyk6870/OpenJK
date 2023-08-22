@@ -5921,7 +5921,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 
 		if (!targ->NPC && targ->client && targ->client->sess.amrpgmode == 2)
-		{ // zyk: Health Strength skill decreases damage taken
+		{ // zyk: bonus resistance
 			float bonus_health_resistance = 0.00;
 
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
@@ -5953,7 +5953,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			take = (int)ceil(take * (1.00 - bonus_health_resistance - (0.05 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH])));
+			// zyk: Health Strength skill decreases damage taken
+			take = (int)ceil(take * (1.00 - bonus_health_resistance - (0.04 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH])));
 
 			if (take < 1)
 			{ // zyk: cannot make player fully absorb all damage

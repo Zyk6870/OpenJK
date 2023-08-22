@@ -283,7 +283,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_HEALTH)
 		return "Each level increases your max health";
 	if (skill_index == SKILL_HEALTH_STRENGTH)
-		return "Each level increases your health resistance by 5 per cent";
+		return "Each level increases your health resistance to damage";
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio";
 	if (skill_index == SKILL_MAX_STAMINA)
