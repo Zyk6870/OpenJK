@@ -4924,6 +4924,12 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			// zyk: loading initial force
 			ent->client->ps.fd.forcePower = ent->client->pers.max_force_power;
 
+			// zyk: loading last MP
+			ent->client->pers.magic_power = ent->client->pers.last_mp;
+
+			// zyk: loading last shield
+			ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.last_shield;
+
 			if (!(ent->client->pers.player_statuses & (1 << 24)) && 
 				ent->client->pers.last_health <= 0)
 			{ // zyk: reload player stats if he died and he did not use /kill command
@@ -4931,23 +4937,13 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 				ent->health = ent->client->pers.max_rpg_health;
 				ent->client->ps.stats[STAT_HEALTH] = ent->health;
 
-				// zyk: loading initial shield
-				ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
-
-				// zyk: loading initial MP
-				ent->client->pers.magic_power = zyk_max_magic_power(ent);
-
-				// zyk: loading initial Stamina
-				ent->client->pers.current_stamina = ent->client->pers.max_stamina;
+				// zyk: loading initial Stamina as the last value plus the minimum Stamina
+				ent->client->pers.current_stamina = ent->client->pers.last_stamina + RPG_MIN_STAMINA;
 			}
 			else
 			{ // zyk: reload the last stats
 				ent->health = ent->client->pers.last_health;
 				ent->client->ps.stats[STAT_HEALTH] = ent->health;
-
-				ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.last_shield;
-
-				ent->client->pers.magic_power = ent->client->pers.last_mp;
 
 				ent->client->pers.current_stamina = ent->client->pers.last_stamina;
 			}
