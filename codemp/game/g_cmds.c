@@ -6264,28 +6264,28 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	// zyk: costs to buy or sell for each seller item
 	int seller_items_cost[MAX_SELLER_ITEMS][2];
 
-	seller_items_cost[SELLER_BLASTER_PACK][0] = 10;
-	seller_items_cost[SELLER_BLASTER_PACK][1] = 5;
+	seller_items_cost[SELLER_BLASTER_PACK][0] = 5;
+	seller_items_cost[SELLER_BLASTER_PACK][1] = 2;
 
-	seller_items_cost[SELLER_POWERCELL][0] = 12;
-	seller_items_cost[SELLER_POWERCELL][1] = 7;
+	seller_items_cost[SELLER_POWERCELL][0] = 8;
+	seller_items_cost[SELLER_POWERCELL][1] = 4;
 
-	seller_items_cost[SELLER_METAL_BOLTS][0] = 15;
-	seller_items_cost[SELLER_METAL_BOLTS][1] = 10;
+	seller_items_cost[SELLER_METAL_BOLTS][0] = 7;
+	seller_items_cost[SELLER_METAL_BOLTS][1] = 4;
 
-	seller_items_cost[SELLER_ROCKETS][0] = 20;
-	seller_items_cost[SELLER_ROCKETS][1] = 12;
+	seller_items_cost[SELLER_ROCKETS][0] = 10;
+	seller_items_cost[SELLER_ROCKETS][1] = 5;
 
-	seller_items_cost[SELLER_THERMALS][0] = 22;
-	seller_items_cost[SELLER_THERMALS][1] = 12;
+	seller_items_cost[SELLER_THERMALS][0] = 12;
+	seller_items_cost[SELLER_THERMALS][1] = 5;
 
-	seller_items_cost[SELLER_TRIPMINES][0] = 25;
-	seller_items_cost[SELLER_TRIPMINES][1] = 14;
+	seller_items_cost[SELLER_TRIPMINES][0] = 14;
+	seller_items_cost[SELLER_TRIPMINES][1] = 9;
 
-	seller_items_cost[SELLER_DETPACKS][0] = 30;
-	seller_items_cost[SELLER_DETPACKS][1] = 18;
+	seller_items_cost[SELLER_DETPACKS][0] = 20;
+	seller_items_cost[SELLER_DETPACKS][1] = 15;
 
-	seller_items_cost[SELLER_AMMO_ALL][0] = 300;
+	seller_items_cost[SELLER_AMMO_ALL][0] = 200;
 	seller_items_cost[SELLER_AMMO_ALL][1] = 0;
 
 	seller_items_cost[SELLER_FLAME_FUEL][0] = 20;
@@ -7105,34 +7105,34 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	{
 		if (value == (SELLER_BLASTER_PACK + 1))
 		{
-			Add_Ammo(ent,AMMO_BLASTER,100);
+			Add_Ammo(ent, AMMO_BLASTER, 50);
 		}
 		else if (value == (SELLER_POWERCELL + 1))
 		{
-			Add_Ammo(ent,AMMO_POWERCELL,100);
+			Add_Ammo(ent, AMMO_POWERCELL, 50);
 		}
 		else if (value == (SELLER_METAL_BOLTS + 1))
 		{
-			Add_Ammo(ent,AMMO_METAL_BOLTS,100);
+			Add_Ammo(ent, AMMO_METAL_BOLTS, 50);
 		}
 		else if (value == (SELLER_ROCKETS + 1))
 		{
-			Add_Ammo(ent,AMMO_ROCKETS,10);
+			Add_Ammo(ent, AMMO_ROCKETS, 2);
 		}
 		else if (value == (SELLER_THERMALS + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_THERMAL);
-			Add_Ammo(ent,AMMO_THERMAL,4);
+			Add_Ammo(ent, AMMO_THERMAL, 4);
 		}
 		else if (value == (SELLER_TRIPMINES + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_TRIP_MINE);
-			Add_Ammo(ent,AMMO_TRIPMINE,3);
+			Add_Ammo(ent, AMMO_TRIPMINE, 3);
 		}
 		else if (value == (SELLER_DETPACKS + 1))
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
-			Add_Ammo(ent,AMMO_DETPACK,2);
+			Add_Ammo(ent, AMMO_DETPACK, 2);
 		}
 		else if (value == (SELLER_SHIELD_BOOSTER + 1))
 		{
@@ -7316,7 +7316,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
 			Add_Ammo(ent,AMMO_DETPACK,2);
 
-			ent->client->ps.cloakFuel = 100;
+			ent->client->ps.cloakFuel = 20;
 		}
 		else if (value == (SELLER_BACTA_UPGRADE + 1))
 		{
