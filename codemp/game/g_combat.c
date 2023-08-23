@@ -4884,9 +4884,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			can_damage_heavy_things = qtrue;
 		}
 
-		if (attacker->client->pers.energy_modulator_mode == 1 && mod != MOD_UNKNOWN)
-		{ // zyk: Energy Modulator mode 1 increases damage done by weapons
-			damage = (int)ceil(damage * 1.3);
+		if (attacker->client->pers.energy_modulator_mode == 1)
+		{ // zyk: Energy Modulator mode 1 increases damage
+			damage = (int)ceil(damage * 1.20);
 		}
 	}
 
@@ -4944,7 +4944,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (targ->client->pers.energy_modulator_mode == 2)
 		{ // zyk: Energy Modulator mode 2
-			bonus_resistance += 0.30;
+			bonus_resistance += 0.20;
 
 			targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 		}

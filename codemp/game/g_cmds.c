@@ -6884,7 +6884,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_ENERGY_MODULATOR)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a device that has two modes. First Mode increases damage by 30 per cent and reduces flame thrower fuel usage. Second Mode increases resistance to damage by 30 per cent. Activate it by getting melee and pressing Saber Style key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a device that converts powercell ammo and blaster pack ammo into attack power or an extra shield protection. It has two modes. First Mode increases damage of all attacks by 20 per cent and reduces flame thrower fuel usage. Second Mode increases resistance to damage from any source by 20 per cent. Activate it by getting melee and pressing Saber Style key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
 	}
 }
