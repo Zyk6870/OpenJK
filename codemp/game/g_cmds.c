@@ -314,7 +314,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_AIR_MAGIC)
 		return "blows people away with a strong wind, and does a little Air damage to them. Increases your run speed. Enemies hit by Air will have their run speed decreased";
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
-		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive. Enemies are hit with Dark damage and will get confused/stunned and their health drained";
+		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive. Enemies hit with Dark Magic will get their health drained";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
 		return "creates a lightning dome that damages enemies nearby. Protects you with a shield that reduces damage and protects from some force powers. Creates a big shining light around you. While inside the light, enemies will get confused/stunned and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets knocked down";
 

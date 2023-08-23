@@ -5212,7 +5212,7 @@ void Player_FireFlameThrower(gentity_t* self, qboolean is_magic)
 	// zyk: Fire Magic power has more damage
 	if (is_magic == qtrue)
 	{
-		damage += (2 * self->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
+		damage += (1 * self->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
 	}
 
 	origin[0] = self->r.currentOrigin[0];
@@ -5320,7 +5320,7 @@ void clear_special_power_effect(gentity_t* ent)
 // zyk: Magic Sense
 void magic_sense(gentity_t* ent)
 {
-	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_SENSE]);
+	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_SENSE]);
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_MAGIC_SENSE);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SENSE] = 0;
@@ -5333,42 +5333,30 @@ void magic_sense(gentity_t* ent)
 // zyk: Healing Area
 void healing_area(gentity_t* ent)
 {
-	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA]);
+	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA]);
 	int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing_area", "4", "env/red_cyc", 0, damage, 228, duration);
 
-	ent->client->pers.quest_power_usage_timer = level.time + (17000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA]));
+	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA]));
 }
 
 // zyk: Enemy Weakening
 void enemy_weakening(gentity_t* ent)
 {
-	int i = 0;
-	int targets_hit = 0;
-	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]);
+	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]);
 
-	for (i = 0; i < level.num_entities; i++)
-	{
-		gentity_t* player_ent = &g_entities[i];
+	ent->client->pers.quest_power_status |= (1 << MAGIC_ENEMY_WEAKENING);
+	ent->client->pers.magic_power_debounce_timer[MAGIC_ENEMY_WEAKENING] = 0;
+	ent->client->pers.magic_power_timer[MAGIC_ENEMY_WEAKENING] = level.time + duration;
 
-		if (zyk_special_power_can_hit_target(ent, player_ent, i, 0, 500, qfalse, &targets_hit) == qtrue)
-		{
-			player_ent->client->pers.magic_power_debounce_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] = 0;
-			player_ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] = level.time + duration;
-			player_ent->client->pers.quest_power_status |= (1 << MAGIC_HIT_BY_ENEMY_WEAKENING);
-
-			G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh10.mp3"));
-		}
-	}
-
-	ent->client->pers.quest_power_usage_timer = level.time + (17000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]));
+	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]));
 }
 
 // zyk: Dome of Damage
 void dome_of_damage(gentity_t* ent)
 {
-	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]);
+	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]);
 	int damage = 4 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE];
 
 	ent->client->pers.dome_of_damage_dmg = damage;
@@ -5377,72 +5365,72 @@ void dome_of_damage(gentity_t* ent)
 	ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] = 0;
 	ent->client->pers.magic_power_timer[MAGIC_DOME_OF_DAMAGE] = level.time + duration;
 
-	ent->client->pers.quest_power_usage_timer = level.time + (18000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]));
+	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]));
 }
 
 // zyk: Water Magic
 void water_magic(gentity_t* ent)
 {
-	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]);
+	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]);
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_WATER_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_WATER_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_WATER_MAGIC] = level.time + duration;
 
-	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]));
+	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]));
 }
 
 // zyk: Earth Magic
 void earth_magic(gentity_t* ent)
 {
-	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]);
+	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]);
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_EARTH_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_EARTH_MAGIC] = level.time + duration;
 
-	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]));
+	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]));
 }
 
 // zyk: Fire Magic
 void fire_magic(gentity_t* ent) 
 {
-	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
+	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_FIRE_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_FIRE_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_FIRE_MAGIC] = level.time + duration;
 
-	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]));
+	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]));
 }
 
 // zyk: Air Magic
 void air_magic(gentity_t* ent)
 {
-	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
+	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_AIR_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_AIR_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_AIR_MAGIC] = level.time + duration;
 
-	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]));
+	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]));
 }
 
 // zyk: Dark Magic
 void dark_magic(gentity_t* ent)
 {
-	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
+	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_DARK_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_DARK_MAGIC] = level.time + duration;
 
-	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]));
+	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]));
 }
 
 extern void zyk_lightning_dome_detonate(gentity_t* ent);
@@ -5492,14 +5480,14 @@ void lightning_dome(gentity_t* ent, int damage)
 //zyk: Light Magic
 void light_magic(gentity_t* ent)
 {
-	int duration = 1000 + (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]);
+	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]);
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_LIGHT_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC] = level.time + duration;
 
-	ent->client->pers.quest_power_usage_timer = level.time + (15000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]));
+	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]));
 }
 
 // zyk: controls the quest powers stuff
@@ -5538,6 +5526,38 @@ void quest_power_events(gentity_t *ent)
 				}
 			}
 
+			if (ent->client->pers.quest_power_status & (1 << MAGIC_ENEMY_WEAKENING))
+			{
+				if (ent->client->pers.magic_power_debounce_timer[MAGIC_ENEMY_WEAKENING] < level.time)
+				{
+					int zyk_it = 0;
+					int targets_hit = 0;
+					int max_distance = 250 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]);
+					int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]);
+
+					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
+					{
+						gentity_t* player_ent = &g_entities[zyk_it];
+
+						if (zyk_special_power_can_hit_target(ent, player_ent, zyk_it, 0, max_distance, qfalse, &targets_hit) == qtrue)
+						{
+							player_ent->client->pers.magic_power_debounce_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] = 0;
+							player_ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] = level.time + duration;
+							player_ent->client->pers.quest_power_status |= (1 << MAGIC_HIT_BY_ENEMY_WEAKENING);
+
+							G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh10.mp3"));
+						}
+					}
+
+					ent->client->pers.magic_power_debounce_timer[MAGIC_ENEMY_WEAKENING] = level.time + 500;
+				}
+
+				if (ent->client->pers.magic_power_timer[MAGIC_ENEMY_WEAKENING] < level.time)
+				{
+					ent->client->pers.quest_power_status &= ~(1 << MAGIC_ENEMY_WEAKENING);
+				}
+			}
+
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
 			{
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] < level.time)
@@ -5572,8 +5592,8 @@ void quest_power_events(gentity_t *ent)
 			{
 				gentity_t* target_ent = NULL;
 				int zyk_it = 0;
-				int max_distance = 200 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]);
-				int damage = 4 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
+				int max_distance = 250 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]);
+				int damage = 2 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] < level.time)
 				{
@@ -5626,9 +5646,9 @@ void quest_power_events(gentity_t *ent)
 				gentity_t* target_ent = NULL;
 				int zyk_it = 0;
 				int targets_hit = 0;
-				int max_distance = 200 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]);
-				int earthquake_damage = 20 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
-				int damage = 6 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
+				int max_distance = 250 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]);
+				int earthquake_damage = 10 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
+				int damage = 3 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] < level.time)
 				{
@@ -5666,7 +5686,7 @@ void quest_power_events(gentity_t *ent)
 								}
 
 								target_ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-								target_ent->client->ps.forceHandExtendTime = level.time + 1000;
+								target_ent->client->ps.forceHandExtendTime = level.time + 800;
 								target_ent->client->ps.velocity[2] += 300;
 								target_ent->client->ps.forceDodgeAnim = 0;
 								target_ent->client->ps.quickerGetup = qtrue;
@@ -5689,7 +5709,7 @@ void quest_power_events(gentity_t *ent)
 						}
 					}
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 2000;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 1600;
 				}
 
 				if (ent->client->pers.magic_power_timer[MAGIC_EARTH_MAGIC] < level.time)
@@ -5702,8 +5722,8 @@ void quest_power_events(gentity_t *ent)
 			{
 				gentity_t* target_ent = NULL;
 				int zyk_it = 0;
-				int max_distance = 200 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
-				int damage = 5 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
+				int max_distance = 250 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
+				int damage = 3 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] < level.time)
 				{
@@ -5751,7 +5771,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						zyk_quest_effect_spawn(fire_magic_user, ent, "zyk_magic_fire_hit", "0", "env/fire", 0, 0, 0, 300);
 
-						G_Damage(ent, fire_magic_user, fire_magic_user, NULL, NULL, 2 * fire_magic_user->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC], 0, MOD_UNKNOWN);
+						G_Damage(ent, fire_magic_user, fire_magic_user, NULL, NULL, fire_magic_user->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC], 0, MOD_UNKNOWN);
 
 						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fire_lp.wav"));
 					}
@@ -5773,7 +5793,7 @@ void quest_power_events(gentity_t *ent)
 					gentity_t* target_ent = NULL;
 					int zyk_it = 0;
 					int targets_hit = 0;
-					int max_distance = 200 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
+					int max_distance = 250 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
 					int damage = 1 + (ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] / 3);
 
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_AIR_MAGIC] > 0)
@@ -5829,15 +5849,15 @@ void quest_power_events(gentity_t *ent)
 			{
 				gentity_t* black_hole_target = NULL;
 				int zyk_it = 0;
-				int confusion_duration = 600 + (200 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
+				int confusion_duration = 300 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] < level.time)
 				{
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] > 0)
 					{
 						int duration = ent->client->pers.magic_power_timer[MAGIC_DARK_MAGIC] - level.time;
-						int damage = 10 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
-						int radius = 340 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]); // zyk: default distace for this effect is 540
+						int damage = 6 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
+						int radius = 390 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]); // zyk: default distace for this effect is 540
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "ships/proton_impact", 100, damage, radius, duration);
 
@@ -5893,7 +5913,6 @@ void quest_power_events(gentity_t *ent)
 								VectorAdd(black_hole_target->client->ps.velocity, dir, black_hole_target->client->ps.velocity);
 							}
 
-							// zyk: setting confuse effect
 							// zyk: removing emotes to prevent exploits
 							if (black_hole_target->client->pers.player_statuses & (1 << 1))
 							{
@@ -5906,20 +5925,6 @@ void quest_power_events(gentity_t *ent)
 							{
 								black_hole_target->client->ps.legsAnim = black_hole_target->client->ps.torsoAnim = BOTH_MEDITATE_END;
 							}
-
-							if (black_hole_target->client->jetPackOn)
-							{
-								Jetpack_Off(black_hole_target);
-							}
-
-							// zyk:  setting anim
-							black_hole_target->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-							black_hole_target->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
-							black_hole_target->client->ps.forceHandExtendTime = level.time + confusion_duration;
-							black_hole_target->client->ps.electrifyTime = level.time + confusion_duration;
-
-							// zyk: target cant attack while confused
-							black_hole_target->client->ps.weaponTime = 1000;
 						}
 					}
 
@@ -5942,7 +5947,7 @@ void quest_power_events(gentity_t *ent)
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] > 0)
 					{
 						int duration = ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC] - level.time;
-						int radius = 340 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]); // zyk: default distace for this effect is 540
+						int radius = 390 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]); // zyk: default distace for this effect is 540
 						int damage = ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_light_effect", "0", "ships/sd_exhaust", 500, 0, 0, duration);
@@ -5953,7 +5958,7 @@ void quest_power_events(gentity_t *ent)
 						VectorCopy(ent->client->ps.origin, ent->client->pers.light_of_judgement_origin);
 
 						// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
-						lightning_dome(ent, damage * 10);
+						lightning_dome(ent, damage * 8);
 
 						// zyk: protective bubble around the player
 						ent->client->ps.eFlags |= EF_INVULNERABLE;
@@ -6003,15 +6008,34 @@ void quest_power_events(gentity_t *ent)
 								ent->client->pers.magic_power = max_player_mp;
 							}
 
+							// zyk: setting confuse effect
+							// zyk: removing emotes to prevent exploits
+							if (light_of_judgement_target->client->pers.player_statuses & (1 << 1))
+							{
+								light_of_judgement_target->client->pers.player_statuses &= ~(1 << 1);
+								light_of_judgement_target->client->ps.forceHandExtendTime = level.time;
+							}
+
+							// zyk: if using Meditate taunt, remove it
+							if (light_of_judgement_target->client->ps.legsAnim == BOTH_MEDITATE && light_of_judgement_target->client->ps.torsoAnim == BOTH_MEDITATE)
+							{
+								light_of_judgement_target->client->ps.legsAnim = light_of_judgement_target->client->ps.torsoAnim = BOTH_MEDITATE_END;
+							}
+
+							if (light_of_judgement_target->client->jetPackOn)
+							{
+								Jetpack_Off(light_of_judgement_target);
+							}
+
 							// zyk: confuses the target
 							if (light_of_judgement_target->client->ps.forceDodgeAnim != BOTH_SONICPAIN_END)
 							{
 								light_of_judgement_target->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 								light_of_judgement_target->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
-								light_of_judgement_target->client->ps.forceHandExtendTime = level.time + 2000;
+								light_of_judgement_target->client->ps.forceHandExtendTime = level.time + 1500;
 
 								// zyk: target cant attack while confused
-								light_of_judgement_target->client->ps.weaponTime = 1000;
+								light_of_judgement_target->client->ps.weaponTime = 1500;
 							}
 						}
 					}
