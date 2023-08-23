@@ -6318,8 +6318,8 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_JETPACK][0] = 500;
 	seller_items_cost[SELLER_JETPACK][1] = 0;
 
-	seller_items_cost[SELLER_CLOAK_ITEM][0] = 90;
-	seller_items_cost[SELLER_CLOAK_ITEM][1] = 50;
+	seller_items_cost[SELLER_CLOAK_ITEM][0] = 150;
+	seller_items_cost[SELLER_CLOAK_ITEM][1] = 90;
 
 	seller_items_cost[SELLER_BLASTER_PISTOL][0] = 90;
 	seller_items_cost[SELLER_BLASTER_PISTOL][1] = 45;
@@ -6788,7 +6788,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_CLOAK_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Cloak Item will be able to cloak vehicles\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Cloak Item will be able to cloak vehicles. Press Saber Stance key when riding a vehicle to cloak it\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_SHIELD_GENERATOR_UPGRADE)
 		{
