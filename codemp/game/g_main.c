@@ -5939,10 +5939,6 @@ void quest_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] < level.time)
 				{
-					// zyk: protective bubble around the player
-					ent->client->ps.eFlags |= EF_INVULNERABLE;
-					ent->client->invulnerableTimer = ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC];
-
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] > 0)
 					{
 						int duration = ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC] - level.time;
@@ -5959,6 +5955,10 @@ void quest_power_events(gentity_t *ent)
 						// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
 						lightning_dome(ent, damage * 10);
 
+						// zyk: protective bubble around the player
+						ent->client->ps.eFlags |= EF_INVULNERABLE;
+						ent->client->invulnerableTimer = ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC];
+
 						ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC]--;
 					}
 
@@ -5966,13 +5966,13 @@ void quest_power_events(gentity_t *ent)
 					{ // zyk: while inside the light, you slowly regen health
 						int heal_amount = 1 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 
-						if ((ent->health + heal_amount) < ent->client->pers.max_rpg_health)
+						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
 						{
 							ent->health += heal_amount;
 						}
 						else
 						{
-							ent->health = ent->client->pers.max_rpg_health;
+							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
 						}
 					}
 
@@ -9293,7 +9293,7 @@ void G_RunFrame( int levelTime ) {
 
 			if (ent->health > 0 && Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy && ent->client->pers.quest_power_usage_timer < level.time)
 			{ // zyk: powers used by the quest_mage npc
-				int random_magic = Q_irand(0, (MAX_MAGIC_POWERS - 1));
+				int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
 				int first_magic_skill = SKILL_MAGIC_MAGIC_SENSE;
 				int current_magic_skill = first_magic_skill;
 
@@ -9302,7 +9302,7 @@ void G_RunFrame( int levelTime ) {
 				{
 					if (ent->client->pers.skill_levels[current_magic_skill] < 1)
 					{
-						ent->client->pers.skill_levels[current_magic_skill] = 2;
+						ent->client->pers.skill_levels[current_magic_skill] = zyk_max_skill_level(current_magic_skill);
 					}
 
 					current_magic_skill++;
@@ -9311,15 +9311,12 @@ void G_RunFrame( int levelTime ) {
 				// zyk: regen mp and level of this mage
 				if (ent->client->pers.magic_power < 20)
 				{
-					ent->client->pers.level = 200;
-					ent->client->pers.skill_levels[SKILL_MAX_MP] = 5;
+					ent->client->pers.level = 100;
+					ent->client->pers.skill_levels[SKILL_MAX_MP] = zyk_max_skill_level(SKILL_MAX_MP) - 2;
 					ent->client->pers.magic_power = zyk_max_magic_power(ent);
 				}
 
 				zyk_cast_magic(ent, first_magic_skill + random_magic);
-
-				// zyk: decreasing npc cooldown based on his level
-				ent->client->pers.quest_power_usage_timer -= Q_irand(1 * ent->client->pers.level, 20 * ent->client->pers.level);
 			}
 		}
 
