@@ -5388,7 +5388,7 @@ void earth_magic(gentity_t* ent)
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_EARTH_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 500;
-	ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC] = 1;
+	ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC] = 2;
 	ent->client->pers.magic_power_timer[MAGIC_EARTH_MAGIC] = level.time + duration;
 
 	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]));
@@ -5652,19 +5652,14 @@ void quest_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] < level.time)
 				{
-					if (ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC] > 0)
+					if (ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC] >= 2)
 					{
-						int heal_amount = 5 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
+						zyk_quest_effect_spawn(ent, ent, "zyk_tree_of_life", "1", "models/map_objects/yavin/tree10_b.md3", 0, 0, 0, 1600);
 
-						zyk_quest_effect_spawn(ent, ent, "zyk_tree_of_life", "1", "models/map_objects/yavin/tree10_b.md3", 0, 0, 0, 2000);
-
-						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
-							ent->health += heal_amount;
-						else
-							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-						G_Sound(ent, CHAN_ITEM, G_SoundIndex("sound/weapons/force/heal.wav"));
-
+						ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC]--;
+					}
+					else if (ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC] > 0)
+					{ // zyk: Tree of Life ended
 						ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC]--;
 					}
 
