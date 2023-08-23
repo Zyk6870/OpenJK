@@ -7157,7 +7157,7 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_SENTRY_GUN] = 6;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_SEEKER_DRONE] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_EWEB] = 22;
-	rpg_inventory_weights[RPG_INVENTORY_ITEM_BIG_BACTA] = 8;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_BIG_BACTA] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_FORCE_FIELD] = 9;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_CLOAK] = 7;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 100;

@@ -6312,14 +6312,14 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_SEEKER_DRONE][0] = 140;
 	seller_items_cost[SELLER_SEEKER_DRONE][1] = 60;
 
-	seller_items_cost[SELLER_BACTA_CANISTER][0] = 150;
-	seller_items_cost[SELLER_BACTA_CANISTER][1] = 80;
+	seller_items_cost[SELLER_BACTA_CANISTER][0] = 120;
+	seller_items_cost[SELLER_BACTA_CANISTER][1] = 50;
 
 	seller_items_cost[SELLER_FORCE_FIELD][0] = 200;
 	seller_items_cost[SELLER_FORCE_FIELD][1] = 100;
 
-	seller_items_cost[SELLER_BIG_BACTA][0] = 300;
-	seller_items_cost[SELLER_BIG_BACTA][1] = 180;
+	seller_items_cost[SELLER_BIG_BACTA][0] = 220;
+	seller_items_cost[SELLER_BIG_BACTA][1] = 90;
 
 	seller_items_cost[SELLER_EWEB][0] = 140;
 	seller_items_cost[SELLER_EWEB][1] = 40;
@@ -6700,7 +6700,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_BACTA_CANISTER)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers 25 HP. With Bacta Upgrade, also regen Magic Points and Stamina\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_FORCE_FIELD)
 		{
@@ -6708,7 +6708,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_BIG_BACTA)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers 50 HP. With Bacta Upgrade, also regen Stamina\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina. Recovers double the amount of a Bacta Canister\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_EWEB)
 		{
@@ -6792,7 +6792,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_BACTA_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister recovers some Magic Power and some Stamina and Big Bacta recovers more HP and some Stamina\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister and Big Bacta recovers more HP, more MP and more Stamina\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_FORCE_FIELD_UPGRADE)
 		{
@@ -7307,7 +7307,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == (SELLER_MAGIC_POTION + 1))
 		{
-			zyk_add_mp(ent, 100);
+			zyk_add_mp(ent, 200);
 		}
 		else if (value == (SELLER_AMMO_ALL + 1))
 		{

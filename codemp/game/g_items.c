@@ -1322,14 +1322,18 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 	{
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 		{
-			MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT * 3);
+			MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT * 2);
+
+			zyk_add_mp(ent, 200);
 
 			// zyk: Big Bacta can regen some stamina
-			zyk_set_stamina(ent, 3000, qtrue);
+			zyk_set_stamina(ent, 2000, qtrue);
 		}
 		else
 		{
 			MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
+
+			zyk_add_mp(ent, 100);
 
 			// zyk: Big Bacta can regen some stamina
 			zyk_set_stamina(ent, 1000, qtrue);
@@ -1348,19 +1352,27 @@ void ItemUse_MedPack(gentity_t *ent)
 	{
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 		{
-			zyk_add_mp(ent, 200);
+			MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT * 2);
+
+			zyk_add_mp(ent, 100);
+
+			// zyk: Bacta Canister can regen some stamina
+			zyk_set_stamina(ent, 1000, qtrue);
+		}
+		else
+		{
+			MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);
+
+			zyk_add_mp(ent, 50);
 
 			// zyk: Bacta Canister can regen some stamina
 			zyk_set_stamina(ent, 500, qtrue);
 		}
-		else
-		{
-			// zyk: Bacta Canister can regen some stamina
-			zyk_set_stamina(ent, 200, qtrue);
-		}
 	}
-	
-	MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);
+	else
+	{
+		MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);
+	}
 }
 
 #define JETPACK_TOGGLE_TIME			900 // zyk: default 1000
