@@ -970,9 +970,6 @@ typedef struct clientPersistant_s {
 
 	int flame_thrower_timer; // zyk: used by stun baton. Its the flame thrower timer
 
-	// zyk: amount of sentries placed in map
-	int bounty_hunter_placed_sentries;
-
 	// zyk: each of the modes of Energy Modulator Upgrade for Gunner:
 	// 0 - Off
 	// 1 - Damage buff and lower flame thrower fuel usage

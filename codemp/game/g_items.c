@@ -1091,12 +1091,6 @@ void turret_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
 
 	g_entities[self->genericValue3].client->ps.fd.sentryDeployed = qfalse;
 
-	// zyk: Gunner items Upgrade allows placing more sentries
-	if (g_entities[self->genericValue3].client->sess.amrpgmode == 2)
-	{
-		g_entities[self->genericValue3].client->pers.bounty_hunter_placed_sentries--;
-	}
-
 	//ExplodeDeath( self );
 	G_FreeEntity( self );
 }
@@ -1238,9 +1232,6 @@ void ItemUse_Sentry( gentity_t *ent )
 	if (ent->client->sess.amrpgmode == 2)
 	{
 		sentry->health = 150;
-
-		// zyk: validating quantity of sentry guns that the player can place
-		ent->client->pers.bounty_hunter_placed_sentries++;
 
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
 		{

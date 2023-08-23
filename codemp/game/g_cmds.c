@@ -4611,8 +4611,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 	if (ent->client->sess.amrpgmode == 2)
 	{
 		int i = 0;
-		gentity_t* this_ent = NULL;
-		int sentry_guns_iterator = 0;
 
 		// zyk: validating max skill levels. If for some reason a skill is above max, get the skillpoint back
 		for (i = 0; i < NUMBER_OF_SKILLS; i++)
@@ -4894,16 +4892,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		if (ent->client->sess.magic_fist_selection > ent->client->pers.skill_levels[SKILL_MAGIC_FIST])
 		{ // zyk: reset magic fist selected if player downgrades Magic Fist skill
 			ent->client->sess.magic_fist_selection = 0;
-		}
-
-		ent->client->pers.bounty_hunter_placed_sentries = 0;
-
-		for (sentry_guns_iterator = MAX_CLIENTS; sentry_guns_iterator < level.num_entities; sentry_guns_iterator++)
-		{
-			this_ent = &g_entities[sentry_guns_iterator];
-
-			if (this_ent && Q_stricmp(this_ent->classname, "sentryGun") == 0 && this_ent->s.owner == ent->s.number)
-				ent->client->pers.bounty_hunter_placed_sentries++;
 		}
 
 		if (init_all == qtrue)

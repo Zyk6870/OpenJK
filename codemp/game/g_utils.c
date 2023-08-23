@@ -1615,6 +1615,7 @@ extern void Touch_Button(gentity_t *ent, gentity_t *other, trace_t *trace );
 extern qboolean gSiegeRoundBegun;
 extern void save_account(gentity_t *ent, qboolean save_char_file);
 extern void NPC_BSDefault( void );
+extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
 static vec3_t	playerMins = {-15, -15, DEFAULT_MINS_2};
 static vec3_t	playerMaxs = {15, 15, DEFAULT_MAXS_2};
 void TryUse( gentity_t *ent )
@@ -1802,23 +1803,32 @@ void TryUse( gentity_t *ent )
 			target && Q_stricmp(target->classname, "sentryGun") == 0 && target->parent && target->parent == ent && 
 			ent->client->ps.ammo[AMMO_POWERCELL] >= 2)
 	{ // zyk: Sentry Gun Upgrade allows recovering sentry guns. Uses some power cell ammo
-		ent->client->pers.bounty_hunter_placed_sentries--;
 		ent->client->ps.fd.sentryDeployed = qfalse;
 
 		ent->client->ps.ammo[AMMO_POWERCELL] -= 2;
 
 		G_FreeEntity(target);
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));
+
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
+
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_SENTRY_GUN);
+
 		return;
 	}
 	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0 &&
 			target && target->s.eType == ET_SPECIAL && target->s.modelindex == HI_SHIELD && target->parent && target->parent == ent &&
-			ent->client->ps.ammo[AMMO_POWERCELL] >= 3)
+			ent->client->ps.ammo[AMMO_POWERCELL] >= 4)
 	{ // zyk: Force Field Upgrade allows recovering force fields. Uses some power cell ammo
-		ent->client->ps.ammo[AMMO_POWERCELL] -= 3;
+		ent->client->ps.ammo[AMMO_POWERCELL] -= 4;
 
 		G_FreeEntity(target);
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));
+
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
+
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_FORCE_FIELD);
+
 		return;
 	}
 
