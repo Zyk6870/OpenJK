@@ -7521,24 +7521,24 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		}
 	}
 
-	if (value == (SELLER_BLASTER_PACK + 1) && ent->client->ps.ammo[AMMO_BLASTER] >= 100)
+	if (value == (SELLER_BLASTER_PACK + 1) && ent->client->ps.ammo[AMMO_BLASTER] >= 50)
 	{
-		ent->client->ps.ammo[AMMO_BLASTER] -= 100;
+		ent->client->ps.ammo[AMMO_BLASTER] -= 50;
 		sold = 1;
 	}
-	else if (value == (SELLER_POWERCELL + 1) && ent->client->ps.ammo[AMMO_POWERCELL] >= 100)
+	else if (value == (SELLER_POWERCELL + 1) && ent->client->ps.ammo[AMMO_POWERCELL] >= 50)
 	{
-		ent->client->ps.ammo[AMMO_POWERCELL] -= 100;
+		ent->client->ps.ammo[AMMO_POWERCELL] -= 50;
 		sold = 1;
 	}
-	else if (value == (SELLER_METAL_BOLTS + 1) && ent->client->ps.ammo[AMMO_METAL_BOLTS] >= 100)
+	else if (value == (SELLER_METAL_BOLTS + 1) && ent->client->ps.ammo[AMMO_METAL_BOLTS] >= 50)
 	{
-		ent->client->ps.ammo[AMMO_METAL_BOLTS] -= 100;
+		ent->client->ps.ammo[AMMO_METAL_BOLTS] -= 50;
 		sold = 1;
 	}
-	else if (value == (SELLER_ROCKETS + 1) && ent->client->ps.ammo[AMMO_ROCKETS] >= 10)
+	else if (value == (SELLER_ROCKETS + 1) && ent->client->ps.ammo[AMMO_ROCKETS] >= 2)
 	{
-		ent->client->ps.ammo[AMMO_ROCKETS] -= 10;
+		ent->client->ps.ammo[AMMO_ROCKETS] -= 2;
 		sold = 1;
 	}
 	else if (value == (SELLER_THERMALS + 1) && ent->client->ps.ammo[AMMO_THERMAL] >= 4)
@@ -7559,31 +7559,26 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (value == (SELLER_BACTA_CANISTER + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_MEDPAC);
-
 		sold = 1;
 	}
 	else if (value == (SELLER_BIG_BACTA + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC_BIG))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_MEDPAC_BIG);
-
 		sold = 1;
 	}
 	else if (value == (SELLER_SENTRY_GUN + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SENTRY_GUN))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SENTRY_GUN);
-
 		sold = 1;
 	}
 	else if (value == (SELLER_SEEKER_DRONE + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SEEKER);
-
 		sold = 1;
 	}
 	else if (value == (SELLER_FORCE_FIELD + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SHIELD))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SHIELD);
-
 		sold = 1;
 	}
 	else if (value == (SELLER_YSALAMIRI + 1) && ent->client->ps.powerups[PW_YSALAMIRI])
