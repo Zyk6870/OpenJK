@@ -6812,7 +6812,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_DEFLECTIVE_ARMOR)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 40 per cent weapon/melee damage to your health (only 5 per cent from saber) and deflects some weapon shots\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 35 per cent weapon/melee damage to your health (only 5 per cent from saber) and deflects some weapon shots\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_SABER_ARMOR)
 		{

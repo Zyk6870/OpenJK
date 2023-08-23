@@ -5933,7 +5933,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{ // zyk: Deflective Armor
 				if (zyk_source_is_non_saber_weapon(mod) == qtrue)
 				{
-					bonus_health_resistance += 0.40;
+					bonus_health_resistance += 0.35;
 				}
 				else if (mod == MOD_SABER)
 				{
