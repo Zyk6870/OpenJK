@@ -820,6 +820,12 @@ typedef enum {
 // zyk: max quest npc events each npc can have
 #define MAX_QUEST_NPC_EVENTS 8
 
+// zyk: main characters names
+#define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
+#define QUESTCHAR_EMPEROR_NAME "^3Vritra"
+#define QUESTCHAR_MAINVILLAIN_NAME "^1Asmodeus"
+#define QUESTCHAR_MAINGOODENTITY_NAME "^5Metatron"
+
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
 typedef struct clientPersistant_s {
@@ -1804,7 +1810,6 @@ qboolean zyk_is_ally(gentity_t *ent, gentity_t *other);
 int zyk_number_of_allies(gentity_t *ent, qboolean in_rpg_mode);
 void send_rpg_events(int send_event_timer);
 int zyk_get_remap_count();
-void zyk_text_message(gentity_t *ent, char *filename, qboolean show_in_chat, qboolean broadcast_message, ...);
 qboolean zyk_can_deflect_shots(gentity_t *ent);
 
 // zyk: shader remap struct

@@ -4725,6 +4725,7 @@ qboolean duel_tournament_is_duelist(gentity_t *ent)
 	return qfalse;
 }
 
+/*
 // zyk: shows a text message from the file based on the language set by the player. Can receive additional arguments to concat in the final string
 void zyk_text_message(gentity_t* ent, char* filename, qboolean show_in_chat, qboolean broadcast_message, ...)
 {
@@ -4771,6 +4772,7 @@ void zyk_text_message(gentity_t* ent, char* filename, qboolean show_in_chat, qbo
 
 	trap->SendServerCommand(client_id, va("%s \"%s\n\"", console_cmd, string));
 }
+*/
 
 void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetname, char *spawnflags, char *effect_path, int start_time, int damage, int radius, int duration)
 {
@@ -5031,7 +5033,7 @@ zyk_main_quest_t zyk_get_magic_spirit(zyk_magic_element_t magic_element)
 }
 
 // zyk: spawns the element effect above the player or npc when magic is cast
-void zyk_spawn_magic_element_effect(gentity_t* ent, int magic_number)
+void zyk_spawn_magic_element_effect(gentity_t* ent, vec3_t effect_origin, int magic_number, int duration)
 {
 	char magic_element_effects[NUM_MAGIC_ELEMENTS][64] = {
 		"env/small_electricity2",
@@ -5048,14 +5050,14 @@ void zyk_spawn_magic_element_effect(gentity_t* ent, int magic_number)
 
 	zyk_set_entity_field(new_ent, "classname", "fx_runner");
 	zyk_set_entity_field(new_ent, "targetname", "zyk_magic_element");
-	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->r.currentOrigin[0], (int)ent->r.currentOrigin[1], (int)ent->r.currentOrigin[2] + 56));
+	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)effect_origin[0], (int)effect_origin[1], (int)effect_origin[2] + 56));
 
 	new_ent->s.modelindex = G_EffectIndex(magic_element_effects[magic_element]);
 
 	zyk_spawn_entity(new_ent);
 
 	level.special_power_effects[new_ent->s.number] = ent->s.number;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + 1000;
+	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
 }
 
 extern void Jedi_Decloak(gentity_t *self);
@@ -7259,6 +7261,171 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	ent->client->pers.current_weight = current_weight;
 }
 
+void zyk_show_tutorial(gentity_t* ent)
+{
+	vec3_t effect_origin;
+
+	if (ent->client->pers.tutorial_step == 0)
+	{
+		VectorSet(effect_origin, ent->r.currentOrigin[0] + 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 180000);
+
+		VectorSet(effect_origin, ent->r.currentOrigin[0], ent->r.currentOrigin[1] + 100, ent->r.currentOrigin[2]);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 180000);
+
+		VectorSet(effect_origin, ent->r.currentOrigin[0] - 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 180000);
+
+		VectorSet(effect_origin, ent->r.currentOrigin[0] - 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 180000);
+
+		VectorSet(effect_origin, ent->r.currentOrigin[0] + 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 180000);
+
+		VectorSet(effect_origin, ent->r.currentOrigin[0] - 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 180000);
+
+		VectorSet(effect_origin, ent->r.currentOrigin[0] + 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 180000);
+	}
+
+	if (ent->client->pers.tutorial_step == 1)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. We are the Magical Spirits.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+	}
+	if (ent->client->pers.tutorial_step == 2)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We will explain to you everything you keed to know.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 3)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You must defeat players or enemy npcs to get experience and levels. Levels give you skillpoints.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 4)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info you need, like current Level, Magic, skillpoints, Stamina, etc.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 5)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: In ^3/list rpg ^7you can see the commands that lists your skills and other commands too.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 6)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: In time your Stamina will decrease. Doing actions makes it decrease faster.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 7)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If out of Stamina, you will faint and regain a bit of it. Also, low Stamina decreases your run speed.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 8)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use meditate (in controls Menu, set the bind for it) to regen Stamina.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 9)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Anything you get (weapons, ammo, items) use your inventory. To see it use ^3/list inventory^7\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 10)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory stuff have weight. If over the max weight, your run speed will decrease.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 11)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or items or sell then to the seller.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 12)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To call the seller use ^3/callseller^7. Press the Use key on him for info on how to buy and sell stuff.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 13)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You will probably need to see info about a skill so use ^3/list <skill number> ^7to see skill info.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 14)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your current stats (hp, shield, mp, stamina) are saved so changing map will keep them at current values.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 15)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To upgrade or downgrade a skill, use ^3/up <skill number> ^7or ^3/down <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 16)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight other players, use ^3/nofight^7\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 17)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can add allies players with ^3/allyadd ^7or use ^3/allyremove ^7to remove them.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 18)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including Single Player ones.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 19)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can see your quests in ^3/list quests^7. Any new mission will appear there\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 20)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: That's the reason we are here. We need your help %s^7\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+	}
+	if (ent->client->pers.tutorial_step == 21)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Each one of us have affinity with one of the Elements of Nature, and one of us is non-elemental.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 22)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: our temples were took by evil forces, lead by the Emperor %s^7\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_EMPEROR_NAME));
+	}
+	if (ent->client->pers.tutorial_step == 23)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he is a servant of the demon %s^7, who came from the World of Darkness and is using the emperor to rule over everything!\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINVILLAIN_NAME));
+	}
+	if (ent->client->pers.tutorial_step == 24)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions, lesser demons, who took our temples.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 25)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the angel %s^7 is in the World of Light, protecting it from being taken over, so he can't help us now.\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINGOODENTITY_NAME));
+	}
+	if (ent->client->pers.tutorial_step == 26)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you defeat one of them, one of us can reside again in it and help you in your quest.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 27)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Then you can summon the ones back in the temples with ^3/spirit <spirit number>\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 28)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: A summoned spirit will enhance magic of that type/element but you will be more vulnerable to that element from enemies.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 29)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: While summoned, the spirit will consume your mp until you use ^3/spirit ^7again to unsummon.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 30)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can try visiting many places (maps). The people there may help with side-quests.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 31)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are also many hidden artifacts that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 32)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 33)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Save everything and bring back harmony to Nature!\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+
+		// zyk: end of tutorial
+		ent->client->pers.player_statuses &= ~(1 << 25);
+	}
+}
+
 /*
 ================
 G_RunFrame
@@ -8642,18 +8809,11 @@ void G_RunFrame( int levelTime ) {
 			// zyk: tutorial, which teaches the player the RPG Mode features
 			if (ent->client->pers.player_statuses & (1 << 25) && ent->client->pers.tutorial_timer < level.time)
 			{
-				if (ent->client->pers.tutorial_step > 1)
-				{ // zyk: after last message, tutorial ends
-					ent->client->pers.player_statuses &= ~(1 << 25);
-				}
-				else
-				{
-					zyk_text_message(ent, va("tutorial/%d", ent->client->pers.tutorial_step), qtrue, qfalse);
-				}
+				zyk_show_tutorial(ent);
 
 				// zyk: interval between messages
 				ent->client->pers.tutorial_step++;
-				ent->client->pers.tutorial_timer = level.time + 7000;
+				ent->client->pers.tutorial_timer = level.time + 5000;
 			}
 
 			zyk_print_custom_quest_info(ent);

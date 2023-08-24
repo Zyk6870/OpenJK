@@ -5209,7 +5209,7 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 
 	if ( trap->Argc() != 3) 
 	{ 
-		trap->SendServerCommand( ent-g_entities, "print \"You must write a login and a password of your choice. Example: ^3/new yourlogin yourpass^7.\n\"" ); 
+		trap->SendServerCommand(ent->s.number, "print \"You must write a login and a password of your choice. Example: ^3/new yourlogin yourpass^7.\n\"" );
 		return;
 	}
 	trap->Argv(1, arg1, sizeof( arg1 ));
@@ -5218,18 +5218,18 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	// zyk: creates the account if player is not logged in
 	if (ent->client->sess.amrpgmode != 0)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You are already logged in.\n\"" ); 
+		trap->SendServerCommand(ent->s.number, "print \"You are already logged in.\n\"" );
 		return;
 	}
 
 	if (strlen(arg1) > MAX_ACC_NAME_SIZE)
 	{
-		trap->SendServerCommand( ent-g_entities, va("print \"Login has a maximum of %d characters.\n\"", MAX_ACC_NAME_SIZE) );
+		trap->SendServerCommand(ent->s.number, va("print \"Login has a maximum of %d characters.\n\"", MAX_ACC_NAME_SIZE) );
 		return;
 	}
 	if (strlen(arg2) > MAX_ACC_NAME_SIZE)
 	{
-		trap->SendServerCommand( ent-g_entities, va("print \"Password has a maximum of %d characters.\n\"", MAX_ACC_NAME_SIZE) );
+		trap->SendServerCommand(ent->s.number, va("print \"Password has a maximum of %d characters.\n\"", MAX_ACC_NAME_SIZE) );
 		return;
 	}
 
@@ -5259,7 +5259,7 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 				if (Q_stricmp( content, va("%s.txt",arg1) ) == 0)
 				{ // zyk: if this login is the same as the one passed in arg1, then it already exists
 					fclose(logins_file);
-					trap->SendServerCommand( ent-g_entities, "print \"Login is used by another player.\n\"" );
+					trap->SendServerCommand(ent->s.number, "print \"Login is used by another player.\n\"" );
 					return;
 				}
 			}
@@ -11068,7 +11068,7 @@ int zyk_get_magic_cost(int magic_number)
 	return magic_costs[magic_number];
 }
 
-extern void zyk_spawn_magic_element_effect(gentity_t* ent, int magic_number);
+extern void zyk_spawn_magic_element_effect(gentity_t* ent, vec3_t effect_origin, int magic_number, int duration);
 extern void magic_sense(gentity_t* ent);
 extern void healing_area(gentity_t* ent);
 extern void enemy_weakening(gentity_t* ent);
@@ -11096,7 +11096,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 		if (ent->client->pers.magic_power >= zyk_get_magic_cost(magic_number))
 		{
 			// zyk: magic usage effect
-			zyk_spawn_magic_element_effect(ent, magic_number);
+			zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, magic_number, 1000);
 
 			// zyk: magic usage anim
 			G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCE_RAGE, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
@@ -11873,61 +11873,9 @@ Cmd_Tutorial_f
 ==================
 */
 void Cmd_Tutorial_f(gentity_t *ent) {
-	int page = 1; // zyk: page the user wants to see
-	int i = 0;
-	int results_per_page = zyk_list_cmds_results_per_page.integer; // zyk: number of results per page
-	char arg1[MAX_STRING_CHARS];
-	char file_content[MAX_STRING_CHARS * 4];
-	char content[MAX_STRING_CHARS];
-	FILE *tutorial_file = NULL;
-
-	if (trap->Argc() < 2)
-	{
-		trap->SendServerCommand(ent->s.number, "print \"You must pass a page number. Example: ^3/tutorial 1^7\n\"");
-		return;
-	}
-
-	strcpy(file_content, "");
-	strcpy(content, "");
-
-	trap->Argv(1, arg1, sizeof(arg1));
-	page = atoi(arg1);
-
-	tutorial_file = fopen("zykmod/tutorial.txt", "r");
-	if (tutorial_file != NULL)
-	{
-		if (page > 0)
-		{ // zyk: show results of this page
-			while (i < (results_per_page * (page - 1)) && fgets(content, sizeof(content), tutorial_file) != NULL)
-			{ // zyk: reads the file until it reaches the position corresponding to the page number
-				i++;
-			}
-
-			while (i < (results_per_page * page) && fgets(content, sizeof(content), tutorial_file) != NULL)
-			{ // zyk: fgets returns NULL at EOF
-				strcpy(file_content, va("%s%s", file_content, content));
-				i++;
-			}
-		}
-		else
-		{ // zyk: search for the string
-			while (i < results_per_page && fgets(content, sizeof(content), tutorial_file) != NULL)
-			{ // zyk: fgets returns NULL at EOF
-				if (strstr(content, arg1))
-				{
-					strcpy(file_content, va("%s%s", file_content, content));
-					i++;
-				}
-			}
-		}
-
-		fclose(tutorial_file);
-		trap->SendServerCommand(ent->s.number, va("print \"\n%s\n\"", file_content));
-	}
-	else
-	{
-		trap->SendServerCommand(ent->s.number, "print \"Tutorial file does not exist\n\"");
-	}
+	ent->client->pers.tutorial_step = 0;
+	ent->client->pers.tutorial_timer = level.time + 1000;
+	ent->client->pers.player_statuses |= (1 << 25);
 }
 
 /*
