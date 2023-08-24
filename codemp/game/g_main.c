@@ -7268,25 +7268,25 @@ void zyk_show_tutorial(gentity_t* ent)
 	if (ent->client->pers.tutorial_step == 0)
 	{
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 180000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 160000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0], ent->r.currentOrigin[1] + 100, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 180000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 160000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 180000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 160000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 180000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 160000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 180000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 160000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 180000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 160000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 180000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 160000);
 	}
 
 	if (ent->client->pers.tutorial_step == 1)
@@ -7391,33 +7391,21 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 26)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you defeat one of them, one of us can reside again in it and help you in your quest.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you defeat one of the demons, one of us can reside again in it and help you in your quest.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 27)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Then you can summon the ones back in the temples with ^3/spirit <spirit number>\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can try visiting many places (maps). The people there may help with side-quests.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 28)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: A summoned spirit will enhance magic of that type/element but you will be more vulnerable to that element from enemies.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are also many powerful hidden artifacts that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 29)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: While summoned, the spirit will consume your mp until you use ^3/spirit ^7again to unsummon.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 30)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can try visiting many places (maps). The people there may help with side-quests.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 31)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are also many hidden artifacts that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 32)
-	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
-	if (ent->client->pers.tutorial_step == 33)
+	if (ent->client->pers.tutorial_step == 30)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Save everything and bring back harmony to Nature!\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 
