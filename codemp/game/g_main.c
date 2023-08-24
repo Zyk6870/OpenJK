@@ -5016,22 +5016,6 @@ zyk_magic_element_t zyk_get_magic_element(int magic_number)
 	return MAGICELEMENT_NONE;
 }
 
-// zyk: return the Spirit value of this magic element
-zyk_main_quest_t zyk_get_magic_spirit(zyk_magic_element_t magic_element)
-{
-	zyk_magic_element_t magic_spirits[NUMBER_OF_MAGIC_SPIRITS + 1] = {
-		-1, // Non-Elemental Magic does not have an Elemental Spirit
-		QUEST_WATER_SPIRIT,
-		QUEST_EARTH_SPIRIT,
-		QUEST_FIRE_SPIRIT,
-		QUEST_AIR_SPIRIT,
-		QUEST_DARK_SPIRIT,
-		QUEST_LIGHT_SPIRIT
-	};
-
-	return magic_spirits[magic_element];
-}
-
 // zyk: spawns the element effect above the player or npc when magic is cast
 void zyk_spawn_magic_element_effect(gentity_t* ent, vec3_t effect_origin, int magic_number, int duration)
 {
@@ -7606,14 +7590,6 @@ void G_RunFrame( int levelTime ) {
 		{
 			trap->SetConfigstring(CS_MUSIC, G_NewString(level.default_map_music));
 		}
-		else if (level.current_map_music == MAPMUSIC_PROLOGUE)
-		{
-			trap->SetConfigstring(CS_MUSIC, "music/zyknewmod/sb_fateandfortune.mp3");
-		}
-		else if (level.current_map_music == MAPMUSIC_DESERT_CITY)
-		{
-			trap->SetConfigstring(CS_MUSIC, "music/zyknewmod/al-andalus.mp3");
-		}
 	}
 
 	if (level.race_mode == 1 && level.race_start_timer < level.time)
@@ -9096,64 +9072,9 @@ void G_RunFrame( int levelTime ) {
 						level.spawned_quest_stuff = qtrue;
 					}
 
-					if (level.quest_map == QUESTMAP_HERO_HOUSE && !(ent->client->pers.main_quest_progress & (1 << QUEST_PROLOGUE)))
-					{ // zyk: Hero's House, show the Prologue to the player
-						vec3_t heros_house_center;
-
-						VectorSet(heros_house_center, -64, -512, 88);
-
-						if (Distance(ent->r.currentOrigin, heros_house_center) < 120 && ent->client->pers.quest_event_timer < level.time)
-						{
-							if (ent->client->pers.current_quest_event == 0)
-							{
-								if (!(ent->client->pers.player_settings & ((1 << SETTINGS_BOSS_MUSIC))))
-								{
-									zyk_set_map_music(MAPMUSIC_PROLOGUE, 500);
-								}
-
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7years ago, after the Great War, evil took over everything.\"");
-							}
-							else if (ent->client->pers.current_quest_event == 1)
-							{
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7the evil king Drakon created an age of oppression and sadness for people.\"");
-							}
-							else if (ent->client->pers.current_quest_event == 2)
-							{
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7a rebel group was formed to fight the king's forces, but failed. The rebel survivors either got arrested or fled.\"");
-							}
-							else if (ent->client->pers.current_quest_event == 3)
-							{
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7now people wait for a hero who will bring hope and will be able to defeat King Drakon.\"");
-							}
-							else if (ent->client->pers.current_quest_event == 4)
-							{
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7you are this hero! With your courage, you can fight for freedom!\"");
-							}
-							else if (ent->client->pers.current_quest_event == 5)
-							{
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7for now, you know you must find more information that will help you get more power and allies for this quest.\"");
-							}
-							else if (ent->client->pers.current_quest_event == 6)
-							{
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7going to the Desert City and talking to people there perhaps will give you the information you need.\"");
-							}
-							else if (ent->client->pers.current_quest_event == 7)
-							{
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7you can also visit cities and places to get levels and information.\"");
-							}
-							else if (ent->client->pers.current_quest_event == 8)
-							{
-								trap->SendServerCommand(ent->s.number, "chat \"^3Prologue: ^7the Main Quest begins!\"");
-
-								ent->client->pers.main_quest_progress |= (1 << QUEST_PROLOGUE);
-								save_account(ent, qtrue);
-
-								zyk_set_map_music(MAPMUSIC_NONE, 500);
-							}
-							
-							ent->client->pers.current_quest_event++;
-							ent->client->pers.quest_event_timer = level.time + 5000;
-						}
+					if (level.quest_map == QUESTMAP_HERO_HOUSE)
+					{ // zyk: Hero's House
+						
 					}
 				}
 

@@ -5670,8 +5670,6 @@ void Cmd_ZykChars_f(gentity_t *ent) {
 	trap->SendServerCommand(ent->s.number, va("zykchars \"%s^7%s<zykc>\"", zyk_get_rpg_chars(ent, "<zyk>"), ent->client->sess.rpgchar));
 }
 
-extern zyk_magic_element_t zyk_get_magic_element(int magic_number);
-extern zyk_main_quest_t zyk_get_magic_spirit(zyk_magic_element_t magic_element);
 qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont_show_message)
 {
 	// zyk: validation on the upgrade level, which must be in the range of valid skills.
@@ -5688,23 +5686,6 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 			trap->SendServerCommand( ent->s.number, "print \"Not enough skillpoints.\n\"" );
 		return qfalse;
 	}
-
-	/*
-	// zyk: each magic requires a certain Elemental Spirit to be upgraded to a level > 1
-	if (upgrade_value > (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS))
-	{
-		int magic_skill_index = (upgrade_value - 1) - (NUMBER_OF_SKILLS - MAX_MAGIC_POWERS);
-		zyk_magic_element_t skill_element = zyk_get_magic_element(magic_skill_index);
-		zyk_main_quest_t magic_spirit = zyk_get_magic_spirit(skill_element);
-
-		if (ent->client->pers.skill_levels[upgrade_value - 1] > 0 && !(ent->client->pers.main_quest_progress & (1 << magic_spirit)))
-		{ // zyk: if player is trying to upgrade the Magic skill again, he must have the corresponding Elemental Spirit
-			if (dont_show_message == qfalse)
-				trap->SendServerCommand(ent->s.number, va("print \"You don't have the %s.\n\"", zyk_get_spirit_name(magic_spirit)));
-			return qfalse;
-		}
-	}
-	*/
 
 	return qtrue;
 }
