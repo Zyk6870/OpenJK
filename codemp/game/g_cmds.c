@@ -4921,6 +4921,9 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.stamina_timer = 0;
 			ent->client->pers.stamina_out_timer = 0;
 
+			// zyk: initial Elemental affinity
+			ent->client->pers.current_magic_element = MAGICELEMENT_NONE;
+
 			// zyk: loading initial force
 			ent->client->ps.fd.forcePower = ent->client->pers.max_force_power;
 

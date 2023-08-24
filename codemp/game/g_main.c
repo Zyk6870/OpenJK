@@ -5322,6 +5322,8 @@ void magic_sense(gentity_t* ent)
 {
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_SENSE]);
 
+	ent->client->pers.current_magic_element = MAGICELEMENT_NONE;
+
 	ent->client->pers.quest_power_status |= (1 << MAGIC_MAGIC_SENSE);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SENSE] = 0;
 	ent->client->pers.magic_power_hit_counter[MAGIC_MAGIC_SENSE] = 1;
@@ -5336,6 +5338,8 @@ void healing_area(gentity_t* ent)
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA]);
 	int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 
+	ent->client->pers.current_magic_element = MAGICELEMENT_NONE;
+
 	zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing_area", "4", "env/red_cyc", 0, damage, 228, duration);
 
 	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA]));
@@ -5345,6 +5349,8 @@ void healing_area(gentity_t* ent)
 void enemy_weakening(gentity_t* ent)
 {
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]);
+
+	ent->client->pers.current_magic_element = MAGICELEMENT_NONE;
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_ENEMY_WEAKENING);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_ENEMY_WEAKENING] = 0;
@@ -5358,6 +5364,8 @@ void dome_of_damage(gentity_t* ent)
 {
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]);
 	int damage = 4 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE];
+
+	ent->client->pers.current_magic_element = MAGICELEMENT_NONE;
 
 	ent->client->pers.dome_of_damage_dmg = damage;
 
@@ -5373,6 +5381,8 @@ void water_magic(gentity_t* ent)
 {
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]);
 
+	ent->client->pers.current_magic_element = MAGICELEMENT_WATER;
+
 	ent->client->pers.quest_power_status |= (1 << MAGIC_WATER_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_WATER_MAGIC] = 1;
@@ -5385,6 +5395,8 @@ void water_magic(gentity_t* ent)
 void earth_magic(gentity_t* ent)
 {
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]);
+
+	ent->client->pers.current_magic_element = MAGICELEMENT_EARTH;
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_EARTH_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 500;
@@ -5399,6 +5411,8 @@ void fire_magic(gentity_t* ent)
 {
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
 
+	ent->client->pers.current_magic_element = MAGICELEMENT_FIRE;
+
 	ent->client->pers.quest_power_status |= (1 << MAGIC_FIRE_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_FIRE_MAGIC] = 1;
@@ -5412,6 +5426,8 @@ void air_magic(gentity_t* ent)
 {
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
 
+	ent->client->pers.current_magic_element = MAGICELEMENT_AIR;
+
 	ent->client->pers.quest_power_status |= (1 << MAGIC_AIR_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_AIR_MAGIC] = 1;
@@ -5424,6 +5440,8 @@ void air_magic(gentity_t* ent)
 void dark_magic(gentity_t* ent)
 {
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
+
+	ent->client->pers.current_magic_element = MAGICELEMENT_DARK;
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_DARK_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = level.time + 500;
@@ -5482,12 +5500,54 @@ void light_magic(gentity_t* ent)
 {
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]);
 
+	ent->client->pers.current_magic_element = MAGICELEMENT_LIGHT;
+
 	ent->client->pers.quest_power_status |= (1 << MAGIC_LIGHT_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] = 1;
 	ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC] = level.time + duration;
 
 	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]));
+}
+
+// zyk: return the bonus resistance. If > 0, target resist the same element. If < 0, target is taking extra effect from opposite element
+float zyk_get_bonus_element_factor(gentity_t* attacker, gentity_t* target)
+{
+	if (attacker && target && attacker != target && attacker->client && target->client)
+	{
+		int magic_skill_levels[NUM_MAGIC_ELEMENTS];
+		int target_skill_level = 0, attacker_skill_level = 0;
+		zyk_magic_element_t target_element = target->client->pers.current_magic_element;
+		zyk_magic_element_t attacker_element = attacker->client->pers.current_magic_element;
+
+		magic_skill_levels[MAGICELEMENT_NONE] = 0;
+		magic_skill_levels[MAGICELEMENT_WATER] = SKILL_MAGIC_WATER_MAGIC;
+		magic_skill_levels[MAGICELEMENT_EARTH] = SKILL_MAGIC_EARTH_MAGIC;
+		magic_skill_levels[MAGICELEMENT_FIRE] = SKILL_MAGIC_FIRE_MAGIC;
+		magic_skill_levels[MAGICELEMENT_AIR] = SKILL_MAGIC_AIR_MAGIC;
+		magic_skill_levels[MAGICELEMENT_DARK] = SKILL_MAGIC_DARK_MAGIC;
+		magic_skill_levels[MAGICELEMENT_LIGHT] = SKILL_MAGIC_LIGHT_MAGIC;
+
+		target_skill_level = target->client->pers.skill_levels[magic_skill_levels[target_element]];
+		attacker_skill_level = attacker->client->pers.skill_levels[magic_skill_levels[attacker_element]];
+
+		if (target_element == attacker_element && target_element != MAGICELEMENT_NONE)
+		{ // zyk: being hit by magic from the same element. Resist based on current level of that elemental magic level subtracted by the attacker level
+			return (0.10 * ((target_skill_level + 1) - attacker_skill_level));
+		}
+		
+		if ((target_element == MAGICELEMENT_WATER && attacker_element == MAGICELEMENT_FIRE) || 
+			(target_element == MAGICELEMENT_EARTH && attacker_element == MAGICELEMENT_AIR) ||
+			(target_element == MAGICELEMENT_FIRE && attacker_element == MAGICELEMENT_WATER) ||
+			(target_element == MAGICELEMENT_AIR && attacker_element == MAGICELEMENT_EARTH) ||
+			(target_element == MAGICELEMENT_DARK && attacker_element == MAGICELEMENT_LIGHT) ||
+			(target_element == MAGICELEMENT_LIGHT && attacker_element == MAGICELEMENT_DARK))
+		{ // zyk: being hit by magic from the opposite element. Take extra bonus based on current level of that elemental magic level subtracted by the attacker level
+			return (-0.10 * ((attacker_skill_level + 1) - target_skill_level));
+		}
+	}
+
+	return 0.00;
 }
 
 // zyk: controls the quest powers stuff
@@ -5985,6 +6045,9 @@ void quest_power_events(gentity_t *ent)
 						{
 							int mp_to_drain = 1 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 							int max_player_mp = zyk_max_magic_power(ent);
+
+							// zyk: Elemental affinity
+							mp_to_drain -= (mp_to_drain * zyk_get_bonus_element_factor(ent, light_of_judgement_target));
 
 							// zyk: drains mp from target
 							if (light_of_judgement_target->client->pers.magic_power >= mp_to_drain)

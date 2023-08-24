@@ -4759,6 +4759,7 @@ vec3_t gPainPoint;
 extern void Jedi_Decloak( gentity_t *self );
 extern void Boba_FlyStop( gentity_t *self );
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
+extern float zyk_get_bonus_element_factor(gentity_t* attacker, gentity_t* target);
 void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
 	int			take, asave = 0, knockback;
@@ -5927,7 +5928,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				take = (int)ceil(take*0.55);
 		}
 
-		if (!targ->NPC && targ->client && targ->client->sess.amrpgmode == 2)
+		if (targ->client && (targ->client->sess.amrpgmode == 2 || targ->NPC))
 		{ // zyk: bonus resistance
 			float bonus_health_resistance = 0.00;
 
@@ -5960,12 +5961,28 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
+			// zyk: Elemental affinity. If taking damage from same element, decrease damage. If taking damage from opposite element, increase damage
+			bonus_health_resistance += zyk_get_bonus_element_factor(attacker, targ);
+
 			// zyk: Health Strength skill decreases damage taken
 			take = (int)ceil(take * (1.00 - bonus_health_resistance - (0.04 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH])));
 
 			if (take < 1)
 			{ // zyk: cannot make player fully absorb all damage
 				take = 1;
+			}
+
+			if (attacker && attacker->client && 
+				(attacker->client->sess.amrpgmode == 2 || attacker->NPC) &&
+				(attacker->client->pers.quest_power_status & (1 << MAGIC_WATER_MAGIC) || 
+				 attacker->client->pers.quest_power_status & (1 << MAGIC_DARK_MAGIC)))
+			{ // zyk: Water Magic and Dark Magic drain health from target
+				int heal_amount = take;
+
+				if ((attacker->health + heal_amount) < attacker->client->ps.stats[STAT_MAX_HEALTH])
+					attacker->health += heal_amount;
+				else
+					attacker->health = attacker->client->ps.stats[STAT_MAX_HEALTH];
 			}
 		}
 
@@ -6340,20 +6357,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					if (zyk_is_ally(quest_power_user, ent) == qtrue)
 					{
 						continue;
-					}
-
-					if (Q_stricmp(attacker->targetname, "zyk_magic_water") == 0 || Q_stricmp(attacker->targetname, "zyk_magic_dark") == 0)
-					{ // zyk: Water Magic and Dark Magic drain from target and heal the magic user
-						if (quest_power_user && quest_power_user->client && quest_power_user->health > 0 && 
-							zyk_can_hit_target(quest_power_user, ent) == qtrue && zyk_is_ally(quest_power_user, ent) == qfalse && ent->health > 0)
-						{
-							int heal_amount = (int)points;
-
-							if ((quest_power_user->health + heal_amount) < quest_power_user->client->ps.stats[STAT_MAX_HEALTH])
-								quest_power_user->health += heal_amount;
-							else
-								quest_power_user->health = quest_power_user->client->ps.stats[STAT_MAX_HEALTH];
-						}
 					}
 
 					// zyk: target will not be knocked back by these powers

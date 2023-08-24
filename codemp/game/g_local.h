@@ -1005,6 +1005,9 @@ typedef struct clientPersistant_s {
 	// zyk: if qtrue, must save player account with the updated inventory
 	qboolean rpg_inventory_modified;
 
+	// zyk: sets the current element with which the player has affinity
+	zyk_magic_element_t current_magic_element;
+
 	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
 	int quest_power_status;
 
