@@ -6359,8 +6359,8 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_CLOAK_UPGRADE][0] = 1100;
 	seller_items_cost[SELLER_CLOAK_UPGRADE][1] = 700;
 
-	seller_items_cost[SELLER_SHIELD_GENERATOR_UPGRADE][0] = 500;
-	seller_items_cost[SELLER_SHIELD_GENERATOR_UPGRADE][1] = 300;
+	seller_items_cost[SELLER_SHIELD_GENERATOR_UPGRADE][0] = 1000;
+	seller_items_cost[SELLER_SHIELD_GENERATOR_UPGRADE][1] = 500;
 
 	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][0] = 2000;
 	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][1] = 1000;
