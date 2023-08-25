@@ -188,21 +188,6 @@ char* zyk_skill_name(int skill_index)
 	return "";
 }
 
-// zyk: return the Elemental Spirit name
-char* zyk_get_spirit_name(zyk_main_quest_t spirit_value)
-{
-	char spirit_names[NUMBER_OF_MAGIC_SPIRITS][32] = {
-		"^4Water Spirit",
-		"^3Earth Spirit",
-		"^1Fire Spirit",
-		"^2Air Spirit",
-		"^6Dark Spirit",
-		"^5Light Spirit"
-	};
-
-	return G_NewString(spirit_names[spirit_value - (MAX_QUEST_MISSIONS - 7)]);
-}
-
 // zyk: returns the description of a RPG skill
 char* zyk_skill_description(int skill_index)
 {
@@ -2221,11 +2206,7 @@ void load_account(gentity_t* ent)
 
 			// zyk: Main Quest progress
 			fscanf(account_file, "%s", content);
-			ent->client->pers.main_quest_progress = atoi(content);
-
-			// zyk: Side Quest progress
-			fscanf(account_file, "%s", content);
-			ent->client->pers.side_quest_progress = atoi(content);
+			ent->client->pers.quest_progress = atoi(content);
 
 			// zyk: last health
 			fscanf(account_file, "%s", content);
@@ -2311,9 +2292,9 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
 				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.credits,
-				client->sess.magic_fist_selection, client->pers.main_quest_progress, client->pers.side_quest_progress,
+				client->sess.magic_fist_selection, client->pers.quest_progress,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
@@ -5574,8 +5555,8 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 
 		strcpy(content, va("%s%s", content, zyk_get_settings_values(ent)));
 
-		strcpy(content, va("%s%d-%d-%d-%d-", 
-			content, 0, ent->client->pers.main_quest_progress, ent->client->pers.side_quest_progress, MAX_QUEST_MISSIONS));
+		strcpy(content, va("%s%d-%d-%d-", 
+			content, 0, ent->client->pers.quest_progress, MAX_QUEST_MISSIONS));
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-NOCLASS-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
 	}
@@ -6051,7 +6032,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 			if (Q_stricmp( arg1, "rpg" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list inventory: ^7shows player inventory\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list inventory: ^7shows player inventory\n^2/list quests: ^7lists the quests\n^2/list custom: ^7lists custom quests\n^2/list commands: ^7lists the RPG Mode console commands\n\n\"");
 			}
 			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || 
 					Q_stricmp( arg1, "other" ) == 0 || Q_stricmp(arg1, "magic") == 0)
@@ -6085,31 +6066,31 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				if (zyk_allow_quests.integer == 1)
 				{
-					char quest_player[512];
-					char target_player[512];
-					int j = 0;
-
-					strcpy(quest_player, "");
-					strcpy(target_player, "");
-
-					for (j = 0; j < MAX_CLIENTS; j++)
-					{
-						gentity_t *player = &g_entities[j];
-
-						if (player && player->client && player->client->sess.amrpgmode == 2 && level.bounty_quest_choose_target == qfalse && player->s.number == level.bounty_quest_target_id)
-						{
-							strcpy(target_player, va("%s", player->client->pers.netname));
-						}
-					}
-
-					trap->SendServerCommand(ent->s.number, va("print \"\n^3RPG Mode Quests\n\n^3/list bounty: ^7The Bounty Hunter quest\n^3/list custom: ^7lists custom quests\n\n^3Quest Player: ^7%s\n^3Bounty Quest Target: ^7%s^7\n\n\"", quest_player, target_player));
+					trap->SendServerCommand(ent->s.number, va("print \"\n^3Quests\n\n\""));
 				}
 				else
+				{
 					trap->SendServerCommand(ent->s.number, "print \"\n^3RPG Mode Quests\n\n^1Quests are not allowed in this server^7\n\n\"");
+				}
 			}
 			else if (Q_stricmp( arg1, "bounty" ) == 0)
 			{
-				trap->SendServerCommand( ent->s.number, va("print \"\n^3Bounty Quest\n^7Use ^3/bountyquest ^7so the server chooses a player to be the target. If the target defeats a RPG player, he receives 200 bonus credits. If a bounty hunter kills the target, he receives bonus credits based in the target player level.\n\n\"") );
+				char target_player[64];
+				int j = 0;
+
+				strcpy(target_player, "");
+
+				for (j = 0; j < MAX_CLIENTS; j++)
+				{
+					gentity_t* player = &g_entities[j];
+
+					if (player && player->client && player->client->sess.amrpgmode == 2 && level.bounty_quest_choose_target == qfalse && player->s.number == level.bounty_quest_target_id)
+					{
+						strcpy(target_player, va("%s", player->client->pers.netname));
+					}
+				}
+
+				trap->SendServerCommand( ent->s.number, va("print \"\n^3Bounty Quest Target: ^7%s^7\n\n^3Bounty Quest\n^7Use ^3/bountyquest ^7so the server chooses a player to be the target. If the target defeats a RPG player, he receives 200 bonus credits. If a bounty hunter kills the target, he receives bonus credits based in the target player level.\n\n\"", target_player) );
 			}
 			else if (Q_stricmp(arg1, "custom") == 0)
 			{
@@ -12145,8 +12126,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 			if (Q_stricmp(arg2, "quests") == 0)
 			{
-				ent->client->pers.main_quest_progress = 0;
-				ent->client->pers.side_quest_progress = 0;
+				ent->client->pers.quest_progress = 0;
 
 				save_account(ent, qtrue);
 

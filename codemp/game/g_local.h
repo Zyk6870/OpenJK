@@ -605,7 +605,7 @@ typedef enum {
 	MAX_SELLER_ITEMS
 } zyk_seller_item_t;
 
-// zyk: Main Quest missions
+// zyk: Quest missions
 typedef enum {
 	QUEST_LILITH_TEMPLE,
 	QUEST_BEHEMOTH_TEMPLE,
@@ -616,7 +616,7 @@ typedef enum {
 	QUEST_WORLD_OF_DARKNESS,
 	QUEST_WORLD_OF_LIGHT,
 	MAX_QUEST_MISSIONS
-} zyk_main_quest_t;
+} zyk_quest_t;
 
 // zyk: maps used in quests will have their level.quest_map set to one of these values
 typedef enum {
@@ -1048,11 +1048,8 @@ typedef struct clientPersistant_s {
 	int current_quest_event;
 	int quest_event_timer;
 
-	// zyk: has bitvalue of each Main Quest task completed
-	int main_quest_progress;
-
-	// zyk: has bitvalue of each side quest tasks completed
-	int side_quest_progress;
+	// zyk: bitvalue for each quest mission completed
+	zyk_quest_t quest_progress;
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;

@@ -7359,7 +7359,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 22)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: our temples were took by evil forces, lead by the Emperor %s^7\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_EMPEROR_NAME));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: evil demon forces, lead by the Emperor %s^7, took over the world\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_EMPEROR_NAME));
 	}
 	if (ent->client->pers.tutorial_step == 23)
 	{
@@ -7367,7 +7367,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 24)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions, lesser demons, who took our temples.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions, lesser demons. They are residing in several places (maps) and giving power to the Emperor.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 25)
 	{
@@ -7375,15 +7375,15 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 26)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you defeat one of the demons, one of us can reside again in it and help you in your quest.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you can defeat them, the Emperor will lose part of his power for each demon defeated.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 27)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can try visiting many places (maps). The people there may help with side-quests.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Go to ^3t3_bounty^7. The people there are hiding from the evil forces, and will to help you.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 28)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are also many powerful hidden artifacts that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are also many powerful hidden weapons, armor and some other artifacts somewhere that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 29)
 	{
@@ -7391,7 +7391,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 30)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Save everything and bring back harmony to Nature!\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Save everything and bring back the balance to Nature!\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 
 		// zyk: end of tutorial
 		ent->client->pers.player_statuses &= ~(1 << 25);
