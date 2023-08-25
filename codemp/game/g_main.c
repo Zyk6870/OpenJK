@@ -7318,7 +7318,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 12)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To call the seller use ^3/callseller^7. Press the Use key on him for info on how to buy and sell stuff.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We are giving you the power to magically buy from the seller. To know how it works, use ^3/stuff^7\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 13)
 	{

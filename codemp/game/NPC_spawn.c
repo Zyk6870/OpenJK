@@ -1772,7 +1772,6 @@ finish:
 		newent->client->sess.amrpgmode = 0;
 		newent->client->pers.player_statuses = 0;
 		newent->client->pers.race_position = 0;
-		newent->client->pers.seller_invoked_by_id = -1;
 		newent->client->pers.stun_baton_less_speed_timer = 0;
 		newent->client->pers.send_event_timer = 0;
 		newent->client->pers.custom_quest_boss_npc = 0;

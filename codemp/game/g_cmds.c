@@ -6146,7 +6146,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			}
 			else if (Q_stricmp( arg1, "commands" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill. Passing ^3all ^7as parameter upgrades all skills.\n^3/down [skill number]: ^7downgrades a skill.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/callseller: ^7calls the jawa seller.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
+				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill. Passing ^3all ^7as parameter upgrades all skills.\n^3/down [skill number]: ^7downgrades a skill.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
 			}
 			else
 			{ // zyk: the player can also list the specific info of a skill passing the skill number as argument
@@ -6173,54 +6173,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 	}
 }
 
-/*
-==================
-Cmd_CallSeller_f
-==================
-*/
 extern gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboolean isVehicle );
-void Cmd_CallSeller_f( gentity_t *ent ) {
-	gentity_t *npc_ent = NULL;
-	int i = 0;
-	int seller_id = -1;
-
-	for (i = MAX_CLIENTS; i < level.num_entities; i++)
-	{
-		npc_ent = &g_entities[i];
-
-		if (npc_ent && npc_ent->client && npc_ent->NPC && Q_stricmp(npc_ent->NPC_type, "jawa_seller") == 0 && 
-			npc_ent->health > 0 && npc_ent->client->pers.seller_invoked_by_id == ent->s.number)
-		{ // zyk: found the seller of this player
-			seller_id = npc_ent->s.number;
-			break;
-		}
-	}
-
-	if (seller_id == -1)
-	{
-		npc_ent = NPC_SpawnType(ent,"jawa_seller",NULL,qfalse);
-		if (npc_ent)
-		{
-			npc_ent->client->pers.seller_invoked_by_id = ent->s.number;
-			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
-
-			trap->SendServerCommand( ent->s.number, "chat \"^3Jawa Seller: ^7Hello, friend! I have some products to sell.\"");
-		}
-		else
-		{
-			trap->SendServerCommand( ent->s.number, va("chat \"%s: ^7The seller couldn't come...\"", ent->client->pers.netname));
-		}
-	}
-	else
-	{ // zyk: seller of this player is already in the map, remove him
-		npc_ent = &g_entities[seller_id];
-
-		G_FreeEntity(npc_ent);
-
-		trap->SendServerCommand( ent->s.number, "chat \"^3Jawa Seller: ^7See you later, friend!\"");
-	}
-}
-
 int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 {
 	// zyk: costs to buy or sell for each seller item
@@ -12855,7 +12808,6 @@ command_t commands[] = {
 	{ "allyremove",			Cmd_AllyRemove_f,			CMD_NOINTERMISSION },
 	{ "bountyquest",		Cmd_BountyQuest_f,			CMD_RPG|CMD_NOINTERMISSION },
 	{ "buy",				Cmd_Buy_f,					CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
-	{ "callseller",			Cmd_CallSeller_f,			CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "callteamvote",		Cmd_CallTeamVote_f,			CMD_NOINTERMISSION },
 	{ "callvote",			Cmd_CallVote_f,				CMD_NOINTERMISSION },
 	{ "changepassword",		Cmd_ChangePassword_f,		CMD_LOGGEDIN|CMD_NOINTERMISSION },
