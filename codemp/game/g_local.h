@@ -1033,8 +1033,6 @@ typedef struct clientPersistant_s {
 	// zyk: player ids which are hitting the target player with magic
 	int magic_power_user_id[MAX_MAGIC_POWERS];
 
-	int dome_of_damage_dmg;
-
 	float black_hole_distance;
 	vec3_t black_hole_origin;
 
@@ -1049,7 +1047,7 @@ typedef struct clientPersistant_s {
 	int quest_event_timer;
 
 	// zyk: bitvalue for each quest mission completed
-	zyk_quest_t quest_progress;
+	int quest_progress;
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;

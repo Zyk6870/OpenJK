@@ -5349,11 +5349,8 @@ void enemy_weakening(gentity_t* ent)
 void dome_of_damage(gentity_t* ent)
 {
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]);
-	int damage = 4 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE];
 
 	ent->client->pers.current_magic_element = MAGICELEMENT_NONE;
-
-	ent->client->pers.dome_of_damage_dmg = damage;
 
 	ent->client->pers.quest_power_status |= (1 << MAGIC_DOME_OF_DAMAGE);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] = 0;
@@ -5623,7 +5620,9 @@ void quest_power_events(gentity_t *ent)
 			{
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] < level.time)
 				{
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dome", "4", "env/dome", 0, ent->client->pers.dome_of_damage_dmg, 290, 1000);
+					int damage = 4 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE];
+
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dome", "4", "env/dome", 0, damage, 290, 1000);
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] = level.time + 500;
 				}
@@ -7383,7 +7382,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 28)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are also many powerful hidden weapons, armor and some other artifacts somewhere that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are also many powerful legendary artifacts hidden somewhere that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 29)
 	{
