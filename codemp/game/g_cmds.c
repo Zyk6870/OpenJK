@@ -6827,7 +6827,6 @@ Cmd_Buy_f
 void Cmd_Buy_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	int value = 0;
-	int found = 0;
 
 	if (trap->Argc() == 1)
 	{
@@ -6849,28 +6848,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	{
 		trap->SendServerCommand( ent->s.number, "print \"Invalid product number.\n\"" );
 		return;
-	}
-	else
-	{ // zyk: searches for the jawa to see if we are near him to buy or sell to him
-		gentity_t *jawa_ent = NULL;
-		int j = 0;
-
-		for (j = MAX_CLIENTS; j < level.num_entities; j++)
-		{
-			jawa_ent = &g_entities[j];
-
-			if (jawa_ent && jawa_ent->client && jawa_ent->NPC && jawa_ent->health > 0 && Q_stricmp( jawa_ent->NPC_type, "jawa_seller" ) == 0 && (int)Distance(ent->client->ps.origin, jawa_ent->client->ps.origin) < 90)
-			{
-				found = 1;
-				break;
-			}
-		}
-
-		if (found == 0)
-		{
-			trap->SendServerCommand(ent->s.number, "print \"You must be near the jawa seller to buy from him.\n\"" );
-			return;
-		}
 	}
 
 	// zyk: general validations. Some items require certain conditions to be bought
@@ -7393,7 +7370,6 @@ Cmd_Sell_f
 void Cmd_Sell_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	int value = 0;
-	int found = 0;
 	int sold = 0;
 
 	if (trap->Argc() == 1)
@@ -7416,28 +7392,6 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"Invalid product number.\n\"" );
 		return;
-	}
-	else
-	{ // zyk: searches for the jawa to see if we are near him to buy or sell to him
-		gentity_t *jawa_ent = NULL;
-		int j = 0;
-
-		for (j = MAX_CLIENTS; j < level.num_entities; j++)
-		{
-			jawa_ent = &g_entities[j];
-
-			if (jawa_ent && jawa_ent->client && jawa_ent->NPC && jawa_ent->health > 0 && Q_stricmp( jawa_ent->NPC_type, "jawa_seller" ) == 0 && (int)Distance(ent->client->ps.origin, jawa_ent->client->ps.origin) < 90)
-			{
-				found = 1;
-				break;
-			}
-		}
-
-		if (found == 0)
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"You must be near the jawa seller to sell to him.\n\"" );
-			return;
-		}
 	}
 
 	if (value == (SELLER_BLASTER_PACK + 1) && ent->client->ps.ammo[AMMO_BLASTER] >= 50)

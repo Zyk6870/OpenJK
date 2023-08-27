@@ -753,9 +753,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// zyk: making case sensitive comparing so only low case quest map names will be set to play quests. This allows building these maps without conflicting with quests
 	if (zyk_allow_quests.integer > 0)
 	{
-		if (Q_strncmp(zyk_mapname, "t1_inter", 9) == 0)
+		if (Q_strncmp(zyk_mapname, "academy3", 9) == 0)
 		{
-			level.quest_map = QUESTMAP_HERO_HOUSE;
+			level.quest_map = QUESTMAP_LILITH_TEMPLE;
 		}
 		else if (Q_strncmp(zyk_mapname, "mp/siege_desert", 16) == 0 && g_gametype.integer == GT_FFA)
 		{
