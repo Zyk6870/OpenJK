@@ -6299,11 +6299,11 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][0] = 2000;
 	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][1] = 1000;
 
-	seller_items_cost[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR][0] = 2000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR][1] = 1000;
+	seller_items_cost[SELLER_DEFLECTIVE_ARMOR][0] = 2000;
+	seller_items_cost[SELLER_DEFLECTIVE_ARMOR][1] = 1000;
 
-	seller_items_cost[RPG_INVENTORY_UPGRADE_SABER_ARMOR][0] = 2000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_SABER_ARMOR][1] = 1000;
+	seller_items_cost[SELLER_SABER_ARMOR][0] = 2000;
+	seller_items_cost[SELLER_SABER_ARMOR][1] = 1000;
 
 	seller_items_cost[SELLER_FLAME_THROWER][0] = 1000;
 	seller_items_cost[SELLER_FLAME_THROWER][1] = 700;
