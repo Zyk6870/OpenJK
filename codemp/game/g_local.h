@@ -823,7 +823,7 @@ typedef enum {
 #define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
 #define QUESTCHAR_EMPEROR_NAME "^3Drakon"
 #define QUESTCHAR_MAINVILLAIN_NAME "^1Asmodeus"
-#define QUESTCHAR_MAINGOODENTITY_NAME "^5Metatron"
+#define QUESTCHAR_MAINGOODENTITY_NAME "^5Michael"
 
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
@@ -1785,9 +1785,6 @@ typedef struct level_locals_s {
 
 	// zyk: used to pass through each quest event
 	int quest_event_counter;
-
-	// zyk: spawn the quest stuff in this map
-	qboolean spawned_quest_stuff;
 
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];

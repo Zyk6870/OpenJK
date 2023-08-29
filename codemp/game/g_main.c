@@ -410,7 +410,7 @@ void zyk_quest_item_use(gentity_t *self, gentity_t* other, gentity_t* activator)
 // entity_type can be:
 // 0: model
 // 1: effect
-
+/*
 void zyk_load_quest_model(char *origin, char *angles, char *model_path, int spawnflags, char *mins, char *maxs, int model_scale, int count, int entity_type)
 {
 	gentity_t* new_ent = G_Spawn();
@@ -448,113 +448,7 @@ void zyk_load_quest_model(char *origin, char *angles, char *model_path, int spaw
 		new_ent->r.svFlags |= SVF_PLAYER_USABLE;
 	}
 }
-
-// zyk: spawn quest stuff (like models and npcs)
-// If load_quest_player_stuff is qfalse, load the default quest stuff. Oherwise, load the specific stuff of the current mission for the quest players
-void zyk_spawn_quest_stuff(qboolean load_quest_player_stuff)
-{
-	if (zyk_allow_quests.integer > 0)
-	{
-		if (level.quest_map == QUESTMAP_HERO_HOUSE)
-		{
-			if (load_quest_player_stuff == qfalse)
-			{
-				zyk_load_quest_model("295 -350 93", "0 0 0", "models/map_objects/nar_shaddar/book.md3", 1, "-8 -8 -8", "8 8 8", 100, 1, 0);
-			}
-		}
-		else if (level.quest_map == QUESTMAP_DESERT_CITY)
-		{
-			// zyk: spawning the citizens
-			if (load_quest_player_stuff == qfalse)
-			{
-				gentity_t* npc_ent = zyk_spawn_quest_npc("quest_citizen", 12253, -454, -486, 45, 1, 0);
-				zyk_set_quest_npc_events(npc_ent);
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 11893, -1262, -486, -179, 1, 1);
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 10183, -3482, -486, 15, 1, 2);
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 10354, -3528, -486, 90, 1, 3);
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 9895, -2367, -486, 60, 1, 4);
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 8748, 298, -230, 172, 1, 5);
-
-				npc_ent = zyk_spawn_quest_npc("quest_city_guard", 8918, -2460, 536, 45, 5, 6); // zyk: guard in one of the towers in the first area of the map
-
-				npc_ent = zyk_spawn_quest_npc("quest_city_guard", 8056, 452, 536, 15, 5, 7); // zyk: the other guard at the other tower in the first area
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 9189, 2528, -359, -179, 1, 8);
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 9755, 991, -486, -90, 5, 9); // zyk: npc near the stairs. Will unlock next Main Quest mission
-
-				npc_ent = zyk_spawn_quest_npc("quest_city_guard", 2355, -306, 376, -45, 5, 10); // zyk: guard in the second area
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 2453, -2353, -486, 179, 1, 11); // zyk: npc inside a building in second area
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 2442, 1269, -486, 0, 1, 12); // zyk: npc inside another building (with turrets) in second area
-
-				npc_ent = zyk_spawn_quest_npc("quest_city_guard", 3005, 530, -486, 90, 5, 13); // zyk: guard inside building with turrets in second area
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 2417, 1122, -486, 90, 1, 14); // zyk: npc in turrets building in second area
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 2417, 1223, -486, -90, 1, 15); // zyk: npc in turrets building in second area talking to the one above
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", -2020, -1286, -7, 90, 1, 16); // zyk: npc in arena
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", -2020, -312, -7, -90, 1, 17); // zyk: npc in arena
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", -2612, 254, 284, -60, 1, 18); // zyk: npc in arena sits
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", -3144, -1281, 268, 19, 1, 19); // zyk: npc in arena sits
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", -2591, -798, -7, 0, 1, 20); // zyk: npc in arena sits. The announcer
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", -6059, -2286, -487, -179, 1, 21); // zyk: npc locked in small room in third area. Will unlock a side quest
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", -7610, -1664, -369, 179, 1, 22); // zyk: npc inside building in third area
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", -9131, 662, -67, 97, 1, 23); // zyk: npc inside high building in third area
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", -6555, 1240, -390, -179, 1, 24); // zyk: npc inside building in third area
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", -7468, -1735, -487, 90, 1, 25); // zyk: npc talking to guard
-
-				npc_ent = zyk_spawn_quest_npc("quest_city_guard", -7468, -1599, -487, -90, 5, 26); // zyk: guard talking to npc
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", -8917, -2755, -487, 0, 1, 27); // zyk: npc in third area
-
-				npc_ent = zyk_spawn_quest_npc("quest_city_guard", -11007, -1045, 8, 0, 5, 28); // zyk: guard outside tower in third area
-
-				npc_ent = zyk_spawn_quest_npc("quest_city_guard", -11014, -118, 8, 0, 5, 29); // zyk: guard outside tower in third area
-
-				npc_ent = zyk_spawn_quest_npc("quest_city_guard_officer", -10852, -638, 8, 0, 5, 30); // zyk: officer inside tower in third area
-
-				npc_ent = zyk_spawn_quest_npc("quest_citizen", 10162, -3299, -487, -5, 1, 31); // zyk: seller. Will unlock the seller for the player
-
-				npc_ent = zyk_spawn_quest_npc("quest_city_guard", 12900, -909, -487, 158, 5, 32); // zyk: guard near entrance in first area
-
-				npc_ent = zyk_spawn_quest_npc("quest_city_guard", 12105, 617, -487, -97, 5, 33); // zyk: guard near entrance in first area
-			}
-		}
-	}
-}
-
-// zyk: remove all entities used in quests
-void zyk_clear_quest_stuff()
-{
-	int i = 0;
-
-	for (i = MAX_CLIENTS + BODY_QUEUE_SIZE; i < level.num_entities; i++)
-	{
-		gentity_t* this_ent = &g_entities[i];
-
-		if (this_ent && this_ent->spawnflags & (131072))
-		{ // zyk: remove quest entity
-			G_FreeEntity(this_ent);
-		}
-	}
-}
+*/
 
 /*
 ============
@@ -973,8 +867,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.last_spawned_entity = NULL;
 
 	level.ent_origin_set = qfalse;
-
-	level.spawned_quest_stuff = qfalse;
 
 	level.load_entities_timer = 0;
 	strcpy(level.load_entities_file,"");
@@ -1970,9 +1862,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	{ // zyk: if the default map music is empty (the map has no music) then set a default music
 		strcpy(level.default_map_music, "music/yavin2/yavtemp2_explore.mp3");
 	}
-
-	// zyk: loading quest map stuff, like npcs, models, etc
-	zyk_spawn_quest_stuff(qfalse);
 
 	zyk_create_dir(va("entities/%s", zyk_mapname));
 
@@ -9064,15 +8953,8 @@ void G_RunFrame( int levelTime ) {
 				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
 					level.quest_debounce_timer = level.time + 100;
 
-					if (level.spawned_quest_stuff == qfalse)
+					if (level.quest_map == QUESTMAP_LILITH_TEMPLE)
 					{
-						zyk_spawn_quest_stuff(qtrue);
-
-						level.spawned_quest_stuff = qtrue;
-					}
-
-					if (level.quest_map == QUESTMAP_HERO_HOUSE)
-					{ // zyk: Hero's House
 						
 					}
 				}
