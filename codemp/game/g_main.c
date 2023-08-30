@@ -8994,7 +8994,7 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				if (level.quest_map > QUESTMAP_NONE && level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && 
-					ent->client->ps.duelInProgress == qfalse && ent->health > 0 &&
+					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && level.quest_players_defeated[ent->s.number] == qfalse &&
 					level.quest_debounce_timer < level.time && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
 					int j = 0;

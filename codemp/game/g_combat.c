@@ -4813,6 +4813,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		{
 			return;
 		}
+
+		if (attacker->s.number < MAX_CLIENTS && level.quest_players_defeated[attacker->s.number] == qtrue && targ->NPC && targ->client->pers.quest_npc > 0)
+		{ // zyk: quest players who are already defeated cant hit quest npcs
+			return;
+		}
 	}
 
 	if (zyk_can_hit_target(attacker, targ) == qfalse)
