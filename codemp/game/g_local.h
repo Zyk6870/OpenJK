@@ -824,6 +824,7 @@ typedef enum {
 #define QUESTCHAR_EMPEROR_NAME "^3Drakon"
 #define QUESTCHAR_MAINVILLAIN_NAME "^1Asmodeus"
 #define QUESTCHAR_MAINGOODENTITY_NAME "^5Michael"
+#define QUESTCHAR_BOSS1 "^6Lilith"
 
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
@@ -1666,9 +1667,6 @@ typedef struct level_locals_s {
 	// zyk: determines if a target can be chosen now. Default qtrue
 	qboolean bounty_quest_choose_target;
 
-	// zyk: sets the map in which the player must complete a quest objective
-	int quest_map;
-
 	// zyk: default map music
 	char default_map_music[128];
 
@@ -1780,10 +1778,20 @@ typedef struct level_locals_s {
 	// zyk: current map name without the path from maps folder
 	char zykmapname[128];
 
+	// zyk: sets the map in which the player must complete a quest objective
+	int quest_map;
+
+	// zyk: has the entity id of some quest entities required for some tasks
+	int quest_special_entity_id1;
+	int quest_special_entity_id2;
+
 	// zyk: sets the interval between each quest event
 	int quest_debounce_timer;
+	int quest_timer;
 
 	// zyk: used to pass through each quest event
+	int quest_progress_counter;
+	int quest_tasks_completed;
 	int quest_event_counter;
 
 	char		mapname[MAX_QPATH];

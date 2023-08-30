@@ -4879,6 +4879,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		{
 			zyk_load_common_settings(ent);
 
+			ent->client->pers.quest_npc = 0;
 			ent->client->pers.sense_health_timer = 0;
 
 			ent->client->pers.thermal_vision = qfalse;

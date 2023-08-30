@@ -370,6 +370,58 @@ void zyk_set_quest_npc_magic(gentity_t* npc_ent, int magic_powers_levels[MAX_MAG
 	}
 }
 
+// zyk: similar to TeleportPlayer(), but this one doesnt spit the player out at the destination
+void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles) {
+	gentity_t* tent;
+	qboolean	isNPC = qfalse;
+
+	if (player->s.eType == ET_NPC)
+	{
+		isNPC = qtrue;
+	}
+
+	// use temp events at source and destination to prevent the effect
+	// from getting dropped by a second player event
+	if (player->client->sess.sessionTeam != TEAM_SPECTATOR) {
+		tent = G_TempEntity(player->client->ps.origin, EV_PLAYER_TELEPORT_OUT);
+		tent->s.clientNum = player->s.clientNum;
+
+		tent = G_TempEntity(origin, EV_PLAYER_TELEPORT_IN);
+		tent->s.clientNum = player->s.clientNum;
+	}
+
+	// unlink to make sure it can't possibly interfere with G_KillBox
+	trap->UnlinkEntity((sharedEntity_t*)player);
+
+	VectorCopy(origin, player->client->ps.origin);
+	player->client->ps.origin[2] += 1;
+
+	// set angles
+	SetClientViewAngle(player, angles);
+
+	// toggle the teleport bit so the client knows to not lerp
+	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
+
+	// kill anything at the destination
+	if (player->client->sess.sessionTeam != TEAM_SPECTATOR) {
+		G_KillBox(player);
+	}
+
+	// save results of pmove
+	BG_PlayerStateToEntityState(&player->client->ps, &player->s, qtrue);
+	if (isNPC)
+	{
+		player->s.eType = ET_NPC;
+	}
+
+	// use the precise origin for linking
+	VectorCopy(player->client->ps.origin, player->r.currentOrigin);
+
+	if (player->client->sess.sessionTeam != TEAM_SPECTATOR) {
+		trap->LinkEntity((sharedEntity_t*)player);
+	}
+}
+
 // zyk: spawns a quest npc and sets additional stuff, like levels, etc
 gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int level, int quest_npc_number)
 {
@@ -377,14 +429,22 @@ gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int
 
 	if (npc_ent && npc_ent->client)
 	{
+		vec3_t npc_origin, npc_angles;
+
 		npc_ent->client->pers.quest_npc = quest_npc_number;
 		npc_ent->client->pers.level = level;
-		npc_ent->client->pers.magic_power = level * 5;
-		npc_ent->client->ps.stats[STAT_MAX_HEALTH] += 10 * level;
+		npc_ent->client->pers.magic_power = level * 10;
+		npc_ent->NPC->stats.health += (10 * level);
+		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
+		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
 		// zyk: every quest stuff will have this spawnflag
 		npc_ent->spawnflags |= 131072;
+
+		VectorSet(npc_origin, x, y, z);
+		VectorSet(npc_angles, 0, yaw, 0);
+		zyk_TeleportPlayer(npc_ent, npc_origin, npc_angles);
 
 		return npc_ent;
 	}
@@ -642,7 +702,12 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	level.quest_map = QUESTMAP_NONE;
 	level.quest_debounce_timer = 0;
+	level.quest_timer = 0;
+	level.quest_progress_counter = 0;
 	level.quest_event_counter = 0;
+	level.quest_tasks_completed = 0;
+	level.quest_special_entity_id1 = -1;
+	level.quest_special_entity_id2 = -1;
 
 	// zyk: making case sensitive comparing so only low case quest map names will be set to play quests. This allows building these maps without conflicting with quests
 	if (zyk_allow_quests.integer > 0)
@@ -4481,58 +4546,6 @@ void NAV_CheckCalcPaths( void )
 int BG_GetTime(void)
 {
 	return level.time;
-}
-
-// zyk: similar to TeleportPlayer(), but this one doesnt spit the player out at the destination
-void zyk_TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
-	gentity_t	*tent;
-	qboolean	isNPC = qfalse;
-
-	if (player->s.eType == ET_NPC)
-	{
-		isNPC = qtrue;
-	}
-
-	// use temp events at source and destination to prevent the effect
-	// from getting dropped by a second player event
-	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-		tent = G_TempEntity( player->client->ps.origin, EV_PLAYER_TELEPORT_OUT );
-		tent->s.clientNum = player->s.clientNum;
-
-		tent = G_TempEntity( origin, EV_PLAYER_TELEPORT_IN );
-		tent->s.clientNum = player->s.clientNum;
-	}
-
-	// unlink to make sure it can't possibly interfere with G_KillBox
-	trap->UnlinkEntity ((sharedEntity_t *)player);
-
-	VectorCopy ( origin, player->client->ps.origin );
-	player->client->ps.origin[2] += 1;
-
-	// set angles
-	SetClientViewAngle( player, angles );
-
-	// toggle the teleport bit so the client knows to not lerp
-	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
-
-	// kill anything at the destination
-	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-		G_KillBox (player);
-	}
-
-	// save results of pmove
-	BG_PlayerStateToEntityState( &player->client->ps, &player->s, qtrue );
-	if (isNPC)
-	{
-		player->s.eType = ET_NPC;
-	}
-
-	// use the precise origin for linking
-	VectorCopy( player->client->ps.origin, player->r.currentOrigin );
-
-	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-		trap->LinkEntity ((sharedEntity_t *)player);
-	}
 }
 
 // zyk: function to kill npcs with the name as parameter
@@ -8948,14 +8961,70 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 				}
 
-				if (level.quest_map > QUESTMAP_NONE && zyk_allow_quests.integer > 0 && ent->client->ps.duelInProgress == qfalse && ent->health > 0 &&
+				if (level.quest_map > QUESTMAP_NONE && level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && 
+					ent->client->ps.duelInProgress == qfalse && ent->health > 0 &&
 					level.quest_debounce_timer < level.time && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
-					level.quest_debounce_timer = level.time + 100;
+					int j = 0;
 
+					level.quest_debounce_timer = level.time + 100;
+					
 					if (level.quest_map == QUESTMAP_LILITH_TEMPLE)
 					{
-						
+						if (level.quest_progress_counter == 0)
+						{
+							for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+							{
+								gentity_t* this_ent = &g_entities[j];
+
+								if (this_ent && Q_stricmp(this_ent->classname, "func_plat") == 0)
+								{ // zyk: the lift to the boss
+									level.quest_special_entity_id1 = this_ent->s.number;
+								}
+
+								if (this_ent && Q_stricmp(this_ent->targetname, "zyk_arena") == 0)
+								{ // zyk: the boss arena
+									level.quest_special_entity_id2 = this_ent->s.number;
+								}
+							}
+
+							trap->SendServerCommand(-1, va("chat \"%s^7: Oh! Someone is inside my temple!\n\"", QUESTCHAR_BOSS1));
+							level.quest_debounce_timer = level.time + 3000;
+							level.quest_progress_counter++;
+						}
+						else if (level.quest_progress_counter == 1)
+						{
+							trap->SendServerCommand(-1, va("chat \"%s^7: Hello my pretty! Defeat at least 20 of my minions...if you survive, I will do a proper reception! hehehehehe\n\"", QUESTCHAR_BOSS1));
+							level.quest_debounce_timer = level.time + 3000;
+							level.quest_progress_counter++;
+						}
+						else if (level.quest_progress_counter == 2)
+						{
+							if (ent->client->ps.groundEntityNum == level.quest_special_entity_id1 || ent->client->ps.groundEntityNum == level.quest_special_entity_id2)
+							{
+								if (level.quest_event_counter <= 25)
+								{
+									level.quest_event_counter++;
+
+									zyk_spawn_quest_npc("wind_demon", ent->r.currentOrigin[0], ent->r.currentOrigin[1] - 128, ent->r.currentOrigin[2] + 128, 90, 2, level.quest_event_counter);
+								}
+
+								if (level.quest_tasks_completed >= 20)
+								{
+									level.quest_progress_counter++;
+								}
+								else
+								{
+									level.quest_debounce_timer = level.time + 5000;
+								}
+							}
+						}
+						else if (level.quest_progress_counter == 3)
+						{
+							trap->SendServerCommand(-1, va("chat \"%s^7: Oh nice! You survived! So now prepare yourself for a nice surprise...hehehehehe!\n\"", QUESTCHAR_BOSS1));
+							level.quest_progress_counter++;
+							level.quest_debounce_timer = level.time + 2000;
+						}
 					}
 				}
 

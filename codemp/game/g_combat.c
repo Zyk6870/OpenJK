@@ -2182,6 +2182,14 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	self->client->pers.quest_power_status = 0;
 	self->client->pers.player_statuses &= ~(1 << 29);
 
+	if (self->client->pers.quest_npc > 0)
+	{
+		if (level.quest_map == QUESTMAP_LILITH_TEMPLE && Q_stricmp(self->NPC_type, "wind_demon") == 0)
+		{
+			level.quest_tasks_completed++;
+		}
+	}
+
 	if (self->client->pers.player_statuses & (1 << 28))
 	{ // zyk: custom quest npc defeated
 		if (self->client->playerTeam == NPCTEAM_PLAYER)
@@ -4877,7 +4885,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			damage = (int)ceil(damage * 1.09);
 	}
 
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
+	if (attacker && attacker->client && (attacker->client->sess.amrpgmode == 2 || (attacker->NPC && attacker->client->pers.quest_npc > 0)))
 	{ // zyk: bonus damage
 		// zyk: Magic bolts can damage heavy things
 		if (mod == MOD_MELEE && inflictor && (inflictor->s.weapon == WP_BOWCASTER || inflictor->s.weapon == WP_DEMP2 || inflictor->s.weapon == WP_CONCUSSION))
@@ -4888,6 +4896,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		if (attacker->client->pers.energy_modulator_mode == 1)
 		{ // zyk: Energy Modulator mode 1 increases damage
 			damage = (int)ceil(damage * 1.20);
+		}
+
+		if (attacker->NPC && attacker->client->pers.quest_npc > 0)
+		{ // zyk: increase damage of quest npcs based on their levels
+			damage = (int)ceil(damage * (1.00 + (0.02 * attacker->client->pers.level)));
 		}
 	}
 
