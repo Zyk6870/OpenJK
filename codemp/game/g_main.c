@@ -705,6 +705,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.quest_progress_counter = 0;
 	level.quest_event_counter = 0;
 	level.quest_tasks_completed = 0;
+	level.quest_map_restart = qfalse;
+	level.quest_map_restart_timer = 0;
 	level.quest_special_entity_id1 = -1;
 	level.quest_special_entity_id2 = -1;
 
@@ -979,6 +981,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			level.screen_message_timer[zyk_iterator] = 0;
 			level.ignored_players[zyk_iterator][0] = 0;
 			level.ignored_players[zyk_iterator][1] = 0;
+
+			level.quest_players_defeated[zyk_iterator] = qfalse;
 		}
 
 		for (zyk_iterator = 0; zyk_iterator < MAX_CUSTOM_QUESTS; zyk_iterator++)
@@ -8279,6 +8283,19 @@ void G_RunFrame( int levelTime ) {
 		}
 
 		level.load_entities_timer = 0;
+	}
+
+	if (level.quest_map_restart == qtrue && level.quest_map_restart_timer < level.time)
+	{ // zyk: do a full map restart if all RPG players are defeated
+		if (level.quest_map_restart_timer == 0)
+		{
+			trap->SendServerCommand(ent->s.number, "cp \"All RPG players defeated! Restarting map\"");
+			level.quest_map_restart_timer = level.time + 3000;
+		}
+		else
+		{
+			trap->SendConsoleCommand(EXEC_APPEND, va("map %s\n", level.zykmapname));
+		}
 	}
 
 	//

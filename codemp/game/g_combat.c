@@ -2299,6 +2299,34 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 	if (self->client->sess.amrpgmode == 2)
 	{
+		if (level.quest_map > QUESTMAP_NONE)
+		{
+			int j = 0;
+			int amount_of_rpg_players = 0, amount_of_defeated_rpg_players = 0;
+
+			level.quest_players_defeated[self->s.number] = qtrue;
+
+			for (j = 0; j < level.maxclients; j++)
+			{
+				gentity_t* player_ent = &g_entities[j];
+
+				if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+				{
+					amount_of_rpg_players++;
+
+					if (level.quest_players_defeated[player_ent->s.number] == qtrue)
+					{
+						amount_of_defeated_rpg_players++;
+					}
+				}
+			}
+
+			if (amount_of_defeated_rpg_players >= amount_of_rpg_players)
+			{ // zyk: all RPG players defeated in this quest map. Restart it
+				level.quest_map_restart = qtrue;
+			}
+		}
+
 		// zyk: player has the Resurrection Power, after completing quests in Challenge Mode. Uses mp. Not allowed in CTF gametype
 		/* zyk: disabled for now
 		if (self->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && self->client->pers.universe_quest_counter & (1 << 29) && g_gametype.integer != GT_CTF &&

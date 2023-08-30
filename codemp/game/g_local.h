@@ -1794,6 +1794,11 @@ typedef struct level_locals_s {
 	int quest_tasks_completed;
 	int quest_event_counter;
 
+	// zyk: when a player is defeated, it is set here. If all are defeated, quest is over in this map
+	qboolean quest_players_defeated[MAX_CLIENTS];
+	qboolean quest_map_restart;
+	int quest_map_restart_timer;
+
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];
 } level_locals_t;
