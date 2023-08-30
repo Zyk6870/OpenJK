@@ -708,7 +708,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.quest_map_restart = qfalse;
 	level.quest_map_restart_timer = 0;
 	level.quest_special_entity_id1 = -1;
-	level.quest_special_entity_id2 = -1;
 
 	// zyk: making case sensitive comparing so only low case quest map names will be set to play quests. This allows building these maps without conflicting with quests
 	if (zyk_allow_quests.integer > 0)
@@ -9013,11 +9012,6 @@ void G_RunFrame( int levelTime ) {
 								{ // zyk: the lift to the boss
 									level.quest_special_entity_id1 = this_ent->s.number;
 								}
-
-								if (this_ent && Q_stricmp(this_ent->targetname, "zyk_arena") == 0)
-								{ // zyk: the boss arena
-									level.quest_special_entity_id2 = this_ent->s.number;
-								}
 							}
 
 							trap->SendServerCommand(-1, va("chat \"%s^7: Oh! Someone is inside my temple!\n\"", QUESTCHAR_BOSS1));
@@ -9032,7 +9026,14 @@ void G_RunFrame( int levelTime ) {
 						}
 						else if (level.quest_progress_counter == 2)
 						{
-							if (ent->client->ps.groundEntityNum == level.quest_special_entity_id1 || ent->client->ps.groundEntityNum == level.quest_special_entity_id2)
+							gentity_t* ground_entity = NULL;
+
+							if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE && ent->client->ps.groundEntityNum != ENTITYNUM_WORLD)
+							{
+								ground_entity = &g_entities[ent->client->ps.groundEntityNum];
+							}
+
+							if (ground_entity && (level.quest_special_entity_id1 == ground_entity->s.number || Q_stricmp(ground_entity->targetname, "zyk_arena") == 0))
 							{
 								if (level.quest_event_counter <= 25)
 								{

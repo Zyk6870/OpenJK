@@ -1783,7 +1783,6 @@ typedef struct level_locals_s {
 
 	// zyk: has the entity id of some quest entities required for some tasks
 	int quest_special_entity_id1;
-	int quest_special_entity_id2;
 
 	// zyk: sets the interval between each quest event
 	int quest_debounce_timer;
