@@ -2184,7 +2184,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 	if (self->client->pers.quest_npc > 0)
 	{
-		if (level.quest_map == QUESTMAP_LILITH_TEMPLE && Q_stricmp(self->NPC_type, "wind_demon") == 0)
+		if (level.quest_map == QUESTMAP_LILITH_TEMPLE)
 		{
 			level.quest_tasks_completed++;
 		}

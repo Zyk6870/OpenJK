@@ -792,7 +792,7 @@ typedef enum {
 #define RPG_MAX_HEALTH_INCREASE 40
 
 // zyk: when casting magic, use anim for this amount of time in miliseconds
-#define MAGIC_ANIM_TIME 2000
+#define MAGIC_ANIM_TIME 1400
 
 // zyk: number of Elemental Spirits
 #define NUMBER_OF_MAGIC_SPIRITS 6

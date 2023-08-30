@@ -433,7 +433,6 @@ gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int
 
 		npc_ent->client->pers.quest_npc = quest_npc_number;
 		npc_ent->client->pers.level = level;
-		npc_ent->client->pers.magic_power = level * 10;
 		npc_ent->NPC->stats.health += (10 * level);
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
@@ -5167,23 +5166,39 @@ void Player_FireFlameThrower(gentity_t* self, qboolean is_magic)
 		traceEnt = &g_entities[entityList[e]];
 		if (traceEnt && traceEnt != self)
 		{
-			G_Damage(traceEnt, self, self, self->client->ps.viewangles, tr.endpos, damage, DAMAGE_NO_KNOCKBACK | DAMAGE_IGNORE_TEAM, MOD_LAVA);
+			qboolean is_ally = qfalse;
 
-			// zyk: make target catch fire
-			if (traceEnt->client)
+			if (traceEnt->s.number < level.maxclients && !self->NPC &&
+				zyk_is_ally(self, traceEnt) == qtrue)
+			{ // zyk: allies will not be hit
+				is_ally = qtrue;
+			}
+
+			if (OnSameTeam(self, traceEnt) == qtrue || npcs_on_same_team(self, traceEnt) == qtrue)
+			{ // zyk: if one of them is npc, also check for allies
+				is_ally = qtrue;
+			}
+
+			if (is_ally == qfalse)
 			{
-				if (is_magic == qtrue)
+				G_Damage(traceEnt, self, self, self->client->ps.viewangles, tr.endpos, damage, DAMAGE_NO_KNOCKBACK | DAMAGE_IGNORE_TEAM, MOD_LAVA);
+
+				// zyk: make target catch fire
+				if (traceEnt->client)
 				{
-					traceEnt->client->pers.fire_bolt_hits_counter = (4 * self->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
+					if (is_magic == qtrue)
+					{
+						traceEnt->client->pers.fire_bolt_hits_counter = (4 * self->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
+					}
+					else
+					{
+						traceEnt->client->pers.fire_bolt_hits_counter = 10;
+					}
+
+					traceEnt->client->pers.fire_bolt_user_id = self->s.number;
+					traceEnt->client->pers.fire_bolt_timer = level.time + 100;
+					traceEnt->client->pers.player_statuses |= (1 << 29);
 				}
-				else
-				{
-					traceEnt->client->pers.fire_bolt_hits_counter = 10;
-				}
-				
-				traceEnt->client->pers.fire_bolt_user_id = self->s.number;
-				traceEnt->client->pers.fire_bolt_timer = level.time + 100;
-				traceEnt->client->pers.player_statuses |= (1 << 29);
 			}
 		}
 		e++;
@@ -5224,7 +5239,7 @@ void magic_sense(gentity_t* ent)
 void healing_area(gentity_t* ent)
 {
 	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA]);
-	int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
+	int damage = ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 
 	ent->client->pers.current_magic_element = MAGICELEMENT_NONE;
 
@@ -9006,7 +9021,10 @@ void G_RunFrame( int levelTime ) {
 								{
 									level.quest_event_counter++;
 
-									zyk_spawn_quest_npc("wind_demon", ent->r.currentOrigin[0], ent->r.currentOrigin[1] - 128, ent->r.currentOrigin[2] + 128, 90, 2, level.quest_event_counter);
+									if (ent->client->ps.groundEntityNum == level.quest_special_entity_id1)
+										zyk_spawn_quest_npc("wind_demon", ent->r.currentOrigin[0], ent->r.currentOrigin[1] - 128, ent->r.currentOrigin[2] + 128, 90, 2, level.quest_event_counter);
+									else
+										zyk_spawn_quest_npc("fire_demon", ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2] + 128, 90, 2, level.quest_event_counter);
 								}
 
 								if (level.quest_tasks_completed >= 20)
@@ -9023,7 +9041,28 @@ void G_RunFrame( int levelTime ) {
 						{
 							trap->SendServerCommand(-1, va("chat \"%s^7: Oh nice! You survived! So now prepare yourself for a nice surprise...hehehehehe!\n\"", QUESTCHAR_BOSS1));
 							level.quest_progress_counter++;
-							level.quest_debounce_timer = level.time + 2000;
+							level.quest_debounce_timer = level.time + 3000;
+						}
+						else if (level.quest_progress_counter == 4)
+						{ // zyk: boss battle
+							zyk_spawn_quest_npc("boss_lilith", -1410, -640, 3180, 90, 20, 1001);
+
+							level.quest_progress_counter++;
+						}
+						else if (level.quest_progress_counter == 5)
+						{
+							vec3_t arena_center;
+
+							VectorSet(arena_center, -1410, -640, 3080);
+
+							if (Distance(ent->r.currentOrigin, arena_center) > 448)
+							{
+								trap->SendServerCommand(-1, va("chat \"%s^7: Leaving the arena? Not a good idea! hehehehehe!\n\"", QUESTCHAR_BOSS1));
+
+								G_Damage(ent, ent, ent, NULL, NULL, 100, 0, MOD_UNKNOWN);
+
+								level.quest_debounce_timer = level.time + 2000;
+							}
 						}
 					}
 				}
@@ -9392,32 +9431,115 @@ void G_RunFrame( int levelTime ) {
 				}
 			}
 
-			if (ent->health > 0 && Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy && ent->client->pers.quest_power_usage_timer < level.time)
-			{ // zyk: powers used by the quest_mage npc
-				int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
-				int first_magic_skill = SKILL_MAGIC_MAGIC_SENSE;
-				int current_magic_skill = first_magic_skill;
-
-				// zyk: adding all magic powers to this npc
-				while (current_magic_skill < NUMBER_OF_SKILLS)
+			if (ent->health > 0 && ent->enemy && ent->client->pers.quest_power_usage_timer < level.time)
+			{ // zyk: npcs with magic powers
+				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0)
 				{
-					if (ent->client->pers.skill_levels[current_magic_skill] < 1)
+					int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
+					int first_magic_skill = SKILL_MAGIC_MAGIC_SENSE;
+					int current_magic_skill = first_magic_skill;
+
+					// zyk: adding all magic powers to this npc
+					while (current_magic_skill < NUMBER_OF_SKILLS)
 					{
-						ent->client->pers.skill_levels[current_magic_skill] = zyk_max_skill_level(current_magic_skill);
+						if (ent->client->pers.skill_levels[current_magic_skill] < 1)
+						{
+							ent->client->pers.skill_levels[current_magic_skill] = zyk_max_skill_level(current_magic_skill);
+						}
+
+						current_magic_skill++;
 					}
 
-					current_magic_skill++;
-				}
+					// zyk: regen mp and level of this mage
+					if (ent->client->pers.magic_power < 20)
+					{
+						ent->client->pers.level = 100;
+						ent->client->pers.skill_levels[SKILL_MAX_MP] = zyk_max_skill_level(SKILL_MAX_MP) - 2;
+						ent->client->pers.magic_power = zyk_max_magic_power(ent);
+					}
 
-				// zyk: regen mp and level of this mage
-				if (ent->client->pers.magic_power < 20)
+					zyk_cast_magic(ent, first_magic_skill + random_magic);
+				}
+				else if (Q_stricmp(ent->NPC_type, "fire_demon") == 0)
 				{
-					ent->client->pers.level = 100;
-					ent->client->pers.skill_levels[SKILL_MAX_MP] = zyk_max_skill_level(SKILL_MAX_MP) - 2;
-					ent->client->pers.magic_power = zyk_max_magic_power(ent);
-				}
+					if (ent->client->pers.magic_power <= 50)
+					{
+						ent->client->pers.magic_power = 1000;
 
-				zyk_cast_magic(ent, first_magic_skill + random_magic);
+						ent->client->pers.quest_power_usage_timer = level.time + 3000;
+					}
+					else
+					{
+						ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] = 2;
+
+						zyk_cast_magic(ent, SKILL_MAGIC_FIRE_MAGIC);
+					}
+				}
+				else if (Q_stricmp(ent->NPC_type, "wind_demon") == 0)
+				{
+					if (ent->client->pers.magic_power <= 50)
+					{
+						ent->client->pers.magic_power = 1000;
+
+						ent->client->pers.quest_power_usage_timer = level.time + 3000;
+					}
+					else
+					{
+						ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] = 2;
+
+						zyk_cast_magic(ent, SKILL_MAGIC_AIR_MAGIC);
+					}
+				}
+				else if (Q_stricmp(ent->NPC_type, "boss_lilith") == 0)
+				{
+					if (level.quest_map == QUESTMAP_LILITH_TEMPLE)
+					{
+						vec3_t arena_center;
+
+						VectorSet(arena_center, -1410, -640, 3180);
+
+						if (Distance(ent->client->ps.origin, arena_center) > 550)
+						{
+							vec3_t npc_angles;
+
+							VectorSet(npc_angles, 0, 90, 0);
+
+							zyk_TeleportPlayer(ent, arena_center, npc_angles);
+
+							trap->SendServerCommand(-1, va("chat \"%s^7: I am back!!! hehehehehe!\n\"", QUESTCHAR_BOSS1));
+						}
+					}
+
+					if (ent->client->pers.magic_power <= 50)
+					{
+						ent->client->pers.magic_power = 5000;
+
+						ent->client->pers.quest_power_usage_timer = level.time + 3000;
+					}
+					else
+					{
+						int probability_for_magic = Q_irand(0, 100);
+
+						ent->client->pers.magic_power = 1000;
+
+						ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING] = 3;
+						ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] = 3;
+						ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] = 1;
+
+						if (probability_for_magic < 20)
+						{
+							zyk_cast_magic(ent, SKILL_MAGIC_ENEMY_WEAKENING);
+						}
+						else if (probability_for_magic < 50)
+						{
+							zyk_cast_magic(ent, SKILL_MAGIC_AIR_MAGIC);
+						}
+						else
+						{
+							zyk_cast_magic(ent, SKILL_MAGIC_FIRE_MAGIC);
+						}
+					}
+				}
 			}
 		}
 
