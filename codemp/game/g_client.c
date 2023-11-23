@@ -2511,8 +2511,6 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 	// zyk: initializing player_statuses value
 	client->pers.player_statuses = 0;
-	client->pers.custom_quest_print = 0;
-	client->pers.custom_quest_print_timer = 0;
 
 	// read or initialize the session data
 	if ( firstTime || level.newSession ) {

@@ -2156,7 +2156,6 @@ extern void zyk_NPC_Kill_f( char *name );
 extern gentity_t *Zyk_NPC_SpawnType(char *npc_type, int x, int y, int z, int yaw);
 extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
-extern void load_custom_quest_mission();
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
 	gentity_t* ent;
 	int			anim;
@@ -2187,48 +2186,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		if (level.quest_map == QUESTMAP_LILITH_TEMPLE)
 		{
 			level.quest_tasks_completed++;
-		}
-	}
-
-	if (self->client->pers.player_statuses & (1 << 28))
-	{ // zyk: custom quest npc defeated
-		if (self->client->playerTeam == NPCTEAM_PLAYER)
-		{
-			level.zyk_quest_ally_npc_count--;
-
-			if (level.zyk_quest_ally_npc_count == 0)
-			{ // zyk: all enemy npcs defeated
-				load_custom_quest_mission();
-
-				trap->SendServerCommand(-1, "chat \"^3Custom Quest: ^7Mission failed\n\"");
-			}
-		}
-		else
-		{
-			level.zyk_quest_npc_count--;
-
-			// zyk: increasing the number of steps done in this mission
-			zyk_set_quest_field(level.custom_quest_map, level.zyk_custom_quest_current_mission, "done", va("%d", atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, "done")) + 1));
-
-			if (level.zyk_quest_npc_count == 0)
-			{ // zyk: all enemy npcs defeated
-				level.zyk_hold_quest_mission = qfalse;
-			}
-		}
-	}
-
-	// zyk: if someone dies by a custom quest npc and it has the recovery field, recover some of its health
-	if (attacker && attacker->client && attacker && attacker->NPC && attacker->client->pers.player_statuses & (1 << 28))
-	{
-		int zyk_npc_recovery = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, "npcrecovery"));
-
-		if ((attacker->health + zyk_npc_recovery) < attacker->client->ps.stats[STAT_MAX_HEALTH])
-		{
-			attacker->health += zyk_npc_recovery;
-		}
-		else
-		{
-			attacker->health = attacker->client->ps.stats[STAT_MAX_HEALTH];
 		}
 	}
 

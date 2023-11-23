@@ -882,7 +882,7 @@ typedef struct clientPersistant_s {
 	// 25 - RPG Mode tutorial
 	// 26 - Using nofight command
 	// 27 - Has just lost his duel in Duel Tournament
-	// 28 - Custom Quest npc
+	// 28 - unused
 	// 29 - hit by Fire Bolt/Flame Thrower
 	int player_statuses;
 
@@ -895,9 +895,6 @@ typedef struct clientPersistant_s {
 	// zyk: if health, shield or mp changes, save it into account after this time in miliseconds
 	int save_stat_changes_timer;
 	qboolean save_stats_changes;
-
-	// zyk: setting this to 1 means the npc has the npcboss Custom Quest field
-	int custom_quest_boss_npc;
 
 	// zyk: used to backup player force powers before some event that does not allow them. They will be restored after event ends
 	int zyk_saved_force_powers;
@@ -918,12 +915,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: chat protection cooldown timer. After this time, player will be protected against damage
 	int chat_protection_timer;
-
-	// zyk: used to print all mission fields when editing a Custom Quest
-	int custom_quest_print;
-	int custom_quest_print_timer;
-	int custom_quest_quest_number;
-	int custom_quest_mission_number;
 
 	// zyk: timer to send events to client game
 	int send_event_timer;
@@ -1441,18 +1432,6 @@ typedef struct {
 // zyk: max matches a tournament may have
 #define MAX_DUEL_MATCHES 496
 
-// zyk: max amount of custom quests
-#define MAX_CUSTOM_QUESTS 64
-
-// zyk: max missions a custom quest can have
-#define MAX_CUSTOM_QUEST_MISSIONS 512
-
-// zyk: max lines of custom quest mission fields to send to client
-#define MAX_MISSION_FIELD_LINES 8
-
-// zyk: max fields a custom quest mission can have
-#define MAX_CUSTOM_QUEST_FIELDS 512
-
 typedef struct level_locals_s {
 	struct gclient_s	*clients;		// [maxclients]
 
@@ -1726,54 +1705,6 @@ typedef struct level_locals_s {
 
 	// zyk: amount of keys and values stored in this entity
 	int zyk_spawn_strings_values_count[ENTITYNUM_MAX_NORMAL];
-
-	// zyk: Custom Quests, missions and fields
-	char *zyk_custom_quest_missions[MAX_CUSTOM_QUESTS][MAX_CUSTOM_QUEST_MISSIONS][MAX_CUSTOM_QUEST_FIELDS];
-
-	// zyk: amounf of keys and values stored for each mission of each quest
-	int zyk_custom_quest_mission_values_count[MAX_CUSTOM_QUESTS][MAX_CUSTOM_QUEST_MISSIONS];
-
-	// zyk: amount of missions of each custom quest
-	int zyk_custom_quest_mission_count[MAX_CUSTOM_QUESTS];
-
-	// zyk: saves the current mission number of the quest loaded for the current map
-	int zyk_custom_quest_current_mission;
-
-	// zyk: custom quest timer
-	int zyk_custom_quest_timer;
-
-	// zyk: custom quest counter, used for keys that can have multiple values (text1, text2, etc)
-	int zyk_custom_quest_counter;
-
-	// zyk: origin point of the quest mission
-	vec3_t zyk_quest_mission_origin;
-
-	// zyk: radius from the quest mission origin point the player must be within for the mission to start
-	int zyk_quest_radius;
-
-	// zyk: do not pass the mission until a certain event has happened (e.g killing all quest npcs)
-	qboolean zyk_hold_quest_mission;
-
-	// zyk: amount of custom quest npcs still alive to be defeated
-	int zyk_quest_npc_count;
-
-	// zyk: amount of ally npcs
-	int zyk_quest_ally_npc_count;
-
-	// zyk: amount of items to get in the mission
-	int zyk_quest_item_count;
-
-	// zyk: if qfalse, any place in the map starts the quest mission
-	qboolean zyk_quest_test_origin;
-
-	// zyk: set an effect on the quest origin point
-	int zyk_custom_quest_effect_id;
-
-	// zyk: custom quest main fields. It will saved in the first quest file line. Order of fields: name, active (value: on or off), count (integer value, number of completed missions)
-	char* zyk_custom_quest_main_fields[MAX_CUSTOM_QUESTS][4];
-
-	// zyk: used to test if the current map is a custom quest one. Sets the custom quest id who will first be played in this map
-	int custom_quest_map;
 
 	// zyk: current map name without the path from maps folder
 	char zykmapname[128];

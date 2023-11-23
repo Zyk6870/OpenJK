@@ -520,7 +520,6 @@ extern void BG_ClearVehicleParseParms(void);
 gentity_t *SelectRandomDeathmatchSpawnPoint( qboolean isbot );
 void SP_info_jedimaster_start( gentity_t *ent );
 extern void zyk_create_dir(char *file_path);
-extern void load_custom_quest_mission();
 void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	int					i;
 	vmCvar_t	mapname;
@@ -883,10 +882,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// zyk: initializing race mode
 	level.race_mode = 0;
 
-	// zyk: initializing custom quest values
-	level.custom_quest_map = -1;
-	level.zyk_custom_quest_effect_id = -1;
-
 	// zyk: initializing bounty_quest_target_id value
 	level.bounty_quest_target_id = 0;
 	level.bounty_quest_choose_target = qtrue;
@@ -982,99 +977,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			level.ignored_players[zyk_iterator][1] = 0;
 
 			level.quest_players_defeated[zyk_iterator] = qfalse;
-		}
-
-		for (zyk_iterator = 0; zyk_iterator < MAX_CUSTOM_QUESTS; zyk_iterator++)
-		{ // zyk: initializing custom quest values
-			level.zyk_custom_quest_mission_count[zyk_iterator] = -1;
-
-			quest_file = fopen(va("zykmod/customquests/%d.txt", zyk_iterator), "r");
-			if (quest_file)
-			{
-				// zyk: initializes amount of quest missions
-				level.zyk_custom_quest_mission_count[zyk_iterator] = 0;
-
-				// zyk: reading the first line, which contains the main quest fields
-				if (fgets(content, sizeof(content), quest_file) != NULL)
-				{
-					int j = 0;
-					int k = 0; // zyk: current spawn string position
-					char field[256];
-
-					if (content[strlen(content) - 1] == '\n')
-						content[strlen(content) - 1] = '\0';
-
-					while (content[k] != '\0')
-					{
-						int l = 0;
-
-						// zyk: getting the field
-						while (content[k] != ';')
-						{
-							field[l] = content[k];
-
-							l++;
-							k++;
-						}
-						field[l] = '\0';
-						k++;
-
-						level.zyk_custom_quest_main_fields[zyk_iterator][j] = G_NewString(field);
-
-						j++;
-					}
-				}
-
-				while (fgets(content, sizeof(content), quest_file) != NULL)
-				{
-					int j = 0; // zyk: the current key/value being used
-					int k = 0; // zyk: current spawn string position
-
-					if (content[strlen(content) - 1] == '\n')
-						content[strlen(content) - 1] = '\0';
-
-					while (content[k] != '\0')
-					{
-						int l = 0;
-						char zyk_key[256];
-						char zyk_value[256];
-
-						// zyk: getting the key
-						while (content[k] != ';')
-						{
-							zyk_key[l] = content[k];
-
-							l++;
-							k++;
-						}
-						zyk_key[l] = '\0';
-						k++;
-
-						// zyk: getting the value
-						l = 0;
-						while (content[k] != ';')
-						{
-							zyk_value[l] = content[k];
-
-							l++;
-							k++;
-						}
-						zyk_value[l] = '\0';
-						k++;
-
-						// zyk: copying the key and value to the fields array
-						level.zyk_custom_quest_missions[zyk_iterator][level.zyk_custom_quest_mission_count[zyk_iterator]][j] = G_NewString(zyk_key);
-						level.zyk_custom_quest_missions[zyk_iterator][level.zyk_custom_quest_mission_count[zyk_iterator]][j + 1] = G_NewString(zyk_value);
-
-						j += 2;
-					}
-
-					level.zyk_custom_quest_mission_values_count[zyk_iterator][level.zyk_custom_quest_mission_count[zyk_iterator]] = j;
-					level.zyk_custom_quest_mission_count[zyk_iterator]++;
-				}
-
-				fclose(quest_file);
-			}
 		}
 	}
 
@@ -2022,9 +1924,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 		level.melee_arena_loaded = qtrue;
 	}
-
-	// zyk: setting map as a custom quest map if it has a mission
-	load_custom_quest_mission();
 }
 
 
@@ -6057,52 +5956,6 @@ void fire_bolt_hits(gentity_t* ent)
 	}
 }
 
-void zyk_print_custom_quest_info(gentity_t *ent)
-{
-	// zyk: show mission fields when player uses /customquest to print mission fields
-	if (ent->client->pers.custom_quest_print > 0 && ent->client->pers.custom_quest_print_timer < level.time)
-	{
-		char mission_content[MAX_STRING_CHARS];
-		int i = 2 * MAX_MISSION_FIELD_LINES * (ent->client->pers.custom_quest_print - 1);
-		int number_of_lines = MAX_MISSION_FIELD_LINES * (ent->client->pers.custom_quest_print - 1);
-		int quest_number = ent->client->pers.custom_quest_quest_number;
-		int mission_number = ent->client->pers.custom_quest_mission_number;
-		qboolean stop_printing = qtrue;
-
-		strcpy(mission_content, "");
-
-		while (i < level.zyk_custom_quest_mission_values_count[quest_number][mission_number])
-		{
-			if (number_of_lines == MAX_MISSION_FIELD_LINES * ent->client->pers.custom_quest_print)
-			{ // zyk: max of mission field lines per string array index
-				stop_printing = qfalse;
-				break;
-			}
-
-			strcpy(mission_content, va("%s^3%s: ^7%s\n", mission_content, level.zyk_custom_quest_missions[quest_number][mission_number][i], level.zyk_custom_quest_missions[quest_number][mission_number][i + 1]));
-			number_of_lines++;
-
-			i += 2;
-		}
-
-		if (stop_printing == qtrue)
-		{ // zyk: all info was printed, stop printing
-			ent->client->pers.custom_quest_print = 0;
-		}
-		else
-		{
-			ent->client->pers.custom_quest_print++;
-		}
-
-		// zyk: sends all mission info to client if there is info to print
-		if (Q_stricmp(mission_content, "") != 0)
-			trap->SendServerCommand(ent->s.number, va("print \"%s\"", mission_content));
-
-		// zyk: interval between each time part of the info is sent
-		ent->client->pers.custom_quest_print_timer = level.time + 200;
-	}
-}
-
 // zyk: checks if the player has already all artifacts
 extern void save_account(gentity_t *ent, qboolean save_char_file);
 
@@ -8712,8 +8565,6 @@ void G_RunFrame( int levelTime ) {
 				ent->client->pers.tutorial_timer = level.time + 5000;
 			}
 
-			zyk_print_custom_quest_info(ent);
-
 			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
 				
@@ -9082,242 +8933,6 @@ void G_RunFrame( int levelTime ) {
 								level.quest_debounce_timer = level.time + 2000;
 							}
 						}
-					}
-				}
-
-				if (level.custom_quest_map > -1 && level.zyk_custom_quest_timer < level.time && ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
-					(level.zyk_quest_test_origin == qfalse || Distance(ent->client->ps.origin, level.zyk_quest_mission_origin) < level.zyk_quest_radius))
-				{ // zyk: Custom Quest map
-					char *zyk_keys[5] = {"text", "npc", "item", "entfile", "" };
-					int j = 0;
-					qboolean still_has_keys = qfalse;
-
-					for (j = 0; j < 5; j++)
-					{ // zyk: testing each key and processing them when found in this mission
-						char *zyk_value = zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("%s%d", zyk_keys[j], level.zyk_custom_quest_counter));
-
-						if (Q_stricmp(zyk_value, "") != 0)
-						{ // zyk: there is a value for this key
-							char *zyk_map = zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("map%d", level.zyk_custom_quest_counter));
-
-							still_has_keys = qtrue;
-
-							if (Q_stricmp(level.zykmapname, zyk_map) == 0)
-							{ // zyk: this mission step is in this map
-								if (Q_stricmp(zyk_keys[j], "text") == 0)
-								{ // zyk: a text message
-									int zyk_timer = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("texttimer%d", level.zyk_custom_quest_counter)));
-
-									if (zyk_timer <= 0)
-									{
-										zyk_timer = 5000;
-									}
-
-									trap->SendServerCommand(-1, va("chat \"%s\n\"", zyk_value));
-									level.zyk_custom_quest_timer = level.time + zyk_timer;
-									level.zyk_custom_quest_counter++;
-
-									// zyk: increasing the number of steps done in this mission
-									zyk_set_quest_field(level.custom_quest_map, level.zyk_custom_quest_current_mission, "done", va("%d", atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, "done")) + 1));
-								}
-								else if (Q_stricmp(zyk_keys[j], "entfile") == 0)
-								{
-									char zykserverinfo[MAX_INFO_STRING] = { 0 };
-									char zyk_mapname[128] = { 0 };
-									int k = 0;
-
-									// zyk: getting mapname
-									trap->GetServerinfo(zykserverinfo, sizeof(zykserverinfo));
-									Q_strncpyz(zyk_mapname, Info_ValueForKey(zykserverinfo, "mapname"), sizeof(zyk_mapname));
-									strcpy(level.load_entities_file, va("zykmod/entities/%s/%s.txt", zyk_mapname, zyk_value));
-
-									// zyk: cleaning entities. Only the ones from the file will be in the map
-									for (k = (MAX_CLIENTS + BODY_QUEUE_SIZE); k < level.num_entities; k++)
-									{
-										gentity_t *target_ent = &g_entities[k];
-
-										if (target_ent)
-											G_FreeEntity(target_ent);
-									}
-
-									level.load_entities_timer = level.time + 1050;
-									level.zyk_custom_quest_counter++;
-									level.zyk_custom_quest_timer = level.time + 2000;
-
-									// zyk: increasing the number of steps done in this mission
-									zyk_set_quest_field(level.custom_quest_map, level.zyk_custom_quest_current_mission, "done", va("%d", atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, "done")) + 1));
-								}
-								else if (Q_stricmp(zyk_keys[j], "npc") == 0)
-								{ // zyk: npc battle
-									int zyk_timer = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npctimer%d", level.zyk_custom_quest_counter)));
-									int npc_count = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npccount%d", level.zyk_custom_quest_counter)));
-									int npc_yaw = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcyaw%d", level.zyk_custom_quest_counter)));
-									int k = 0;
-
-									if (zyk_timer <= 0)
-									{
-										zyk_timer = 1000;
-									}
-
-									if (npc_count <= 0)
-									{
-										npc_count = 1;
-									}
-
-									for (k = 0; k < npc_count; k++)
-									{
-										gentity_t *zyk_npc = NULL;
-										vec3_t zyk_vec;
-
-										if (sscanf(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcorigin%d", level.zyk_custom_quest_counter)), "%f %f %f", &zyk_vec[0], &zyk_vec[1], &zyk_vec[2]) != 3)
-										{ // zyk: if there was not a valid npcorigin, use the mission origin instead
-											VectorCopy(level.zyk_quest_mission_origin, zyk_vec);
-										}
-
-										zyk_npc = Zyk_NPC_SpawnType(zyk_value, zyk_vec[0], zyk_vec[1], zyk_vec[2], npc_yaw);
-
-										if (zyk_npc)
-										{
-											int zyk_enemy = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcenemy%d", level.zyk_custom_quest_counter)));
-											int zyk_ally = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcally%d", level.zyk_custom_quest_counter)));
-											int zyk_health = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npchealth%d", level.zyk_custom_quest_counter)));
-											int zyk_boss = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcboss%d", level.zyk_custom_quest_counter)));
-
-											zyk_npc->client->pers.player_statuses |= (1 << 28);
-
-											if (zyk_health > 0)
-											{ // zyk: custom npc health
-												zyk_npc->NPC->stats.health = zyk_health;
-												zyk_npc->client->ps.stats[STAT_MAX_HEALTH] = zyk_health;
-												zyk_npc->health = zyk_health;
-											}
-
-											if (zyk_enemy > 0)
-											{ // zyk: force it to be enemy
-												zyk_npc->client->playerTeam = NPCTEAM_ENEMY;
-												zyk_npc->client->enemyTeam = NPCTEAM_PLAYER;
-											}
-
-											if (zyk_ally > 0)
-											{ // zyk: force it to be ally
-												zyk_npc->client->playerTeam = NPCTEAM_PLAYER;
-												zyk_npc->client->enemyTeam = NPCTEAM_ENEMY;
-											}
-
-											if (zyk_boss > 0)
-											{ // zyk: set it as a Custom Quest boss
-												zyk_npc->client->pers.custom_quest_boss_npc = 1;
-											}
-
-											if (zyk_npc->client->playerTeam == NPCTEAM_PLAYER)
-											{ // zyk: if ally, must count this npc in the counter until mission ends
-												level.zyk_quest_ally_npc_count++;
-											}
-											else
-											{ // zyk: if any non-ally team, must count this npc in the counter and hold mission until all npcs are defeated
-												level.zyk_hold_quest_mission = qtrue;
-												level.zyk_quest_npc_count++;
-											}
-
-											zyk_set_quest_npc_abilities(zyk_npc);
-										}
-									}
-
-									level.zyk_custom_quest_timer = level.time + zyk_timer;
-									level.zyk_custom_quest_counter++;
-								}
-								else if (Q_stricmp(zyk_keys[j], "item") == 0)
-								{ // zyk: items to find
-									char *zyk_item_origin = zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("itemorigin%d", level.zyk_custom_quest_counter));
-									gentity_t *new_ent = G_Spawn();
-
-									zyk_set_entity_field(new_ent, "classname", G_NewString(zyk_value));
-									zyk_set_entity_field(new_ent, "spawnflags", "262144");
-									zyk_set_entity_field(new_ent, "origin", zyk_item_origin);
-
-									zyk_spawn_entity(new_ent);
-
-									level.zyk_quest_item_count++;
-
-									level.zyk_custom_quest_timer = level.time + 1000;
-									level.zyk_custom_quest_counter++;
-									level.zyk_hold_quest_mission = qtrue;
-								}
-							}
-							else
-							{ // zyk: will test map in the next step
-								level.zyk_custom_quest_counter++;
-							}
-						}
-					}
-
-					// zyk: no more fields to test, pass the mission
-					if (still_has_keys == qfalse && level.zyk_hold_quest_mission == qfalse)
-					{
-						int zyk_steps = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, "steps"));
-						int zyk_done = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, "done"));
-						int k = 0;
-						int zyk_prize = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, "prize"));
-
-						if (zyk_done >= zyk_steps)
-						{ // zyk: completed all steps of this mission
-							if (zyk_prize > 0)
-							{ // zyk: add this amount of credits to all players in quest area
-								for (k = 0; k < level.maxclients; k++)
-								{
-									gentity_t *zyk_ent = &g_entities[k];
-
-									if (zyk_ent && zyk_ent->client && zyk_ent->client->sess.amrpgmode == 2 && zyk_ent->client->sess.sessionTeam != TEAM_SPECTATOR && 
-										(level.zyk_quest_test_origin == qfalse || Distance(zyk_ent->client->ps.origin, level.zyk_quest_mission_origin) < level.zyk_quest_radius))
-									{ // zyk: only players in the quest area can receive the prize
-										add_credits(ent, zyk_prize);
-										trap->SendServerCommand(zyk_ent->s.number, va("chat \"^3Custom Quest: ^7Got ^2%d ^7credits\n\"", zyk_prize));
-									}
-								}
-							}
-
-							if ((level.zyk_custom_quest_current_mission + 1) >= level.zyk_custom_quest_mission_count[level.custom_quest_map])
-							{ // zyk: completed all missions, reset quest to the first mission
-								level.zyk_custom_quest_main_fields[level.custom_quest_map][2] = "0";
-							}
-							else
-							{
-								level.zyk_custom_quest_main_fields[level.custom_quest_map][2] = G_NewString(va("%d", level.zyk_custom_quest_current_mission + 1));
-							}
-
-							// zyk: reset the steps done for this mission
-							zyk_set_quest_field(level.custom_quest_map, level.zyk_custom_quest_current_mission, "done", "0");
-
-							for (k = 0; k < level.zyk_custom_quest_mission_values_count[level.custom_quest_map][level.zyk_custom_quest_current_mission] / 2; k++)
-							{ // zyk: goes through all keys of this mission to find the map keys with the current map and reset them
-								char *zyk_map = zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("donemap%d", k));
-
-								if (Q_stricmp(zyk_map, "") != 0)
-								{
-									zyk_set_quest_field(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("donemap%d", k), "zykremovekey");
-								}
-							}
-
-							trap->SendServerCommand(-1, "chat \"^3Custom Quest: ^7Mission complete\n\"");
-						}
-						else
-						{ // zyk: completed a step but not the entire mission yet, because some steps are in other maps
-							for (k = 0; k < level.zyk_custom_quest_mission_values_count[level.custom_quest_map][level.zyk_custom_quest_current_mission] / 2; k++)
-							{ // zyk: goes through all keys of this mission to find the map keys with the current map and set them as done
-								char *zyk_map = zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("map%d", k));
-
-								if (Q_stricmp(level.zykmapname, zyk_map) == 0)
-								{
-									zyk_set_quest_field(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("donemap%d", k), "yes");
-								}
-							}
-
-							trap->SendServerCommand(-1, "chat \"^3Custom Quest: ^7Objectives complete\n\"");
-						}
-
-						save_quest_file(level.custom_quest_map);
-
-						load_custom_quest_mission();
 					}
 				}
 			}

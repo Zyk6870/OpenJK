@@ -229,12 +229,6 @@ void NPC_ChoosePainAnimation( gentity_t *self, gentity_t *other, vec3_t point, i
 		return;
 	}
 
-	// zyk: Custom Quest boss will not have pain anim
-	if (self->client && self->client->pers.custom_quest_boss_npc > 0)
-	{
-		return;
-	}
-
 	if ( self->s.weapon == WP_THERMAL && self->client->ps.weaponTime > 0 )
 	{//don't interrupt thermal throwing anim
 		return;
