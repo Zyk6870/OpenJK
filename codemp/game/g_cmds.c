@@ -74,23 +74,12 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_FASTER_FORCE_REGEN] = 2;
 	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
-	max_skill_levels[SKILL_STUN_BATON] = 2;
-	max_skill_levels[SKILL_SABER] = 1;
-	max_skill_levels[SKILL_BLASTER_PISTOL] = 2;
-	max_skill_levels[SKILL_E11_BLASTER_RIFLE] = 2;
-	max_skill_levels[SKILL_DISRUPTOR] = 2;
-	max_skill_levels[SKILL_BOWCASTER] = 2;
-	max_skill_levels[SKILL_REPEATER] = 2;
-	max_skill_levels[SKILL_DEMP2] = 2;
-	max_skill_levels[SKILL_FLECHETTE] = 2;
-	max_skill_levels[SKILL_ROCKET_LAUNCHER] = 2;
-	max_skill_levels[SKILL_CONCUSSION_RIFLE] = 2;
-	max_skill_levels[SKILL_BRYAR_PISTOL] = 2;
-	max_skill_levels[SKILL_MELEE_SPEED] = 3;
-	max_skill_levels[SKILL_MELEE] = 3;
-
 	max_skill_levels[SKILL_MAX_HEALTH] = 10;
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
+	max_skill_levels[SKILL_MELEE] = 3;
+	max_skill_levels[SKILL_MELEE_SPEED] = 3;
+	max_skill_levels[SKILL_SABER] = 1;
+	max_skill_levels[SKILL_WEAPON_DAMAGE] = 10;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
 	max_skill_levels[SKILL_MAX_STAMINA] = 5;
 	max_skill_levels[SKILL_UNDERWATER] = 2;
@@ -145,23 +134,12 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_FASTER_FORCE_REGEN] = "Faster Force Regen";
 	skill_names[SKILL_FORCE_POWER] = "Force Power";
 
-	skill_names[SKILL_STUN_BATON] = "Stun Baton";
-	skill_names[SKILL_SABER] = "Saber Damage";
-	skill_names[SKILL_BLASTER_PISTOL] = "Blaster Pistol";
-	skill_names[SKILL_E11_BLASTER_RIFLE] = "E11 Blaster Rifle";
-	skill_names[SKILL_DISRUPTOR] = "Disruptor";
-	skill_names[SKILL_BOWCASTER] = "Bowcaster";
-	skill_names[SKILL_REPEATER] = "Repeater";
-	skill_names[SKILL_DEMP2] = "DEMP2";
-	skill_names[SKILL_FLECHETTE] = "Flechette";
-	skill_names[SKILL_ROCKET_LAUNCHER] = "Rocket Launcher";
-	skill_names[SKILL_CONCUSSION_RIFLE] = "Concussion Rifle";
-	skill_names[SKILL_BRYAR_PISTOL] = "Bryar Pistol";
-	skill_names[SKILL_MELEE_SPEED] = "Melee Punch Speed";
-	skill_names[SKILL_MELEE] = "Melee";
-
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
+	skill_names[SKILL_MELEE] = "Melee";
+	skill_names[SKILL_MELEE_SPEED] = "Melee Punch Speed";
+	skill_names[SKILL_SABER] = "Saber Damage";
+	skill_names[SKILL_WEAPON_DAMAGE] = "Weapon Damage";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
 	skill_names[SKILL_MAX_STAMINA] = "Max Stamina";
 	skill_names[SKILL_UNDERWATER] = "Underwater";
@@ -236,39 +214,18 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_FORCE_POWER)
 		return "increases the max force power you have. Necessary to allow you to use force powers and force-based skills";
 
-	if (skill_index == SKILL_STUN_BATON)
-		return va("attacks someone with a small electric charge. Has %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level. Can fire the flame thrower when using alternate fire. With Stun Baton Upgrade, it opens any door, even locked ones, and also decloaks enemies and decrease their moving speed for some seconds", zyk_stun_baton_damage.integer);
-	if (skill_index == SKILL_SABER)
-		return "increases Saber damage based on your current level";
-	if (skill_index == SKILL_BLASTER_PISTOL)
-		return va("the popular Star Wars pistol used by Han Solo in the movies. Normal fire is a single blaster shot, alternate fire allows you to fire a powerful charged shot. The pistol shot does %d damage. The charged shot causes a lot more damage depending on how much it was charged. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_blaster_pistol_damage.integer);
-	if (skill_index == SKILL_E11_BLASTER_RIFLE)
-		return va("the rifle used by the Storm Troopers. E11 shots do %d damage. Normal fire is a single shot, while the alternate fire is the rapid fire. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_e11_blaster_rifle_damage.integer);
-	if (skill_index == SKILL_DISRUPTOR)
-		return va("the sniper, used by the rodians ingame. Normal fire is a shot that causes %d damage, alternate fire allows zoom and a charged shot that when fully charged, causes %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_disruptor_damage.integer, zyk_disruptor_alt_damage.integer);
-	if (skill_index == SKILL_BOWCASTER)
-		return va("the famous weapon used by Chewbacca. Normal fire can be charged to fire up to 5 shots at once. It does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_bowcaster_damage.integer);
-	if (skill_index == SKILL_REPEATER)
-		return va("a powerful weapon with a rapid fire and a plasma bomb. Normal fire shoots the rapid fire, and does %d damage. Alt fire fires the plasma bomb and does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_repeater_damage.integer, zyk_repeater_alt_damage.integer);
-	if (skill_index == SKILL_DEMP2)
-		return va("a very powerful weapon against machine npc and some vehicles, causing more damage to them and stunning them. Normal fire does %d damage and alt fire can be charged and does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_demp2_damage.integer, zyk_demp2_alt_damage.integer);
-	if (skill_index == SKILL_FLECHETTE)
-		return va("this weapon is similar to a shotgun. Normal fire causes %d damage. Alt fire shoots 2 bombs and causes %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_flechette_damage.integer, zyk_flechette_alt_damage.integer);
-	if (skill_index == SKILL_ROCKET_LAUNCHER)
-		return va("a powerful explosive weapon. Normal fire shoots a rocket causing %d damage. Alt fire shoots a homing missile. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_rocket_damage.integer);
-	if (skill_index == SKILL_CONCUSSION_RIFLE)
-		return va("it shoots a powerful shot that has a big damage area. Alt fire shoots a ray similar to disruptor shots, but it can go through force fields and can throw the enemy on the ground. Normal fire does %d damage and alt fire does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_concussion_damage.integer, zyk_concussion_alt_damage.integer);
-	if (skill_index == SKILL_BRYAR_PISTOL)
-		return va("very similar to the blaster pistol, but this one has a better fire rate with normal shot. Does %d damage. Each level multiplies damage per amount of this weapon in inventory and per this skill level", zyk_blaster_pistol_damage.integer);
-	if (skill_index == SKILL_MELEE_SPEED)
-		return "Each level increases how fast you can punch with Melee";
-	if (skill_index == SKILL_MELEE)
-		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
-	
 	if (skill_index == SKILL_MAX_HEALTH)
 		return "Each level increases your max health";
 	if (skill_index == SKILL_HEALTH_STRENGTH)
 		return "Each level increases your health resistance to damage";
+	if (skill_index == SKILL_MELEE)
+		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
+	if (skill_index == SKILL_MELEE_SPEED)
+		return "Each level increases how fast you can punch with Melee";
+	if (skill_index == SKILL_SABER)
+		return "Increases Saber damage based on your current level";
+	if (skill_index == SKILL_WEAPON_DAMAGE)
+		return "Each level multiplies damage per amount of this weapon in your inventory and per this skill level";
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio";
 	if (skill_index == SKILL_MAX_STAMINA)
@@ -5866,11 +5823,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	{
 		zyk_list_category_skills(ent, target_ent, "^5", SKILL_JUMP, SKILL_FORCE_POWER, 18);
 	}
-	else if (Q_stricmp( arg1, "weapons" ) == 0)
-	{
-		zyk_list_category_skills(ent, target_ent, "^3", SKILL_STUN_BATON, SKILL_MELEE, 17);
-	}
-	else if (Q_stricmp( arg1, "other" ) == 0)
+	else if (Q_stricmp( arg1, "misc" ) == 0)
 	{
 		zyk_list_category_skills(ent, target_ent, "^7", SKILL_MAX_HEALTH, SKILL_RUN_SPEED, 15);
 	}
@@ -6033,10 +5986,9 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 			if (Q_stricmp( arg1, "rpg" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list weapons: ^7lists weapon skills\n^2/list other: ^7lists miscellaneous skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list inventory: ^7shows player inventory\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list misc: ^7lists miscellaneous skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list inventory: ^7shows player inventory\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n\n\"");
 			}
-			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || 
-					Q_stricmp( arg1, "other" ) == 0 || Q_stricmp(arg1, "magic") == 0)
+			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "misc" ) == 0 || Q_stricmp(arg1, "magic") == 0)
 			{
 				zyk_list_player_skills(ent, ent, G_NewString(arg1));
 			}
@@ -10189,7 +10141,7 @@ void Cmd_AdminList_f( gentity_t *ent ) {
 		}
 		else if (command_number == ADM_PLAYERS)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/players ^7to see info about the players. Use ^3/players <player name or ID> ^7to see RPG info of a player. Use ^3/players <player name or ID> ^7and a third argument (^3force,weapons,other,ammo,items^7) to see skill levels of the player\n\n\"" );
+			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/players ^7to see info about the players. Use ^3/players <player name or ID> ^7to see RPG info of a player. Use ^3/players <player name or ID> ^7and a third argument (^3force, misc, magic^7) to see skill levels of the player\n\n\"" );
 		}
 		else if (command_number == ADM_DUELARENA)
 		{
@@ -10616,8 +10568,7 @@ void Cmd_Players_f( gentity_t *ent ) {
 
 			trap->Argv( 2, arg2, sizeof( arg2 ) );
 
-			if (Q_stricmp(arg2, "force") == 0 || Q_stricmp(arg2, "weapons") == 0 || 
-				Q_stricmp(arg2, "other") == 0 || Q_stricmp(arg2, "magic") == 0)
+			if (Q_stricmp(arg2, "force") == 0 || Q_stricmp(arg2, "misc") == 0 || Q_stricmp(arg2, "magic") == 0)
 			{ // zyk: show skills of the player
 				zyk_list_player_skills(player_ent, ent, G_NewString(arg2));
 			}

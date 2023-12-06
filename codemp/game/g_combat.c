@@ -4693,7 +4693,7 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 	return qfalse;
 }
 
-// zyk: calculates weapon damage based on the weapon skill level and extra amount of this weapon in inventory
+// zyk: calculates weapon damage based on the weapon damage skill level and extra amount of this weapon in inventory
 int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int skill_index, int inventory_index)
 {
 	int final_dmg = base_dmg;

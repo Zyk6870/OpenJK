@@ -255,11 +255,11 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire, int weapon )
 	{ // zyk: bonus damage of the pistols
 		if (weapon == WP_BRYAR_PISTOL)
 		{
-			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_BLASTER_PISTOL, RPG_INVENTORY_WP_BLASTER_PISTOL);
+			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_BLASTER_PISTOL);
 		}
 		else if (weapon == WP_BRYAR_OLD)
 		{
-			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_BRYAR_PISTOL, RPG_INVENTORY_WP_BRYAR_PISTOL);
+			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_BRYAR_PISTOL);
 		}
 	}
 
@@ -410,7 +410,7 @@ void WP_FireBlasterMissile( gentity_t *ent, vec3_t start, vec3_t dir, qboolean a
 
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_E11_BLASTER_RIFLE, RPG_INVENTORY_WP_E11_BLASTER_RIFLE);
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_E11_BLASTER_RIFLE);
 	}
 
 	missile->damage = damage;
@@ -645,7 +645,7 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 
 			if (ent->client && ent->client->sess.amrpgmode == 2)
 			{ // zyk: Disruptor at higher levels causes more damage
-				damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_DISRUPTOR, RPG_INVENTORY_WP_DISRUPTOR);
+				damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_DISRUPTOR);
 			}
 
 			G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, DAMAGE_NORMAL, MOD_DISRUPTOR );
@@ -874,7 +874,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 					{
 						if (ent->client && ent->client->sess.amrpgmode == 2)
 						{
-							damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_DISRUPTOR, RPG_INVENTORY_WP_DISRUPTOR);
+							damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_DISRUPTOR);
 						}
 
 						G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage,
@@ -914,7 +914,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 
 				if (ent->client && ent->client->sess.amrpgmode == 2)
 				{
-					damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_DISRUPTOR, RPG_INVENTORY_WP_DISRUPTOR);
+					damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_DISRUPTOR);
 				}
 
 				G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, DAMAGE_NO_KNOCKBACK, MOD_DISRUPTOR_SNIPER );
@@ -1004,7 +1004,7 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 
 	if (ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_BOWCASTER, RPG_INVENTORY_WP_BOWCASTER);
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_BOWCASTER);
 	}
 
 	missile->damage = damage;
@@ -1093,7 +1093,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 
 		if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 		{
-			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_BOWCASTER, RPG_INVENTORY_WP_BOWCASTER);
+			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_BOWCASTER);
 		}
 
 		missile->damage = damage;
@@ -1144,7 +1144,7 @@ static void WP_RepeaterMainFire( gentity_t *ent, vec3_t dir )
 
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_REPEATER, RPG_INVENTORY_WP_REPEATER);
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_REPEATER);
 	}
 
 	missile->damage = damage;
@@ -1175,8 +1175,8 @@ static void WP_RepeaterAltFire( gentity_t *ent )
 
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_REPEATER, RPG_INVENTORY_WP_REPEATER);
-		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_REPEATER, RPG_INVENTORY_WP_REPEATER);
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_REPEATER);
+		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_REPEATER);
 	}
 
 	missile->damage = damage;
@@ -1253,7 +1253,7 @@ static void WP_DEMP2_MainFire( gentity_t *ent )
 
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_DEMP2, RPG_INVENTORY_WP_DEMP2);
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_DEMP2);
 	}
 
 	missile->damage = damage;
@@ -1497,7 +1497,7 @@ static void WP_DEMP2_AltFire( gentity_t *ent )
 
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_DEMP2, RPG_INVENTORY_WP_DEMP2);
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_DEMP2);
 	}
 
 	missile->splashDamage = missile->damage = damage;
@@ -1749,7 +1749,7 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 
 		if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 		{
-			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_FLECHETTE, RPG_INVENTORY_WP_FLECHETTE);
+			damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_FLECHETTE);
 		}
 
 		missile->damage = damage;
@@ -1888,8 +1888,8 @@ static void WP_CreateFlechetteBouncyThing( vec3_t start, vec3_t fwd, gentity_t *
 
 	if (self && self->client && self->client->sess.amrpgmode == 2)
 	{
-		damage = zyk_calculate_rpg_weapon_damage(self, damage, SKILL_FLECHETTE, RPG_INVENTORY_WP_FLECHETTE);
-		splash_damage = zyk_calculate_rpg_weapon_damage(self, splash_damage, SKILL_FLECHETTE, RPG_INVENTORY_WP_FLECHETTE);
+		damage = zyk_calculate_rpg_weapon_damage(self, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_FLECHETTE);
+		splash_damage = zyk_calculate_rpg_weapon_damage(self, splash_damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_FLECHETTE);
 	}
 
 	missile->damage = damage;
@@ -2190,8 +2190,8 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_ROCKET_LAUNCHER, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
-		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_ROCKET_LAUNCHER, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
+		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
 	}
 
 	missile->damage = damage;
@@ -3485,7 +3485,7 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 
 					if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 					{
-						damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_CONCUSSION_RIFLE, RPG_INVENTORY_WP_CONCUSSION);
+						damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_CONCUSSION);
 					}
 
 					noKnockBack = (traceEnt->flags&FL_NO_KNOCKBACK);//will be set if they die, I want to know if it was on *before* they died
@@ -3671,8 +3671,8 @@ static void WP_FireConcussion( gentity_t *ent )
 
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
 	{
-		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_CONCUSSION_RIFLE, RPG_INVENTORY_WP_CONCUSSION);
-		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_CONCUSSION_RIFLE, RPG_INVENTORY_WP_CONCUSSION);
+		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_CONCUSSION);
+		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_CONCUSSION);
 	}
 
 	missile->damage = damage;
@@ -3778,7 +3778,7 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 		// zyk: stun baton in RPG mode does more damage
 		if (ent->client->sess.amrpgmode == 2)
 		{
-			G_Damage( tr_ent, ent, ent, forward, tr.endpos, zyk_calculate_rpg_weapon_damage(ent, zyk_stun_baton_damage.integer, SKILL_STUN_BATON, RPG_INVENTORY_WP_STUN_BATON), (DAMAGE_NO_KNOCKBACK | DAMAGE_HALF_ABSORB), MOD_STUN_BATON);
+			G_Damage( tr_ent, ent, ent, forward, tr.endpos, zyk_calculate_rpg_weapon_damage(ent, zyk_stun_baton_damage.integer, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_STUN_BATON), (DAMAGE_NO_KNOCKBACK | DAMAGE_HALF_ABSORB), MOD_STUN_BATON);
 		}
 		else
 		{
