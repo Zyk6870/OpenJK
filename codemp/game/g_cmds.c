@@ -5761,15 +5761,14 @@ void Cmd_DownSkill_f( gentity_t *ent ) {
 }
 
 // zyk: used to format text when player wants to list skills
-char* zyk_add_whitespaces(int skill_index, int biggest_skill_name_length)
+char* zyk_add_whitespaces(int number_of_whitespaces)
 {
 	char result_text[MAX_STRING_CHARS];
-	int skill_name_length = strlen(zyk_skill_name(skill_index));
 	int i = 0;
 
 	strcpy(result_text, "");
 
-	for (i = 0; i < (biggest_skill_name_length - skill_name_length); i++)
+	for (i = 0; i < number_of_whitespaces; i++)
 	{
 		// zyk: adds a whitespace at the end of the current string
 		strcpy(result_text, va("%s ", result_text));
@@ -5779,31 +5778,48 @@ char* zyk_add_whitespaces(int skill_index, int biggest_skill_name_length)
 }
 
 // zyk: lists skills from a specific category
-void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, char *skill_color, int lowest_skill_index, int highest_skill_index, int number_of_whitespaces)
+void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, int lowest_skill_index, int highest_skill_index)
 {
 	char message[1024];
+	char current_column[64];
 	char final_chars[32];
+	char skill_number_value[8];
 	int i = 0;
 	int current_skill_index = lowest_skill_index;
 	int skill_count = (highest_skill_index - lowest_skill_index) + 1;
+	int number_of_whitespaces = 0;
+	int max_column_size = 32;
 
 	strcpy(message, "");
 	strcpy(final_chars, "");
+	strcpy(skill_number_value, "");
 
 	while (i < skill_count)
 	{
+		if ((current_skill_index + 1) < 10)
+		{ // zyk: add an extra space to keep the skills aligned when printing them in console
+			strcpy(skill_number_value, va(" %d", (current_skill_index + 1)));
+		}
+		else
+		{
+			strcpy(skill_number_value, va("%d", (current_skill_index + 1)));
+		}
+
+		strcpy(current_column, va("^3%s - ^7%s: ^5%d/%d", skill_number_value, zyk_skill_name(current_skill_index),
+			ent->client->pers.skill_levels[current_skill_index], zyk_max_skill_level(current_skill_index)));
+
 		if ((i % 2) == 0)
 		{ // zyk: adds whitespaces in first column
-			strcpy(final_chars, va("%s ", zyk_add_whitespaces(current_skill_index, number_of_whitespaces)));
+			number_of_whitespaces = max_column_size - strlen(current_column) + 6; // zyk: adds 6 which are the color chars that will not appear in console
+
+			strcpy(final_chars, va("%s ", zyk_add_whitespaces(number_of_whitespaces)));
 		}
 		else
 		{
 			strcpy(final_chars, "\n");
 		}
 
-		strcpy(message, va("%s%s%d - %s: %d/%d%s", message,
-			skill_color, (current_skill_index + 1), zyk_skill_name(current_skill_index),
-			ent->client->pers.skill_levels[current_skill_index], zyk_max_skill_level(current_skill_index), final_chars));
+		strcpy(message, va("%s%s%s", message, current_column, final_chars));
 
 		current_skill_index++;
 		i++;
@@ -5814,22 +5830,22 @@ void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, char *skill
 		strcpy(message, va("%s\n", message));
 	}
 
-	trap->SendServerCommand(target_ent->s.number, va("print \"%s\"", message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n%s^7\n\"", message));
 }
 
 void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 {
 	if (Q_stricmp( arg1, "force" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^5", SKILL_JUMP, SKILL_FORCE_POWER, 18);
+		zyk_list_category_skills(ent, target_ent, SKILL_JUMP, SKILL_FORCE_POWER);
 	}
 	else if (Q_stricmp( arg1, "misc" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^7", SKILL_MAX_HEALTH, SKILL_RUN_SPEED, 15);
+		zyk_list_category_skills(ent, target_ent, SKILL_MAX_HEALTH, SKILL_RUN_SPEED);
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, "^2", SKILL_MAGIC_FIST, SKILL_MAGIC_LIGHT_MAGIC, 18);
+		zyk_list_category_skills(ent, target_ent, SKILL_MAGIC_FIST, SKILL_MAGIC_LIGHT_MAGIC);
 	}
 }
 
