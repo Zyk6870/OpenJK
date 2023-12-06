@@ -1422,34 +1422,18 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 	// zyk: Stamina
 	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.stamina_timer < level.time && ent->health > 0)
 	{
-		if (ent->client->pers.stamina_out_timer > level.time ||
-			(!(ent->client->ps.pm_flags & PMF_DUCKED) &&
-			   ucmd->forwardmove == 0 && ucmd->rightmove == 0 && ucmd->upmove == 0 &&
-			   actionPressed == qfalse &&
-			   ent->client->ps.weaponstate == WEAPON_READY))
-		{ // zyk: Idle player, recovering Stamina
-			int stamina_recovery = 1 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA];
+		int stamina_recovery = 1 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA];
 
-			if (ent->client->pers.stamina_out_timer <= level.time)
-			{ // zyk: only consume or recover stamina if player did not pass out
-				if (ent->client->ps.legsAnim == BOTH_MEDITATE)
-				{ // zyk: meditating recovers stamina
-					zyk_set_stamina(ent, 10 * stamina_recovery, qtrue);
-				}
-				else
-				{ // zyk: idle, consumes a bit of stamina
-					zyk_set_stamina(ent, 1, qfalse);
-
-					zyk_stamina_out(ent);
-				}
-			}
-			else
-			{ // zyk: player passed out, recover some stamina
-				zyk_set_stamina(ent, 100 * stamina_recovery, qtrue);
-			}
+		if (ent->client->pers.stamina_out_timer > level.time)
+		{ // zyk: passed out, recover some stamina
+			zyk_set_stamina(ent, 100 * stamina_recovery, qtrue);
 		}
-		else if (ent->client->pers.stamina_out_timer <= level.time)
-		{ // zyk: not Idle, reducing Stamina
+		else if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+		{ // zyk: meditating, recover some stamina
+			zyk_set_stamina(ent, 10 * stamina_recovery, qtrue);
+		}
+		else
+		{ // zyk: consumes a bit of stamina, even when player is idle
 			zyk_set_stamina(ent, 1, qfalse);
 
 			zyk_stamina_out(ent);
