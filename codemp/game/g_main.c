@@ -5826,20 +5826,6 @@ void quest_power_events(gentity_t *ent)
 						ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC]--;
 					}
 
-					if (Distance(ent->client->ps.origin, ent->client->pers.light_of_judgement_origin) < ent->client->pers.light_of_judgement_distance)
-					{ // zyk: while inside the light, you slowly regen health
-						int heal_amount = 1 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
-
-						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
-						{
-							ent->health += heal_amount;
-						}
-						else
-						{
-							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
-						}
-					}
-
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
 						light_of_judgement_target = &g_entities[zyk_it];

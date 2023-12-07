@@ -258,7 +258,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
 		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
-		return "creates a lightning dome that damages enemies nearby. Protects you with a shield that reduces damage and protects from some force powers. Creates a big shining light around you. While inside the light, enemies will get confused/stunned and will have their MP drained to restore your MP. While inside the light, you slowly get health, take less damage and any attacker who hits you gets knocked down";
+		return "creates a lightning dome that damages enemies nearby. Protects you with a shield that reduces damage and protects from some force powers. Creates a big shining light around you. While inside the light, enemies will get confused/stunned and will have their MP drained to restore your MP. While inside the light, you take less damage and any attacker who hits you gets knocked down";
 
 	return "";
 }
