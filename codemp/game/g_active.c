@@ -2561,7 +2561,7 @@ void ClientThink_real( gentity_t *ent ) {
 			client->ps.speed *= 2;
 		}
 
-		if (client->pers.quest_power_status & (1 << MAGIC_HIT_BY_AIR))
+		if (client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_AIR))
 		{ // zyk: hit by Air Magic. Decrease speed
 			client->ps.speed /= 2;
 		}
@@ -2602,7 +2602,7 @@ void ClientThink_real( gentity_t *ent ) {
 			zyk_player_speed *= 0.2f;
 		}
 
-		if (client->pers.quest_power_status & (1 << MAGIC_HIT_BY_AIR))
+		if (client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_AIR))
 		{ // zyk: hit by Air Magic. Decrease speed
 			zyk_player_speed /= 2;
 		}

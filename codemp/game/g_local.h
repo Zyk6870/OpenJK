@@ -656,11 +656,16 @@ typedef enum {
 	MAGIC_AIR_MAGIC,
 	MAGIC_DARK_MAGIC,
 	MAGIC_LIGHT_MAGIC,
+	MAX_MAGIC_POWERS
+} zyk_magic_t;
+
+// zyk: flags set when someone is hit by some magic powers
+typedef enum {
 	MAGIC_HIT_BY_FIRE,
 	MAGIC_HIT_BY_AIR,
 	MAGIC_HIT_BY_ENEMY_WEAKENING,
-	MAX_MAGIC_POWERS
-} zyk_magic_t;
+	MAX_HIT_BY_MAGIC
+} zyk_hit_by_magic_t;
 
 typedef enum {
 	SKILL_JUMP,
@@ -994,6 +999,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
 	int quest_power_status;
+
+	// zyk: bitvalue. If this player is hit by some enemy magic, set a flag
+	int hit_by_magic;
 
 	// zyk: cooldown between quest power uses
 	int quest_power_usage_timer;

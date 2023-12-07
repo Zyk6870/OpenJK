@@ -4802,10 +4802,7 @@ zyk_magic_element_t zyk_get_magic_element(int magic_number)
 		MAGICELEMENT_FIRE,
 		MAGICELEMENT_AIR,
 		MAGICELEMENT_DARK,
-		MAGICELEMENT_LIGHT,
-		MAGICELEMENT_FIRE,
-		MAGICELEMENT_AIR,
-		MAGICELEMENT_NONE
+		MAGICELEMENT_LIGHT
 	};
 
 	for (i = 0; i < MAX_MAGIC_POWERS; i++)
@@ -5405,7 +5402,7 @@ void quest_power_events(gentity_t *ent)
 						{
 							player_ent->client->pers.magic_power_debounce_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] = 0;
 							player_ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] = level.time + duration;
-							player_ent->client->pers.quest_power_status |= (1 << MAGIC_HIT_BY_ENEMY_WEAKENING);
+							player_ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_ENEMY_WEAKENING);
 
 							G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh10.mp3"));
 						}
@@ -5420,7 +5417,7 @@ void quest_power_events(gentity_t *ent)
 				}
 			}
 
-			if (ent->client->pers.quest_power_status & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
+			if (ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
 			{
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] < level.time)
 				{
@@ -5431,7 +5428,7 @@ void quest_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] < level.time)
 				{
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_HIT_BY_ENEMY_WEAKENING);
+					ent->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_ENEMY_WEAKENING);
 				}
 			}
 
@@ -5620,7 +5617,7 @@ void quest_power_events(gentity_t *ent)
 				}
 			}
 
-			if (ent->client->pers.quest_power_status & (1 << MAGIC_HIT_BY_FIRE))
+			if (ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_FIRE))
 			{
 				if (ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] > 0 && ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_FIRE] < level.time)
 				{
@@ -5641,7 +5638,7 @@ void quest_power_events(gentity_t *ent)
 				}
 				else if (ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] == 0 && ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_FIRE] < level.time)
 				{
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_HIT_BY_FIRE);
+					ent->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_FIRE);
 				}
 			}
 
@@ -5696,11 +5693,11 @@ void quest_power_events(gentity_t *ent)
 				}
 			}
 
-			if (ent->client->pers.quest_power_status & (1 << MAGIC_HIT_BY_AIR))
+			if (ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_AIR))
 			{
 				if (ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_AIR] < level.time)
 				{
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_HIT_BY_AIR);
+					ent->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_AIR);
 				}
 			}
 

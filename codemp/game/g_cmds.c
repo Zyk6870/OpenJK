@@ -4405,7 +4405,7 @@ void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
 	}
 	else
 	{
-		if (ent->client->pers.quest_power_status & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
+		if (ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
 		{ // zyk: Enemy Weakening decreases Stamina faster
 			amount *= 2;
 		}
@@ -4843,6 +4843,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.thermal_vision_cooldown_time = 0;
 
 			ent->client->pers.quest_power_status = 0;
+			ent->client->pers.hit_by_magic = 0;
 
 			// zyk: used to add a cooldown between each flame
 			ent->client->cloakDebReduce = 0;
@@ -10844,10 +10845,7 @@ int zyk_get_magic_cost(int magic_number)
 		30, // Fire Magic
 		30, // Air Magic
 		30, // Dark Magic
-		30, // Light Magic
-		0,
-		0,
-		0
+		30 // Light Magic
 	};
 
 	return magic_costs[magic_number];

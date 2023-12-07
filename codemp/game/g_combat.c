@@ -4894,7 +4894,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
-	if (attacker && attacker->client && attacker->client->pers.quest_power_status & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
+	if (attacker && attacker->client && attacker->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
 	{ // zyk: Enemy Weakening decreases damage
 		damage = (int)ceil(damage*0.90);
 	}
@@ -4931,7 +4931,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		attacker->client->ps.quickerGetup = qtrue;
 	}
 
-	if (targ && targ->client && targ->client->pers.quest_power_status & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
+	if (targ && targ->client && targ->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
 	{ // zyk: Enemy Weakening increases damage taken
 		damage = (int)ceil(damage * 1.10);
 	}
@@ -6375,7 +6375,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						if (Q_stricmp(attacker->targetname, "zyk_magic_fire") == 0 && quest_power_user && quest_power_user != ent && ent->client &&  
 								 quest_power_user->client)
 						{ // zyk: Fire Magic. If target touches the flame, will keep catching fire for some seconds
-							ent->client->pers.quest_power_status |= (1 << MAGIC_HIT_BY_FIRE);
+							ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_FIRE);
 							ent->client->pers.magic_power_user_id[MAGIC_HIT_BY_FIRE] = quest_power_user->s.number;
 							ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] = 2 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
 							ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_FIRE] = level.time + 200;
@@ -6383,7 +6383,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						else if (Q_stricmp(attacker->targetname, "zyk_magic_air") == 0 && quest_power_user && quest_power_user != ent && ent->client &&
 							quest_power_user->client)
 						{ // zyk: hit by Air Magic. It will make target have lower run speed
-							ent->client->pers.quest_power_status |= (1 << MAGIC_HIT_BY_AIR);
+							ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_AIR);
 
 							ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_AIR] = level.time + 500;
 						}
