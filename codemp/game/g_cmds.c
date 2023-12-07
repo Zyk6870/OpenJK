@@ -87,9 +87,7 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 4;
 	max_skill_levels[SKILL_MAX_MP] = 10;
-	max_skill_levels[SKILL_MAGIC_MAGIC_SENSE] = 7;
 	max_skill_levels[SKILL_MAGIC_HEALING_AREA] = 7;
-	max_skill_levels[SKILL_MAGIC_ENEMY_WEAKENING] = 7;
 	max_skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 7;
 	max_skill_levels[SKILL_MAGIC_WATER_MAGIC] = 7;
 	max_skill_levels[SKILL_MAGIC_EARTH_MAGIC] = 7;
@@ -147,9 +145,7 @@ char* zyk_skill_name(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAX_MP] = "Max Magic Points";
-	skill_names[SKILL_MAGIC_MAGIC_SENSE] = "Magic Sense";
 	skill_names[SKILL_MAGIC_HEALING_AREA] = "Healing Area";
-	skill_names[SKILL_MAGIC_ENEMY_WEAKENING] = "Enemy Weakening";
 	skill_names[SKILL_MAGIC_DOME_OF_DAMAGE] = "Dome of Damage";
 	skill_names[SKILL_MAGIC_WATER_MAGIC] = "Water Magic";
 	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "Earth Magic";
@@ -239,12 +235,8 @@ char* zyk_skill_description(int skill_index)
 		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key";
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have";
-	if (skill_index == SKILL_MAGIC_MAGIC_SENSE)
-		return "similar to Sense at max level. Sense Health works with it";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
 		return "creates an energy area that recovers health and shield to you and your allies. It also does a little damage to enemies";
-	if (skill_index == SKILL_MAGIC_ENEMY_WEAKENING)
-		return "decreases damage and resistance of enemies nearby. Also makes enemy Stamina decrease faster";
 	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
 		return "an energy dome appears at your position each half second, damaging enemies inside it";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
@@ -4168,7 +4160,7 @@ int zyk_max_magic_power(gentity_t *ent)
 // zyk: tests if this skill is one of the magic powers
 qboolean zyk_is_magic_power_skill(int skill_index)
 {
-	if (skill_index >= SKILL_MAGIC_MAGIC_SENSE && skill_index <= SKILL_MAGIC_LIGHT_MAGIC)
+	if (skill_index >= SKILL_MAGIC_HEALING_AREA && skill_index <= SKILL_MAGIC_LIGHT_MAGIC)
 	{
 		return qtrue;
 	}
@@ -4181,7 +4173,7 @@ int zyk_get_magic_index(int skill_index)
 {
 	if (zyk_is_magic_power_skill(skill_index) == qtrue)
 	{
-		return (skill_index - SKILL_MAGIC_MAGIC_SENSE);
+		return (skill_index - SKILL_MAGIC_HEALING_AREA);
 	}
 
 	return -1;
@@ -4403,17 +4395,9 @@ void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
 			ent->client->pers.current_stamina = ent->client->pers.max_stamina;
 		}
 	}
-	else
+	else if (ent->client->pers.stamina_out_timer <= level.time)
 	{
-		if (ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
-		{ // zyk: Enemy Weakening decreases Stamina faster
-			amount *= 2;
-		}
-
-		if (ent->client->pers.stamina_out_timer <= level.time)
-		{
-			ent->client->pers.current_stamina -= amount;
-		}
+		ent->client->pers.current_stamina -= amount;
 	}
 }
 
@@ -10836,9 +10820,7 @@ Cmd_Magic_f
 int zyk_get_magic_cost(int magic_number)
 {
 	int magic_costs[MAX_MAGIC_POWERS] = {
-		5, // Magic Sense
 		20, // Healing Area
-		20, // Enemy Weakening
 		25, // Dome of Damage
 		30, // Water Magic
 		30, // Earth Magic
@@ -10852,9 +10834,7 @@ int zyk_get_magic_cost(int magic_number)
 }
 
 extern void zyk_spawn_magic_element_effect(gentity_t* ent, vec3_t effect_origin, int magic_number, int duration);
-extern void magic_sense(gentity_t* ent);
 extern void healing_area(gentity_t* ent);
-extern void enemy_weakening(gentity_t* ent);
 extern void dome_of_damage(gentity_t* ent);
 extern void water_magic(gentity_t* ent);
 extern void earth_magic(gentity_t* ent);
@@ -10887,17 +10867,9 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			ent->client->ps.legsTimer = MAGIC_ANIM_TIME;
 			ent->client->ps.weaponTime = MAGIC_ANIM_TIME;
 
-			if (magic_number == MAGIC_MAGIC_SENSE)
-			{
-				magic_sense(ent);
-			}
-			else if (magic_number == MAGIC_HEALING_AREA)
+			if (magic_number == MAGIC_HEALING_AREA)
 			{
 				healing_area(ent);
-			}
-			else if (magic_number == MAGIC_ENEMY_WEAKENING)
-			{
-				enemy_weakening(ent);
 			}
 			else if (magic_number == MAGIC_DOME_OF_DAMAGE)
 			{

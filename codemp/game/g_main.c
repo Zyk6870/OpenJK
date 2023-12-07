@@ -362,9 +362,9 @@ void zyk_set_quest_npc_magic(gentity_t* npc_ent, int magic_powers_levels[MAX_MAG
 	{
 		for (i = 0; i < MAX_MAGIC_POWERS; i++)
 		{
-			if ((SKILL_MAGIC_MAGIC_SENSE + i) < NUMBER_OF_SKILLS)
+			if ((SKILL_MAGIC_HEALING_AREA + i) < NUMBER_OF_SKILLS)
 			{
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_SENSE + i] = magic_powers_levels[i];
+				npc_ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA + i] = magic_powers_levels[i];
 			}
 		}
 	}
@@ -4795,8 +4795,6 @@ zyk_magic_element_t zyk_get_magic_element(int magic_number)
 	zyk_magic_element_t magic_power_elements[MAX_MAGIC_POWERS] = {
 		MAGICELEMENT_NONE,
 		MAGICELEMENT_NONE,
-		MAGICELEMENT_NONE,
-		MAGICELEMENT_NONE,
 		MAGICELEMENT_WATER,
 		MAGICELEMENT_EARTH,
 		MAGICELEMENT_FIRE,
@@ -5119,21 +5117,6 @@ void clear_special_power_effect(gentity_t* ent)
 	}
 }
 
-// zyk: Magic Sense
-void magic_sense(gentity_t* ent)
-{
-	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_SENSE]);
-
-	ent->client->pers.current_magic_element = MAGICELEMENT_NONE;
-
-	ent->client->pers.quest_power_status |= (1 << MAGIC_MAGIC_SENSE);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SENSE] = 0;
-	ent->client->pers.magic_power_hit_counter[MAGIC_MAGIC_SENSE] = 1;
-	ent->client->pers.magic_power_timer[MAGIC_MAGIC_SENSE] = level.time + duration;
-
-	ent->client->pers.quest_power_usage_timer = level.time + (9000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_SENSE]));
-}
-
 // zyk: Healing Area
 void healing_area(gentity_t* ent)
 {
@@ -5145,20 +5128,6 @@ void healing_area(gentity_t* ent)
 	zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing_area", "4", "env/red_cyc", 0, damage, 228, duration);
 
 	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA]));
-}
-
-// zyk: Enemy Weakening
-void enemy_weakening(gentity_t* ent)
-{
-	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]);
-
-	ent->client->pers.current_magic_element = MAGICELEMENT_NONE;
-
-	ent->client->pers.quest_power_status |= (1 << MAGIC_ENEMY_WEAKENING);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_ENEMY_WEAKENING] = 0;
-	ent->client->pers.magic_power_timer[MAGIC_ENEMY_WEAKENING] = level.time + duration;
-
-	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]));
 }
 
 // zyk: Dome of Damage
@@ -5358,80 +5327,6 @@ void quest_power_events(gentity_t *ent)
 	{
 		if (ent->health > 0)
 		{
-			if (ent->client->pers.quest_power_status & (1 << MAGIC_MAGIC_SENSE))
-			{
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SENSE] < level.time)
-				{
-					if (ent->client->pers.magic_power_hit_counter[MAGIC_MAGIC_SENSE] > 0)
-					{
-						ent->client->ps.forceAllowDeactivateTime = ent->client->pers.magic_power_timer[MAGIC_MAGIC_SENSE];
-						ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
-						ent->client->ps.fd.forcePowerDuration[FP_SEE] = ent->client->pers.magic_power_timer[MAGIC_MAGIC_SENSE];
-
-						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/force/see.wav"));
-
-						ent->client->pers.magic_power_hit_counter[MAGIC_MAGIC_SENSE]--;
-					}
-
-					ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_3;
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SENSE] = level.time + 100;
-				}
-
-				if (ent->client->pers.magic_power_timer[MAGIC_MAGIC_SENSE] < level.time)
-				{
-					ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[SKILL_SENSE];
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_MAGIC_SENSE);
-				}
-			}
-
-			if (ent->client->pers.quest_power_status & (1 << MAGIC_ENEMY_WEAKENING))
-			{
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_ENEMY_WEAKENING] < level.time)
-				{
-					int zyk_it = 0;
-					int targets_hit = 0;
-					int max_distance = 250 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]);
-					int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING]);
-
-					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
-					{
-						gentity_t* player_ent = &g_entities[zyk_it];
-
-						if (zyk_special_power_can_hit_target(ent, player_ent, zyk_it, 0, max_distance, qfalse, &targets_hit) == qtrue)
-						{
-							player_ent->client->pers.magic_power_debounce_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] = 0;
-							player_ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] = level.time + duration;
-							player_ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_ENEMY_WEAKENING);
-
-							G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh10.mp3"));
-						}
-					}
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_ENEMY_WEAKENING] = level.time + 500;
-				}
-
-				if (ent->client->pers.magic_power_timer[MAGIC_ENEMY_WEAKENING] < level.time)
-				{
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_ENEMY_WEAKENING);
-				}
-			}
-
-			if (ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
-			{
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] < level.time)
-				{
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_enemy_weakening", "0", "force/kothos_beam", 0, 0, 0, 1000);
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] = level.time + 500;
-				}
-
-				if (ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_ENEMY_WEAKENING] < level.time)
-				{
-					ent->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_ENEMY_WEAKENING);
-				}
-			}
-
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_DOME_OF_DAMAGE))
 			{
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] < level.time)
@@ -8931,7 +8826,7 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.quest_power_usage_timer < level.time)
 				{
 					int random_magic = Q_irand(0, (MAX_MAGIC_POWERS - 1));
-					int first_magic_skill = SKILL_MAGIC_MAGIC_SENSE;
+					int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
 					int current_magic_skill = first_magic_skill;
 
 					// zyk: adding all magic powers to this npc
@@ -8973,7 +8868,7 @@ void G_RunFrame( int levelTime ) {
 				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0)
 				{
 					int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
-					int first_magic_skill = SKILL_MAGIC_MAGIC_SENSE;
+					int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
 					int current_magic_skill = first_magic_skill;
 
 					// zyk: adding all magic powers to this npc
@@ -9025,56 +8920,6 @@ void G_RunFrame( int levelTime ) {
 						ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] = 2;
 
 						zyk_cast_magic(ent, SKILL_MAGIC_AIR_MAGIC);
-					}
-				}
-				else if (Q_stricmp(ent->NPC_type, "boss_lilith") == 0)
-				{
-					if (level.quest_map == QUESTMAP_LILITH_TEMPLE)
-					{
-						vec3_t arena_center;
-
-						VectorSet(arena_center, -1410, -640, 3180);
-
-						if (Distance(ent->client->ps.origin, arena_center) > 550)
-						{
-							vec3_t npc_angles;
-
-							VectorSet(npc_angles, 0, 90, 0);
-
-							zyk_TeleportPlayer(ent, arena_center, npc_angles);
-
-							trap->SendServerCommand(-1, va("chat \"%s^7: I am back!!! hehehehehe!\n\"", QUESTCHAR_BOSS1));
-						}
-					}
-
-					if (ent->client->pers.magic_power <= 50)
-					{
-						ent->client->pers.magic_power = 5000;
-
-						ent->client->pers.quest_power_usage_timer = level.time + 3000;
-					}
-					else
-					{
-						int probability_for_magic = Q_irand(0, 100);
-
-						ent->client->pers.magic_power = 1000;
-
-						ent->client->pers.skill_levels[SKILL_MAGIC_ENEMY_WEAKENING] = 3;
-						ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] = 3;
-						ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] = 1;
-
-						if (probability_for_magic < 20)
-						{
-							zyk_cast_magic(ent, SKILL_MAGIC_ENEMY_WEAKENING);
-						}
-						else if (probability_for_magic < 50)
-						{
-							zyk_cast_magic(ent, SKILL_MAGIC_AIR_MAGIC);
-						}
-						else
-						{
-							zyk_cast_magic(ent, SKILL_MAGIC_FIRE_MAGIC);
-						}
 					}
 				}
 			}

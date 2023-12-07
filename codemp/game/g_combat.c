@@ -4894,11 +4894,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
-	if (attacker && attacker->client && attacker->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
-	{ // zyk: Enemy Weakening decreases damage
-		damage = (int)ceil(damage*0.90);
-	}
-
 	if (level.gametype == GT_SIEGE)
 	{
 		damage = (int)ceil(damage*zyk_scale_siege_damage.value);
@@ -4929,11 +4924,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		attacker->client->ps.velocity[2] += 150;
 		attacker->client->ps.forceDodgeAnim = 0;
 		attacker->client->ps.quickerGetup = qtrue;
-	}
-
-	if (targ && targ->client && targ->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_ENEMY_WEAKENING))
-	{ // zyk: Enemy Weakening increases damage taken
-		damage = (int)ceil(damage * 1.10);
 	}
 
 	// zyk: player or npc with Earth Magic inside the Tree. Take less damage

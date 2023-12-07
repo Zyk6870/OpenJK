@@ -2986,7 +2986,6 @@ void fx_runner_link( gentity_t *ent )
 		ent->think = fx_runner_think;
 
 		if (Q_stricmp(ent->targetname, "zyk_magic_healing_area") == 0 || 
-			Q_stricmp(ent->targetname, "zyk_magic_enemy_weakening") == 0 || 
 			Q_stricmp(ent->targetname, "zyk_magic_dome") == 0 ||
 			Q_stricmp(ent->targetname, "zyk_magic_water") == 0 || Q_stricmp(ent->targetname, "zyk_magic_earth") == 0 ||
 			Q_stricmp(ent->targetname, "zyk_magic_fire") == 0 || Q_stricmp(ent->targetname, "zyk_magic_air") == 0 ||
@@ -3068,7 +3067,6 @@ void SP_fx_runner( gentity_t *ent )
 
 	// zyk: no need to wait 400 ms with these effects
 	if (Q_stricmp(ent->targetname, "zyk_magic_healing_area") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_magic_enemy_weakening") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_magic_dome") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_water") == 0 || Q_stricmp(ent->targetname, "zyk_magic_earth") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_fire") == 0 || Q_stricmp(ent->targetname, "zyk_magic_air") == 0 ||
