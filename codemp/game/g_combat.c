@@ -5977,9 +5977,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			if (attacker && attacker->client && 
 				(attacker->client->sess.amrpgmode == 2 || attacker->NPC) &&
-				(attacker->client->pers.quest_power_status & (1 << MAGIC_WATER_MAGIC) || 
-				 attacker->client->pers.quest_power_status & (1 << MAGIC_DARK_MAGIC)))
-			{ // zyk: Water Magic and Dark Magic drain health from target
+				attacker->client->pers.quest_power_status & (1 << MAGIC_WATER_MAGIC))
+			{ // zyk: Water Magic drain health from target
 				int heal_amount = take;
 
 				if ((attacker->health + heal_amount) < attacker->client->ps.stats[STAT_MAX_HEALTH])
