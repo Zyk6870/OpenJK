@@ -236,7 +236,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
-		return "creates an energy area that recovers health and shield to you and your allies. It also does a little damage to enemies";
+		return "creates an energy area that makes you and your allies recover health, stamina and shield. It also does a little damage to enemies";
 	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
 		return "an energy dome appears at your position each half second, damaging enemies inside it";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)

@@ -6197,6 +6197,7 @@ G_RadiusDamage
 ============
 */
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
+extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, gentity_t *missile, int mod) {
 	float		points, dist;
@@ -6307,11 +6308,14 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					{
 						int heal_amount = 2 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 						int shield_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
+						int stamina_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 
 						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
 							ent->health += heal_amount;
 						else
 							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
+
+						zyk_set_stamina(ent, stamina_amount, qtrue);
 
 						if (ent->health == ent->client->ps.stats[STAT_MAX_HEALTH])
 						{ // zyk: can restore shield shield too, if hp is full
