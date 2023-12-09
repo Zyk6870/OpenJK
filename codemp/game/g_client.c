@@ -4067,6 +4067,7 @@ void G_ClearTeamVote( gentity_t *ent, int team ) {
 }
 
 extern void try_finishing_race();
+extern void zyk_stop_all_magic_powers(gentity_t* ent);
 void ClientDisconnect( int clientNum ) {
 	gentity_t	*ent;
 	gentity_t	*tent;
@@ -4237,8 +4238,8 @@ void ClientDisconnect( int clientNum ) {
 		try_finishing_race();
 	}
 
-	// zyk: remove any quest_power status from this player
-	ent->client->pers.quest_power_status = 0;
+	// zyk: stop magic powes used by this player
+	zyk_stop_all_magic_powers(ent);
 
 	// zyk: logout player from account
 	ent->client->sess.amrpgmode = 0;
