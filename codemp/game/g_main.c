@@ -5266,10 +5266,6 @@ void zyk_stop_magic_power(gentity_t* ent, zyk_magic_t magic_number)
 	{ // zyk: Fire Magic, stops flame thrower
 		ent->client->pers.flame_thrower_timer = 0;
 	}
-	else if (magic_number == MAGIC_LIGHT_MAGIC)
-	{ // zyk: stops the protection bubble
-		ent->client->invulnerableTimer = 0;
-	}
 }
 
 void zyk_stop_all_magic_powers(gentity_t* ent)
@@ -5581,8 +5577,8 @@ void quest_power_events(gentity_t *ent)
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] > 0)
 					{
 						int duration = 1500;
-						int damage = 6 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
-						int radius = 390 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]); // zyk: default distace for this effect is 540
+						int damage = 5 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
+						int radius = 290 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]); // zyk: default distace for this effect is 540
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "ships/proton_impact", 100, damage, radius, duration);
 
@@ -5679,10 +5675,6 @@ void quest_power_events(gentity_t *ent)
 
 						// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
 						lightning_dome(ent, damage * 8);
-
-						// zyk: protective bubble around the player
-						ent->client->ps.eFlags |= EF_INVULNERABLE;
-						ent->client->invulnerableTimer = 2000000000;
 
 						ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC]--;
 					}

@@ -4934,12 +4934,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		damage = (int)ceil(damage * (1.00 - (0.05 * targ->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC])));
 	}
 
-	// zyk: player or npc with Light Magic takes little damage
-	if (targ && targ->client && (targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC))
-	{
-		damage = (int)ceil(damage * 0.50);
-	}
-
 	if (targ && targ->client && targ->client->sess.amrpgmode == 2)
 	{ // zyk: damage resistance
 		float bonus_resistance = 0.00;
@@ -5392,8 +5386,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				targ->client->ps.eFlags &= ~EF_INVULNERABLE;
 			}
-			else if (!((targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC)))
-			{ // zyk: added condition to not consider clients using Light Magic
+			else
+			{
 				return;
 			}
 		}
