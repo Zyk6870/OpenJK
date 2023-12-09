@@ -563,13 +563,6 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 		return 0;
 	}
 
-	if (other && other->client && (other->NPC || other->client->sess.amrpgmode == 2) && 
-		(forcePower == FP_PUSH || forcePower == FP_PULL || forcePower == FP_GRIP) && 
-		other->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC))
-	{ // zyk: Light Magic protects against some force powers
-		return 0;
-	}
-
 	if (forcePower != FP_TEAM_HEAL && forcePower != FP_TEAM_FORCE && attacker && attacker->client && other && other->client && 
 		attacker->client->sess.amrpgmode > 0 && other->client->sess.amrpgmode > 0 && other->client->pers.player_settings & (1 << SETTINGS_FORCE_FROM_ALLIES) &&
 		zyk_is_ally(attacker,other) == qtrue)

@@ -5187,7 +5187,6 @@ void fire_magic(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_FIRE_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] = level.time + 500;
-	ent->client->pers.magic_power_hit_counter[MAGIC_FIRE_MAGIC] = 1;
 }
 
 // zyk: Air Magic
@@ -5261,11 +5260,6 @@ void light_magic(gentity_t* ent)
 void zyk_stop_magic_power(gentity_t* ent, zyk_magic_t magic_number)
 {
 	ent->client->pers.quest_power_status &= ~(1 << magic_number);
-
-	if (magic_number == MAGIC_FIRE_MAGIC)
-	{ // zyk: Fire Magic, stops flame thrower
-		ent->client->pers.flame_thrower_timer = 0;
-	}
 }
 
 void zyk_stop_all_magic_powers(gentity_t* ent)
@@ -5457,13 +5451,7 @@ void quest_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] < level.time)
 				{
-					if (ent->client->pers.magic_power_hit_counter[MAGIC_FIRE_MAGIC] > 0)
-					{
-						// zyk: starts the magic flame thrower and keep it active
-						ent->client->pers.flame_thrower_timer = 2000000000;
-
-						ent->client->pers.magic_power_hit_counter[MAGIC_FIRE_MAGIC]--;
-					}
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_fire", "4", "env/fire_wall", 0, damage, 100, 1000);
 
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
@@ -5479,11 +5467,6 @@ void quest_power_events(gentity_t *ent)
 					}
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] = level.time + 500;
-				}
-
-				if (ent->client->cloakDebReduce < level.time)
-				{ // zyk: fires the flame thrower
-					Player_FireFlameThrower(ent, qtrue);
 				}
 			}
 
@@ -5663,7 +5646,7 @@ void quest_power_events(gentity_t *ent)
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] > 0)
 					{
 						int duration = 1500;
-						int radius = 390 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]); // zyk: default distace for this effect is 540
+						int radius = 290 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]); // zyk: default distace for this effect is 540
 						int damage = ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_light_effect", "0", "ships/sd_exhaust", 500, 0, 0, duration);
