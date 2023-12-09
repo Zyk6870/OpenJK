@@ -5453,6 +5453,8 @@ void quest_power_events(gentity_t *ent)
 				{
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_fire", "4", "env/fire_wall", 0, damage, 100, 1000);
 
+					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fire_lp.wav"));
+
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
 						target_ent = &g_entities[zyk_it];
