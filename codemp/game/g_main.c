@@ -5555,7 +5555,6 @@ void quest_power_events(gentity_t *ent)
 			{
 				gentity_t* black_hole_target = NULL;
 				int zyk_it = 0;
-				int confusion_duration = 300 + (100 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] < level.time)
 				{
@@ -5567,7 +5566,7 @@ void quest_power_events(gentity_t *ent)
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "ships/proton_impact", 100, damage, radius, duration);
 
-						zyk_spawn_black_hole_model(ent, duration, 80);
+						zyk_spawn_black_hole_model(ent, duration, (20 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]));
 
 						ent->client->pers.black_hole_distance = radius;
 
