@@ -4752,7 +4752,6 @@ vec3_t gPainPoint;
 extern void Jedi_Decloak( gentity_t *self );
 extern void Boba_FlyStop( gentity_t *self );
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
-extern float zyk_get_bonus_element_factor(gentity_t* attacker, gentity_t* target);
 void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
 	int			take, asave = 0, knockback;
@@ -5953,9 +5952,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					bonus_health_resistance += 0.40;
 				}
 			}
-
-			// zyk: Elemental affinity. If taking damage from same element, decrease damage. If taking damage from opposite element, increase damage
-			bonus_health_resistance += zyk_get_bonus_element_factor(attacker, targ);
 
 			// zyk: Health Strength skill decreases damage taken
 			take = (int)ceil(take * (1.00 - bonus_health_resistance - (0.04 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH])));
