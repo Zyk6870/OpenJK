@@ -4845,6 +4845,8 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.stamina_timer = 0;
 			ent->client->pers.stamina_out_timer = 0;
 
+			ent->client->pers.magic_consumption_timer = 0;
+
 			// zyk: loading initial force
 			ent->client->ps.fd.forcePower = ent->client->pers.max_force_power;
 
@@ -10852,64 +10854,87 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 	}
 
 	if (ent->client->pers.quest_power_usage_timer < level.time)
-	{		
-		if (ent->client->pers.magic_power >= zyk_get_magic_cost(magic_number))
-		{
-			// zyk: magic usage effect
-			zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, magic_number, 1000);
+	{
+		// zyk: cooldown to toggle magic powers
+		ent->client->pers.quest_power_usage_timer = level.time + MAGIC_ANIM_TIME;
 
-			// zyk: magic usage anim
-			G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCE_RAGE, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-			ent->client->ps.torsoTimer = MAGIC_ANIM_TIME;
-			ent->client->ps.legsTimer = MAGIC_ANIM_TIME;
-			ent->client->ps.weaponTime = MAGIC_ANIM_TIME;
+		if (ent->client->pers.quest_power_status & (1 << magic_number))
+		{ // zyk: stop using the magic power
+			ent->client->pers.quest_power_status &= ~(1 << magic_number);
 
-			if (magic_number == MAGIC_HEALING_AREA)
-			{
-				healing_area(ent);
-			}
-			else if (magic_number == MAGIC_DOME_OF_DAMAGE)
-			{
-				dome_of_damage(ent);
-			}
-			else if (magic_number == MAGIC_WATER_MAGIC)
-			{
-				water_magic(ent);
-			}
-			else if (magic_number == MAGIC_EARTH_MAGIC)
-			{
-				earth_magic(ent);
-			}
-			else if (magic_number == MAGIC_FIRE_MAGIC)
-			{
-				fire_magic(ent);
-			}
-			else if (magic_number == MAGIC_AIR_MAGIC)
-			{
-				air_magic(ent);
-			}
-			else if (magic_number == MAGIC_DARK_MAGIC)
-			{
-				dark_magic(ent);
+			if (magic_number == MAGIC_FIRE_MAGIC)
+			{ // zyk: Fire Magic, stops flame thrower
+				ent->client->pers.flame_thrower_timer = 0;
 			}
 			else if (magic_number == MAGIC_LIGHT_MAGIC)
 			{
-				light_magic(ent);
+				ent->client->invulnerableTimer = 0;
 			}
 
-			// zyk: magic powers cost mp
-			ent->client->pers.magic_power -= zyk_get_magic_cost(magic_number);
-
-			if (ent->s.number < MAX_CLIENTS)
-			{
-				display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
-				send_rpg_events(2000);
-			}
+			// zyk: magic stop anim
+			G_SetAnim(ent, NULL, SETANIM_TORSO, BOTH_BUTTON_HOLD, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+			ent->client->ps.weaponTime = ent->client->ps.torsoTimer;
 		}
 		else
-		{
-			if (ent->s.number < MAX_CLIENTS)
-				trap->SendServerCommand(ent->s.number, va("print \"You need %d mp to cast ^3%s\n\"", zyk_get_magic_cost(magic_number), zyk_skill_name(skill_index)));
+		{ // zyk: use the magic power
+			if (ent->client->pers.magic_power >= zyk_get_magic_cost(magic_number))
+			{
+				// zyk: magic usage effect
+				zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, magic_number, 1000);
+
+				// zyk: magic usage anim
+				G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCE_RAGE, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+				ent->client->ps.torsoTimer = MAGIC_ANIM_TIME;
+				ent->client->ps.legsTimer = MAGIC_ANIM_TIME;
+				ent->client->ps.weaponTime = MAGIC_ANIM_TIME;
+
+				if (magic_number == MAGIC_HEALING_AREA)
+				{
+					healing_area(ent);
+				}
+				else if (magic_number == MAGIC_DOME_OF_DAMAGE)
+				{
+					dome_of_damage(ent);
+				}
+				else if (magic_number == MAGIC_WATER_MAGIC)
+				{
+					water_magic(ent);
+				}
+				else if (magic_number == MAGIC_EARTH_MAGIC)
+				{
+					earth_magic(ent);
+				}
+				else if (magic_number == MAGIC_FIRE_MAGIC)
+				{
+					fire_magic(ent);
+				}
+				else if (magic_number == MAGIC_AIR_MAGIC)
+				{
+					air_magic(ent);
+				}
+				else if (magic_number == MAGIC_DARK_MAGIC)
+				{
+					dark_magic(ent);
+				}
+				else if (magic_number == MAGIC_LIGHT_MAGIC)
+				{
+					light_magic(ent);
+				}
+
+				// zyk: magic powers cost mp
+				ent->client->pers.magic_power -= zyk_get_magic_cost(magic_number);
+
+				if (ent->s.number < MAX_CLIENTS)
+				{
+					display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
+					send_rpg_events(2000);
+				}
+			}
+			else
+			{
+				if (ent->s.number < MAX_CLIENTS)
+					trap->SendServerCommand(ent->s.number, va("print \"You need %d mp to cast ^3%s\n\"", zyk_get_magic_cost(magic_number), zyk_skill_name(skill_index)));
+			}
 		}
 	}
 	else

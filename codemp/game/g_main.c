@@ -5105,7 +5105,39 @@ void Player_FireFlameThrower(gentity_t* self, qboolean is_magic)
 // zyk: clear effects of some special powers
 void clear_special_power_effect(gentity_t* ent)
 {
+	qboolean clear_effect = qfalse;
+
 	if (level.special_power_effects[ent->s.number] != -1 && level.special_power_effects_timer[ent->s.number] < level.time)
+	{
+		clear_effect = qtrue;
+	}
+	else if (level.special_power_effects[ent->s.number] != -1)
+	{
+		gentity_t* quest_power_user = &g_entities[level.special_power_effects[ent->s.number]];
+
+		if (quest_power_user && quest_power_user->client && quest_power_user->client->sess.amrpgmode == 2)
+		{ // zyk: stops the magic power effect/model if player is no longer using the magic power
+			if (quest_power_user->client->pers.quest_power_status & (1 << MAGIC_HEALING_AREA) && 
+				Q_stricmp(ent->targetname, "zyk_magic_healing_area") == 0)
+			{
+				level.special_power_effects_timer[ent->s.number] = level.time + 200;
+			}
+			else if (quest_power_user->client->pers.quest_power_status & (1 << MAGIC_DARK_MAGIC) &&
+				(Q_stricmp(ent->targetname, "zyk_magic_dark") == 0 ||
+				 Q_stricmp(ent->targetname, "zyk_magic_black_hole") == 0))
+			{
+				level.special_power_effects_timer[ent->s.number] = level.time + 200;
+			}
+			else if (quest_power_user->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC) &&
+				(Q_stricmp(ent->targetname, "zyk_magic_light") == 0 ||
+				 Q_stricmp(ent->targetname, "zyk_magic_light_effect") == 0))
+			{
+				level.special_power_effects_timer[ent->s.number] = level.time + 200;
+			}
+		}
+	}
+
+	if (clear_effect == qtrue)
 	{
 		level.special_power_effects[ent->s.number] = -1;
 
@@ -5120,89 +5152,58 @@ void clear_special_power_effect(gentity_t* ent)
 // zyk: Healing Area
 void healing_area(gentity_t* ent)
 {
-	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA]);
 	int damage = ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 
-	zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing_area", "4", "env/red_cyc", 0, damage, 228, duration);
+	ent->client->pers.quest_power_status |= (1 << MAGIC_HEALING_AREA);
 
-	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA]));
+	zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing_area", "4", "env/red_cyc", 0, damage, 228, 1500);
 }
 
 // zyk: Dome of Damage
 void dome_of_damage(gentity_t* ent)
 {
-	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]);
-
 	ent->client->pers.quest_power_status |= (1 << MAGIC_DOME_OF_DAMAGE);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] = 0;
-	ent->client->pers.magic_power_timer[MAGIC_DOME_OF_DAMAGE] = level.time + duration;
-
-	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]));
 }
 
 // zyk: Water Magic
 void water_magic(gentity_t* ent)
 {
-	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]);
-
 	ent->client->pers.quest_power_status |= (1 << MAGIC_WATER_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_WATER_MAGIC] = 1;
-	ent->client->pers.magic_power_timer[MAGIC_WATER_MAGIC] = level.time + duration;
-
-	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]));
 }
 
 // zyk: Earth Magic
 void earth_magic(gentity_t* ent)
 {
-	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]);
-
 	ent->client->pers.quest_power_status |= (1 << MAGIC_EARTH_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC] = 2;
-	ent->client->pers.magic_power_timer[MAGIC_EARTH_MAGIC] = level.time + duration;
-
-	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]));
 }
 
 // zyk: Fire Magic
 void fire_magic(gentity_t* ent) 
 {
-	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
-
 	ent->client->pers.quest_power_status |= (1 << MAGIC_FIRE_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_FIRE_MAGIC] = 1;
-	ent->client->pers.magic_power_timer[MAGIC_FIRE_MAGIC] = level.time + duration;
-
-	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]));
 }
 
 // zyk: Air Magic
 void air_magic(gentity_t* ent)
 {
-	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
-
 	ent->client->pers.quest_power_status |= (1 << MAGIC_AIR_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_AIR_MAGIC] = 1;
-	ent->client->pers.magic_power_timer[MAGIC_AIR_MAGIC] = level.time + duration;
-
-	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]));
 }
 
 // zyk: Dark Magic
 void dark_magic(gentity_t* ent)
 {
-	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
-
 	ent->client->pers.quest_power_status |= (1 << MAGIC_DARK_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] = 1;
-	ent->client->pers.magic_power_timer[MAGIC_DARK_MAGIC] = level.time + duration;
-
-	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]));
 }
 
 extern void zyk_lightning_dome_detonate(gentity_t* ent);
@@ -5252,14 +5253,41 @@ void lightning_dome(gentity_t* ent, int damage)
 //zyk: Light Magic
 void light_magic(gentity_t* ent)
 {
-	int duration = 1500 + (500 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]);
-
 	ent->client->pers.quest_power_status |= (1 << MAGIC_LIGHT_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] = 1;
-	ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC] = level.time + duration;
+}
 
-	ent->client->pers.quest_power_usage_timer = level.time + (12000 - (1000 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]));
+// zyk: keeps using mp while magic powers are active
+extern int zyk_max_skill_level(int skill_index);
+void zyk_active_magic_mp_consumption(gentity_t* ent)
+{
+	if (ent->client->pers.quest_power_status > 0 && ent->client->pers.magic_consumption_timer < level.time)
+	{
+		int i = 0;
+		int total_mp_usage = 0;
+
+		for (i = SKILL_MAGIC_HEALING_AREA; i < (SKILL_MAGIC_HEALING_AREA + MAX_MAGIC_POWERS); i++)
+		{
+			int magic_number = i - SKILL_MAGIC_HEALING_AREA;
+
+			if (ent->client->pers.quest_power_status & (1 << magic_number))
+			{ // zyk: active magic, consume mp
+				total_mp_usage += (zyk_max_skill_level(i) - ent->client->pers.skill_levels[i] + 1);
+			}
+		}
+
+		if (ent->client->pers.magic_power >= total_mp_usage)
+		{
+			ent->client->pers.magic_power -= total_mp_usage;
+		}
+		else
+		{ // zyk: players run out of mp, stop all magic
+			ent->client->pers.quest_power_status = 0;
+		}
+
+		ent->client->pers.magic_consumption_timer = level.time + 500;
+	}
 }
 
 // zyk: controls the quest powers stuff
@@ -5271,6 +5299,8 @@ void quest_power_events(gentity_t *ent)
 	{
 		if (ent->health > 0)
 		{
+			zyk_active_magic_mp_consumption(ent);
+
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_DOME_OF_DAMAGE))
 			{
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] < level.time)
@@ -5280,11 +5310,6 @@ void quest_power_events(gentity_t *ent)
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dome", "4", "env/dome", 0, damage, 290, 1000);
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] = level.time + 500;
-				}
-
-				if (ent->client->pers.magic_power_timer[MAGIC_DOME_OF_DAMAGE] < level.time)
-				{
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_DOME_OF_DAMAGE);
 				}
 			}
 
@@ -5299,7 +5324,7 @@ void quest_power_events(gentity_t *ent)
 				{
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_WATER_MAGIC] > 0)
 					{
-						int duration = (ent->client->pers.magic_power_timer[MAGIC_WATER_MAGIC] - level.time)/2;
+						int ice_block_duration = 2000;
 						int heal_amount = 20 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
 
 						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
@@ -5308,12 +5333,12 @@ void quest_power_events(gentity_t *ent)
 							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
 
 						// zyk: ice block around the player
-						zyk_spawn_ice_block(ent, duration, 0, 0, -140, 0, 0);
-						zyk_spawn_ice_block(ent, duration, 0, 90, 140, 0, 0);
-						zyk_spawn_ice_block(ent, duration, 0, 179, 0, -140, 0);
-						zyk_spawn_ice_block(ent, duration, 0, -90, 0, 140, 0);
-						zyk_spawn_ice_block(ent, duration, 90, 0, 0, 0, -140);
-						zyk_spawn_ice_block(ent, duration, -90, 0, 0, 0, 140);
+						zyk_spawn_ice_block(ent, ice_block_duration, 0, 0, -140, 0, 0);
+						zyk_spawn_ice_block(ent, ice_block_duration, 0, 90, 140, 0, 0);
+						zyk_spawn_ice_block(ent, ice_block_duration, 0, 179, 0, -140, 0);
+						zyk_spawn_ice_block(ent, ice_block_duration, 0, -90, 0, 140, 0);
+						zyk_spawn_ice_block(ent, ice_block_duration, 90, 0, 0, 0, -140);
+						zyk_spawn_ice_block(ent, ice_block_duration, -90, 0, 0, 0, 140);
 
 						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
 
@@ -5334,11 +5359,6 @@ void quest_power_events(gentity_t *ent)
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 500;
 				}
-
-				if (ent->client->pers.magic_power_timer[MAGIC_WATER_MAGIC] < level.time)
-				{
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_WATER_MAGIC);
-				}
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_EARTH_MAGIC))
@@ -5354,7 +5374,7 @@ void quest_power_events(gentity_t *ent)
 				{
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC] >= 2)
 					{
-						zyk_quest_effect_spawn(ent, ent, "zyk_tree_of_life", "1", "models/map_objects/yavin/tree10_b.md3", 0, 0, 0, 1600);
+						zyk_quest_effect_spawn(ent, ent, "zyk_tree_of_life", "1", "models/map_objects/yavin/tree10_b.md3", 0, 0, 0, 2000);
 
 						ent->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC]--;
 					}
@@ -5404,12 +5424,7 @@ void quest_power_events(gentity_t *ent)
 						}
 					}
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 1600;
-				}
-
-				if (ent->client->pers.magic_power_timer[MAGIC_EARTH_MAGIC] < level.time)
-				{
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_EARTH_MAGIC);
+					ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 2000;
 				}
 			}
 
@@ -5424,7 +5439,8 @@ void quest_power_events(gentity_t *ent)
 				{
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_FIRE_MAGIC] > 0)
 					{
-						ent->client->pers.flame_thrower_timer = ent->client->pers.magic_power_timer[MAGIC_FIRE_MAGIC];
+						// zyk: starts the magic flame thrower and keep it active
+						ent->client->pers.flame_thrower_timer = 2000000000;
 
 						ent->client->pers.magic_power_hit_counter[MAGIC_FIRE_MAGIC]--;
 					}
@@ -5448,11 +5464,6 @@ void quest_power_events(gentity_t *ent)
 				if (ent->client->cloakDebReduce < level.time)
 				{ // zyk: fires the flame thrower
 					Player_FireFlameThrower(ent, qtrue);
-				}
-
-				if (ent->client->pers.magic_power_timer[MAGIC_FIRE_MAGIC] < level.time)
-				{
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_FIRE_MAGIC);
 				}
 			}
 
@@ -5525,11 +5536,6 @@ void quest_power_events(gentity_t *ent)
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 50;
 				}
-
-				if (ent->client->pers.magic_power_timer[MAGIC_AIR_MAGIC] < level.time)
-				{
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_AIR_MAGIC);
-				}
 			}
 
 			if (ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_AIR))
@@ -5550,7 +5556,7 @@ void quest_power_events(gentity_t *ent)
 				{
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] > 0)
 					{
-						int duration = ent->client->pers.magic_power_timer[MAGIC_DARK_MAGIC] - level.time;
+						int duration = 1500;
 						int damage = 6 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
 						int radius = 390 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]); // zyk: default distace for this effect is 540
 
@@ -5625,11 +5631,6 @@ void quest_power_events(gentity_t *ent)
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = level.time + 50;
 				}
-				
-				if (ent->client->pers.magic_power_timer[MAGIC_DARK_MAGIC] < level.time)
-				{
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_DARK_MAGIC);
-				}
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC))
@@ -5641,7 +5642,7 @@ void quest_power_events(gentity_t *ent)
 				{
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] > 0)
 					{
-						int duration = ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC] - level.time;
+						int duration = 1500;
 						int radius = 390 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]); // zyk: default distace for this effect is 540
 						int damage = ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 
@@ -5657,7 +5658,7 @@ void quest_power_events(gentity_t *ent)
 
 						// zyk: protective bubble around the player
 						ent->client->ps.eFlags |= EF_INVULNERABLE;
-						ent->client->invulnerableTimer = ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC];
+						ent->client->invulnerableTimer = 2000000000;
 
 						ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC]--;
 					}
@@ -5724,11 +5725,6 @@ void quest_power_events(gentity_t *ent)
 					send_rpg_events(2000);
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 50;
-				}
-
-				if (ent->client->pers.magic_power_timer[MAGIC_LIGHT_MAGIC] < level.time)
-				{
-					ent->client->pers.quest_power_status &= ~(1 << MAGIC_LIGHT_MAGIC);
 				}
 			}
 		}
@@ -7009,7 +7005,6 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time );
 
 extern void remove_credits(gentity_t *ent, int credits);
 extern void try_finishing_race();
-extern int zyk_max_skill_level(int skill_index);
 extern void set_max_health(gentity_t *ent);
 extern void set_max_shield(gentity_t *ent);
 extern void duel_show_table(gentity_t *ent);

@@ -4237,6 +4237,9 @@ void ClientDisconnect( int clientNum ) {
 		try_finishing_race();
 	}
 
+	// zyk: remove any quest_power status from this player
+	ent->client->pers.quest_power_status = 0;
+
 	// zyk: logout player from account
 	ent->client->sess.amrpgmode = 0;
 

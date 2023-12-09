@@ -1001,14 +1001,14 @@ typedef struct clientPersistant_s {
 	// zyk: powers that hits the target player more than once need a hit counter or powers that need a counter to start an effect
 	int magic_power_hit_counter[MAX_MAGIC_POWERS];
 
-	// zyk: timers of the magic powers used by this player
-	int magic_power_timer[MAX_MAGIC_POWERS];
-
 	// zyk: timers used by the magic powers hitting this player
 	int magic_power_target_timer[MAX_MAGIC_POWERS];
 
 	// zyk: magic powers debounce timer, for example, like Wind powers
 	int magic_power_debounce_timer[MAX_MAGIC_POWERS];
+
+	// zyk: debounce timer used to consume mp when magic is active
+	int magic_consumption_timer;
 
 	// zyk: player ids which are hitting the target player with magic
 	int magic_power_user_id[MAX_MAGIC_POWERS];
