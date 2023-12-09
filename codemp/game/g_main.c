@@ -5287,7 +5287,7 @@ void zyk_active_magic_mp_consumption(gentity_t* ent)
 
 			if (ent->client->pers.quest_power_status & (1 << magic_number))
 			{ // zyk: active magic, consume mp
-				total_mp_usage += (zyk_max_skill_level(i) - ent->client->pers.skill_levels[i] + 1);
+				total_mp_usage++;
 			}
 		}
 
@@ -5300,7 +5300,7 @@ void zyk_active_magic_mp_consumption(gentity_t* ent)
 			zyk_stop_all_magic_powers(ent);
 		}
 
-		ent->client->pers.magic_consumption_timer = level.time + 500;
+		ent->client->pers.magic_consumption_timer = level.time + 200;
 	}
 }
 
