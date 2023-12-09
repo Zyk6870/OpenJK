@@ -5258,6 +5258,30 @@ void light_magic(gentity_t* ent)
 	ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] = 1;
 }
 
+void zyk_stop_magic_power(gentity_t* ent, zyk_magic_t magic_number)
+{
+	ent->client->pers.quest_power_status &= ~(1 << magic_number);
+
+	if (magic_number == MAGIC_FIRE_MAGIC)
+	{ // zyk: Fire Magic, stops flame thrower
+		ent->client->pers.flame_thrower_timer = 0;
+	}
+	else if (magic_number == MAGIC_LIGHT_MAGIC)
+	{ // zyk: stops the protection bubble
+		ent->client->invulnerableTimer = 0;
+	}
+}
+
+void zyk_stop_all_magic_powers(gentity_t* ent)
+{
+	int i = 0;
+
+	for (i = 0; i < MAX_MAGIC_POWERS; i++)
+	{
+		zyk_stop_magic_power(ent, i);
+	}
+}
+
 // zyk: keeps using mp while magic powers are active
 extern int zyk_max_skill_level(int skill_index);
 void zyk_active_magic_mp_consumption(gentity_t* ent)
@@ -5283,7 +5307,7 @@ void zyk_active_magic_mp_consumption(gentity_t* ent)
 		}
 		else
 		{ // zyk: players run out of mp, stop all magic
-			ent->client->pers.quest_power_status = 0;
+			zyk_stop_all_magic_powers(ent);
 		}
 
 		ent->client->pers.magic_consumption_timer = level.time + 500;

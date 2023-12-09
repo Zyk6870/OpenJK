@@ -5384,6 +5384,8 @@ void try_finishing_race()
 Cmd_LogoutAccount_f
 ==================
 */
+extern void zyk_stop_magic_power(gentity_t* ent, zyk_magic_t magic_number);
+extern void zyk_stop_all_magic_powers(gentity_t* ent);
 void Cmd_LogoutAccount_f( gentity_t *ent ) {
 	if (level.duel_tournament_mode > 0 && level.duel_players[ent->s.number] != -1)
 	{
@@ -5396,6 +5398,9 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 		trap->SendServerCommand(ent->s.number, "print \"Cannot logout while in a Sniper Battle\n\"");
 		return;
 	}
+
+	// zyk: stop all magic powers
+	zyk_stop_all_magic_powers(ent);
 
 	// zyk: saving the not logged player mode in session
 	ent->client->sess.amrpgmode = 0;
@@ -10860,16 +10865,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 
 		if (ent->client->pers.quest_power_status & (1 << magic_number))
 		{ // zyk: stop using the magic power
-			ent->client->pers.quest_power_status &= ~(1 << magic_number);
-
-			if (magic_number == MAGIC_FIRE_MAGIC)
-			{ // zyk: Fire Magic, stops flame thrower
-				ent->client->pers.flame_thrower_timer = 0;
-			}
-			else if (magic_number == MAGIC_LIGHT_MAGIC)
-			{
-				ent->client->invulnerableTimer = 0;
-			}
+			zyk_stop_magic_power(ent, magic_number);
 
 			// zyk: magic stop anim
 			G_SetAnim(ent, NULL, SETANIM_TORSO, BOTH_BUTTON_HOLD, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);

@@ -2156,6 +2156,7 @@ extern void zyk_NPC_Kill_f( char *name );
 extern gentity_t *Zyk_NPC_SpawnType(char *npc_type, int x, int y, int z, int yaw);
 extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
+extern void zyk_stop_all_magic_powers(gentity_t* ent);
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
 	gentity_t* ent;
 	int			anim;
@@ -2177,8 +2178,9 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	if (!attacker)
 		return;
 
-	// zyk: remove any quest_power status from this player
-	self->client->pers.quest_power_status = 0;
+	// zyk: stop all magic powers
+	zyk_stop_all_magic_powers(self);
+	
 	self->client->pers.player_statuses &= ~(1 << 29);
 
 	if (self->client->pers.quest_npc > 0)
