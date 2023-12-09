@@ -5561,7 +5561,7 @@ void quest_power_events(gentity_t *ent)
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] > 0)
 					{
 						int duration = 1500;
-						int damage = 5 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
+						int damage = 4 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
 						int radius = 290 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]); // zyk: default distace for this effect is 540
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "ships/proton_impact", 100, damage, radius, duration);
@@ -5595,17 +5595,17 @@ void quest_power_events(gentity_t *ent)
 							// zyk: increases strength with which target is sucked into the black hole the closer he is to it
 							if (black_hole_target->client->ps.groundEntityNum != ENTITYNUM_NONE)
 							{
-								black_hole_suck_strength *= 215.0;
+								black_hole_suck_strength *= 200.0;
 							}
 							else
 							{
-								black_hole_suck_strength *= 52.0;
+								black_hole_suck_strength *= 48.0;
 							}
 
 							// zyk: add a limit to the strength to prevent the target from being blown out of the black hole
-							if (black_hole_suck_strength > 500.0)
+							if (black_hole_suck_strength > 450.0)
 							{
-								black_hole_suck_strength = 500.0;
+								black_hole_suck_strength = 450.0;
 							}
 
 							if (target_distance < 64.0)
