@@ -4907,44 +4907,6 @@ void zyk_energy_modulator(gentity_t* ent)
 	}
 }
 
-void zyk_spawn_ice_block(gentity_t *ent, int duration, int pitch, int yaw, int x_offset, int y_offset, int z_offset)
-{
-	gentity_t *new_ent = G_Spawn();
-
-	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
-	zyk_set_entity_field(new_ent, "spawnflags", "65537");
-	zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)ent->r.currentOrigin[0], (int)ent->r.currentOrigin[1], (int)ent->r.currentOrigin[2]));
-
-	zyk_set_entity_field(new_ent, "angles", va("%d %d 0", pitch, yaw));
-
-	if (x_offset == 0 && y_offset != 0)
-	{
-		zyk_set_entity_field(new_ent, "mins", va("%d -50 %d", y_offset * -1, y_offset * -1));
-		zyk_set_entity_field(new_ent, "maxs", va("%d 50 %d", y_offset, y_offset));
-	}
-	else if (x_offset != 0 && y_offset == 0)
-	{
-		zyk_set_entity_field(new_ent, "mins", va("-50 %d %d", x_offset * -1, x_offset * -1));
-		zyk_set_entity_field(new_ent, "maxs", va("50 %d %d", x_offset, x_offset));
-	}
-	else if (x_offset == 0 && y_offset == 0)
-	{
-		zyk_set_entity_field(new_ent, "mins", va("%d %d -50", z_offset * -1, z_offset * -1));
-		zyk_set_entity_field(new_ent, "maxs", va("%d %d 50", z_offset, z_offset));
-	}
-
-	zyk_set_entity_field(new_ent, "model", "models/map_objects/rift/crystal_wall.md3");
-
-	zyk_set_entity_field(new_ent, "targetname", "zyk_ice_block");
-
-	zyk_set_entity_field(new_ent, "zykmodelscale", "200");
-
-	zyk_spawn_entity(new_ent);
-
-	level.special_power_effects[new_ent->s.number] = ent->s.number;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
-}
-
 void zyk_spawn_black_hole_model(gentity_t* ent, int duration, int model_scale)
 {
 	gentity_t* new_ent = G_Spawn();
@@ -5159,7 +5121,7 @@ void healing_area(gentity_t* ent)
 	zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing_area", "4", "env/red_cyc", 0, damage, 228, 1500);
 }
 
-// zyk: Dome of Damage
+// zyk: Magic Dome
 void dome_of_damage(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_DOME_OF_DAMAGE);
@@ -5171,7 +5133,6 @@ void water_magic(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_WATER_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 500;
-	ent->client->pers.magic_power_hit_counter[MAGIC_WATER_MAGIC] = 1;
 }
 
 // zyk: Earth Magic
@@ -5336,29 +5297,6 @@ void quest_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] < level.time)
 				{
-					if (ent->client->pers.magic_power_hit_counter[MAGIC_WATER_MAGIC] > 0)
-					{
-						int ice_block_duration = 2000;
-						int heal_amount = 20 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
-
-						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
-							ent->health += heal_amount;
-						else
-							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-						// zyk: ice block around the player
-						zyk_spawn_ice_block(ent, ice_block_duration, 0, 0, -140, 0, 0);
-						zyk_spawn_ice_block(ent, ice_block_duration, 0, 90, 140, 0, 0);
-						zyk_spawn_ice_block(ent, ice_block_duration, 0, 179, 0, -140, 0);
-						zyk_spawn_ice_block(ent, ice_block_duration, 0, -90, 0, 140, 0);
-						zyk_spawn_ice_block(ent, ice_block_duration, 90, 0, 0, 0, -140);
-						zyk_spawn_ice_block(ent, ice_block_duration, -90, 0, 0, 0, 140);
-
-						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
-
-						ent->client->pers.magic_power_hit_counter[MAGIC_WATER_MAGIC]--;
-					}
-
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
 						target_ent = &g_entities[zyk_it];

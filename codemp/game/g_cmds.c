@@ -146,7 +146,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAX_MP] = "Max Magic Points";
 	skill_names[SKILL_MAGIC_HEALING_AREA] = "Healing Area";
-	skill_names[SKILL_MAGIC_DOME_OF_DAMAGE] = "Dome of Damage";
+	skill_names[SKILL_MAGIC_DOME_OF_DAMAGE] = "Magic Dome";
 	skill_names[SKILL_MAGIC_WATER_MAGIC] = "Water Magic";
 	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "Earth Magic";
 	skill_names[SKILL_MAGIC_FIRE_MAGIC] = "Fire Magic";
@@ -240,7 +240,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
 		return "an energy dome appears at your position each half second, damaging enemies inside it";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
-		return "creates an ice block that protects you and restores some health. Hits enemies around you with Water damage. Enemies hit by Water get their hp drained to restore your health";
+		return "hits enemies around you with Water damage. Enemies hit by Water get their hp drained to restore your health";
 	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
 		return "creates a tree that protects you from damage. Creates earthquakes and hits enemies with Earth damage";
 	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
@@ -10825,7 +10825,7 @@ int zyk_get_magic_cost(int magic_number)
 {
 	int magic_costs[MAX_MAGIC_POWERS] = {
 		40, // Healing Area
-		50, // Dome of Damage
+		40, // Dome of Damage
 		50, // Water Magic
 		50, // Earth Magic
 		50, // Fire Magic
