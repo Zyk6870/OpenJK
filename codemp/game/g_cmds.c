@@ -242,15 +242,15 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
 		return "hits enemies around you with Water damage. Enemies hit by Water get their hp drained to restore your health";
 	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
-		return "creates a tree that protects you from damage. Creates earthquakes and hits enemies with Earth damage";
+		return "creates earthquakes and hits enemies with Earth damage";
 	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
-		return "creates fire around you and hits enemies around you with Fire damage. Enemies hit by it will catch fire for some seconds";
+		return "hits enemies around you with Fire damage. Enemies hit by it will catch fire for some seconds";
 	if (skill_index == SKILL_MAGIC_AIR_MAGIC)
 		return "blows people away with a strong wind, and does a little Air damage to them. Increases your run speed. Enemies hit by Air will have their run speed decreased";
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
-		return "creates a black hole, sucking everyone nearby. The closer the enemies are, the more damage they receive";
+		return "creates a black hole, sucking everyone nearby and doing Dark damage to them. The closer the enemies are, the more damage they receive";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
-		return "creates a lightning dome that damages enemies nearby. Creates a big shining light around you. While inside the light, enemies will get confused/stunned and will have their MP drained to restore your MP. While inside the light, you take less damage and any attacker who hits you gets knocked down";
+		return "creates a lightning dome that damages enemies nearby. Creates a big shining light around you that does Light damage to enemies. While inside the light, enemies will get confused/stunned and will have their MP drained to restore your MP. While inside the light, you take less damage and any attacker who hits you gets knocked down";
 
 	return "";
 }
