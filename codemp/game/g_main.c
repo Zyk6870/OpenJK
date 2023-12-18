@@ -4692,57 +4692,6 @@ qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target)
 	return qfalse;
 }
 
-// zyk: tests if the target entity can be hit by the attacker special power
-qboolean zyk_special_power_can_hit_target(gentity_t *attacker, gentity_t *target, int i, int min_distance, int max_distance, qboolean hit_breakable, int *targets_hit)
-{
-	if ((*targets_hit) >= zyk_max_special_power_targets.integer)
-		return qfalse;
-
-	if (attacker->s.number != i && target && target->client && target->health > 0 && zyk_can_hit_target(attacker, target) == qtrue && 
-		(i > MAX_CLIENTS || (target->client->pers.connected == CON_CONNECTED && target->client->sess.sessionTeam != TEAM_SPECTATOR && 
-		 target->client->ps.duelInProgress == qfalse)))
-	{ // zyk: target is a player or npc that can be hit by the attacker
-		int player_distance = (int)Distance(attacker->client->ps.origin,target->client->ps.origin);
-
-		if (player_distance > min_distance && player_distance < max_distance)
-		{
-			int is_ally = 0;
-
-			if (i < level.maxclients && !attacker->NPC && 
-				zyk_is_ally(attacker,target) == qtrue)
-			{ // zyk: allies will not be hit by this power
-				is_ally = 1;
-			}
-
-			if (OnSameTeam(attacker, target) == qtrue || npcs_on_same_team(attacker, target) == qtrue)
-			{ // zyk: if one of them is npc, also check for allies
-				is_ally = 1;
-			}
-
-			if (is_ally == 0)
-			{ // zyk: players in bosses can only hit bosses and their helper npcs. Players not in boss battles
-			  // can only hit normal enemy npcs and npcs spawned by bosses but not the bosses themselves. Magic-using npcs can hit everyone that are not their allies
-				(*targets_hit)++;
-
-				return qtrue;
-			}
-		}
-	}
-	else if (i >= MAX_CLIENTS && hit_breakable == qtrue && target && !target->client && target->health > 0 && target->takedamage == qtrue)
-	{
-		int entity_distance = (int)Distance(attacker->client->ps.origin,target->r.currentOrigin);
-
-		if (entity_distance > min_distance && entity_distance < max_distance)
-		{
-			(*targets_hit)++;
-
-			return qtrue;
-		}
-	}
-
-	return qfalse;
-}
-
 // zyk: similar to the function above, but for powers with which the effect/model itself must be tested
 qboolean zyk_magic_effect_can_hit_target(gentity_t* attacker, gentity_t* target, vec3_t effect_origin, int i, int min_distance, int max_distance, qboolean hit_breakable)
 {
@@ -4754,22 +4703,21 @@ qboolean zyk_magic_effect_can_hit_target(gentity_t* attacker, gentity_t* target,
 
 		if (player_distance > min_distance && player_distance < max_distance)
 		{
-			int is_ally = 0;
+			qboolean is_ally = qfalse;
 
 			if (i < level.maxclients && !attacker->NPC &&
 				zyk_is_ally(attacker, target) == qtrue)
 			{ // zyk: allies will not be hit by this power
-				is_ally = 1;
+				is_ally = qtrue;
 			}
 
 			if (OnSameTeam(attacker, target) == qtrue || npcs_on_same_team(attacker, target) == qtrue)
 			{ // zyk: if one of them is npc, also check for allies
-				is_ally = 1;
+				is_ally = qtrue;
 			}
 
-			if (is_ally == 0)
-			{ // zyk: players in bosses can only hit bosses and their helper npcs. Players not in boss battles
-			  // can only hit normal enemy npcs and npcs spawned by bosses but not the bosses themselves. Magic-using npcs can hit everyone that are not their allies
+			if (is_ally == qfalse)
+			{
 				return qtrue;
 			}
 		}
@@ -5318,8 +5266,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (target_ent && target_ent->client && ent != target_ent &&
-							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qfalse))
+						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qfalse))
 						{
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water", "4", "world/waterfall3", 0, damage, 200, 1000);
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water_effect", "0", "env/water_impact", 0, 0, 0, 1000);
@@ -5350,7 +5297,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (zyk_special_power_can_hit_target(ent, target_ent, zyk_it, 0, max_distance, qfalse, &targets_hit) == qtrue)
+						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qfalse))
 						{
 							if (target_ent->client && target_ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 							{ // zyk: player can only be hit if he is on floor
@@ -5372,13 +5319,9 @@ void quest_power_events(gentity_t *ent)
 								G_ScreenShake(target_ent->client->ps.origin, target_ent, 10.0f, 2000, qtrue);
 							}
 
-							G_Sound(target_ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
-						}
-
-						if (target_ent && target_ent->client && ent != target_ent &&
-							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qfalse))
-						{
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_earth", "4", "env/rock_smash", 0, damage, 100, 2000);
+
+							G_Sound(target_ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
 						}
 					}
 
@@ -5404,8 +5347,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (target_ent && target_ent->client && ent != target_ent &&
-							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qfalse))
+						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qfalse))
 						{
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_fire", "4", "env/fire", 0, damage, 90, 1000);
 
@@ -5466,8 +5408,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (target_ent && target_ent->client && 
-							zyk_special_power_can_hit_target(ent, target_ent, zyk_it, 0, max_distance, qfalse, &targets_hit) == qtrue)
+						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qfalse))
 						{
 							static vec3_t forward;
 							vec3_t dir;
@@ -5528,8 +5469,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						black_hole_target = &g_entities[zyk_it];
 
-						if (black_hole_target && black_hole_target->client && ent != black_hole_target &&
-							zyk_magic_effect_can_hit_target(ent, black_hole_target, ent->client->pers.black_hole_origin, zyk_it, 0, ent->client->pers.black_hole_distance, qfalse))
+						if (zyk_magic_effect_can_hit_target(ent, black_hole_target, ent->client->pers.black_hole_origin, zyk_it, 0, ent->client->pers.black_hole_distance, qfalse))
 						{
 							vec3_t dir, forward;
 							float target_distance = Distance(ent->client->pers.black_hole_origin, black_hole_target->client->ps.origin);
@@ -5621,8 +5561,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						light_of_judgement_target = &g_entities[zyk_it];
 
-						if (light_of_judgement_target && light_of_judgement_target->client && ent != light_of_judgement_target &&
-							zyk_magic_effect_can_hit_target(ent, light_of_judgement_target, ent->client->pers.light_of_judgement_origin, zyk_it, 0, ent->client->pers.light_of_judgement_distance, qfalse))
+						if (zyk_magic_effect_can_hit_target(ent, light_of_judgement_target, ent->client->pers.light_of_judgement_origin, zyk_it, 0, ent->client->pers.light_of_judgement_distance, qfalse))
 						{
 							int mp_to_drain = 1 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 							int max_player_mp = zyk_max_magic_power(ent);
