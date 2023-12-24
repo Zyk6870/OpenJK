@@ -78,7 +78,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
 	max_skill_levels[SKILL_MELEE] = 3;
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
-	max_skill_levels[SKILL_SABER] = 1;
+	max_skill_levels[SKILL_SABER] = 5;
 	max_skill_levels[SKILL_WEAPON_DAMAGE] = 10;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
 	max_skill_levels[SKILL_MAX_STAMINA] = 5;
@@ -219,7 +219,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MELEE_SPEED)
 		return "Each level increases how fast you can punch with Melee";
 	if (skill_index == SKILL_SABER)
-		return "Increases Saber damage based on your current level";
+		return "Increases Saber damage based on your current level and on this skill level";
 	if (skill_index == SKILL_WEAPON_DAMAGE)
 		return "Each level multiplies damage per amount of this weapon in your inventory and per this skill level";
 	if (skill_index == SKILL_MAX_WEIGHT)

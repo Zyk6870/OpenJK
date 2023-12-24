@@ -4849,7 +4849,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			if (attacker->client->pers.skill_levels[SKILL_SABER] > 0)
 			{ // zyk: Saber Damage skill, increases damage based on current RPG level
-				bonus_saber_damage_factor += (0.005 * attacker->client->pers.level);
+				bonus_saber_damage_factor += (0.002 * attacker->client->pers.skill_levels[SKILL_SABER] * attacker->client->pers.level);
 			}
 
 			damage = (int)ceil(damage * bonus_saber_damage_factor);
