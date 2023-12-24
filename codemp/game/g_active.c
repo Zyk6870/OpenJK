@@ -3448,15 +3448,11 @@ void ClientThink_real( gentity_t *ent ) {
 						}
 						else if (ent->client->sess.magic_fist_selection == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7Electric Bolt     ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer * 2));
+							trap->SendServerCommand(ent->s.number, va("chat \"^7Electric Bolt     ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer));
 						}
 						else if (ent->client->sess.magic_fist_selection == 3)
 						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7Fire Bolt         ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer * 2));
-						}
-						else if (ent->client->sess.magic_fist_selection == 4)
-						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7Ultra Bolt        ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer * 2));
+							trap->SendServerCommand(ent->s.number, va("chat \"^7Ultra Bolt        ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer));
 						}
 						else
 						{

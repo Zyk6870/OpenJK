@@ -3872,6 +3872,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			{ // zyk: Normal Bolt
 				vec3_t origin, dir, zyk_forward;
 				gentity_t *missile = NULL;
+				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * (1.00 + (0.01 * ent->client->pers.level)));
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 12);
@@ -3890,7 +3891,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				VectorSet(missile->r.maxs, BOWCASTER_SIZE, BOWCASTER_SIZE, BOWCASTER_SIZE);
 				VectorScale(missile->r.maxs, -1, missile->r.mins);
 
-				missile->damage = zyk_magic_fist_damage.integer;
+				missile->damage = fist_damage;
 
 				missile->dflags = DAMAGE_DEATH_KNOCKBACK;
 				missile->methodOfDeath = MOD_MELEE;
@@ -3906,11 +3907,11 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 
 				send_rpg_events(2000);
 			}
-			else if (ent->client->sess.magic_fist_selection == 2 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
+			else if (ent->client->sess.magic_fist_selection == 2 && ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
 			{ // zyk: Electric Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;
-				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * 2.0);
+				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * (1.00 + (0.01 * ent->client->pers.level)));
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 12);
@@ -3941,67 +3942,17 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 				missile->bounceCount = 0;
 
 				rpg_skill_counter(ent, 10);
-				ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 2);
+				ent->client->pers.magic_power -= zyk_magic_fist_mp_cost.integer;
 
 				G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/demp2/fire.mp3"));
 
 				send_rpg_events(2000);
 			}
-			else if (ent->client->sess.magic_fist_selection == 3 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
-			{ // zyk: Fire Bolt
-				gentity_t* missile;
-				vec3_t origin, dir, zyk_forward;
-				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * 1.8);
-
-				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
-					VectorSet(origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 12);
-				else
-					VectorSet(origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 36);
-
-				VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
-
-				AngleVectors(dir, zyk_forward, NULL, NULL);
-
-				VectorNormalize(zyk_forward);
-
-				missile = CreateMissile(origin, zyk_forward, magic_fist_velocity(ent), 10000, ent, qfalse);
-
-				missile->classname = "flech_alt";
-				missile->s.weapon = WP_FLECHETTE;
-				missile->mass = 4;
-
-				// How 'bout we give this thing a size...
-				VectorSet(missile->r.mins, -3.0f, -3.0f, -3.0f);
-				VectorSet(missile->r.maxs, 3.0f, 3.0f, 3.0f);
-
-				missile->damage = fist_damage;
-
-				missile->dflags = 0;
-				missile->methodOfDeath = MOD_MELEE;
-				missile->splashMethodOfDeath = MOD_MELEE;
-				missile->clipmask = MASK_SHOT;
-
-				missile->splashDamage = fist_damage;
-
-				missile->splashRadius = 40;
-
-				missile->s.eFlags |= EF_ALT_FIRING;
-
-				// we don't want it to ever bounce
-				missile->bounceCount = 0;
-
-				rpg_skill_counter(ent, 10);
-				ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 2);
-
-				G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/effects/fireout.mp3"));
-
-				send_rpg_events(2000);
-			}
-			else if (ent->client->sess.magic_fist_selection == 4 && ent->client->pers.magic_power >= (zyk_magic_fist_mp_cost.integer * 2))
+			else if (ent->client->sess.magic_fist_selection == 3 && ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
 			{ // zyk: Ultra Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;
-				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * 2.2);
+				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * (1.00 + (0.01 * ent->client->pers.level)));
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 12);
@@ -4033,13 +3984,13 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 
 				missile->splashDamage = fist_damage;
 
-				missile->splashRadius = CONC_SPLASH_RADIUS/2;
+				missile->splashRadius = CONC_SPLASH_RADIUS;
 
 				// we don't want it to ever bounce
 				missile->bounceCount = 0;
 
 				rpg_skill_counter(ent, 10);
-				ent->client->pers.magic_power -= (zyk_magic_fist_mp_cost.integer * 2);
+				ent->client->pers.magic_power -= zyk_magic_fist_mp_cost.integer;
 
 				G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/concussion/fire.mp3"));
 

@@ -554,7 +554,6 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		ent->s.weapon != WP_DET_PACK &&
 		ent->s.weapon != WP_DEMP2 &&
 		!(ent->s.weapon == WP_CONCUSSION && ent->methodOfDeath == MOD_MELEE) && // zyk: cannot be Ultra Bolt
-		!(ent->s.weapon == WP_FLECHETTE && ent->methodOfDeath == MOD_MELEE && Q_stricmp(ent->classname, "flech_alt") == 0) && // zyk: cannot be Fire Bolt
 		ent->methodOfDeath != MOD_REPEATER_ALT &&
 		ent->methodOfDeath != MOD_FLECHETTE_ALT_SPLASH &&
 		ent->methodOfDeath != MOD_CONC &&
@@ -628,7 +627,6 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			ent->s.weapon != WP_DET_PACK &&
 			ent->s.weapon != WP_DEMP2 &&
 			!(ent->s.weapon == WP_CONCUSSION && ent->methodOfDeath == MOD_MELEE) && // zyk: cannot be Ultra Bolt
-			!(ent->s.weapon == WP_FLECHETTE && ent->methodOfDeath == MOD_MELEE && Q_stricmp(ent->classname, "flech_alt") == 0) && // zyk: cannot be Fire Bolt
 			ent->methodOfDeath != MOD_REPEATER_ALT &&
 			ent->methodOfDeath != MOD_FLECHETTE_ALT_SPLASH &&
 			ent->methodOfDeath != MOD_CONC &&
@@ -823,15 +821,6 @@ killProj:
 		G_AddEvent( ent, EV_MISSILE_MISS_METAL, DirToByte( trace->plane.normal ) );
 	} else if (ent->s.weapon != G2_MODEL_PART && !isKnockedSaber) {
 		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
-	}
-
-	// zyk: Fire Bolt spawns a fire in the ground
-	if (ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING) && ent->methodOfDeath == MOD_MELEE &&
-		ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2)
-	{
-		zyk_quest_effect_spawn(ent->parent, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 100);
-
-		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
 	}
 
 	if (!isKnockedSaber)

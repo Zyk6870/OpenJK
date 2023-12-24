@@ -85,7 +85,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_UNDERWATER] = 2;
 	max_skill_levels[SKILL_RUN_SPEED] = 3;
 
-	max_skill_levels[SKILL_MAGIC_FIST] = 4;
+	max_skill_levels[SKILL_MAGIC_FIST] = 3;
 	max_skill_levels[SKILL_MAX_MP] = 10;
 	max_skill_levels[SKILL_MAGIC_HEALING_AREA] = 7;
 	max_skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 7;
@@ -232,7 +232,7 @@ char* zyk_skill_description(int skill_index)
 		return va("At level 0 your run speed is %f. Each level increases it by 50", g_speed.value);
 	
 	if (skill_index == SKILL_MAGIC_FIST)
-		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key";
+		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key. Bolt damage increases when you get more RPG levels";
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
