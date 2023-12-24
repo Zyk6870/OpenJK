@@ -5921,30 +5921,16 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	return "";
 }
 
-char* zyk_add_inventory_whitespaces(int inventory_index, int biggest_inventory_item_name_length)
-{
-	char result_text[MAX_STRING_CHARS];
-	int inventory_item_name_length = strlen(zyk_get_inventory_item_name(inventory_index));
-	int i = 0;
-
-	strcpy(result_text, "");
-
-	for (i = 0; i < (biggest_inventory_item_name_length - inventory_item_name_length); i++)
-	{
-		// zyk: adds a whitespace at the end of the current string
-		strcpy(result_text, va("%s ", result_text));
-	}
-
-	return G_NewString(result_text);
-}
-
 void zyk_list_inventory(gentity_t* ent, int page)
 {
 	int inventory_it = 0;
 	int results_per_page = 20; // zyk: number of results per page
-
 	char message[MAX_STRING_CHARS];
 	char final_chars[32];
+	char current_column[64];
+	char item_number_value[8];
+	int number_of_whitespaces = 0;
+	int max_column_size = 32;
 
 	strcpy(message, "");
 	strcpy(final_chars, "");
@@ -5953,21 +5939,34 @@ void zyk_list_inventory(gentity_t* ent, int page)
 	{
 		if (inventory_it >= ((page - 1) * results_per_page) && inventory_it < (page * results_per_page))
 		{
+			if ((inventory_it + 1) < 10)
+			{ // zyk: add an extra space to keep the items aligned when printing them in console
+				strcpy(item_number_value, va(" %d", (inventory_it + 1)));
+			}
+			else
+			{
+				strcpy(item_number_value, va("%d", (inventory_it + 1)));
+			}
+
+			strcpy(current_column, va("^1%s - ^7%s: ^5%d", item_number_value, zyk_get_inventory_item_name(inventory_it),
+				ent->client->pers.rpg_inventory[inventory_it]));
+
 			if ((inventory_it % 2) == 0)
 			{ // zyk: adds whitespaces in first column
-				strcpy(final_chars, va("%s ", zyk_add_inventory_whitespaces(inventory_it, 30)));
+				number_of_whitespaces = max_column_size - strlen(current_column) + 6; // zyk: adds 6 which are the color chars that will not appear in console
+
+				strcpy(final_chars, va("%s ", zyk_add_whitespaces(number_of_whitespaces)));
 			}
 			else
 			{
 				strcpy(final_chars, "\n");
 			}
 
-			strcpy(message, va("%s^3%d - ^7%s: ^5%d%s", message, (inventory_it + 1), zyk_get_inventory_item_name(inventory_it),
-				ent->client->pers.rpg_inventory[inventory_it], final_chars));
+			strcpy(message, va("%s%s%s", message, current_column, final_chars));
 		}
 	}
 
-	trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", message));
+	trap->SendServerCommand(ent->s.number, va("print \"\n%s\n\"", message));
 }
 
 /*
