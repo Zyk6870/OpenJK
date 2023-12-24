@@ -71,7 +71,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_TEAM_ENERGIZE] = 3;
 	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
 	max_skill_levels[SKILL_SHIELD_HEALING] = 3;
-	max_skill_levels[SKILL_FASTER_FORCE_REGEN] = 2;
+	max_skill_levels[SKILL_FASTER_FORCE_REGEN] = 5;
 	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
 	max_skill_levels[SKILL_MAX_HEALTH] = 10;
