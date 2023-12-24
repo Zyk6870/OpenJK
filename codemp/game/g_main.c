@@ -5158,12 +5158,43 @@ void lightning_dome(gentity_t* ent, int damage)
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 }
 
-//zyk: Light Magic
+// zyk: Light Magic
 void light_magic(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_LIGHT_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] = 1;
+}
+
+// zyk: calculates bonus damage factor based on element of the magic used by attacker and target magic levels of both the same element and opposite element
+float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t *attacker, gentity_t *target)
+{
+	float bonus_damage_factor = 1.0;
+
+	zyk_magic_t opposite_elemental_magic[MAX_MAGIC_POWERS] = {
+		-1,
+		-1,
+		MAGIC_FIRE_MAGIC,
+		MAGIC_AIR_MAGIC,
+		MAGIC_WATER_MAGIC,
+		MAGIC_EARTH_MAGIC,
+		MAGIC_LIGHT_MAGIC,
+		MAGIC_DARK_MAGIC
+	};
+
+	if (magic_power >= 0 && magic_power < MAX_MAGIC_POWERS && opposite_elemental_magic[magic_power] != -1)
+	{ /* zyk: calculates bonus damage based on the levels of the magic skill of the attacker and both the same elemental magic and the opposite elemental magic of the target, so
+			    it will increase and decrease damage considering both opposite and same elements of target
+	*/
+		int attacker_skill_level = attacker->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA + magic_power];
+		int target_skill_level = target->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA + magic_power];
+		int target_opposite_element_skill_level = target->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA + opposite_elemental_magic[magic_power]];
+
+		if (attacker_skill_level > 0)
+			bonus_damage_factor = ((float)(attacker_skill_level - target_skill_level + target_opposite_element_skill_level) / (float)attacker_skill_level);
+	}
+
+	return bonus_damage_factor;
 }
 
 void zyk_stop_magic_power(gentity_t* ent, zyk_magic_t magic_number)

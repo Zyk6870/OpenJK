@@ -6172,6 +6172,43 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 	return qfalse;
 }
 
+zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
+{
+	int i = 0;
+
+	char *magic_powers_effects[MAX_MAGIC_POWERS] = {
+		"zyk_magic_healing_area",
+		"zyk_magic_dome",
+		"zyk_magic_water",
+		"zyk_magic_earth",
+		"zyk_magic_fire",
+		"zyk_magic_air",
+		"zyk_magic_dark",
+		"zyk_magic_light"
+	};
+
+	zyk_magic_t magic_powers[MAX_MAGIC_POWERS] =
+	{
+		MAGIC_HEALING_AREA,
+		MAGIC_DOME_OF_DAMAGE,
+		MAGIC_WATER_MAGIC,
+		MAGIC_EARTH_MAGIC,
+		MAGIC_FIRE_MAGIC,
+		MAGIC_AIR_MAGIC,
+		MAGIC_DARK_MAGIC,
+		MAGIC_LIGHT_MAGIC
+	};
+
+	for (i = 0; i < MAX_MAGIC_POWERS; i++)
+	{
+		if (Q_stricmp(magic_powers_effects[i], effect_name) == 0)
+		{
+			return magic_powers[i];
+		}
+	}
+
+	return -1;
+}
 
 /*
 ============
@@ -6180,6 +6217,7 @@ G_RadiusDamage
 */
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
+extern float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t* attacker, gentity_t* target);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, gentity_t *missile, int mod) {
 	float		points, dist;
@@ -6345,9 +6383,10 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						Q_stricmp(attacker->targetname, "zyk_magic_fire") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_magic_air") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_magic_dark") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_magic_light") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_effect_fire_bolt_hit") == 0)
+						Q_stricmp(attacker->targetname, "zyk_magic_light") == 0)
 					{
+						int final_damage = (int)points;
+
 						if (Q_stricmp(attacker->targetname, "zyk_magic_fire") == 0 && quest_power_user && quest_power_user != ent && ent->client &&  
 								 quest_power_user->client)
 						{ // zyk: Fire Magic. If target touches the flame, will keep catching fire for some seconds
@@ -6364,7 +6403,14 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_AIR] = level.time + 500;
 						}
 
-						G_Damage (ent, quest_power_user, quest_power_user, NULL, origin, (int)points, DAMAGE_RADIUS, mod);
+						// zyk: Elemental bonus. Each power gives a higher damage to target of opposite element and less damage to target of same element
+						final_damage = (int)ceil(final_damage * zyk_get_elemental_bonus_factor(zyk_get_magic_for_effect(attacker->targetname), quest_power_user, ent));
+
+						// zyk: must do at least 1 damage
+						if (final_damage < 1)
+							final_damage = 1;
+
+						G_Damage (ent, quest_power_user, quest_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
 
 						if (Q_stricmp(attacker->targetname, "zyk_magic_dark") == 0 && ent && ent->client && ent->health < 1)
 						{ // zyk: Black Hole disintegrates enemies who got killed by it
