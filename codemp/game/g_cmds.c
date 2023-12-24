@@ -5962,7 +5962,7 @@ void zyk_list_inventory(gentity_t* ent, int page)
 				strcpy(final_chars, "\n");
 			}
 
-			strcpy(message, va("%s^3%s: ^7%d%s", message, zyk_get_inventory_item_name(inventory_it),
+			strcpy(message, va("%s^3%d - ^7%s: ^5%d%s", message, (inventory_it + 1), zyk_get_inventory_item_name(inventory_it),
 				ent->client->pers.rpg_inventory[inventory_it], final_chars));
 		}
 	}
@@ -6001,7 +6001,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				if (trap->Argc() == 2)
 				{
-					trap->SendServerCommand(ent->s.number, "print \"Must pass a page number. Example: ^3/list inventory 1^7\n\"");
+					trap->SendServerCommand(ent->s.number, "print \"Must pass a page number or ^3desc ^7to see inventory item description. Example: ^3/list inventory 1^7 or ^3/list inventory desc 1^7\n\"");
 				}
 				else
 				{
@@ -6014,10 +6014,45 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 					page = atoi(arg2);
 
-					if (page <= 0)
-						page = 1;
+					if (Q_stricmp(arg2, "desc") == 0)
+					{
+						char arg3[MAX_STRING_CHARS];
+						int item_number = 0;
+						int item_index = 0;
 
-					zyk_list_inventory(ent, page);
+						strcpy(arg3, "");
+
+						if (trap->Argc() == 3)
+						{
+							trap->SendServerCommand(ent->s.number, "print \"Must pass a number to see inventory item description. Example: ^3/list inventory desc 1^7\n\"");
+						}
+						else
+						{
+							trap->Argv(3, arg3, sizeof(arg3));
+
+							item_number = atoi(arg3);
+							item_index = item_number - 1;
+
+							if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
+							{
+								if (item_index == RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR)
+								{
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a device that converts powercell ammo and blaster pack ammo into attack power or an extra shield protection. It has two modes. First Mode increases damage of all attacks by 20 per cent and reduces flame thrower fuel usage. Second Mode increases resistance to damage from any source by 20 per cent. Activate it by getting melee and pressing Saber Style key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+								}
+							}
+							else
+							{
+								trap->SendServerCommand(ent->s.number, va("print \"Item number must be between 1 and %d\n\"", MAX_RPG_INVENTORY_ITEMS));
+							}
+						}
+					}
+					else
+					{
+						if (page <= 0)
+							page = 1;
+
+						zyk_list_inventory(ent, page);
+					}
 				}
 			}
 			else if (Q_stricmp( arg1, "quests" ) == 0)
@@ -6268,9 +6303,6 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_EWEB_UPGRADE][0] = 1200;
 	seller_items_cost[SELLER_EWEB_UPGRADE][1] = 500;
 
-	seller_items_cost[SELLER_ENERGY_MODULATOR][0] = 7000;
-	seller_items_cost[SELLER_ENERGY_MODULATOR][1] = 5000;
-
 	if (buy_item == qtrue)
 	{
 		return seller_items_cost[item_number][0];
@@ -6349,7 +6381,6 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_SENTRY_GUN_UPGRADE] = "Sentry Gun Upgrade";
 	seller_items_names[SELLER_SEEKER_DRONE_UPGRADE] = "Seeker Drone Upgrade";
 	seller_items_names[SELLER_EWEB_UPGRADE] = "E-Web Upgrade";
-	seller_items_names[SELLER_ENERGY_MODULATOR] = "Energy Modulator";
 
 	if (item_number >= 0 && item_number < MAX_SELLER_ITEMS)
 	{
@@ -6703,10 +6734,6 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes E-Web stronger\n\n\"", zyk_get_seller_item_name(i)));
 		}
-		else if (i == SELLER_ENERGY_MODULATOR)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a device that converts powercell ammo and blaster pack ammo into attack power or an extra shield protection. It has two modes. First Mode increases damage of all attacks by 20 per cent and reduces flame thrower fuel usage. Second Mode increases resistance to damage from any source by 20 per cent. Activate it by getting melee and pressing Saber Style key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
 	}
 }
 
@@ -6890,11 +6917,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	else if (value == (SELLER_EWEB_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_EWEB_UPGRADE)));
-		return;
-	}
-	else if (value == (SELLER_ENERGY_MODULATOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_ENERGY_MODULATOR)));
 		return;
 	}
 
@@ -7227,10 +7249,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (value == (SELLER_EWEB_UPGRADE + 1))
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_EWEB);
-		}
-		else if (value == (SELLER_ENERGY_MODULATOR + 1))
-		{
-			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR);
 		}
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
@@ -7598,11 +7616,6 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (value == (SELLER_EWEB_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_EWEB);
-		sold = 1;
-	}
-	else if (value == (SELLER_ENERGY_MODULATOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR] > 0)
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR);
 		sold = 1;
 	}
 
