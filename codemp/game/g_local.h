@@ -778,6 +778,10 @@ typedef enum {
 // zyk: initial credits in RPG Mode
 #define RPG_INITIAL_CREDITS 200
 
+// zyk: bonus skillpoints given at certain levels
+#define RPG_LEVEL_BONUS_SKILLPOINTS 5
+#define RPG_BONUS_SKILLPOINTS 1
+
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
 #define RPG_MAX_HEALTH_INCREASE 40
 

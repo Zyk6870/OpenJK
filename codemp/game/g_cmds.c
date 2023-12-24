@@ -2097,9 +2097,9 @@ void load_account(gentity_t* ent)
 
 			for (j = 1; j <= ent->client->pers.level; j++)
 			{
-				if ((j % 5) == 0)
-				{ // zyk: level divisible by 5 has more skillpoints
-					max_skillpoints += 2;
+				if ((j % RPG_LEVEL_BONUS_SKILLPOINTS) == 0)
+				{ // zyk: level divisible by RPG_LEVEL_BONUS_SKILLPOINTS has more skillpoints
+					max_skillpoints += (1 + RPG_BONUS_SKILLPOINTS);
 				}
 				else
 				{
@@ -4928,8 +4928,8 @@ void rpg_score(gentity_t *ent)
 			ent->client->pers.level_up_score -= (ent->client->pers.level * zyk_level_up_score_factor.integer);
 			ent->client->pers.level++;
 
-			if (ent->client->pers.level % 5 == 0) // zyk: every level divisible by 5 gives bonus skillpoints
-				ent->client->pers.skillpoints += 2;
+			if (ent->client->pers.level % RPG_LEVEL_BONUS_SKILLPOINTS == 0) // zyk: every level divisible by this RPG_LEVEL_BONUS_SKILLPOINTS gives bonus skillpoints
+				ent->client->pers.skillpoints += (1 + RPG_BONUS_SKILLPOINTS);
 			else
 				ent->client->pers.skillpoints++;
 
