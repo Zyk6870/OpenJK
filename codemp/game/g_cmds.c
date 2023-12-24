@@ -87,14 +87,14 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 3;
 	max_skill_levels[SKILL_MAX_MP] = 10;
-	max_skill_levels[SKILL_MAGIC_HEALING_AREA] = 7;
-	max_skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 7;
-	max_skill_levels[SKILL_MAGIC_WATER_MAGIC] = 7;
-	max_skill_levels[SKILL_MAGIC_EARTH_MAGIC] = 7;
-	max_skill_levels[SKILL_MAGIC_FIRE_MAGIC] = 7;
-	max_skill_levels[SKILL_MAGIC_AIR_MAGIC] = 7;
-	max_skill_levels[SKILL_MAGIC_DARK_MAGIC] = 7;
-	max_skill_levels[SKILL_MAGIC_LIGHT_MAGIC] = 7;
+	max_skill_levels[SKILL_MAGIC_HEALING_AREA] = 8;
+	max_skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 8;
+	max_skill_levels[SKILL_MAGIC_WATER_MAGIC] = 8;
+	max_skill_levels[SKILL_MAGIC_EARTH_MAGIC] = 8;
+	max_skill_levels[SKILL_MAGIC_FIRE_MAGIC] = 8;
+	max_skill_levels[SKILL_MAGIC_AIR_MAGIC] = 8;
+	max_skill_levels[SKILL_MAGIC_DARK_MAGIC] = 8;
+	max_skill_levels[SKILL_MAGIC_LIGHT_MAGIC] = 8;
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
