@@ -3428,11 +3428,6 @@ void ClientThink_real( gentity_t *ent ) {
 
 				if (pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE)
 				{ 
-					if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR] > 0)
-					{ // zyk: Energy Modulator Upgrade
-						zyk_energy_modulator(ent);
-					}
-					
 					if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0)
 					{ // zyk: Magic Fist attacks
 						if (ent->client->sess.magic_fist_selection < ent->client->pers.skill_levels[SKILL_MAGIC_FIST])

@@ -4927,32 +4927,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		attacker->client->ps.quickerGetup = qtrue;
 	}
 
-	// zyk: player or npc with Earth Magic inside the Tree. Take less damage
-	if (targ && targ->client && (targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.quest_power_status & (1 << MAGIC_EARTH_MAGIC) && 
-		targ->client->pers.magic_power_hit_counter[MAGIC_EARTH_MAGIC] == 1)
-	{
-		damage = (int)ceil(damage * (1.00 - (0.05 * targ->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC])));
-	}
-
-	if (targ && targ->client && targ->client->sess.amrpgmode == 2)
-	{ // zyk: damage resistance
-		float bonus_resistance = 0.00;
-
-		if (targ->client->pers.energy_modulator_mode == 2)
-		{ // zyk: Energy Modulator mode 2
-			bonus_resistance += 0.20;
-
-			targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
-		}
-
-		damage = (int)ceil(damage * (1.00 - bonus_resistance));
-
-		if (damage < 1)
-		{ // zyk: cannot make player fully absorb all damage
-			damage = 1;
-		}
-	}
-
 	if (targ && targ->damageRedirect)
 	{
 		G_Damage(&g_entities[targ->damageRedirectTo], inflictor, attacker, dir, point, damage, dflags, mod);
@@ -5469,13 +5443,19 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	if (check_shield == 1 && targ && targ->client && take > 0)  
 	{ // zyk: check shields if the damage is greater than 0
 		int scaled_damage = take;
+		float bonus_resistance = 0.00;
 
-		/*
-		if (targ->client->sess.amrpgmode == 2) // zyk: Shield Strength skill
-		{
-			scaled_damage = (int)ceil(take * (1.0 - (0.05 * targ->client->pers.skill_levels[SKILL_SHIELD_STRENGTH])));
+		if (targ->client->sess.amrpgmode == 2)
+		{ // zyk: RPG resistance bonuses
+			if (targ->client->pers.energy_modulator_mode == 2)
+			{ // zyk: Energy Modulator mode 2
+				bonus_resistance += 0.20;
+
+				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
+			}
+
+			scaled_damage = (int)ceil(take * (1.0 - bonus_resistance));
 		}
-		*/
 
 		if (targ->client->ps.stats[STAT_ARMOR] >= scaled_damage)
 		{

@@ -3700,6 +3700,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	vec3_t		mins, maxs, end;
 	vec3_t		muzzleStun;
 
+	int flame_thrower_fuel_usage = 1;
+
 	if (!ent->client)
 	{
 		VectorCopy(ent->r.currentOrigin, muzzleStun);
@@ -3723,15 +3725,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 
 	// zyk: starts flame thrower
 	if (ent->client && ent->client->sess.amrpgmode == 2 && alt_fire == qtrue && 
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0 && ent->client->ps.cloakFuel > 0 && ent->waterlevel < 3)
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0 && ent->client->ps.cloakFuel >= flame_thrower_fuel_usage && ent->waterlevel < 3)
 	{ // zyk: do not use flame thrower when underwater
-		int flame_thrower_fuel_usage = 2;
-
-		if (ent->client->pers.energy_modulator_mode == 1)
-		{ // zyk: Energy Modulator mode 1 decreases flame thrower fuel usage
-			flame_thrower_fuel_usage = 1;
-		}
-
 		G_Sound( ent, CHAN_WEAPON, G_SoundIndex("sound/effects/fireout.mp3") );
 
 		ent->client->pers.flame_thrower_timer = level.time + 1500;
