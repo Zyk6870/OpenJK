@@ -4754,6 +4754,8 @@ vec3_t gPainPoint;
 extern void Jedi_Decloak( gentity_t *self );
 extern void Boba_FlyStop( gentity_t *self );
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
+extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
+extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
 	int			take, asave = 0, knockback;
@@ -5872,7 +5874,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{ // zyk: Deflective Armor
 				if (zyk_source_is_non_saber_weapon(mod) == qtrue)
 				{
-					bonus_health_resistance += 0.35;
+					bonus_health_resistance += 0.25;
 				}
 				else if (mod == MOD_SABER)
 				{
@@ -5888,8 +5890,13 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 				else if (mod == MOD_SABER)
 				{
-					bonus_health_resistance += 0.40;
+					bonus_health_resistance += 0.35;
 				}
+			}
+
+			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SERAPH_ARMOR] > 0)
+			{ // zyk: Seraph Armor
+				bonus_health_resistance += 0.20;
 			}
 
 			if (attacker && attacker->client && targ && targ->client && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC) && attacker != targ &&
@@ -5907,6 +5914,37 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (take < 1)
 			{ // zyk: cannot make player fully absorb all damage
 				take = 1;
+			}
+
+			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SERAPH_ARMOR] > 0)
+			{ // zyk: Seraph Armor. Regens shield, mp, force and stamina based on the amount of damage taken
+				int absorbed_damage = (int)ceil(take * 0.10);
+				int recovery_amount = (int)ceil(absorbed_damage / 4);
+				int max_shield = targ->client->ps.stats[STAT_MAX_HEALTH];
+
+				if (targ->client->sess.amrpgmode == 2)
+					max_shield = targ->client->pers.max_rpg_shield;
+
+				if (!targ->NPC)
+				{
+					if ((targ->client->ps.stats[STAT_ARMOR] + recovery_amount) < max_shield)
+					{
+						targ->client->ps.stats[STAT_ARMOR] += recovery_amount;
+					}
+					else
+					{
+						targ->client->ps.stats[STAT_ARMOR] = max_shield;
+					}
+				}
+
+				zyk_set_stamina(targ, recovery_amount, qtrue);
+				zyk_add_mp(targ, recovery_amount);
+
+				targ->client->ps.fd.forcePower += recovery_amount;
+				if (targ->client->ps.fd.forcePower > targ->client->ps.fd.forcePowerMax)
+				{
+					targ->client->ps.fd.forcePower = targ->client->ps.fd.forcePowerMax;
+				}
 			}
 
 			if (attacker && attacker->client && 
@@ -6178,7 +6216,6 @@ G_RadiusDamage
 ============
 */
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
-extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t* attacker, gentity_t* target);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, gentity_t *missile, int mod) {

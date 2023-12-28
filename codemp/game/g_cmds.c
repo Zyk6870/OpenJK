@@ -3894,7 +3894,7 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 	trace_t tr;
 	vec3_t forward, fwdOrg;
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR] > 0)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] > 0)
 	{ // zyk: Energy Modulator Upgrade
 		zyk_energy_modulator(ent);
 	}
@@ -5917,7 +5917,8 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "Sentry Gun Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR] = "Energy Modulator";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_SERAPH_ARMOR] = "Seraph Armor";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -6040,9 +6041,13 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 							if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
 							{
-								if (item_index == RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR)
+								if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 								{
 									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7one of the ^3Legendary Artifacts^7. A device that converts powercell ammo and blaster pack ammo into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 20 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. Activate it by pressing Duel key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+								}
+								else if (item_index == RPG_INVENTORY_LEGENDARY_SERAPH_ARMOR)
+								{
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7one of the ^3Legendary Artifacts^7. An armor that absorbs 20 per cent damage to health from any source. It converts 10 per cent of the damage taken into shield, mp, force and stamina\n\n\"", zyk_get_inventory_item_name(item_index)));
 								}
 							}
 							else
@@ -6657,11 +6662,11 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_DEFLECTIVE_ARMOR)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 35 per cent weapon/melee damage to your health (only 5 per cent from saber) and deflects some weapon shots\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 25 per cent weapon/melee damage to your health (only 5 per cent from saber) and deflects some weapon shots\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_SABER_ARMOR)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 5 per cent weapon/melee damage to your health (40 per cent from saber)\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 5 per cent weapon/melee damage to your health (35 per cent from saber)\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_FLAME_THROWER)
 		{
