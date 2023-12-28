@@ -5422,7 +5422,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		{ // zyk: RPG resistance bonuses
 			if (targ->client->pers.energy_modulator_mode == 2)
 			{ // zyk: Energy Modulator mode 2
-				bonus_resistance += 0.20;
+				bonus_resistance += 0.25;
 
 				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 			}

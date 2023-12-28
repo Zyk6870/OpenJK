@@ -6042,7 +6042,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							{
 								if (item_index == RPG_INVENTORY_UPGRADE_ENERGY_MODULATOR)
 								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7one of the ^3Legendary Artifacts^7. A device that converts powercell ammo and blaster pack ammo into attack power or an extra shield protection. It has two modes. First Mode increases damage of all attacks by 20 per cent. Second Mode increases resistance to damage to your shield from any source by 20 per cent. Activate it by pressing Duel key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7one of the ^3Legendary Artifacts^7. A device that converts powercell ammo and blaster pack ammo into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 20 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. Activate it by pressing Duel key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
 								}
 							}
 							else
