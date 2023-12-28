@@ -5297,7 +5297,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qfalse))
+						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water", "4", "world/waterfall3", 0, damage, 200, 1000);
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water_effect", "0", "env/water_impact", 0, 0, 0, 1000);
@@ -5328,7 +5328,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qfalse))
+						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
 							if (target_ent->client && target_ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 							{ // zyk: player can only be hit if he is on floor
@@ -5378,7 +5378,7 @@ void quest_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qfalse))
+						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_fire", "4", "env/fire", 0, damage, 90, 1000);
 
@@ -5439,23 +5439,26 @@ void quest_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qfalse))
+						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
 							static vec3_t forward;
 							vec3_t dir;
 
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_air", "4", "env/water_steam3", 0, damage, 100, 500);
 
-							AngleVectors(ent->client->ps.viewangles, forward, NULL, NULL);
+							if (target_ent->client)
+							{ // zyk: blows the target away
+								AngleVectors(ent->client->ps.viewangles, forward, NULL, NULL);
 
-							VectorNormalize(forward);
+								VectorNormalize(forward);
 
-							if (target_ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-								VectorScale(forward, 215.0, dir);
-							else
-								VectorScale(forward, 40.0, dir);
+								if (target_ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
+									VectorScale(forward, 215.0, dir);
+								else
+									VectorScale(forward, 40.0, dir);
 
-							VectorAdd(target_ent->client->ps.velocity, dir, target_ent->client->ps.velocity);
+								VectorAdd(target_ent->client->ps.velocity, dir, target_ent->client->ps.velocity);
+							}
 						}
 					}
 
