@@ -5182,7 +5182,8 @@ float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t *attacke
 		MAGIC_DARK_MAGIC
 	};
 
-	if (magic_power >= 0 && magic_power < MAX_MAGIC_POWERS && opposite_elemental_magic[magic_power] != -1)
+	if (magic_power >= 0 && magic_power < MAX_MAGIC_POWERS && opposite_elemental_magic[magic_power] != -1 && 
+		attacker && target && attacker->client && target->client)
 	{ /* zyk: calculates bonus damage based on the levels of the magic skill of the attacker and both the same elemental magic and the opposite elemental magic of the target, so
 			    it will increase and decrease damage considering both opposite and same elements of target
 	*/
