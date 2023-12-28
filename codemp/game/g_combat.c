@@ -4900,33 +4900,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		damage = (int)ceil(damage*zyk_scale_siege_damage.value);
 	}
 
-	if (attacker && attacker->client && targ && targ->client && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC) && attacker != targ &&
-		Distance(targ->client->ps.origin, targ->client->pers.light_of_judgement_origin) < targ->client->pers.light_of_judgement_distance)
-	{ // zyk: target is using Light Magic. Decreases damage taken and knocks down the attacker if target is inside the light
-		int light_of_judgement_stun_time = 500 * targ->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
-
-		damage = (int)ceil(damage * (1.0 - (0.05 * targ->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC])));
-
-		// zyk: removing emotes to prevent exploits
-		if (attacker->client->pers.player_statuses & (1 << 1))
-		{
-			attacker->client->pers.player_statuses &= ~(1 << 1);
-			attacker->client->ps.forceHandExtendTime = level.time;
-		}
-
-		// zyk: if using Meditate taunt, remove it
-		if (attacker->client->ps.legsAnim == BOTH_MEDITATE && attacker->client->ps.torsoAnim == BOTH_MEDITATE)
-		{
-			attacker->client->ps.legsAnim = attacker->client->ps.torsoAnim = BOTH_MEDITATE_END;
-		}
-
-		attacker->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-		attacker->client->ps.forceHandExtendTime = level.time + light_of_judgement_stun_time;
-		attacker->client->ps.velocity[2] += 150;
-		attacker->client->ps.forceDodgeAnim = 0;
-		attacker->client->ps.quickerGetup = qtrue;
-	}
-
 	if (targ && targ->damageRedirect)
 	{
 		G_Damage(&g_entities[targ->damageRedirectTo], inflictor, attacker, dir, point, damage, dflags, mod);
@@ -5919,8 +5892,17 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
+			if (attacker && attacker->client && targ && targ->client && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC) && attacker != targ &&
+				Distance(targ->client->ps.origin, targ->client->pers.light_of_judgement_origin) < targ->client->pers.light_of_judgement_distance)
+			{ // zyk: target using Light Magic. Decreases damage taken if target is inside the light
+				bonus_health_resistance += (0.025 * targ->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]);
+			}
+
 			// zyk: Health Strength skill decreases damage taken
-			take = (int)ceil(take * (1.00 - bonus_health_resistance - (0.04 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH])));
+			bonus_health_resistance += (0.04 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH]);
+
+			// zyk: reduces damage based on the health resistance bonuses
+			take = (int)ceil(take * (1.00 - bonus_health_resistance));
 
 			if (take < 1)
 			{ // zyk: cannot make player fully absorb all damage
