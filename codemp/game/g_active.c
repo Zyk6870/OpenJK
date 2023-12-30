@@ -1389,6 +1389,9 @@ void zyk_stamina_out(gentity_t* ent)
 
 		ent->client->pers.stamina_out_timer = level.time + stamina_out_time;
 
+		// zyk: also lose some health
+		G_Damage(ent, ent, ent, NULL, NULL, 20, 0, MOD_UNKNOWN);
+
 		trap->SendServerCommand(ent->s.number, va("chat \"^3%s: ^7I am tired...\"", ent->client->pers.netname));
 	}
 }
