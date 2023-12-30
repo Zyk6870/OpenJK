@@ -8368,79 +8368,6 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 	}
 }
 
-/*
-==================
-Cmd_ZykFile_f
-==================
-*/
-void Cmd_ZykFile_f(gentity_t *ent) {
-	int page = 1; // zyk: page the user wants to see
-	char arg1[MAX_STRING_CHARS];
-	char arg2[MAX_STRING_CHARS];
-	char file_content[MAX_STRING_CHARS * 4];
-	char content[MAX_STRING_CHARS];
-	int i = 0;
-	int results_per_page = zyk_list_cmds_results_per_page.integer; // zyk: number of results per page
-	FILE *server_file = NULL;
-	strcpy(file_content, "");
-	strcpy(content, "");
-
-	if (trap->Argc() < 3)
-	{
-		trap->SendServerCommand(ent->s.number, "print \"Use ^3/zykfile <filename> <page number> ^7to see the results of this page or a search string. Example: ^3/zykfile npclist 1 ^7or to do a search ^3/zykfile npclist reborn^7\n\"");
-		return;
-	}
-
-	// zyk: filename
-	trap->Argv(1, arg1, sizeof(arg1));
-
-	// zyk: page number or search string
-	trap->Argv(2, arg2, sizeof(arg2));
-	page = atoi(arg2);
-
-	if (zyk_check_user_input(arg1, strlen(arg1)) == qfalse)
-	{
-		trap->SendServerCommand(ent->s.number, "print \"Invalid filename. Only letters and numbers allowed.\n\"");
-		return;
-	}
-
-	server_file = fopen(va("zykmod/%s.txt", arg1), "r");
-	if (server_file != NULL)
-	{
-		if (page > 0)
-		{ // zyk: show results of this page
-			while (i < (results_per_page * (page - 1)) && fgets(content, sizeof(content), server_file) != NULL)
-			{ // zyk: reads the file until it reaches the position corresponding to the page number
-				i++;
-			}
-
-			while (i < (results_per_page * page) && fgets(content, sizeof(content), server_file) != NULL)
-			{ // zyk: fgets returns NULL at EOF
-				strcpy(file_content, va("%s%s", file_content, content));
-				i++;
-			}
-		}
-		else
-		{ // zyk: search for the string
-			while (i < results_per_page && fgets(content, MAX_STRING_CHARS, server_file) != NULL)
-			{ // zyk: fgets returns NULL at EOF
-				if (strstr(content, arg2))
-				{
-					strcpy(file_content, va("%s%s", file_content, content));
-					i++;
-				}
-			}
-		}
-
-		fclose(server_file);
-		trap->SendServerCommand(ent->s.number, va("print \"\n%s\n\"", file_content));
-	}
-	else
-	{
-		trap->SendServerCommand(ent->s.number, "print \"This file does not exist\n\"");
-	}
-}
-
 void zyk_spawn_race_line(int x, int y, int z, int yaw)
 {
 	gentity_t *new_ent_line = G_Spawn();
@@ -12229,7 +12156,6 @@ command_t commands[] = {
 	{ "vote",				Cmd_Vote_f,					CMD_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				CMD_NOINTERMISSION },
 	{ "zykchars",			Cmd_ZykChars_f,				CMD_LOGGEDIN | CMD_NOINTERMISSION },
-	{ "zykfile",			Cmd_ZykFile_f,				CMD_NOINTERMISSION },
 	{ "zyklist",			Cmd_ListAccount_f,			CMD_NOINTERMISSION },
 	{ "zyklogin",			Cmd_LoginAccount_f,			CMD_NOINTERMISSION },
 	{ "zyklogout",			Cmd_LogoutAccount_f,		CMD_LOGGEDIN | CMD_NOINTERMISSION },
