@@ -5918,7 +5918,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_SERAPH_ARMOR] = "Seraph Armor";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_CRYSTAL] = "Legendary Crystal";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -6043,11 +6043,11 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							{
 								if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7one of the ^3Legendary Artifacts^7. A device that converts powercell ammo and blaster pack ammo into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 20 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. Activate it by pressing Duel key. It uses blaster pack ammo, and it if runs out, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the Magic Spirits. A device that converts some energy sources (magic or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 30 per cent. Activate it by pressing Duel key. It uses mp, and it if runs out, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
 								}
-								else if (item_index == RPG_INVENTORY_LEGENDARY_SERAPH_ARMOR)
+								else if (item_index == RPG_INVENTORY_LEGENDARY_CRYSTAL)
 								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7one of the ^3Legendary Artifacts^7. An armor that absorbs 20 per cent damage to health from any source. It converts 10 per cent of the damage taken into shield, mp, force and stamina\n\n\"", zyk_get_inventory_item_name(item_index)));
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7legendary crystals hidden in several places. You must find all 7 of them and then go to the place where Energy Modulator is hidden. Then you must solve the puzzle to get the Energy Modulator\n\n\"", zyk_get_inventory_item_name(item_index)));
 								}
 							}
 							else

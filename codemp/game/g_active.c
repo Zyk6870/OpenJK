@@ -843,26 +843,26 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		if (client->sess.amrpgmode == 2)
 		{ // zyk: healing abilities
 			if (client->pers.energy_modulator_mode > 0)
-			{ // zyk: Energy Modulator consumes ammo while active
+			{ // zyk: Energy Modulator consumes mp or ammo while active
 				if (ent->health < 1)
 				{ // zyk: if player dies, deactivate Energy Modulator
 					ent->client->pers.energy_modulator_mode = 2;
 
 					zyk_energy_modulator(ent);
 				}
-				else if (client->ps.ammo[AMMO_BLASTER] < 2 && client->ps.ammo[AMMO_POWERCELL] < 2)
+				else if (client->pers.magic_power < 1 && client->ps.ammo[AMMO_POWERCELL] < 1)
 				{ // zyk: no more ammo to keep it active. Turn it off
 					ent->client->pers.energy_modulator_mode = 2;
 
 					zyk_energy_modulator(ent);
 				}
-				else if (client->ps.ammo[AMMO_BLASTER] < 2)
+				else if (client->pers.magic_power >= 1)
 				{
-					client->ps.ammo[AMMO_POWERCELL] -= 2;
+					client->pers.magic_power -= 1;
 				}
 				else
 				{
-					client->ps.ammo[AMMO_BLASTER] -= 2;
+					client->ps.ammo[AMMO_POWERCELL] -= 1;
 				}
 			}
 		}

@@ -4888,7 +4888,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (attacker->client->pers.energy_modulator_mode == 1)
 		{ // zyk: Energy Modulator mode 1 increases damage
-			damage = (int)ceil(damage * 1.20);
+			damage = (int)ceil(damage * 1.25);
 		}
 
 		if (attacker->NPC && attacker->client->pers.quest_npc > 0)
@@ -5424,7 +5424,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		{ // zyk: RPG resistance bonuses
 			if (targ->client->pers.energy_modulator_mode == 2)
 			{ // zyk: Energy Modulator mode 2
-				bonus_resistance += 0.25;
+				bonus_resistance += 0.30;
 
 				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 			}
@@ -5894,11 +5894,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SERAPH_ARMOR] > 0)
-			{ // zyk: Seraph Armor
-				bonus_health_resistance += 0.20;
-			}
-
 			if (attacker && attacker->client && targ && targ->client && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC) && attacker != targ &&
 				Distance(targ->client->ps.origin, targ->client->pers.light_of_judgement_origin) < targ->client->pers.light_of_judgement_distance)
 			{ // zyk: target using Light Magic. Decreases damage taken if target is inside the light
@@ -5914,37 +5909,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (take < 1)
 			{ // zyk: cannot make player fully absorb all damage
 				take = 1;
-			}
-
-			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SERAPH_ARMOR] > 0)
-			{ // zyk: Seraph Armor. Regens shield, mp, force and stamina based on the amount of damage taken
-				int absorbed_damage = (int)ceil(take * 0.10);
-				int recovery_amount = (int)ceil(absorbed_damage / 4);
-				int max_shield = targ->client->ps.stats[STAT_MAX_HEALTH];
-
-				if (targ->client->sess.amrpgmode == 2)
-					max_shield = targ->client->pers.max_rpg_shield;
-
-				if (!targ->NPC)
-				{
-					if ((targ->client->ps.stats[STAT_ARMOR] + recovery_amount) < max_shield)
-					{
-						targ->client->ps.stats[STAT_ARMOR] += recovery_amount;
-					}
-					else
-					{
-						targ->client->ps.stats[STAT_ARMOR] = max_shield;
-					}
-				}
-
-				zyk_set_stamina(targ, recovery_amount, qtrue);
-				zyk_add_mp(targ, recovery_amount);
-
-				targ->client->ps.fd.forcePower += recovery_amount;
-				if (targ->client->ps.fd.forcePower > targ->client->ps.fd.forcePowerMax)
-				{
-					targ->client->ps.fd.forcePower = targ->client->ps.fd.forcePowerMax;
-				}
 			}
 
 			if (attacker && attacker->client && 
