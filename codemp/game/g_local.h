@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.2.2"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.2.3"
 
 #define SECURITY_LOG "security.log"
 
@@ -767,7 +767,6 @@ typedef enum {
 	RPG_INVENTORY_UPGRADE_SEEKER_DRONE,
 	RPG_INVENTORY_UPGRADE_EWEB,
 	RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR,
-	RPG_INVENTORY_LEGENDARY_CRYSTAL,
 	MAX_RPG_INVENTORY_ITEMS
 } zyk_inventory_t;
 
