@@ -5890,7 +5890,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 				else if (mod == MOD_SABER)
 				{
-					bonus_health_resistance += 0.35;
+					bonus_health_resistance += 0.25;
 				}
 			}
 
