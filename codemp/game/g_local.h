@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.2.5"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.2.6"
 
 #define SECURITY_LOG "security.log"
 
@@ -549,6 +549,7 @@ typedef enum {
 	SELLER_DETPACKS,
 	SELLER_AMMO_ALL,
 	SELLER_FLAME_FUEL,
+	SELLER_MEDPACK,
 	SELLER_SHIELD_BOOSTER,
 	SELLER_SENTRY_GUN,
 	SELLER_SEEKER_DRONE,

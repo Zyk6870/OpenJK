@@ -6152,7 +6152,10 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_FLAME_FUEL][0] = 20;
 	seller_items_cost[SELLER_FLAME_FUEL][1] = 0;
 
-	seller_items_cost[SELLER_SHIELD_BOOSTER][0] = 50;
+	seller_items_cost[SELLER_MEDPACK][0] = 25;
+	seller_items_cost[SELLER_MEDPACK][1] = 0;
+
+	seller_items_cost[SELLER_SHIELD_BOOSTER][0] = 25;
 	seller_items_cost[SELLER_SHIELD_BOOSTER][1] = 0;
 
 	seller_items_cost[SELLER_SENTRY_GUN][0] = 120;
@@ -6331,6 +6334,7 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_AMMO_ALL] = "Ammo All";
 	seller_items_names[SELLER_FLAME_FUEL] = "Flame Thrower Fuel";
 
+	seller_items_names[SELLER_MEDPACK] = "Medpac";
 	seller_items_names[SELLER_SHIELD_BOOSTER] = "Shield Booster";
 	seller_items_names[SELLER_SENTRY_GUN] = "Sentry Gun";
 	seller_items_names[SELLER_SEEKER_DRONE] = "Seeker Drone";
@@ -6450,7 +6454,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (Q_stricmp(arg1, "items" ) == 0)
 		{
-			zyk_show_stuff_category(ent, SELLER_SHIELD_BOOSTER, SELLER_CLOAK_ITEM);
+			zyk_show_stuff_category(ent, SELLER_MEDPACK, SELLER_CLOAK_ITEM);
 		}
 		else if (Q_stricmp(arg1, "weapons" ) == 0)
 		{
@@ -6531,9 +6535,13 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers all fuel of the flame thrower\n\n\"", zyk_get_seller_item_name(i)));
 		}
+		else if (i == SELLER_MEDPACK)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 25 health\n\n\"", zyk_get_seller_item_name(i)));
+		}
 		else if (i == SELLER_SHIELD_BOOSTER)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 50 shield\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 25 shield\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_SENTRY_GUN)
 		{
@@ -6959,11 +6967,21 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
 			Add_Ammo(ent, AMMO_DETPACK, 2);
 		}
+		else if (value == (SELLER_MEDPACK + 1))
+		{
+			if (ent->health < ent->client->pers.max_rpg_health)
+			{
+				ent->health += 25;
+			}
+
+			if (ent->health > ent->client->pers.max_rpg_health)
+				ent->health = ent->client->pers.max_rpg_health;
+		}
 		else if (value == (SELLER_SHIELD_BOOSTER + 1))
 		{
 			if (ent->client->ps.stats[STAT_ARMOR] < ent->client->pers.max_rpg_shield)
-			{ // zyk: RPG Mode has the Max Shield skill that doesnt allow someone to heal shields above this value
-				ent->client->ps.stats[STAT_ARMOR] += 50;
+			{
+				ent->client->ps.stats[STAT_ARMOR] += 25;
 			}
 
 			if (ent->client->ps.stats[STAT_ARMOR] > ent->client->pers.max_rpg_shield)
