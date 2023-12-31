@@ -6152,10 +6152,10 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_FLAME_FUEL][0] = 20;
 	seller_items_cost[SELLER_FLAME_FUEL][1] = 0;
 
-	seller_items_cost[SELLER_MEDPACK][0] = 25;
+	seller_items_cost[SELLER_MEDPACK][0] = 50;
 	seller_items_cost[SELLER_MEDPACK][1] = 0;
 
-	seller_items_cost[SELLER_SHIELD_BOOSTER][0] = 25;
+	seller_items_cost[SELLER_SHIELD_BOOSTER][0] = 50;
 	seller_items_cost[SELLER_SHIELD_BOOSTER][1] = 0;
 
 	seller_items_cost[SELLER_SENTRY_GUN][0] = 120;
