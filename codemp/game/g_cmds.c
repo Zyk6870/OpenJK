@@ -5694,14 +5694,7 @@ void Cmd_UpSkill_f( gentity_t *ent ) {
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	upgrade_value = atoi(arg1);
 
-	if (Q_stricmp(arg1, "all") == 0)
-	{ // zyk: upgrade all skills of this class
-		do_upgrade_skill(ent, 0, qtrue);
-	}
-	else
-	{
-		do_upgrade_skill(ent, upgrade_value, qfalse);
-	}
+	do_upgrade_skill(ent, upgrade_value, qfalse);
 }
 
 void do_downgrade_skill(gentity_t *ent, int downgrade_value)
@@ -5723,15 +5716,6 @@ void do_downgrade_skill(gentity_t *ent, int downgrade_value)
 		trap->SendServerCommand( ent->s.number, va("print \"You reached the minimum level of ^3%s ^7skill.\n\"", zyk_skill_name(downgrade_value - 1)));
 		return;
 	}
-
-	// zyk: saving the account file with the downgraded skill
-	save_account(ent, qtrue);
-
-	trap->SendServerCommand( ent->s.number, "print \"Skill downgraded successfully.\n\"" );
-
-	initialize_rpg_skills(ent, qfalse);
-
-	Cmd_ZykMod_f(ent);
 }
 
 /*
@@ -5740,19 +5724,24 @@ Cmd_DownSkill_f
 ==================
 */
 void Cmd_DownSkill_f( gentity_t *ent ) {
-	char arg1[MAX_STRING_CHARS]; // zyk: value the user sends as an arg which is the skill to be downgraded
-	int downgrade_value; // zyk: the integer value of arg1
+	int i = 0;
 
-	if ( trap->Argc() != 2) 
-	{ 
-		trap->SendServerCommand( ent->s.number, "print \"You must specify the number of the skill to be downgraded.\n\"" );
-		return;
+	for (i = 0; i < NUMBER_OF_SKILLS; i++)
+	{
+		while (ent->client->pers.skill_levels[i] > 0)
+		{
+			do_downgrade_skill(ent, (i + 1));
+		}
 	}
 
-	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	downgrade_value = atoi(arg1);
+	// zyk: saving the account file with the downgraded skill
+	save_account(ent, qtrue);
 
-	do_downgrade_skill(ent, downgrade_value);
+	initialize_rpg_skills(ent, qfalse);
+
+	Cmd_ZykMod_f(ent);
+
+	trap->SendServerCommand(ent->s.number, "print \"Skills downgraded successfully.\n\"");	
 }
 
 // zyk: used to format text when player wants to list skills
@@ -6092,7 +6081,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			}
 			else if (Q_stricmp( arg1, "commands" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill. Passing ^3all ^7as parameter upgrades all skills.\n^3/down [skill number]: ^7downgrades a skill.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
+				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill.\n^3/down: ^7resets all skills to level 0 and recovers the skillpoints.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
 			}
 			else
 			{ // zyk: the player can also list the specific info of a skill passing the skill number as argument

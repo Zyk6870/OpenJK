@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.2.7"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.2.8"
 
 #define SECURITY_LOG "security.log"
 
