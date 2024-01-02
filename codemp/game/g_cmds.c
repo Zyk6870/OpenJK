@@ -442,6 +442,9 @@ int ClientNumberFromString( gentity_t *to, const char *s, qboolean allowconnecti
 
 int zyk_get_emote_id_with_option(char *option)
 {
+	if (Q_stricmp(option, "stand") == 0)
+		return BOTH_STAND4;
+
 	if (Q_stricmp(option, "hug") == 0)
 		return BOTH_HUGGER1;
 
@@ -527,7 +530,7 @@ void Cmd_Emote_f( gentity_t *ent )
 	}
 
 	if ( trap->Argc () < 2 ) {
-		trap->SendServerCommand(ent->s.number, va("print \"Usage: ^3/emote <anim id between 0 and %d> ^7or ^3/emote <emote name from the list below>^7. List of emotes: hug, talk, hello, comeon, hips, kneel, surrender, cower, die, die2, die3, die4, die5, sleep, sit, updown, typing, nod, shake\n\"", (MAX_ANIMATIONS-1)) );
+		trap->SendServerCommand(ent->s.number, va("print \"Usage: ^3/emote <anim id between 0 and %d> ^7or ^3/emote <emote name from the list below>^7. List of emotes: stand, hug, talk, hello, comeon, hips, kneel, surrender, cower, die, die2, die3, die4, die5, sleep, sit, updown, typing, nod, shake\n\"", (MAX_ANIMATIONS-1)) );
 		return;
 	}
 
