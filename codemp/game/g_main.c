@@ -708,6 +708,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.quest_map_restart_timer = 0;
 	level.quest_special_entity_id1 = -1;
 
+	level.legendary_artifact_map = QUESTARTIFACT_NONE;
+	level.legendary_artifact_step = 0;
+	level.legendary_artifact_debounce_timer = 0;
+
 	// zyk: making case sensitive comparing so only low case quest map names will be set to play quests. This allows building these maps without conflicting with quests
 	if (zyk_allow_quests.integer > 0)
 	{
@@ -719,6 +723,11 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		{
 			level.quest_map = QUESTMAP_DESERT_CITY;
 		}
+	}
+
+	if (Q_strncmp(zyk_mapname, "yavin1b", 8) == 0)
+	{
+		level.legendary_artifact_map = QUESTARTIFACT_ENERGY_MODULATOR;
 	}
 
 	// parse the key/value pairs and spawn gentities
@@ -977,6 +986,11 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			level.ignored_players[zyk_iterator][1] = 0;
 
 			level.quest_players_defeated[zyk_iterator] = qfalse;
+		}
+
+		for (zyk_iterator = 0; zyk_iterator < LEGENDARY_CRYSTALS_CHOSEN; zyk_iterator++)
+		{
+			level.legendary_crystal_chosen[zyk_iterator] = 0;
 		}
 	}
 
@@ -5012,6 +5026,78 @@ void Player_FireFlameThrower(gentity_t* self, qboolean is_magic)
 	}
 }
 
+// zyk: checks if the player has already all artifacts
+extern void save_account(gentity_t* ent, qboolean save_char_file);
+
+void zyk_spawn_puzzle_effect(gentity_t *crystal_model)
+{
+	gentity_t* new_ent = G_Spawn();
+
+	zyk_set_entity_field(new_ent, "classname", "fx_runner");
+	zyk_set_entity_field(new_ent, "targetname", "zyk_puzzle_effect");
+	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", crystal_model->r.currentOrigin[0], crystal_model->r.currentOrigin[1], crystal_model->r.currentOrigin[2]));
+
+	new_ent->s.modelindex = G_EffectIndex("env/btend");
+
+	zyk_spawn_entity(new_ent);
+
+	level.special_power_effects[new_ent->s.number] = 0;
+	level.special_power_effects_timer[new_ent->s.number] = level.time + 1500;
+}
+
+// zyk: used in puzzles to get Legendary Artifacts, like the Energy Modulator
+void zyk_spawn_legendary_artifact_puzzle_model(float x, float y, float z, int model_scale, char *model_path, int crystal_number)
+{
+	gentity_t* new_ent = G_Spawn();
+
+	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
+
+	// zyk: only the usable crystals will be solid, to avoid a bug in which player cannot use the correct crystals
+	if (crystal_number > 0)
+		zyk_set_entity_field(new_ent, "spawnflags", "1");
+	else
+		zyk_set_entity_field(new_ent, "spawnflags", "0");
+
+	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
+
+	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
+
+	zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
+	zyk_set_entity_field(new_ent, "targetname", "zyk_puzzle_model");
+
+	if (crystal_number > 0)
+	{
+		zyk_set_entity_field(new_ent, "mins", "-16 -16 -16");
+		zyk_set_entity_field(new_ent, "maxs", "16 16 16");
+	}
+
+	zyk_spawn_entity(new_ent);
+
+	new_ent->count = crystal_number;
+}
+
+void zyk_spawn_energy_modulator_model(float x, float y, float z, int model_scale)
+{
+	gentity_t* new_ent = G_Spawn();
+
+	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
+	zyk_set_entity_field(new_ent, "spawnflags", "1");
+	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
+
+	zyk_set_entity_field(new_ent, "model", "models/map_objects/danger/ship_item04.md3");
+
+	zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
+
+	zyk_set_entity_field(new_ent, "mins", "-32 -32 -32");
+	zyk_set_entity_field(new_ent, "maxs", "32 32 32");
+
+	zyk_set_entity_field(new_ent, "targetname", "zyk_energy_modulator_model");
+
+	zyk_spawn_entity(new_ent);
+
+	new_ent->count = 8;
+}
+
 // zyk: clear effects of some special powers
 void clear_special_power_effect(gentity_t* ent)
 {
@@ -5699,9 +5785,6 @@ void fire_bolt_hits(gentity_t* ent)
 			ent->client->pers.player_statuses &= ~(1 << 29);
 	}
 }
-
-// zyk: checks if the player has already all artifacts
-extern void save_account(gentity_t *ent, qboolean save_char_file);
 
 // zyk: backup player force powers
 void player_backup_force(gentity_t *ent)
@@ -8597,6 +8680,74 @@ void G_RunFrame( int levelTime ) {
 					if (level.quest_map == QUESTMAP_LILITH_TEMPLE)
 					{
 						
+					}
+				}
+
+				if (level.legendary_artifact_map > QUESTARTIFACT_NONE && level.load_entities_timer == 0 &&
+					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && level.legendary_artifact_debounce_timer < level.time && 
+					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+				{ // zyk: map has an legendary artifact
+
+					if (level.legendary_artifact_map == QUESTARTIFACT_ENERGY_MODULATOR)
+					{
+						if (level.legendary_artifact_step == 0)
+						{ // zyk: spawns the crystal models
+
+							// zyk: main crystal
+							zyk_spawn_legendary_artifact_puzzle_model(1887, 4479, 1432, 100, "models/map_objects/mp/crystal_red.md3", 7);
+							zyk_spawn_legendary_artifact_puzzle_model(1887, 4479, 1432, 100, "models/map_objects/mp/crystal_green.md3", 0);
+							zyk_spawn_legendary_artifact_puzzle_model(1887, 4479, 1432, 100, "models/map_objects/mp/crystal_blue.md3", 0);
+
+							// zyk: other crystals
+
+							zyk_spawn_legendary_artifact_puzzle_model(1968, 4525, 1432, 100, "models/map_objects/mp/crystal_red.md3", 1);
+
+							zyk_spawn_legendary_artifact_puzzle_model(1968, 4433, 1432, 100, "models/map_objects/mp/crystal_green.md3", 2);
+
+							zyk_spawn_legendary_artifact_puzzle_model(1804, 4525, 1432, 100, "models/map_objects/mp/crystal_blue.md3", 3);
+
+							zyk_spawn_legendary_artifact_puzzle_model(1804, 4433, 1432, 100, "models/map_objects/mp/crystal_red.md3", 4);
+							zyk_spawn_legendary_artifact_puzzle_model(1804, 4433, 1432, 100, "models/map_objects/mp/crystal_green.md3", 0);
+
+							zyk_spawn_legendary_artifact_puzzle_model(1887, 4563, 1432, 100, "models/map_objects/mp/crystal_red.md3", 5);
+							zyk_spawn_legendary_artifact_puzzle_model(1887, 4563, 1432, 100, "models/map_objects/mp/crystal_blue.md3", 0);
+
+							zyk_spawn_legendary_artifact_puzzle_model(1887, 4395, 1432, 100, "models/map_objects/mp/crystal_green.md3", 6);
+							zyk_spawn_legendary_artifact_puzzle_model(1887, 4395, 1432, 100, "models/map_objects/mp/crystal_blue.md3", 0);
+
+							level.legendary_artifact_step++;
+
+							level.legendary_artifact_debounce_timer = level.time + 2000;
+						}
+						else if (level.legendary_artifact_step >= 2 && level.legendary_artifact_step <= 11)
+						{ // zyk: starts the memory puzzle by spawning effects the player must remember
+							int chosen_crystal = Q_irand(1, 6);
+							int j = 0;
+
+							level.legendary_crystal_chosen[level.legendary_artifact_step - 2] = chosen_crystal;
+
+							level.legendary_artifact_step++;
+
+							for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+							{ // zyk: show effect in the chosen crystal position
+								gentity_t* crystal_ent = &g_entities[j];
+
+								if (crystal_ent && Q_stricmp(crystal_ent->targetname, "zyk_puzzle_model") == 0 && crystal_ent->count == chosen_crystal)
+								{
+									zyk_spawn_puzzle_effect(crystal_ent);
+
+									G_Sound(crystal_ent, CHAN_AUTO, G_SoundIndex("sound/effects/tractorbeam.mp3"));
+								}
+							}
+
+							level.legendary_artifact_debounce_timer = level.time + 2000;
+						}
+						else if (level.legendary_artifact_step == (12 + LEGENDARY_CRYSTALS_CHOSEN))
+						{ // zyk: player solved the puzzle, spawn the Energy Modulator
+							zyk_spawn_energy_modulator_model(2000, 4479, 1432, 30);
+
+							level.legendary_artifact_step++;
+						}
 					}
 				}
 			}

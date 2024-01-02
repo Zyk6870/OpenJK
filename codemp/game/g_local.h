@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.2.11"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.2.12"
 
 #define SECURITY_LOG "security.log"
 
@@ -626,6 +626,12 @@ typedef enum {
 	QUESTMAP_LILITH_TEMPLE,
 	NUM_QUEST_MAPS
 } zyk_quest_map_t;
+
+typedef enum {
+	QUESTARTIFACT_NONE,
+	QUESTARTIFACT_ENERGY_MODULATOR,
+	NUM_QUEST_ARTIFACTS
+} zyk_quest_artifact_t;
 
 typedef enum {
 	MAPMUSIC_NONE,
@@ -1426,6 +1432,9 @@ typedef struct {
 // zyk: max matches a tournament may have
 #define MAX_DUEL_MATCHES 496
 
+// zyk: number of chosen crystals in a puzzle
+#define LEGENDARY_CRYSTALS_CHOSEN 10
+
 typedef struct level_locals_s {
 	struct gclient_s	*clients;		// [maxclients]
 
@@ -1722,6 +1731,12 @@ typedef struct level_locals_s {
 	qboolean quest_players_defeated[MAX_CLIENTS];
 	qboolean quest_map_restart;
 	int quest_map_restart_timer;
+
+	// zyk: some maps will have legendary artifacts
+	zyk_quest_artifact_t legendary_artifact_map;
+	int legendary_artifact_step;
+	int legendary_artifact_debounce_timer;
+	int legendary_crystal_chosen[LEGENDARY_CRYSTALS_CHOSEN];
 
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];

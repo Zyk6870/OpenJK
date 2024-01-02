@@ -1820,6 +1820,64 @@ void TryUse( gentity_t *ent )
 
 		return;
 	}
+	else if (level.legendary_artifact_map == QUESTARTIFACT_ENERGY_MODULATOR && 
+		target && Q_stricmp(target->targetname, "zyk_puzzle_model") == 0)
+	{ // zyk: player touched one of the puzzle crystals
+		if (target->count == 7 && level.legendary_artifact_step == 1)
+		{ // zyk: main crystal, start the puzzle
+			G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+
+			level.legendary_artifact_step = 2;
+		}
+
+		if (level.legendary_artifact_step >= 12 && level.legendary_artifact_step < (12 + LEGENDARY_CRYSTALS_CHOSEN))
+		{
+			if (level.legendary_crystal_chosen[level.legendary_artifact_step - 12] == target->count)
+			{ // zyk: one of the crystals chosen in the correct order
+				G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+
+				level.legendary_artifact_step++;
+			}
+			else
+			{ // zyk: wrong crystal in the order, stop the puzzle
+				G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/weapons/overchargeend.wav"));
+
+				level.legendary_artifact_step = 1;
+			}
+		}
+
+		// zyk: setting use anim
+		ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+		ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
+		ent->client->ps.forceHandExtendTime = level.time + 500;
+
+		return;
+	}
+	else if (level.legendary_artifact_map == QUESTARTIFACT_ENERGY_MODULATOR && 
+		target && Q_stricmp(target->targetname, "zyk_energy_modulator_model") == 0)
+	{ // zyk: player touched the Energy Modulator after solving the puzzle
+		if (ent->client->sess.amrpgmode == 2 &&
+			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
+		{
+			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 1;
+
+			save_account(ent, qtrue);
+
+			target->think = G_FreeEntity;
+			target->nextthink = level.time;
+
+			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+
+			trap->SendServerCommand(ent->s.number, "print \"^3Quest System: ^7You got the legendary ^3Energy Modulator\n\"");
+		}
+
+		// zyk: setting use anim
+		ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+		ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
+		ent->client->ps.forceHandExtendTime = level.time + 500;
+
+		return;
+	}
 
 	if (target->NPC && target->client && target->s.NPC_class != CLASS_VEHICLE && OnSameTeam(ent,target))
 	{
