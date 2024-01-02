@@ -1181,7 +1181,7 @@ void ForceHeal( gentity_t *self )
 
 	if (self->client->ps.fd.forcePowerLevel[FP_HEAL] == FORCE_LEVEL_4)
 	{ // zyk: Heal 4/4
-		self->health += 40; //This was 50, but that angered the Balance God.
+		self->health += 30; //This was 50, but that angered the Balance God.
 
 		if (self->health > self->client->ps.stats[STAT_MAX_HEALTH])
 		{
