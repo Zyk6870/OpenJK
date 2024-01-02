@@ -440,6 +440,68 @@ int ClientNumberFromString( gentity_t *to, const char *s, qboolean allowconnecti
 	return -1;
 }
 
+int zyk_get_emote_id_with_option(char *option)
+{
+	if (Q_stricmp(option, "hug") == 0)
+		return BOTH_HUGGER1;
+
+	if (Q_stricmp(option, "talk") == 0)
+		return BOTH_TALK1;
+
+	if (Q_stricmp(option, "hello") == 0)
+		return BOTH_SILENCEGESTURE1;
+
+	if (Q_stricmp(option, "comeon") == 0)
+		return BOTH_COME_ON1;
+
+	if (Q_stricmp(option, "hips") == 0)
+		return BOTH_STAND5TOSTAND8;
+
+	if (Q_stricmp(option, "kneel") == 0)
+		return BOTH_KNEES2;
+
+	if (Q_stricmp(option, "surrender") == 0)
+		return TORSO_SURRENDER_START;
+
+	if (Q_stricmp(option, "cower") == 0)
+		return BOTH_SONICPAIN_HOLD;
+
+	if (Q_stricmp(option, "die") == 0)
+		return BOTH_DEATH2;
+
+	if (Q_stricmp(option, "die2") == 0)
+		return BOTH_DEATH3;
+
+	if (Q_stricmp(option, "die3") == 0)
+		return BOTH_DEATH4;
+
+	if (Q_stricmp(option, "die4") == 0)
+		return BOTH_DEATH10;
+
+	if (Q_stricmp(option, "die5") == 0)
+		return BOTH_DEATHBACKWARD1;
+
+	if (Q_stricmp(option, "sleep") == 0)
+		return BOTH_SLEEP1;
+
+	if (Q_stricmp(option, "sit") == 0)
+		return BOTH_STAND5TOSIT3;
+
+	if (Q_stricmp(option, "updown") == 0)
+		return BOTH_FLIP_HOLD7;
+
+	if (Q_stricmp(option, "typing") == 0)
+		return BOTH_CONSOLE1;
+
+	if (Q_stricmp(option, "nod") == 0)
+		return BOTH_HEADNOD;
+
+	if (Q_stricmp(option, "shake") == 0)
+		return BOTH_HEADSHAKE;
+
+	return 0;
+}
+
 // zyk: plays an animation from anims.h
 void Cmd_Emote_f( gentity_t *ent )
 {
@@ -448,33 +510,38 @@ void Cmd_Emote_f( gentity_t *ent )
 
 	if (zyk_allow_emotes.integer < 1)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"Cannot use emotes in this server\n\"" );
+		trap->SendServerCommand(ent->s.number, "print \"Cannot use emotes in this server\n\"" );
 		return;
 	}
 
 	if (level.gametype == GT_SIEGE)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"Cannot use emotes in Siege gametype\n\"" );
+		trap->SendServerCommand(ent->s.number, "print \"Cannot use emotes in Siege gametype\n\"" );
 		return;
 	}
 
 	if (zyk_allow_emotes.integer != 1 && ent->client->ps.duelInProgress == qtrue)
 	{
-		trap->SendServerCommand(ent - g_entities, "print \"Cannot use emotes in private duel\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"Cannot use emotes in private duel\n\"");
 		return;
 	}
 
 	if ( trap->Argc () < 2 ) {
-		trap->SendServerCommand( ent-g_entities, va("print \"Usage: emote <anim id between 0 and %d>\n\"",MAX_ANIMATIONS-1) );
+		trap->SendServerCommand(ent->s.number, va("print \"Usage: ^3/emote <anim id between 0 and %d> ^7or ^3/emote <emote name from the list below>^7. List of emotes: hug, talk, hello, comeon, hips, kneel, surrender, cower, die, die2, die3, die4, die5, sleep, sit, updown, typing, nod, shake\n\"", (MAX_ANIMATIONS-1)) );
 		return;
 	}
 
 	trap->Argv( 1, arg, sizeof( arg ) );
 	anim_id = atoi(arg);
 
-	if (anim_id < 0 || anim_id >= MAX_ANIMATIONS)
+	if (anim_id == 0 && strlen(arg) > 2)
+	{ // zyk: specific emotes
+		anim_id = zyk_get_emote_id_with_option(G_NewString(arg));
+	}
+
+	if (anim_id < 1 || anim_id >= MAX_ANIMATIONS)
 	{
-		trap->SendServerCommand( ent-g_entities, va("print \"Usage: anim ID must be between 0 and %d>\n\"",MAX_ANIMATIONS-1) );
+		trap->SendServerCommand(ent->s.number, va("print \"Usage: anim ID must be between 1 and %d>\n\"",MAX_ANIMATIONS-1) );
 		return;
 	}
 
