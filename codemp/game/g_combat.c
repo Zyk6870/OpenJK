@@ -4888,7 +4888,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (attacker->client->pers.energy_modulator_mode == 1)
 		{ // zyk: Energy Modulator mode 1 increases damage
-			damage = (int)ceil(damage * 1.25);
+			damage = (int)ceil(damage * (1.00 + (0.01 * attacker->client->pers.level / 4)));
 		}
 
 		if (attacker->NPC && attacker->client->pers.quest_npc > 0)
@@ -5424,7 +5424,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		{ // zyk: RPG resistance bonuses
 			if (targ->client->pers.energy_modulator_mode == 2)
 			{ // zyk: Energy Modulator mode 2
-				bonus_resistance += 0.30;
+				bonus_resistance += (0.01 * (targ->client->pers.level / 4));
 
 				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 			}
