@@ -1729,16 +1729,6 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 	}
 	newent->client->ps.persistant[PERS_TEAM] = newent->client->sess.sessionTeam;
 
-	// zyk: this spawnflag allows setting a custom amount of credits this npc should give
-	if (ent->spawnflags & 32768)
-	{
-		newent->client->pers.credits_modifier = ent->genericValue7;
-	}
-	else
-	{
-		newent->client->pers.credits_modifier = 0;
-	}
-
 	trap->LinkEntity ((sharedEntity_t *)newent);
 
 	if(!ent->use)
@@ -1777,8 +1767,6 @@ finish:
 
 		newent->client->sess.ally1 = 0;
 		newent->client->sess.ally2 = 0;
-
-		newent->client->pers.level = 0;
 
 		newent->client->pers.quest_npc = 0;
 

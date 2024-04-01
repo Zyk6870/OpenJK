@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.2.15"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.3.0"
 
 #define SECURITY_LOG "security.log"
 
@@ -784,18 +784,11 @@ typedef enum {
 // zyk: initial credits in RPG Mode
 #define RPG_INITIAL_CREDITS 200
 
-// zyk: bonus skillpoints given at certain levels
-#define RPG_LEVEL_BONUS_SKILLPOINTS 5
-#define RPG_BONUS_SKILLPOINTS 1
-
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
 #define RPG_MAX_HEALTH_INCREASE 30
 
 // zyk: when casting magic, use anim for this amount of time in miliseconds
 #define MAGIC_ANIM_TIME 1400
-
-// zyk: number of Elemental Spirits
-#define NUMBER_OF_MAGIC_SPIRITS 6
 
 // zyk: damage bonus of weapons
 #define RPG_WEAPON_DMG_BONUS 0.01
@@ -926,8 +919,6 @@ typedef struct clientPersistant_s {
 
 	int	bitvalue; // zyk: player is considered as admin if bitvalue is > 0, because he has at least 1 admin command
 	
-	int level; // zyk: RPG mode level
-	int level_up_score; // zyk: RPG mode Level Up Score
 	int skillpoints; // zyk: RPG mode skillpoints
 
 	char password[32]; // zyk: account password
@@ -973,9 +964,6 @@ typedef struct clientPersistant_s {
 
 	int max_force_power; // zyk: max force power the player can have based on skill_levels[54] value
 
-	int score_modifier; // zyk: sets the amount of extra score a player can get by defeating some npcs
-
-	int credits_modifier; // zyk: sets the amount of extra credits a player can get by killing rpg players or some npcs
 	int credits; // zyk: the amount of credits (RPG Mode currency) this player has now
 
 	int tutorial_step; // zyk: sets the current tutorial step, to display the correct message to hthe player
@@ -983,9 +971,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: Race Mode. Sets the initial position of this racer which is calculated in racemode command. Default 0. If greater than 0, player joined a race
 	int race_position;
-
-	// zyk: amount of skills used by the player. After a certain amount of uses, player gets 1 experience point (level up score)
-	int skill_counter;
 
 	// zyk: current weight of stuff the player is carrying
 	int current_weight;

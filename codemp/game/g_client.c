@@ -2713,8 +2713,6 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	client->pers.send_event_timer = level.time + 3000;
 	client->pers.send_event_interval = level.time + 100;
 
-	client->pers.skill_counter = 0;
-
 	client->pers.stun_baton_less_speed_timer = 0;
 
 	VectorSet(client->pers.teleport_point,0,0,0);

@@ -432,7 +432,6 @@ gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int
 		vec3_t npc_origin, npc_angles;
 
 		npc_ent->client->pers.quest_npc = quest_npc_number;
-		npc_ent->client->pers.level = level;
 		npc_ent->NPC->stats.health += (10 * level);
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
@@ -8899,42 +8898,11 @@ void G_RunFrame( int levelTime ) {
 					// zyk: regen mp and level of this mage
 					if (ent->client->pers.magic_power < 20)
 					{
-						ent->client->pers.level = 100;
 						ent->client->pers.skill_levels[SKILL_MAX_MP] = zyk_max_skill_level(SKILL_MAX_MP) - 2;
 						ent->client->pers.magic_power = zyk_max_magic_power(ent);
 					}
 
 					zyk_cast_magic(ent, first_magic_skill + random_magic);
-				}
-				else if (Q_stricmp(ent->NPC_type, "fire_demon") == 0)
-				{
-					if (ent->client->pers.magic_power <= 50)
-					{
-						ent->client->pers.magic_power = 1000;
-
-						ent->client->pers.quest_power_usage_timer = level.time + 3000;
-					}
-					else
-					{
-						ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] = 2;
-
-						zyk_cast_magic(ent, SKILL_MAGIC_FIRE_MAGIC);
-					}
-				}
-				else if (Q_stricmp(ent->NPC_type, "wind_demon") == 0)
-				{
-					if (ent->client->pers.magic_power <= 50)
-					{
-						ent->client->pers.magic_power = 1000;
-
-						ent->client->pers.quest_power_usage_timer = level.time + 3000;
-					}
-					else
-					{
-						ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] = 2;
-
-						zyk_cast_magic(ent, SKILL_MAGIC_AIR_MAGIC);
-					}
 				}
 			}
 		}

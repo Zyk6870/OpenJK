@@ -244,7 +244,6 @@ XCVAR_DEF( zyk_screen_message,	"",						NULL,				CVAR_ARCHIVE|CVAR_NORESTART,			
 XCVAR_DEF( zyk_screen_message_timer,	"3000",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_allow_rpg_mode,	"1",					NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_list_cmds_results_per_page,	"10",		NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
-XCVAR_DEF( zyk_max_skill_counter,	"20000",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_start_race_timer,	"15000",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_flame_thrower_cooldown,	"50",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_flame_thrower_damage,	"2",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
@@ -275,14 +274,12 @@ XCVAR_DEF( zyk_max_rpg_credits, "500000",				NULL,				CVAR_ARCHIVE|CVAR_NORESTAR
 XCVAR_DEF( zyk_allow_emotes,					"1",	NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_allow_zyksound_command, "0",				NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_allow_saber_command,		"2",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
-XCVAR_DEF( zyk_level_up_score_factor, "5",				NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_duel_no_collision,		"0",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_duel_tournament_time_to_start, "12000",  NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_duel_tournament_rounds_per_match, "1",	NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_sniper_battle_time_to_start, "12000",	NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_quest_afk_timer, "300000",				NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_buying_selling_cooldown, "500",			NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
-XCVAR_DEF( zyk_rpg_max_level, "100",					NULL,				CVAR_ARCHIVE|CVAR_NORESTART,					qtrue )
 XCVAR_DEF( zyk_duelForcePowerDisable,	"0",			NULL,				CVAR_ARCHIVE|CVAR_LATCH,						qtrue )
 
 #undef XCVAR_DEF

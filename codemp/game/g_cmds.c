@@ -2100,11 +2100,6 @@ void load_account(gentity_t* ent)
 	if (account_file != NULL)
 	{
 		int i = 0;
-		// zyk: this variable will validate the skillpoints this player has
-		// if he has more than the max skillpoints defined, then server must remove the exceeding ones
-		int validate_skillpoints = 0;
-		int max_skillpoints = 0;
-		int j = 0;
 
 		// zyk: loading the account password
 		fscanf(account_file, "%s", content);
@@ -2144,58 +2139,15 @@ void load_account(gentity_t* ent)
 		account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "r");
 		if (account_file != NULL)
 		{
-			// zyk: loading level up score value
-			fscanf(account_file, "%s", content);
-			ent->client->pers.level_up_score = atoi(content);
-
-			// zyk: loading Level value
-			fscanf(account_file, "%s", content);
-			ent->client->pers.level = atoi(content);
-
 			// zyk: loading Skillpoints value
 			fscanf(account_file, "%s", content);
 			ent->client->pers.skillpoints = atoi(content);
 
-			if (ent->client->pers.level > zyk_rpg_max_level.integer)
-			{ // zyk: validating level
-				ent->client->pers.level = zyk_rpg_max_level.integer;
-			}
-			else if (ent->client->pers.level < 1)
-			{
-				ent->client->pers.level = 1;
-			}
-
-			for (j = 1; j <= ent->client->pers.level; j++)
-			{
-				if ((j % RPG_LEVEL_BONUS_SKILLPOINTS) == 0)
-				{ // zyk: level divisible by RPG_LEVEL_BONUS_SKILLPOINTS has more skillpoints
-					max_skillpoints += (1 + RPG_BONUS_SKILLPOINTS);
-				}
-				else
-				{
-					max_skillpoints++;
-				}
-			}
-
-			validate_skillpoints = ent->client->pers.skillpoints;
 			// zyk: loading skill levels
 			for (i = 0; i < NUMBER_OF_SKILLS; i++)
 			{
 				fscanf(account_file, "%s", content);
 				ent->client->pers.skill_levels[i] = atoi(content);
-				validate_skillpoints += ent->client->pers.skill_levels[i];
-			}
-
-			// zyk: validating skillpoints
-			if (validate_skillpoints != max_skillpoints)
-			{
-				// zyk: if not valid, reset all skills and set the max skillpoints he can have in this level
-				for (i = 0; i < NUMBER_OF_SKILLS; i++)
-				{
-					ent->client->pers.skill_levels[i] = 0;
-				}
-
-				ent->client->pers.skillpoints = max_skillpoints;
 			}
 
 			// zyk: loading RPG inventory
@@ -2311,8 +2263,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%d\n%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.level_up_score, client->pers.level, client->pers.skillpoints, content, client->pers.credits,
+			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+				client->pers.skillpoints, content, client->pers.credits,
 				client->sess.magic_fist_selection, client->pers.quest_progress,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
@@ -4910,9 +4862,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.energy_modulator_mode = 0;
 
-			ent->client->pers.credits_modifier = 0;
-			ent->client->pers.score_modifier = 0;
-
 			ent->client->pers.buy_sell_timer = 0;
 
 			ent->client->pers.current_quest_event = 0;
@@ -4985,72 +4934,13 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 	}
 }
 
-// zyk: gives rpg score to the player
-void rpg_score(gentity_t *ent)
-{
-	int send_message = 0; // zyk: if its 1, sends the message in player console
-	char message[128];
-
-	strcpy(message,"");
-
-	add_credits(ent, (10 + ent->client->pers.credits_modifier));
-
-	if (ent->client->pers.level < zyk_rpg_max_level.integer)
-	{
-		ent->client->pers.level_up_score += (1 + ent->client->pers.score_modifier); // zyk: add score to the RPG mode score
-
-		if (ent->client->pers.level_up_score >= (ent->client->pers.level * zyk_level_up_score_factor.integer))
-		{ // zyk: player got a new level
-			ent->client->pers.level_up_score -= (ent->client->pers.level * zyk_level_up_score_factor.integer);
-			ent->client->pers.level++;
-
-			if (ent->client->pers.level % RPG_LEVEL_BONUS_SKILLPOINTS == 0) // zyk: every level divisible by this RPG_LEVEL_BONUS_SKILLPOINTS gives bonus skillpoints
-				ent->client->pers.skillpoints += (1 + RPG_BONUS_SKILLPOINTS);
-			else
-				ent->client->pers.skillpoints++;
-
-			initialize_rpg_skills(ent, qfalse);
-
-			strcpy(message,va("^3New Level: ^7%d^3, Skillpoints: ^7%d\n", ent->client->pers.level, ent->client->pers.skillpoints));
-
-			send_message = 1;
-		}
-	}
-
-	save_account(ent, qtrue); // zyk: saves new score and credits in the account file
-
-	// zyk: cleaning the modifiers after they are applied
-	ent->client->pers.credits_modifier = 0;
-	ent->client->pers.score_modifier = 0;
-
-	if (send_message == 1)
-	{
-		trap->SendServerCommand( ent->s.number, va("chat \"%s\"", message));
-	}
-}
-
-// zyk: increases the RPG skill counter by this amount
+// zyk: using skills (weapons, force, etc) calls this. Used to set Stamina
 void rpg_skill_counter(gentity_t *ent, int amount)
 {
 	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
-	{ // zyk: now RPG mode increases level up score after a certain amount of attacks
+	{
 		// zyk: when player does things, it will decrease Stamina
 		zyk_set_stamina(ent, amount, qfalse);
-
-		if (ent->client->pers.level < zyk_rpg_max_level.integer)
-		{
-			ent->client->pers.skill_counter += amount;
-
-			if (ent->client->pers.skill_counter >= zyk_max_skill_counter.integer)
-			{
-				ent->client->pers.skill_counter = 0;
-
-				// zyk: skill counter does not give credits, only Level Up Score
-				ent->client->pers.credits_modifier = -10;
-
-				rpg_score(ent);
-			}
-		}
 	}
 }
 
@@ -5153,9 +5043,7 @@ void add_new_char(gentity_t *ent)
 {
 	int i = 0;
 
-	ent->client->pers.level_up_score = 0;
-	ent->client->pers.level = 1;
-	ent->client->pers.skillpoints = 1;
+	ent->client->pers.skillpoints = 0;
 
 	for (i = 0; i < NUMBER_OF_SKILLS; i++)
 	{
@@ -5581,7 +5469,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 		strcpy(content, va("%s%d-%d-%d-", 
 			content, 0, ent->client->pers.quest_progress, MAX_QUEST_MISSIONS));
 
-		trap->SendServerCommand(ent->s.number, va("zykmod \"%d/%d-%d/%d-%d-%d/%d-%d/%d-%d-NOCLASS-%s\"",ent->client->pers.level, zyk_rpg_max_level.integer,ent->client->pers.level_up_score,(ent->client->pers.level * zyk_level_up_score_factor.integer),ent->client->pers.skillpoints,ent->client->pers.skill_counter,zyk_max_skill_counter.integer,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
+		trap->SendServerCommand(ent->s.number, va("zykmod \"%d-%d/%d-%d-NOCLASS-%s\"",ent->client->pers.skillpoints,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
 	}
 	else if (ent->client->sess.amrpgmode == 1)
 	{ // zyk: just sends the player settings
@@ -5905,10 +5793,8 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Level: ^7%d/%d\n^3Level Up Score: ^7%d/%d\n^3Skill Points: ^7%d\n^3Action Counter: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Stamina: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
-		ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.level, zyk_rpg_max_level.integer, 
-		ent->client->pers.level_up_score, (ent->client->pers.level * zyk_level_up_score_factor.integer), ent->client->pers.skillpoints, 
-		ent->client->pers.skill_counter, zyk_max_skill_counter.integer, ent->client->pers.magic_power, zyk_max_magic_power(ent), 
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Skill Points: ^7%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Stamina: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
+		ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.skillpoints, ent->client->pers.magic_power, zyk_max_magic_power(ent), 
 		ent->client->pers.current_weight, ent->client->pers.max_weight, ent->client->pers.current_stamina, ent->client->pers.max_stamina, ent->client->pers.credits));
 }
 
@@ -8333,7 +8219,7 @@ void Cmd_BountyQuest_f( gentity_t *ent ) {
 				!(this_ent->client->pers.player_statuses & (1 << 26)))
 			{
 				level.bounty_quest_choose_target = qfalse;
-				trap->SendServerCommand( -1, va("chat \"^3Bounty Quest: ^7A reward of ^3%d ^7credits will be given to who kills %s^7\n\"", (this_ent->client->pers.level*15), this_ent->client->pers.netname) );
+				trap->SendServerCommand( -1, va("chat \"^3Bounty Quest: ^7A reward of ^3200 ^7credits will be given to who kills %s^7\n\"", this_ent->client->pers.netname) );
 				return;
 			}
 
@@ -11981,9 +11867,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 					ent->client->pers.rpg_inventory[i] = 0;
 				}
 
-				ent->client->pers.level = 1;
-				ent->client->pers.level_up_score = 0;
-				ent->client->pers.skillpoints = 1;
+				ent->client->pers.skillpoints = 0;
 
 				ent->client->pers.credits = RPG_INITIAL_CREDITS;
 

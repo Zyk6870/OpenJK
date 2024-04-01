@@ -3867,7 +3867,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			{ // zyk: Normal Bolt
 				vec3_t origin, dir, zyk_forward;
 				gentity_t *missile = NULL;
-				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * (1.00 + (0.01 * ent->client->pers.level)));
+				int fist_damage = zyk_magic_fist_damage.integer;
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 12);
@@ -3906,7 +3906,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			{ // zyk: Electric Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;
-				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * (1.00 + (0.01 * ent->client->pers.level)));
+				int fist_damage = zyk_magic_fist_damage.integer;
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 12);
@@ -3947,7 +3947,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			{ // zyk: Ultra Bolt
 				gentity_t	*missile;
 				vec3_t origin, dir, zyk_forward;
-				int fist_damage = (int)ceil(zyk_magic_fist_damage.integer * (1.00 + (0.01 * ent->client->pers.level)));
+				int fist_damage = zyk_magic_fist_damage.integer;
 
 				if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 					VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 12);

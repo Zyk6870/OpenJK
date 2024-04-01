@@ -453,7 +453,6 @@ Adds score to both the client and his team
 ============
 */
 extern qboolean g_dontPenalizeTeam; //g_cmds.c
-extern void rpg_score(gentity_t *ent);
 void AddScore( gentity_t *ent, vec3_t origin, int score )
 {
 	/*
@@ -474,11 +473,6 @@ void AddScore( gentity_t *ent, vec3_t origin, int score )
 	//ScorePlum(ent, origin, score);
 	//
 	ent->client->ps.persistant[PERS_SCORE] += score;
-
-	if (!ent->NPC && ent->client->sess.amrpgmode == 2 && score > 0)
-	{
-		rpg_score(ent);
-	}
 
 	if ( level.gametype == GT_TEAM && !g_dontPenalizeTeam )
 		level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] += score;
@@ -2636,61 +2630,26 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	// zyk: setting the credits_modifier and the bonus score for the RPG player
 	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 	{
-		if (!self->NPC && self->client->sess.amrpgmode == 2)
-		{ // zyk: RPG Mode player score and credits
-			attacker->client->pers.credits_modifier = self->client->pers.level;
-			attacker->client->pers.score_modifier = self->client->pers.level / 10;
-		}
-		else if (self->NPC && self->client->NPC_class != CLASS_VEHICLE)
-		{ // zyk: score given by defeating npcs. Vehicles will only give the default 1 score and 10 credits
-			int enemy_health_bonus_score = 0;
-			int last_result = 200;
-
-			// zyk: bonus score based on enemy max health
-			while (last_result <= self->client->ps.stats[STAT_MAX_HEALTH])
-			{
-				last_result *= 2;
-				enemy_health_bonus_score++;
-			}
-
-			if (self->s.weapon != WP_NONE)
-			{ // zyk: armed npcs give more score
-				attacker->client->pers.score_modifier += 1;
-				attacker->client->pers.credits_modifier += 10;
-			}
-
-			if (self->client->ps.fd.forcePowerMax > 0)
-			{ // zyk: force users give more score
-				attacker->client->pers.score_modifier += 1;
-				attacker->client->pers.credits_modifier += 10;
-			}
-
-			// zyk: also give bonus score and credits based on npc health
-			attacker->client->pers.score_modifier += enemy_health_bonus_score;
-			attacker->client->pers.credits_modifier += (enemy_health_bonus_score * 10);
-		}
-
-		if (self->NPC && self->client->pers.credits_modifier > 0)
-		{ // zyk: npc with a custom amount of credits set
-			attacker->client->pers.credits_modifier = self->client->pers.credits_modifier;
-		}
-
 		// zyk: Bounty Quest manager
 		if (level.bounty_quest_choose_target == qfalse && attacker != self && self->client->sess.amrpgmode == 2)
 		{
 			if (level.bounty_quest_target_id == (attacker - g_entities))
 			{ // zyk: attacker was the target, so the attacker receives bonus credits
-				int bonus_credits = self->client->pers.level * 2;
+				int bonus_credits = 10;
 
-				attacker->client->pers.credits_modifier += bonus_credits;
+				attacker->client->pers.credits += bonus_credits;
+				save_account(attacker, qtrue);
 				trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7%s ^7was defeated by the target player, ^3%d ^7bonus credits\n\"", self->client->pers.netname, bonus_credits));
 			}
 			else if (level.bounty_quest_target_id == (self - g_entities))
 			{ // zyk: target player was defeated. Gives the reward to the attacker
-				attacker->client->pers.credits_modifier += (self->client->pers.level * 15);
+				int bonus_credits = 200;
+
+				attacker->client->pers.credits += bonus_credits;
+				save_account(attacker, qtrue);
 				level.bounty_quest_choose_target = qtrue;
 				level.bounty_quest_target_id++;
-				trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7%s^7 receives ^3%d ^7bonus credits\n\"", attacker->client->pers.netname, (self->client->pers.level * 15)));
+				trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7%s^7 receives ^3%d ^7bonus credits\n\"", attacker->client->pers.netname, bonus_credits));
 			}
 		}
 	}
@@ -4851,7 +4810,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			if (attacker->client->pers.skill_levels[SKILL_SABER] > 0)
 			{ // zyk: Saber Damage skill, increases damage based on current RPG level
-				bonus_saber_damage_factor += (0.002 * attacker->client->pers.skill_levels[SKILL_SABER] * attacker->client->pers.level);
+				bonus_saber_damage_factor += (0.04 * attacker->client->pers.skill_levels[SKILL_SABER]);
 			}
 
 			damage = (int)ceil(damage * bonus_saber_damage_factor);
@@ -4888,12 +4847,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (attacker->client->pers.energy_modulator_mode == 1)
 		{ // zyk: Energy Modulator mode 1 increases damage
-			damage = (int)ceil(damage * (1.00 + (0.01 * attacker->client->pers.level / 4)));
+			damage = (int)ceil(damage * 1.25);
 		}
 
 		if (attacker->NPC && attacker->client->pers.quest_npc > 0)
 		{ // zyk: increase damage of quest npcs based on their levels
-			damage = (int)ceil(damage * (1.00 + (0.02 * attacker->client->pers.level)));
+			damage = (int)ceil(damage * 1.20);
 		}
 	}
 
@@ -5424,7 +5383,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		{ // zyk: RPG resistance bonuses
 			if (targ->client->pers.energy_modulator_mode == 2)
 			{ // zyk: Energy Modulator mode 2
-				bonus_resistance += (0.01 * (targ->client->pers.level / 4));
+				bonus_resistance += 0.25;
 
 				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 			}
