@@ -2766,6 +2766,7 @@ extern int	BMS_END;
 
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 extern void add_credits(gentity_t* ent, int credits);
+extern int zyk_total_skillpoints(gentity_t* ent);
 
 //----------------------------------------------------------
 void fx_runner_think( gentity_t *ent )
@@ -2823,7 +2824,7 @@ void fx_runner_think( gentity_t *ent )
 
 			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
 			{ // zyk: a logged RPG player
-				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < 50)
+				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < 50 && zyk_total_skillpoints(player_ent) < RPG_MAX_SKILLPOINTS)
 				{
 					player_ent->client->pers.skillpoints++;
 					add_credits(player_ent, 100);
