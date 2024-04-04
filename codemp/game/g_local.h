@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.3.01"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.3.02"
 
 #define SECURITY_LOG "security.log"
 
@@ -784,6 +784,9 @@ typedef enum {
 // zyk: initial credits in RPG Mode
 #define RPG_INITIAL_CREDITS 200
 
+// zyk: max RPG skillpoints
+#define RPG_MAX_SKILLPOINTS 120
+
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
 #define RPG_MAX_HEALTH_INCREASE 30
 
@@ -814,10 +817,7 @@ typedef enum {
 
 // zyk: main characters names
 #define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
-#define QUESTCHAR_EMPEROR_NAME "^3Drakon"
-#define QUESTCHAR_MAINVILLAIN_NAME "^1Asmodeus"
-#define QUESTCHAR_MAINGOODENTITY_NAME "^5Michael"
-#define QUESTCHAR_BOSS1 "^6Lilith"
+#define QUESTCHAR_MAINVILLAIN_NAME "^1Drakon"
 
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()

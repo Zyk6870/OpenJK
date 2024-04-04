@@ -6881,43 +6881,43 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 3)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You must defeat players or enemy npcs to get experience and levels. Levels give you skillpoints.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info you need, like skillpoints, Magic points, Stamina, etc.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 4)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info you need, like current Level, Magic, skillpoints, Stamina, etc.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: In ^3/list rpg ^7you can see the commands that lists your skills and other commands too.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 5)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: In ^3/list rpg ^7you can see the commands that lists your skills and other commands too.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: In time your Stamina will decrease. Doing actions makes it decrease faster.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 6)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: In time your Stamina will decrease. Doing actions makes it decrease faster.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If out of Stamina, you will faint and regain a bit of it. Also, low Stamina decreases your run speed.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 7)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If out of Stamina, you will faint and regain a bit of it. Also, low Stamina decreases your run speed.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use meditate (in controls Menu, set the bind for it) to regen Stamina.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 8)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use meditate (in controls Menu, set the bind for it) to regen Stamina.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Anything you get (weapons, ammo, items) use your inventory. To see it use ^3/list inventory^7\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 9)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Anything you get (weapons, ammo, items) use your inventory. To see it use ^3/list inventory^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory stuff have weight. If over the max weight, your run speed will decrease.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 10)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory stuff have weight. If over the max weight, your run speed will decrease.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or items or sell then to the seller.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 11)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or items or sell then to the seller.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We are giving you the power to magically buy from the seller. To know how it works, use ^3/stuff^7\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 12)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We are giving you the power to magically buy from the seller. To know how it works, use ^3/stuff^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need skillpoints to upgrade skills. You get them by finding skill crystals that we will place in any map.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 13)
 	{
@@ -6925,23 +6925,23 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 14)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your current stats (hp, shield, mp, stamina) are saved so changing map will keep them at current values.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To upgrade or downgrade a skill, use ^3/up <skill number> ^7or ^3/down <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 15)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To upgrade or downgrade a skill, use ^3/up <skill number> ^7or ^3/down <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your current stats (hp, shield, mp, stamina) are saved so changing map will keep them at current values.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 16)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight other players, use ^3/nofight^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight players, use ^3/nofight^7, preventing damage to you and you cannot damage them\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 17)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can add allies players with ^3/allyadd ^7or use ^3/allyremove ^7to remove them.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can add or remove ally players with ^3/allyadd ^7and ^3/allyremove.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 18)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including Single Player ones.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including SP ones. Use ^3/maplist ^7to list maps\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 19)
 	{
@@ -6957,39 +6957,27 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 22)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: evil demon forces, lead by the Emperor %s^7, took over the world\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_EMPEROR_NAME));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the Brotherhood of Mages, lead by the %s^7, took over everything\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINVILLAIN_NAME));
 	}
 	if (ent->client->pers.tutorial_step == 23)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he is a servant of the demon %s^7, who came from the World of Darkness and is using the emperor to rule over everything!\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINVILLAIN_NAME));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions, lesser demons. They are residing in several places (maps) and giving power to him.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 24)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions, lesser demons. They are residing in several places (maps) and giving power to the Emperor.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: each one you defeat will weaken him and we will be able to create skill crystals faster.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 25)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the angel %s^7 is in the World of Light, protecting it from being taken over, so he can't help us now.\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINGOODENTITY_NAME));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There is a legendary artifact hidden somewhere that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 26)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you can defeat them, the Emperor will lose part of his power for each demon defeated.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 27)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Go to ^3t3_bounty^7. The people there are hiding from the evil forces, and will to help you.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 28)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are also many powerful legendary artifacts hidden somewhere that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 29)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 30)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Save everything and bring back the balance to Nature!\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! We are counting on you.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 
 		// zyk: end of tutorial
 		ent->client->pers.player_statuses &= ~(1 << 25);

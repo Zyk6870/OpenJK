@@ -5791,10 +5791,25 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 }
 
+int zyk_total_skillpoints(gentity_t* ent)
+{
+	int i = 0;
+	int total_skillpoints = 0;
+
+	for (i = 0; i < NUMBER_OF_SKILLS; i++)
+	{
+		total_skillpoints += ent->client->pers.skill_levels[i];
+	}
+
+	total_skillpoints += ent->client->pers.skillpoints;
+
+	return total_skillpoints;
+}
+
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Skill Points: ^7%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Stamina: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
-		ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.skillpoints, ent->client->pers.magic_power, zyk_max_magic_power(ent), 
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Skill Crystals: ^7%d/%d\n^3Skill Points: ^7%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Stamina: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
+		ent->client->sess.filename, ent->client->sess.rpgchar, zyk_total_skillpoints(ent), RPG_MAX_SKILLPOINTS, ent->client->pers.skillpoints, ent->client->pers.magic_power, zyk_max_magic_power(ent),
 		ent->client->pers.current_weight, ent->client->pers.max_weight, ent->client->pers.current_stamina, ent->client->pers.max_stamina, ent->client->pers.credits));
 }
 
