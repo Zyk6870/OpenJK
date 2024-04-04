@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.3.03"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.3.04"
 
 #define SECURITY_LOG "security.log"
 
@@ -782,7 +782,7 @@ typedef enum {
 #define RPG_DEFAULT_STAMINA 5000
 
 // zyk: initial credits in RPG Mode
-#define RPG_INITIAL_CREDITS 200
+#define RPG_INITIAL_CREDITS 0
 
 // zyk: max RPG skillpoints
 #define RPG_MAX_SKILLPOINTS 120
@@ -937,6 +937,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: RPG skills
 	int skill_levels[NUMBER_OF_SKILLS];
+
+	// zyk: timer to spawn and respawn skill crystals in the map
+	int skill_crystal_timer;
 
 	int max_rpg_health; // zyk: max health the player can have in RPG Mode. This is set to STAT_MAX_HEALTH for RPG players
 	int max_rpg_shield; // zyk: max shield the player can have in RPG Mode based in the skill_levels[30] value

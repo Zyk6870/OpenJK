@@ -4555,6 +4555,21 @@ qboolean zyk_check_user_input(char *user_input, int user_input_size)
 	return qtrue;
 }
 
+int zyk_total_skillpoints(gentity_t* ent)
+{
+	int i = 0;
+	int total_skillpoints = 0;
+
+	for (i = 0; i < NUMBER_OF_SKILLS; i++)
+	{
+		total_skillpoints += ent->client->pers.skill_levels[i];
+	}
+
+	total_skillpoints += ent->client->pers.skillpoints;
+
+	return total_skillpoints;
+}
+
 // zyk: initialize RPG skills of this player
 void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 {
@@ -5789,21 +5804,6 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	{
 		zyk_list_category_skills(ent, target_ent, SKILL_MAGIC_FIST, SKILL_MAGIC_LIGHT_MAGIC);
 	}
-}
-
-int zyk_total_skillpoints(gentity_t* ent)
-{
-	int i = 0;
-	int total_skillpoints = 0;
-
-	for (i = 0; i < NUMBER_OF_SKILLS; i++)
-	{
-		total_skillpoints += ent->client->pers.skill_levels[i];
-	}
-
-	total_skillpoints += ent->client->pers.skillpoints;
-
-	return total_skillpoints;
 }
 
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)

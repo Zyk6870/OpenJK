@@ -5025,7 +5025,6 @@ void Player_FireFlameThrower(gentity_t* self, qboolean is_magic)
 	}
 }
 
-// zyk: checks if the player has already all artifacts
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 
 void zyk_spawn_puzzle_effect(gentity_t *crystal_model)
@@ -5095,6 +5094,82 @@ void zyk_spawn_energy_modulator_model(float x, float y, float z, int model_scale
 	zyk_spawn_entity(new_ent);
 
 	new_ent->count = 8;
+}
+
+extern int zyk_total_skillpoints(gentity_t* ent);
+void zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration)
+{
+	gentity_t* new_ent = G_Spawn();
+
+	zyk_set_entity_field(new_ent, "classname", "fx_runner");
+	zyk_set_entity_field(new_ent, "targetname", "zyk_skill_crystal");
+	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
+
+	new_ent->s.modelindex = G_EffectIndex("force/heal2");
+
+	zyk_spawn_entity(new_ent);
+
+	level.special_power_effects[new_ent->s.number] = 0;
+	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+}
+
+void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, int duration)
+{
+	gentity_t* new_ent = G_Spawn();
+
+	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
+
+	// zyk: only the usable crystals will be solid, to avoid a bug in which player cannot use the correct crystals
+	zyk_set_entity_field(new_ent, "spawnflags", "0");
+
+	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
+
+	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
+
+	zyk_set_entity_field(new_ent, "zykmodelscale", "80");
+	zyk_set_entity_field(new_ent, "targetname", "zyk_skill_crystal");
+
+	zyk_spawn_entity(new_ent);
+
+	level.special_power_effects[new_ent->s.number] = 0;
+	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+}
+
+// zyk: spawn the model and effect used by skill crystals
+void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
+{
+	float x, y, z;
+	int min_distance = 25, max_distance = 50;
+	int distance_factor = zyk_total_skillpoints(ent) + 1;
+
+	// zyk: the distance to the skill crystal will increase as the player gets more skillpoints
+	x = Q_irand((min_distance * distance_factor), (max_distance * distance_factor));
+	y = Q_irand((min_distance * distance_factor), (max_distance * distance_factor));
+	z = Q_irand((min_distance * distance_factor), (max_distance * distance_factor));
+
+	if (Q_irand(0, 1) == 0)
+	{
+		x *= -1;
+	}
+
+	if (Q_irand(0, 1) == 0)
+	{
+		y *= -1;
+	}
+
+	if (Q_irand(0, 1) == 0)
+	{
+		z *= -1;
+	}
+
+	x = ent->r.currentOrigin[0] + x;
+	y = ent->r.currentOrigin[1] + y;
+	z = ent->r.currentOrigin[2] + z;
+
+	zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration);
+	zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration);
+	zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration);
+	zyk_spawn_skill_crystal_effect(x, y, z, duration);
 }
 
 // zyk: clear effects of some special powers
@@ -6913,11 +6988,11 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 11)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We are giving you the power to magically buy from the seller. To know how it works, use ^3/stuff^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can magically buy from the seller. Use ^3/stuff^7. You can get credits by selling stuff or getting skill crystals\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 12)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need skillpoints to upgrade skills. You get them by finding skill crystals that we will place in any map.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need skillpoints to upgrade skills. Find skill crystals that we keep randomly placing in the map.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 13)
 	{
@@ -6957,7 +7032,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 22)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the Brotherhood of Mages, lead by the %s^7, took over everything\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINVILLAIN_NAME));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the Brotherhood of Mages, lead by %s^7, took over everything\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINVILLAIN_NAME));
 	}
 	if (ent->client->pers.tutorial_step == 23)
 	{
@@ -8720,6 +8795,17 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.forceAllowDeactivateTime = level.time + 300;
 
 					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
+				}
+
+				// zyk: skill crystals must be spawned after a certain amount of time
+				if (ent->client->pers.skill_crystal_timer < level.time && zyk_total_skillpoints(ent) < RPG_MAX_SKILLPOINTS)
+				{
+					int skill_crystal_duration = 30000 + (zyk_total_skillpoints(ent) * 10000);
+
+					zyk_spawn_skill_crystal(ent, skill_crystal_duration);
+
+					// zyk: each skillpoint the player has increases the time to respawn skill crystals
+					ent->client->pers.skill_crystal_timer = level.time + skill_crystal_duration;
 				}
 
 				if (level.quest_map > QUESTMAP_NONE && level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && 

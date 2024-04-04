@@ -2763,6 +2763,10 @@ Runs the specified effect, can also be targeted at an info_notnull to orient the
 extern int	BMS_START;
 extern int	BMS_MID;
 extern int	BMS_END;
+
+extern void save_account(gentity_t* ent, qboolean save_char_file);
+extern void add_credits(gentity_t* ent, int credits);
+
 //----------------------------------------------------------
 void fx_runner_think( gentity_t *ent )
 {
@@ -2805,6 +2809,36 @@ void fx_runner_think( gentity_t *ent )
 			ent->s.soundSetIndex = G_SoundSetIndex(ent->soundSet);
 			ent->s.loopIsSoundset = qtrue;
 			ent->s.loopSound = BMS_MID;
+		}
+	}
+
+	// zyk: Skill Crystal. Tests if there is a RPG player touching it
+	if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0)
+	{
+		int i = 0;
+
+		for (i = 0; i < level.maxclients; i++)
+		{
+			gentity_t* player_ent = &g_entities[i];
+
+			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+			{ // zyk: a logged RPG player
+				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < 40)
+				{
+					player_ent->client->pers.skillpoints++;
+					add_credits(player_ent, 100);
+
+					save_account(player_ent, qtrue);
+
+					ent->think = G_FreeEntity;
+					ent->nextthink = level.time + 100;
+
+					G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+
+					trap->SendServerCommand(player_ent->s.number, "chat \"^3Skill System: ^7found a skill crystal, +1 skillpoint +100 credits\"");
+					return;
+				}
+			}
 		}
 	}
 
