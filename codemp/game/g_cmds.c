@@ -225,7 +225,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio";
 	if (skill_index == SKILL_MAX_STAMINA)
-		return "Each level increases your max stamina. Stamina is used by any action the player does. Low stamina makes run speed slower. If Stamina runs out you will pass out for some seconds. Each skill level decreases time you need to rest. Meditating recovers stamina faster, and the amount recovered increases with each skill level. Use bacta canister or big bacta items to regen stamina";
+		return "Each level increases your max stamina. Stamina is used by any action the player does. Low stamina makes run speed slower. Stamina will slowly decrease over the time and you can also lose some stamina when taking damage. If Stamina runs out you will pass out for some seconds. Each skill level decreases time you need to rest. Meditating recovers stamina faster, and the amount recovered increases with each skill level. Use bacta canister or big bacta items to regen stamina";
 	if (skill_index == SKILL_UNDERWATER)
 		return "Each level increases your air underwater";
 	if (skill_index == SKILL_RUN_SPEED)

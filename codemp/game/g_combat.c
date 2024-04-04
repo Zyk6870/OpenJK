@@ -5823,6 +5823,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		if (targ->client && (targ->client->sess.amrpgmode == 2 || targ->NPC))
 		{ // zyk: bonus resistance
 			float bonus_health_resistance = 0.00;
+			int stamina_loss = 0;
 
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
 			{ // zyk: Impact Reducer Armor
@@ -5868,6 +5869,24 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (take < 1)
 			{ // zyk: cannot make player fully absorb all damage
 				take = 1;
+			}
+
+			// zyk: damage to health alsomakes RPG player lose Stamina
+			stamina_loss = take;
+
+			if (targ->client->sess.amrpgmode == 2)
+			{
+				if (targ->client->pers.skill_levels[SKILL_MAX_STAMINA] > 0)
+				{
+					stamina_loss -= (take / (2 * targ->client->pers.skill_levels[SKILL_MAX_STAMINA]));
+
+					if (stamina_loss < 1)
+					{
+						stamina_loss = 1;
+					}
+				}
+
+				zyk_set_stamina(targ, stamina_loss, qfalse);
 			}
 
 			if (attacker && attacker->client && 

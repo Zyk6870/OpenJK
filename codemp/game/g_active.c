@@ -1375,7 +1375,7 @@ void zyk_stamina_out(gentity_t* ent)
 {
 	if (ent->client->pers.current_stamina <= 0 && ent->client->pers.stamina_out_timer <= level.time)
 	{ // zyk: if run out of stamina, knock out the player until stamina recovers a bit
-		int stamina_out_time = 8000 - (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 1000);
+		int stamina_out_time = 10000 - (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 1000);
 
 		if (ent->client->jetPackOn)
 		{
