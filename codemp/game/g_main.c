@@ -6850,25 +6850,25 @@ void zyk_show_tutorial(gentity_t* ent)
 	if (ent->client->pers.tutorial_step == 0)
 	{
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 160000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 145000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0], ent->r.currentOrigin[1] + 100, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 160000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 145000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 160000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 145000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 160000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 145000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 160000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 145000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 160000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 145000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 160000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 145000);
 	}
 
 	if (ent->client->pers.tutorial_step == 1)
@@ -8818,49 +8818,6 @@ void G_RunFrame( int levelTime ) {
 							ent->NPC->tempBehavior = BS_INVESTIGATE;
 						}
 					}
-				}
-			}
-
-			// zyk: abilities of custom quest npcs
-			if (ent->client->pers.player_statuses & (1 << 28) && ent->health > 0)
-			{
-				if (ent->client->pers.quest_power_usage_timer < level.time)
-				{
-					int random_magic = Q_irand(0, (MAX_MAGIC_POWERS - 1));
-					int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
-					int current_magic_skill = first_magic_skill;
-
-					// zyk: adding all magic powers to this npc
-					while (current_magic_skill < NUMBER_OF_SKILLS)
-					{
-						if (random_magic < 31 && ent->client->pers.custom_quest_magic & (1 << random_magic) && ent->client->pers.skill_levels[current_magic_skill] < 1)
-						{
-							ent->client->pers.skill_levels[current_magic_skill] = 2;
-						}
-
-						current_magic_skill++;
-					}
-
-					current_magic_skill = first_magic_skill + 31;
-
-					// zyk: adding all magic powers to this npc
-					while (current_magic_skill < NUMBER_OF_SKILLS)
-					{
-						if (random_magic >= 31 && ent->client->pers.custom_quest_more_magic & (1 << (random_magic - 31)) && ent->client->pers.skill_levels[current_magic_skill] < 1)
-						{
-							ent->client->pers.skill_levels[current_magic_skill] = 2;
-						}
-
-						current_magic_skill++;
-					}
-
-					// zyk: regen mp of this npc
-					if (ent->client->pers.magic_power < 20)
-					{
-						ent->client->pers.magic_power = 500;
-					}
-
-					zyk_cast_magic(ent, first_magic_skill + random_magic);
 				}
 			}
 

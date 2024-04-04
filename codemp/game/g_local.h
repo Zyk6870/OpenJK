@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.3.02"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.3.03"
 
 #define SECURITY_LOG "security.log"
 
@@ -1038,10 +1038,6 @@ typedef struct clientPersistant_s {
 
 	int quest_npc_current_event;
 	int quest_npc_timer;
-
-	// zyk: used to set magic powers and abilities to custom quest npcs
-	int custom_quest_magic;
-	int custom_quest_more_magic;
 } clientPersistant_t;
 
 typedef struct renderInfo_s
