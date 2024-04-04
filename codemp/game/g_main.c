@@ -5139,10 +5139,10 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 {
 	float x, y, z;
-	int min_distance = 25, max_distance = 50;
+	int min_distance = 10, max_distance = 50;
 	int distance_factor = zyk_total_skillpoints(ent) + 1;
 
-	// zyk: the distance to the skill crystal will increase as the player gets more skillpoints
+	// zyk: the distance the skill crystal is from the map origin will increase as the player gets more skillpoints
 	x = Q_irand((min_distance * distance_factor), (max_distance * distance_factor));
 	y = Q_irand((min_distance * distance_factor), (max_distance * distance_factor));
 	z = Q_irand((min_distance * distance_factor), (max_distance * distance_factor));
@@ -5161,10 +5161,6 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 	{
 		z *= -1;
 	}
-
-	x = ent->r.currentOrigin[0] + x;
-	y = ent->r.currentOrigin[1] + y;
-	z = ent->r.currentOrigin[2] + z;
 
 	zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration);
 	zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration);
@@ -8800,7 +8796,7 @@ void G_RunFrame( int levelTime ) {
 				// zyk: skill crystals must be spawned after a certain amount of time
 				if (ent->client->pers.skill_crystal_timer < level.time && zyk_total_skillpoints(ent) < RPG_MAX_SKILLPOINTS)
 				{
-					int skill_crystal_duration = 30000 + (zyk_total_skillpoints(ent) * 10000);
+					int skill_crystal_duration = (zyk_total_skillpoints(ent) + 1) * 5000;
 
 					zyk_spawn_skill_crystal(ent, skill_crystal_duration);
 

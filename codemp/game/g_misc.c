@@ -2823,7 +2823,7 @@ void fx_runner_think( gentity_t *ent )
 
 			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
 			{ // zyk: a logged RPG player
-				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < 40)
+				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < 50)
 				{
 					player_ent->client->pers.skillpoints++;
 					add_credits(player_ent, 100);
