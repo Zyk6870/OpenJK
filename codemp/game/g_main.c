@@ -5139,8 +5139,45 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 {
 	float x, y, z;
-	int min_distance = 10, max_distance = 50;
+	int min_distance = 1, max_distance = 5;
 	int distance_factor = zyk_total_skillpoints(ent) + 1;
+	int min_entity_id = (MAX_CLIENTS + BODY_QUEUE_SIZE);
+	int max_entity_id = level.num_entities - 1;
+	int chosen_entity_index = 0; // zyk: skill crystal origin will be at a random map entity origin
+	gentity_t* chosen_entity = NULL;
+	int i = 0, j = 0;
+	int total_entities_in_use = 0;
+
+	// zyk: get all entities in use
+	for (i = min_entity_id; i < level.num_entities; i++)
+	{
+		gentity_t *current_entity = &g_entities[i];
+
+		if (current_entity && current_entity->inuse == qtrue)
+		{
+			total_entities_in_use++;
+		}
+	}
+
+	chosen_entity_index = Q_irand(0, (total_entities_in_use - 1));
+
+	for (i = min_entity_id; i < level.num_entities; i++)
+	{
+		gentity_t* current_entity = &g_entities[i];
+
+		if (current_entity && current_entity->inuse == qtrue && chosen_entity_index == j)
+		{ // zyk: found the entity
+			chosen_entity = current_entity;
+			break;
+		}
+
+		j++;
+	}
+
+	if (!chosen_entity)
+	{ // zyk: if for some reason there was no chosen entity, the skill crystal will be spawned later
+		return;
+	}
 
 	// zyk: the distance the skill crystal is from the map origin will increase as the player gets more skillpoints
 	x = Q_irand((min_distance * distance_factor), (max_distance * distance_factor));
@@ -5162,8 +5199,10 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 		z *= -1;
 	}
 
-	zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration);
-	zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration);
+	x += chosen_entity->r.currentOrigin[0];
+	y += chosen_entity->r.currentOrigin[1];
+	z += chosen_entity->r.currentOrigin[2];
+
 	zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration);
 	zyk_spawn_skill_crystal_effect(x, y, z, duration);
 }
@@ -6921,25 +6960,25 @@ void zyk_show_tutorial(gentity_t* ent)
 	if (ent->client->pers.tutorial_step == 0)
 	{
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 145000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0], ent->r.currentOrigin[1] + 100, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 145000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 145000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 145000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 145000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 145000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 145000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 155000);
 	}
 
 	if (ent->client->pers.tutorial_step == 1)
@@ -6992,61 +7031,69 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 13)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You will probably need to see info about a skill so use ^3/list <skill number> ^7to see skill info.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Skill crystals will disappear after a short time. The more skillpoints you get the longer it will take for new ones to appear.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 14)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To upgrade or downgrade a skill, use ^3/up <skill number> ^7or ^3/down <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You will probably need to see info about a skill so use ^3/list <skill number> ^7to see skill info.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 15)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your current stats (hp, shield, mp, stamina) are saved so changing map will keep them at current values.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To upgrade or downgrade a skill, use ^3/up <skill number> ^7or ^3/down <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 16)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight players, use ^3/nofight^7, preventing damage to you and you cannot damage them\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your current stats (hp, shield, mp, stamina) are saved so changing map will keep them at current values.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 17)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can add or remove ally players with ^3/allyadd ^7and ^3/allyremove.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight players, use ^3/nofight^7, preventing damage to you and you cannot damage them\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 18)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including SP ones. Use ^3/maplist ^7to list maps\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can add or remove ally players with ^3/allyadd ^7and ^3/allyremove.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 19)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can see your quests in ^3/list quests^7. Any new mission will appear there\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including SP ones. Use ^3/maplist ^7to list maps\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 20)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: That's the reason we are here. We need your help %s^7\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can see your quests in ^3/list quests^7. Any new mission will appear there\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 21)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Each one of us have affinity with one of the Elements of Nature, and one of us is non-elemental.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: That's the reason we are here. We need your help %s^7\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 	}
 	if (ent->client->pers.tutorial_step == 22)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the Brotherhood of Mages, lead by %s^7, took over everything\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINVILLAIN_NAME));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Each one of us have affinity with one of the Elements of Nature, and one of us is non-elemental.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 23)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions, lesser demons. They are residing in several places (maps) and giving power to him.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the Brotherhood of Mages, lead by %s^7, took over everything\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINVILLAIN_NAME));
 	}
 	if (ent->client->pers.tutorial_step == 24)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: each one you defeat will weaken him and we will be able to create skill crystals faster.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions, lesser demons. They are residing in several places (maps) and giving power to him and weakening us.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 25)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There is a legendary artifact hidden somewhere that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: each one you defeat will weaken him and we will be able to create skill crystals faster.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 26)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There is a legendary artifact hidden somewhere that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 27)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the seller may help you with quest info. Find him in t1_inter map.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 28)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 29)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! We are counting on you.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 
@@ -8794,14 +8841,15 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				// zyk: skill crystals must be spawned after a certain amount of time
-				if (ent->client->pers.skill_crystal_timer < level.time && zyk_total_skillpoints(ent) < RPG_MAX_SKILLPOINTS)
+				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time && zyk_total_skillpoints(ent) < RPG_MAX_SKILLPOINTS)
 				{
-					int skill_crystal_duration = (zyk_total_skillpoints(ent) + 1) * 5000;
+					int skill_crystal_duration = 30000 + (1250 * (zyk_total_skillpoints(ent) + 1));
+					int skill_crystal_respawn_time = ((zyk_total_skillpoints(ent) + 1) * RPG_SKILL_CRYSTAL_RESPAWN_TIME);
 
 					zyk_spawn_skill_crystal(ent, skill_crystal_duration);
 
 					// zyk: each skillpoint the player has increases the time to respawn skill crystals
-					ent->client->pers.skill_crystal_timer = level.time + skill_crystal_duration;
+					ent->client->pers.skill_crystal_timer = level.time + skill_crystal_respawn_time;
 				}
 
 				if (level.quest_map > QUESTMAP_NONE && level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && 

@@ -4887,6 +4887,8 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.magic_consumption_timer = 0;
 
+			ent->client->pers.skill_crystal_timer = level.time + ((zyk_total_skillpoints(ent) + 1) * RPG_SKILL_CRYSTAL_RESPAWN_TIME);
+
 			// zyk: loading initial force
 			ent->client->ps.fd.forcePower = ent->client->pers.max_force_power;
 
