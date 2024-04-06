@@ -4816,13 +4816,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			damage = (int)ceil(damage * bonus_saber_damage_factor);
 		}
 		else if (mod == MOD_MELEE)
-		{ // zyk: setting melee damage in RPG Mode
-			if (attacker->client->pers.skill_levels[SKILL_MELEE] == 0)
-				damage = (int)ceil((damage * 1.0) / 2.0);
-			else if (attacker->client->pers.skill_levels[SKILL_MELEE] == 2)
-				damage = damage * 2;
-			else if (attacker->client->pers.skill_levels[SKILL_MELEE] == 3)
-				damage = damage * 3;
+		{
+			damage = (int)ceil(damage * (1.0 + (0.50 * attacker->client->pers.skill_levels[SKILL_MELEE])));
 		}
 	}
 

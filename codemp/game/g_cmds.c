@@ -215,7 +215,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_HEALTH_STRENGTH)
 		return "Each level increases your health resistance to damage";
 	if (skill_index == SKILL_MELEE)
-		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 0, melee attacks cause only half normal damage. Right hand punch causes %d normal damage, left hand punch causes %d normal damage and kick causes %d damage at level 1", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
+		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 1, Right hand punch does %d normal damage, left hand punch does %d normal damage and kick does %d damage. Each level increases melee damage", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	if (skill_index == SKILL_MELEE_SPEED)
 		return "Each level increases how fast you can punch with Melee";
 	if (skill_index == SKILL_SABER)
@@ -232,7 +232,7 @@ char* zyk_skill_description(int skill_index)
 		return va("At level 0 your run speed is %f. Each level increases it by 50", g_speed.value);
 	
 	if (skill_index == SKILL_MAGIC_FIST)
-		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key. Bolt damage increases when you get more RPG levels";
+		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key. Melee skill also increases bolt damage";
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
