@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.3.10"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.3.11"
 
 #define SECURITY_LOG "security.log"
 
@@ -788,7 +788,7 @@ typedef enum {
 #define RPG_MAX_SKILLPOINTS 120
 
 // zyk: amount of time to increase to spawn new skill crystals
-#define RPG_SKILL_CRYSTAL_RESPAWN_TIME 3000
+#define RPG_SKILL_CRYSTAL_RESPAWN_TIME 4000
 
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
 #define RPG_MAX_HEALTH_INCREASE 30

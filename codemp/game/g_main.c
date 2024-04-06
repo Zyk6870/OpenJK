@@ -5199,9 +5199,18 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 		z *= -1;
 	}
 
-	x += chosen_entity->r.currentOrigin[0];
-	y += chosen_entity->r.currentOrigin[1];
-	z += chosen_entity->r.currentOrigin[2];
+	if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
+	{
+		x += chosen_entity->r.currentOrigin[0];
+		y += chosen_entity->r.currentOrigin[1];
+		z += chosen_entity->r.currentOrigin[2];
+	}
+	else
+	{
+		x += chosen_entity->s.origin[0];
+		y += chosen_entity->s.origin[1];
+		z += chosen_entity->s.origin[2];
+	}
 
 	zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration);
 	zyk_spawn_skill_crystal_effect(x, y, z, duration);
@@ -8843,7 +8852,7 @@ void G_RunFrame( int levelTime ) {
 				// zyk: skill crystals must be spawned after a certain amount of time
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time && zyk_total_skillpoints(ent) < RPG_MAX_SKILLPOINTS)
 				{
-					int skill_crystal_duration = 30000 + (1250 * (zyk_total_skillpoints(ent) + 1));
+					int skill_crystal_duration = 60000;
 					int skill_crystal_respawn_time = ((zyk_total_skillpoints(ent) + 1) * RPG_SKILL_CRYSTAL_RESPAWN_TIME);
 
 					zyk_spawn_skill_crystal(ent, skill_crystal_duration);
