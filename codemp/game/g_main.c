@@ -5126,7 +5126,7 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 
 	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
 
-	zyk_set_entity_field(new_ent, "zykmodelscale", "80");
+	zyk_set_entity_field(new_ent, "zykmodelscale", "70");
 	zyk_set_entity_field(new_ent, "targetname", "zyk_skill_crystal");
 
 	zyk_spawn_entity(new_ent);
@@ -6969,25 +6969,25 @@ void zyk_show_tutorial(gentity_t* ent)
 	if (ent->client->pers.tutorial_step == 0)
 	{
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 155000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 150000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0], ent->r.currentOrigin[1] + 100, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 155000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 150000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 155000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 150000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 155000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 150000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 155000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 150000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 155000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 150000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 155000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 150000);
 	}
 
 	if (ent->client->pers.tutorial_step == 1)
@@ -7084,7 +7084,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 24)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions, lesser demons. They are residing in several places (maps) and giving power to him and weakening us.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions residing in several places (maps), giving power to him and weakening us.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 25)
 	{
@@ -7096,13 +7096,9 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 27)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the seller may help you with quest info. Find him in t1_inter map.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 28)
-	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
-	if (ent->client->pers.tutorial_step == 29)
+	if (ent->client->pers.tutorial_step == 28)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! We are counting on you.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 
@@ -8852,8 +8848,8 @@ void G_RunFrame( int levelTime ) {
 				// zyk: skill crystals must be spawned after a certain amount of time
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time && zyk_total_skillpoints(ent) < RPG_MAX_SKILLPOINTS)
 				{
-					int skill_crystal_duration = 30000;
-					int skill_crystal_respawn_time = ((zyk_total_skillpoints(ent) + 1) * RPG_SKILL_CRYSTAL_RESPAWN_TIME);
+					int skill_crystal_duration = 60000;
+					int skill_crystal_respawn_time = RPG_SKILL_CRYSTAL_RESPAWN_TIME + (500 * (zyk_total_skillpoints(ent) + 1));
 
 					zyk_spawn_skill_crystal(ent, skill_crystal_duration);
 
