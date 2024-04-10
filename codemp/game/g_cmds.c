@@ -232,7 +232,7 @@ char* zyk_skill_description(int skill_index)
 		return va("At level 0 your run speed is %f. Each level increases it by 50", g_speed.value);
 	
 	if (skill_index == SKILL_MAGIC_FIST)
-		return "allows you to attack with magic bolts when using melee punches. Each level gives a new bolt type. To select a bolt type, get melee and press Saber Style Key. Melee skill also increases bolt damage";
+		return "allows you to attack with magic bolts when using melee punches. Each level increases damage. Melee skill also increases damage";
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
@@ -2171,10 +2171,6 @@ void load_account(gentity_t* ent)
 				ent->client->pers.credits = 0;
 			}
 
-			// zyk: loading Magic Fist selection and selected powers
-			fscanf(account_file, "%s", content);
-			ent->client->sess.magic_fist_selection = atoi(content);
-
 			// zyk: Main Quest progress
 			fscanf(account_file, "%s", content);
 			ent->client->pers.quest_progress = atoi(content);
@@ -2263,9 +2259,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.skillpoints, content, client->pers.credits,
-				client->sess.magic_fist_selection, client->pers.quest_progress,
+			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n",
+				client->pers.skillpoints, content, client->pers.credits, client->pers.quest_progress,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
@@ -4854,11 +4849,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 		// zyk: setting rpg control attributes
 
-		if (ent->client->sess.magic_fist_selection > ent->client->pers.skill_levels[SKILL_MAGIC_FIST])
-		{ // zyk: reset magic fist selected if player downgrades Magic Fist skill
-			ent->client->sess.magic_fist_selection = 0;
-		}
-
 		if (init_all == qtrue)
 		{
 			zyk_load_common_settings(ent);
@@ -5074,7 +5064,6 @@ void add_new_char(gentity_t *ent)
 	}
 
 	ent->client->pers.credits = RPG_INITIAL_CREDITS;
-	ent->client->sess.magic_fist_selection = 0;
 
 	// zyk: in RPG Mode, player must actually buy these
 	ent->client->ps.jetpackFuel = 0;
@@ -11887,8 +11876,6 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 				ent->client->pers.skillpoints = 0;
 
 				ent->client->pers.credits = RPG_INITIAL_CREDITS;
-
-				ent->client->sess.magic_fist_selection = 0;
 
 				// zyk: in RPG Mode, player must actually buy these
 				ent->client->ps.jetpackFuel = 0;

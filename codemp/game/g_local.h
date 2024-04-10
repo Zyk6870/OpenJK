@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.3.12"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.3.13"
 
 #define SECURITY_LOG "security.log"
 
@@ -480,15 +480,6 @@ typedef struct clientSession_s {
 	char filename[32]; // zyk: player account filename
 
 	char rpgchar[32]; // zyk: file name of the RPG char
-	
-	// zyk: activates Magic Fist types
-	// Possible values are:
-	// 1 - Normal Bolt
-	// 2 - Electric Bolt
-	// 3 - Fire Bolt
-	// 4 - Ultra Bolt
-	// 5 - None
-	int magic_fist_selection;
 
 	// zyk: vote timer, used to avoid vote spam
 	int vote_timer;

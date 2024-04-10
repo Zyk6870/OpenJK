@@ -3428,36 +3428,6 @@ void ClientThink_real( gentity_t *ent ) {
 						Jedi_Decloak(&g_entities[ent->client->ps.m_iVehicleNum]);
 					}
 				}
-
-				if (pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE)
-				{ 
-					if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0)
-					{ // zyk: Magic Fist attacks
-						if (ent->client->sess.magic_fist_selection < ent->client->pers.skill_levels[SKILL_MAGIC_FIST])
-							ent->client->sess.magic_fist_selection++;
-						else
-							ent->client->sess.magic_fist_selection = 0;
-
-						save_account(ent, qtrue);
-
-						if (ent->client->sess.magic_fist_selection == 1)
-						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7Normal Bolt       ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer));
-						}
-						else if (ent->client->sess.magic_fist_selection == 2)
-						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7Electric Bolt     ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer));
-						}
-						else if (ent->client->sess.magic_fist_selection == 3)
-						{
-							trap->SendServerCommand(ent->s.number, va("chat \"^7Ultra Bolt        ^3MP cost: ^7%d\"", zyk_magic_fist_mp_cost.integer));
-						}
-						else
-						{
-							trap->SendServerCommand(ent->s.number, "chat \"^7None              ^3MP cost: ^70\"");
-						}
-					}
-				}
 			}
 
 			ent->client->lastGenCmdTime = level.time + 300; //default 100ms debounce between issuing the same command.
