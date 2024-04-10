@@ -5045,17 +5045,13 @@ void Cmd_DateTime_f( gentity_t *ent ) {
 	trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", ctime(&current_time)) ); 
 }
 
-// zyk: adds a new RPG char with default values
-void add_new_char(gentity_t *ent)
+void zyk_set_default_rpg_stuff(gentity_t* ent)
 {
 	int i = 0;
 
-	ent->client->pers.skillpoints = 0;
-
+	// zyk: resetting all skills
 	for (i = 0; i < NUMBER_OF_SKILLS; i++)
-	{
 		ent->client->pers.skill_levels[i] = 0;
-	}
 
 	// zyk: initializing RPG inventory
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
@@ -5063,6 +5059,7 @@ void add_new_char(gentity_t *ent)
 		ent->client->pers.rpg_inventory[i] = 0;
 	}
 
+	ent->client->pers.skillpoints = 0;
 	ent->client->pers.credits = RPG_INITIAL_CREDITS;
 
 	// zyk: in RPG Mode, player must actually buy these
@@ -5074,6 +5071,12 @@ void add_new_char(gentity_t *ent)
 	ent->client->pers.last_health = 100;
 	ent->client->pers.current_stamina = RPG_DEFAULT_STAMINA;
 	ent->client->pers.last_stamina = RPG_DEFAULT_STAMINA;
+}
+
+// zyk: adds a new RPG char with default values
+void add_new_char(gentity_t *ent)
+{
+	zyk_set_default_rpg_stuff(ent);
 }
 
 // zyk: creates the directory correctly depending on the OS
@@ -11847,8 +11850,6 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 		}
 		else if (Q_stricmp(arg1, "reset") == 0)
 		{
-			int i = 0;
-
 			if (Q_stricmp(arg2, "quests") == 0)
 			{
 				ent->client->pers.quest_progress = 0;
@@ -11864,23 +11865,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 			}
 			else if (Q_stricmp(arg2, "levels") == 0)
 			{
-				for (i = 0; i < NUMBER_OF_SKILLS; i++)
-					ent->client->pers.skill_levels[i] = 0;
-
-				// zyk: initializing RPG inventory
-				for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
-				{
-					ent->client->pers.rpg_inventory[i] = 0;
-				}
-
-				ent->client->pers.skillpoints = 0;
-
-				ent->client->pers.credits = RPG_INITIAL_CREDITS;
-
-				// zyk: in RPG Mode, player must actually buy these
-				ent->client->ps.jetpackFuel = 0;
-				ent->client->ps.cloakFuel = 0;
-				ent->client->pers.jetpack_fuel = 0;
+				zyk_set_default_rpg_stuff(ent);
 
 				save_account(ent, qtrue);
 
