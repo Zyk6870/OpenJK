@@ -5126,7 +5126,7 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 
 	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
 
-	zyk_set_entity_field(new_ent, "zykmodelscale", "70");
+	zyk_set_entity_field(new_ent, "zykmodelscale", "30");
 	zyk_set_entity_field(new_ent, "targetname", "zyk_skill_crystal");
 
 	zyk_spawn_entity(new_ent);

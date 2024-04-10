@@ -1390,7 +1390,7 @@ void zyk_stamina_out(gentity_t* ent)
 		ent->client->pers.stamina_out_timer = level.time + stamina_out_time;
 
 		// zyk: also lose some health
-		G_Damage(ent, ent, ent, NULL, NULL, 20, 0, MOD_UNKNOWN);
+		G_Damage(ent, ent, ent, NULL, NULL, 50, 0, MOD_UNKNOWN);
 
 		trap->SendServerCommand(ent->s.number, va("chat \"^3%s: ^7I am tired...\"", ent->client->pers.netname));
 	}
@@ -1429,11 +1429,11 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 
 		if (ent->client->pers.stamina_out_timer > level.time)
 		{ // zyk: passed out, recover some stamina
-			zyk_set_stamina(ent, 100 * stamina_recovery, qtrue);
+			zyk_set_stamina(ent, 50 * stamina_recovery, qtrue);
 		}
 		else if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 		{ // zyk: meditating, recover some stamina
-			zyk_set_stamina(ent, 10 * stamina_recovery, qtrue);
+			zyk_set_stamina(ent, 5 * stamina_recovery, qtrue);
 		}
 		else
 		{ // zyk: consumes a bit of stamina, even when player is idle

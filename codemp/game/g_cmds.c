@@ -4403,7 +4403,7 @@ void set_max_weight(gentity_t* ent)
 // zyk: set the Max Stamina of this player
 void set_max_stamina(gentity_t* ent)
 {
-	ent->client->pers.max_stamina = RPG_DEFAULT_STAMINA + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * RPG_DEFAULT_STAMINA);
+	ent->client->pers.max_stamina = RPG_DEFAULT_STAMINA + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 3000);
 }
 
 // zyk: increases or decreases RPG player stamina
