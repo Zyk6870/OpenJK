@@ -5139,7 +5139,7 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 {
 	float x, y, z;
-	int min_distance = 1, max_distance = 5;
+	int min_distance = 1, max_distance = 2;
 	int distance_factor = zyk_total_skillpoints(ent) + 1;
 	int min_entity_id = (MAX_CLIENTS + BODY_QUEUE_SIZE);
 	int max_entity_id = level.num_entities - 1;
