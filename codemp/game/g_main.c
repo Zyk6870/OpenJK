@@ -8846,10 +8846,10 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				// zyk: skill crystals must be spawned after a certain amount of time
-				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time && zyk_total_skillpoints(ent) < RPG_MAX_SKILLPOINTS)
+				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int skill_crystal_duration = 60000;
-					int skill_crystal_respawn_time = RPG_SKILL_CRYSTAL_RESPAWN_TIME + (500 * (zyk_total_skillpoints(ent) + 1));
+					int skill_crystal_respawn_time = RPG_MAGIC_CRYSTAL_RESPAWN_TIME + (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (zyk_total_skillpoints(ent) + 1));
 
 					zyk_spawn_skill_crystal(ent, skill_crystal_duration);
 

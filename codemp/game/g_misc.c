@@ -2766,7 +2766,6 @@ extern int	BMS_END;
 
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 extern void add_credits(gentity_t* ent, int credits);
-extern int zyk_total_skillpoints(gentity_t* ent);
 
 //----------------------------------------------------------
 void fx_runner_think( gentity_t *ent )
@@ -2824,9 +2823,9 @@ void fx_runner_think( gentity_t *ent )
 
 			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
 			{ // zyk: a logged RPG player
-				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < 50 && zyk_total_skillpoints(player_ent) < RPG_MAX_SKILLPOINTS)
+				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < 50)
 				{
-					player_ent->client->pers.skillpoints++;
+					player_ent->client->pers.magic_crystals++;
 					add_credits(player_ent, 100);
 
 					save_account(player_ent, qtrue);
@@ -2836,7 +2835,7 @@ void fx_runner_think( gentity_t *ent )
 
 					G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
-					trap->SendServerCommand(player_ent->s.number, "chat \"^3Skill System: ^7found a skill crystal, +1 skillpoint +100 credits\"");
+					trap->SendServerCommand(player_ent->s.number, "chat \"^3Quest System: ^7found a magic crystal crystal, +1 magic crystal +100 credits\"");
 					return;
 				}
 			}

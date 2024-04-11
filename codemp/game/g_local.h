@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.3.17"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.3.18"
 
 #define SECURITY_LOG "security.log"
 
@@ -775,11 +775,15 @@ typedef enum {
 // zyk: initial credits in RPG Mode
 #define RPG_INITIAL_CREDITS 0
 
+// zyk: amount of Magic Crystals to upgrade a skill
+#define MAGIC_CRYSTALS_TO_UPGRADE_SKILL 1
+
 // zyk: max RPG skillpoints
 #define RPG_MAX_SKILLPOINTS 120
 
 // zyk: amount of time to increase to spawn new skill crystals
-#define RPG_SKILL_CRYSTAL_RESPAWN_TIME 5000
+#define RPG_MAGIC_CRYSTAL_RESPAWN_TIME 5000
+#define RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL 200
 
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
 #define RPG_MAX_HEALTH_INCREASE 30
@@ -913,7 +917,7 @@ typedef struct clientPersistant_s {
 
 	int	bitvalue; // zyk: player is considered as admin if bitvalue is > 0, because he has at least 1 admin command
 	
-	int skillpoints; // zyk: RPG mode skillpoints
+	int magic_crystals; // zyk: Magic Crystals. Used to upgrade skill levels
 
 	char password[32]; // zyk: account password
 

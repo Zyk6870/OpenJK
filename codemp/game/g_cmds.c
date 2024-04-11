@@ -2141,7 +2141,7 @@ void load_account(gentity_t* ent)
 		{
 			// zyk: loading Skillpoints value
 			fscanf(account_file, "%s", content);
-			ent->client->pers.skillpoints = atoi(content);
+			ent->client->pers.magic_crystals = atoi(content);
 
 			// zyk: loading skill levels
 			for (i = 0; i < NUMBER_OF_SKILLS; i++)
@@ -2260,7 +2260,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
 			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.skillpoints, content, client->pers.credits, client->pers.quest_progress,
+				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_progress,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
@@ -4560,8 +4560,6 @@ int zyk_total_skillpoints(gentity_t* ent)
 		total_skillpoints += ent->client->pers.skill_levels[i];
 	}
 
-	total_skillpoints += ent->client->pers.skillpoints;
-
 	return total_skillpoints;
 }
 
@@ -4572,13 +4570,12 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 	{
 		int i = 0;
 
-		// zyk: validating max skill levels. If for some reason a skill is above max, get the skillpoint back
+		// zyk: validating max skill levels. If for some reason a skill is above max, set it to the max
 		for (i = 0; i < NUMBER_OF_SKILLS; i++)
 		{
 			if (ent->client->pers.skill_levels[i] > zyk_max_skill_level(i))
 			{
 				ent->client->pers.skill_levels[i]--;
-				ent->client->pers.skillpoints++;
 			}
 		}
 
@@ -4877,7 +4874,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.magic_consumption_timer = 0;
 
-			ent->client->pers.skill_crystal_timer = level.time + RPG_SKILL_CRYSTAL_RESPAWN_TIME + (500 * (zyk_total_skillpoints(ent) + 1));
+			ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_RESPAWN_TIME + (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (zyk_total_skillpoints(ent) + 1));
 
 			// zyk: loading initial force
 			ent->client->ps.fd.forcePower = ent->client->pers.max_force_power;
@@ -5059,7 +5056,7 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 		ent->client->pers.rpg_inventory[i] = 0;
 	}
 
-	ent->client->pers.skillpoints = 0;
+	ent->client->pers.magic_crystals = 0;
 	ent->client->pers.credits = RPG_INITIAL_CREDITS;
 
 	// zyk: in RPG Mode, player must actually buy these
@@ -5414,7 +5411,7 @@ qboolean rpg_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont_show
 	if (ent->client->pers.skill_levels[upgrade_value - 1] < zyk_max_skill_level(upgrade_value - 1))
 	{
 		ent->client->pers.skill_levels[upgrade_value - 1]++;
-		ent->client->pers.skillpoints--;
+		ent->client->pers.magic_crystals -= MAGIC_CRYSTALS_TO_UPGRADE_SKILL;
 	}
 	else
 	{
@@ -5478,7 +5475,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 		strcpy(content, va("%s%d-%d-%d-", 
 			content, 0, ent->client->pers.quest_progress, MAX_QUEST_MISSIONS));
 
-		trap->SendServerCommand(ent->s.number, va("zykmod \"%d-%d/%d-%d-NOCLASS-%s\"",ent->client->pers.skillpoints,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
+		trap->SendServerCommand(ent->s.number, va("zykmod \"%d-%d/%d-%d-NOCLASS-%s\"",ent->client->pers.magic_crystals,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
 	}
 	else if (ent->client->sess.amrpgmode == 1)
 	{ // zyk: just sends the player settings
@@ -5581,64 +5578,44 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 	}
 
 	// zyk: the user must have skillpoints to get a new skill level
-	if (ent->client->pers.skillpoints == 0)
+	if (ent->client->pers.magic_crystals < MAGIC_CRYSTALS_TO_UPGRADE_SKILL)
 	{
 		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"Not enough skillpoints.\n\"" );
+			trap->SendServerCommand( ent->s.number, "print \"Not enough magic crystals.\n\"" );
+		return qfalse;
+	}
+
+	if (zyk_total_skillpoints(ent) >= RPG_MAX_SKILLPOINTS)
+	{
+		if (dont_show_message == qfalse)
+			trap->SendServerCommand(ent->s.number, va("print \"Cannot upgrade more than %d skills.\n\"", RPG_MAX_SKILLPOINTS));
 		return qfalse;
 	}
 
 	return qtrue;
 }
 
-void do_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean update_all)
+void do_upgrade_skill(gentity_t *ent, int upgrade_value)
 {
-	if (update_all == qfalse)
-	{ // zyk: update a single skill
-		qboolean is_upgraded = qfalse;
+	qboolean is_upgraded = qfalse;
 
-		if (validate_upgrade_skill(ent, upgrade_value, qfalse) == qfalse)
-		{
-			return;
-		}
-
-		// zyk: the upgrade is done if it doesnt go above the maximum level of the skill
-		is_upgraded = rpg_upgrade_skill(ent, upgrade_value, qfalse);
-
-		if (is_upgraded == qfalse)
-			return;
-
-		// zyk: saving the account file with the upgraded skill
-		save_account(ent, qtrue);
-
-		trap->SendServerCommand( ent-g_entities, "print \"Skill upgraded successfully.\n\"" );
-
-		Cmd_ZykMod_f(ent);
+	if (validate_upgrade_skill(ent, upgrade_value, qfalse) == qfalse)
+	{
+		return;
 	}
-	else
-	{ // zyk: update all skills
-		int i = 0;
 
-		for (i = 1; i <= NUMBER_OF_SKILLS; i++)
-		{
-			int j = 0;
+	// zyk: the upgrade is done if it doesnt go above the maximum level of the skill
+	is_upgraded = rpg_upgrade_skill(ent, upgrade_value, qfalse);
 
-			for (j = 0; j < 5; j++)
-			{
-				if (validate_upgrade_skill(ent, i, qtrue) == qtrue)
-				{
-					// zyk: the upgrade is done if it doesnt go above the maximum level of the skill
-					rpg_upgrade_skill(ent, i, qtrue);
-				}
-			}
-		}
+	if (is_upgraded == qfalse)
+		return;
 
-		// zyk: saving the account file with the upgraded skill
-		save_account(ent, qtrue);
+	// zyk: saving the account file with the upgraded skill
+	save_account(ent, qtrue);
 
-		trap->SendServerCommand( ent-g_entities, "print \"Skills upgraded successfully.\n\"" );
-		Cmd_ZykMod_f(ent);
-	}
+	trap->SendServerCommand( ent->s.number, "print \"Skill upgraded successfully.\n\"" );
+
+	Cmd_ZykMod_f(ent);
 
 	initialize_rpg_skills(ent, qfalse);
 }
@@ -5661,7 +5638,7 @@ void Cmd_UpSkill_f( gentity_t *ent ) {
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	upgrade_value = atoi(arg1);
 
-	do_upgrade_skill(ent, upgrade_value, qfalse);
+	do_upgrade_skill(ent, upgrade_value);
 }
 
 void do_downgrade_skill(gentity_t *ent, int downgrade_value)
@@ -5676,7 +5653,6 @@ void do_downgrade_skill(gentity_t *ent, int downgrade_value)
 	if (ent->client->pers.skill_levels[downgrade_value - 1] > 0)
 	{
 		ent->client->pers.skill_levels[downgrade_value - 1]--;
-		ent->client->pers.skillpoints++;
 	}
 	else
 	{
@@ -5802,8 +5778,8 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Skill Crystals: ^7%d/%d\n^3Skill Points: ^7%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Stamina: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
-		ent->client->sess.filename, ent->client->sess.rpgchar, zyk_total_skillpoints(ent), RPG_MAX_SKILLPOINTS, ent->client->pers.skillpoints, ent->client->pers.magic_power, zyk_max_magic_power(ent),
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Magic Crystals: ^7%d\n^3Skills Upgraded: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Stamina: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
+		ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.magic_crystals, zyk_total_skillpoints(ent), RPG_MAX_SKILLPOINTS, ent->client->pers.magic_power, zyk_max_magic_power(ent),
 		ent->client->pers.current_weight, ent->client->pers.max_weight, ent->client->pers.current_stamina, ent->client->pers.max_stamina, ent->client->pers.credits));
 }
 
