@@ -6161,7 +6161,7 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_FORCE_BOON][1] = 100;
 
 	seller_items_cost[SELLER_MAGIC_CRYSTAL][0] = 0;
-	seller_items_cost[SELLER_MAGIC_CRYSTAL][1] = 100;
+	seller_items_cost[SELLER_MAGIC_CRYSTAL][1] = 50;
 
 	seller_items_cost[SELLER_MAGIC_POTION][0] = 100;
 	seller_items_cost[SELLER_MAGIC_POTION][1] = 0;
