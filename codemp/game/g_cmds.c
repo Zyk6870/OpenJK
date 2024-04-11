@@ -6295,6 +6295,7 @@ char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
 	seller_items_names[SELLER_YSALAMIRI] = "Ysalamiri";
 	seller_items_names[SELLER_JETPACK_FUEL] = "Jetpack Fuel";
 	seller_items_names[SELLER_FORCE_BOON] = "Force Boon";
+	seller_items_names[SELLER_MAGIC_CRYSTAL] = "Magic Crystal";
 	seller_items_names[SELLER_MAGIC_POTION] = "Magic Potion";
 
 	seller_items_names[SELLER_BACTA_UPGRADE] = "Bacta Upgrade";
