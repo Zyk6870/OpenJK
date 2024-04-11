@@ -7052,53 +7052,57 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 16)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your current stats (hp, shield, mp, stamina) are saved so changing map will keep them at current values.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast a magic power, you can upgrade the magic power skill listed in ^3/list magic^7, then bind the magic command to a key like this: ^3/bind <key> magic <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 17)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight players, use ^3/nofight^7, preventing damage to you and you cannot damage them\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your current stats (hp, shield, mp, stamina) are saved so changing map will keep them at current values.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 18)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can add or remove ally players with ^3/allyadd ^7and ^3/allyremove.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight players, use ^3/nofight^7, preventing damage to you and you cannot damage them\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 19)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including SP ones. Use ^3/maplist ^7to list maps\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can add or remove ally players with ^3/allyadd ^7and ^3/allyremove.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 20)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can see your quests in ^3/list quests^7. Any new mission will appear there\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including SP ones. Use ^3/maplist ^7to list maps\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 21)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: That's the reason we are here. We need your help %s^7\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can see your quests in ^3/list quests^7. Any new mission will appear there\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 22)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Each one of us have affinity with one of the Elements of Nature, and one of us is non-elemental.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: That's the reason we are here. We need your help %s^7\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 	}
 	if (ent->client->pers.tutorial_step == 23)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the Brotherhood of Mages, lead by %s^7, are trying to take over everything\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINVILLAIN_NAME));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Each one of us have affinity with one of the Elements of Nature, and one of us is non-elemental.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 24)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions residing in several places (maps), giving power to him and weakening us.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the Brotherhood of Mages, lead by %s^7, are trying to take over everything\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINVILLAIN_NAME));
 	}
 	if (ent->client->pers.tutorial_step == 25)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: each one you defeat will weaken him and we will be able to create Magic Crystals faster.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions residing in several places (maps), giving power to him and weakening us.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 26)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There is a legendary artifact hidden somewhere that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: each one you defeat will weaken him and we will be able to create Magic Crystals faster.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 27)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There is a legendary artifact hidden somewhere that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 28)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 29)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! We are counting on you.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 

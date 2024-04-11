@@ -234,23 +234,23 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FIST)
 		return "allows you to attack with magic bolts when using melee punches. Each level increases damage. Melee skill also increases damage";
 	if (skill_index == SKILL_MAX_MP)
-		return "increases the max amount of Magic Points the player can have";
+		return "increases the max amount of Magic Points the player can have. This is used to cast magic powers";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
-		return "creates an energy area that makes you and your allies recover health, stamina and shield. It also does a little damage to enemies";
+		return "creates an energy area that makes you and your allies recover health, stamina and shield. It also deals a little non-elemental damage to enemies";
 	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
-		return "an energy dome appears at your position each half second, damaging enemies inside it";
+		return "an energy dome appears at your position each half second, damaging enemies inside it. This power deals non-elemental damage";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
-		return "hits enemies around you with Water damage. Enemies hit by Water get their hp drained to restore your health";
+		return "hits enemies around you with Water elemental damage. Enemies hit by Water get their hp drained to restore your health. Increases your Water element affinity. Deals extra damage to enemies with Fire affinity. Absorbs some Water damage";
 	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
-		return "creates earthquakes and hits enemies with Earth damage";
+		return "creates earthquakes and hits enemies with Earth elemental damage. Increases your Earth element affinity. Deals extra damage to enemies with Air affinity. Absorbs some Earth damage";
 	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
-		return "hits enemies around you with Fire damage. Enemies hit by it will catch fire for some seconds";
+		return "hits enemies around you with Fire elemental damage. Enemies hit by it will catch fire for some seconds. Increases your Fire element affinity. Deals extra damage to enemies with Water affinity. Absorbs some Fire damage";
 	if (skill_index == SKILL_MAGIC_AIR_MAGIC)
-		return "blows people away with a strong wind, and does Air damage to them. Increases your run speed. Enemies hit by Air will have their run speed decreased";
+		return "blows people away with a strong wind, and does Air elemental damage to them. Increases your run speed. Enemies hit by Air will have their run speed decreased. Increases your Air element affinity. Deals extra damage to enemies with Earth affinity. Absorbs some Air damage";
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
-		return "creates a black hole, sucking everyone nearby and doing Dark damage to them. The closer the enemies are, the more damage they receive";
+		return "creates a black hole, sucking everyone nearby and doing Dark elemental damage to them. The closer the enemies are, the more damage they receive. Increases your Dark element affinity. Deals extra damage to enemies with Light affinity. Absorbs some Dark damage";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
-		return "creates a lightning dome that damages enemies nearby. Creates a shining light that does Light damage to enemies. While near the light, enemies will get confused/stunned, will have their MP drained to restore your MP and you will take less damage to your health";
+		return "creates a lightning dome that damages enemies nearby. Creates a shining light that does Light elemental damage to enemies. While near the light, enemies will get confused/stunned, will have their MP drained to restore your MP and you will take less damage to your health. Increases your Light element affinity. Deals extra damage to enemies with Dark affinity. Absorbs some Light damage";
 
 	return "";
 }
