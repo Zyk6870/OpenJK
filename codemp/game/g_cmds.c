@@ -6160,6 +6160,9 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_FORCE_BOON][0] = 200;
 	seller_items_cost[SELLER_FORCE_BOON][1] = 100;
 
+	seller_items_cost[SELLER_MAGIC_CRYSTAL][0] = 0;
+	seller_items_cost[SELLER_MAGIC_CRYSTAL][1] = 100;
+
 	seller_items_cost[SELLER_MAGIC_POTION][0] = 100;
 	seller_items_cost[SELLER_MAGIC_POTION][1] = 0;
 
@@ -6338,8 +6341,19 @@ void zyk_show_stuff_category(gentity_t* ent, int min_item_index, int max_item_in
 
 	for (i = min_item_index; i <= max_item_index; i++)
 	{
+		char buy_item_string[16];
 		char sell_item_string[16];
+		int buy_cost = zyk_get_seller_item_cost(i, qtrue);
 		int sell_cost = zyk_get_seller_item_cost(i, qfalse);
+		
+		if (buy_cost > 0)
+		{
+			strcpy(buy_item_string, va("%d", buy_cost));
+		}
+		else
+		{
+			strcpy(buy_item_string, "^1no^7");
+		}
 
 		if (sell_cost > 0)
 		{
@@ -6350,7 +6364,7 @@ void zyk_show_stuff_category(gentity_t* ent, int min_item_index, int max_item_in
 			strcpy(sell_item_string, "^1no^7");
 		}
 
-		strcpy(content, va("%s\n^3%d - %s: ^7Buy: %d, Sell: %s", content, (i + 1), zyk_get_seller_item_name(i), zyk_get_seller_item_cost(i, qtrue), sell_item_string));
+		strcpy(content, va("%s\n^3%d - %s: ^7Buy: %s, Sell: %s", content, (i + 1), zyk_get_seller_item_name(i), buy_item_string, sell_item_string));
 	}
 
 	trap->SendServerCommand(ent->s.number, va("print \"%s\n\n\"", content));
@@ -6569,6 +6583,10 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to regenerate force faster\n\n\"", zyk_get_seller_item_name(i)));
 		}
+		else if (i == SELLER_MAGIC_CRYSTAL)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Magic Crystals spawned in the map. They can be sold\n\n\"", zyk_get_seller_item_name(i)));
+		}
 		else if (i == SELLER_MAGIC_POTION)
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some MP\n\n\"", zyk_get_seller_item_name(i)));
@@ -6720,7 +6738,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (value < 1 || value > MAX_SELLER_ITEMS)
+	if (value < 1 || value > MAX_SELLER_ITEMS || zyk_get_seller_item_cost((value - 1), qtrue) == 0)
 	{
 		trap->SendServerCommand( ent->s.number, "print \"Invalid product number.\n\"" );
 		return;
@@ -7438,6 +7456,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (value == (SELLER_FORCE_BOON + 1) && ent->client->ps.powerups[PW_FORCE_BOON])
 	{
 		ent->client->ps.powerups[PW_FORCE_BOON] = 0;
+		sold = 1;
+	}
+	else if (value == (SELLER_MAGIC_CRYSTAL + 1) && ent->client->pers.magic_crystals > 0)
+	{
+		ent->client->pers.magic_crystals--;
 		sold = 1;
 	}
 	else if (value == (SELLER_BACTA_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)

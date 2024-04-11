@@ -2765,7 +2765,6 @@ extern int	BMS_MID;
 extern int	BMS_END;
 
 extern void save_account(gentity_t* ent, qboolean save_char_file);
-extern void add_credits(gentity_t* ent, int credits);
 
 //----------------------------------------------------------
 void fx_runner_think( gentity_t *ent )
@@ -2826,7 +2825,6 @@ void fx_runner_think( gentity_t *ent )
 				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < 50)
 				{
 					player_ent->client->pers.magic_crystals++;
-					add_credits(player_ent, 100);
 
 					save_account(player_ent, qtrue);
 
@@ -2835,7 +2833,7 @@ void fx_runner_think( gentity_t *ent )
 
 					G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
-					trap->SendServerCommand(player_ent->s.number, "chat \"^3Quest System: ^7found a magic crystal crystal, +1 magic crystal +100 credits\"");
+					trap->SendServerCommand(player_ent->s.number, "chat \"^3Quest System: ^7found a magic crystal crystal\"");
 					return;
 				}
 			}
