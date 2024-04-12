@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.3.27"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.00"
 
 #define SECURITY_LOG "security.log"
 
@@ -605,7 +605,7 @@ typedef enum {
 
 // zyk: quest missions
 typedef enum {
-	QUEST_BOSS_01, 
+	QUEST_BOSS_01,
 	QUEST_BOSS_02,
 	QUEST_BOSS_03,
 	QUEST_BOSS_04,
@@ -614,7 +614,7 @@ typedef enum {
 	QUEST_BOSS_07,
 	QUEST_BOSS_08,
 	QUEST_BOSS_09,
-	QUEST_BOSS_10,
+	QUEST_FINAL_BOSS,
 	NUM_QUEST_MISSIONS
 } zyk_quest_t;
 

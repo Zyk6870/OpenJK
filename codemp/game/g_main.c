@@ -329,23 +329,6 @@ gentity_t *Zyk_NPC_SpawnType( char *npc_type, int x, int y, int z, int yaw )
 	return NULL;
 }
 
-void zyk_set_quest_npc_magic(gentity_t* npc_ent, int magic_powers_levels[MAX_MAGIC_POWERS])
-{
-	int i = 0;
-
-	// zyk: sets magic power levels to this npc
-	if (npc_ent && npc_ent->client)
-	{
-		for (i = 0; i < MAX_MAGIC_POWERS; i++)
-		{
-			if ((SKILL_MAGIC_HEALING_AREA + i) < NUMBER_OF_SKILLS)
-			{
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA + i] = magic_powers_levels[i];
-			}
-		}
-	}
-}
-
 // zyk: similar to TeleportPlayer(), but this one doesnt spit the player out at the destination
 void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles) {
 	gentity_t* tent;
@@ -399,16 +382,86 @@ void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles) {
 }
 
 // zyk: spawns a quest npc and sets additional stuff, like levels, etc
-gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int level, int quest_npc_number)
+void zyk_spawn_quest_npc(char* npc_type, int yaw, int quest_npc_number, int bonuses)
 {
-	gentity_t* npc_ent = Zyk_NPC_SpawnType(npc_type, x, y, z, yaw);
+	gentity_t* npc_ent = NULL;
+
+	float x, y, z;
+	int min_distance = 1, max_distance = 50;
+	int min_entity_id = (MAX_CLIENTS + BODY_QUEUE_SIZE);
+	int max_entity_id = level.num_entities - 1;
+	int chosen_entity_index = 0; // zyk: npc origin will be at a random map entity origin
+	gentity_t* chosen_entity = NULL;
+	int i = 0, j = 0;
+	int total_entities_in_use = 0;
+
+	// zyk: get all entities in use
+	for (i = min_entity_id; i < level.num_entities; i++)
+	{
+		gentity_t* current_entity = &g_entities[i];
+
+		if (current_entity && current_entity->inuse == qtrue)
+		{
+			total_entities_in_use++;
+		}
+	}
+
+	chosen_entity_index = Q_irand(0, (total_entities_in_use - 1));
+
+	for (i = min_entity_id; i < level.num_entities; i++)
+	{
+		gentity_t* current_entity = &g_entities[i];
+
+		if (current_entity && current_entity->inuse == qtrue && chosen_entity_index == j)
+		{ // zyk: found the entity
+			chosen_entity = current_entity;
+			break;
+		}
+
+		j++;
+	}
+
+	if (!chosen_entity)
+	{ // zyk: if for some reason there was no chosen entity, the skill crystal will be spawned later
+		return;
+	}
+
+	// zyk: the distance the skill crystal is from the map origin will increase as the player gets more skillpoints
+	x = Q_irand(min_distance, max_distance);
+	y = Q_irand(min_distance, max_distance);
+	z = Q_irand(min_distance, max_distance);
+
+	if (Q_irand(0, 1) == 0)
+	{
+		x *= -1;
+	}
+
+	if (Q_irand(0, 1) == 0)
+	{
+		y *= -1;
+	}
+
+	if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
+	{
+		x += chosen_entity->r.currentOrigin[0];
+		y += chosen_entity->r.currentOrigin[1];
+		z += chosen_entity->r.currentOrigin[2];
+	}
+	else
+	{
+		x += chosen_entity->s.origin[0];
+		y += chosen_entity->s.origin[1];
+		z += chosen_entity->s.origin[2];
+	}
+
+	npc_ent = Zyk_NPC_SpawnType(npc_type, x, y, z, yaw);
 
 	if (npc_ent && npc_ent->client)
 	{
 		vec3_t npc_origin, npc_angles;
 
 		npc_ent->client->pers.quest_npc = quest_npc_number;
-		npc_ent->NPC->stats.health += (10 * level);
+		npc_ent->NPC->stats.health += bonuses;
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
@@ -419,11 +472,7 @@ gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int
 		VectorSet(npc_origin, x, y, z);
 		VectorSet(npc_angles, 0, yaw, 0);
 		zyk_TeleportPlayer(npc_ent, npc_origin, npc_angles);
-
-		return npc_ent;
 	}
-
-	return NULL;
 }
 
 /*
@@ -6934,7 +6983,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 16)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast a magic power, you can upgrade the magic power skill listed in ^3/list magic^7, then bind the magic command to a key like this: ^3/bind <key> magic <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 17)
 	{
@@ -8731,13 +8780,23 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				// zyk: control the quest events
-				if (level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && 
-					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
-					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+				if (level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
+					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && ent->client->pers.quest_event_timer < level.time && 
+					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
+					level.num_entities < 1000 /* zyk: this is to guarantee the map will not crash */
+					)
 				{
-					
+					int random_chance_to_spawn_enemy = Q_irand(0, 100);
+					int percentage_value = ent->client->pers.quest_defeated_enemies / 10;
 
+					ent->client->pers.quest_event_timer = level.time + 5000;
 
+					if (random_chance_to_spawn_enemy <= percentage_value)
+					{ // zyk: calculates the chance to spawn an enemy. Defeating enemies will increase chance of new ones spawning
+						int enemy_type = Q_irand(1, 3);
+
+						zyk_spawn_quest_npc(G_NewString(va("quest_minion_%d", enemy_type)), ent->client->ps.viewangles[YAW], NUM_QUEST_MISSIONS + enemy_type, ent->client->pers.quest_defeated_enemies);
+					}
 				}
 			}
 

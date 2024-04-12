@@ -2833,7 +2833,7 @@ void fx_runner_think( gentity_t *ent )
 
 					G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
-					trap->SendServerCommand(player_ent->s.number, "chat \"^3Quest System: ^7found a magic crystal crystal\"");
+					trap->SendServerCommand(player_ent->s.number, "chat \"^3Quest System: ^7found a magic crystal\"");
 					return;
 				}
 			}
