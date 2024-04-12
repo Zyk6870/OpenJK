@@ -7083,6 +7083,15 @@ int zyk_quest_bosses_defeated(gentity_t* ent)
 	return boss_count;
 }
 
+void zyk_set_magic_crystal_respawn_time(gentity_t* ent)
+{
+	int magic_crystal_respawn_time = RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent));
+	int interval_decrease = (ent->client->pers.quest_defeated_enemies * 10) + (zyk_quest_bosses_defeated(ent) * 200);
+
+	// zyk: each skillpoint the player has increases the time to respawn skill crystals
+	ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_RESPAWN_TIME + magic_crystal_respawn_time - interval_decrease;
+}
+
 /*
 ================
 G_RunFrame
@@ -7108,8 +7117,6 @@ extern void set_max_shield(gentity_t *ent);
 extern void duel_show_table(gentity_t *ent);
 extern void WP_DisruptorAltFire(gentity_t *ent);
 extern void G_Kill( gentity_t *ent );
-extern void save_quest_file(int quest_number);
-extern void zyk_set_quest_npc_abilities(gentity_t *zyk_npc);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
 
@@ -8811,14 +8818,8 @@ void G_RunFrame( int levelTime ) {
 				// zyk: skill crystals must be spawned after a certain amount of time
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
-					int skill_crystal_duration = 60000;
-					int interval_decrease = ent->client->pers.quest_defeated_enemies + (10 * zyk_quest_bosses_defeated(ent));
-					int skill_crystal_respawn_time = RPG_MAGIC_CRYSTAL_RESPAWN_TIME + (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * ent->client->pers.magic_crystals) + (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (zyk_total_skillpoints(ent) + 1));
-
-					zyk_spawn_skill_crystal(ent, skill_crystal_duration);
-
-					// zyk: each skillpoint the player has increases the time to respawn skill crystals
-					ent->client->pers.skill_crystal_timer = level.time + skill_crystal_respawn_time - interval_decrease;
+					zyk_spawn_skill_crystal(ent, 60000);
+					zyk_set_magic_crystal_respawn_time(ent);
 				}
 
 				// zyk: control the quest events
