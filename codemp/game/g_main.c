@@ -476,11 +476,17 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 		{
 			int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
 			int current_magic_skill = first_magic_skill;
+			int magic_level_bonus = 0;
+
+			if (Q_stricmp(npc_type, "quest_minion_1") == 0)
+			{
+				magic_level_bonus = 1;
+			}
 
 			// zyk: adding all magic powers to this npc
 			while (current_magic_skill < NUMBER_OF_SKILLS)
 			{
-				npc_ent->client->pers.skill_levels[current_magic_skill] = Q_irand((bonuses / 50), ((bonuses / 50) + 1));
+				npc_ent->client->pers.skill_levels[current_magic_skill] = Q_irand((magic_level_bonus + (bonuses / 50)), ((bonuses / 50) + 1 + magic_level_bonus));
 
 				current_magic_skill++;
 			}
@@ -5087,15 +5093,14 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
 }
 
-// zyk: spawn the model and effect used by skill crystals
+// zyk: spawn the model and effect used by magic crystals
 void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 {
 	float x, y, z;
-	int min_distance = 1, max_distance = 2;
-	int distance_factor = zyk_total_skillpoints(ent) + 1;
+	int distance_factor = ent->client->pers.magic_crystals + zyk_total_skillpoints(ent);
 	int min_entity_id = (MAX_CLIENTS + BODY_QUEUE_SIZE);
 	int max_entity_id = level.num_entities - 1;
-	int chosen_entity_index = 0; // zyk: skill crystal origin will be at a random map entity origin
+	int chosen_entity_index = 0; // zyk: magic crystal origin will be at a random map entity origin
 	gentity_t* chosen_entity = NULL;
 	int i = 0, j = 0;
 	int total_entities_in_use = 0;
@@ -5127,14 +5132,14 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 	}
 
 	if (!chosen_entity)
-	{ // zyk: if for some reason there was no chosen entity, the skill crystal will be spawned later
+	{ // zyk: if for some reason there was no chosen entity, the magic crystal will be spawned later
 		return;
 	}
 
-	// zyk: the distance the skill crystal is from the map origin will increase as the player gets more skillpoints
-	x = Q_irand((min_distance * distance_factor), (max_distance * distance_factor));
-	y = Q_irand((min_distance * distance_factor), (max_distance * distance_factor));
-	z = Q_irand((min_distance * distance_factor), (max_distance * distance_factor));
+	// zyk: the distance the magic crystal is from the chosen entity origin will increase as the player gets more skillpoints
+	x = Q_irand(0, distance_factor);
+	y = Q_irand(0, distance_factor);
+	z = Q_irand(0, distance_factor);
 
 	if (Q_irand(0, 1) == 0)
 	{
@@ -8896,16 +8901,22 @@ void G_RunFrame( int levelTime ) {
 				}
 			}
 
-			// zyk: quest npc events
-			if (ent->client->pers.quest_npc > 0 && ent->health > 0)
-			{
-				
-
-
-			}
-
 			if (ent->health > 0 && ent->enemy && ent->client->pers.quest_power_usage_timer < level.time)
 			{ // zyk: npcs with magic powers
+				if (ent->client->pers.quest_npc > 0 && ent->health > 0 && ent->client->pers.quest_event_timer < level.time)
+				{
+					int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
+					int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
+					int magic_skill_index = first_magic_skill + random_magic;
+
+					if (ent->client->pers.skill_levels[magic_skill_index] > 0)
+					{
+						zyk_cast_magic(ent, magic_skill_index);
+					}
+
+					ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(10, 20)) - ent->client->ps.stats[STAT_MAX_HEALTH];
+				}
+
 				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0)
 				{
 					int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
