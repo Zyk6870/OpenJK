@@ -2811,8 +2811,8 @@ void fx_runner_think( gentity_t *ent )
 		}
 	}
 
-	// zyk: Skill Crystal. Tests if there is a RPG player touching it
-	if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0)
+	// zyk: Magic Crystal. Tests if there is a RPG player touching it
+	if (Q_stricmp(ent->targetname, "zyk_magic_crystal") == 0)
 	{
 		int i = 0;
 
@@ -2830,6 +2830,9 @@ void fx_runner_think( gentity_t *ent )
 
 					ent->think = G_FreeEntity;
 					ent->nextthink = level.time + 100;
+
+					// zyk: must set this to -1 so the server will not try to clear this entity again
+					level.special_power_effects[ent->s.number] = -1;
 
 					G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 

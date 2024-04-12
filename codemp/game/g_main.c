@@ -5054,7 +5054,7 @@ void zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration)
 	gentity_t* new_ent = G_Spawn();
 
 	zyk_set_entity_field(new_ent, "classname", "fx_runner");
-	zyk_set_entity_field(new_ent, "targetname", "zyk_skill_crystal");
+	zyk_set_entity_field(new_ent, "targetname", "zyk_magic_crystal");
 	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
 
 	new_ent->s.modelindex = G_EffectIndex("force/heal2");
