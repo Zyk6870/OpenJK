@@ -382,12 +382,14 @@ void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles) {
 }
 
 // zyk: spawns a quest npc and sets additional stuff, like levels, etc
-void zyk_spawn_quest_npc(char* npc_type, int yaw, int quest_npc_number, int bonuses)
+extern int zyk_max_skill_level(int skill_index);
+extern int zyk_max_magic_power(gentity_t* ent);
+void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 {
 	gentity_t* npc_ent = NULL;
 
 	float x, y, z;
-	int min_distance = 1, max_distance = 50;
+	int min_distance = 1, max_distance = 30;
 	int min_entity_id = (MAX_CLIENTS + BODY_QUEUE_SIZE);
 	int max_entity_id = level.num_entities - 1;
 	int chosen_entity_index = 0; // zyk: npc origin will be at a random map entity origin
@@ -460,14 +462,33 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int quest_npc_number, int bonu
 	{
 		vec3_t npc_origin, npc_angles;
 
-		npc_ent->client->pers.quest_npc = quest_npc_number;
-		npc_ent->NPC->stats.health += bonuses;
+		npc_ent->client->pers.quest_npc = 1;
+		npc_ent->client->pers.quest_npc_event = 0;
+		npc_ent->NPC->stats.health += (bonuses * 2);
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
 		// zyk: every quest stuff will have this spawnflag
 		npc_ent->spawnflags |= 131072;
+
+		if (Q_stricmp(npc_type, "quest_minion_1") == 0 || Q_stricmp(npc_type, "quest_minion_2") == 0 || Q_stricmp(npc_type, "quest_minion_3") == 0)
+		{
+			int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
+			int current_magic_skill = first_magic_skill;
+
+			// zyk: adding all magic powers to this npc
+			while (current_magic_skill < NUMBER_OF_SKILLS)
+			{
+				npc_ent->client->pers.skill_levels[current_magic_skill] = Q_irand((bonuses / 50), ((bonuses / 50) + 1));
+
+				current_magic_skill++;
+			}
+
+			
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = (bonuses + 1);
+			npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
+		}
 
 		VectorSet(npc_origin, x, y, z);
 		VectorSet(npc_angles, 0, yaw, 0);
@@ -5349,7 +5370,6 @@ void zyk_stop_all_magic_powers(gentity_t* ent)
 }
 
 // zyk: keeps using mp while magic powers are active
-extern int zyk_max_skill_level(int skill_index);
 void zyk_active_magic_mp_consumption(gentity_t* ent)
 {
 	if (ent->client->pers.quest_power_status > 0 && ent->client->pers.magic_consumption_timer < level.time)
@@ -5382,7 +5402,6 @@ void zyk_active_magic_mp_consumption(gentity_t* ent)
 
 // zyk: controls the quest powers stuff
 extern void initialize_rpg_skills(gentity_t *ent, qboolean init_all);
-extern int zyk_max_magic_power(gentity_t* ent);
 void quest_power_events(gentity_t *ent)
 {
 	if (ent && ent->client)
@@ -7040,6 +7059,23 @@ void zyk_show_tutorial(gentity_t* ent)
 		// zyk: end of tutorial
 		ent->client->pers.player_statuses &= ~(1 << 25);
 	}
+}
+
+// zyk: counts how many bosses the player defeated
+int zyk_quest_bosses_defeated(gentity_t* ent)
+{
+	int i = 0;
+	int boss_count = 0;
+
+	for (i = 0; i <= QUEST_FINAL_BOSS; i++)
+	{
+		if (ent->client->pers.quest_progress & (1 << i))
+		{
+			boss_count++;
+		}
+	}
+
+	return boss_count;
 }
 
 /*
@@ -8771,12 +8807,13 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int skill_crystal_duration = 60000;
+					int interval_decrease = ent->client->pers.quest_defeated_enemies + (10 * zyk_quest_bosses_defeated(ent));
 					int skill_crystal_respawn_time = RPG_MAGIC_CRYSTAL_RESPAWN_TIME + (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * ent->client->pers.magic_crystals) + (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (zyk_total_skillpoints(ent) + 1));
 
 					zyk_spawn_skill_crystal(ent, skill_crystal_duration);
 
 					// zyk: each skillpoint the player has increases the time to respawn skill crystals
-					ent->client->pers.skill_crystal_timer = level.time + skill_crystal_respawn_time;
+					ent->client->pers.skill_crystal_timer = level.time + skill_crystal_respawn_time - interval_decrease;
 				}
 
 				// zyk: control the quest events
@@ -8795,7 +8832,7 @@ void G_RunFrame( int levelTime ) {
 					{ // zyk: calculates the chance to spawn an enemy. Defeating enemies will increase chance of new ones spawning
 						int enemy_type = Q_irand(1, 3);
 
-						zyk_spawn_quest_npc(G_NewString(va("quest_minion_%d", enemy_type)), ent->client->ps.viewangles[YAW], NUM_QUEST_MISSIONS + enemy_type, ent->client->pers.quest_defeated_enemies);
+						zyk_spawn_quest_npc(G_NewString(va("quest_minion_%d", enemy_type)), ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies);
 					}
 				}
 			}

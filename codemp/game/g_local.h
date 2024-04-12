@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.02"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.03"
 
 #define SECURITY_LOG "security.log"
 
@@ -1013,6 +1013,7 @@ typedef struct clientPersistant_s {
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;
+	int quest_npc_event;
 } clientPersistant_t;
 
 typedef struct renderInfo_s
