@@ -329,30 +329,6 @@ gentity_t *Zyk_NPC_SpawnType( char *npc_type, int x, int y, int z, int yaw )
 	return NULL;
 }
 
-void zyk_set_quest_npc_events(gentity_t* npc_ent)
-{
-	if (npc_ent && npc_ent->client)
-	{
-		int i = 0;
-
-		npc_ent->client->pers.quest_npc_timer = 0;
-		npc_ent->client->pers.quest_npc_current_event = 0;
-
-		if (level.quest_map == QUESTMAP_DESERT_CITY)
-		{ // zyk: main city
-			if (npc_ent->client->pers.quest_npc == 1)
-			{
-				for (i = 0; i < MAX_QUEST_NPC_EVENTS; i++)
-				{
-					npc_ent->client->pers.quest_npc_anims[i] = BOTH_WALK1TALKCOMM1 + i;
-					npc_ent->client->pers.quest_npc_anim_duration[i] = 2000;
-					npc_ent->client->pers.quest_npc_interval_timer[i] = 3000;
-				}
-			}
-		}
-	}
-}
-
 void zyk_set_quest_npc_magic(gentity_t* npc_ent, int magic_powers_levels[MAX_MAGIC_POWERS])
 {
 	int i = 0;
@@ -449,64 +425,6 @@ gentity_t* zyk_spawn_quest_npc(char* npc_type, int x, int y, int z, int yaw, int
 
 	return NULL;
 }
-
-void zyk_quest_item_use(gentity_t *self, gentity_t* other, gentity_t* activator)
-{
-	if (level.quest_map == QUESTMAP_HERO_HOUSE && self->count == 1)
-	{ // zyk: Book in the table
-		// zyk: starts tutorial
-		if (other && other->client && other->client->sess.amrpgmode == 2)
-		{
-			other->client->pers.tutorial_step = 0;
-			other->client->pers.tutorial_timer = level.time + 1000;
-			other->client->pers.player_statuses |= (1 << 25);
-		}
-	}
-}
-
-// zyk: spawns quest entities
-// entity_type can be:
-// 0: model
-// 1: effect
-/*
-void zyk_load_quest_model(char *origin, char *angles, char *model_path, int spawnflags, char *mins, char *maxs, int model_scale, int count, int entity_type)
-{
-	gentity_t* new_ent = G_Spawn();
-
-	if (entity_type == 1)
-	{
-		zyk_main_set_entity_field(new_ent, "classname", "fx_runner");
-		zyk_main_set_entity_field(new_ent, "spawnflags", va("%d", spawnflags));
-		zyk_main_set_entity_field(new_ent, "origin", G_NewString(origin));
-		zyk_main_set_entity_field(new_ent, "angles", G_NewString(angles));
-		zyk_main_set_entity_field(new_ent, "fxFile", G_NewString(model_path));
-	}
-	else
-	{
-		zyk_main_set_entity_field(new_ent, "classname", "misc_model_breakable");
-		zyk_main_set_entity_field(new_ent, "spawnflags", va("%d", spawnflags));
-		zyk_main_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
-		zyk_main_set_entity_field(new_ent, "origin", G_NewString(origin));
-		zyk_main_set_entity_field(new_ent, "angles", G_NewString(angles));
-		zyk_main_set_entity_field(new_ent, "model", G_NewString(model_path));
-		zyk_main_set_entity_field(new_ent, "mins", G_NewString(mins));
-		zyk_main_set_entity_field(new_ent, "maxs", G_NewString(maxs));
-	}
-
-	zyk_main_spawn_entity(new_ent);
-
-	new_ent->count = count;
-
-	// zyk: every quest stuff will have this spawnflag
-	new_ent->spawnflags |= 131072;
-
-	if (level.quest_map == QUESTMAP_HERO_HOUSE && count == 1)
-	{ // zyk: Book in the table
-		new_ent->use = zyk_quest_item_use;
-		new_ent->r.svFlags |= SVF_PLAYER_USABLE;
-	}
-}
-*/
 
 /*
 ============
@@ -697,33 +615,11 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		level.sp_map = qtrue;
 	}
 
-	level.quest_map = QUESTMAP_NONE;
-	level.quest_debounce_timer = 0;
-	level.quest_timer = 0;
-	level.quest_progress_counter = 0;
-	level.quest_event_counter = 0;
-	level.quest_tasks_completed = 0;
-	level.quest_map_restart = qfalse;
-	level.quest_map_restart_timer = 0;
-	level.quest_special_entity_id1 = -1;
-
 	level.legendary_artifact_map = QUESTARTIFACT_NONE;
 	level.legendary_artifact_step = 0;
 	level.legendary_artifact_debounce_timer = 0;
 
 	// zyk: making case sensitive comparing so only low case quest map names will be set to play quests. This allows building these maps without conflicting with quests
-	if (zyk_allow_quests.integer > 0)
-	{
-		if (Q_strncmp(zyk_mapname, "academy3", 9) == 0)
-		{
-			level.quest_map = QUESTMAP_LILITH_TEMPLE;
-		}
-		else if (Q_strncmp(zyk_mapname, "mp/siege_desert", 16) == 0 && g_gametype.integer == GT_FFA)
-		{
-			level.quest_map = QUESTMAP_DESERT_CITY;
-		}
-	}
-
 	if (Q_strncmp(zyk_mapname, "yavin1b", 8) == 0)
 	{
 		level.legendary_artifact_map = QUESTARTIFACT_ENERGY_MODULATOR;
@@ -983,8 +879,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			level.screen_message_timer[zyk_iterator] = 0;
 			level.ignored_players[zyk_iterator][0] = 0;
 			level.ignored_players[zyk_iterator][1] = 0;
-
-			level.quest_players_defeated[zyk_iterator] = qfalse;
 		}
 
 		for (zyk_iterator = 0; zyk_iterator < LEGENDARY_CRYSTALS_CHOSEN; zyk_iterator++)
@@ -1789,18 +1683,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			{
 				G_FreeEntity(ent);
 			}
-		}
-
-		if (level.quest_map == QUESTMAP_DESERT_CITY)
-		{ // zyk: loading quest stuff
-			zyk_create_info_player_deathmatch(12500, 32, -486, 179);
-			zyk_create_info_player_deathmatch(12500, -93, -486, 179);
-			zyk_create_info_player_deathmatch(12500, -235, -486, 179);
-			zyk_create_info_player_deathmatch(12500, -419, -486, 179);
-			zyk_create_info_player_deathmatch(12500, -599, -486, 179);
-			zyk_create_info_player_deathmatch(12500, -748, -486, 179);
-			zyk_create_info_player_deathmatch(12500, -911, -486, 179);
-			zyk_create_info_player_deathmatch(12500, -1091, -486, 179);
 		}
 	}
 	else if (Q_stricmp(zyk_mapname, "mp/siege_destroyer") == 0 && g_gametype.integer == GT_FFA)
@@ -8077,19 +7959,6 @@ void G_RunFrame( int levelTime ) {
 		level.load_entities_timer = 0;
 	}
 
-	if (level.quest_map_restart == qtrue && level.quest_map_restart_timer < level.time)
-	{ // zyk: do a full map restart if all RPG players are defeated
-		if (level.quest_map_restart_timer == 0)
-		{
-			trap->SendServerCommand(ent->s.number, "cp \"All RPG players defeated! Restarting map\"");
-			level.quest_map_restart_timer = level.time + 3000;
-		}
-		else
-		{
-			trap->SendConsoleCommand(EXEC_APPEND, va("map %s\n", level.zykmapname));
-		}
-	}
-
 	if (level.legendary_artifact_map > QUESTARTIFACT_NONE && level.load_entities_timer == 0 &&
 		level.legendary_artifact_debounce_timer < level.time)
 	{ // zyk: map has an legendary artifact
@@ -8861,18 +8730,14 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.skill_crystal_timer = level.time + skill_crystal_respawn_time;
 				}
 
-				if (level.quest_map > QUESTMAP_NONE && level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && 
-					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && level.quest_players_defeated[ent->s.number] == qfalse &&
-					level.quest_debounce_timer < level.time && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
-				{ // zyk: control the quest events which happen in the quest maps, if player can play quests now, is alive and is not in a private duel
-					int j = 0;
-
-					level.quest_debounce_timer = level.time + 100;
+				// zyk: control the quest events
+				if (level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && 
+					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
+					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+				{
 					
-					if (level.quest_map == QUESTMAP_LILITH_TEMPLE)
-					{
-						
-					}
+
+
 				}
 			}
 
@@ -8936,28 +8801,11 @@ void G_RunFrame( int levelTime ) {
 			}
 
 			// zyk: quest npc events
-			if (ent->client->pers.quest_npc > 0 && ent->health > 0 && ent->client->pers.quest_npc_timer < level.time && 
-				ent->client->pers.quest_npc_current_event < MAX_QUEST_NPC_EVENTS)
+			if (ent->client->pers.quest_npc > 0 && ent->health > 0)
 			{
-				if (level.quest_map == QUESTMAP_DESERT_CITY)
-				{
-					if (ent->client->pers.quest_npc == 1)
-					{
-						G_SetAnim(ent, NULL, SETANIM_BOTH, ent->client->pers.quest_npc_anims[ent->client->pers.quest_npc_current_event], SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-						ent->client->ps.torsoTimer = ent->client->pers.quest_npc_anim_duration[ent->client->pers.quest_npc_current_event];
-						ent->client->ps.legsTimer = ent->client->ps.torsoTimer;
+				
 
-						ent->client->pers.quest_npc_timer = level.time + ent->client->pers.quest_npc_interval_timer[ent->client->pers.quest_npc_current_event];
-						ent->client->pers.quest_npc_current_event++;
 
-						if (ent->client->pers.quest_npc_current_event == 1)
-						{
-							VectorSet(ent->NPC->tempGoal->r.currentOrigin, ent->client->ps.origin[0] + 100, ent->client->ps.origin[1] + 100, -486);
-							ent->NPC->goalEntity = ent->NPC->tempGoal;
-							ent->NPC->tempBehavior = BS_INVESTIGATE;
-						}
-					}
-				}
 			}
 
 			if (ent->health > 0 && ent->enemy && ent->client->pers.quest_power_usage_timer < level.time)

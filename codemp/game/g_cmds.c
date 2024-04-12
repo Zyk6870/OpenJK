@@ -5473,7 +5473,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 		strcpy(content, va("%s%s", content, zyk_get_settings_values(ent)));
 
 		strcpy(content, va("%s%d-%d-%d-", 
-			content, 0, ent->client->pers.quest_progress, MAX_QUEST_MISSIONS));
+			content, 0, ent->client->pers.quest_progress, 22));
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%d-%d/%d-%d-NOCLASS-%s\"",ent->client->pers.magic_crystals,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
 	}

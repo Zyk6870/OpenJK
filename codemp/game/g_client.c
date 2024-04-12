@@ -4231,12 +4231,8 @@ void ClientDisconnect( int clientNum ) {
 	}
 
 	// zyk: player is no longer part of the race, testing if it must be finished
-	if (level.quest_map == 17)
-	{
-		ent->client->pers.race_position = 0;
-
-		try_finishing_race();
-	}
+	ent->client->pers.race_position = 0;
+	try_finishing_race();
 
 	// zyk: stop magic powes used by this player
 	zyk_stop_all_magic_powers(ent);

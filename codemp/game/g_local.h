@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.3.25"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.3.26"
 
 #define SECURITY_LOG "security.log"
 
@@ -597,28 +597,6 @@ typedef enum {
 	MAX_SELLER_ITEMS
 } zyk_seller_item_t;
 
-// zyk: Quest missions
-typedef enum {
-	QUEST_LILITH_TEMPLE,
-	QUEST_BEHEMOTH_TEMPLE,
-	QUEST_ASTAROTH_TEMPLE,
-	QUEST_BELPHEGOR_TEMPLE,
-	QUEST_ABADDON_TEMPLE,
-	QUEST_EMPEROR_PALACE,
-	QUEST_WORLD_OF_DARKNESS,
-	QUEST_WORLD_OF_LIGHT,
-	MAX_QUEST_MISSIONS
-} zyk_quest_t;
-
-// zyk: maps used in quests will have their level.quest_map set to one of these values
-typedef enum {
-	QUESTMAP_NONE,
-	QUESTMAP_HERO_HOUSE,
-	QUESTMAP_DESERT_CITY,
-	QUESTMAP_LILITH_TEMPLE,
-	NUM_QUEST_MAPS
-} zyk_quest_map_t;
-
 typedef enum {
 	QUESTARTIFACT_NONE,
 	QUESTARTIFACT_ENERGY_MODULATOR,
@@ -810,9 +788,6 @@ typedef enum {
 
 // zyk: duration of the duelists protection in Duel Tournament
 #define DUEL_TOURNAMENT_PROTECTION_TIME 2000
-
-// zyk: max quest npc events each npc can have
-#define MAX_QUEST_NPC_EVENTS 8
 
 // zyk: main characters names
 #define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
@@ -1028,18 +1003,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;
-
-	// zyk: quest npc events
-	int quest_npc_anims[MAX_QUEST_NPC_EVENTS];
-
-	// zyk: duration in mliseconds of each quest npc anim
-	int quest_npc_anim_duration[MAX_QUEST_NPC_EVENTS];
-
-	// zyk: interval time between each event
-	int quest_npc_interval_timer[MAX_QUEST_NPC_EVENTS];
-
-	int quest_npc_current_event;
-	int quest_npc_timer;
 } clientPersistant_t;
 
 typedef struct renderInfo_s
@@ -1694,26 +1657,6 @@ typedef struct level_locals_s {
 
 	// zyk: current map name without the path from maps folder
 	char zykmapname[128];
-
-	// zyk: sets the map in which the player must complete a quest objective
-	int quest_map;
-
-	// zyk: has the entity id of some quest entities required for some tasks
-	int quest_special_entity_id1;
-
-	// zyk: sets the interval between each quest event
-	int quest_debounce_timer;
-	int quest_timer;
-
-	// zyk: used to pass through each quest event
-	int quest_progress_counter;
-	int quest_tasks_completed;
-	int quest_event_counter;
-
-	// zyk: when a player is defeated, it is set here. If all are defeated, quest is over in this map
-	qboolean quest_players_defeated[MAX_CLIENTS];
-	qboolean quest_map_restart;
-	int quest_map_restart_timer;
 
 	// zyk: some maps will have legendary artifacts
 	zyk_quest_artifact_t legendary_artifact_map;

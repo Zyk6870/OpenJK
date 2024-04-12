@@ -2179,10 +2179,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 	if (self->client->pers.quest_npc > 0)
 	{
-		if (level.quest_map == QUESTMAP_LILITH_TEMPLE)
-		{
-			level.quest_tasks_completed++;
-		}
+		
 	}
 
 	if (self->client->pers.race_position > 0) // zyk: if a player dies during a race, he loses the race
@@ -2248,65 +2245,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		{ // zyk: adding score to the attacker
 			level.melee_players[attacker->s.number]++;
 		}
-	}
-
-	if (self->client->sess.amrpgmode == 2)
-	{
-		if (level.quest_map > QUESTMAP_NONE)
-		{
-			int j = 0;
-			int amount_of_rpg_players = 0, amount_of_defeated_rpg_players = 0;
-
-			level.quest_players_defeated[self->s.number] = qtrue;
-
-			for (j = 0; j < level.maxclients; j++)
-			{
-				gentity_t* player_ent = &g_entities[j];
-
-				if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
-				{
-					amount_of_rpg_players++;
-
-					if (level.quest_players_defeated[player_ent->s.number] == qtrue)
-					{
-						amount_of_defeated_rpg_players++;
-					}
-				}
-			}
-
-			if (amount_of_defeated_rpg_players >= amount_of_rpg_players)
-			{ // zyk: all RPG players defeated in this quest map. Restart it
-				level.quest_map_restart = qtrue;
-			}
-		}
-
-		// zyk: player has the Resurrection Power, after completing quests in Challenge Mode. Uses mp. Not allowed in CTF gametype
-		/* zyk: disabled for now
-		if (self->client->pers.universe_quest_progress == NUMBER_OF_UNIVERSE_QUEST_OBJECTIVES && self->client->pers.universe_quest_counter & (1 << 29) && g_gametype.integer != GT_CTF &&
-			!(self->client->ps.eFlags2 & EF2_HELD_BY_MONSTER) && self->client->pers.magic_power >= 5)
-		{
-			qboolean zyk_allow_vehicle_resurrect = qtrue; // zyk: if player is riding a ship, do not allow resurrection to avoid invisible player bug
-
-			if (self->client->NPC_class != CLASS_VEHICLE
-				&& self->client->ps.m_iVehicleNum)
-			{ //I'm riding a vehicle
-				//tell it I'm getting off
-				gentity_t *veh = &g_entities[self->client->ps.m_iVehicleNum];
-
-				if (veh->inuse && veh->client && veh->m_pVehicle && veh->m_pVehicle->m_pVehicleInfo->type == VH_FIGHTER)
-				{
-					zyk_allow_vehicle_resurrect = qfalse;
-				}
-			}
-
-			if (zyk_allow_vehicle_resurrect == qtrue)
-			{
-				self->client->pers.magic_power -= 5;
-				self->client->pers.quest_power_status |= (1 << 10);
-				self->client->pers.quest_power1_timer = level.time + 3000;
-			}
-		}
-		*/
 	}
 
 	//check player stuff
@@ -4730,11 +4668,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	{
 		if (zyk_is_ally(attacker,targ) == qtrue)
 		{
-			return;
-		}
-
-		if (attacker->s.number < MAX_CLIENTS && level.quest_players_defeated[attacker->s.number] == qtrue && targ->NPC && targ->client->pers.quest_npc > 0)
-		{ // zyk: quest players who are already defeated cant hit quest npcs
 			return;
 		}
 	}

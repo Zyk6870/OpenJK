@@ -2015,13 +2015,6 @@ void SP_NPC_spawner( gentity_t *self)
 		return;
 	}
 
-	if (level.quest_map > 0 && zyk_allow_quests.integer > 0)
-	{ // zyk: if server allows quests and this is a quest map, do not spawn any of the map npcs. The quests will use their own npcs instead
-		self->think = G_FreeEntity;
-		self->nextthink = level.time;
-		return;
-	}
-
 	if (zyk_sp_npc_fix.integer)
 	{ // zyk: removing npcs from SP maps which are not that useful
 		if (level.sp_map == qtrue && (Q_stricmp(self->NPC_type, "player") == 0 || Q_stricmp(self->NPC_type, "r2d2_imp") == 0 || Q_stricmp(self->NPC_type, "r2d2") == 0 || 
