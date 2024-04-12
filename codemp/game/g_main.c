@@ -8771,7 +8771,7 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int skill_crystal_duration = 60000;
-					int skill_crystal_respawn_time = RPG_MAGIC_CRYSTAL_RESPAWN_TIME + (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (zyk_total_skillpoints(ent) + 1));
+					int skill_crystal_respawn_time = RPG_MAGIC_CRYSTAL_RESPAWN_TIME + (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * ent->client->pers.magic_crystals) + (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (zyk_total_skillpoints(ent) + 1));
 
 					zyk_spawn_skill_crystal(ent, skill_crystal_duration);
 
@@ -8789,7 +8789,7 @@ void G_RunFrame( int levelTime ) {
 					int random_chance_to_spawn_enemy = Q_irand(0, 100);
 					int percentage_value = ent->client->pers.quest_defeated_enemies / 10;
 
-					ent->client->pers.quest_event_timer = level.time + 5000;
+					ent->client->pers.quest_event_timer = level.time + 1000;
 
 					if (random_chance_to_spawn_enemy <= percentage_value)
 					{ // zyk: calculates the chance to spawn an enemy. Defeating enemies will increase chance of new ones spawning
