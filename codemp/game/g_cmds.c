@@ -2171,9 +2171,12 @@ void load_account(gentity_t* ent)
 				ent->client->pers.credits = 0;
 			}
 
-			// zyk: Main Quest progress
+			// zyk: quest fields
 			fscanf(account_file, "%s", content);
 			ent->client->pers.quest_progress = atoi(content);
+
+			fscanf(account_file, "%s", content);
+			ent->client->pers.quest_defeated_enemies = atoi(content);
 
 			// zyk: last health
 			fscanf(account_file, "%s", content);
@@ -2259,8 +2262,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_progress,
+			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_progress, client->pers.quest_defeated_enemies,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
@@ -4866,7 +4869,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.buy_sell_timer = 0;
 
-			ent->client->pers.current_quest_event = 0;
 			ent->client->pers.quest_event_timer = 0;
 
 			ent->client->pers.stamina_timer = 0;
@@ -5190,6 +5192,12 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	if (ent->client->sess.amrpgmode == 2)
 	{
 		initialize_rpg_skills(ent, qtrue);
+
+		ent->client->pers.quest_progress = 0;
+		ent->client->pers.quest_defeated_enemies = 0;
+
+		// zyk: gives some time for the player to see the tutorial before the quest events
+		ent->client->pers.quest_event_timer = level.time + 180000;
 	}
 	else
 	{
@@ -11853,6 +11861,8 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 			if (Q_stricmp(arg2, "quests") == 0)
 			{
 				ent->client->pers.quest_progress = 0;
+				ent->client->pers.quest_defeated_enemies = 0;
+				ent->client->pers.quest_event_timer = 0;
 
 				save_account(ent, qtrue);
 

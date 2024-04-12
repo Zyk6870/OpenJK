@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.3.26"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.3.27"
 
 #define SECURITY_LOG "security.log"
 
@@ -603,6 +603,21 @@ typedef enum {
 	NUM_QUEST_ARTIFACTS
 } zyk_quest_artifact_t;
 
+// zyk: quest missions
+typedef enum {
+	QUEST_BOSS_01, 
+	QUEST_BOSS_02,
+	QUEST_BOSS_03,
+	QUEST_BOSS_04,
+	QUEST_BOSS_05,
+	QUEST_BOSS_06,
+	QUEST_BOSS_07,
+	QUEST_BOSS_08,
+	QUEST_BOSS_09,
+	QUEST_BOSS_10,
+	NUM_QUEST_MISSIONS
+} zyk_quest_t;
+
 typedef enum {
 	MAPMUSIC_NONE,
 	NUM_MAP_MUSIC
@@ -867,9 +882,6 @@ typedef struct clientPersistant_s {
 	int zyk_saved_force_powers;
 	int zyk_saved_force_power_levels[NUM_FORCE_POWERS];
 
-	// zyk: time in which quest player is afk during a quest
-	int quest_afk_timer;
-
 	// zyk: timer used to keep spawning fire effects on player who catch fire after being hit by Fire Bolt
 	int fire_bolt_timer;
 	int fire_bolt_user_id;
@@ -994,12 +1006,10 @@ typedef struct clientPersistant_s {
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
 
-	// zyk: sets the current quest event for this player and the time between events
-	int current_quest_event;
-	int quest_event_timer;
-
 	// zyk: bitvalue for each quest mission completed
 	int quest_progress;
+	int quest_defeated_enemies;
+	int quest_event_timer;
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;

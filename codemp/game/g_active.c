@@ -1473,6 +1473,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			ent->client->ps.forceHandExtendTime = level.time;
 		}
 
+		/*
 		if (ent->client->sess.amrpgmode == 2)
 		{ // zyk: tests if RPG player is idle/afk
 			if (actionPressed || ucmd->forwardmove || ucmd->rightmove || ucmd->upmove || 
@@ -1487,6 +1488,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 				ent->client->pers.quest_afk_timer = level.time + zyk_quest_afk_timer.integer;
 			}
 		}
+		*/
 
 		if ( !VectorCompare( vec3_origin, ent->client->ps.velocity )
 			|| actionPressed || ucmd->forwardmove || ucmd->rightmove || ucmd->upmove
