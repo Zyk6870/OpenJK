@@ -6943,7 +6943,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 6)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If out of Stamina, you will faint and regain a bit of it. Also, low Stamina decreases your run speed.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Low Stamina decreases your run speed. If out of Stamina, you will faint for some seconds.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 7)
 	{
@@ -6967,15 +6967,15 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 12)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Crystals will disappear after a short time. The more skill levels you upgrade the longer it will take for new crystals to appear.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Crystals disappear after some time.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 13)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can magically buy from the seller. Use ^3/stuff^7. You can get credits by selling stuff. You can even sell Magic Crystals\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can magically buy stuff from the seller. Use ^3/stuff^7. You get credits by selling stuff. You can even sell Magic Crystals\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 14)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You will probably need to see info about a skill so use ^3/list <skill number> ^7to see skill info.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To see info about a skill use ^3/list <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 15)
 	{
@@ -7019,7 +7019,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 25)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions residing in several places (maps), giving power to him and weakening us.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions striking everywhere, giving power to him and weakening us.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 26)
 	{
@@ -7027,7 +7027,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 27)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There is a legendary artifact hidden somewhere that may help you.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There is a rare green crystal that may help in your quest if you find it.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 28)
 	{
