@@ -2177,9 +2177,12 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	
 	self->client->pers.player_statuses &= ~(1 << 29);
 
-	if (self->client->pers.quest_npc > 0)
-	{
-		
+	if (self->client->pers.quest_npc > 0 && 
+		attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
+	{ // zyk: quest npc defeated by a RPG player
+		attacker->client->pers.quest_defeated_enemies++;
+
+		save_account(attacker, qtrue);
 	}
 
 	if (self->client->pers.race_position > 0) // zyk: if a player dies during a race, he loses the race

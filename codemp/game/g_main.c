@@ -478,10 +478,15 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 			int current_magic_skill = first_magic_skill;
 			int magic_level_bonus = 0;
 
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ((bonuses / 10) + 1);
+
 			if (Q_stricmp(npc_type, "quest_minion_1") == 0)
-			{
+			{ // zyk: magic user minion, will have higher level in his magic-based skills
 				magic_level_bonus = 1;
+				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 2;
 			}
+
+			npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
 
 			// zyk: adding all magic powers to this npc
 			while (current_magic_skill < NUMBER_OF_SKILLS)
@@ -490,10 +495,6 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 
 				current_magic_skill++;
 			}
-
-			
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = (bonuses + 1);
-			npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
 		}
 
 		VectorSet(npc_origin, x, y, z);
@@ -8829,10 +8830,10 @@ void G_RunFrame( int levelTime ) {
 					level.num_entities < 1000 /* zyk: this is to guarantee the map will not crash */
 					)
 				{
-					int random_chance_to_spawn_enemy = Q_irand(0, 100);
-					int percentage_value = ent->client->pers.quest_defeated_enemies / 10;
+					int random_chance_to_spawn_enemy = Q_irand(0, 99);
+					int percentage_value = ent->client->pers.quest_defeated_enemies / 5;
 
-					ent->client->pers.quest_event_timer = level.time + 1000;
+					ent->client->pers.quest_event_timer = level.time + 3000;
 
 					if (random_chance_to_spawn_enemy <= percentage_value)
 					{ // zyk: calculates the chance to spawn an enemy. Defeating enemies will increase chance of new ones spawning
