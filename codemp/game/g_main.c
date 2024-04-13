@@ -5817,25 +5817,6 @@ void quest_power_events(gentity_t *ent)
 				}
 			}
 		}
-		/*
-		else if (!ent->NPC && ent->client->pers.quest_power_status & (1 << 10) && ent->client->pers.quest_power1_timer < level.time && 
-				!(ent->client->ps.eFlags & EF_DISINTEGRATION)) 
-		{ // zyk: Resurrection Power
-			ent->r.contents = CONTENTS_BODY;
-			ent->client->ps.pm_type = PM_NORMAL;
-			ent->client->ps.fallingToDeath = 0;
-			ent->client->noCorpse = qtrue;
-			ent->client->ps.eFlags &= ~EF_NODRAW;
-			ent->client->ps.eFlags2 &= ~EF2_HELD_BY_MONSTER;
-			ent->flags = 0;
-			ent->die = player_die; // zyk: must set this function again
-			initialize_rpg_skills(ent);
-			ent->client->pers.jetpack_fuel = MAX_JETPACK_FUEL;
-			ent->client->ps.jetpackFuel = 100;
-			ent->client->ps.cloakFuel = 100;
-			ent->client->pers.quest_power_status &= ~(1 << 10);
-		}
-		*/
 	}
 }
 
@@ -8827,13 +8808,15 @@ void G_RunFrame( int levelTime ) {
 				if (level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && ent->client->pers.quest_event_timer < level.time && 
 					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
+					ent->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES && 
 					level.num_entities < 1000 /* zyk: this is to guarantee the map will not crash */
 					)
 				{
 					int random_chance_to_spawn_enemy = Q_irand(0, 99);
-					int percentage_value = ent->client->pers.quest_defeated_enemies / 5;
+					int enemy_spawn_rate = QUEST_MAX_ENEMIES / 100;
+					int percentage_value = ent->client->pers.quest_defeated_enemies / enemy_spawn_rate;
 
-					ent->client->pers.quest_event_timer = level.time + 3000;
+					ent->client->pers.quest_event_timer = level.time + 1500;
 
 					if (random_chance_to_spawn_enemy <= percentage_value)
 					{ // zyk: calculates the chance to spawn an enemy. Defeating enemies will increase chance of new ones spawning
@@ -8903,7 +8886,7 @@ void G_RunFrame( int levelTime ) {
 				}
 			}
 
-			if (ent->health > 0 && ent->enemy && ent->client->pers.quest_power_usage_timer < level.time)
+			if (ent->health > 0 && ent->enemy)
 			{ // zyk: npcs with magic powers
 				if (ent->client->pers.quest_npc > 0 && ent->health > 0 && ent->client->pers.quest_event_timer < level.time)
 				{
@@ -8914,9 +8897,9 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.skill_levels[magic_skill_index] > 0)
 					{
 						zyk_cast_magic(ent, magic_skill_index);
-					}
 
-					ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(10, 20)) - ent->client->ps.stats[STAT_MAX_HEALTH];
+						ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(5, 10));
+					}
 				}
 
 				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0)

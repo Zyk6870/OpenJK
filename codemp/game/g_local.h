@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.07"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.08"
 
 #define SECURITY_LOG "security.log"
 
@@ -605,15 +605,13 @@ typedef enum {
 
 // zyk: quest missions
 typedef enum {
-	QUEST_BOSS_01,
-	QUEST_BOSS_02,
-	QUEST_BOSS_03,
-	QUEST_BOSS_04,
-	QUEST_BOSS_05,
-	QUEST_BOSS_06,
-	QUEST_BOSS_07,
-	QUEST_BOSS_08,
-	QUEST_BOSS_09,
+	QUEST_BOSS_WATER,
+	QUEST_BOSS_EARTH,
+	QUEST_BOSS_FIRE,
+	QUEST_BOSS_AIR,
+	QUEST_BOSS_DARK,
+	QUEST_BOSS_LIGHT,
+	QUEST_BOSS_MULTI,
 	QUEST_FINAL_BOSS,
 	NUM_QUEST_MISSIONS
 } zyk_quest_t;
@@ -807,6 +805,9 @@ typedef enum {
 // zyk: main characters names
 #define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
 #define QUESTCHAR_MAINVILLAIN_NAME "^1Drakon"
+
+// zyk: max quest non-boss enemies that the player can defeat
+#define QUEST_MAX_ENEMIES 500
 
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()

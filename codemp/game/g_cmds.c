@@ -6003,7 +6003,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				if (zyk_allow_quests.integer == 1)
 				{
-					trap->SendServerCommand(ent->s.number, va("print \"\n^3Quests\n\n\""));
+					trap->SendServerCommand(ent->s.number, va("print \"\n^3Defeat the Brotherhood of Mages\n\nEnemies Defeated: ^7%d\n\n\"", ent->client->pers.quest_defeated_enemies));
 				}
 				else
 				{
