@@ -5676,15 +5676,19 @@ Cmd_DownSkill_f
 ==================
 */
 void Cmd_DownSkill_f( gentity_t *ent ) {
-	int i = 0;
+	char arg1[MAX_STRING_CHARS]; // zyk: value the user sends as an arg which is the skill to be upgraded
+	int downgrade_value; // zyk: the integer value of arg1
 
-	for (i = 0; i < NUMBER_OF_SKILLS; i++)
+	if (trap->Argc() != 2)
 	{
-		while (ent->client->pers.skill_levels[i] > 0)
-		{
-			do_downgrade_skill(ent, (i + 1));
-		}
+		trap->SendServerCommand(ent->s.number, "print \"You must specify the number of the skill to be downgraded.\n\"");
+		return;
 	}
+
+	trap->Argv(1, arg1, sizeof(arg1));
+	downgrade_value = atoi(arg1);
+
+	do_downgrade_skill(ent, downgrade_value);
 
 	// zyk: saving the account file with the downgraded skill
 	save_account(ent, qtrue);
@@ -5693,7 +5697,7 @@ void Cmd_DownSkill_f( gentity_t *ent ) {
 
 	Cmd_ZykMod_f(ent);
 
-	trap->SendServerCommand(ent->s.number, "print \"Skills downgraded successfully.\n\"");	
+	trap->SendServerCommand(ent->s.number, "print \"Skill downgraded successfully.\n\"");	
 }
 
 // zyk: used to format text when player wants to list skills
@@ -6031,7 +6035,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			}
 			else if (Q_stricmp( arg1, "commands" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill.\n^3/down: ^7resets all skills to level 0 and recovers the skillpoints.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
+				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill.\n^3/down [skill number]: ^7downgrades a skill.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
 			}
 			else
 			{ // zyk: the player can also list the specific info of a skill passing the skill number as argument
