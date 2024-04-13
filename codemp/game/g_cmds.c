@@ -4568,6 +4568,7 @@ int zyk_total_skillpoints(gentity_t* ent)
 
 // zyk: initialize RPG skills of this player
 extern void zyk_set_magic_crystal_respawn_time(gentity_t* ent);
+extern void zyk_set_quest_event_timer(gentity_t* ent);
 void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 {
 	if (ent->client->sess.amrpgmode == 2)
@@ -4870,7 +4871,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.buy_sell_timer = 0;
 
-			ent->client->pers.quest_event_timer = 0;
+			zyk_set_quest_event_timer(ent);
 
 			ent->client->pers.stamina_timer = 0;
 			ent->client->pers.stamina_out_timer = 0;
@@ -5197,8 +5198,7 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 		ent->client->pers.quest_progress = 0;
 		ent->client->pers.quest_defeated_enemies = 0;
 
-		// zyk: gives some time for the player to see the tutorial before the quest events
-		ent->client->pers.quest_event_timer = level.time + 180000;
+		zyk_set_quest_event_timer(ent);
 	}
 	else
 	{
@@ -11867,7 +11867,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 			{
 				ent->client->pers.quest_progress = 0;
 				ent->client->pers.quest_defeated_enemies = 0;
-				ent->client->pers.quest_event_timer = 0;
+				zyk_set_quest_event_timer(ent);
 
 				save_account(ent, qtrue);
 

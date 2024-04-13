@@ -464,6 +464,7 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 
 		npc_ent->client->pers.quest_npc = 1;
 		npc_ent->client->pers.quest_npc_event = 0;
+		npc_ent->client->pers.quest_event_timer = 0;
 		npc_ent->NPC->stats.health += (bonuses * 2);
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
@@ -4833,7 +4834,7 @@ void zyk_spawn_black_hole_model(gentity_t* ent, int duration, int model_scale)
 
 	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
 	zyk_set_entity_field(new_ent, "spawnflags", "65536");
-	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2] - 24));
+	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2] - 20));
 
 	zyk_set_entity_field(new_ent, "model", "models/map_objects/mp/sphere_1.md3");
 
@@ -7065,13 +7066,36 @@ int zyk_quest_bosses_defeated(gentity_t* ent)
 	return boss_count;
 }
 
+void zyk_set_quest_event_timer(gentity_t* ent)
+{
+	int interval_time = (QUEST_MAX_ENEMIES * 1000);
+
+	interval_time -= ((ent->client->pers.quest_defeated_enemies * 1000) + (zyk_quest_bosses_defeated(ent) * 10000));
+
+	// zyk: also decrease time based on player skills and magic crystals
+	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 500);
+
+	// zyk: wait at least 1500 ms
+	if (interval_time < 1500)
+	{
+		interval_time = 1500;
+	}
+	
+	ent->client->pers.quest_event_timer = level.time + interval_time;
+}
+
 void zyk_set_magic_crystal_respawn_time(gentity_t* ent)
 {
 	int magic_crystal_respawn_time = RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent));
-	int interval_decrease = (ent->client->pers.quest_defeated_enemies * 10) + (zyk_quest_bosses_defeated(ent) * 200);
+	int interval_decrease = (ent->client->pers.quest_defeated_enemies * 50) + (zyk_quest_bosses_defeated(ent) * 1000);
+	int total_interval = RPG_MAGIC_CRYSTAL_RESPAWN_TIME + magic_crystal_respawn_time - interval_decrease;
 
-	// zyk: each skillpoint the player has increases the time to respawn skill crystals
-	ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_RESPAWN_TIME + magic_crystal_respawn_time - interval_decrease;
+	if (total_interval < RPG_MAGIC_CRYSTAL_RESPAWN_TIME)
+	{
+		total_interval = RPG_MAGIC_CRYSTAL_RESPAWN_TIME;
+	}
+
+	ent->client->pers.skill_crystal_timer = level.time + total_interval;
 }
 
 /*
@@ -8800,7 +8824,13 @@ void G_RunFrame( int levelTime ) {
 				// zyk: skill crystals must be spawned after a certain amount of time
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
-					zyk_spawn_skill_crystal(ent, 60000);
+					int magic_crystal_chance_to_spawn = Q_irand(0, 9);
+
+					if (magic_crystal_chance_to_spawn < 8)
+					{
+						zyk_spawn_skill_crystal(ent, 60000);
+					}
+
 					zyk_set_magic_crystal_respawn_time(ent);
 				}
 
@@ -8812,18 +8842,11 @@ void G_RunFrame( int levelTime ) {
 					level.num_entities < 1000 /* zyk: this is to guarantee the map will not crash */
 					)
 				{
-					int random_chance_to_spawn_enemy = Q_irand(0, 99);
-					int enemy_spawn_rate = QUEST_MAX_ENEMIES / 100;
-					int percentage_value = ent->client->pers.quest_defeated_enemies / enemy_spawn_rate;
+					int enemy_type = Q_irand(1, 3);
 
-					ent->client->pers.quest_event_timer = level.time + 1500;
+					zyk_set_quest_event_timer(ent);
 
-					if (random_chance_to_spawn_enemy <= percentage_value)
-					{ // zyk: calculates the chance to spawn an enemy. Defeating enemies will increase chance of new ones spawning
-						int enemy_type = Q_irand(1, 3);
-
-						zyk_spawn_quest_npc(G_NewString(va("quest_minion_%d", enemy_type)), ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies);
-					}
+					zyk_spawn_quest_npc(G_NewString(va("quest_minion_%d", enemy_type)), ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies);
 				}
 			}
 

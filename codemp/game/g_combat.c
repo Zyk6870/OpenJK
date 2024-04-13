@@ -2183,7 +2183,9 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		attacker->client->pers.quest_defeated_enemies++;
 
 		if (attacker->client->pers.quest_defeated_enemies > QUEST_MAX_ENEMIES)
+		{
 			attacker->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
+		}
 
 		save_account(attacker, qtrue);
 	}
