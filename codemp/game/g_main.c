@@ -6897,6 +6897,9 @@ void zyk_calculate_current_weight(gentity_t* ent)
 		current_weight += (ent->client->pers.rpg_inventory[i] * rpg_inventory_weights[i]);
 	}
 
+	// zyk: Magic Crystals will also hace a weight
+	current_weight += (ent->client->pers.magic_crystals * 1);
+
 	ent->client->pers.current_weight = current_weight;
 }
 
