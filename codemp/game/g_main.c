@@ -7068,12 +7068,12 @@ int zyk_quest_bosses_defeated(gentity_t* ent)
 
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = (QUEST_MAX_ENEMIES * 1000);
+	int interval_time = (QUEST_MAX_ENEMIES * 600);
 
-	interval_time -= ((ent->client->pers.quest_defeated_enemies * 1000) + (zyk_quest_bosses_defeated(ent) * 10000));
+	interval_time -= ((ent->client->pers.quest_defeated_enemies * 600) + (zyk_quest_bosses_defeated(ent) * 10000));
 
 	// zyk: also decrease time based on player skills and magic crystals
-	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 500);
+	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 1000);
 
 	// zyk: wait at least 1500 ms
 	if (interval_time < 1500)

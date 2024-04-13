@@ -5662,6 +5662,7 @@ void do_downgrade_skill(gentity_t *ent, int downgrade_value)
 	if (ent->client->pers.skill_levels[downgrade_value - 1] > 0)
 	{
 		ent->client->pers.skill_levels[downgrade_value - 1]--;
+		trap->SendServerCommand(ent->s.number, "print \"Skill downgraded successfully.\n\"");
 	}
 	else
 	{
@@ -5696,8 +5697,6 @@ void Cmd_DownSkill_f( gentity_t *ent ) {
 	initialize_rpg_skills(ent, qfalse);
 
 	Cmd_ZykMod_f(ent);
-
-	trap->SendServerCommand(ent->s.number, "print \"Skill downgraded successfully.\n\"");	
 }
 
 // zyk: used to format text when player wants to list skills

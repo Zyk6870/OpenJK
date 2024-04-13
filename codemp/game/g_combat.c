@@ -6203,6 +6203,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						(level.special_power_effects[attacker->s.number] == ent->s.number || OnSameTeam(quest_power_user, ent) == qtrue || 
 						npcs_on_same_team(quest_power_user, ent) == qtrue || zyk_is_ally(quest_power_user,ent) == qtrue))
 					{
+						int max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
 						int heal_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 						int shield_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 						int stamina_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
@@ -6214,23 +6215,18 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 						zyk_set_stamina(ent, stamina_amount, qtrue);
 
-						if (ent->health == ent->client->ps.stats[STAT_MAX_HEALTH])
-						{ // zyk: can restore shield shield too, if hp is full
-							int max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
+						if (ent->client->sess.amrpgmode == 2)
+							max_shield = ent->client->pers.max_rpg_shield;
 
-							if (ent->client->sess.amrpgmode == 2)
-								max_shield = ent->client->pers.max_rpg_shield;
-
-							if (!ent->NPC)
+						if (!ent->NPC)
+						{
+							if ((ent->client->ps.stats[STAT_ARMOR] + shield_amount) < max_shield)
 							{
-								if ((ent->client->ps.stats[STAT_ARMOR] + shield_amount) < max_shield)
-								{
-									ent->client->ps.stats[STAT_ARMOR] += shield_amount;
-								}
-								else
-								{
-									ent->client->ps.stats[STAT_ARMOR] = max_shield;
-								}
+								ent->client->ps.stats[STAT_ARMOR] += shield_amount;
+							}
+							else
+							{
+								ent->client->ps.stats[STAT_ARMOR] = max_shield;
 							}
 						}
 					}
