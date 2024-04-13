@@ -2834,6 +2834,9 @@ void fx_runner_think( gentity_t *ent )
 					// zyk: must set this to -1 so the server will not try to clear this entity again
 					level.special_power_effects[ent->s.number] = -1;
 
+					// zyk: must also clear the crystal model. Uses the model id stored in count
+					level.special_power_effects_timer[ent->count] = level.time;
+
 					G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
 					return;

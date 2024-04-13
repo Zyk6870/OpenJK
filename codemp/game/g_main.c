@@ -5057,7 +5057,7 @@ void zyk_spawn_energy_modulator_model(float x, float y, float z, int model_scale
 }
 
 extern int zyk_total_skillpoints(gentity_t* ent);
-void zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration)
+void zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration, int magic_crystal_model_id)
 {
 	gentity_t* new_ent = G_Spawn();
 
@@ -5069,11 +5069,14 @@ void zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration)
 
 	zyk_spawn_entity(new_ent);
 
+	// zyk: used to clear the model entity when player gets the crystal
+	new_ent->count = magic_crystal_model_id;
+
 	level.special_power_effects[new_ent->s.number] = 0;
 	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
 }
 
-void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, int duration)
+int zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, int duration)
 {
 	gentity_t* new_ent = G_Spawn();
 
@@ -5093,6 +5096,8 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 
 	level.special_power_effects[new_ent->s.number] = 0;
 	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+
+	return new_ent->s.number;
 }
 
 // zyk: spawn the model and effect used by magic crystals
@@ -5106,6 +5111,7 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 	gentity_t* chosen_entity = NULL;
 	int i = 0, j = 0;
 	int total_entities_in_use = 0;
+	int crystal_model_id = 0;
 
 	// zyk: get all entities in use
 	for (i = min_entity_id; i < level.num_entities; i++)
@@ -5171,8 +5177,8 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 		z += chosen_entity->s.origin[2];
 	}
 
-	zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration);
-	zyk_spawn_skill_crystal_effect(x, y, z, duration);
+	crystal_model_id = zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration);
+	zyk_spawn_skill_crystal_effect(x, y, z, duration, crystal_model_id);
 }
 
 // zyk: clear effects of some special powers
