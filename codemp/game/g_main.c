@@ -5188,8 +5188,8 @@ void clear_special_power_effect(gentity_t* ent)
 	{
 		gentity_t* quest_power_user = &g_entities[level.special_power_effects[ent->s.number]];
 
-		if (quest_power_user && quest_power_user->client && quest_power_user->client->sess.amrpgmode == 2)
-		{ // zyk: stops the magic power effect/model if player is no longer using the magic power
+		if (quest_power_user && quest_power_user->client && (quest_power_user->client->sess.amrpgmode == 2 || quest_power_user->NPC))
+		{ // zyk: stops the magic power effect/model if player or npc is no longer using the magic power
 			if (quest_power_user->client->pers.quest_power_status & (1 << MAGIC_HEALING_AREA) && 
 				Q_stricmp(ent->targetname, "zyk_magic_healing_area") == 0)
 			{
@@ -7068,9 +7068,9 @@ int zyk_quest_bosses_defeated(gentity_t* ent)
 
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = (QUEST_MAX_ENEMIES * 600);
+	int interval_time = (QUEST_MAX_ENEMIES * 180);
 
-	interval_time -= ((ent->client->pers.quest_defeated_enemies * 600) + (zyk_quest_bosses_defeated(ent) * 10000));
+	interval_time -= ((ent->client->pers.quest_defeated_enemies * 180) + (zyk_quest_bosses_defeated(ent) * 10000));
 
 	// zyk: also decrease time based on player skills and magic crystals
 	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 1000);
