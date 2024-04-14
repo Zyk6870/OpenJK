@@ -497,18 +497,14 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 
 	if (npc_ent && npc_ent->client)
 	{
-		// vec3_t npc_origin, npc_angles;
-
 		npc_ent->client->pers.quest_npc = 1;
 		npc_ent->client->pers.quest_npc_event = 0;
 		npc_ent->client->pers.quest_event_timer = 0;
-		npc_ent->NPC->stats.health += (bonuses * 5);
+		npc_ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
+		npc_ent->NPC->stats.health += (bonuses * 3);
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
-
-		// zyk: every quest stuff will have this spawnflag
-		npc_ent->spawnflags |= 131072;
 
 		// zyk: setting magic powers
 		if (Q_stricmp(npc_type, "quest_minion_1") == 0 || Q_stricmp(npc_type, "quest_minion_2") == 0 || 
@@ -524,14 +520,14 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 
 			if (Q_stricmp(npc_type, "quest_minion_1") == 0)
 			{ // zyk: magic users, will have higher level in his magic-based skills
-				magic_level_bonus = 2;
+				magic_level_bonus = 3;
 				npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 1 + (bonuses / (QUEST_MAX_ENEMIES / 4));
-				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 5;
+				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 4;
 			}
 			else if (Q_stricmp(npc_type, "quest_minion_2") == 0)
 			{ // zyk: magic users, will have higher level in his magic-based skills
 				magic_level_bonus = 1;
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / 4));
+				npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 1 + (bonuses / (QUEST_MAX_ENEMIES / 4));
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 4;
 			}
 
@@ -541,26 +537,20 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 			{ // zyk: elemental enemy. Will have a specific element
 				int chosen_element = Q_irand(0, 5) + 1;
 
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 3 + (bonuses / (QUEST_MAX_ENEMIES / 4));
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE + chosen_element] = 5 + (bonuses / (QUEST_MAX_ENEMIES / 4));
+				npc_ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 2 + (bonuses / (QUEST_MAX_ENEMIES / 5));
+				npc_ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE + chosen_element] = 4 + (bonuses / (QUEST_MAX_ENEMIES / 5));
 			}
 			else
 			{
 				// zyk: adding all magic powers to this npc
 				while (current_magic_skill < NUMBER_OF_SKILLS)
 				{
-					npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / 7));
+					npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / 6));
 
 					current_magic_skill++;
 				}
 			}
 		}
-
-		/*
-		VectorSet(npc_origin, x, y, z);
-		VectorSet(npc_angles, 0, yaw, 0);
-		zyk_TeleportPlayer(npc_ent, npc_origin, npc_angles);
-		*/
 	}
 }
 
@@ -8927,23 +8917,83 @@ void G_RunFrame( int levelTime ) {
 				}
 			}
 
-			if (ent->health > 0 && ent->enemy)
+			if (ent->health > 0)
 			{ // zyk: npcs with magic powers
-				if (ent->client->pers.quest_npc > 0 && ent->health > 0 && ent->client->pers.quest_event_timer < level.time)
+				if (ent->client->pers.quest_npc > 0 && ent->client->pers.quest_event_timer < level.time)
 				{
-					int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
-					int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
-					int magic_skill_index = first_magic_skill + random_magic;
-
-					if (ent->client->pers.skill_levels[magic_skill_index] > 0)
+					if (ent->enemy)
 					{
-						zyk_cast_magic(ent, magic_skill_index);
+						int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
+						int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
+						int magic_skill_index = first_magic_skill + random_magic;
 
-						ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(4, 8));
+						if (ent->client->pers.skill_levels[magic_skill_index] > 0)
+						{
+							zyk_cast_magic(ent, magic_skill_index);
+
+							ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(4, 8));
+						}
+
+						ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
+					}
+					else
+					{
+						if (ent->client->pers.quest_npc_idle_timer < level.time)
+						{ // zyk: find another map spot
+							vec3_t npc_origin, npc_angles;
+
+							float x, y, z;
+							int min_distance = 1, max_distance = 20;
+							gentity_t* chosen_entity = NULL;
+
+							chosen_entity = zyk_find_entity_for_quest();
+
+							if (chosen_entity)
+							{ // zyk: if for some reason there was no chosen entity, try again later
+								// zyk: the distance the npc is from the chosen entity origin
+								x = Q_irand(min_distance, max_distance);
+								y = Q_irand(min_distance, max_distance);
+								z = Q_irand(min_distance, max_distance);
+
+								if (Q_irand(0, 1) == 0)
+								{
+									x *= -1;
+								}
+
+								if (Q_irand(0, 1) == 0)
+								{
+									y *= -1;
+								}
+
+								if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
+								{
+									x += chosen_entity->r.currentOrigin[0];
+									y += chosen_entity->r.currentOrigin[1];
+									z += chosen_entity->r.currentOrigin[2];
+								}
+								else
+								{
+									x += chosen_entity->s.origin[0];
+									y += chosen_entity->s.origin[1];
+									z += chosen_entity->s.origin[2];
+								}
+
+
+								VectorSet(npc_origin, x, y, z);
+								VectorSet(npc_angles, 0, 0, 0);
+								zyk_TeleportPlayer(ent, npc_origin, npc_angles);
+
+								ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
+							}
+						}
+						else if (ent->client->pers.quest_power_status > 0)
+						{ // zyk: stop using all magic
+							zyk_stop_all_magic_powers(ent);
+						}
 					}
 				}
 
-				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0)
+				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy)
 				{
 					int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
 					int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
