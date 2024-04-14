@@ -465,7 +465,7 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 		npc_ent->client->pers.quest_npc = 1;
 		npc_ent->client->pers.quest_npc_event = 0;
 		npc_ent->client->pers.quest_event_timer = 0;
-		npc_ent->NPC->stats.health += (bonuses * 2);
+		npc_ent->NPC->stats.health += (bonuses * 5);
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
@@ -473,8 +473,10 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 		// zyk: every quest stuff will have this spawnflag
 		npc_ent->spawnflags |= 131072;
 
-		if (Q_stricmp(npc_type, "quest_minion_1") == 0 || Q_stricmp(npc_type, "quest_minion_2") == 0 || Q_stricmp(npc_type, "quest_minion_3") == 0)
-		{
+		// zyk: setting magic powers
+		if (Q_stricmp(npc_type, "quest_minion_1") == 0 || Q_stricmp(npc_type, "quest_minion_2") == 0 || 
+			Q_stricmp(npc_type, "quest_minion_3") == 0 || Q_stricmp(npc_type, "quest_minion_4") == 0)
+		{ 
 			int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
 			int current_magic_skill = first_magic_skill;
 			int magic_level_bonus = 0;
@@ -482,7 +484,7 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ((bonuses / 10) + 1);
 
 			if (Q_stricmp(npc_type, "quest_minion_1") == 0)
-			{ // zyk: magic user minion, will have higher level in his magic-based skills
+			{ // zyk: magic user minion tier 1, will have higher level in his magic-based skills
 				magic_level_bonus = 1;
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 2;
 			}
@@ -492,7 +494,7 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 			// zyk: adding all magic powers to this npc
 			while (current_magic_skill < NUMBER_OF_SKILLS)
 			{
-				npc_ent->client->pers.skill_levels[current_magic_skill] = Q_irand((magic_level_bonus + (bonuses / 50)), ((bonuses / 50) + 1 + magic_level_bonus));
+				npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / 8));
 
 				current_magic_skill++;
 			}
@@ -7058,28 +7060,11 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 }
 
-// zyk: counts how many bosses the player defeated
-int zyk_quest_bosses_defeated(gentity_t* ent)
-{
-	int i = 0;
-	int boss_count = 0;
-
-	for (i = 0; i <= QUEST_FINAL_BOSS; i++)
-	{
-		if (ent->client->pers.quest_progress & (1 << i))
-		{
-			boss_count++;
-		}
-	}
-
-	return boss_count;
-}
-
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = (QUEST_MAX_ENEMIES * 180);
+	int interval_time = 180000; // zyk: default interval time will be 3 minutes
 
-	interval_time -= ((ent->client->pers.quest_defeated_enemies * 180) + (zyk_quest_bosses_defeated(ent) * 10000));
+	interval_time -= (ent->client->pers.quest_defeated_enemies * 800);
 
 	// zyk: also decrease time based on player skills and magic crystals
 	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 1000);
@@ -7096,7 +7081,7 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 void zyk_set_magic_crystal_respawn_time(gentity_t* ent)
 {
 	int magic_crystal_respawn_time = RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent));
-	int interval_decrease = (ent->client->pers.quest_defeated_enemies * 50) + (zyk_quest_bosses_defeated(ent) * 1000);
+	int interval_decrease = ent->client->pers.quest_defeated_enemies * 50;
 	int total_interval = RPG_MAGIC_CRYSTAL_RESPAWN_TIME + magic_crystal_respawn_time - interval_decrease;
 
 	if (total_interval < RPG_MAGIC_CRYSTAL_RESPAWN_TIME)
@@ -8845,13 +8830,14 @@ void G_RunFrame( int levelTime ) {
 
 				// zyk: control the quest events
 				if (level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
-					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && ent->client->pers.quest_event_timer < level.time && 
+					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
 					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
 					ent->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES && 
-					level.num_entities < 1000 /* zyk: this is to guarantee the map will not crash */
+					ent->client->pers.quest_event_timer < level.time && 
+					level.num_entities < (ENTITYNUM_MAX_NORMAL - 22) /* zyk: this is to guarantee the map will not crash */
 					)
 				{
-					int enemy_type = Q_irand(1, 3);
+					int enemy_type = Q_irand(1, 4);
 
 					zyk_set_quest_event_timer(ent);
 
