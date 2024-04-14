@@ -2190,6 +2190,13 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		save_account(attacker, qtrue);
 	}
 
+	if (attacker && attacker->client && attacker->client->pers.quest_npc > 0 && attacker->enemy && attacker->enemy == self)
+	{ // zyk: quest npc defeated an enemy. Clear it to find a new one and stop all magic powers
+		attacker->enemy = NULL;
+
+		zyk_stop_all_magic_powers(attacker);
+	}
+
 	if (self->client->pers.race_position > 0) // zyk: if a player dies during a race, he loses the race
 	{
 		self->client->pers.race_position = 0;

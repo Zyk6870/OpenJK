@@ -475,28 +475,42 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 
 		// zyk: setting magic powers
 		if (Q_stricmp(npc_type, "quest_minion_1") == 0 || Q_stricmp(npc_type, "quest_minion_2") == 0 || 
-			Q_stricmp(npc_type, "quest_minion_3") == 0 || Q_stricmp(npc_type, "quest_minion_4") == 0)
+			Q_stricmp(npc_type, "quest_minion_3") == 0 || Q_stricmp(npc_type, "quest_minion_4") == 0 || 
+			Q_stricmp(npc_type, "quest_minion_5") == 0)
 		{ 
 			int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
 			int current_magic_skill = first_magic_skill;
 			int magic_level_bonus = 0;
 
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 0;
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ((bonuses / 10) + 1);
 
-			if (Q_stricmp(npc_type, "quest_minion_1") == 0)
-			{ // zyk: magic user minion tier 1, will have higher level in his magic-based skills
+			if (Q_stricmp(npc_type, "quest_minion_1") == 0 || Q_stricmp(npc_type, "quest_minion_5") == 0)
+			{ // zyk: magic user tier 1, will have higher level in his magic-based skills
 				magic_level_bonus = 1;
+				npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / 4));
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 2;
 			}
 
 			npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
 
-			// zyk: adding all magic powers to this npc
-			while (current_magic_skill < NUMBER_OF_SKILLS)
-			{
-				npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / 8));
+			
+			if (Q_stricmp(npc_type, "quest_minion_5") == 0)
+			{ // zyk: elemental enemy. Will have a specific element
+				int chosen_element = Q_irand(0, 5) + 1;
 
-				current_magic_skill++;
+				npc_ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 3 + (bonuses / (QUEST_MAX_ENEMIES / 4));
+				npc_ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE + chosen_element] = 5 + (bonuses / (QUEST_MAX_ENEMIES / 4));
+			}
+			else
+			{
+				// zyk: adding all magic powers to this npc
+				while (current_magic_skill < NUMBER_OF_SKILLS)
+				{
+					npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / 8));
+
+					current_magic_skill++;
+				}
 			}
 		}
 
@@ -8837,7 +8851,7 @@ void G_RunFrame( int levelTime ) {
 					level.num_entities < (ENTITYNUM_MAX_NORMAL - 22) /* zyk: this is to guarantee the map will not crash */
 					)
 				{
-					int enemy_type = Q_irand(1, 4);
+					int enemy_type = Q_irand(1, 5);
 
 					zyk_set_quest_event_timer(ent);
 
@@ -8916,7 +8930,7 @@ void G_RunFrame( int levelTime ) {
 					{
 						zyk_cast_magic(ent, magic_skill_index);
 
-						ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(5, 10));
+						ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(4, 8));
 					}
 				}
 

@@ -3861,7 +3861,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 	}
 	else
 	{
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0 && ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
+		if ((ent->client->sess.amrpgmode == 2 || ent->NPC) && ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0 && ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
 		{ // zyk: Magic fist attacks. Shoots an electric bolt
 			gentity_t	*missile;
 			vec3_t origin, dir, zyk_forward;
