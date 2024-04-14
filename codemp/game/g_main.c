@@ -413,7 +413,7 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 	gentity_t* npc_ent = NULL;
 
 	float x, y, z;
-	int min_distance = 1, max_distance = 30;
+	int min_distance = 1, max_distance = 20;
 	int min_entity_id = (MAX_CLIENTS + BODY_QUEUE_SIZE);
 	int max_entity_id = level.num_entities - 1;
 	int chosen_entity_index = 0; // zyk: npc origin will be at a random map entity origin
@@ -452,7 +452,7 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 		return;
 	}
 
-	// zyk: the distance the skill crystal is from the map origin will increase as the player gets more skillpoints
+	// zyk: the distance the npc is from the chosen entity origin
 	x = Q_irand(min_distance, max_distance);
 	y = Q_irand(min_distance, max_distance);
 	z = Q_irand(min_distance, max_distance);
@@ -8851,9 +8851,9 @@ void G_RunFrame( int levelTime ) {
 				// zyk: skill crystals must be spawned after a certain amount of time
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
-					int magic_crystal_chance_to_spawn = Q_irand(0, 9);
+					int magic_crystal_chance_to_spawn = Q_irand(0, 19);
 
-					if (magic_crystal_chance_to_spawn < 9)
+					if (magic_crystal_chance_to_spawn < 19)
 					{ // zyk: Magic Crystal
 						zyk_spawn_skill_crystal(ent, 60000, 1);
 					}

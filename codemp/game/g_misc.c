@@ -2827,10 +2827,14 @@ void fx_runner_think( gentity_t *ent )
 					if (Q_stricmp(ent->targetname, "zyk_magic_crystal") == 0)
 					{
 						player_ent->client->pers.magic_crystals++;
+
+						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 					}
 					else
 					{
 						player_ent->client->pers.quest_tries++;
+
+						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/pickup_battery.mp3"));
 					}
 
 					save_account(player_ent, qtrue);
@@ -2843,8 +2847,6 @@ void fx_runner_think( gentity_t *ent )
 
 					// zyk: must also clear the crystal model. Uses the model id stored in count
 					level.special_power_effects_timer[ent->count] = level.time;
-
-					G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
 					return;
 				}

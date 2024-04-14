@@ -2196,7 +2196,8 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 	if (self->client->sess.amrpgmode == 2 && !(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 		self->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES && 
-		(!(self->client->pers.player_statuses & (1 << 24) || (attacker && attacker->client && attacker != self))) // zyk: dont reset in this case, for example, when player logs into his account
+		!(attacker && attacker->client && attacker->s.number < MAX_CLIENTS) && // zyk: dying to a player will not count
+		!(self->client->pers.player_statuses & (1 << 24) && meansOfDeath == MOD_SUICIDE) // zyk: dont reset in this case, for example, when player logs into his account
 		)
 	{ // zyk: player died in quest. Decrease number of tries
 		self->client->pers.quest_tries--;
