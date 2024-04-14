@@ -381,6 +381,30 @@ void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles) {
 	}
 }
 
+// zyk: function to kill npcs with the name as parameter
+void zyk_NPC_Kill_f(char* name)
+{
+	int	n = 0;
+	gentity_t* player = NULL;
+
+	for (n = level.maxclients; n < level.num_entities; n++)
+	{
+		player = &g_entities[n];
+		if (player && player->NPC && player->client)
+		{
+			if (Q_stricmp(name, player->NPC_type) == 0 || Q_stricmp(name, "all") == 0)
+			{
+				player->health = 0;
+				player->client->ps.stats[STAT_HEALTH] = 0;
+				if (player->die)
+				{
+					player->die(player, player, player, 100, MOD_UNKNOWN);
+				}
+			}
+		}
+	}
+}
+
 // zyk: spawns a quest npc and sets additional stuff, like levels, etc
 extern int zyk_max_skill_level(int skill_index);
 extern int zyk_max_magic_power(gentity_t* ent);
@@ -424,7 +448,7 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 	}
 
 	if (!chosen_entity)
-	{ // zyk: if for some reason there was no chosen entity, the skill crystal will be spawned later
+	{ // zyk: if for some reason there was no chosen entity, try again later
 		return;
 	}
 
@@ -460,7 +484,7 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 
 	if (npc_ent && npc_ent->client)
 	{
-		vec3_t npc_origin, npc_angles;
+		// vec3_t npc_origin, npc_angles;
 
 		npc_ent->client->pers.quest_npc = 1;
 		npc_ent->client->pers.quest_npc_event = 0;
@@ -485,17 +509,22 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 0;
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ((bonuses / 10) + 1);
 
-			if (Q_stricmp(npc_type, "quest_minion_1") == 0 || Q_stricmp(npc_type, "quest_minion_5") == 0)
-			{ // zyk: magic user tier 1, will have higher level in his magic-based skills
+			if (Q_stricmp(npc_type, "quest_minion_1") == 0)
+			{ // zyk: magic users, will have higher level in his magic-based skills
+				magic_level_bonus = 2;
+				npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 1 + (bonuses / (QUEST_MAX_ENEMIES / 4));
+				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 5;
+			}
+			else if (Q_stricmp(npc_type, "quest_minion_2") == 0)
+			{ // zyk: magic users, will have higher level in his magic-based skills
 				magic_level_bonus = 1;
 				npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / 4));
-				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 2;
+				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 4;
 			}
 
 			npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
-
 			
-			if (Q_stricmp(npc_type, "quest_minion_5") == 0)
+			if (Q_stricmp(npc_type, "quest_minion_2") == 0)
 			{ // zyk: elemental enemy. Will have a specific element
 				int chosen_element = Q_irand(0, 5) + 1;
 
@@ -507,16 +536,18 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 				// zyk: adding all magic powers to this npc
 				while (current_magic_skill < NUMBER_OF_SKILLS)
 				{
-					npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / 8));
+					npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / 7));
 
 					current_magic_skill++;
 				}
 			}
 		}
 
+		/*
 		VectorSet(npc_origin, x, y, z);
 		VectorSet(npc_angles, 0, yaw, 0);
 		zyk_TeleportPlayer(npc_ent, npc_origin, npc_angles);
+		*/
 	}
 }
 
@@ -4438,30 +4469,6 @@ int BG_GetTime(void)
 	return level.time;
 }
 
-// zyk: function to kill npcs with the name as parameter
-void zyk_NPC_Kill_f( char *name )
-{
-	int	n = 0;
-	gentity_t *player = NULL;
-
-	for ( n = level.maxclients; n < level.num_entities; n++) 
-	{
-		player = &g_entities[n];
-		if ( player && player->NPC && player->client )
-		{
-			if(Q_stricmp( name, player->NPC_type ) == 0 || Q_stricmp( name, "all" ) == 0)
-			{
-				player->health = 0;
-				player->client->ps.stats[STAT_HEALTH] = 0;
-				if (player->die)
-				{
-					player->die(player, player, player, 100, MOD_UNKNOWN);
-				}
-			}
-		}
-	}
-}
-
 // zyk: tests if ent has other as ally
 qboolean zyk_is_ally(gentity_t *ent, gentity_t *other)
 {
@@ -5120,7 +5127,7 @@ int zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, i
 void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 {
 	float x, y, z;
-	int distance_factor = ent->client->pers.magic_crystals + zyk_total_skillpoints(ent);
+	int distance_factor = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
 	int min_entity_id = (MAX_CLIENTS + BODY_QUEUE_SIZE);
 	int max_entity_id = level.num_entities - 1;
 	int chosen_entity_index = 0; // zyk: magic crystal origin will be at a random map entity origin
@@ -7047,11 +7054,11 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 24)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the Brotherhood of Mages, lead by %s^7, are trying to take over everything\n\"", QUESTCHAR_ALL_SPIRITS, QUESTCHAR_MAINVILLAIN_NAME));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: the Brotherhood of Mages is weakening us in their quest for power.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 25)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: he has minions striking everywhere, giving power to him and weakening us.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Defeat enough of them so we will be strong enough to defeat what is left of them\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 26)
 	{
@@ -7076,17 +7083,22 @@ void zyk_show_tutorial(gentity_t* ent)
 
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = 180000; // zyk: default interval time will be 3 minutes
+	int interval_time = 180000; // zyk: default interval time
 
 	interval_time -= (ent->client->pers.quest_defeated_enemies * 800);
 
 	// zyk: also decrease time based on player skills and magic crystals
 	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 1000);
 
-	// zyk: wait at least 1500 ms
-	if (interval_time < 1500)
+	// zyk: wait a minimum interval
+	if (interval_time < 3000)
 	{
-		interval_time = 1500;
+		interval_time = 3000;
+	}
+
+	if (ent->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
+	{ // zyk: set the timer to spawn the final boss
+		interval_time = Q_irand(30000, 60000);
 	}
 	
 	ent->client->pers.quest_event_timer = level.time + interval_time;
@@ -7095,7 +7107,7 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 void zyk_set_magic_crystal_respawn_time(gentity_t* ent)
 {
 	int magic_crystal_respawn_time = RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent));
-	int interval_decrease = ent->client->pers.quest_defeated_enemies * 50;
+	int interval_decrease = ent->client->pers.quest_defeated_enemies * 100;
 	int total_interval = RPG_MAGIC_CRYSTAL_RESPAWN_TIME + magic_crystal_respawn_time - interval_decrease;
 
 	if (total_interval < RPG_MAGIC_CRYSTAL_RESPAWN_TIME)
@@ -8846,16 +8858,18 @@ void G_RunFrame( int levelTime ) {
 				if (level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
 					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
-					ent->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES && 
 					ent->client->pers.quest_event_timer < level.time && 
 					level.num_entities < (ENTITYNUM_MAX_NORMAL - 22) /* zyk: this is to guarantee the map will not crash */
 					)
 				{
-					int enemy_type = Q_irand(1, 5);
-
 					zyk_set_quest_event_timer(ent);
 
-					zyk_spawn_quest_npc(G_NewString(va("quest_minion_%d", enemy_type)), ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies);
+					if (ent->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES)
+					{
+						int enemy_type = Q_irand(1, 5);
+
+						zyk_spawn_quest_npc(G_NewString(va("quest_minion_%d", enemy_type)), ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies);
+					}
 				}
 			}
 

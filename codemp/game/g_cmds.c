@@ -6006,7 +6006,14 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				if (zyk_allow_quests.integer == 1)
 				{
-					trap->SendServerCommand(ent->s.number, va("print \"\n^3Defeat the Brotherhood of Mages\n\nEnemies Defeated: ^7%d/%d\n\n\"", ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES));
+					if (ent->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES)
+					{
+						trap->SendServerCommand(ent->s.number, va("print \"\n^3Defeat the Brotherhood of Mages\n\n^7The Brotherhood of mages is attacking!\nKeep defeating them until all are defeated\n\n^3Enemies Defeated: ^7%d/%d\n\n\"", ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES));
+					}
+					else
+					{
+						trap->SendServerCommand(ent->s.number, "print \"\n^3Completed\n\n\"");
+					}
 				}
 				else
 				{

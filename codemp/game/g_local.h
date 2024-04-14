@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.16"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.17"
 
 #define SECURITY_LOG "security.log"
 
@@ -797,9 +797,8 @@ typedef enum {
 
 // zyk: main characters names
 #define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
-#define QUESTCHAR_MAINVILLAIN_NAME "^1Drakon"
 
-// zyk: max quest non-boss enemies that the player can defeat
+// zyk: max quest enemies that the player must defeat
 #define QUEST_MAX_ENEMIES 400
 
 // client data that stays across multiple respawns, but is cleared
