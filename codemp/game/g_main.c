@@ -405,17 +405,9 @@ void zyk_NPC_Kill_f(char* name)
 	}
 }
 
-// zyk: spawns a quest npc and sets additional stuff, like levels, etc
-extern int zyk_max_skill_level(int skill_index);
-extern int zyk_max_magic_power(gentity_t* ent);
-void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
+gentity_t* zyk_find_entity_for_quest()
 {
-	gentity_t* npc_ent = NULL;
-
-	float x, y, z;
-	int min_distance = 1, max_distance = 20;
 	int min_entity_id = (MAX_CLIENTS + BODY_QUEUE_SIZE);
-	int max_entity_id = level.num_entities - 1;
 	int chosen_entity_index = 0; // zyk: npc origin will be at a random map entity origin
 	gentity_t* chosen_entity = NULL;
 	int i = 0, j = 0;
@@ -446,6 +438,27 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 
 		j++;
 	}
+
+	if (chosen_entity && Q_stricmp(chosen_entity->classname, "lightsaber") == 0)
+	{ // zyk: do not use the lightsaber entity for quests
+		chosen_entity = NULL;
+	}
+
+	return chosen_entity;
+}
+
+// zyk: spawns a quest npc and sets additional stuff, like levels, etc
+extern int zyk_max_skill_level(int skill_index);
+extern int zyk_max_magic_power(gentity_t* ent);
+void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
+{
+	gentity_t* npc_ent = NULL;
+
+	float x, y, z;
+	int min_distance = 1, max_distance = 20;
+	gentity_t* chosen_entity = NULL;
+
+	chosen_entity = zyk_find_entity_for_quest();
 
 	if (!chosen_entity)
 	{ // zyk: if for some reason there was no chosen entity, try again later
@@ -5128,42 +5141,13 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
 {
 	float x, y, z;
 	int distance_factor = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
-	int min_entity_id = (MAX_CLIENTS + BODY_QUEUE_SIZE);
-	int max_entity_id = level.num_entities - 1;
-	int chosen_entity_index = 0; // zyk: magic crystal origin will be at a random map entity origin
 	gentity_t* chosen_entity = NULL;
-	int i = 0, j = 0;
-	int total_entities_in_use = 0;
 	int crystal_model_id = 0;
 
-	// zyk: get all entities in use
-	for (i = min_entity_id; i < level.num_entities; i++)
-	{
-		gentity_t *current_entity = &g_entities[i];
-
-		if (current_entity && current_entity->inuse == qtrue)
-		{
-			total_entities_in_use++;
-		}
-	}
-
-	chosen_entity_index = Q_irand(0, (total_entities_in_use - 1));
-
-	for (i = min_entity_id; i < level.num_entities; i++)
-	{
-		gentity_t* current_entity = &g_entities[i];
-
-		if (current_entity && current_entity->inuse == qtrue && chosen_entity_index == j)
-		{ // zyk: found the entity
-			chosen_entity = current_entity;
-			break;
-		}
-
-		j++;
-	}
+	chosen_entity = zyk_find_entity_for_quest();
 
 	if (!chosen_entity)
-	{ // zyk: if for some reason there was no chosen entity, the magic crystal will be spawned later
+	{ // zyk: if for some reason there was no chosen entity, try again later
 		return;
 	}
 
