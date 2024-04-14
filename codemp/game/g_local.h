@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.17"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.18"
 
 #define SECURITY_LOG "security.log"
 
@@ -603,12 +603,6 @@ typedef enum {
 	NUM_QUEST_ARTIFACTS
 } zyk_quest_artifact_t;
 
-// zyk: quest missions
-typedef enum {
-	QUEST_FINAL_BOSS,
-	NUM_QUEST_MISSIONS
-} zyk_quest_t;
-
 typedef enum {
 	MAPMUSIC_NONE,
 	NUM_MAP_MUSIC
@@ -800,6 +794,9 @@ typedef enum {
 
 // zyk: max quest enemies that the player must defeat
 #define QUEST_MAX_ENEMIES 400
+
+// zyk: minimum amount of quest tries
+#define MIN_QUEST_TRIES 1
 
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
@@ -999,8 +996,8 @@ typedef struct clientPersistant_s {
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
 
-	// zyk: bitvalue for each quest mission completed
-	int quest_progress;
+	// zyk: quest control fields
+	int quest_tries;
 	int quest_defeated_enemies;
 	int quest_event_timer;
 

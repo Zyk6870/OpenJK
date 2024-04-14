@@ -2173,7 +2173,7 @@ void load_account(gentity_t* ent)
 
 			// zyk: quest fields
 			fscanf(account_file, "%s", content);
-			ent->client->pers.quest_progress = atoi(content);
+			ent->client->pers.quest_tries = atoi(content);
 
 			fscanf(account_file, "%s", content);
 			ent->client->pers.quest_defeated_enemies = atoi(content);
@@ -2263,7 +2263,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
 			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_progress, client->pers.quest_defeated_enemies,
+				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, client->pers.quest_defeated_enemies,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
@@ -5195,7 +5195,7 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	{
 		initialize_rpg_skills(ent, qtrue);
 
-		ent->client->pers.quest_progress = 0;
+		ent->client->pers.quest_tries = MIN_QUEST_TRIES;
 		ent->client->pers.quest_defeated_enemies = 0;
 
 		zyk_set_quest_event_timer(ent);
@@ -5482,7 +5482,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 		strcpy(content, va("%s%s", content, zyk_get_settings_values(ent)));
 
 		strcpy(content, va("%s%d-%d-%d-", 
-			content, 0, ent->client->pers.quest_progress, 22));
+			content, 0, ent->client->pers.quest_defeated_enemies, 22));
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%d-%d/%d-%d-NOCLASS-%s\"",ent->client->pers.magic_crystals,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
 	}
@@ -6008,7 +6008,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (ent->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^3Defeat the Brotherhood of Mages\n\n^7The Brotherhood of mages is attacking!\nKeep defeating them until all are defeated\n\n^3Enemies Defeated: ^7%d/%d\n\n\"", ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES));
+						trap->SendServerCommand(ent->s.number, va("print \"\n^3Defeat the Brotherhood of Mages\n\n^7The Brotherhood of mages is attacking!\nKeep defeating them until all are defeated\n\n^3Enemies Defeated: ^7%d/%d\n^3Quest tries: ^7%d\n\n\"", ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES, ent->client->pers.quest_tries));
 					}
 					else
 					{
@@ -11871,7 +11871,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 		{
 			if (Q_stricmp(arg2, "quests") == 0)
 			{
-				ent->client->pers.quest_progress = 0;
+				ent->client->pers.quest_tries = MIN_QUEST_TRIES;
 				ent->client->pers.quest_defeated_enemies = 0;
 				zyk_set_quest_event_timer(ent);
 

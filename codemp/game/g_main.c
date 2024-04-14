@@ -5080,12 +5080,12 @@ void zyk_spawn_energy_modulator_model(float x, float y, float z, int model_scale
 }
 
 extern int zyk_total_skillpoints(gentity_t* ent);
-void zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration, int magic_crystal_model_id)
+void zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration, int magic_crystal_model_id, char *crystal_type)
 {
 	gentity_t* new_ent = G_Spawn();
 
 	zyk_set_entity_field(new_ent, "classname", "fx_runner");
-	zyk_set_entity_field(new_ent, "targetname", "zyk_magic_crystal");
+	zyk_set_entity_field(new_ent, "targetname", G_NewString(crystal_type));
 	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
 
 	new_ent->s.modelindex = G_EffectIndex("force/heal2");
@@ -5124,7 +5124,7 @@ int zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, i
 }
 
 // zyk: spawn the model and effect used by magic crystals
-void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
+void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
 {
 	float x, y, z;
 	int distance_factor = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
@@ -5200,8 +5200,16 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration)
 		z += chosen_entity->s.origin[2];
 	}
 
-	crystal_model_id = zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration);
-	zyk_spawn_skill_crystal_effect(x, y, z, duration, crystal_model_id);
+	if (crystal_type == 1)
+	{
+		crystal_model_id = zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration);
+		zyk_spawn_skill_crystal_effect(x, y, z, duration, crystal_model_id, "zyk_magic_crystal");
+	}
+	else
+	{
+		crystal_model_id = zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration);
+		zyk_spawn_skill_crystal_effect(x, y, z, duration, crystal_model_id, "zyk_extra_tries_crystal");
+	}
 }
 
 // zyk: clear effects of some special powers
@@ -6939,25 +6947,25 @@ void zyk_show_tutorial(gentity_t* ent)
 	if (ent->client->pers.tutorial_step == 0)
 	{
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 150000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0], ent->r.currentOrigin[1] + 100, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 150000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 150000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 150000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 150000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] - 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 150000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 155000);
 
 		VectorSet(effect_origin, ent->r.currentOrigin[0] + 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 150000);
+		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 155000);
 	}
 
 	if (ent->client->pers.tutorial_step == 1)
@@ -7058,7 +7066,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 25)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Defeat enough of them so we will be strong enough to defeat what is left of them\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Defeat enough of them so we will be strong enough to defeat what is left of them.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 26)
 	{
@@ -7066,13 +7074,17 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 27)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There is a rare green crystal that may help in your quest if you find it.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: But beware. They will become stronger over the time.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 28)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There is a rare green crystal that gives you extra quest tries. If you have no tries left the quest is reset.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 29)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
+	}
+	if (ent->client->pers.tutorial_step == 30)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! We are counting on you.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 
@@ -7094,11 +7106,6 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 	if (interval_time < 3000)
 	{
 		interval_time = 3000;
-	}
-
-	if (ent->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
-	{ // zyk: set the timer to spawn the final boss
-		interval_time = Q_irand(30000, 60000);
 	}
 	
 	ent->client->pers.quest_event_timer = level.time + interval_time;
@@ -8846,9 +8853,13 @@ void G_RunFrame( int levelTime ) {
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 9);
 
-					if (magic_crystal_chance_to_spawn < 8)
-					{
-						zyk_spawn_skill_crystal(ent, 60000);
+					if (magic_crystal_chance_to_spawn < 9)
+					{ // zyk: Magic Crystal
+						zyk_spawn_skill_crystal(ent, 60000, 1);
+					}
+					else
+					{ // zyk: Extra Tries Crystal
+						zyk_spawn_skill_crystal(ent, 60000, 2);
 					}
 
 					zyk_set_magic_crystal_respawn_time(ent);

@@ -2194,6 +2194,24 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		}
 	}
 
+	if (self->client->sess.amrpgmode == 2 && !(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
+		self->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES && 
+		(!(self->client->pers.player_statuses & (1 << 24) || (attacker && attacker->client && attacker != self))) // zyk: dont reset in this case, for example, when player logs into his account
+		)
+	{ // zyk: player died in quest. Decrease number of tries
+		self->client->pers.quest_tries--;
+
+		if (self->client->pers.quest_tries <= 0)
+		{
+			self->client->pers.quest_tries = MIN_QUEST_TRIES;
+			self->client->pers.quest_defeated_enemies = 0;
+
+			trap->SendServerCommand(self->s.number, "chat \"^3Quest System: ^7You have no tries left. Quests reset\n\"");
+		}
+
+		save_account(self, qtrue);
+	}
+
 	if (attacker && attacker->client && attacker->client->pers.quest_npc > 0 && attacker->enemy && attacker->enemy == self)
 	{ // zyk: quest npc defeated an enemy. Clear it to find a new one and stop all magic powers
 		attacker->enemy = NULL;

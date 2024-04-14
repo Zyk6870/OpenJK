@@ -2812,7 +2812,7 @@ void fx_runner_think( gentity_t *ent )
 	}
 
 	// zyk: Magic Crystal. Tests if there is a RPG player touching it
-	if (Q_stricmp(ent->targetname, "zyk_magic_crystal") == 0)
+	if (Q_stricmp(ent->targetname, "zyk_magic_crystal") == 0 || Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0)
 	{
 		int i = 0;
 
@@ -2824,7 +2824,14 @@ void fx_runner_think( gentity_t *ent )
 			{ // zyk: a logged RPG player
 				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < 45)
 				{
-					player_ent->client->pers.magic_crystals++;
+					if (Q_stricmp(ent->targetname, "zyk_magic_crystal") == 0)
+					{
+						player_ent->client->pers.magic_crystals++;
+					}
+					else
+					{
+						player_ent->client->pers.quest_tries++;
+					}
 
 					save_account(player_ent, qtrue);
 
