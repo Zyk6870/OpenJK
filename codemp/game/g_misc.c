@@ -2811,8 +2811,10 @@ void fx_runner_think( gentity_t *ent )
 		}
 	}
 
-	// zyk: Magic Crystal. Tests if there is a RPG player touching it
-	if (Q_stricmp(ent->targetname, "zyk_magic_crystal") == 0 || Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0)
+	// zyk: one of the crystal types. Tests if there is a RPG player touching it
+	if (Q_stricmp(ent->targetname, "zyk_magic_crystal") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_secret_crystal") == 0)
 	{
 		int i = 0;
 
@@ -2830,11 +2832,19 @@ void fx_runner_think( gentity_t *ent )
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 					}
-					else
+					else if (Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0)
 					{
 						player_ent->client->pers.quest_tries++;
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/pickup_battery.mp3"));
+					}
+					else if (player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
+					{ // zyk: player that has the Energy Modulator cannot play the puzzle again
+						trap->SendServerCommand(player_ent->s.number, "chat \"^3Quest System: ^7You found a secret! Press ^2Use ^7key to start the puzzle\n\"");
+
+						player_ent->client->pers.player_statuses |= (1 << 7);
+
+						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
 					}
 
 					save_account(player_ent, qtrue);

@@ -1693,6 +1693,25 @@ void TryUse( gentity_t *ent )
 
 	VectorMA( src, USE_DISTANCE, vf, dest );
 
+	if (ent->client->sess.amrpgmode == 2 && 
+		ent->client->pers.player_statuses & (1 << 7) && 
+		ent->client->pers.cmd.buttons & BUTTON_USE &&
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
+	{ // zyk: start the puzzle
+		VectorCopy(ent->client->ps.origin, level.legendary_artifact_origin);
+
+		level.legendary_artifact_step = QUEST_SECRET_SPAWN_CRYSTALS_STEP;
+
+		ent->client->pers.player_statuses &= ~(1 << 7);
+
+		// zyk: setting use anim
+		ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+		ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
+		ent->client->ps.forceHandExtendTime = level.time + 500;
+
+		return;
+	}
+
 	//Trace ahead to find a valid target
 	trap->Trace( &trace, src, vec3_origin, vec3_origin, dest, ent->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, qfalse, 0, 0 );
 
@@ -1820,30 +1839,23 @@ void TryUse( gentity_t *ent )
 
 		return;
 	}
-	else if (level.legendary_artifact_map == QUESTARTIFACT_ENERGY_MODULATOR && 
-		target && Q_stricmp(target->targetname, "zyk_puzzle_model") == 0)
+	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0 &&
+			level.legendary_artifact_step >= QUEST_SECRET_CHOSEN_CRYSTALS_STEP && 
+			level.legendary_artifact_step < QUEST_SECRET_CORRECT_CRYSTALS_STEP && 
+			target && target->count > 0 && 
+			Q_stricmp(target->targetname, "zyk_puzzle_model") == 0)
 	{ // zyk: player touched one of the puzzle crystals
-		if (target->count == 7 && level.legendary_artifact_step == 1)
-		{ // zyk: main crystal, start the puzzle
-			G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+		if (level.legendary_crystal_chosen[level.legendary_artifact_step - QUEST_SECRET_CHOSEN_CRYSTALS_STEP] == target->count)
+		{ // zyk: one of the crystals chosen in the correct order
+			G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
 
-			level.legendary_artifact_step = 2;
+			level.legendary_artifact_step++;
 		}
+		else
+		{ // zyk: wrong crystal in the order, stop the puzzle
+			G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/weapons/overchargeend.wav"));
 
-		if (level.legendary_artifact_step >= 12 && level.legendary_artifact_step < (12 + LEGENDARY_CRYSTALS_CHOSEN))
-		{
-			if (level.legendary_crystal_chosen[level.legendary_artifact_step - 12] == target->count)
-			{ // zyk: one of the crystals chosen in the correct order
-				G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
-
-				level.legendary_artifact_step++;
-			}
-			else
-			{ // zyk: wrong crystal in the order, stop the puzzle
-				G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/weapons/overchargeend.wav"));
-
-				level.legendary_artifact_step = 1;
-			}
+			level.legendary_artifact_step = QUEST_SECRET_CLEAR_STEP;
 		}
 
 		// zyk: setting use anim
@@ -1853,23 +1865,23 @@ void TryUse( gentity_t *ent )
 
 		return;
 	}
-	else if (level.legendary_artifact_map == QUESTARTIFACT_ENERGY_MODULATOR && 
-		target && Q_stricmp(target->targetname, "zyk_energy_modulator_model") == 0)
+	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0 &&
+			level.legendary_artifact_step == QUEST_SECRET_SECRET_ITEM_SPAWNED_STEP &&
+			target && target->count == 7 && 
+			Q_stricmp(target->targetname, "zyk_energy_modulator_model") == 0)
 	{ // zyk: player touched the Energy Modulator after solving the puzzle
-		if (ent->client->sess.amrpgmode == 2 &&
-			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
-		{
-			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 1;
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 1;
 
-			save_account(ent, qtrue);
+		save_account(ent, qtrue);
 
-			target->think = G_FreeEntity;
-			target->nextthink = level.time;
+		target->think = G_FreeEntity;
+		target->nextthink = level.time;
 
-			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/tram_boost.mp3"));
 
-			trap->SendServerCommand(ent->s.number, "print \"^3Quest System: ^7You got the legendary ^3Energy Modulator\n\"");
-		}
+		level.legendary_artifact_step = QUEST_SECRET_CLEAR_STEP;
+
+		trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You got the legendary ^3Energy Modulator^7\n\"");
 
 		// zyk: setting use anim
 		ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;

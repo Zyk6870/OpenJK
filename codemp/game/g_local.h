@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.21"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.22"
 
 #define SECURITY_LOG "security.log"
 
@@ -598,12 +598,6 @@ typedef enum {
 } zyk_seller_item_t;
 
 typedef enum {
-	QUESTARTIFACT_NONE,
-	QUESTARTIFACT_ENERGY_MODULATOR,
-	NUM_QUEST_ARTIFACTS
-} zyk_quest_artifact_t;
-
-typedef enum {
 	MAPMUSIC_NONE,
 	NUM_MAP_MUSIC
 } zyk_map_music_t;
@@ -836,7 +830,7 @@ typedef struct clientPersistant_s {
 	// 4 - Scaled player
 	// 5 - Chat protection activated for this player
 	// 6 - Paralyzed by an admin
-	// 7 - unused
+	// 7 - got a rare red crystal for the artifact puzzle
 	// 8 - unused
 	// 9 - unused
 	// 10 - unused
@@ -1383,8 +1377,18 @@ typedef struct {
 // zyk: max matches a tournament may have
 #define MAX_DUEL_MATCHES 496
 
-// zyk: number of chosen crystals in a puzzle
+// zyk: number of chosen crystals in the secret artifact puzzle
 #define LEGENDARY_CRYSTALS_CHOSEN 10
+
+typedef enum {
+	QUEST_SECRET_INIT_STEP,
+	QUEST_SECRET_SPAWN_CRYSTALS_STEP,
+	QUEST_SECRET_START_PUZZLE_STEP,
+	QUEST_SECRET_CHOSEN_CRYSTALS_STEP = (QUEST_SECRET_START_PUZZLE_STEP + LEGENDARY_CRYSTALS_CHOSEN),
+	QUEST_SECRET_CORRECT_CRYSTALS_STEP = (QUEST_SECRET_CHOSEN_CRYSTALS_STEP + LEGENDARY_CRYSTALS_CHOSEN),
+	QUEST_SECRET_SECRET_ITEM_SPAWNED_STEP,
+	QUEST_SECRET_CLEAR_STEP
+} zyk_quest_secret_step_t;
 
 typedef struct level_locals_s {
 	struct gclient_s	*clients;		// [maxclients]
@@ -1664,9 +1668,9 @@ typedef struct level_locals_s {
 	char zykmapname[128];
 
 	// zyk: some maps will have legendary artifacts
-	zyk_quest_artifact_t legendary_artifact_map;
-	int legendary_artifact_step;
+	zyk_quest_secret_step_t legendary_artifact_step;
 	int legendary_artifact_debounce_timer;
+	vec3_t legendary_artifact_origin;
 	int legendary_crystal_chosen[LEGENDARY_CRYSTALS_CHOSEN];
 
 	char		mapname[MAX_QPATH];

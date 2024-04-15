@@ -743,15 +743,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		level.sp_map = qtrue;
 	}
 
-	level.legendary_artifact_map = QUESTARTIFACT_NONE;
-	level.legendary_artifact_step = 0;
+	level.legendary_artifact_step = QUEST_SECRET_INIT_STEP;
 	level.legendary_artifact_debounce_timer = 0;
-
-	// zyk: making case sensitive comparing so only low case quest map names will be set to play quests. This allows building these maps without conflicting with quests
-	if (Q_strncmp(zyk_mapname, "yavin1b", 8) == 0)
-	{
-		level.legendary_artifact_map = QUESTARTIFACT_ENERGY_MODULATOR;
-	}
 
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString(qfalse);
@@ -5079,7 +5072,7 @@ void zyk_spawn_energy_modulator_model(float x, float y, float z, int model_scale
 
 	zyk_spawn_entity(new_ent);
 
-	new_ent->count = 8;
+	new_ent->count = 7;
 }
 
 extern int zyk_total_skillpoints(gentity_t* ent);
@@ -5179,10 +5172,15 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
 		crystal_model_id = zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration);
 		zyk_spawn_skill_crystal_effect(x, y, z, duration, crystal_model_id, "zyk_magic_crystal");
 	}
-	else
+	else if (crystal_type == 2)
 	{
 		crystal_model_id = zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration);
 		zyk_spawn_skill_crystal_effect(x, y, z, duration, crystal_model_id, "zyk_extra_tries_crystal");
+	}
+	else
+	{
+		crystal_model_id = zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration);
+		zyk_spawn_skill_crystal_effect(x, y, z, duration, crystal_model_id, "zyk_secret_crystal");
 	}
 }
 
@@ -7088,7 +7086,7 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 void zyk_set_magic_crystal_respawn_time(gentity_t* ent)
 {
 	int magic_crystal_respawn_time = RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent));
-	int interval_decrease = ent->client->pers.quest_defeated_enemies * 100;
+	int interval_decrease = ent->client->pers.quest_defeated_enemies * (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL / 2);
 	int total_interval = RPG_MAGIC_CRYSTAL_RESPAWN_TIME + magic_crystal_respawn_time - interval_decrease;
 
 	if (total_interval < RPG_MAGIC_CRYSTAL_RESPAWN_TIME)
@@ -8063,69 +8061,84 @@ void G_RunFrame( int levelTime ) {
 		level.load_entities_timer = 0;
 	}
 
-	if (level.legendary_artifact_map > QUESTARTIFACT_NONE && level.load_entities_timer == 0 &&
+	if (level.load_entities_timer == 0 && level.legendary_artifact_step >= QUEST_SECRET_SPAWN_CRYSTALS_STEP &&
 		level.legendary_artifact_debounce_timer < level.time)
 	{ // zyk: map has an legendary artifact
-		if (level.legendary_artifact_map == QUESTARTIFACT_ENERGY_MODULATOR)
-		{
-			if (level.legendary_artifact_step == 0)
-			{ // zyk: spawns the crystal models
+		if (level.legendary_artifact_step == QUEST_SECRET_SPAWN_CRYSTALS_STEP)
+		{ // zyk: spawns the crystal models
+			int crystal_scale = 90;
+			int model_x = level.legendary_artifact_origin[0];
+			int model_y = level.legendary_artifact_origin[1];
+			int model_z = level.legendary_artifact_origin[2];
 
-				// zyk: main crystal
-				zyk_spawn_legendary_artifact_puzzle_model(1887, 4479, 1432, 100, "models/map_objects/mp/crystal_red.md3", 7);
-				zyk_spawn_legendary_artifact_puzzle_model(1887, 4479, 1432, 100, "models/map_objects/mp/crystal_green.md3", 0);
-				zyk_spawn_legendary_artifact_puzzle_model(1887, 4479, 1432, 100, "models/map_objects/mp/crystal_blue.md3", 0);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x + 82, model_y + 46, model_z, crystal_scale, "models/map_objects/mp/crystal_red.md3", 1);
 
-				// zyk: other crystals
+			zyk_spawn_legendary_artifact_puzzle_model(model_x + 82, model_y - 46, model_z, crystal_scale, "models/map_objects/mp/crystal_green.md3", 2);
 
-				zyk_spawn_legendary_artifact_puzzle_model(1968, 4525, 1432, 100, "models/map_objects/mp/crystal_red.md3", 1);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x - 82, model_y + 46, model_z, crystal_scale, "models/map_objects/mp/crystal_blue.md3", 3);
 
-				zyk_spawn_legendary_artifact_puzzle_model(1968, 4433, 1432, 100, "models/map_objects/mp/crystal_green.md3", 2);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x - 82, model_y - 46, model_z, crystal_scale, "models/map_objects/mp/crystal_red.md3", 4);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x - 82, model_y - 46, model_z, crystal_scale, "models/map_objects/mp/crystal_green.md3", 0);
 
-				zyk_spawn_legendary_artifact_puzzle_model(1804, 4525, 1432, 100, "models/map_objects/mp/crystal_blue.md3", 3);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x, model_y + 84, model_z, crystal_scale, "models/map_objects/mp/crystal_red.md3", 5);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x, model_y + 84, model_z, crystal_scale, "models/map_objects/mp/crystal_blue.md3", 0);
 
-				zyk_spawn_legendary_artifact_puzzle_model(1804, 4433, 1432, 100, "models/map_objects/mp/crystal_red.md3", 4);
-				zyk_spawn_legendary_artifact_puzzle_model(1804, 4433, 1432, 100, "models/map_objects/mp/crystal_green.md3", 0);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x, model_y - 84, model_z, crystal_scale, "models/map_objects/mp/crystal_green.md3", 6);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x, model_y - 84, model_z, crystal_scale, "models/map_objects/mp/crystal_blue.md3", 0);
 
-				zyk_spawn_legendary_artifact_puzzle_model(1887, 4563, 1432, 100, "models/map_objects/mp/crystal_red.md3", 5);
-				zyk_spawn_legendary_artifact_puzzle_model(1887, 4563, 1432, 100, "models/map_objects/mp/crystal_blue.md3", 0);
+			level.legendary_artifact_step = QUEST_SECRET_START_PUZZLE_STEP;
 
-				zyk_spawn_legendary_artifact_puzzle_model(1887, 4395, 1432, 100, "models/map_objects/mp/crystal_green.md3", 6);
-				zyk_spawn_legendary_artifact_puzzle_model(1887, 4395, 1432, 100, "models/map_objects/mp/crystal_blue.md3", 0);
+			level.legendary_artifact_debounce_timer = level.time + 2000;
+		}
+		else if (level.legendary_artifact_step >= QUEST_SECRET_START_PUZZLE_STEP && level.legendary_artifact_step < QUEST_SECRET_CHOSEN_CRYSTALS_STEP)
+		{ // zyk: starts the memory puzzle by spawning effects the player must remember
+			int chosen_crystal = Q_irand(1, 6);
+			int j = 0;
 
-				level.legendary_artifact_step++;
+			level.legendary_crystal_chosen[level.legendary_artifact_step - QUEST_SECRET_START_PUZZLE_STEP] = chosen_crystal;
 
-				level.legendary_artifact_debounce_timer = level.time + 2000;
-			}
-			else if (level.legendary_artifact_step >= 2 && level.legendary_artifact_step <= 11)
-			{ // zyk: starts the memory puzzle by spawning effects the player must remember
-				int chosen_crystal = Q_irand(1, 6);
-				int j = 0;
+			level.legendary_artifact_step++;
 
-				level.legendary_crystal_chosen[level.legendary_artifact_step - 2] = chosen_crystal;
+			for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+			{ // zyk: show effect in the chosen crystal position
+				gentity_t* crystal_ent = &g_entities[j];
 
-				level.legendary_artifact_step++;
+				if (crystal_ent && Q_stricmp(crystal_ent->targetname, "zyk_puzzle_model") == 0 && crystal_ent->count == chosen_crystal)
+				{
+					zyk_spawn_puzzle_effect(crystal_ent);
 
-				for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
-				{ // zyk: show effect in the chosen crystal position
-					gentity_t* crystal_ent = &g_entities[j];
-
-					if (crystal_ent && Q_stricmp(crystal_ent->targetname, "zyk_puzzle_model") == 0 && crystal_ent->count == chosen_crystal)
-					{
-						zyk_spawn_puzzle_effect(crystal_ent);
-
-						G_Sound(crystal_ent, CHAN_AUTO, G_SoundIndex("sound/effects/tractorbeam.mp3"));
-					}
+					G_Sound(crystal_ent, CHAN_AUTO, G_SoundIndex("sound/effects/tractorbeam.mp3"));
 				}
-
-				level.legendary_artifact_debounce_timer = level.time + 2000;
 			}
-			else if (level.legendary_artifact_step == (12 + LEGENDARY_CRYSTALS_CHOSEN))
-			{ // zyk: player solved the puzzle, spawn the Energy Modulator
-				zyk_spawn_energy_modulator_model(2000, 4479, 1432, 30);
 
-				level.legendary_artifact_step++;
+			level.legendary_artifact_debounce_timer = level.time + 1500;
+		}
+		else if (level.legendary_artifact_step == QUEST_SECRET_CORRECT_CRYSTALS_STEP)
+		{ // zyk: player solved the puzzle, spawn the Energy Modulator
+			int energy_modulator_scale = 30;
+			int model_x = level.legendary_artifact_origin[0];
+			int model_y = level.legendary_artifact_origin[1];
+			int model_z = level.legendary_artifact_origin[2];
+
+			zyk_spawn_energy_modulator_model(model_x, model_y, model_z, energy_modulator_scale);
+
+			level.legendary_artifact_step = QUEST_SECRET_SECRET_ITEM_SPAWNED_STEP;
+		}
+		else if (level.legendary_artifact_step == QUEST_SECRET_CLEAR_STEP)
+		{ // zyk: clear the crystals
+			int j = 0;
+
+			for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+			{ // zyk: show effect in the chosen crystal position
+				gentity_t* crystal_ent = &g_entities[j];
+
+				if (crystal_ent && Q_stricmp(crystal_ent->targetname, "zyk_puzzle_model") == 0)
+				{
+					G_FreeEntity(crystal_ent);
+				}
 			}
+
+			level.legendary_artifact_step = QUEST_SECRET_INIT_STEP;
 		}
 	}
 
@@ -8825,15 +8838,19 @@ void G_RunFrame( int levelTime ) {
 				// zyk: skill crystals must be spawned after a certain amount of time
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
-					int magic_crystal_chance_to_spawn = Q_irand(0, 19);
+					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
 
-					if (magic_crystal_chance_to_spawn < 19)
+					if (magic_crystal_chance_to_spawn < 86)
 					{ // zyk: Magic Crystal
 						zyk_spawn_skill_crystal(ent, 60000, 1);
 					}
-					else
+					else if (magic_crystal_chance_to_spawn < 89)
 					{ // zyk: Extra Tries Crystal
-						zyk_spawn_skill_crystal(ent, 60000, 2);
+						zyk_spawn_skill_crystal(ent, 45000, 2);
+					}
+					else if (magic_crystal_chance_to_spawn < 90)
+					{ // zyk: Energy Modulator puzzle crystal
+						zyk_spawn_skill_crystal(ent, 30000, 3);
 					}
 
 					zyk_set_magic_crystal_respawn_time(ent);
