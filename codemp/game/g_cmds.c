@@ -6010,10 +6010,6 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					{
 						trap->SendServerCommand(ent->s.number, va("print \"\n^3Defeat the Brotherhood of Mages\n\n^7The Brotherhood of mages is attacking!\nKeep defeating them until all are defeated\n\n^3Enemies Defeated: ^7%d/%d\n^3Quest tries: ^7%d\n\n\"", ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES, ent->client->pers.quest_tries));
 					}
-					else if (ent->client->pers.quest_defeated_enemies == QUEST_MAX_ENEMIES)
-					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^3Final Battle\n\n^7Defeat the leader of the Brotherhood of Mages\n\n^3Quest tries: ^7%d\n\n\"", ent->client->pers.quest_tries));
-					}
 					else
 					{
 						trap->SendServerCommand(ent->s.number, "print \"\n^3Completed\n\n\"");

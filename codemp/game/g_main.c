@@ -495,89 +495,53 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 
 	npc_ent = Zyk_NPC_SpawnType(npc_type, x, y, z, yaw);
 
-	if (Q_stricmp(npc_type, "drakon") == 0)
-	{
-		level.quest_boss_validation_timer = level.time + 20000;
-	}
-
 	if (npc_ent && npc_ent->client)
 	{
+		int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
+		int current_magic_skill = first_magic_skill;
+		int magic_level_bonus = 0;
+
 		npc_ent->client->pers.quest_npc = 1;
-
-		if (Q_stricmp(npc_type, "drakon") == 0)
-		{
-			npc_ent->client->pers.quest_npc = 2;
-			level.quest_final_boss_in_map = qtrue;
-		}
-
 		npc_ent->client->pers.quest_npc_event = 0;
 		npc_ent->client->pers.quest_event_timer = 0;
 		npc_ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
+
 		npc_ent->NPC->stats.health += (bonuses * 3);
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
-		// zyk: setting magic powers
-		if (Q_stricmp(npc_type, "quest_minion_1") == 0 || Q_stricmp(npc_type, "quest_minion_2") == 0 || 
-			Q_stricmp(npc_type, "quest_minion_3") == 0 || Q_stricmp(npc_type, "quest_minion_4") == 0 || 
-			Q_stricmp(npc_type, "quest_minion_5") == 0 || Q_stricmp(npc_type, "drakon") == 0)
-		{
-			int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
-			int current_magic_skill = first_magic_skill;
-			int magic_level_bonus = 0;
+		// zyk: setting magic abilities
+		npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 0;
+		npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = (bonuses / 10) + 1;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 0;
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ((bonuses / 10) + 1);
+		if (Q_stricmp(npc_type, "quest_minion_1") == 0)
+		{ // zyk: magic users, will have higher level in his magic-based skills
+			magic_level_bonus = 3;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 2 + (bonuses / (QUEST_MAX_ENEMIES / 4));
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 10;
+		}
+		else if (Q_stricmp(npc_type, "quest_minion_2") == 0)
+		{ // zyk: magic users, will have higher level in his magic-based skills
+			magic_level_bonus = 2;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 1 + (bonuses / (QUEST_MAX_ENEMIES / 4));
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 5;
+		}
+		else if (Q_stricmp(npc_type, "quest_minion_3") == 0)
+		{ // zyk: magic users, will have higher level in his magic-based skills
+			magic_level_bonus = 1;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / 4));
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 2;
+		}
 
-			if (Q_stricmp(npc_type, "quest_minion_1") == 0)
-			{ // zyk: magic users, will have higher level in his magic-based skills
-				magic_level_bonus = 3;
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 1 + (bonuses / (QUEST_MAX_ENEMIES / 4));
-				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 4;
-			}
-			else if (Q_stricmp(npc_type, "quest_minion_2") == 0)
-			{ // zyk: magic users, will have higher level in his magic-based skills
-				magic_level_bonus = 1;
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 1 + (bonuses / (QUEST_MAX_ENEMIES / 4));
-				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 4;
-			}
-			else if (npc_ent->client->pers.quest_npc == 2)
-			{ // zyk: final boss will have a more powerful magic fist
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 5;
-				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = 10000;
-			}
-
-			npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
+		npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
 			
-			if (Q_stricmp(npc_type, "quest_minion_2") == 0)
-			{ // zyk: elemental enemy. Will have a specific element
-				int chosen_element = Q_irand(0, 5) + 1;
+		// zyk: adding all magic powers to this npc
+		while (current_magic_skill < NUMBER_OF_SKILLS)
+		{
+			npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / 6));
 
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 2 + (bonuses / (QUEST_MAX_ENEMIES / 5));
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE + chosen_element] = 4 + (bonuses / (QUEST_MAX_ENEMIES / 5));
-			}
-			else if (npc_ent->client->pers.quest_npc == 2)
-			{
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA] = 1 + zyk_max_skill_level(SKILL_MAGIC_HEALING_AREA);
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 1 + zyk_max_skill_level(SKILL_MAGIC_DOME_OF_DAMAGE);
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC] = 1 + zyk_max_skill_level(SKILL_MAGIC_WATER_MAGIC);
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC] = 1 + zyk_max_skill_level(SKILL_MAGIC_EARTH_MAGIC);
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] = 1 + zyk_max_skill_level(SKILL_MAGIC_FIRE_MAGIC);
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] = 1 + zyk_max_skill_level(SKILL_MAGIC_AIR_MAGIC);
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC] = 1 + zyk_max_skill_level(SKILL_MAGIC_DARK_MAGIC);
-				npc_ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC] = 1 + zyk_max_skill_level(SKILL_MAGIC_LIGHT_MAGIC);
-			}
-			else
-			{
-				// zyk: adding all magic powers to this npc
-				while (current_magic_skill < NUMBER_OF_SKILLS)
-				{
-					npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / 6));
-
-					current_magic_skill++;
-				}
-			}
+			current_magic_skill++;
 		}
 	}
 }
@@ -773,10 +737,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	level.legendary_artifact_step = QUEST_SECRET_INIT_STEP;
 	level.legendary_artifact_debounce_timer = 0;
-
-	level.quest_final_boss_in_map = qfalse;
-	level.quest_boss_validation_timer = 0;
-	level.final_boss_events = 0;
 
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString(qfalse);
@@ -8174,13 +8134,6 @@ void G_RunFrame( int levelTime ) {
 		}
 	}
 
-	// zyk: if for some reason not all bosses spawned, stop the final boss battle
-	if (level.quest_boss_validation_timer > 0 && level.quest_boss_validation_timer < level.time && level.quest_final_boss_in_map == qfalse)
-	{
-		level.quest_boss_validation_timer = 0;
-		level.final_boss_events = 0;
-	}
-
 	//
 	// go through all allocated objects
 	//
@@ -8907,65 +8860,32 @@ void G_RunFrame( int levelTime ) {
 				{
 					zyk_set_quest_event_timer(ent);
 
+					// zyk: spawning the enemies will depend on the enemy level, lower level enemies will appear earlier in the quest
 					if (ent->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES)
 					{
-						int enemy_type = Q_irand(1, 5);
+						int chance_to_spawn_enemy = Q_irand(0, 99);
+						int enemy_type = 0;
+						int enemy_tier = ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / 6);
+						int j = 0;
+						int enemy_chances[6][6] = { 
+							{0, 1, 2, 15, 35, 100}, // zyk: tier 6 highest chance to be spawned
+							{0, 3, 10, 20, 70, 100}, // zyk: tier 5 highest chance to be spawned
+							{1, 8, 25, 70, 90, 100}, // zyk: tier 4 highest chance to be spawned
+							{5, 15, 60, 85, 95, 100}, // zyk: tier 3 highest chance to be spawned
+							{20, 60, 80, 90, 98, 100}, // zyk: tier 2 highest chance to be spawned
+							{50, 75, 90, 95, 99, 100} // zyk: tier 1 highest chance to be spawned
+						};
+
+						for (j = 0; j < 6; j++)
+						{
+							if (chance_to_spawn_enemy < enemy_chances[enemy_tier][j])
+							{
+								enemy_type = j + 1;
+								break;
+							}
+						}
 
 						zyk_spawn_quest_npc(G_NewString(va("quest_minion_%d", enemy_type)), ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies);
-					}
-					else if (ent->client->pers.quest_defeated_enemies < (QUEST_MAX_ENEMIES + 1) && level.quest_final_boss_in_map == qfalse)
-					{ // zyk: spawns the final bosses
-						if (level.final_boss_events == 0)
-						{
-							zyk_NPC_Kill_f("all");
-
-							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We can finally defeat the remaining of the Brotherhood of Mages.\n\"", QUESTCHAR_ALL_SPIRITS));
-						}
-						else if (level.final_boss_events == 1)
-						{
-							zyk_NPC_Kill_f("all");
-
-							trap->SendServerCommand(ent->s.number, va("chat \"^1Drakon^7: Greetings! I am the leader Brotherhood of Mages.\n\""));
-						}
-						else if (level.final_boss_events == 2)
-						{
-							zyk_NPC_Kill_f("all");
-
-							trap->SendServerCommand(ent->s.number, va("chat \"^1Drakon^7: I will destroy all who oppose me!\n\""));
-						}
-						else if (level.final_boss_events == 3)
-						{
-							zyk_NPC_Kill_f("all");
-
-							trap->SendServerCommand(ent->s.number, va("chat \"^1Drakon^7: Then I will rebuild the Brotherhood again.\n\""));
-						}
-						else if (level.final_boss_events == 4)
-						{
-							zyk_NPC_Kill_f("all");
-
-							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We cannot stop him. Please defeat him and our victory will be complete.\n\"", QUESTCHAR_ALL_SPIRITS));
-						}
-						else if (level.final_boss_events == 5)
-						{
-							zyk_spawn_quest_npc("drakon", ent->client->ps.viewangles[YAW], 0);
-						}
-						else if (level.final_boss_events == 7)
-						{
-							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Nice! Now our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
-
-							ent->client->pers.quest_defeated_enemies = QUEST_COMPLETE_VALUE;
-
-							save_account(ent, qtrue);
-						}
-
-						if (level.final_boss_events < 6)
-						{
-							level.final_boss_events++;
-						}
-						else if (level.final_boss_events == 7)
-						{
-							level.final_boss_events = 0;
-						}
 					}
 				}
 			}

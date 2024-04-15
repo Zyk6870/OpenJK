@@ -2202,24 +2202,25 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 			attacker->client->pers.quest_defeated_enemies++;
 
 			if (attacker->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
-			{
+			{ // zyk: this RPG player completed the quest
+				int j = 0;
+
 				attacker->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
+
+				for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+				{
+					gentity_t* npc_ent = &g_entities[j];
+
+					if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc == 1)
+					{ // zyk: one of the quest enemies
+						zyk_NPC_Kill_f(npc_ent->NPC_type);
+					}
+				}
+
+				trap->SendServerCommand(attacker->s.number, va("chat \"%s^7: Nice! Our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
 			}
 
 			save_account(attacker, qtrue);
-		}
-		else if (self->client->pers.quest_npc == 2)
-		{ // zyk: defeated a boss
-			if (attacker->client->pers.quest_defeated_enemies == QUEST_MAX_ENEMIES)
-			{
-				level.final_boss_events = 7;
-				level.quest_final_boss_in_map = qfalse;
-			}
-			else
-			{ // zyk: boss died for other reasons
-				level.final_boss_events = 0;
-				level.quest_final_boss_in_map = qfalse;
-			}
 		}
 	}
 
@@ -2229,15 +2230,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		!(self->client->pers.player_statuses & (1 << 24) && meansOfDeath == MOD_SUICIDE) // zyk: dont reset in this case, for example, when player logs into his account
 		)
 	{ // zyk: player died in quest. Decrease number of tries
-		zyk_decrease_quest_tries(self);
-	}
-	else if (self->client->sess.amrpgmode == 2 && !(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
-		self->client->pers.quest_defeated_enemies == QUEST_MAX_ENEMIES && 
-		level.quest_final_boss_in_map == qtrue && 
-		!(attacker && attacker->client && attacker->s.number < MAX_CLIENTS) && // zyk: dying to a player will not count
-		!(self->client->pers.player_statuses & (1 << 24) && meansOfDeath == MOD_SUICIDE) // zyk: dont reset in this case, for example, when player logs into his account
-		) 
-	{ // zyk: player died in the final boss battle. Decrease number of tries
 		zyk_decrease_quest_tries(self);
 	}
 

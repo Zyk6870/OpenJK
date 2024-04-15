@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.25"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.26"
 
 #define SECURITY_LOG "security.log"
 
@@ -787,8 +787,7 @@ typedef enum {
 #define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
 
 // zyk: max quest enemies that the player must defeat
-#define QUEST_MAX_ENEMIES 400
-#define QUEST_COMPLETE_VALUE (QUEST_MAX_ENEMIES + 100)
+#define QUEST_MAX_ENEMIES 300
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 60000
@@ -1673,10 +1672,6 @@ typedef struct level_locals_s {
 	int legendary_artifact_debounce_timer;
 	vec3_t legendary_artifact_origin;
 	int legendary_crystal_chosen[LEGENDARY_CRYSTALS_CHOSEN];
-
-	qboolean quest_final_boss_in_map;
-	int quest_boss_validation_timer;
-	int final_boss_events;
 
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];
