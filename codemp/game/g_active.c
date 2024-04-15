@@ -1382,6 +1382,9 @@ void zyk_stamina_out(gentity_t* ent)
 			Jetpack_Off(ent);
 		}
 
+		// zyk: reset Stamina. If player took massive damage from  something it may have a too low negative value
+		ent->client->pers.current_stamina = 0;
+
 		G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_DEATH22, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
 		ent->client->ps.torsoTimer = stamina_out_time;
 		ent->client->ps.legsTimer = stamina_out_time;
