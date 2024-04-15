@@ -4806,8 +4806,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			damage = (int)ceil(damage * bonus_saber_damage_factor);
 		}
-		else if (mod == MOD_MELEE)
-		{
+		else if (mod == MOD_MELEE && !(inflictor && inflictor->s.weapon == WP_DEMP2))
+		{ // zyk: Melee damage. Will not consider the magic bolt attacks
 			damage = (int)ceil(damage * (1.0 + (0.50 * attacker->client->pers.skill_levels[SKILL_MELEE])));
 		}
 	}
