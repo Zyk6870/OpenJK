@@ -6950,7 +6950,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 3)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info you need, like skillpoints, Magic points, Stamina, etc.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info you need: Magic Crystals, Magic points, Stamina, etc.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 4)
 	{
@@ -6978,11 +6978,11 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 10)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or items or sell them to the seller.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or items, or sell them to the seller.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 11)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Magic Crystals to upgrade skills. We keep randomly placing them in the map.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Magic Crystals (the blue ones) to upgrade skills. We keep randomly placing them in the map.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 12)
 	{
@@ -7042,7 +7042,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 26)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: each one you defeat will weaken him and we will be able to create Magic Crystals faster.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: each one you defeat will weaken them so we can create Magic Crystals faster.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 27)
 	{
@@ -7054,11 +7054,11 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 29)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Remember, you can use ^3/tutorial ^7to see all of this explanation again if you need.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There is also a very rare red crystal. Find it and solve the puzzle to get a very helpful item.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 30)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! We are counting on you.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Use ^3/tutorial ^7if you need this information again.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 
 		// zyk: end of tutorial
 		ent->client->pers.player_statuses &= ~(1 << 25);
