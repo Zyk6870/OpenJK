@@ -499,7 +499,7 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 	{
 		int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
 		int current_magic_skill = first_magic_skill;
-		int magic_level_bonus = 0;
+		int magic_level_bonus = -2;
 
 		npc_ent->client->pers.quest_npc = 1;
 		npc_ent->client->pers.quest_npc_event = 0;
@@ -512,34 +512,43 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
 		// zyk: setting magic abilities
-		npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 0;
-		npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = (bonuses / 10) + 1;
-
 		if (Q_stricmp(npc_type, "quest_minion_1") == 0)
 		{ // zyk: magic users, will have higher level in his magic-based skills
-			magic_level_bonus += 3;
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 2 + (bonuses / (QUEST_MAX_ENEMIES / 4));
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 10;
+			magic_level_bonus += 5;
 		}
 		else if (Q_stricmp(npc_type, "quest_minion_2") == 0)
 		{ // zyk: magic users, will have higher level in his magic-based skills
-			magic_level_bonus += 2;
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 1 + (bonuses / (QUEST_MAX_ENEMIES / 4));
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 5;
+			magic_level_bonus += 4;
 		}
 		else if (Q_stricmp(npc_type, "quest_minion_3") == 0)
 		{ // zyk: magic users, will have higher level in his magic-based skills
+			magic_level_bonus += 4;
+		}
+		else if (Q_stricmp(npc_type, "quest_minion_4") == 0)
+		{ // zyk: magic users, will have higher level in his magic-based skills
+			magic_level_bonus += 3;
+		}
+		else if (Q_stricmp(npc_type, "quest_minion_5") == 0)
+		{ // zyk: magic users, will have higher level in his magic-based skills
+			magic_level_bonus += 2;
+		}
+		else if (Q_stricmp(npc_type, "quest_minion_6") == 0)
+		{ // zyk: magic users, will have higher level in his magic-based skills
 			magic_level_bonus += 1;
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / 4));
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 2;
+		}
+		else if (Q_stricmp(npc_type, "quest_minion_7") == 0)
+		{ // zyk: magic users, will have higher level in his magic-based skills
+			magic_level_bonus += 1;
 		}
 
+		npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
+		npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = (magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES))) * 5;
 		npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
 			
 		// zyk: adding all magic powers to this npc
 		while (current_magic_skill < NUMBER_OF_SKILLS)
 		{
-			npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / 6));
+			npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
 
 			current_magic_skill++;
 		}
@@ -7059,9 +7068,9 @@ void zyk_show_tutorial(gentity_t* ent)
 
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = 180000; // zyk: default interval time
+	int interval_time = (QUEST_MAX_ENEMIES * 1000) - (QUEST_MAX_ENEMIES * 100); // zyk: default interval time
 
-	interval_time -= (ent->client->pers.quest_defeated_enemies * 900);
+	interval_time -= (ent->client->pers.quest_defeated_enemies * 1000);
 
 	// zyk: also decrease time based on player skills and magic crystals
 	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 1000);
@@ -8866,24 +8875,22 @@ void G_RunFrame( int levelTime ) {
 					{
 						int chance_to_spawn_enemy = Q_irand(0, 99);
 						int enemy_type = 0;
-						int enemy_tier = ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / 10);
+						int enemy_tier = ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES);
 						int j = 0;
 
 						// zyk: each array has the chances of each enemy type to appear. Higher indexes increase chance of high tier npcs to appear
-						int enemy_chances[10][6] = { 
-							{0, 0, 1, 15, 40, 100},
-							{0, 1, 5, 20, 50, 100},
-							{0, 3, 10, 30, 70, 100},
-							{0, 8, 20, 40, 75, 100},
-							{1, 10, 25, 50, 80, 100},
-							{5, 15, 30, 60, 85, 100},
-							{10, 25, 45, 70, 90, 100},
-							{15, 35, 60, 85, 95, 100},
-							{20, 60, 85, 90, 98, 100},
-							{50, 75, 90, 95, 99, 100}
+						int enemy_chances[8][QUEST_ENEMY_TYPES] = {
+							{0, 0, 0, 0, 0, 12, 35, 100},
+							{0, 0, 0, 0, 4, 20, 65, 100},
+							{0, 0, 0, 4, 8, 55, 75, 100},
+							{0, 0, 4, 8, 55, 70, 85, 100},
+							{0, 4, 10, 50, 65, 80, 90, 100},
+							{3, 10, 55, 70, 85, 92, 98, 100},
+							{12, 60, 89, 92, 94, 96, 100, 100},
+							{50, 80, 95, 97, 99, 100, 100, 100}
 						};
 
-						for (j = 0; j < 6; j++)
+						for (j = 0; j < QUEST_ENEMY_TYPES; j++)
 						{
 							if (chance_to_spawn_enemy < enemy_chances[enemy_tier][j])
 							{
