@@ -8831,6 +8831,7 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
+					int red_crystal_chance = 91 + (ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / 3));
 
 					if (magic_crystal_chance_to_spawn < 86)
 					{ // zyk: Magic Crystal
@@ -8839,11 +8840,11 @@ void G_RunFrame( int levelTime ) {
 					else if (magic_crystal_chance_to_spawn >= 86 && magic_crystal_chance_to_spawn < 89 &&
 							zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)))
 					{ // zyk: Extra Tries Crystal. Quests must be enabled
-						zyk_spawn_skill_crystal(ent, 50000, 2);
+						zyk_spawn_skill_crystal(ent, 45000, 2);
 					}
-					else if (magic_crystal_chance_to_spawn == 89)
-					{ // zyk: Energy Modulator puzzle crystal
-						zyk_spawn_skill_crystal(ent, 40000, 3);
+					else if (magic_crystal_chance_to_spawn >= 89 && magic_crystal_chance_to_spawn < red_crystal_chance)
+					{ // zyk: Energy Modulator puzzle crystal. Increases chance based on the quest progress
+						zyk_spawn_skill_crystal(ent, 30000, 3);
 					}
 
 					zyk_set_magic_crystal_respawn_time(ent);
