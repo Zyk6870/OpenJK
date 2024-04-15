@@ -506,7 +506,7 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 		npc_ent->client->pers.quest_event_timer = 0;
 		npc_ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
 
-		npc_ent->NPC->stats.health += (bonuses * 3);
+		npc_ent->NPC->stats.health += (bonuses * 2);
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
@@ -517,19 +517,19 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 
 		if (Q_stricmp(npc_type, "quest_minion_1") == 0)
 		{ // zyk: magic users, will have higher level in his magic-based skills
-			magic_level_bonus = 3;
+			magic_level_bonus += 3;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 2 + (bonuses / (QUEST_MAX_ENEMIES / 4));
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 10;
 		}
 		else if (Q_stricmp(npc_type, "quest_minion_2") == 0)
 		{ // zyk: magic users, will have higher level in his magic-based skills
-			magic_level_bonus = 2;
+			magic_level_bonus += 2;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 1 + (bonuses / (QUEST_MAX_ENEMIES / 4));
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 5;
 		}
 		else if (Q_stricmp(npc_type, "quest_minion_3") == 0)
 		{ // zyk: magic users, will have higher level in his magic-based skills
-			magic_level_bonus = 1;
+			magic_level_bonus += 1;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / 4));
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] *= 2;
 		}
@@ -7061,7 +7061,7 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 {
 	int interval_time = 180000; // zyk: default interval time
 
-	interval_time -= (ent->client->pers.quest_defeated_enemies * 800);
+	interval_time -= (ent->client->pers.quest_defeated_enemies * 900);
 
 	// zyk: also decrease time based on player skills and magic crystals
 	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 1000);
@@ -8866,15 +8866,21 @@ void G_RunFrame( int levelTime ) {
 					{
 						int chance_to_spawn_enemy = Q_irand(0, 99);
 						int enemy_type = 0;
-						int enemy_tier = ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / 6);
+						int enemy_tier = ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / 10);
 						int j = 0;
-						int enemy_chances[6][6] = { 
-							{0, 1, 2, 15, 35, 100}, // zyk: tier 6 highest chance to be spawned
-							{0, 3, 10, 20, 70, 100}, // zyk: tier 5 highest chance to be spawned
-							{1, 8, 25, 70, 90, 100}, // zyk: tier 4 highest chance to be spawned
-							{5, 15, 60, 85, 95, 100}, // zyk: tier 3 highest chance to be spawned
-							{20, 60, 80, 90, 98, 100}, // zyk: tier 2 highest chance to be spawned
-							{50, 75, 90, 95, 99, 100} // zyk: tier 1 highest chance to be spawned
+
+						// zyk: each array has the chances of each enemy type to appear. Higher indexes increase chance of high tier npcs to appear
+						int enemy_chances[10][6] = { 
+							{0, 0, 1, 15, 40, 100},
+							{0, 1, 5, 20, 50, 100},
+							{0, 3, 10, 30, 70, 100},
+							{0, 8, 20, 40, 75, 100},
+							{1, 10, 25, 50, 80, 100},
+							{5, 15, 30, 60, 85, 100},
+							{10, 25, 45, 70, 90, 100},
+							{15, 35, 60, 85, 95, 100},
+							{20, 60, 85, 90, 98, 100},
+							{50, 75, 90, 95, 99, 100}
 						};
 
 						for (j = 0; j < 6; j++)
