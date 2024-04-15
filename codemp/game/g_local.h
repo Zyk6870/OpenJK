@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.24"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.25"
 
 #define SECURITY_LOG "security.log"
 
@@ -788,6 +788,7 @@ typedef enum {
 
 // zyk: max quest enemies that the player must defeat
 #define QUEST_MAX_ENEMIES 400
+#define QUEST_COMPLETE_VALUE (QUEST_MAX_ENEMIES + 100)
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 60000
@@ -1673,14 +1674,16 @@ typedef struct level_locals_s {
 	vec3_t legendary_artifact_origin;
 	int legendary_crystal_chosen[LEGENDARY_CRYSTALS_CHOSEN];
 
+	qboolean quest_final_boss_in_map;
+	int quest_boss_validation_timer;
+	int final_boss_events;
+
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];
 } level_locals_t;
 
 
 // zyk: functions used in a lot of places
-char *zyk_get_mission_value(int custom_quest, int mission, char *key);
-void zyk_set_quest_field(int quest_number, int mission_number, char *key, char *value);
 qboolean zyk_is_ally(gentity_t *ent, gentity_t *other);
 int zyk_number_of_allies(gentity_t *ent, qboolean in_rpg_mode);
 void send_rpg_events(int send_event_timer);

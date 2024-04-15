@@ -2124,6 +2124,22 @@ void G_AddPowerDuelLoserScore(int team, int score)
 	}
 }
 
+extern void save_account(gentity_t* ent, qboolean save_char_file);
+void zyk_decrease_quest_tries(gentity_t *ent)
+{
+	ent->client->pers.quest_tries--;
+
+	if (ent->client->pers.quest_tries <= 0)
+	{
+		ent->client->pers.quest_tries = MIN_QUEST_TRIES;
+		ent->client->pers.quest_defeated_enemies = 0;
+
+		trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You have no tries left. Quests reset\n\"");
+	}
+
+	save_account(ent, qtrue);
+}
+
 /*
 ==================
 player_die
@@ -2144,7 +2160,6 @@ extern qboolean g_noPDuelCheck;
 extern void saberReactivate(gentity_t *saberent, gentity_t *saberOwner);
 extern void saberBackToOwner(gentity_t *saberent);
 extern void try_finishing_race();
-extern void save_account(gentity_t *ent, qboolean save_char_file);
 extern void remove_credits(gentity_t *ent, int credits);
 extern void zyk_NPC_Kill_f( char *name );
 extern gentity_t *Zyk_NPC_SpawnType(char *npc_type, int x, int y, int z, int yaw);
@@ -2182,18 +2197,29 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 	if (self->client->pers.quest_npc > 0)
 	{ // zyk: quest npc defeated by a RPG player
-		if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
+		if (self->client->pers.quest_npc == 1 && attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 		{
 			attacker->client->pers.quest_defeated_enemies++;
 
 			if (attacker->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
 			{
 				attacker->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
-
-				zyk_NPC_Kill_f("all");
 			}
 
 			save_account(attacker, qtrue);
+		}
+		else if (self->client->pers.quest_npc == 2)
+		{ // zyk: defeated a boss
+			if (attacker->client->pers.quest_defeated_enemies == QUEST_MAX_ENEMIES)
+			{
+				level.final_boss_events = 7;
+				level.quest_final_boss_in_map = qfalse;
+			}
+			else
+			{ // zyk: boss died for other reasons
+				level.final_boss_events = 0;
+				level.quest_final_boss_in_map = qfalse;
+			}
 		}
 	}
 
@@ -2203,17 +2229,16 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		!(self->client->pers.player_statuses & (1 << 24) && meansOfDeath == MOD_SUICIDE) // zyk: dont reset in this case, for example, when player logs into his account
 		)
 	{ // zyk: player died in quest. Decrease number of tries
-		self->client->pers.quest_tries--;
-
-		if (self->client->pers.quest_tries <= 0)
-		{
-			self->client->pers.quest_tries = MIN_QUEST_TRIES;
-			self->client->pers.quest_defeated_enemies = 0;
-
-			trap->SendServerCommand(self->s.number, "chat \"^3Quest System: ^7You have no tries left. Quests reset\n\"");
-		}
-
-		save_account(self, qtrue);
+		zyk_decrease_quest_tries(self);
+	}
+	else if (self->client->sess.amrpgmode == 2 && !(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
+		self->client->pers.quest_defeated_enemies == QUEST_MAX_ENEMIES && 
+		level.quest_final_boss_in_map == qtrue && 
+		!(attacker && attacker->client && attacker->s.number < MAX_CLIENTS) && // zyk: dying to a player will not count
+		!(self->client->pers.player_statuses & (1 << 24) && meansOfDeath == MOD_SUICIDE) // zyk: dont reset in this case, for example, when player logs into his account
+		) 
+	{ // zyk: player died in the final boss battle. Decrease number of tries
+		zyk_decrease_quest_tries(self);
 	}
 
 	if (attacker && attacker->client && attacker->client->pers.quest_npc > 0 && attacker->enemy && attacker->enemy == self)
