@@ -8844,20 +8844,22 @@ void G_RunFrame( int levelTime ) {
 					{ // zyk: Magic Crystal
 						zyk_spawn_skill_crystal(ent, 60000, 1);
 					}
-					else if (magic_crystal_chance_to_spawn < 89)
-					{ // zyk: Extra Tries Crystal
-						zyk_spawn_skill_crystal(ent, 45000, 2);
+					else if (magic_crystal_chance_to_spawn >= 86 && magic_crystal_chance_to_spawn < 89 &&
+							zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)))
+					{ // zyk: Extra Tries Crystal. Quests must be enabled
+						zyk_spawn_skill_crystal(ent, 50000, 2);
 					}
-					else if (magic_crystal_chance_to_spawn < 90)
+					else if (magic_crystal_chance_to_spawn == 89)
 					{ // zyk: Energy Modulator puzzle crystal
-						zyk_spawn_skill_crystal(ent, 30000, 3);
+						zyk_spawn_skill_crystal(ent, 40000, 3);
 					}
 
 					zyk_set_magic_crystal_respawn_time(ent);
 				}
 
 				// zyk: control the quest events
-				if (level.load_entities_timer == 0 && zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
+				if (level.load_entities_timer == 0 && 
+					zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
 					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
 					ent->client->pers.quest_event_timer < level.time && 
