@@ -520,7 +520,10 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 	{
 		int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
 		int current_magic_skill = first_magic_skill;
-		int magic_level_bonus = -2;
+		int magic_level_bonus = -7; // zyk: by default, none of the npcs start with any magic
+		int first_main_magic_skill = 0;
+		int second_main_magic_skill = 0;
+		int third_main_magic_skill = 0;
 
 		npc_ent->client->pers.quest_npc = 1;
 		npc_ent->client->pers.quest_npc_event = 0;
@@ -532,43 +535,115 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
-		// zyk: setting magic abilities. Higher tier enemies will have a better magic bonus
-		if (enemy_type == 0)
-		{
-			magic_level_bonus += 5;
-		}
-		else if (enemy_type == 1)
-		{
-			magic_level_bonus += 4;
-		}
-		else if (enemy_type == 2)
-		{
-			magic_level_bonus += 3;
-		}
-		else if (enemy_type == 3)
-		{
-			magic_level_bonus += 2;
-		}
-		else if (enemy_type == 4)
-		{
-			magic_level_bonus += 1;
-		}
-		else if (enemy_type == 5)
-		{
-			magic_level_bonus += 1;
-		}
+		// zyk: setting magic abilities. Higher tier enemies will have a better magic bonus. Set primary and secondary preferred magic for some npcs
 
-		npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
-		npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = (magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES))) * 5;
-		npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
-			
-		// zyk: adding all magic powers to this npc
 		while (current_magic_skill < NUMBER_OF_SKILLS)
 		{
 			npc_ent->client->pers.skill_levels[current_magic_skill] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
 
 			current_magic_skill++;
 		}
+
+		current_magic_skill = first_magic_skill;
+
+		npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = 0;
+		npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = magic_level_bonus + (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
+
+		if (enemy_type == 0)
+		{ // zyk: most powerful mage. Set all to this bonus
+			magic_level_bonus = 10;
+
+			while (current_magic_skill < NUMBER_OF_SKILLS)
+			{
+				npc_ent->client->pers.skill_levels[current_magic_skill] += magic_level_bonus;
+
+				current_magic_skill++;
+			}
+
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) + 3;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 20);
+		}
+		else if (enemy_type == 1)
+		{
+			magic_level_bonus = 7;
+
+			first_main_magic_skill = SKILL_MAGIC_DARK_MAGIC;
+			second_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
+			third_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) - 2;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 18);
+		}
+		else if (enemy_type == 2)
+		{
+			magic_level_bonus = 6;
+
+			first_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
+			second_main_magic_skill = SKILL_MAGIC_HEALING_AREA;
+			third_main_magic_skill = SKILL_MAGIC_DARK_MAGIC;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) - 4;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 15);
+		}
+		else if (enemy_type == 3)
+		{
+			magic_level_bonus = 5;
+
+			first_main_magic_skill = SKILL_MAGIC_FIRE_MAGIC;
+			second_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 12);
+		}
+		else if (enemy_type == 4)
+		{
+			magic_level_bonus = 5;
+
+			first_main_magic_skill = SKILL_MAGIC_AIR_MAGIC;
+			second_main_magic_skill = SKILL_MAGIC_FIRE_MAGIC;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 10);
+		}
+		else if (enemy_type == 5)
+		{
+			magic_level_bonus = 5;
+
+			first_main_magic_skill = SKILL_MAGIC_WATER_MAGIC;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 8);
+		}
+		else if (enemy_type == 6)
+		{
+			magic_level_bonus = 4;
+
+			first_main_magic_skill = SKILL_MAGIC_EARTH_MAGIC;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 5);
+		}
+		else if (enemy_type == 7)
+		{
+			magic_level_bonus = 2;
+
+			first_main_magic_skill = SKILL_MAGIC_HEALING_AREA;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 2);
+		}
+
+		if (first_main_magic_skill > 0)
+		{
+			npc_ent->client->pers.skill_levels[first_main_magic_skill] += (magic_level_bonus + 2);
+		}
+
+		if (second_main_magic_skill > 0)
+		{
+			npc_ent->client->pers.skill_levels[second_main_magic_skill] += (magic_level_bonus + 1);
+		}
+
+		if (third_main_magic_skill > 0)
+		{
+			npc_ent->client->pers.skill_levels[third_main_magic_skill] += magic_level_bonus;
+		}
+
+		npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
 	}
 }
 
@@ -7095,6 +7170,24 @@ void zyk_set_magic_crystal_respawn_time(gentity_t* ent)
 	ent->client->pers.skill_crystal_timer = level.time + total_interval;
 }
 
+int zyk_number_of_used_entities()
+{
+	int i = 0;
+	int total_used_entities = (MAX_CLIENTS + BODY_QUEUE_SIZE);
+
+	for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
+	{
+		gentity_t* this_ent = &g_entities[i];
+
+		if (this_ent && Q_stricmp(this_ent->classname, "freed") != 0)
+		{ // zyk: a non-free entity
+			total_used_entities++;
+		}
+	}
+
+	return total_used_entities;
+}
+
 /*
 ================
 G_RunFrame
@@ -8837,18 +8930,18 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
-					int red_crystal_chance = 90 + (ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
+					int red_crystal_chance = 91 + (ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
 
 					if (magic_crystal_chance_to_spawn < 85)
 					{ // zyk: Magic Crystal
 						zyk_spawn_skill_crystal(ent, 60000, 1);
 					}
-					else if (magic_crystal_chance_to_spawn >= 85 && magic_crystal_chance_to_spawn < 89 &&
+					else if (magic_crystal_chance_to_spawn >= 85 && magic_crystal_chance_to_spawn < 90 &&
 							zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)))
 					{ // zyk: Extra Tries Crystal. Quests must be enabled
 						zyk_spawn_skill_crystal(ent, 50000, 2);
 					}
-					else if (magic_crystal_chance_to_spawn >= 89 && magic_crystal_chance_to_spawn < red_crystal_chance)
+					else if (magic_crystal_chance_to_spawn >= 90 && magic_crystal_chance_to_spawn < red_crystal_chance)
 					{ // zyk: Energy Modulator puzzle crystal. Increases chance based on the quest progress
 						zyk_spawn_skill_crystal(ent, 40000, 3);
 					}
@@ -8917,7 +9010,7 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
 					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
 					ent->client->pers.quest_event_timer < level.time && 
-					level.num_entities < (ENTITYNUM_MAX_NORMAL - 22) /* zyk: this is to guarantee the map will not crash */
+					zyk_number_of_used_entities() < (ENTITYNUM_MAX_NORMAL - 22) /* zyk: this is to guarantee the map will not crash */
 					)
 				{
 					zyk_set_quest_event_timer(ent);
@@ -8932,14 +9025,14 @@ void G_RunFrame( int levelTime ) {
 
 						// zyk: each array has the chances of each enemy type to appear. Higher indexes increase chance of high tier npcs to appear
 						int enemy_chances[8][QUEST_ENEMY_TYPES] = {
-							{0, 0, 0, 0, 0, 0, 20, 100},
-							{0, 0, 0, 0, 0, 20, 70, 100},
-							{0, 0, 0, 0, 12, 50, 75, 100},
-							{0, 0, 0, 12, 55, 70, 85, 100},
-							{0, 0, 10, 50, 65, 80, 90, 100},
-							{0, 10, 55, 70, 85, 92, 97, 100},
-							{5, 60, 80, 90, 95, 98, 100, 100},
-							{50, 80, 95, 97, 100, 100, 100, 100}
+							{0, 0, 0, 0, 0, 1, 30, 100},
+							{0, 0, 0, 0, 1, 10, 60, 100},
+							{0, 0, 0, 1, 10, 50, 75, 100},
+							{0, 0, 1, 10, 55, 70, 85, 100},
+							{0, 1, 10, 50, 65, 80, 90, 100},
+							{1, 10, 55, 70, 85, 92, 96, 100},
+							{10, 60, 78, 86, 91, 95, 97, 100},
+							{45, 65, 78, 84, 90, 95, 98, 100}
 						};
 
 						for (j = 0; j < QUEST_ENEMY_TYPES; j++)
