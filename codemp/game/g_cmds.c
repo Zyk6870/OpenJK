@@ -4569,6 +4569,7 @@ int zyk_total_skillpoints(gentity_t* ent)
 // zyk: initialize RPG skills of this player
 extern void zyk_set_magic_crystal_respawn_time(gentity_t* ent);
 extern void zyk_set_quest_event_timer(gentity_t* ent);
+extern void zyk_calculate_current_weight(gentity_t* ent);
 void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 {
 	if (ent->client->sess.amrpgmode == 2)
@@ -4870,6 +4871,8 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.energy_modulator_mode = 0;
 
 			ent->client->pers.buy_sell_timer = 0;
+
+			zyk_calculate_current_weight(ent);
 
 			zyk_set_quest_event_timer(ent);
 

@@ -447,10 +447,31 @@ gentity_t* zyk_find_entity_for_quest()
 	return chosen_entity;
 }
 
+char* zyk_get_enemy_type(int enemy_type)
+{
+	char* enemy_names[QUEST_ENEMY_TYPES];
+
+	enemy_names[0] = "mage_master";
+	enemy_names[1] = "mage_minister";
+	enemy_names[2] = "mage_scholar";
+	enemy_names[3] = "high_trained_warrior";
+	enemy_names[4] = "flying_changeling";
+	enemy_names[5] = "force_saber_warrior";
+	enemy_names[6] = "changeling_soldier";
+	enemy_names[7] = "armored_gun_soldier";
+
+	if (enemy_type >= 0 && enemy_type < QUEST_ENEMY_TYPES)
+	{
+		return G_NewString(enemy_names[enemy_type]);
+	}
+	
+	return "";
+}
+
 // zyk: spawns a quest npc and sets additional stuff, like levels, etc
 extern int zyk_max_skill_level(int skill_index);
 extern int zyk_max_magic_power(gentity_t* ent);
-void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
+void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 {
 	gentity_t* npc_ent = NULL;
 
@@ -493,7 +514,7 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 		z += chosen_entity->s.origin[2];
 	}
 
-	npc_ent = Zyk_NPC_SpawnType(npc_type, x, y, z, yaw);
+	npc_ent = Zyk_NPC_SpawnType(zyk_get_enemy_type(enemy_type), x, y, z, yaw);
 
 	if (npc_ent && npc_ent->client)
 	{
@@ -511,33 +532,29 @@ void zyk_spawn_quest_npc(char* npc_type, int yaw, int bonuses)
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
-		// zyk: setting magic abilities
-		if (Q_stricmp(npc_type, "quest_minion_1") == 0)
-		{ // zyk: magic users, will have higher level in his magic-based skills
+		// zyk: setting magic abilities. Higher tier enemies will have a better magic bonus
+		if (enemy_type == 0)
+		{
 			magic_level_bonus += 5;
 		}
-		else if (Q_stricmp(npc_type, "quest_minion_2") == 0)
-		{ // zyk: magic users, will have higher level in his magic-based skills
+		else if (enemy_type == 1)
+		{
 			magic_level_bonus += 4;
 		}
-		else if (Q_stricmp(npc_type, "quest_minion_3") == 0)
-		{ // zyk: magic users, will have higher level in his magic-based skills
-			magic_level_bonus += 4;
-		}
-		else if (Q_stricmp(npc_type, "quest_minion_4") == 0)
-		{ // zyk: magic users, will have higher level in his magic-based skills
+		else if (enemy_type == 2)
+		{
 			magic_level_bonus += 3;
 		}
-		else if (Q_stricmp(npc_type, "quest_minion_5") == 0)
-		{ // zyk: magic users, will have higher level in his magic-based skills
+		else if (enemy_type == 3)
+		{
 			magic_level_bonus += 2;
 		}
-		else if (Q_stricmp(npc_type, "quest_minion_6") == 0)
-		{ // zyk: magic users, will have higher level in his magic-based skills
+		else if (enemy_type == 4)
+		{
 			magic_level_bonus += 1;
 		}
-		else if (Q_stricmp(npc_type, "quest_minion_7") == 0)
-		{ // zyk: magic users, will have higher level in his magic-based skills
+		else if (enemy_type == 5)
+		{
 			magic_level_bonus += 1;
 		}
 
@@ -7070,10 +7087,10 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 {
 	int interval_time = (QUEST_MAX_ENEMIES * 1000) - (QUEST_MAX_ENEMIES * 100); // zyk: default interval time
 
+	// zyk: decrease time based on the amount of enemies defeated, magic crystals, skill levels and inventory weight
 	interval_time -= (ent->client->pers.quest_defeated_enemies * 1000);
-
-	// zyk: also decrease time based on player skills and magic crystals
 	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 1000);
+	interval_time -= (ent->client->pers.current_weight * 10);
 
 	// zyk: wait a minimum interval
 	if (interval_time < 3000)
@@ -8880,26 +8897,26 @@ void G_RunFrame( int levelTime ) {
 
 						// zyk: each array has the chances of each enemy type to appear. Higher indexes increase chance of high tier npcs to appear
 						int enemy_chances[8][QUEST_ENEMY_TYPES] = {
-							{0, 0, 0, 0, 0, 12, 35, 100},
-							{0, 0, 0, 0, 4, 20, 65, 100},
-							{0, 0, 0, 4, 8, 55, 75, 100},
-							{0, 0, 4, 8, 55, 70, 85, 100},
-							{0, 4, 10, 50, 65, 80, 90, 100},
-							{3, 10, 55, 70, 85, 92, 98, 100},
-							{12, 60, 89, 92, 94, 96, 100, 100},
-							{50, 80, 95, 97, 99, 100, 100, 100}
+							{0, 0, 0, 0, 0, 0, 20, 100},
+							{0, 0, 0, 0, 0, 20, 70, 100},
+							{0, 0, 0, 0, 12, 50, 75, 100},
+							{0, 0, 0, 12, 55, 70, 85, 100},
+							{0, 0, 10, 50, 65, 80, 90, 100},
+							{0, 10, 55, 70, 85, 92, 97, 100},
+							{5, 60, 80, 90, 95, 98, 100, 100},
+							{50, 80, 95, 97, 100, 100, 100, 100}
 						};
 
 						for (j = 0; j < QUEST_ENEMY_TYPES; j++)
 						{
 							if (chance_to_spawn_enemy < enemy_chances[enemy_tier][j])
 							{
-								enemy_type = j + 1;
+								enemy_type = j;
 								break;
 							}
 						}
 
-						zyk_spawn_quest_npc(G_NewString(va("quest_minion_%d", enemy_type)), ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies);
+						zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies);
 					}
 				}
 			}
