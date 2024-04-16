@@ -2197,7 +2197,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 	if (self->client->pers.quest_npc > 0)
 	{ // zyk: quest npc defeated by a RPG player
-		if (self->client->pers.quest_npc == 1 && attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
+		if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 		{
 			attacker->client->pers.quest_defeated_enemies++;
 

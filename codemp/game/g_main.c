@@ -560,16 +560,19 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 				current_magic_skill++;
 			}
 
+			// zyk: this npc will have a different AI when casting magic
+			npc_ent->client->pers.quest_npc = 2;
+
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) + 3;
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 20);
 		}
 		else if (enemy_type == 1)
 		{
-			magic_level_bonus = 7;
+			magic_level_bonus = 6;
 
 			first_main_magic_skill = SKILL_MAGIC_DARK_MAGIC;
-			second_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
-			third_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
+			second_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
+			third_main_magic_skill = SKILL_MAGIC_HEALING_AREA;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) - 2;
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 18);
@@ -579,8 +582,8 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 			magic_level_bonus = 6;
 
 			first_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
-			second_main_magic_skill = SKILL_MAGIC_HEALING_AREA;
-			third_main_magic_skill = SKILL_MAGIC_DARK_MAGIC;
+			second_main_magic_skill = SKILL_MAGIC_WATER_MAGIC;
+			third_main_magic_skill = SKILL_MAGIC_AIR_MAGIC;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) - 4;
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 15);
@@ -591,6 +594,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 
 			first_main_magic_skill = SKILL_MAGIC_FIRE_MAGIC;
 			second_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
+			third_main_magic_skill = SKILL_MAGIC_EARTH_MAGIC;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 12);
 		}
@@ -7140,11 +7144,11 @@ void zyk_show_tutorial(gentity_t* ent)
 
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = QUEST_MAX_ENEMIES * 600; // zyk: default interval time
+	int interval_time = 60000; // zyk: default interval time
 
 	// zyk: decrease time based on the amount of enemies defeated, magic crystals, skill levels and inventory weight
-	interval_time -= (ent->client->pers.quest_defeated_enemies * 500);
-	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 500);
+	interval_time -= (ent->client->pers.quest_defeated_enemies * 300);
+	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 300);
 	interval_time -= (ent->client->pers.current_weight * 10);
 
 	// zyk: wait a minimum interval
@@ -7186,6 +7190,24 @@ int zyk_number_of_used_entities()
 	}
 
 	return total_used_entities;
+}
+
+int zyk_quest_npcs_in_the_map()
+{
+	int i = 0;
+	int total_npcs = 0;
+
+	for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
+	{
+		gentity_t* npc_ent = &g_entities[i];
+
+		if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc > 0)
+		{
+			total_npcs++;
+		}
+	}
+
+	return total_npcs;
 }
 
 /*
@@ -8968,7 +8990,7 @@ void G_RunFrame( int levelTime ) {
 								{
 									gentity_t* npc_ent = &g_entities[j];
 
-									if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc == 1)
+									if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc > 0)
 									{ // zyk: one of the quest enemies
 										zyk_NPC_Kill_f(npc_ent->NPC_type);
 									}
@@ -9016,7 +9038,8 @@ void G_RunFrame( int levelTime ) {
 					zyk_set_quest_event_timer(ent);
 
 					// zyk: spawning the enemies will depend on the enemy level, lower level enemies will appear earlier in the quest
-					if (ent->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES)
+					if (ent->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES && 
+						zyk_quest_npcs_in_the_map() < QUEST_MAX_NPCS_IN_THE_MAP)
 					{
 						int chance_to_spawn_enemy = Q_irand(0, 99);
 						int enemy_type = 0;
@@ -9123,6 +9146,11 @@ void G_RunFrame( int levelTime ) {
 							zyk_cast_magic(ent, magic_skill_index);
 
 							ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(4, 8));
+
+							if (ent->client->pers.quest_npc == 2)
+							{ // zyk: master mage npc will use magic more often
+								ent->client->pers.quest_event_timer -= 2000;
+							}
 						}
 
 						ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
