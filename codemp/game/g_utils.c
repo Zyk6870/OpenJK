@@ -1847,7 +1847,7 @@ void TryUse( gentity_t *ent )
 	{ // zyk: player touched one of the puzzle crystals
 		if (level.legendary_crystal_chosen[level.legendary_artifact_step - QUEST_SECRET_CHOSEN_CRYSTALS_STEP] == target->count)
 		{ // zyk: one of the crystals chosen in the correct order
-			G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
+			G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/interface/pickup_battery.mp3"));
 
 			level.legendary_artifact_step++;
 		}

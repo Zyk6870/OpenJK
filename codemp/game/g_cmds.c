@@ -10809,6 +10809,8 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 		{ // zyk: stop using the magic power
 			zyk_stop_magic_power(ent, magic_number);
 
+			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/boon.mp3"));
+
 			// zyk: magic stop anim
 			G_SetAnim(ent, NULL, SETANIM_TORSO, BOTH_BUTTON_HOLD, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
 			ent->client->ps.weaponTime = ent->client->ps.torsoTimer;
@@ -10825,6 +10827,8 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				ent->client->ps.torsoTimer = MAGIC_ANIM_TIME;
 				ent->client->ps.legsTimer = MAGIC_ANIM_TIME;
 				ent->client->ps.weaponTime = MAGIC_ANIM_TIME;
+
+				G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder1.mp3"));
 
 				if (magic_number == MAGIC_HEALING_AREA)
 				{

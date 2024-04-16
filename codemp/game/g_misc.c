@@ -2836,7 +2836,7 @@ void fx_runner_think( gentity_t *ent )
 					{
 						player_ent->client->pers.quest_tries++;
 
-						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/pickup_battery.mp3"));
+						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
 					}
 					else if (player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
 					{ // zyk: player that has the Energy Modulator cannot play the puzzle again
