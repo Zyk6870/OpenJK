@@ -7089,17 +7089,17 @@ void zyk_show_tutorial(gentity_t* ent)
 
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = (QUEST_MAX_ENEMIES * 1000) - (QUEST_MAX_ENEMIES * 100); // zyk: default interval time
+	int interval_time = QUEST_MAX_ENEMIES * 600; // zyk: default interval time
 
 	// zyk: decrease time based on the amount of enemies defeated, magic crystals, skill levels and inventory weight
-	interval_time -= (ent->client->pers.quest_defeated_enemies * 1000);
-	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 1000);
+	interval_time -= (ent->client->pers.quest_defeated_enemies * 500);
+	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 500);
 	interval_time -= (ent->client->pers.current_weight * 10);
 
 	// zyk: wait a minimum interval
-	if (interval_time < 3000)
+	if (interval_time < 5000)
 	{
-		interval_time = 3000;
+		interval_time = 5000;
 	}
 	
 	ent->client->pers.quest_event_timer = level.time + interval_time;
