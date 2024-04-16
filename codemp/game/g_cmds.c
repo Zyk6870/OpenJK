@@ -4876,6 +4876,9 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			zyk_set_quest_event_timer(ent);
 
+			ent->client->pers.quest_enemy_wave_event_step = 0;
+			ent->client->pers.quest_enemy_wave_event_timer = 0;
+
 			ent->client->pers.stamina_timer = 0;
 			ent->client->pers.stamina_out_timer = 0;
 

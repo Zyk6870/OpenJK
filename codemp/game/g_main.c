@@ -6930,34 +6930,38 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	ent->client->pers.current_weight = current_weight;
 }
 
-void zyk_show_tutorial(gentity_t* ent)
+void zyk_spawn_magic_spirits(gentity_t* ent, int duration)
 {
 	vec3_t effect_origin;
 
+	VectorSet(effect_origin, ent->r.currentOrigin[0] + 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
+	zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, duration);
+
+	VectorSet(effect_origin, ent->r.currentOrigin[0], ent->r.currentOrigin[1] + 100, ent->r.currentOrigin[2]);
+	zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, duration);
+
+	VectorSet(effect_origin, ent->r.currentOrigin[0] - 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
+	zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, duration);
+
+	VectorSet(effect_origin, ent->r.currentOrigin[0] - 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
+	zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, duration);
+
+	VectorSet(effect_origin, ent->r.currentOrigin[0] + 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
+	zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, duration);
+
+	VectorSet(effect_origin, ent->r.currentOrigin[0] - 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
+	zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, duration);
+
+	VectorSet(effect_origin, ent->r.currentOrigin[0] + 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
+	zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, duration);
+}
+
+void zyk_show_tutorial(gentity_t* ent)
+{
 	if (ent->client->pers.tutorial_step == 0)
 	{
-		VectorSet(effect_origin, ent->r.currentOrigin[0] + 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DOME_OF_DAMAGE, 155000);
-
-		VectorSet(effect_origin, ent->r.currentOrigin[0], ent->r.currentOrigin[1] + 100, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, 155000);
-
-		VectorSet(effect_origin, ent->r.currentOrigin[0] - 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, 155000);
-
-		VectorSet(effect_origin, ent->r.currentOrigin[0] - 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_FIRE_MAGIC, 155000);
-
-		VectorSet(effect_origin, ent->r.currentOrigin[0] + 90, ent->r.currentOrigin[1], ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_AIR_MAGIC, 155000);
-
-		VectorSet(effect_origin, ent->r.currentOrigin[0] - 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_DARK_MAGIC, 155000);
-
-		VectorSet(effect_origin, ent->r.currentOrigin[0] + 50, ent->r.currentOrigin[1] - 70, ent->r.currentOrigin[2]);
-		zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_LIGHT_MAGIC, 155000);
+		zyk_spawn_magic_spirits(ent, 155000);
 	}
-
 	if (ent->client->pers.tutorial_step == 1)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. We are the Magical Spirits.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
@@ -8874,6 +8878,61 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					zyk_set_magic_crystal_respawn_time(ent);
+				}
+
+				// zyk: when player defeats each enemy wave, Magic Spirits will appear to talk to them
+				if (ent->client->pers.quest_enemy_wave_event_step > 0 && ent->client->pers.quest_enemy_wave_event_timer < level.time)
+				{
+					if (ent->client->pers.quest_enemy_wave_event_step == 1)
+					{
+						zyk_spawn_magic_spirits(ent, 20000);
+					}
+					else
+					{
+						if (ent->client->pers.quest_defeated_enemies == QUEST_MAX_ENEMIES)
+						{ // zyk: quest completed
+							if (ent->client->pers.quest_enemy_wave_event_step == 2)
+							{
+								int j = 0;
+
+								for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+								{
+									gentity_t* npc_ent = &g_entities[j];
+
+									if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc == 1)
+									{ // zyk: one of the quest enemies
+										zyk_NPC_Kill_f(npc_ent->NPC_type);
+									}
+								}
+
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We can now defeat the remaining of them.\n\"", QUESTCHAR_ALL_SPIRITS));
+							}
+							else if (ent->client->pers.quest_enemy_wave_event_step == 3)
+							{
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
+							}
+						}
+						else
+						{
+							if (ent->client->pers.quest_enemy_wave_event_step == 2)
+							{
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated a group of %d enemies.\n\"", QUESTCHAR_ALL_SPIRITS, (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)));
+							}
+							else if (ent->client->pers.quest_enemy_wave_event_step == 3)
+							{
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Prepare yourself for the next group. Beware though, they will bring stronger enemies!\n\"", QUESTCHAR_ALL_SPIRITS));
+							}
+						}
+					}
+
+					ent->client->pers.quest_enemy_wave_event_step++;
+
+					if (ent->client->pers.quest_enemy_wave_event_step >= 4)
+					{
+						ent->client->pers.quest_enemy_wave_event_step = 0;
+					}
+
+					ent->client->pers.quest_enemy_wave_event_timer = level.time + 5000;
 				}
 
 				// zyk: control the quest events

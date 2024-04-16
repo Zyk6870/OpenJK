@@ -2203,21 +2203,12 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 			if (attacker->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
 			{ // zyk: this RPG player completed the quest
-				int j = 0;
-
 				attacker->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
+			}
 
-				for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
-				{
-					gentity_t* npc_ent = &g_entities[j];
-
-					if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc == 1)
-					{ // zyk: one of the quest enemies
-						zyk_NPC_Kill_f(npc_ent->NPC_type);
-					}
-				}
-
-				trap->SendServerCommand(attacker->s.number, va("chat \"%s^7: Nice! Our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
+			if ((attacker->client->pers.quest_defeated_enemies % (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) == 0)
+			{ // zyk: defeated an enemy wave
+				attacker->client->pers.quest_enemy_wave_event_step = 1;
 			}
 
 			save_account(attacker, qtrue);
