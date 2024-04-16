@@ -453,12 +453,14 @@ char* zyk_get_enemy_type(int enemy_type)
 
 	enemy_names[0] = "mage_master";
 	enemy_names[1] = "mage_minister";
-	enemy_names[2] = "mage_scholar";
-	enemy_names[3] = "high_trained_warrior";
-	enemy_names[4] = "flying_changeling";
-	enemy_names[5] = "force_saber_warrior";
-	enemy_names[6] = "changeling_soldier";
-	enemy_names[7] = "armored_gun_soldier";
+	enemy_names[2] = "high_trained_warrior";
+	enemy_names[3] = "mage_scholar";
+	enemy_names[4] = "mid_trained_warrior";
+	enemy_names[5] = "flying_warrior";
+	enemy_names[6] = "flying_changeling";
+	enemy_names[7] = "force_saber_warrior";
+	enemy_names[8] = "changeling_warrior";
+	enemy_names[9] = "low_trained_warrior";
 
 	if (enemy_type >= 0 && enemy_type < QUEST_ENEMY_TYPES)
 	{
@@ -520,7 +522,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 	{
 		int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
 		int current_magic_skill = first_magic_skill;
-		int magic_level_bonus = -7; // zyk: by default, none of the npcs start with any magic
+		int magic_level_bonus = -9; // zyk: by default, none of the npcs start with any magic
 		int first_main_magic_skill = 0;
 		int second_main_magic_skill = 0;
 		int third_main_magic_skill = 0;
@@ -563,73 +565,91 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 			// zyk: this npc will have a different AI when casting magic
 			npc_ent->client->pers.quest_npc = 2;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) + 3;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) + 1;
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 20);
 		}
 		else if (enemy_type == 1)
 		{
-			magic_level_bonus = 6;
+			magic_level_bonus = 8;
 
 			first_main_magic_skill = SKILL_MAGIC_DARK_MAGIC;
 			second_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
 			third_main_magic_skill = SKILL_MAGIC_HEALING_AREA;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) - 2;
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 18);
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 9);
 		}
 		else if (enemy_type == 2)
 		{
-			magic_level_bonus = 6;
-
-			first_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
-			second_main_magic_skill = SKILL_MAGIC_WATER_MAGIC;
-			third_main_magic_skill = SKILL_MAGIC_AIR_MAGIC;
-
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) - 4;
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 15);
-		}
-		else if (enemy_type == 3)
-		{
-			magic_level_bonus = 5;
+			magic_level_bonus = 7;
 
 			first_main_magic_skill = SKILL_MAGIC_FIRE_MAGIC;
 			second_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
 			third_main_magic_skill = SKILL_MAGIC_EARTH_MAGIC;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 12);
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 8);
+		}
+		else if (enemy_type == 3)
+		{
+			magic_level_bonus = 7;
+
+			first_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
+			second_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
+			third_main_magic_skill = SKILL_MAGIC_DARK_MAGIC;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 7);
 		}
 		else if (enemy_type == 4)
 		{
-			magic_level_bonus = 5;
+			magic_level_bonus = 7;
+
+			first_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
+			second_main_magic_skill = SKILL_MAGIC_WATER_MAGIC;
+			third_main_magic_skill = SKILL_MAGIC_EARTH_MAGIC;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 6);
+		}
+		else if (enemy_type == 5)
+		{
+			magic_level_bonus = 7;
+
+			first_main_magic_skill = SKILL_MAGIC_AIR_MAGIC;
+			second_main_magic_skill = SKILL_MAGIC_HEALING_AREA;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 5);
+		}
+		else if (enemy_type == 6)
+		{
+			magic_level_bonus = 7;
 
 			first_main_magic_skill = SKILL_MAGIC_AIR_MAGIC;
 			second_main_magic_skill = SKILL_MAGIC_FIRE_MAGIC;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 10);
-		}
-		else if (enemy_type == 5)
-		{
-			magic_level_bonus = 5;
-
-			first_main_magic_skill = SKILL_MAGIC_WATER_MAGIC;
-
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 8);
-		}
-		else if (enemy_type == 6)
-		{
-			magic_level_bonus = 4;
-
-			first_main_magic_skill = SKILL_MAGIC_EARTH_MAGIC;
-
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 5);
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 4);
 		}
 		else if (enemy_type == 7)
 		{
-			magic_level_bonus = 2;
+			magic_level_bonus = 7;
+
+			first_main_magic_skill = SKILL_MAGIC_WATER_MAGIC;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 3);
+		}
+		else if (enemy_type == 8)
+		{
+			magic_level_bonus = 6;
+
+			first_main_magic_skill = SKILL_MAGIC_EARTH_MAGIC;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 2);
+		}
+		else if (enemy_type == 9)
+		{
+			magic_level_bonus = 4;
 
 			first_main_magic_skill = SKILL_MAGIC_HEALING_AREA;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 2);
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus + 2);
 		}
 
 		if (first_main_magic_skill > 0)
@@ -7147,8 +7167,8 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 	int interval_time = 60000; // zyk: default interval time
 
 	// zyk: decrease time based on the amount of enemies defeated, magic crystals, skill levels and inventory weight
-	interval_time -= (ent->client->pers.quest_defeated_enemies * 300);
-	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 300);
+	interval_time -= (ent->client->pers.quest_defeated_enemies * 200);
+	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 200);
 	interval_time -= (ent->client->pers.current_weight * 10);
 
 	// zyk: wait a minimum interval
@@ -8952,18 +8972,18 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
-					int red_crystal_chance = 91 + (ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
+					int red_crystal_chance = 86 + (ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
 
-					if (magic_crystal_chance_to_spawn < 85)
+					if (magic_crystal_chance_to_spawn < 80)
 					{ // zyk: Magic Crystal
 						zyk_spawn_skill_crystal(ent, 60000, 1);
 					}
-					else if (magic_crystal_chance_to_spawn >= 85 && magic_crystal_chance_to_spawn < 90 &&
+					else if (magic_crystal_chance_to_spawn >= 80 && magic_crystal_chance_to_spawn < 85 &&
 							zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)))
 					{ // zyk: Extra Tries Crystal. Quests must be enabled
 						zyk_spawn_skill_crystal(ent, 50000, 2);
 					}
-					else if (magic_crystal_chance_to_spawn >= 90 && magic_crystal_chance_to_spawn < red_crystal_chance)
+					else if (magic_crystal_chance_to_spawn >= 85 && magic_crystal_chance_to_spawn < red_crystal_chance)
 					{ // zyk: Energy Modulator puzzle crystal. Increases chance based on the quest progress
 						zyk_spawn_skill_crystal(ent, 40000, 3);
 					}
@@ -9047,15 +9067,17 @@ void G_RunFrame( int levelTime ) {
 						int j = 0;
 
 						// zyk: each array has the chances of each enemy type to appear. Higher indexes increase chance of high tier npcs to appear
-						int enemy_chances[8][QUEST_ENEMY_TYPES] = {
-							{0, 0, 0, 0, 0, 1, 30, 100},
-							{0, 0, 0, 0, 1, 10, 60, 100},
-							{0, 0, 0, 1, 10, 50, 75, 100},
-							{0, 0, 1, 10, 55, 70, 85, 100},
-							{0, 1, 10, 50, 65, 80, 90, 100},
-							{1, 10, 55, 70, 85, 92, 96, 100},
-							{10, 60, 78, 86, 91, 95, 97, 100},
-							{45, 65, 78, 84, 90, 95, 98, 100}
+						int enemy_chances[10][QUEST_ENEMY_TYPES] = {
+							{0, 0, 0, 0, 0, 0, 0, 1, 20, 100},
+							{0, 0, 0, 0, 0, 0, 1, 19, 65, 100},
+							{0, 0, 0, 0, 0, 1, 18, 55, 70, 100},
+							{0, 0, 0, 0, 1, 15, 55, 70, 80, 100},
+							{0, 0, 0, 1, 14, 55, 70, 78, 83, 100},
+							{0, 0, 1, 12, 52, 62, 72, 79, 87, 100},
+							{0, 1, 10, 45, 60, 68, 75, 80, 90, 100},
+							{1, 8, 48, 55, 65, 70, 78, 92, 96, 100},
+							{5, 40, 52, 62, 78, 86, 89, 95, 97, 100},
+							{40, 55, 65, 72, 79, 84, 90, 96, 98, 100}
 						};
 
 						for (j = 0; j < QUEST_ENEMY_TYPES; j++)
