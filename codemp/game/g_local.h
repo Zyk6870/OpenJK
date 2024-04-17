@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.40"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.41"
 
 #define SECURITY_LOG "security.log"
 
@@ -531,6 +531,28 @@ typedef enum {
 } zyk_settings_t;
 
 typedef enum {
+	PLAYER_STATUS_SILENCED,
+	PLAYER_STATUS_EMOTE,
+	PLAYER_STATUS_RADAR_EVENT,
+	PLAYER_STATUS_JETPACK_FLAME_EVENT,
+	PLAYER_STATUS_SCALED,
+	PLAYER_STATUS_CHAT_PROTECTION,
+	PLAYER_STATUS_PARALYZED,
+	PLAYER_STATUS_GOT_RED_CRYSTAL,
+	PLAYER_STATUS_ADM_GIVE_FORCE,
+	PLAYER_STATUS_ADM_GIVE_GUNS,
+	PLAYER_STATUS_MAGIC_POINTS_EVENT,
+	PLAYER_STATUS_NPC_ORDER_GUARD,
+	PLAYER_STATUS_NPC_ORDER_COVER,
+	PLAYER_STATUS_SELF_KILL,
+	PLAYER_STATUS_TUTORIAL,
+	PLAYER_STATUS_NO_FIGHT,
+	PLAYER_STATUS_DUEL_TOURNAMENT_LOSS,
+	PLAYER_STATUS_IN_FLAMES,
+	NUM_PLAYER_STATUSES
+} zyk_player_status_t;
+
+typedef enum {
 	SELLER_BLASTER_PACK,
 	SELLER_POWERCELL,
 	SELLER_METAL_BOLTS,
@@ -824,37 +846,7 @@ typedef struct clientPersistant_s {
 
 	// zyk: account system attributes
 
-	// zyk: Possible bit values are:
-	// 0 - Silenced by an admin
-	// 1 - using an emote
-	// 2 - Received Radar event - set after client-side receives the Bounty Hunter Upgrade event
-	// 3 - Received Jetpack Flame event - set after client-side receives the Jetpack Upgrade event
-	// 4 - Scaled player
-	// 5 - Chat protection activated for this player
-	// 6 - Paralyzed by an admin
-	// 7 - got a rare red crystal for the artifact puzzle
-	// 8 - unused
-	// 9 - unused
-	// 10 - unused
-	// 11 - unused
-	// 12 - Give Command - Force
-	// 13 - Give Command - Guns
-	// 14 - Sending scaled current Magic Power event
-	// 15 - unused
-	// 16 - unused
-	// 17 - unused
-	// 18 - NPC has the guard order
-	// 19 - NPC has the cover order
-	// 20 - unused
-	// 21 - unused
-	// 22 - unused
-	// 23 - unused
-	// 24 - Self-killed. Do not reload his health, shield and mp from account
-	// 25 - RPG Mode tutorial
-	// 26 - Using nofight command
-	// 27 - Has just lost his duel in Duel Tournament
-	// 28 - unused
-	// 29 - hit by Fire Bolt/Flame Thrower
+	// zyk: player status flags
 	int player_statuses;
 
 	// zyk: last health, shield, mp and stamina are saved into account

@@ -2789,7 +2789,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 			validate_pickup_item = qfalse;
 		}
 	}
-	else if (other->client->pers.player_statuses & (1 << 12) && (ent->item->giType == IT_WEAPON || ent->item->giType == IT_AMMO || 
+	else if (other->client->pers.player_statuses & (1 << PLAYER_STATUS_ADM_GIVE_FORCE) && (ent->item->giType == IT_WEAPON || ent->item->giType == IT_AMMO ||
 			ent->item->giType == IT_HOLDABLE))
 	{ // zyk: players with all force powers given by admin cannot pickup some things
 		return;

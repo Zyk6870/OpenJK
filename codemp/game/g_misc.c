@@ -2842,7 +2842,7 @@ void fx_runner_think( gentity_t *ent )
 					{ // zyk: player that has the Energy Modulator cannot play the puzzle again
 						trap->SendServerCommand(player_ent->s.number, "chat \"^3Quest System: ^7You found a secret! Press ^2Use ^7key to start the puzzle\n\"");
 
-						player_ent->client->pers.player_statuses |= (1 << 7);
+						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_RED_CRYSTAL);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
 					}

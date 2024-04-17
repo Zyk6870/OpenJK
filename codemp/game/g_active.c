@@ -882,15 +882,15 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 	{
 		client->pers.send_event_interval = level.time + 100;
 
-		if (!(client->pers.player_statuses & (1 << 14)))
+		if (!(client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_POINTS_EVENT)))
 		{
 			int scaled_magic_power = ((float)client->pers.magic_power/zyk_max_magic_power(ent)) * 100.0;
 
 			G_AddEvent(ent, EV_USE_ITEM13, scaled_magic_power);
 
-			client->pers.player_statuses |= (1 << 14);
+			client->pers.player_statuses |= (1 << PLAYER_STATUS_MAGIC_POINTS_EVENT);
 		}
-		else if (!(client->pers.player_statuses & (1 << 2)))
+		else if (!(client->pers.player_statuses & (1 << PLAYER_STATUS_RADAR_EVENT)))
 		{ // zyk: send this event after some seconds in map and if the player did not received this event yet
 			// must wait some seconds because after a map change, sometimes the event is not received by the client-side game right away
 			if (client->sess.amrpgmode == 2 && client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_RADAR] > 0)
@@ -900,9 +900,9 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			else // zyk: removing rpg stuff from client-side game
 				G_AddEvent(ent, EV_ITEMUSEFAIL, 6);
 
-			client->pers.player_statuses |= (1 << 2);
+			client->pers.player_statuses |= (1 << PLAYER_STATUS_RADAR_EVENT);
 		}
-		else if (!(client->pers.player_statuses & (1 << 3)))
+		else if (!(client->pers.player_statuses & (1 << PLAYER_STATUS_JETPACK_FLAME_EVENT)))
 		{
 			// zyk: event to set the blue jetpack flame
 			if (client->sess.amrpgmode == 2 && client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
@@ -910,13 +910,13 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			else
 				G_AddEvent(ent, EV_ITEMUSEFAIL, 8);
 
-			client->pers.player_statuses |= (1 << 3);
+			client->pers.player_statuses |= (1 << PLAYER_STATUS_JETPACK_FLAME_EVENT);
 		}
 		else
 		{
-			client->pers.player_statuses &= ~(1 << 2);
-			client->pers.player_statuses &= ~(1 << 3);
-			client->pers.player_statuses &= ~(1 << 14);
+			client->pers.player_statuses &= ~(1 << PLAYER_STATUS_RADAR_EVENT);
+			client->pers.player_statuses &= ~(1 << PLAYER_STATUS_JETPACK_FLAME_EVENT);
+			client->pers.player_statuses &= ~(1 << PLAYER_STATUS_MAGIC_POINTS_EVENT);
 		}
 	}
 }
@@ -1420,7 +1420,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 	actionPressed = G_ActionButtonPressed(buttons);
 
 	// zyk: if the player is using an emote, keeps the emote
-	if (!ent->NPC && ent->client->pers.player_statuses & (1 << 1))
+	if (!ent->NPC && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_EMOTE))
 	{
 		ent->client->ps.forceHandExtendTime = level.time + 1000;
 	}
@@ -1470,9 +1470,9 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 		qboolean brokeOut = qfalse;
 
 		// zyk: if the player is using an emote, removes it
-		if (!ent->NPC && ent->client->pers.player_statuses & (1 << 1) && actionPressed == qtrue)
+		if (!ent->NPC && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_EMOTE) && actionPressed == qtrue)
 		{
-			ent->client->pers.player_statuses &= ~(1 << 1);
+			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_EMOTE);
 			ent->client->ps.forceHandExtendTime = level.time;
 		}
 
@@ -2334,7 +2334,7 @@ void ClientThink_real( gentity_t *ent ) {
 				client->ps.pm_type = PM_NORMAL;
 			}
 
-			if (client->pers.player_statuses & (1 << 6))
+			if (client->pers.player_statuses & (1 << PLAYER_STATUS_PARALYZED))
 			{ // zyk: paralyzed by an admin. Keep him this way
 				client->ps.forceHandExtendTime = level.time + 500;
 			}

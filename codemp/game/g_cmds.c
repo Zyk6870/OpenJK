@@ -558,7 +558,7 @@ void Cmd_Emote_f( gentity_t *ent )
 	ent->client->ps.forceDodgeAnim = anim_id;
 	ent->client->ps.forceHandExtendTime = level.time + 1000;
 
-	ent->client->pers.player_statuses |= (1 << 1);
+	ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_EMOTE);
 }
 
 /*
@@ -737,11 +737,11 @@ void Cmd_Give_f( gentity_t *ent )
 
 	if (Q_stricmp(arg2, "force") == 0)
 	{
-		if (g_entities[client_id].client->pers.player_statuses & (1 << 12))
+		if (g_entities[client_id].client->pers.player_statuses & (1 << PLAYER_STATUS_ADM_GIVE_FORCE))
 		{ // zyk: remove force powers
 			zyk_remove_force_powers(&g_entities[client_id]);
 
-			g_entities[client_id].client->pers.player_statuses &= ~(1 << 12);
+			g_entities[client_id].client->pers.player_statuses &= ~(1 << PLAYER_STATUS_ADM_GIVE_FORCE);
 			trap->SendServerCommand( -1, va("print \"Removed force powers from %s^7\n\"", g_entities[client_id].client->pers.netname) );
 		}
 		else
@@ -749,18 +749,18 @@ void Cmd_Give_f( gentity_t *ent )
 			zyk_remove_guns(&g_entities[client_id]);
 			zyk_add_force_powers(&g_entities[client_id]);
 
-			g_entities[client_id].client->pers.player_statuses &= ~(1 << 13);
-			g_entities[client_id].client->pers.player_statuses |= (1 << 12);
+			g_entities[client_id].client->pers.player_statuses &= ~(1 << PLAYER_STATUS_ADM_GIVE_GUNS);
+			g_entities[client_id].client->pers.player_statuses |= (1 << PLAYER_STATUS_ADM_GIVE_FORCE);
 			trap->SendServerCommand( -1, va("print \"Added force powers to %s^7\n\"", g_entities[client_id].client->pers.netname) );
 		}
 	}
 	else if (Q_stricmp(arg2, "guns") == 0)
 	{
-		if (g_entities[client_id].client->pers.player_statuses & (1 << 13))
+		if (g_entities[client_id].client->pers.player_statuses & (1 << PLAYER_STATUS_ADM_GIVE_GUNS))
 		{ // zyk: remove guns
 			zyk_remove_guns(&g_entities[client_id]);
 
-			g_entities[client_id].client->pers.player_statuses &= ~(1 << 13);
+			g_entities[client_id].client->pers.player_statuses &= ~(1 << PLAYER_STATUS_ADM_GIVE_GUNS);
 			trap->SendServerCommand( -1, va("print \"Removed guns from %s^7\n\"", g_entities[client_id].client->pers.netname) );
 		}
 		else
@@ -768,8 +768,8 @@ void Cmd_Give_f( gentity_t *ent )
 			zyk_remove_force_powers(&g_entities[client_id]);
 			zyk_add_guns(&g_entities[client_id]);
 
-			g_entities[client_id].client->pers.player_statuses &= ~(1 << 12);
-			g_entities[client_id].client->pers.player_statuses |= (1 << 13);
+			g_entities[client_id].client->pers.player_statuses &= ~(1 << PLAYER_STATUS_ADM_GIVE_FORCE);
+			g_entities[client_id].client->pers.player_statuses |= (1 << PLAYER_STATUS_ADM_GIVE_GUNS);
 			trap->SendServerCommand( -1, va("print \"Added guns to %s^7\n\"", g_entities[client_id].client->pers.netname) );
 		}
 	}
@@ -793,9 +793,9 @@ void do_scale(gentity_t *ent, int new_size)
 	ent->client->pers.player_scale = new_size;
 
 	if (new_size == 100) // zyk: default size
-		ent->client->pers.player_statuses &= ~(1 << 4);
+		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_SCALED);
 	else
-		ent->client->pers.player_statuses |= (1 << 4);
+		ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_SCALED);
 }
 
 void Cmd_Scale_f( gentity_t *ent ) {
@@ -1015,7 +1015,7 @@ void G_Kill( gentity_t *ent ) {
 	}
 
 	// zyk: target has been paralyzed by an admin
-	if (ent && ent->client && !ent->NPC && ent->client->pers.player_statuses & (1 << 6))
+	if (ent && ent->client && !ent->NPC && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_PARALYZED))
 		return;
 
 	ent->flags &= ~FL_GODMODE;
@@ -1047,7 +1047,7 @@ Cmd_Kill_f
 void Cmd_Kill_f( gentity_t *ent ) {
 	if (ent && ent->client)
 	{
-		ent->client->pers.player_statuses |= (1 << 24);
+		ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_SELF_KILL);
 	}
 
 	G_Kill( ent );
@@ -2037,7 +2037,7 @@ void zyk_jetpack(gentity_t* ent)
 	if ((ent->client->sess.amrpgmode == 1 && 
 		!(ent->client->pers.player_settings & (1 << SETTINGS_JETPACK))) && zyk_allow_jetpack_command.integer &&
 		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && 
-		level.gametype != GT_JEDIMASTER && !(ent->client->pers.player_statuses & (1 << 12)))
+		level.gametype != GT_JEDIMASTER && !(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_ADM_GIVE_FORCE)))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 	}
@@ -2370,7 +2370,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	default:
 	case SAY_ALL:
 		// zyk: if player is silenced by an admin, he cannot say anything
-		if (ent->client->pers.player_statuses & (1 << 0))
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SILENCED))
 			return;
 
 		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, text );
@@ -2379,7 +2379,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		break;
 	case SAY_TEAM:
 		// zyk: if player is silenced by an admin, he cannot say anything
-		if (ent->client->pers.player_statuses & (1 << 0))
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SILENCED))
 			return;
 
 		G_LogPrintf( "sayteam: %s: %s\n", ent->client->pers.netname, text );
@@ -2412,7 +2412,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		break;
 	case SAY_ALLY: // zyk: say to allies
 		// zyk: if player is silenced by an admin, he cannot say anything
-		if (ent->client->pers.player_statuses & (1 << 0))
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SILENCED))
 			return;
 
 		G_LogPrintf( "sayally: %s: %s\n", ent->client->pers.netname, text );
@@ -4366,8 +4366,8 @@ void send_rpg_events(int send_event_timer)
 		{
 			player_ent->client->pers.send_event_timer = level.time + send_event_timer;
 			player_ent->client->pers.send_event_interval = level.time + 100;
-			player_ent->client->pers.player_statuses &= ~(1 << 2);
-			player_ent->client->pers.player_statuses &= ~(1 << 3);
+			player_ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_RADAR_EVENT);
+			player_ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_JETPACK_FLAME_EVENT);
 		}
 	}
 }
@@ -4898,7 +4898,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			// zyk: loading initial Stamina
 			ent->client->pers.current_stamina = ent->client->pers.last_stamina;
 
-			if (!(ent->client->pers.player_statuses & (1 << 24)) && 
+			if (!(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SELF_KILL)) &&
 				ent->client->pers.last_health <= 0)
 			{ // zyk: reload player stats if he died and he did not use /kill command
 				// zyk: loading initial health
@@ -5214,7 +5214,7 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	// zyk: starting the tutorial, to help players use the mod features
 	ent->client->pers.tutorial_step = 0;
 	ent->client->pers.tutorial_timer = level.time + 1000;
-	ent->client->pers.player_statuses |= (1 << 25);
+	ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_TUTORIAL);
 }
 
 /*
@@ -5311,7 +5311,7 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 			{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
 				if (ent && ent->client)
 				{
-					ent->client->pers.player_statuses |= (1 << 24);
+					ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_SELF_KILL);
 				}
 
 				G_Kill(ent);
@@ -8250,7 +8250,7 @@ void Cmd_BountyQuest_f( gentity_t *ent ) {
 			this_ent = &g_entities[level.bounty_quest_target_id];
 
 			if (this_ent && this_ent->client && this_ent->client->sess.amrpgmode == 2 && this_ent->health > 0 && this_ent->client->sess.sessionTeam != TEAM_SPECTATOR && 
-				!(this_ent->client->pers.player_statuses & (1 << 26)))
+				!(this_ent->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT)))
 			{
 				level.bounty_quest_choose_target = qfalse;
 				trap->SendServerCommand( -1, va("chat \"^3Bounty Quest: ^7A reward of ^3200 ^7credits will be given to who kills %s^7\n\"", this_ent->client->pers.netname) );
@@ -8309,8 +8309,8 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 		ent->client->sess.amrpgmode = 2;
 
 		// zyk: removing the /give stuff, which is not allowed to RPG players
-		ent->client->pers.player_statuses &= ~(1 << 12);
-		ent->client->pers.player_statuses &= ~(1 << 13);
+		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_ADM_GIVE_FORCE);
+		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_ADM_GIVE_GUNS);
 	}
 
 	save_account(ent, qfalse);
@@ -8358,7 +8358,7 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 	{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
 		if (ent && ent->client)
 		{
-			ent->client->pers.player_statuses |= (1 << 24);
+			ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_SELF_KILL);
 		}
 
 		G_Kill(ent);
@@ -8391,7 +8391,7 @@ void Cmd_RaceMode_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (ent->client->pers.player_statuses & (1 << 26))
+	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT))
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Cannot join race while being in nofight mode\n\"");
 		return;
@@ -8772,7 +8772,7 @@ void Cmd_Jetpack_f( gentity_t *ent ) {
 	if (!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)) && zyk_allow_jetpack_command.integer && 
 		 ent->client->sess.amrpgmode < 2 &&
 		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && level.gametype != GT_JEDIMASTER && 
-		!(ent->client->pers.player_statuses & (1 << 12)))
+		!(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_ADM_GIVE_FORCE)))
 	{ // zyk: gets jetpack if player does not have it. RPG players need jetpack skill to get it
 		// zyk: Jedi Master gametype will not allow jetpack
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
@@ -9850,14 +9850,14 @@ void Cmd_Silence_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (g_entities[client_id].client->pers.player_statuses & (1 << 0))
+	if (g_entities[client_id].client->pers.player_statuses & (1 << PLAYER_STATUS_SILENCED))
 	{
-		g_entities[client_id].client->pers.player_statuses &= ~(1 << 0);
+		g_entities[client_id].client->pers.player_statuses &= ~(1 << PLAYER_STATUS_SILENCED);
 		trap->SendServerCommand( -1, va("chat \"^3Admin System: ^7player %s^7 is no longer silenced!\n\"", g_entities[client_id].client->pers.netname) );
 	}
 	else
 	{
-		g_entities[client_id].client->pers.player_statuses |= (1 << 0);
+		g_entities[client_id].client->pers.player_statuses |= (1 << PLAYER_STATUS_SILENCED);
 		trap->SendServerCommand( -1, va("chat \"^3Admin System: ^7player %s^7 is silenced!\n\"", g_entities[client_id].client->pers.netname) );
 	}
 }
@@ -10334,8 +10334,8 @@ void Cmd_Order_f( gentity_t *ent ) {
 				if (this_ent && this_ent->client && this_ent->NPC && this_ent->client->NPC_class != CLASS_VEHICLE && 
 					this_ent->client->leader == ent)
 				{
-					this_ent->client->pers.player_statuses &= ~(1 << 18);
-					this_ent->client->pers.player_statuses &= ~(1 << 19);
+					this_ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_GUARD);
+					this_ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
 					this_ent->NPC->tempBehavior = BS_FOLLOW_LEADER;
 				}
 			}
@@ -10351,8 +10351,8 @@ void Cmd_Order_f( gentity_t *ent ) {
 					this_ent->client->leader == ent)
 				{
 					this_ent->NPC->tempBehavior = BS_STAND_GUARD;
-					this_ent->client->pers.player_statuses &= ~(1 << 19);
-					this_ent->client->pers.player_statuses |= (1 << 18);
+					this_ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
+					this_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_NPC_ORDER_GUARD);
 				}
 			}
 			trap->SendServerCommand( ent-g_entities, "print \"Order given.\n\"" );
@@ -10367,8 +10367,8 @@ void Cmd_Order_f( gentity_t *ent ) {
 					this_ent->client->leader == ent)
 				{
 					this_ent->NPC->tempBehavior = BS_FOLLOW_LEADER;
-					this_ent->client->pers.player_statuses &= ~(1 << 18);
-					this_ent->client->pers.player_statuses |= (1 << 19);
+					this_ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_GUARD);
+					this_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_NPC_ORDER_COVER);
 				}
 			}
 			trap->SendServerCommand( ent-g_entities, "print \"Order given.\n\"" );
@@ -10410,9 +10410,9 @@ void Cmd_Paralyze_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (g_entities[client_id].client->pers.player_statuses & (1 << 6))
+	if (g_entities[client_id].client->pers.player_statuses & (1 << PLAYER_STATUS_PARALYZED))
 	{ // zyk: if paralyzed, remove it from the target player
-		g_entities[client_id].client->pers.player_statuses &= ~(1 << 6);
+		g_entities[client_id].client->pers.player_statuses &= ~(1 << PLAYER_STATUS_PARALYZED);
 
 		// zyk: kill the target player to prevent exploits with RPG Mode commands
 		G_Kill(&g_entities[client_id]);
@@ -10422,7 +10422,7 @@ void Cmd_Paralyze_f( gentity_t *ent ) {
 	}
 	else
 	{ // zyk: paralyze the target player
-		g_entities[client_id].client->pers.player_statuses |= (1 << 6);
+		g_entities[client_id].client->pers.player_statuses |= (1 << PLAYER_STATUS_PARALYZED);
 
 		g_entities[client_id].client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
 		g_entities[client_id].client->ps.forceHandExtendTime = level.time + 500;
@@ -10953,7 +10953,7 @@ void Cmd_DuelMode_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->pers.player_statuses & (1 << 26))
+	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT))
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Cannot join tournament while being in nofight mode\n\"");
 		return;
@@ -11317,7 +11317,7 @@ void Cmd_SniperMode_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->pers.player_statuses & (1 << 26))
+	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT))
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Cannot join sniper battle while being in nofight mode\n\"");
 		return;
@@ -11412,7 +11412,7 @@ void Cmd_MeleeMode_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->pers.player_statuses & (1 << 26))
+	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT))
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Cannot join melee battle while being in nofight mode\n\"");
 		return;
@@ -11528,7 +11528,7 @@ void Cmd_RpgLmsMode_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->pers.player_statuses & (1 << 26))
+	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT))
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Cannot join RPG LMS while being in nofight mode\n\"");
 		return;
@@ -11594,7 +11594,7 @@ Cmd_Tutorial_f
 void Cmd_Tutorial_f(gentity_t *ent) {
 	ent->client->pers.tutorial_step = 0;
 	ent->client->pers.tutorial_timer = level.time + 1000;
-	ent->client->pers.player_statuses |= (1 << 25);
+	ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_TUTORIAL);
 }
 
 /*
@@ -11605,14 +11605,14 @@ Cmd_NoFight_f
 void Cmd_NoFight_f(gentity_t *ent) {
 	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR)
 	{
-		if (ent->client->pers.player_statuses & (1 << 26))
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT))
 		{
-			ent->client->pers.player_statuses &= ~(1 << 26);
+			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NO_FIGHT);
 			trap->SendServerCommand(ent->s.number, "print \"Deactivated\n\"");
 		}
 		else
 		{
-			ent->client->pers.player_statuses |= (1 << 26);
+			ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_NO_FIGHT);
 			trap->SendServerCommand(ent->s.number, "print \"Activated\n\"");
 		}
 	}

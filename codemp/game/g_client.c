@@ -3854,17 +3854,17 @@ void ClientSpawn(gentity_t *ent) {
 	{
 		initialize_rpg_skills(ent, qtrue);
 
-		if (ent->client->pers.player_statuses & (1 << 24))
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SELF_KILL))
 		{
-			ent->client->pers.player_statuses &= ~(1 << 24);
+			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_SELF_KILL);
 		}
 	}
-	else if (ent->client->pers.player_statuses & (1 << 12))
+	else if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_ADM_GIVE_FORCE))
 	{ // zyk: player received force powers from admin
 		zyk_remove_guns(ent);
 		zyk_add_force_powers(ent);
 	}
-	else if (ent->client->pers.player_statuses & (1 << 13))
+	else if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_ADM_GIVE_GUNS))
 	{ // zyk: player received guns from admin
 		zyk_remove_force_powers(ent);
 		zyk_add_guns(ent);
@@ -3875,7 +3875,7 @@ void ClientSpawn(gentity_t *ent) {
 		zyk_load_common_settings(ent);
 	}
 
-	if (ent->client->pers.player_statuses & (1 << 4))
+	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SCALED))
 	{ // zyk: player is scaled, set the scale factor
 		do_scale(ent, ent->client->pers.player_scale);
 	}
@@ -3948,7 +3948,7 @@ void ClientSpawn(gentity_t *ent) {
 			}
 
 			// zyk: if player is paralyzed by an admin, keeps him that way
-			if (ent->client->pers.player_statuses & (1 << 6))
+			if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_PARALYZED))
 			{
 				ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
 				ent->client->ps.forceHandExtendTime = level.time + 500;

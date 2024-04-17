@@ -4766,12 +4766,12 @@ qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target)
 			return qfalse;
 		}
 
-		if (attacker->client->pers.player_statuses & (1 << 26) && attacker != target)
+		if (attacker->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT) && attacker != target)
 		{ // zyk: used nofight command, cannot hit anyone
 			return qfalse;
 		}
 
-		if (target->client->pers.player_statuses & (1 << 26) && attacker != target)
+		if (target->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT) && attacker != target)
 		{ // zyk: used nofight command, cannot be hit by anyone
 			return qfalse;
 		}
@@ -5113,7 +5113,7 @@ void Player_FireFlameThrower(gentity_t* self, qboolean is_magic)
 
 					traceEnt->client->pers.fire_bolt_user_id = self->s.number;
 					traceEnt->client->pers.fire_bolt_timer = level.time + 100;
-					traceEnt->client->pers.player_statuses |= (1 << 29);
+					traceEnt->client->pers.player_statuses |= (1 << PLAYER_STATUS_IN_FLAMES);
 				}
 			}
 		}
@@ -5832,9 +5832,9 @@ void quest_power_events(gentity_t *ent)
 							}
 
 							// zyk: removing emotes to prevent exploits
-							if (black_hole_target->client->pers.player_statuses & (1 << 1))
+							if (black_hole_target->client->pers.player_statuses & (1 << PLAYER_STATUS_EMOTE))
 							{
-								black_hole_target->client->pers.player_statuses &= ~(1 << 1);
+								black_hole_target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_EMOTE);
 								black_hole_target->client->ps.forceHandExtendTime = level.time;
 							}
 
@@ -5908,9 +5908,9 @@ void quest_power_events(gentity_t *ent)
 
 							// zyk: setting confuse effect
 							// zyk: removing emotes to prevent exploits
-							if (light_of_judgement_target->client->pers.player_statuses & (1 << 1))
+							if (light_of_judgement_target->client->pers.player_statuses & (1 << PLAYER_STATUS_EMOTE))
 							{
-								light_of_judgement_target->client->pers.player_statuses &= ~(1 << 1);
+								light_of_judgement_target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_EMOTE);
 								light_of_judgement_target->client->ps.forceHandExtendTime = level.time;
 							}
 
@@ -5950,7 +5950,7 @@ void quest_power_events(gentity_t *ent)
 // zyk: damages target player with Fire Bolt flames
 void fire_bolt_hits(gentity_t* ent)
 {
-	if (ent && ent->client && ent->health > 0 && ent->client->pers.player_statuses & (1 << 29) && ent->client->pers.fire_bolt_hits_counter > 0 &&
+	if (ent && ent->client && ent->health > 0 && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_IN_FLAMES) && ent->client->pers.fire_bolt_hits_counter > 0 &&
 		ent->client->pers.fire_bolt_timer < level.time)
 	{
 		gentity_t* fire_bolt_user = &g_entities[ent->client->pers.fire_bolt_user_id];
@@ -5964,7 +5964,7 @@ void fire_bolt_hits(gentity_t* ent)
 
 		// zyk: no more do fire bolt damage if counter is 0
 		if (ent->client->pers.fire_bolt_hits_counter == 0)
-			ent->client->pers.player_statuses &= ~(1 << 29);
+			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
 	}
 }
 
@@ -5986,7 +5986,7 @@ void player_restore_force(gentity_t *ent)
 {
 	int i = 0;
 
-	if (ent->client->pers.player_statuses & (1 << 27))
+	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS))
 	{ // zyk: do not restore force to players that died in a Duel Tournament duel, because the force was already restored
 		return;
 	}
@@ -6109,7 +6109,7 @@ void duel_tournament_prepare(gentity_t *ent)
 	ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = 0;
 
 	// zyk: removing flag that is used to test if player died in a duel
-	ent->client->pers.player_statuses &= ~(1 << 27);
+	ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS);
 
 	// zyk: stop any movement
 	VectorSet(ent->client->ps.velocity, 0, 0, 0);
@@ -6353,12 +6353,12 @@ char *duel_tournament_remaining_health(gentity_t *ent)
 
 	if (level.duel_tournament_mode == 4)
 	{
-		if (!(ent->client->pers.player_statuses & (1 << 27)))
+		if (!(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))
 		{ // zyk: show health if the player did not die in duel
 			strcpy(health_info, va(" ^1%d^7/^2%d^7 ", ent->health, ent->client->ps.stats[STAT_ARMOR]));
 		}
 
-		if (ally && !(ally->client->pers.player_statuses & (1 << 27)))
+		if (ally && !(ally->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))
 		{ // zyk: show health if the ally did not die in duel
 			strcpy(health_info, va("%s ^1%d^7/^2%d^7", health_info, ally->health, ally->client->ps.stats[STAT_ARMOR]));
 		}
@@ -6378,7 +6378,7 @@ void duel_tournament_give_score(gentity_t *ent, int score)
 	}
 
 	level.duel_players[ent->s.number] += score;
-	if (level.duel_tournament_mode == 4 && !(ent->client->pers.player_statuses & (1 << 27)))
+	if (level.duel_tournament_mode == 4 && !(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))
 	{ // zyk: add hp score if he did not die in duel
 		level.duel_players_hp[ent->s.number] += (ent->health + ent->client->ps.stats[STAT_ARMOR]);
 	}
@@ -6387,7 +6387,7 @@ void duel_tournament_give_score(gentity_t *ent, int score)
 	{ // zyk: both players must have the same score and the same hp score
 		level.duel_players[ally->s.number] = level.duel_players[ent->s.number];
 
-		if (level.duel_tournament_mode == 4 && !(ally->client->pers.player_statuses & (1 << 27)))
+		if (level.duel_tournament_mode == 4 && !(ally->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))
 		{ // zyk: add hp score if he did not die in duel
 			level.duel_players_hp[ent->s.number] += (ally->health + ally->client->ps.stats[STAT_ARMOR]);
 		}
@@ -7158,7 +7158,7 @@ void zyk_show_tutorial(gentity_t* ent)
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Use ^3/tutorial ^7if you need all this information again.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 
 		// zyk: end of tutorial
-		ent->client->pers.player_statuses &= ~(1 << 25);
+		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_TUTORIAL);
 	}
 }
 
@@ -7561,16 +7561,20 @@ void G_RunFrame( int levelTime ) {
 				second_duelist_ally = &g_entities[level.duelist_2_ally_id];
 			}
 
-			if ((!(first_duelist->client->pers.player_statuses & (1 << 27)) || (first_duelist_ally && !(first_duelist_ally->client->pers.player_statuses & (1 << 27)))) &&
-				 second_duelist->client->pers.player_statuses & (1 << 27) && (!second_duelist_ally || second_duelist_ally->client->pers.player_statuses & (1 << 27)))
+			if ((!(first_duelist->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)) || 
+				(first_duelist_ally && !(first_duelist_ally->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))) &&
+				 second_duelist->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS) && 
+				(!second_duelist_ally || second_duelist_ally->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))
 			{ // zyk: first team wins
 				duel_tournament_set_match_winner(first_duelist);
 
 				level.duel_tournament_mode = 5;
 				level.duel_tournament_timer = level.time + 1500;
 			}
-			else if ((!(second_duelist->client->pers.player_statuses & (1 << 27)) || (second_duelist_ally && !(second_duelist_ally->client->pers.player_statuses & (1 << 27)))) &&
-				first_duelist->client->pers.player_statuses & (1 << 27) && (!first_duelist_ally || first_duelist_ally->client->pers.player_statuses & (1 << 27)))
+			else if ((!(second_duelist->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)) || 
+				(second_duelist_ally && !(second_duelist_ally->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))) &&
+				first_duelist->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS) && 
+				(!first_duelist_ally || first_duelist_ally->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))
 			{ // zyk: second team wins
 				duel_tournament_set_match_winner(second_duelist);
 
@@ -7582,22 +7586,22 @@ void G_RunFrame( int levelTime ) {
 				int first_team_health = 0;
 				int second_team_health = 0;
 
-				if (!(first_duelist->client->pers.player_statuses & (1 << 27)))
+				if (!(first_duelist->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))
 				{
 					first_team_health = first_duelist->health + first_duelist->client->ps.stats[STAT_ARMOR];
 				}
 
-				if (!(second_duelist->client->pers.player_statuses & (1 << 27)))
+				if (!(second_duelist->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))
 				{
 					second_team_health = second_duelist->health + second_duelist->client->ps.stats[STAT_ARMOR];
 				}
 
-				if (first_duelist_ally && !(first_duelist_ally->client->pers.player_statuses & (1 << 27)))
+				if (first_duelist_ally && !(first_duelist_ally->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))
 				{
 					first_team_health += (first_duelist_ally->health + first_duelist_ally->client->ps.stats[STAT_ARMOR]);
 				}
 
-				if (second_duelist_ally && !(second_duelist_ally->client->pers.player_statuses & (1 << 27)))
+				if (second_duelist_ally && !(second_duelist_ally->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))
 				{
 					second_team_health += (second_duelist_ally->health + second_duelist_ally->client->ps.stats[STAT_ARMOR]);
 				}
@@ -7618,8 +7622,10 @@ void G_RunFrame( int levelTime ) {
 				level.duel_tournament_mode = 5;
 				level.duel_tournament_timer = level.time + 1500;
 			}
-			else if (first_duelist->client->pers.player_statuses & (1 << 27) && (!first_duelist_ally || first_duelist_ally->client->pers.player_statuses & (1 << 27)) &&
-				second_duelist->client->pers.player_statuses & (1 << 27) && (!second_duelist_ally || second_duelist_ally->client->pers.player_statuses & (1 << 27)))
+			else if (first_duelist->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS) && 
+				(!first_duelist_ally || first_duelist_ally->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)) &&
+				second_duelist->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS) && 
+				(!second_duelist_ally || second_duelist_ally->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)))
 			{ // zyk: tie when everyone dies at the same frame
 				duel_tournament_set_match_winner(NULL);
 
@@ -7791,7 +7797,7 @@ void G_RunFrame( int levelTime ) {
 
 				// zyk: cleaning flag from player
 				if (this_ent && this_ent->client)
-					this_ent->client->pers.player_statuses &= ~(1 << 27);
+					this_ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS);
 			}
 
 			if (level.duel_matches_done < level.duel_matches_quantity)
@@ -8484,7 +8490,7 @@ void G_RunFrame( int levelTime ) {
 			if (level.duel_tournament_mode == 4)
 			{
 				if (duel_tournament_is_duelist(ent) == qtrue && 
-					!(ent->client->pers.player_statuses & (1 << 27)) && // zyk: did not die in his duel yet
+					!(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS)) && // zyk: did not die in his duel yet
 					Distance(ent->client->ps.origin, level.duel_tournament_origin) > (DUEL_TOURNAMENT_ARENA_SIZE * zyk_duel_tournament_arena_scale.value / 100.0) &&
 					ent->health > 0)
 				{ // zyk: duelists cannot leave the arena after duel begins
@@ -8493,7 +8499,7 @@ void G_RunFrame( int levelTime ) {
 					player_die(ent, ent, ent, 100000, MOD_SUICIDE);
 				}
 				else if ((duel_tournament_is_duelist(ent) == qfalse || 
-					(level.duel_players[ent->s.number] != -1 && ent->client->pers.player_statuses & (1 << 27))) && // zyk: not a duelist or died in his duel
+					(level.duel_players[ent->s.number] != -1 && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS))) && // zyk: not a duelist or died in his duel
 					ent->client->sess.sessionTeam != TEAM_SPECTATOR && 
 					Distance(ent->client->ps.origin, level.duel_tournament_origin) < (DUEL_TOURNAMENT_ARENA_SIZE * zyk_duel_tournament_arena_scale.value / 100.0) &&
 					ent->health > 0)
@@ -8671,17 +8677,17 @@ void G_RunFrame( int levelTime ) {
 				}
 				else if (ent->client->ps.eFlags & EF_TALK && ent->client->pers.chat_protection_timer < level.time)
 				{
-					ent->client->pers.player_statuses |= (1 << 5);
+					ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_CHAT_PROTECTION);
 				}
 				else if (ent->client->pers.chat_protection_timer != 0 && !(ent->client->ps.eFlags & EF_TALK))
 				{
-					ent->client->pers.player_statuses &= ~(1 << 5);
+					ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CHAT_PROTECTION);
 					ent->client->pers.chat_protection_timer = 0;
 				}
 			}
 
 			// zyk: tutorial, which teaches the player the RPG Mode features
-			if (ent->client->pers.player_statuses & (1 << 25) && ent->client->pers.tutorial_timer < level.time)
+			if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_TUTORIAL) && ent->client->pers.tutorial_timer < level.time)
 			{
 				zyk_show_tutorial(ent);
 
@@ -8710,7 +8716,7 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
 				}
 
-				if (!(ent->client->pers.player_statuses & (1 << 24)) && 
+				if (!(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SELF_KILL)) &&
 					(ent->client->pers.last_health != ent->health || 
 					 ent->client->pers.last_shield != ent->client->ps.stats[STAT_ARMOR] || 
 					 ent->client->pers.last_mp != ent->client->pers.magic_power || 

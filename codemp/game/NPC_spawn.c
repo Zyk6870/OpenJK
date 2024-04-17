@@ -4600,21 +4600,6 @@ void NPC_Kill_f( void )
 			continue;
 		}
 
-		if (player && player->NPC && player->client)
-		{
-			int found = 0; // zyk: will be set to 1 when found a guardian npc
-
-			if (player->client && player->client->pers.player_statuses & (1 << 28))
-			{ // zyk: custom quest npc
-				found = 1;
-			}
-
-			if (found == 1)
-			{ // zyk: if this npc is a guardian or quest npc, do not kill it
-				continue;
-			}
-		}
-
 		if ( killNonSF )
 		{
 			if ( player )

@@ -1201,7 +1201,7 @@ qboolean NPC_ValidEnemy( gentity_t *ent )
 	if ( ent->client->playerTeam == NPCS.NPC->client->playerTeam )
 	{
 		// zyk: npc received order to guard or cover, attack anyone besides the player or his allies
-		if (NPCS.NPC->client->pers.player_statuses & (1 << 18) || NPCS.NPC->client->pers.player_statuses & (1 << 19))
+		if (NPCS.NPC->client->pers.player_statuses & (1 << PLAYER_STATUS_NPC_ORDER_GUARD) || NPCS.NPC->client->pers.player_statuses & (1 << PLAYER_STATUS_NPC_ORDER_COVER))
 		{
 			if ((ent->NPC && ent->client->leader != NPCS.NPC->client->leader) || (!ent->NPC && NPCS.NPC->client->leader != ent && zyk_is_ally(NPCS.NPC->client->leader,ent) == qfalse))
 				return qtrue;

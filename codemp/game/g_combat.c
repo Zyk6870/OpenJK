@@ -2190,10 +2190,10 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	// zyk: stop all magic powers
 	zyk_stop_all_magic_powers(self);
 	
-	self->client->pers.player_statuses &= ~(1 << 29);
+	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
 
 	// zyk: dying makes the player lose the red crystal
-	self->client->pers.player_statuses &= ~(1 << 7);
+	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_RED_CRYSTAL);
 
 	if (self->client->pers.quest_npc > 0)
 	{ // zyk: quest npc defeated by a RPG player
@@ -2218,7 +2218,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	if (self->client->sess.amrpgmode == 2 && !(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 		self->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES && 
 		!(attacker && attacker->client && attacker->s.number < MAX_CLIENTS) && // zyk: dying to a player will not count
-		!(self->client->pers.player_statuses & (1 << 24) && meansOfDeath == MOD_SUICIDE) // zyk: dont reset in this case, for example, when player logs into his account
+		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_SELF_KILL) && meansOfDeath == MOD_SUICIDE) // zyk: dont reset in this case, for example, when player logs into his account
 		)
 	{ // zyk: player died in quest. Decrease number of tries
 		zyk_decrease_quest_tries(self);
@@ -2277,7 +2277,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		player_restore_force(self);
 
 		// zyk: lost the duel
-		self->client->pers.player_statuses |= (1 << 27);
+		self->client->pers.player_statuses |= (1 << PLAYER_STATUS_DUEL_TOURNAMENT_LOSS);
 	}
 
 	// zyk: player died in Melee Battle
@@ -4733,18 +4733,18 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	}
 
 	// zyk: if attacker has nofight, cannot damage sentries
-	if (attacker && attacker->client && !attacker->NPC && attacker->client->pers.player_statuses & (1 << 26) && targ && Q_stricmp(targ->classname, "sentryGun") == 0 && 
+	if (attacker && attacker->client && !attacker->NPC && attacker->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT) && targ && Q_stricmp(targ->classname, "sentryGun") == 0 &&
 		(!targ->parent || targ->parent != attacker))
 	{
 		return;
 	}
 
 	// zyk: target has chat protection
-	if (targ && targ->client && !targ->NPC && targ->client->pers.player_statuses & (1 << 5))
+	if (targ && targ->client && !targ->NPC && targ->client->pers.player_statuses & (1 << PLAYER_STATUS_CHAT_PROTECTION))
 		return;
 
 	// zyk: target has been paralyzed by an admin
-	if (targ && targ->client && !targ->NPC && targ->client->pers.player_statuses & (1 << 6))
+	if (targ && targ->client && !targ->NPC && targ->client->pers.player_statuses & (1 << PLAYER_STATUS_PARALYZED))
 		return;
 
 	// zyk: players with noclip cannot damage

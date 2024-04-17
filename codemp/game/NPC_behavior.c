@@ -546,7 +546,7 @@ void NPC_BSFollowLeader (void)
 	visibility_t	leaderVis;
 	int			curAnim;
 
-	if ( !NPCS.NPC->client->leader || NPCS.NPC->client->pers.player_statuses & (1 << 18)) // zyk: if npc has received order to stand guard, do not follow leader
+	if ( !NPCS.NPC->client->leader || NPCS.NPC->client->pers.player_statuses & (1 << PLAYER_STATUS_NPC_ORDER_GUARD)) // zyk: if npc has received order to stand guard, do not follow leader
 	{//ok, stand guard until we find an enemy
 		if( NPCS.NPCInfo->tempBehavior == BS_HUNT_AND_KILL )
 		{
