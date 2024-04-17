@@ -453,8 +453,8 @@ char* zyk_get_enemy_type(int enemy_type)
 
 	enemy_names[0] = "mage_master";
 	enemy_names[1] = "mage_minister";
-	enemy_names[2] = "high_trained_warrior";
-	enemy_names[3] = "mage_scholar";
+	enemy_names[2] = "mage_scholar";
+	enemy_names[3] = "high_trained_warrior";
 	enemy_names[4] = "mid_trained_warrior";
 	enemy_names[5] = "flying_warrior";
 	enemy_names[6] = "flying_changeling";
@@ -583,9 +583,9 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		{
 			magic_level_bonus = 7;
 
-			first_main_magic_skill = SKILL_MAGIC_FIRE_MAGIC;
-			second_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
-			third_main_magic_skill = SKILL_MAGIC_EARTH_MAGIC;
+			first_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
+			second_main_magic_skill = SKILL_MAGIC_DARK_MAGIC;
+			third_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 8);
 		}
@@ -593,9 +593,9 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		{
 			magic_level_bonus = 7;
 
-			first_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
+			first_main_magic_skill = SKILL_MAGIC_FIRE_MAGIC;
 			second_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
-			third_main_magic_skill = SKILL_MAGIC_DARK_MAGIC;
+			third_main_magic_skill = SKILL_MAGIC_EARTH_MAGIC;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] += (magic_level_bonus * 7);
 		}
@@ -7143,7 +7143,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 21)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Defeat enough of them so we will be strong enough to defeat the rest of them.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Defeat them so we will be strong enough to defeat the rest of them.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 22)
 	{
@@ -7162,19 +7162,20 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 }
 
+extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = 60000; // zyk: default interval time
+	int interval_time = 90000; // zyk: default interval time
 
 	// zyk: decrease time based on the amount of enemies defeated, magic crystals, skill levels and inventory weight
-	interval_time -= (ent->client->pers.quest_defeated_enemies * 200);
-	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 200);
+	interval_time -= (ent->client->pers.quest_defeated_enemies * 300);
+	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 300);
 	interval_time -= (ent->client->pers.current_weight * 10);
 
 	// zyk: wait a minimum interval
-	if (interval_time < 5000)
+	if (interval_time < QUEST_NPC_MIN_SPAWN_TIME)
 	{
-		interval_time = 5000;
+		interval_time = QUEST_NPC_MIN_SPAWN_TIME;
 	}
 	
 	ent->client->pers.quest_event_timer = level.time + interval_time;
@@ -7182,13 +7183,17 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 
 void zyk_set_magic_crystal_respawn_time(gentity_t* ent)
 {
-	int magic_crystal_respawn_time = RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent));
-	int interval_decrease = ent->client->pers.quest_defeated_enemies * (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL / 2);
-	int total_interval = RPG_MAGIC_CRYSTAL_RESPAWN_TIME + magic_crystal_respawn_time - interval_decrease;
+	int skill_progress = (int)ceil(((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 100.0) / RPG_MAX_SKILLPOINTS);
+	int quest_progress = (int)ceil((ent->client->pers.quest_defeated_enemies * 100.0) / QUEST_MAX_ENEMIES);
 
-	if (total_interval < RPG_MAGIC_CRYSTAL_RESPAWN_TIME)
+	int interval_increase = skill_progress * RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL;
+	int interval_decrease = quest_progress * RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL;
+
+	int total_interval = RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME + interval_increase - interval_decrease;
+
+	if (total_interval < RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME)
 	{
-		total_interval = RPG_MAGIC_CRYSTAL_RESPAWN_TIME;
+		total_interval = RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME;
 	}
 
 	ent->client->pers.skill_crystal_timer = level.time + total_interval;
@@ -9006,8 +9011,8 @@ void G_RunFrame( int levelTime ) {
 					}
 					else
 					{
-						if (ent->client->pers.quest_defeated_enemies == QUEST_MAX_ENEMIES)
-						{ // zyk: quest completed
+						if (zyk_is_main_quest_complete(ent) == qtrue)
+						{
 							if (ent->client->pers.quest_enemy_wave_event_step == 2)
 							{
 								int j = 0;
@@ -9037,7 +9042,7 @@ void G_RunFrame( int levelTime ) {
 							}
 							else if (ent->client->pers.quest_enemy_wave_event_step == 3)
 							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Prepare yourself for the next group. Beware though, they will bring stronger enemies!\n\"", QUESTCHAR_ALL_SPIRITS));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Prepare yourself for the next group. Remember, defeat enough of them and some of their mage masters (mage in red robes) to win!\n\"", QUESTCHAR_ALL_SPIRITS));
 							}
 						}
 					}
@@ -9064,7 +9069,7 @@ void G_RunFrame( int levelTime ) {
 					zyk_set_quest_event_timer(ent);
 
 					// zyk: spawning the enemies will depend on the enemy level, lower level enemies will appear earlier in the quest
-					if (ent->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES && 
+					if (zyk_is_main_quest_complete(ent) == qfalse &&
 						zyk_quest_npcs_in_the_map() < QUEST_MAX_NPCS_IN_THE_MAP)
 					{
 						int chance_to_spawn_enemy = Q_irand(0, 99);
@@ -9072,8 +9077,10 @@ void G_RunFrame( int levelTime ) {
 						int enemy_tier = ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES);
 						int j = 0;
 
-						// zyk: each array has the chances of each enemy type to appear. Higher indexes increase chance of high tier npcs to appear
-						int enemy_chances[10][QUEST_ENEMY_TYPES] = {
+						/* zyk: each array has the chances of each enemy type to appear.Higher indexes increase chance of high tier npcs to appear
+							    the last index is when player defeated QUEST_MAX_ENEMIES 
+						*/
+						int enemy_chances[11][QUEST_ENEMY_TYPES] = {
 							{0, 0, 0, 0, 0, 0, 0, 1, 20, 100},
 							{0, 0, 0, 0, 0, 0, 1, 19, 65, 100},
 							{0, 0, 0, 0, 0, 1, 18, 55, 70, 100},
@@ -9082,8 +9089,9 @@ void G_RunFrame( int levelTime ) {
 							{0, 0, 1, 12, 52, 62, 72, 79, 87, 100},
 							{0, 1, 10, 45, 60, 68, 75, 80, 90, 100},
 							{1, 8, 48, 55, 65, 70, 78, 92, 96, 100},
-							{5, 40, 52, 62, 78, 86, 89, 95, 97, 100},
-							{40, 55, 65, 72, 79, 84, 90, 96, 98, 100}
+							{2, 45, 60, 68, 78, 86, 89, 95, 97, 100},
+							{40, 60, 70, 80, 84, 89, 92, 95, 98, 100},
+							{50, 80, 85, 90, 92, 94, 96, 98, 99, 100}
 						};
 
 						for (j = 0; j < QUEST_ENEMY_TYPES; j++)

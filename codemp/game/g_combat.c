@@ -2140,6 +2140,26 @@ void zyk_decrease_quest_tries(gentity_t *ent)
 	save_account(ent, qtrue);
 }
 
+qboolean zyk_completed_enemy_wave_event(gentity_t* ent, int old_quest_defeated_enemies_value)
+{
+	if ((ent->client->pers.quest_defeated_enemies % (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) != 0)
+	{
+		return qfalse;
+	}
+
+	if (old_quest_defeated_enemies_value != ent->client->pers.quest_defeated_enemies)
+	{
+		return qtrue;
+	}
+
+	if (ent->client->pers.quest_defeated_masters == QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 /*
 ==================
 player_die
@@ -2199,15 +2219,29 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	{ // zyk: quest npc defeated by a RPG player
 		if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 		{
-			attacker->client->pers.quest_defeated_enemies++;
+			int old_quest_defeated_enemies_value = attacker->client->pers.quest_defeated_enemies;
 
-			if (attacker->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
-			{ // zyk: this RPG player completed the quest
-				attacker->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
+			if (self->client->pers.quest_npc == 2)
+			{ // zyk: a mage master
+				attacker->client->pers.quest_defeated_masters++;
+
+				if (attacker->client->pers.quest_defeated_masters >= QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
+				{
+					attacker->client->pers.quest_defeated_masters = QUEST_MIN_MAGE_MASTERS_TO_DEFEAT;
+				}
+			}
+			else
+			{
+				attacker->client->pers.quest_defeated_enemies++;
+
+				if (attacker->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
+				{
+					attacker->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
+				}
 			}
 
-			if ((attacker->client->pers.quest_defeated_enemies % (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) == 0)
-			{ // zyk: defeated an enemy wave
+			if (zyk_completed_enemy_wave_event(attacker, old_quest_defeated_enemies_value) == qtrue)
+			{ // zyk: defeated an enemy wave or the min mage masters required to complete the quest
 				attacker->client->pers.quest_enemy_wave_event_step = 1;
 			}
 

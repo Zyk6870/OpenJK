@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.41"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.42"
 
 #define SECURITY_LOG "security.log"
 
@@ -776,8 +776,8 @@ typedef enum {
 // zyk: max RPG skillpoints
 #define RPG_MAX_SKILLPOINTS 120
 
-// zyk: amount of time to increase to spawn new skill crystals
-#define RPG_MAGIC_CRYSTAL_RESPAWN_TIME 5000
+// zyk: minimum amount of time to spawn magic crystals
+#define RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME 5000
 #define RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL 400
 
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
@@ -808,10 +808,12 @@ typedef enum {
 // zyk: main characters names
 #define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
 
-// zyk: max quest enemies that the player must defeat
+// zyk: quest enemies values
 #define QUEST_MAX_ENEMIES 200
+#define QUEST_MIN_MAGE_MASTERS_TO_DEFEAT 5
 #define QUEST_ENEMY_TYPES 10
 #define QUEST_MAX_NPCS_IN_THE_MAP 20
+#define QUEST_NPC_MIN_SPAWN_TIME 5000
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 60000
@@ -990,6 +992,7 @@ typedef struct clientPersistant_s {
 	// zyk: quest control fields
 	int quest_tries;
 	int quest_defeated_enemies;
+	int quest_defeated_masters;
 	int quest_event_timer;
 	int quest_enemy_wave_event_step;
 	int quest_enemy_wave_event_timer;

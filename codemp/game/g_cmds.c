@@ -2178,6 +2178,9 @@ void load_account(gentity_t* ent)
 			fscanf(account_file, "%s", content);
 			ent->client->pers.quest_defeated_enemies = atoi(content);
 
+			fscanf(account_file, "%s", content);
+			ent->client->pers.quest_defeated_masters = atoi(content);
+
 			// zyk: last health
 			fscanf(account_file, "%s", content);
 			ent->client->pers.last_health = atoi(content);
@@ -2262,8 +2265,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, client->pers.quest_defeated_enemies,
+			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.quest_defeated_masters,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
@@ -5080,10 +5083,19 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 	ent->client->pers.last_stamina = RPG_DEFAULT_STAMINA;
 }
 
+void zyk_set_default_quest_fields(gentity_t* ent)
+{
+	ent->client->pers.quest_tries = MIN_QUEST_TRIES;
+	ent->client->pers.quest_defeated_enemies = 0;
+	ent->client->pers.quest_defeated_masters = 0;
+}
+
 // zyk: adds a new RPG char with default values
 void add_new_char(gentity_t *ent)
 {
 	zyk_set_default_rpg_stuff(ent);
+
+	zyk_set_default_quest_fields(ent);
 }
 
 // zyk: creates the directory correctly depending on the OS
@@ -5200,11 +5212,6 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	if (ent->client->sess.amrpgmode == 2)
 	{
 		initialize_rpg_skills(ent, qtrue);
-
-		ent->client->pers.quest_tries = MIN_QUEST_TRIES;
-		ent->client->pers.quest_defeated_enemies = 0;
-
-		zyk_set_quest_event_timer(ent);
 	}
 	else
 	{
@@ -5923,6 +5930,16 @@ void zyk_list_inventory(gentity_t* ent, int page)
 	trap->SendServerCommand(ent->s.number, va("print \"\n%s\n\"", message));
 }
 
+qboolean zyk_is_main_quest_complete(gentity_t* ent)
+{
+	if (ent->client->pers.quest_defeated_enemies == QUEST_MAX_ENEMIES && ent->client->pers.quest_defeated_masters == QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 /*
 ==================
 Cmd_ListAccount_f
@@ -6012,9 +6029,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				if (zyk_allow_quests.integer == 1)
 				{
-					if (ent->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES)
+					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^3Defeat the Brotherhood of Mages\n\n^7The Brotherhood of mages is attacking!\nKeep defeating them until all are defeated\n\n^3Enemies Defeated: ^7%d/%d\n^3Quest tries: ^7%d\n\n\"", ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES, ent->client->pers.quest_tries));
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them and some of the Mage Masters (mages in red robes)\nso the Magic Spirits can end the war.\n\n^3Enemies Defeated: ^7%d/%d\n^3Masters Defeated: ^7%d/%d\n^3Quest tries: ^7%d\n\n\"", 
+							ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES, ent->client->pers.quest_defeated_masters, QUEST_MIN_MAGE_MASTERS_TO_DEFEAT, ent->client->pers.quest_tries));
 					}
 					else
 					{
@@ -11881,8 +11899,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 		{
 			if (Q_stricmp(arg2, "quests") == 0)
 			{
-				ent->client->pers.quest_tries = MIN_QUEST_TRIES;
-				ent->client->pers.quest_defeated_enemies = 0;
+				zyk_set_default_quest_fields(ent);
 				zyk_set_quest_event_timer(ent);
 
 				save_account(ent, qtrue);
