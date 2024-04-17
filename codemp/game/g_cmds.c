@@ -5081,6 +5081,20 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 	ent->client->pers.last_health = 100;
 	ent->client->pers.current_stamina = RPG_DEFAULT_STAMINA;
 	ent->client->pers.last_stamina = RPG_DEFAULT_STAMINA;
+
+	// zyk: player starts with no weapons, ammo or items
+	ent->client->ps.stats[STAT_WEAPONS] = 0;
+	ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_NONE);
+	ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_MELEE);
+	ent->client->ps.ammo[AMMO_BLASTER] = 0;
+	ent->client->ps.ammo[AMMO_POWERCELL] = 0;
+	ent->client->ps.ammo[AMMO_METAL_BOLTS] = 0;
+	ent->client->ps.ammo[AMMO_ROCKETS] = 0;
+	ent->client->ps.ammo[AMMO_THERMAL] = 0;
+	ent->client->ps.ammo[AMMO_TRIPMINE] = 0;
+	ent->client->ps.ammo[AMMO_DETPACK] = 0;
+	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = 0;
+	ent->client->ps.stats[STAT_HOLDABLE_ITEM] = 0;
 }
 
 void zyk_set_default_quest_fields(gentity_t* ent)

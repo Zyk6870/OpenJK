@@ -2764,6 +2764,7 @@ extern int	BMS_START;
 extern int	BMS_MID;
 extern int	BMS_END;
 
+extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 extern void zyk_clear_magic_crystals(gentity_t* effect_ent);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 
@@ -2831,6 +2832,8 @@ void fx_runner_think( gentity_t *ent )
 					if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0)
 					{
 						player_ent->client->pers.magic_crystals++;
+
+						zyk_add_mp(player_ent, 1);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 					}
