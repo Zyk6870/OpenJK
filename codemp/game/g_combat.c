@@ -2125,14 +2125,14 @@ void G_AddPowerDuelLoserScore(int team, int score)
 }
 
 extern void save_account(gentity_t* ent, qboolean save_char_file);
+extern void zyk_set_default_quest_fields(gentity_t* ent);
 void zyk_decrease_quest_tries(gentity_t *ent)
 {
 	ent->client->pers.quest_tries--;
 
 	if (ent->client->pers.quest_tries <= 0)
 	{
-		ent->client->pers.quest_tries = MIN_QUEST_TRIES;
-		ent->client->pers.quest_defeated_enemies = 0;
+		zyk_set_default_quest_fields(ent);
 
 		trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You have no tries left. Quests reset\n\"");
 	}

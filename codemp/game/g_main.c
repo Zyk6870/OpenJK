@@ -526,13 +526,15 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		int first_main_magic_skill = 0;
 		int second_main_magic_skill = 0;
 		int third_main_magic_skill = 0;
+		float quest_progress = (bonuses * 1.0) / QUEST_MAX_ENEMIES;
+		int hp_bonus = npc_ent->NPC->stats.health * quest_progress;
 
 		npc_ent->client->pers.quest_npc = 1;
 		npc_ent->client->pers.quest_npc_event = 0;
 		npc_ent->client->pers.quest_event_timer = 0;
 		npc_ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
 
-		npc_ent->NPC->stats.health += (bonuses * 2);
+		npc_ent->NPC->stats.health += hp_bonus;
 		npc_ent->client->ps.stats[STAT_MAX_HEALTH] = npc_ent->NPC->stats.health;
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
@@ -553,7 +555,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 
 		if (enemy_type == 0)
 		{ // zyk: most powerful mage. Set all to this bonus
-			magic_level_bonus = 9;
+			magic_level_bonus = 8;
 
 			while (current_magic_skill < NUMBER_OF_SKILLS)
 			{
@@ -570,7 +572,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		}
 		else if (enemy_type == 1)
 		{
-			magic_level_bonus = 8;
+			magic_level_bonus = 7;
 
 			first_main_magic_skill = SKILL_MAGIC_DARK_MAGIC;
 			second_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
@@ -581,7 +583,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		}
 		else if (enemy_type == 2)
 		{
-			magic_level_bonus = 8;
+			magic_level_bonus = 7;
 
 			first_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
 			second_main_magic_skill = SKILL_MAGIC_DARK_MAGIC;
@@ -591,7 +593,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		}
 		else if (enemy_type == 3)
 		{
-			magic_level_bonus = 7;
+			magic_level_bonus = 6;
 
 			first_main_magic_skill = SKILL_MAGIC_FIRE_MAGIC;
 			second_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
@@ -601,7 +603,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		}
 		else if (enemy_type == 4)
 		{
-			magic_level_bonus = 7;
+			magic_level_bonus = 6;
 
 			first_main_magic_skill = SKILL_MAGIC_DOME_OF_DAMAGE;
 			second_main_magic_skill = SKILL_MAGIC_WATER_MAGIC;
@@ -611,7 +613,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		}
 		else if (enemy_type == 5)
 		{
-			magic_level_bonus = 7;
+			magic_level_bonus = 6;
 
 			first_main_magic_skill = SKILL_MAGIC_AIR_MAGIC;
 			second_main_magic_skill = SKILL_MAGIC_HEALING_AREA;
@@ -620,7 +622,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		}
 		else if (enemy_type == 6)
 		{
-			magic_level_bonus = 7;
+			magic_level_bonus = 6;
 
 			first_main_magic_skill = SKILL_MAGIC_AIR_MAGIC;
 			second_main_magic_skill = SKILL_MAGIC_FIRE_MAGIC;
@@ -629,7 +631,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		}
 		else if (enemy_type == 7)
 		{
-			magic_level_bonus = 7;
+			magic_level_bonus = 6;
 
 			first_main_magic_skill = SKILL_MAGIC_WATER_MAGIC;
 
@@ -8983,18 +8985,18 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
-					int red_crystal_chance = 86 + (ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
+					int red_crystal_chance = 76 + ((ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) / 2);
 
-					if (magic_crystal_chance_to_spawn < 80)
+					if (magic_crystal_chance_to_spawn < 70)
 					{ // zyk: Magic Crystal
 						zyk_spawn_skill_crystal(ent, 60000, 1);
 					}
-					else if (magic_crystal_chance_to_spawn >= 80 && magic_crystal_chance_to_spawn < 85 &&
+					else if (magic_crystal_chance_to_spawn >= 70 && magic_crystal_chance_to_spawn < 75 &&
 							zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)))
 					{ // zyk: Extra Tries Crystal. Quests must be enabled
 						zyk_spawn_skill_crystal(ent, 50000, 2);
 					}
-					else if (magic_crystal_chance_to_spawn >= 85 && magic_crystal_chance_to_spawn < red_crystal_chance)
+					else if (magic_crystal_chance_to_spawn >= 75 && magic_crystal_chance_to_spawn < red_crystal_chance)
 					{ // zyk: Energy Modulator puzzle crystal. Increases chance based on the quest progress
 						zyk_spawn_skill_crystal(ent, 40000, 3);
 					}
@@ -9090,8 +9092,8 @@ void G_RunFrame( int levelTime ) {
 							{0, 1, 10, 45, 60, 68, 75, 80, 93, 100},
 							{1, 8, 48, 55, 65, 70, 78, 92, 96, 100},
 							{2, 45, 60, 68, 78, 86, 89, 95, 97, 100},
-							{40, 60, 70, 80, 84, 89, 92, 95, 98, 100},
-							{50, 80, 85, 90, 92, 94, 96, 98, 99, 100}
+							{25, 55, 75, 80, 84, 89, 92, 95, 98, 100},
+							{50, 75, 90, 92, 94, 96, 97, 98, 99, 100}
 						};
 
 						for (j = 0; j < QUEST_ENEMY_TYPES; j++)
