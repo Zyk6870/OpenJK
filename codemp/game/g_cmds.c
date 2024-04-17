@@ -5212,6 +5212,9 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	if (ent->client->sess.amrpgmode == 2)
 	{
 		initialize_rpg_skills(ent, qtrue);
+
+		// zyk: set flag so the quest will not spawn npcsyet before player sees the tutorial
+		ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_CREATED_ACCOUNT);
 	}
 	else
 	{

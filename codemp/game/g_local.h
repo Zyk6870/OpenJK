@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.42"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.43"
 
 #define SECURITY_LOG "security.log"
 
@@ -549,6 +549,7 @@ typedef enum {
 	PLAYER_STATUS_NO_FIGHT,
 	PLAYER_STATUS_DUEL_TOURNAMENT_LOSS,
 	PLAYER_STATUS_IN_FLAMES,
+	PLAYER_STATUS_CREATED_ACCOUNT,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -805,6 +806,9 @@ typedef enum {
 // zyk: duration of the duelists protection in Duel Tournament
 #define DUEL_TOURNAMENT_PROTECTION_TIME 2000
 
+// zyk: tutorial duration time
+#define TUTORIAL_DURATION 120000
+
 // zyk: main characters names
 #define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
 
@@ -813,7 +817,7 @@ typedef enum {
 #define QUEST_MIN_MAGE_MASTERS_TO_DEFEAT 5
 #define QUEST_ENEMY_TYPES 10
 #define QUEST_MAX_NPCS_IN_THE_MAP 20
-#define QUEST_NPC_MIN_SPAWN_TIME 5000
+#define QUEST_NPC_SPAWN_TIME 30000
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 60000

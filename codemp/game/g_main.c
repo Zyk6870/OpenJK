@@ -553,7 +553,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 
 		if (enemy_type == 0)
 		{ // zyk: most powerful mage. Set all to this bonus
-			magic_level_bonus = 10;
+			magic_level_bonus = 9;
 
 			while (current_magic_skill < NUMBER_OF_SKILLS)
 			{
@@ -562,7 +562,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 				current_magic_skill++;
 			}
 
-			// zyk: this npc will have a different AI when casting magic
+			// zyk: one of the Mage Masters
 			npc_ent->client->pers.quest_npc = 2;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) + 1;
@@ -581,7 +581,7 @@ void zyk_spawn_quest_npc(int enemy_type, int yaw, int bonuses)
 		}
 		else if (enemy_type == 2)
 		{
-			magic_level_bonus = 7;
+			magic_level_bonus = 8;
 
 			first_main_magic_skill = SKILL_MAGIC_LIGHT_MAGIC;
 			second_main_magic_skill = SKILL_MAGIC_DARK_MAGIC;
@@ -7059,7 +7059,7 @@ void zyk_show_tutorial(gentity_t* ent)
 {
 	if (ent->client->pers.tutorial_step == 0)
 	{
-		zyk_spawn_magic_spirits(ent, 120000);
+		zyk_spawn_magic_spirits(ent, TUTORIAL_DURATION);
 	}
 	if (ent->client->pers.tutorial_step == 1)
 	{
@@ -7165,17 +7165,17 @@ void zyk_show_tutorial(gentity_t* ent)
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = 90000; // zyk: default interval time
+	int interval_time = QUEST_NPC_SPAWN_TIME;
+	int quest_progress = (int)ceil((ent->client->pers.quest_defeated_enemies * 100.0) / QUEST_MAX_ENEMIES);
 
-	// zyk: decrease time based on the amount of enemies defeated, magic crystals, skill levels and inventory weight
-	interval_time -= (ent->client->pers.quest_defeated_enemies * 300);
-	interval_time -= ((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 300);
-	interval_time -= (ent->client->pers.current_weight * 10);
+	// zyk: decrease time based on the quest progress
+	interval_time -= (quest_progress * 200);
 
-	// zyk: wait a minimum interval
-	if (interval_time < QUEST_NPC_MIN_SPAWN_TIME)
-	{
-		interval_time = QUEST_NPC_MIN_SPAWN_TIME;
+	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT))
+	{ //zyk: player is in tutorial for the first time. Do not spawn quest npcs yet
+		interval_time = TUTORIAL_DURATION;
+
+		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CREATED_ACCOUNT);
 	}
 	
 	ent->client->pers.quest_event_timer = level.time + interval_time;
@@ -9081,13 +9081,13 @@ void G_RunFrame( int levelTime ) {
 							    the last index is when player defeated QUEST_MAX_ENEMIES 
 						*/
 						int enemy_chances[11][QUEST_ENEMY_TYPES] = {
-							{0, 0, 0, 0, 0, 0, 0, 1, 20, 100},
-							{0, 0, 0, 0, 0, 0, 1, 19, 65, 100},
-							{0, 0, 0, 0, 0, 1, 18, 55, 70, 100},
-							{0, 0, 0, 0, 1, 15, 55, 70, 80, 100},
-							{0, 0, 0, 1, 14, 55, 70, 78, 83, 100},
-							{0, 0, 1, 12, 52, 62, 72, 79, 87, 100},
-							{0, 1, 10, 45, 60, 68, 75, 80, 90, 100},
+							{0, 0, 0, 0, 0, 0, 0, 1, 35, 100},
+							{0, 0, 0, 0, 0, 0, 1, 22, 65, 100},
+							{0, 0, 0, 0, 0, 1, 20, 55, 75, 100},
+							{0, 0, 0, 0, 1, 15, 55, 70, 83, 100},
+							{0, 0, 0, 1, 14, 55, 70, 78, 89, 100},
+							{0, 0, 1, 12, 52, 62, 72, 79, 91, 100},
+							{0, 1, 10, 45, 60, 68, 75, 80, 93, 100},
 							{1, 8, 48, 55, 65, 70, 78, 92, 96, 100},
 							{2, 45, 60, 68, 78, 86, 89, 95, 97, 100},
 							{40, 60, 70, 80, 84, 89, 92, 95, 98, 100},
