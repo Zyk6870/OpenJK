@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.44"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.45"
 
 #define SECURITY_LOG "security.log"
 
@@ -538,7 +538,6 @@ typedef enum {
 	PLAYER_STATUS_SCALED,
 	PLAYER_STATUS_CHAT_PROTECTION,
 	PLAYER_STATUS_PARALYZED,
-	PLAYER_STATUS_GOT_RED_CRYSTAL,
 	PLAYER_STATUS_ADM_GIVE_FORCE,
 	PLAYER_STATUS_ADM_GIVE_GUNS,
 	PLAYER_STATUS_MAGIC_POINTS_EVENT,
@@ -550,6 +549,8 @@ typedef enum {
 	PLAYER_STATUS_DUEL_TOURNAMENT_LOSS,
 	PLAYER_STATUS_IN_FLAMES,
 	PLAYER_STATUS_CREATED_ACCOUNT,
+	PLAYER_STATUS_GOT_RED_CRYSTAL,
+	PLAYER_STATUS_GOT_YELLOW_CRYSTAL,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -656,6 +657,15 @@ typedef enum {
 	MAGIC_HIT_BY_AIR,
 	MAX_HIT_BY_MAGIC
 } zyk_hit_by_magic_t;
+
+typedef enum {
+	MAGIC_CRYSTAL_NONE,
+	MAGIC_CRYSTAL_SKILL,
+	MAGIC_CRYSTAL_EXTRA_TRIES,
+	MAGIC_CRYSTAL_TIME,
+	MAGIC_CRYSTAL_ARTIFACT,
+	NUM_MAGIC_CRYSTALS
+} zyk_magic_crystal_type_t;
 
 typedef enum {
 	SKILL_JUMP,

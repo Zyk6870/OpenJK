@@ -6034,8 +6034,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them and some of the Mage Masters (mages in red robes)\nso the Magic Spirits can end the war.\n\n^3Enemies Defeated: ^7%d/%d\n^3Masters Defeated: ^7%d/%d\n^3Quest tries: ^7%d\n\n\"", 
-							ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES, ent->client->pers.quest_defeated_masters, QUEST_MIN_MAGE_MASTERS_TO_DEFEAT, ent->client->pers.quest_tries));
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them and some of the Mage Masters (mages in red robes)\nso the %s ^7can end the war.\n\n^3Enemies Defeated: ^7%d/%d\n^3Masters Defeated: ^7%d/%d\n^3Quest tries: ^7%d (find ^2green ^7crystals to increase it)\n\n\"", 
+							QUESTCHAR_ALL_SPIRITS, 
+							ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES, ent->client->pers.quest_defeated_masters, QUEST_MIN_MAGE_MASTERS_TO_DEFEAT, 
+							ent->client->pers.quest_tries));
 					}
 					else
 					{

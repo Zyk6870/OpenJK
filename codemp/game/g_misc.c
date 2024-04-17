@@ -2764,6 +2764,7 @@ extern int	BMS_START;
 extern int	BMS_MID;
 extern int	BMS_END;
 
+extern void zyk_clear_magic_crystals(gentity_t* effect_ent);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 
 //----------------------------------------------------------
@@ -2812,9 +2813,10 @@ void fx_runner_think( gentity_t *ent )
 	}
 
 	// zyk: one of the crystal types. Tests if there is a RPG player touching it
-	if (Q_stricmp(ent->targetname, "zyk_magic_crystal") == 0 || 
+	if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_secret_crystal") == 0)
+		Q_stricmp(ent->targetname, "zyk_time_crystal") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_artifact_crystal") == 0)
 	{
 		int i = 0;
 
@@ -2826,7 +2828,7 @@ void fx_runner_think( gentity_t *ent )
 			{ // zyk: a logged RPG player
 				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < 45)
 				{
-					if (Q_stricmp(ent->targetname, "zyk_magic_crystal") == 0)
+					if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0)
 					{
 						player_ent->client->pers.magic_crystals++;
 
@@ -2838,9 +2840,18 @@ void fx_runner_think( gentity_t *ent )
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
 					}
-					else if (player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
+					else if (Q_stricmp(ent->targetname, "zyk_time_crystal") == 0)
+					{
+						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7a Time crystal! We can use this power to prevent new enemies from coming for some time.\n\"", QUESTCHAR_ALL_SPIRITS));
+
+						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_YELLOW_CRYSTAL);
+
+						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/player/holocron.wav"));
+					}
+					else if (Q_stricmp(ent->targetname, "zyk_artifact_crystal") == 0 && 
+						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
 					{ // zyk: player that has the Energy Modulator cannot play the puzzle again
-						trap->SendServerCommand(player_ent->s.number, "chat \"^3Quest System: ^7You found a secret! Press ^2Use ^7key to start the puzzle\n\"");
+						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Press ^2Use ^7key and solve the puzzle to receive our powerful artifact!\n\"", QUESTCHAR_ALL_SPIRITS));
 
 						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_RED_CRYSTAL);
 
@@ -2849,14 +2860,13 @@ void fx_runner_think( gentity_t *ent )
 
 					save_account(player_ent, qtrue);
 
+					zyk_clear_magic_crystals(ent);
+
 					ent->think = G_FreeEntity;
 					ent->nextthink = level.time + 100;
 
 					// zyk: must set this to -1 so the server will not try to clear this entity again
 					level.special_power_effects[ent->s.number] = -1;
-
-					// zyk: must also clear the crystal model. Uses the model id stored in count
-					level.special_power_effects_timer[ent->count] = level.time;
 
 					return;
 				}

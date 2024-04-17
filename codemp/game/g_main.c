@@ -5194,8 +5194,25 @@ void zyk_spawn_energy_modulator_model(float x, float y, float z, int model_scale
 	new_ent->count = 7;
 }
 
+void zyk_clear_magic_crystals(gentity_t* effect_ent)
+{
+	int i = 0;
+
+	for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
+	{
+		gentity_t* crystal_ent = &g_entities[i];
+
+		if (crystal_ent && Q_stricmp(crystal_ent->classname, "misc_model_breakable") == 0 && 
+			Q_stricmp(crystal_ent->targetname, "zyk_magic_crystal") == 0 &&
+			crystal_ent->count == effect_ent->s.number)
+		{ // zyk: found one of the models of this crystal effect, clear it
+			level.special_power_effects_timer[crystal_ent->s.number] = level.time;
+		}
+	}
+}
+
 extern int zyk_total_skillpoints(gentity_t* ent);
-void zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration, int magic_crystal_model_id, char *crystal_type)
+int zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration, char *crystal_type)
 {
 	gentity_t* new_ent = G_Spawn();
 
@@ -5207,14 +5224,13 @@ void zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration, int
 
 	zyk_spawn_entity(new_ent);
 
-	// zyk: used to clear the model entity when player gets the crystal
-	new_ent->count = magic_crystal_model_id;
-
 	level.special_power_effects[new_ent->s.number] = 0;
 	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+
+	return new_ent->s.number;
 }
 
-int zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, int duration)
+void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, int duration, int crystal_effect_id)
 {
 	gentity_t* new_ent = G_Spawn();
 
@@ -5228,14 +5244,14 @@ int zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, i
 	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
 
 	zyk_set_entity_field(new_ent, "zykmodelscale", "30");
-	zyk_set_entity_field(new_ent, "targetname", "zyk_skill_crystal");
+	zyk_set_entity_field(new_ent, "targetname", "zyk_magic_crystal");
 
 	zyk_spawn_entity(new_ent);
 
+	new_ent->count = crystal_effect_id;
+
 	level.special_power_effects[new_ent->s.number] = 0;
 	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
-
-	return new_ent->s.number;
 }
 
 // zyk: spawn the model and effect used by magic crystals
@@ -5244,7 +5260,7 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
 	float x, y, z;
 	int distance_factor = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
 	gentity_t* chosen_entity = NULL;
-	int crystal_model_id = 0;
+	int crystal_effect_id = 0;
 
 	chosen_entity = zyk_find_entity_for_quest();
 
@@ -5286,20 +5302,26 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
 		z += chosen_entity->s.origin[2];
 	}
 
-	if (crystal_type == 1)
+	if (crystal_type == MAGIC_CRYSTAL_SKILL)
 	{
-		crystal_model_id = zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration);
-		zyk_spawn_skill_crystal_effect(x, y, z, duration, crystal_model_id, "zyk_magic_crystal");
+		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_skill_crystal");
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id);
 	}
-	else if (crystal_type == 2)
+	else if (crystal_type == MAGIC_CRYSTAL_EXTRA_TRIES)
 	{
-		crystal_model_id = zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration);
-		zyk_spawn_skill_crystal_effect(x, y, z, duration, crystal_model_id, "zyk_extra_tries_crystal");
+		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_extra_tries_crystal");
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id);
 	}
-	else
+	else if (crystal_type == MAGIC_CRYSTAL_TIME)
 	{
-		crystal_model_id = zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration);
-		zyk_spawn_skill_crystal_effect(x, y, z, duration, crystal_model_id, "zyk_secret_crystal");
+		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_time_crystal");
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id);
+	}
+	else if (crystal_type == MAGIC_CRYSTAL_ARTIFACT)
+	{
+		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_artifact_crystal");
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id);
 	}
 }
 
@@ -7153,7 +7175,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 23)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There is a rare green crystal that gives you extra quest tries. There is also a very rare and helpful red crystal.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are some other crystal types that will help you in your quest.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 24)
 	{
@@ -7178,6 +7200,13 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 		interval_time = TUTORIAL_DURATION;
 
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CREATED_ACCOUNT);
+	}
+
+	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_YELLOW_CRYSTAL))
+	{
+		interval_time += 120000;
+
+		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_YELLOW_CRYSTAL);
 	}
 	
 	ent->client->pers.quest_event_timer = level.time + interval_time;
@@ -8985,20 +9014,29 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
-					int red_crystal_chance = 76 + ((ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) / 2);
+					int red_crystal_chance = 80 + ((ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) / 2);
+
+					if (ent->client->pers.quest_defeated_masters == QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
+					{
+						red_crystal_chance += 1;
+					}
 
 					if (magic_crystal_chance_to_spawn < 70)
 					{ // zyk: Magic Crystal
-						zyk_spawn_skill_crystal(ent, 60000, 1);
+						zyk_spawn_skill_crystal(ent, 60000, MAGIC_CRYSTAL_SKILL);
 					}
 					else if (magic_crystal_chance_to_spawn >= 70 && magic_crystal_chance_to_spawn < 75 &&
 							zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)))
 					{ // zyk: Extra Tries Crystal. Quests must be enabled
-						zyk_spawn_skill_crystal(ent, 50000, 2);
+						zyk_spawn_skill_crystal(ent, 55000, MAGIC_CRYSTAL_EXTRA_TRIES);
 					}
-					else if (magic_crystal_chance_to_spawn >= 75 && magic_crystal_chance_to_spawn < red_crystal_chance)
+					else if (magic_crystal_chance_to_spawn >= 75 && magic_crystal_chance_to_spawn < 79)
+					{ // zyk: Time crystal. Makes enemies not able to spawn for some time
+						zyk_spawn_skill_crystal(ent, 50000, MAGIC_CRYSTAL_TIME);
+					}
+					else if (magic_crystal_chance_to_spawn >= 79 && magic_crystal_chance_to_spawn < red_crystal_chance)
 					{ // zyk: Energy Modulator puzzle crystal. Increases chance based on the quest progress
-						zyk_spawn_skill_crystal(ent, 40000, 3);
+						zyk_spawn_skill_crystal(ent, 45000, MAGIC_CRYSTAL_ARTIFACT);
 					}
 
 					zyk_set_magic_crystal_respawn_time(ent);
