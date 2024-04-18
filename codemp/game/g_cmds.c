@@ -6048,7 +6048,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them and some of the Mage Masters (mages in red robes)\nso the %s ^7can end the war.\n\n^3Enemies Defeated: ^7%d/%d\n^3Masters Defeated: ^7%d/%d\n^3Quest tries: ^7%d (find ^2green ^7crystals to increase it)\n\n\"", 
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them and some of the Mage Masters (mages in red robes)\nso the %s ^7can end the war.\n\n^3Enemies Defeated: ^7%d/%d\n^3Masters Defeated: ^7%d/%d\n\n^3Quest tries: ^7%d (find ^2green ^7crystals to increase it)\n\n\"", 
 							QUESTCHAR_ALL_SPIRITS, 
 							ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES, ent->client->pers.quest_defeated_masters, QUEST_MIN_MAGE_MASTERS_TO_DEFEAT, 
 							ent->client->pers.quest_tries));
@@ -8147,47 +8147,56 @@ void Cmd_Settings_f( gentity_t *ent ) {
 
 		if (ent->client->pers.player_settings & (1 << SETTINGS_HEAL_ALLY))
 		{
-			strcpy(message, va("%s\n^3%d - Use healing force only at allied players - ^1OFF", message, SETTINGS_HEAL_ALLY));
+			strcpy(message, va("%s\n^3 %d - Use healing force only at allied players - ^1OFF", message, SETTINGS_HEAL_ALLY));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^3%d - Use healing force only at allied players - ^2ON", message, SETTINGS_HEAL_ALLY));
+			strcpy(message, va("%s\n^3 %d - Use healing force only at allied players - ^2ON", message, SETTINGS_HEAL_ALLY));
 		}
 
 		if (ent->client->pers.player_settings & (1 << SETTINGS_SABER_START))
 		{
-			strcpy(message, va("%s\n^3%d - Start With Saber ^1OFF", message, SETTINGS_SABER_START));
+			strcpy(message, va("%s\n^3 %d - Start With Saber ^1OFF", message, SETTINGS_SABER_START));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^3%d - Start With Saber ^2ON", message, SETTINGS_SABER_START));
+			strcpy(message, va("%s\n^3 %d - Start With Saber ^2ON", message, SETTINGS_SABER_START));
 		}
 
 		if (ent->client->pers.player_settings & (1 << SETTINGS_JETPACK))
 		{
-			strcpy(message, va("%s\n^3%d - Jetpack ^1OFF", message, SETTINGS_JETPACK));
+			strcpy(message, va("%s\n^3 %d - Jetpack ^1OFF", message, SETTINGS_JETPACK));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^3%d - Jetpack ^2ON", message, SETTINGS_JETPACK));
+			strcpy(message, va("%s\n^3 %d - Jetpack ^2ON", message, SETTINGS_JETPACK));
 		}
 
 		if (ent->client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT))
 		{
-			strcpy(message, va("%s\n^3%d - Admin Protect ^1OFF", message, SETTINGS_ADMIN_PROTECT));
+			strcpy(message, va("%s\n^3 %d - Admin Protect ^1OFF", message, SETTINGS_ADMIN_PROTECT));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^3%d - Admin Protect ^2ON", message, SETTINGS_ADMIN_PROTECT));
+			strcpy(message, va("%s\n^3 %d - Admin Protect ^2ON", message, SETTINGS_ADMIN_PROTECT));
+		}
+
+		if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+		{
+			strcpy(message, va("%s\n^3 %d - Quest Difficulty ^1Hard", message, SETTINGS_DIFFICULTY));
+		}
+		else
+		{
+			strcpy(message, va("%s\n^3 %d - Quest Difficulty ^2Normal", message, SETTINGS_DIFFICULTY));
 		}
 
 		if (ent->client->pers.player_settings & (1 << SETTINGS_BOSS_MUSIC))
 		{
-			strcpy(message, va("%s\n^3%d - Custom Music ^1OFF", message, SETTINGS_BOSS_MUSIC));
+			strcpy(message, va("%s\n^3 %d - Custom Music ^1OFF", message, SETTINGS_BOSS_MUSIC));
 		}
 		else
 		{
-			strcpy(message, va("%s\n^3%d - Custom Music ^2ON", message, SETTINGS_BOSS_MUSIC));
+			strcpy(message, va("%s\n^3 %d - Custom Music ^2ON", message, SETTINGS_BOSS_MUSIC));
 		}
 
 		trap->SendServerCommand( ent->s.number, va("print \"%s\n\n^7Choose a setting above and use ^3/settings <number> ^7to turn it ^2ON ^7or ^1OFF^7\n\"", message) );
@@ -8207,50 +8216,76 @@ void Cmd_Settings_f( gentity_t *ent ) {
 			return;
 		}
 
-		if (ent->client->pers.player_settings & (1 << value))
+		if (value == SETTINGS_DIFFICULTY)
 		{
-			ent->client->pers.player_settings &= ~(1 << value);
-			strcpy(new_status,"^2ON^7");
+			if (ent->client->pers.quest_defeated_enemies > 0 || ent->client->pers.quest_defeated_masters > 0)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Cannot change Quest Difficulty after quest started.\n\"");
+				return;
+			}
+
+			if (ent->client->pers.player_settings & (1 << value))
+			{
+				ent->client->pers.player_settings &= ~(1 << value);
+				strcpy(new_status, "^2Normal^7");
+			}
+			else
+			{
+				ent->client->pers.player_settings |= (1 << value);
+				strcpy(new_status, "^1Hard^7");
+			}
 		}
 		else
 		{
-			ent->client->pers.player_settings |= (1 << value);
-			strcpy(new_status,"^1OFF^7");
+			if (ent->client->pers.player_settings & (1 << value))
+			{
+				ent->client->pers.player_settings &= ~(1 << value);
+				strcpy(new_status, "^2ON^7");
+			}
+			else
+			{
+				ent->client->pers.player_settings |= (1 << value);
+				strcpy(new_status, "^1OFF^7");
+			}
 		}
 
 		save_account(ent, qfalse);
 
 		if (value == SETTINGS_RPG_QUESTS)
 		{
-			trap->SendServerCommand( ent->s.number, va("print \"Quests %s\n\"", new_status) );
+			trap->SendServerCommand(ent->s.number, va("print \"Quests %s\n\"", new_status));
 		}
 		else if (value == SETTINGS_FORCE_FROM_ALLIES)
 		{
-			trap->SendServerCommand( ent->s.number, va("print \"Allow Force Powers from allies %s\n\"", new_status) );
+			trap->SendServerCommand(ent->s.number, va("print \"Allow Force Powers from allies %s\n\"", new_status));
 		}
 		else if (value == SETTINGS_SCREEN_MESSAGE)
 		{
-			trap->SendServerCommand( ent->s.number, va("print \"Allow Screen Message %s\n\"", new_status) );
+			trap->SendServerCommand(ent->s.number, va("print \"Allow Screen Message %s\n\"", new_status));
 		}
 		else if (value == SETTINGS_HEAL_ALLY)
 		{
-			trap->SendServerCommand( ent->s.number, va("print \"Use healing force only at allied players %s\n\"", new_status) );
+			trap->SendServerCommand(ent->s.number, va("print \"Use healing force only at allied players %s\n\"", new_status));
 		}
 		else if (value == SETTINGS_SABER_START)
 		{
-			trap->SendServerCommand( ent->s.number, va("print \"Start With Saber %s\n\"", new_status) );
+			trap->SendServerCommand(ent->s.number, va("print \"Start With Saber %s\n\"", new_status));
 		}
 		else if (value == SETTINGS_JETPACK)
 		{
-			trap->SendServerCommand( ent->s.number, va("print \"Jetpack %s\n\"", new_status) );
+			trap->SendServerCommand(ent->s.number, va("print \"Jetpack %s\n\"", new_status));
 		}
 		else if (value == SETTINGS_ADMIN_PROTECT)
 		{
-			trap->SendServerCommand( ent->s.number, va("print \"Admin Protect %s\n\"", new_status) );
+			trap->SendServerCommand(ent->s.number, va("print \"Admin Protect %s\n\"", new_status));
+		}
+		else if (value == SETTINGS_DIFFICULTY)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"Quest Difficulty %s\n\"", new_status));
 		}
 		else if (value == SETTINGS_BOSS_MUSIC)
 		{
-			trap->SendServerCommand( ent->s.number, va("print \"Custom Music %s\n\"", new_status) );
+			trap->SendServerCommand(ent->s.number, va("print \"Custom Music %s\n\"", new_status));
 		}
 
 		if (value == SETTINGS_RPG_QUESTS && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)
