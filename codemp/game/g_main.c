@@ -462,6 +462,9 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR] = "force_saber_warrior";
 	enemy_names[QUEST_NPC_CHANGELING_WARRIOR] = "changeling_warrior";
 	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR] = "low_trained_warrior";
+	enemy_names[QUEST_NPC_ALLY_MAGE] = "ally_mage";
+	enemy_names[QUEST_NPC_ALLY_FLYING_WARRIOR] = "ally_flying_warrior";
+	enemy_names[QUEST_NPC_ALLY_FORCE_WARRIOR] = "ally_force_warrior";
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
@@ -484,7 +487,10 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 		6, 
 		7, 
 		8, 
-		16
+		16, 
+		12, 
+		7, 
+		7
 	};
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
@@ -510,7 +516,7 @@ void zyk_set_magic_level_for_quest_npc(gentity_t* npc_ent, zyk_quest_npc_t enemy
 // zyk: spawns a quest npc and sets additional stuff, like levels, etc
 extern int zyk_max_skill_level(int skill_index);
 extern int zyk_max_magic_power(gentity_t* ent);
-void zyk_spawn_quest_npc(zyk_quest_npc_t enemy_type, int yaw, int bonuses, qboolean hard_mode)
+void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, qboolean hard_mode)
 {
 	gentity_t* npc_ent = NULL;
 
@@ -567,7 +573,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t enemy_type, int yaw, int bonuses, qbool
 		z += chosen_entity->s.origin[2];
 	}
 
-	npc_ent = Zyk_NPC_SpawnType(zyk_get_enemy_type(enemy_type), x, y, z, yaw);
+	npc_ent = Zyk_NPC_SpawnType(zyk_get_enemy_type(quest_npc_type), x, y, z, yaw);
 
 	if (npc_ent && npc_ent->client)
 	{
@@ -576,7 +582,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t enemy_type, int yaw, int bonuses, qbool
 		int enemy_wave = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) + 1;
 		int skill_level_bonus = 0;
 
-		npc_ent->client->pers.quest_npc = enemy_type;
+		npc_ent->client->pers.quest_npc = quest_npc_type;
 		npc_ent->client->pers.quest_npc_event = 0;
 		npc_ent->client->pers.quest_event_timer = 0;
 		npc_ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
@@ -594,109 +600,146 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t enemy_type, int yaw, int bonuses, qbool
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
 		// zyk: setting magic abilities. Higher tier enemies will have a better magic bonus
-		if (enemy_type == QUEST_NPC_MAGE_MASTER)
+		if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_DARK_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_LIGHT_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_HEALING_AREA, enemy_wave + 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, enemy_wave + 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, enemy_wave + 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave + 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave + 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave + 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave + 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave + 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave + 1 + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = enemy_wave + 1 + skill_level_bonus;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 189 + skill_level_bonus;
 		}
-		else if (enemy_type == QUEST_NPC_MAGE_MINISTER)
+		else if (quest_npc_type == QUEST_NPC_MAGE_MINISTER)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_DARK_MAGIC, enemy_wave - 3 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_LIGHT_MAGIC, enemy_wave - 3 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_HEALING_AREA, enemy_wave - 4 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, enemy_wave - 3 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, enemy_wave - 3 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave - 4 + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = enemy_wave - 5 + skill_level_bonus;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 25 + skill_level_bonus;
 		}
-		else if (enemy_type == QUEST_NPC_MAGE_SCHOLAR)
+		else if (quest_npc_type == QUEST_NPC_MAGE_SCHOLAR)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_LIGHT_MAGIC, enemy_wave - 2 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_DARK_MAGIC, enemy_wave - 2 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave - 3 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, enemy_wave - 2 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, enemy_wave - 2 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave - 3 + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = enemy_wave - 6 + skill_level_bonus;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 20 + skill_level_bonus;
 		}
-		else if (enemy_type == QUEST_NPC_HIGH_TRAINED_WARRIOR)
+		else if (quest_npc_type == QUEST_NPC_HIGH_TRAINED_WARRIOR)
 		{
 			if (enemy_wave >= 2)
 			{
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave - 1 + skill_level_bonus);
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 1 + skill_level_bonus);
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave - 1 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave - 1 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 1 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave - 1 + skill_level_bonus);
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 5 + skill_level_bonus;
 			}
 		}
-		else if (enemy_type == QUEST_NPC_MID_TRAINED_WARRIOR)
+		else if (quest_npc_type == QUEST_NPC_MID_TRAINED_WARRIOR)
 		{
 			if (enemy_wave >= 3)
 			{
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave - 2 + skill_level_bonus);
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave - 1 + skill_level_bonus);
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 1 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave - 2 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave - 1 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 1 + skill_level_bonus);
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 4 + skill_level_bonus;
 			}
 		}
-		else if (enemy_type == QUEST_NPC_FLYING_WARRIOR)
+		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
 		{
 			if (enemy_wave >= 3)
 			{
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_HEALING_AREA, enemy_wave - 2 + skill_level_bonus);
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave - 1 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave - 2 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave - 1 + skill_level_bonus);
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 3 + skill_level_bonus;
 			}
 		}
-		else if (enemy_type == QUEST_NPC_FLYING_CHANGELING)
+		else if (quest_npc_type == QUEST_NPC_FLYING_CHANGELING)
 		{
 			if (enemy_wave >= 3)
 			{
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave - 2 + skill_level_bonus);
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave - 1 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave - 2 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave - 1 + skill_level_bonus);
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 2 + skill_level_bonus;
 			}
 		}
-		else if (enemy_type == QUEST_NPC_FORCE_SABER_WARRIOR)
+		else if (quest_npc_type == QUEST_NPC_FORCE_SABER_WARRIOR)
 		{
 			if (enemy_wave >= 2)
 			{
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave - 1 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave - 1 + skill_level_bonus);
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + skill_level_bonus;
 			}
 		}
-		else if (enemy_type == QUEST_NPC_CHANGELING_WARRIOR)
+		else if (quest_npc_type == QUEST_NPC_CHANGELING_WARRIOR)
 		{
 			if (enemy_wave >= 3)
 			{
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 2 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 2 + skill_level_bonus);
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + skill_level_bonus;
 			}
 		}
-		else if (enemy_type == QUEST_NPC_LOW_TRAINED_WARRIOR)
+		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR)
 		{
 			if (enemy_wave >= 5)
 			{
-				zyk_set_magic_level_for_quest_npc(npc_ent, enemy_type, SKILL_MAGIC_HEALING_AREA, enemy_wave - 4 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave - 4 + skill_level_bonus);
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave - 4 + skill_level_bonus;
 			}
+		}
+		else if (quest_npc_type == QUEST_NPC_ALLY_MAGE)
+		{
+			int ally_bonus = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
+
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, ally_bonus + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + skill_level_bonus;
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 90 + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_ALLY_FLYING_WARRIOR)
+		{
+			int ally_bonus = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
+
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, ally_bonus + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_ALLY_FORCE_WARRIOR)
+		{
+			int ally_bonus = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
+
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, ally_bonus + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 20 + skill_level_bonus;
 		}
 
 		// zyk: setting the initial amount of magic points here because it is based on the Max MP skill
@@ -5349,6 +5392,12 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
 		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id);
 		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id);
 	}
+	else if (crystal_type == MAGIC_CRYSTAL_ALLY)
+	{
+		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_ally_crystal");
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id);
+	}
 	else if (crystal_type == MAGIC_CRYSTAL_ARTIFACT)
 	{
 		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_artifact_crystal");
@@ -9062,10 +9111,13 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
-					int red_crystal_chance = 81 + ((ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) / 2);
+					float quest_progress = (ent->client->pers.quest_defeated_enemies * 1.0) / QUEST_MAX_ENEMIES;
+					int ally_crystal_chance = 86 + (int)ceil(quest_progress * 5);
+					int red_crystal_chance = 93 + (int)ceil(quest_progress * 5);
 
 					if (ent->client->pers.quest_defeated_masters == QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
 					{
+						ally_crystal_chance += 1;
 						red_crystal_chance += 1;
 					}
 
@@ -9075,15 +9127,19 @@ void G_RunFrame( int levelTime ) {
 					}
 					else if (magic_crystal_chance_to_spawn >= 70 && magic_crystal_chance_to_spawn < 75 && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Extra Tries Crystal
-						zyk_spawn_skill_crystal(ent, 55000, MAGIC_CRYSTAL_EXTRA_TRIES);
+						zyk_spawn_skill_crystal(ent, 57000, MAGIC_CRYSTAL_EXTRA_TRIES);
 					}
 					else if (magic_crystal_chance_to_spawn >= 75 && magic_crystal_chance_to_spawn < 80 && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Time crystal
-						zyk_spawn_skill_crystal(ent, 50000, MAGIC_CRYSTAL_TIME);
+						zyk_spawn_skill_crystal(ent, 54000, MAGIC_CRYSTAL_TIME);
 					}
-					else if (magic_crystal_chance_to_spawn >= 80 && magic_crystal_chance_to_spawn < red_crystal_chance)
+					else if (magic_crystal_chance_to_spawn >= 80 && magic_crystal_chance_to_spawn < ally_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					{ // zyk: Ally call crystal
+						zyk_spawn_skill_crystal(ent, 51000, MAGIC_CRYSTAL_ALLY);
+					}
+					else if (magic_crystal_chance_to_spawn >= 92 && magic_crystal_chance_to_spawn < red_crystal_chance)
 					{ // zyk: Energy Modulator puzzle crystal
-						zyk_spawn_skill_crystal(ent, 45000, MAGIC_CRYSTAL_ARTIFACT);
+						zyk_spawn_skill_crystal(ent, 48000, MAGIC_CRYSTAL_ARTIFACT);
 					}
 
 					zyk_set_magic_crystal_respawn_time(ent);

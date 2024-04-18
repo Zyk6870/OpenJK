@@ -881,7 +881,7 @@ void NPC_Begin (gentity_t *ent)
 		if (NPC_SpotWouldTelefrag(ent))
 		{
 			// zyk: added jawa seller condition, remove it to avoid exploit in which player can spawn a lot of sellers
-			if ( ent->wait < 0 || Q_stricmp(ent->NPC_type, "jawa_seller") == 0)
+			if ( ent->wait < 0 || Q_stricmp(ent->NPC_type, "zyk_seller") == 0)
 			{//remove yourself
 				G_DebugPrint( WL_DEBUG, "NPC %s could not spawn, firing target3 (%s) and removing self\n", ent->targetname, ent->target3 );
 				//Fire off our target3
@@ -4522,10 +4522,6 @@ void NPC_Spawn_f( gentity_t *ent )
 	{
 		trap->Argv(3, targetname, 1024);
 	}
-
-	// zyk: cannot spawn jawa seller
-	if (Q_stricmp("jawa_seller", npc_type) == 0)
-		return;
 
 	NPC_SpawnType( ent, npc_type, targetname, isVehicle );
 }

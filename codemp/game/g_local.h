@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.54"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.55"
 
 #define SECURITY_LOG "security.log"
 
@@ -665,6 +665,7 @@ typedef enum {
 	MAGIC_CRYSTAL_EXTRA_TRIES,
 	MAGIC_CRYSTAL_TIME,
 	MAGIC_CRYSTAL_ARTIFACT,
+	MAGIC_CRYSTAL_ALLY,
 	NUM_MAGIC_CRYSTALS
 } zyk_magic_crystal_type_t;
 
@@ -787,6 +788,9 @@ typedef enum {
 	QUEST_NPC_FORCE_SABER_WARRIOR,
 	QUEST_NPC_CHANGELING_WARRIOR,
 	QUEST_NPC_LOW_TRAINED_WARRIOR,
+	QUEST_NPC_ALLY_MAGE,
+	QUEST_NPC_ALLY_FLYING_WARRIOR,
+	QUEST_NPC_ALLY_FORCE_WARRIOR,
 	NUM_QUEST_NPCS
 } zyk_quest_npc_t;
 
