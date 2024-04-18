@@ -2215,13 +2215,13 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	// zyk: dying makes the player lose the red crystal
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_RED_CRYSTAL);
 
-	if (self->client->pers.quest_npc > 0)
+	if (self->client->pers.quest_npc > QUEST_NPC_NONE)
 	{ // zyk: quest npc defeated by a RPG player
 		if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 		{
 			int old_quest_defeated_enemies_value = attacker->client->pers.quest_defeated_enemies;
 
-			if (self->client->pers.quest_npc == 2)
+			if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 			{ // zyk: a mage master
 				attacker->client->pers.quest_defeated_masters++;
 
@@ -2258,7 +2258,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		zyk_decrease_quest_tries(self);
 	}
 
-	if (attacker && attacker->client && attacker->client->pers.quest_npc > 0 && attacker->enemy && attacker->enemy == self)
+	if (attacker && attacker->client && attacker->client->pers.quest_npc > QUEST_NPC_NONE && attacker->enemy && attacker->enemy == self)
 	{ // zyk: quest npc defeated an enemy. Clear it to find a new one and stop all magic powers
 		attacker->enemy = NULL;
 
@@ -4848,7 +4848,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			damage = (int)ceil(damage * 1.09);
 	}
 
-	if (attacker && attacker->client && (attacker->client->sess.amrpgmode == 2 || (attacker->NPC && attacker->client->pers.quest_npc > 0)))
+	if (attacker && attacker->client && (attacker->client->sess.amrpgmode == 2 || (attacker->NPC && attacker->client->pers.quest_npc > QUEST_NPC_NONE)))
 	{ // zyk: bonus damage
 		// zyk: Magic bolts can damage heavy things
 		if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2)

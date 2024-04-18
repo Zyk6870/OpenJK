@@ -1768,7 +1768,7 @@ finish:
 		newent->client->sess.ally1 = 0;
 		newent->client->sess.ally2 = 0;
 
-		newent->client->pers.quest_npc = 0;
+		newent->client->pers.quest_npc = QUEST_NPC_NONE;
 
 		// zyk: initializing Magic Power attributes
 		newent->client->pers.quest_power_status = 0;

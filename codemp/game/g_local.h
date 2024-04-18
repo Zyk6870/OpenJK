@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.48"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.49"
 
 #define SECURITY_LOG "security.log"
 
@@ -773,6 +773,21 @@ typedef enum {
 	RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR,
 	MAX_RPG_INVENTORY_ITEMS
 } zyk_inventory_t;
+
+typedef enum {
+	QUEST_NPC_NONE,
+	QUEST_NPC_MAGE_MASTER,
+	QUEST_NPC_MAGE_MINISTER,
+	QUEST_NPC_MAGE_SCHOLAR,
+	QUEST_NPC_HIGH_TRAINED_WARRIOR,
+	QUEST_NPC_MID_TRAINED_WARRIOR,
+	QUEST_NPC_FLYING_WARRIOR,
+	QUEST_NPC_FLYING_CHANGELING,
+	QUEST_NPC_FORCE_SABER_WARRIOR,
+	QUEST_NPC_CHANGELING_WARRIOR,
+	QUEST_NPC_LOW_TRAINED_WARRIOR,
+	NUM_QUEST_NPCS
+} zyk_quest_npc_t;
 
 // zyk: Minimum Stamina before player starts to get tired
 #define RPG_MIN_STAMINA 1000.0
