@@ -2124,6 +2124,8 @@ void G_AddPowerDuelLoserScore(int team, int score)
 	}
 }
 
+extern void zyk_NPC_Kill_f(char* name);
+extern char* zyk_get_enemy_type(int enemy_type);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 extern void zyk_set_default_quest_fields(gentity_t* ent);
 void zyk_decrease_quest_tries(gentity_t *ent)
@@ -2133,6 +2135,9 @@ void zyk_decrease_quest_tries(gentity_t *ent)
 	if (ent->client->pers.quest_tries <= 0)
 	{
 		zyk_set_default_quest_fields(ent);
+
+		// zyk: kill all mage masters
+		zyk_NPC_Kill_f(zyk_get_enemy_type(QUEST_NPC_MAGE_MASTER));
 
 		trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You have no tries left. Quests reset\n\"");
 	}
@@ -2181,11 +2186,11 @@ extern void saberReactivate(gentity_t *saberent, gentity_t *saberOwner);
 extern void saberBackToOwner(gentity_t *saberent);
 extern void try_finishing_race();
 extern void remove_credits(gentity_t *ent, int credits);
-extern void zyk_NPC_Kill_f( char *name );
 extern gentity_t *Zyk_NPC_SpawnType(char *npc_type, int x, int y, int z, int yaw);
 extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
+extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
 	gentity_t* ent;
 	int			anim;
@@ -2249,8 +2254,10 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		}
 	}
 
-	if (self->client->sess.amrpgmode == 2 && !(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
-		self->client->pers.quest_defeated_enemies < QUEST_MAX_ENEMIES && 
+	if (zyk_allow_quests.integer > 0 && 
+		self->client->sess.amrpgmode == 2 && 
+		!(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
+		zyk_is_main_quest_complete(self) == qfalse && 
 		!(attacker && attacker->client && attacker->s.number < MAX_CLIENTS) && // zyk: dying to a player will not count
 		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_SELF_KILL) && meansOfDeath == MOD_SUICIDE) // zyk: dont reset in this case, for example, when player logs into his account
 		)

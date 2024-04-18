@@ -405,46 +405,47 @@ void zyk_NPC_Kill_f(char* name)
 	}
 }
 
+qboolean zyk_valid_entity_for_quest(gentity_t* ent)
+{
+	if (ent && Q_stricmp(ent->classname, "freed") != 0 && Q_stricmp(ent->classname, "lightsaber") != 0)
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 gentity_t* zyk_find_entity_for_quest()
 {
 	int min_entity_id = (MAX_CLIENTS + BODY_QUEUE_SIZE);
 	int chosen_entity_index = 0; // zyk: npc origin will be at a random map entity origin
-	gentity_t* chosen_entity = NULL;
+	gentity_t* valid_entities[ENTITYNUM_MAX_NORMAL];
 	int i = 0, j = 0;
-	int total_entities_in_use = 0;
+	int total_valid_entities = 0;
 
-	// zyk: get all entities in use
+	// zyk: initializing valid_entities
+	for (i = 0; i < ENTITYNUM_MAX_NORMAL; i++)
+	{
+		valid_entities[i] = NULL;
+	}
+
+	// zyk: get possible entities to be used to place quest stuff
 	for (i = min_entity_id; i < level.num_entities; i++)
 	{
 		gentity_t* current_entity = &g_entities[i];
 
-		if (current_entity && current_entity->inuse == qtrue)
+		if (zyk_valid_entity_for_quest(current_entity) == qtrue)
 		{
-			total_entities_in_use++;
+			total_valid_entities++;
+			valid_entities[j] = current_entity;
+			j++;
 		}
 	}
 
-	chosen_entity_index = Q_irand(0, (total_entities_in_use - 1));
+	// zyk: choose a random entity from the valid ones
+	chosen_entity_index = Q_irand(0, (total_valid_entities - 1));
 
-	for (i = min_entity_id; i < level.num_entities; i++)
-	{
-		gentity_t* current_entity = &g_entities[i];
-
-		if (current_entity && current_entity->inuse == qtrue && chosen_entity_index == j)
-		{ // zyk: found the entity
-			chosen_entity = current_entity;
-			break;
-		}
-
-		j++;
-	}
-
-	if (chosen_entity && Q_stricmp(chosen_entity->classname, "lightsaber") == 0)
-	{ // zyk: do not use the lightsaber entity for quests
-		chosen_entity = NULL;
-	}
-
-	return chosen_entity;
+	return valid_entities[chosen_entity_index];
 }
 
 char* zyk_get_enemy_type(int enemy_type)
@@ -513,21 +514,35 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t enemy_type, int yaw, int bonuses, qbool
 {
 	gentity_t* npc_ent = NULL;
 
-	float x, y, z;
-	int min_distance = 1, max_distance = 20;
+	float x = 0, y = 0, z = 0;
+	int npc_offset = 48;
 	gentity_t* chosen_entity = NULL;
 
 	chosen_entity = zyk_find_entity_for_quest();
 
-	if (!chosen_entity)
+	if (chosen_entity == NULL)
 	{ // zyk: if for some reason there was no chosen entity, try again later
 		return;
 	}
 
-	// zyk: the distance the npc is from the chosen entity origin
-	x = Q_irand(min_distance, max_distance);
-	y = Q_irand(min_distance, max_distance);
-	z = Q_irand(min_distance, max_distance);
+	// zyk: validating some entity types so the npc will not be stuck or telefrag other npcs
+	if (chosen_entity->NPC)
+	{
+		z += 50;
+	}
+	else if (Q_stricmp(chosen_entity->classname, "fx_runner") == 0 || 
+			chosen_entity->r.contents & CONTENTS_SOLID
+		)
+	{
+		x += npc_offset;
+		y += npc_offset;
+	}
+	else
+	{
+		x = Q_irand(0, npc_offset);
+		y = Q_irand(0, npc_offset);
+		z = Q_irand(0, npc_offset);
+	}
 
 	if (Q_irand(0, 1) == 0)
 	{
