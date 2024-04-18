@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.52"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.53"
 
 #define SECURITY_LOG "security.log"
 
@@ -837,6 +837,7 @@ typedef enum {
 
 // zyk: main characters names
 #define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
+#define QUESTCHAR_SELLER "^3Seller"
 
 // zyk: quest enemies values
 #define QUEST_MAX_ENEMIES 200

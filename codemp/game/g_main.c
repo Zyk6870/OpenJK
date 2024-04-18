@@ -7220,7 +7220,7 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_YELLOW_CRYSTAL))
 	{
-		interval_time += 120000;
+		interval_time += 60000;
 
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_YELLOW_CRYSTAL);
 	}

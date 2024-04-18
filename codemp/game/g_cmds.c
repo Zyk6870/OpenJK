@@ -6048,7 +6048,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them and some of the Mage Masters (mages in red robes)\nso the %s ^7can end the war.\n\n^3Enemies Defeated: ^7%d/%d\n^3Masters Defeated: ^7%d/%d\n\n^3Quest tries: ^7%d (find ^2green ^7crystals to increase it)\n\n\"", 
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them and some of the Mage Masters (mages in red robes)\nso the %s ^7can end the war.\n\n^3Enemies Defeated: ^7%d/%d\n^3Masters Defeated: ^7%d/%d\n\n^3Quest tries: ^7%d (^2green ^7crystals increase this)\n\n\"", 
 							QUESTCHAR_ALL_SPIRITS, 
 							ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES, ent->client->pers.quest_defeated_masters, QUEST_MIN_MAGE_MASTERS_TO_DEFEAT, 
 							ent->client->pers.quest_tries));
@@ -7292,13 +7292,13 @@ void Cmd_Buy_f( gentity_t *ent ) {
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
-		trap->SendServerCommand( ent-g_entities, va("chat \"^3Jawa Seller: ^7Thanks %s^7!\n\"",ent->client->pers.netname) );
+		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Thanks %s^7!\n\"", QUESTCHAR_SELLER, ent->client->pers.netname));
 
 		Cmd_ZykMod_f(ent);
 	}
 	else
 	{
-		trap->SendServerCommand( ent-g_entities, va("chat \"^3Jawa Seller: ^7%s^7, my products are not free! Give me the money!\n\"",ent->client->pers.netname) );
+		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7%s^7, my products are not free! Give me the money!\n\"", QUESTCHAR_SELLER, ent->client->pers.netname));
 		return;
 	}
 }
@@ -7667,11 +7667,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
-		trap->SendServerCommand( ent-g_entities, va("chat \"^3Jawa Seller: ^7Thanks %s^7!\n\"",ent->client->pers.netname) );
+		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Thanks %s^7!\n\"", QUESTCHAR_SELLER, ent->client->pers.netname));
 	}
 	else
 	{
-		trap->SendServerCommand( ent-g_entities, va("chat \"^3Jawa Seller: ^7You don't have this item.\n\"") );
+		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7You don't have this item.\n\"", QUESTCHAR_SELLER));
 	}
 }
 
