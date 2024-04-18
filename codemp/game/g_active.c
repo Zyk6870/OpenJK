@@ -816,6 +816,7 @@ ClientTimerActions
 Actions that happen once a second
 ==================
 */
+extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 extern int zyk_max_magic_power(gentity_t *ent);
 extern void Add_Ammo (gentity_t *ent, int weapon, int count);
 extern void zyk_energy_modulator(gentity_t* ent);
@@ -850,7 +851,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 					zyk_energy_modulator(ent);
 				}
-				else if (client->pers.magic_power < 1 && client->ps.ammo[AMMO_POWERCELL] < 1)
+				else if (client->pers.magic_power < 1 && client->pers.magic_crystals < 1 && client->ps.ammo[AMMO_POWERCELL] < 1)
 				{ // zyk: no more ammo to keep it active. Turn it off
 					ent->client->pers.energy_modulator_mode = 2;
 
@@ -859,6 +860,11 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				else if (client->pers.magic_power >= 1)
 				{
 					client->pers.magic_power -= 1;
+				}
+				else if (client->pers.magic_crystals > 0)
+				{
+					client->pers.magic_crystals--;
+					zyk_add_mp(ent, 100);
 				}
 				else
 				{
