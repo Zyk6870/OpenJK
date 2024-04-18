@@ -5243,7 +5243,7 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 
 	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
 
-	zyk_set_entity_field(new_ent, "zykmodelscale", "30");
+	zyk_set_entity_field(new_ent, "zykmodelscale", "35");
 	zyk_set_entity_field(new_ent, "targetname", "zyk_magic_crystal");
 
 	zyk_spawn_entity(new_ent);
@@ -9121,7 +9121,7 @@ void G_RunFrame( int levelTime ) {
 						int enemy_tier = ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES);
 						int j = 0;
 
-						/* zyk: each array has the chances of each enemy type to appear.Higher indexes increase chance of high tier npcs to appear
+						/* zyk: each array has the chances of each enemy type to appear. Higher indexes increase chance of high tier npcs to appear
 							    the last index is when player defeated QUEST_MAX_ENEMIES 
 						*/
 						int enemy_chances[11][QUEST_ENEMY_TYPES] = {
@@ -9131,10 +9131,10 @@ void G_RunFrame( int levelTime ) {
 							{0, 0, 0, 0, 1, 15, 55, 70, 83, 100},
 							{0, 0, 0, 1, 14, 55, 70, 78, 89, 100},
 							{0, 0, 1, 12, 52, 62, 72, 79, 91, 100},
-							{0, 1, 10, 45, 60, 68, 75, 80, 93, 100},
-							{1, 8, 48, 55, 65, 70, 78, 92, 96, 100},
-							{2, 45, 60, 68, 78, 86, 89, 95, 97, 100},
-							{25, 55, 75, 80, 84, 89, 92, 95, 98, 100},
+							{0, 0, 10, 45, 60, 68, 75, 80, 93, 100},
+							{0, 2, 48, 55, 65, 70, 78, 92, 96, 100},
+							{0, 25, 60, 68, 78, 86, 89, 95, 97, 100},
+							{20, 55, 75, 80, 84, 89, 92, 95, 98, 100},
 							{50, 75, 90, 92, 94, 96, 97, 98, 99, 100}
 						};
 
