@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.55"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.56"
 
 #define SECURITY_LOG "security.log"
 
@@ -845,7 +845,7 @@ typedef enum {
 
 // zyk: quest enemies values
 #define QUEST_MAX_ENEMIES 200
-#define QUEST_MIN_MAGE_MASTERS_TO_DEFEAT 5
+#define QUEST_MIN_MAGE_MASTERS_TO_DEFEAT 10
 #define QUEST_ENEMY_TYPES 10
 #define QUEST_MAX_NPCS_IN_THE_MAP 20
 #define QUEST_NPC_SPAWN_TIME 30000
@@ -1036,6 +1036,7 @@ typedef struct clientPersistant_s {
 	int quest_npc;
 	int quest_npc_event;
 	int quest_npc_idle_timer;
+	int quest_npc_caller_player_id;
 } clientPersistant_t;
 
 typedef struct renderInfo_s

@@ -489,8 +489,8 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 		8, 
 		16, 
 		12, 
-		7, 
-		7
+		8, 
+		8
 	};
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
@@ -516,7 +516,7 @@ void zyk_set_magic_level_for_quest_npc(gentity_t* npc_ent, zyk_quest_npc_t enemy
 // zyk: spawns a quest npc and sets additional stuff, like levels, etc
 extern int zyk_max_skill_level(int skill_index);
 extern int zyk_max_magic_power(gentity_t* ent);
-void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, qboolean hard_mode)
+void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, qboolean hard_mode, int player_id)
 {
 	gentity_t* npc_ent = NULL;
 
@@ -586,6 +586,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		npc_ent->client->pers.quest_npc_event = 0;
 		npc_ent->client->pers.quest_event_timer = 0;
 		npc_ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
+		npc_ent->client->pers.quest_npc_caller_player_id = player_id;
 
 		if (hard_mode == qtrue)
 		{
@@ -639,9 +640,10 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		{
 			if (enemy_wave >= 2)
 			{
-				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave - 1 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave - 1 + skill_level_bonus);
 				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 1 + skill_level_bonus);
 				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave - 1 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave - 1 + skill_level_bonus);
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 5 + skill_level_bonus;
 			}
@@ -719,7 +721,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + skill_level_bonus;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 90 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 40 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_FLYING_WARRIOR)
 		{
@@ -728,16 +730,16 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, ally_bonus + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 30 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_FORCE_WARRIOR)
 		{
 			int ally_bonus = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, ally_bonus + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, ally_bonus + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, ally_bonus + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 20 + skill_level_bonus;
 		}
@@ -9164,13 +9166,14 @@ void G_RunFrame( int levelTime ) {
 								{
 									gentity_t* npc_ent = &g_entities[j];
 
-									if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc > QUEST_NPC_NONE)
+									if (npc_ent && npc_ent->client && npc_ent->NPC && 
+										npc_ent->client->pers.quest_npc > QUEST_NPC_NONE && npc_ent->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 									{ // zyk: one of the quest enemies
 										zyk_NPC_Kill_f(npc_ent->NPC_type);
 									}
 								}
 
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We can now defeat the remaining of them.\n\"", QUESTCHAR_ALL_SPIRITS));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We can now defeat the remaining of Brotherhood of Mages.\n\"", QUESTCHAR_ALL_SPIRITS));
 							}
 							else if (ent->client->pers.quest_enemy_wave_event_step == 3)
 							{
@@ -9181,11 +9184,11 @@ void G_RunFrame( int levelTime ) {
 						{
 							if (ent->client->pers.quest_enemy_wave_event_step == 2)
 							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated a group of %d enemies.\n\"", QUESTCHAR_ALL_SPIRITS, (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated a wave of enemies.\n\"", QUESTCHAR_ALL_SPIRITS));
 							}
 							else if (ent->client->pers.quest_enemy_wave_event_step == 3)
 							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Prepare yourself for the next group. Remember, defeat enough of them and some of their mage masters (mage in red robes) to win!\n\"", QUESTCHAR_ALL_SPIRITS));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The next enemy wave is coming. Defeat enough of them and some of the mage masters to win!\n\"", QUESTCHAR_ALL_SPIRITS));
 							}
 						}
 					}
@@ -9252,7 +9255,7 @@ void G_RunFrame( int levelTime ) {
 							hard_difficulty = qtrue;
 						}
 
-						zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty);
+						zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
 					}
 				}
 			}

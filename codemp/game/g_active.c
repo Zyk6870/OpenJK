@@ -1398,6 +1398,9 @@ void zyk_stamina_out(gentity_t* ent)
 
 		ent->client->pers.stamina_out_timer = level.time + stamina_out_time;
 
+		// zyk: cannot use magic while passed out
+		ent->client->pers.quest_power_usage_timer = level.time + stamina_out_time;
+
 		// zyk: also lose some health
 		G_Damage(ent, ent, ent, NULL, NULL, 50, 0, MOD_UNKNOWN);
 
