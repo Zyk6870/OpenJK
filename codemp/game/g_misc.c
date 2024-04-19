@@ -2837,8 +2837,6 @@ void fx_runner_think( gentity_t *ent )
 					{
 						player_ent->client->pers.magic_crystals++;
 
-						zyk_add_mp(player_ent, 1);
-
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0)
@@ -2877,6 +2875,8 @@ void fx_runner_think( gentity_t *ent )
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
 					}
+
+					zyk_add_mp(player_ent, 1);
 
 					save_account(player_ent, qtrue);
 

@@ -448,6 +448,7 @@ gentity_t* zyk_find_entity_for_quest()
 	return valid_entities[chosen_entity_index];
 }
 
+extern void Jedi_Cloak(gentity_t* self);
 char* zyk_get_enemy_type(int enemy_type)
 {
 	char* enemy_names[NUM_QUEST_NPCS];
@@ -534,7 +535,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 	// zyk: validating some entity types so the npc will not be stuck or telefrag other npcs
 	if (chosen_entity->NPC)
 	{
-		z += 50;
+		z += 70;
 	}
 	else if (Q_stricmp(chosen_entity->classname, "fx_runner") == 0 || 
 			chosen_entity->r.contents & CONTENTS_SOLID
@@ -603,6 +604,15 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		// zyk: setting magic abilities. Higher tier enemies will have a better magic bonus
 		if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
 		{
+			if (hard_mode == qtrue)
+			{
+				Jedi_Cloak(npc_ent);
+			}
+			else if (Q_irand(0, 9) == 0)
+			{
+				Jedi_Cloak(npc_ent);
+			}
+
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, enemy_wave + 1 + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, enemy_wave + 1 + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave + 1 + skill_level_bonus);
@@ -661,6 +671,8 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		}
 		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
 		{
+			Jedi_Cloak(npc_ent);
+
 			if (enemy_wave >= 3)
 			{
 				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave - 2 + skill_level_bonus);
@@ -690,11 +702,11 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_WARRIOR)
 		{
-			if (enemy_wave >= 3)
+			if (enemy_wave >= 2)
 			{
-				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 2 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 1 + skill_level_bonus);
 
-				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + skill_level_bonus;
+				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave - 1 + skill_level_bonus;
 			}
 		}
 		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR)
@@ -702,6 +714,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 			if (enemy_wave >= 5)
 			{
 				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave - 4 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave - 5 + skill_level_bonus);
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave - 4 + skill_level_bonus;
 			}
@@ -7259,7 +7272,7 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 	int quest_progress = (int)ceil((ent->client->pers.quest_defeated_enemies * 100.0) / QUEST_MAX_ENEMIES);
 
 	// zyk: decrease time based on the quest progress
-	interval_time -= (quest_progress * 200);
+	interval_time -= (quest_progress * 150);
 
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT))
 	{ //zyk: player is in tutorial for the first time. Do not spawn quest npcs yet
@@ -7527,7 +7540,6 @@ void AI_UpdateGroups( void );
 void ClearPlayerAlertEvents( void );
 void SiegeCheckTimers(void);
 void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd );
-extern void Jedi_Cloak( gentity_t *self );
 qboolean G_PointInBounds( vec3_t point, vec3_t mins, vec3_t maxs );
 
 int g_siegeRespawnCheck = 0;
@@ -8494,14 +8506,14 @@ void G_RunFrame( int levelTime ) {
 			int model_y = level.legendary_artifact_origin[1];
 			int model_z = level.legendary_artifact_origin[2];
 
-			zyk_spawn_legendary_artifact_puzzle_model(model_x + 82, model_y + 46, model_z, crystal_scale, "models/map_objects/mp/crystal_red.md3", 1);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x + 77, model_y + 42, model_z, crystal_scale, "models/map_objects/mp/crystal_red.md3", 1);
 
-			zyk_spawn_legendary_artifact_puzzle_model(model_x + 82, model_y - 46, model_z, crystal_scale, "models/map_objects/mp/crystal_green.md3", 2);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x + 77, model_y - 42, model_z, crystal_scale, "models/map_objects/mp/crystal_green.md3", 2);
 
-			zyk_spawn_legendary_artifact_puzzle_model(model_x - 82, model_y + 46, model_z, crystal_scale, "models/map_objects/mp/crystal_blue.md3", 3);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x - 77, model_y + 42, model_z, crystal_scale, "models/map_objects/mp/crystal_blue.md3", 3);
 
-			zyk_spawn_legendary_artifact_puzzle_model(model_x - 82, model_y - 46, model_z, crystal_scale, "models/map_objects/mp/crystal_red.md3", 4);
-			zyk_spawn_legendary_artifact_puzzle_model(model_x - 82, model_y - 46, model_z, crystal_scale, "models/map_objects/mp/crystal_green.md3", 0);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x - 77, model_y - 42, model_z, crystal_scale, "models/map_objects/mp/crystal_red.md3", 4);
+			zyk_spawn_legendary_artifact_puzzle_model(model_x - 77, model_y - 42, model_z, crystal_scale, "models/map_objects/mp/crystal_green.md3", 0);
 
 			zyk_spawn_legendary_artifact_puzzle_model(model_x, model_y + 84, model_z, crystal_scale, "models/map_objects/mp/crystal_red.md3", 5);
 			zyk_spawn_legendary_artifact_puzzle_model(model_x, model_y + 84, model_z, crystal_scale, "models/map_objects/mp/crystal_blue.md3", 0);
@@ -9143,22 +9155,23 @@ void G_RunFrame( int levelTime ) {
 
 						// zyk: get a resistance member near the player
 						if (ally_ent && ally_ent->client && ally_ent->NPC && ally_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE &&
-							ally_ent->client->pers.quest_npc_caller_player_id == ent->s.number)
+							ally_ent->client->pers.quest_npc_caller_player_id == ent->s.number && 
+							ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL))
 						{
 							vec3_t npc_origin;
 
 							VectorCopy(ent->client->ps.origin, npc_origin);
-							npc_origin[2] += 50;
+							npc_origin[2] += 70;
 
 							zyk_TeleportPlayer(ally_ent, npc_origin, ent->client->ps.viewangles);
 
-							trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Hi! I came to help you fight the enemies!\n\"", QUESTCHAR_ALLY));
+							ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL);
 
-							break;
+							trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Hi! I came to help you fight the enemies!\n\"", QUESTCHAR_ALLY));
 						}
 					}
 
-					ent->client->pers.player_statuses &= (1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL);
+					ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL);
 				}
 
 				// zyk: when player defeats each enemy wave, Magic Spirits will appear to talk to them
@@ -9166,7 +9179,7 @@ void G_RunFrame( int levelTime ) {
 				{
 					if (ent->client->pers.quest_enemy_wave_event_step == 1)
 					{
-						zyk_spawn_magic_spirits(ent, 20000);
+						zyk_spawn_magic_spirits(ent, 15000);
 					}
 					else
 					{
@@ -9250,8 +9263,8 @@ void G_RunFrame( int levelTime ) {
 							{0, 0, 1, 12, 52, 62, 72, 79, 91, 100},
 							{0, 0, 10, 45, 60, 68, 75, 80, 93, 100},
 							{0, 2, 48, 55, 65, 70, 78, 92, 96, 100},
-							{1, 25, 60, 68, 78, 86, 89, 95, 97, 100},
-							{20, 55, 75, 80, 84, 89, 92, 95, 98, 100},
+							{0, 25, 60, 68, 78, 86, 89, 95, 97, 100},
+							{10, 55, 75, 80, 84, 89, 92, 95, 98, 100},
 							{50, 75, 93, 94, 95, 96, 97, 98, 99, 100}
 						};
 

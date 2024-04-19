@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.57"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.58"
 
 #define SECURITY_LOG "security.log"
 
@@ -849,11 +849,11 @@ typedef enum {
 #define QUEST_MAX_ENEMIES 200
 #define QUEST_MIN_MAGE_MASTERS_TO_DEFEAT 10
 #define QUEST_ENEMY_TYPES 10
-#define QUEST_MAX_NPCS_IN_THE_MAP 20
+#define QUEST_MAX_NPCS_IN_THE_MAP 22
 #define QUEST_NPC_SPAWN_TIME 30000
 
 // zyk: maximum time a quest npc can be idle (without enemies)
-#define QUEST_NPC_IDLE_TIME 60000
+#define QUEST_NPC_IDLE_TIME 45000
 
 // zyk: minimum amount of quest tries
 #define MIN_QUEST_TRIES 1

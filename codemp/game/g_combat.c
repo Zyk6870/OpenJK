@@ -2243,33 +2243,36 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				quest_player = &g_entities[attacker->client->pers.quest_npc_caller_player_id];
 			}
 
-			old_quest_defeated_enemies_value = quest_player->client->pers.quest_defeated_enemies;
-
-			if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
-			{ // zyk: a mage master
-				quest_player->client->pers.quest_defeated_masters++;
-
-				if (quest_player->client->pers.quest_defeated_masters >= QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
-				{
-					quest_player->client->pers.quest_defeated_masters = QUEST_MIN_MAGE_MASTERS_TO_DEFEAT;
-				}
-			}
-			else
+			if (zyk_is_main_quest_complete(quest_player) == qfalse && self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 			{
-				quest_player->client->pers.quest_defeated_enemies++;
+				old_quest_defeated_enemies_value = quest_player->client->pers.quest_defeated_enemies;
 
-				if (quest_player->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
-				{
-					quest_player->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
+				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+				{ // zyk: a mage master
+					quest_player->client->pers.quest_defeated_masters++;
+
+					if (quest_player->client->pers.quest_defeated_masters >= QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
+					{
+						quest_player->client->pers.quest_defeated_masters = QUEST_MIN_MAGE_MASTERS_TO_DEFEAT;
+					}
 				}
-			}
+				else
+				{
+					quest_player->client->pers.quest_defeated_enemies++;
 
-			if (zyk_completed_enemy_wave_event(quest_player, old_quest_defeated_enemies_value) == qtrue)
-			{ // zyk: defeated an enemy wave or the min mage masters required to complete the quest
-				quest_player->client->pers.quest_enemy_wave_event_step = 1;
-			}
+					if (quest_player->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
+					{
+						quest_player->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
+					}
+				}
 
-			save_account(quest_player, qtrue);
+				if (zyk_completed_enemy_wave_event(quest_player, old_quest_defeated_enemies_value) == qtrue)
+				{ // zyk: defeated an enemy wave or the min mage masters required to complete the quest
+					quest_player->client->pers.quest_enemy_wave_event_step = 1;
+				}
+
+				save_account(quest_player, qtrue);
+			}
 		}
 	}
 
