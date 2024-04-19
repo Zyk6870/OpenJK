@@ -4711,7 +4711,7 @@ int zyk_number_of_allies(gentity_t *ent, qboolean in_rpg_mode)
 // zyk: starts the boss battle music
 void zyk_start_boss_battle_music(gentity_t *ent)
 {
-	if (!(ent->client->pers.player_settings & (1 << SETTINGS_BOSS_MUSIC)))
+	if (!(ent->client->pers.player_settings & (1 << SETTINGS_QUEST_MUSIC)))
 	{
 		trap->SetConfigstring(CS_MUSIC, "music/kor_lite/korrib_action.mp3");
 	}

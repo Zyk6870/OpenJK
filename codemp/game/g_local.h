@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.58"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.59"
 
 #define SECURITY_LOG "security.log"
 
@@ -524,10 +524,13 @@ typedef enum {
 	SETTINGS_SCREEN_MESSAGE,
 	SETTINGS_HEAL_ALLY,
 	SETTINGS_SABER_START,
+	SETTINGS_PICKUP_WEAPONS,
+	SETTINGS_PICKUP_AMMO,
+	SETTINGS_PICKUP_ITEMS,
 	SETTINGS_JETPACK,
 	SETTINGS_ADMIN_PROTECT,
 	SETTINGS_DIFFICULTY,
-	SETTINGS_BOSS_MUSIC,
+	SETTINGS_QUEST_MUSIC,
 	MAX_PLAYER_SETTINGS
 } zyk_settings_t;
 

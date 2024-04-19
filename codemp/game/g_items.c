@@ -2787,6 +2787,13 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		if (ent->item->giType == IT_WEAPON || ent->item->giType == IT_AMMO || ent->item->giType == IT_HOLDABLE)
 		{ // zyk: RPG players always can pickup weapons, ammo and holdable items
 			validate_pickup_item = qfalse;
+
+			if ((ent->item->giType == IT_WEAPON && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_WEAPONS)) ||
+				(ent->item->giType == IT_AMMO && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_AMMO)) ||
+				(ent->item->giType == IT_HOLDABLE && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_ITEMS)))
+			{
+				return;
+			}
 		}
 	}
 	else if (other->client->pers.player_statuses & (1 << PLAYER_STATUS_ADM_GIVE_FORCE) && (ent->item->giType == IT_WEAPON || ent->item->giType == IT_AMMO ||
@@ -2827,7 +2834,6 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		// zyk: if powerups > level.time, item is a dropped item, cant get it now
 		return;
 	}
-
 
 	if ( other->client->NPC_class == CLASS_ATST ||
 		other->client->NPC_class == CLASS_GONK ||
