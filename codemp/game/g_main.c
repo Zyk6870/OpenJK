@@ -453,6 +453,7 @@ char* zyk_get_enemy_type(int enemy_type)
 {
 	char* enemy_names[NUM_QUEST_NPCS];
 
+	enemy_names[QUEST_NPC_NONE] = "";
 	enemy_names[QUEST_NPC_MAGE_MASTER] = "mage_master";
 	enemy_names[QUEST_NPC_MAGE_MINISTER] = "mage_minister";
 	enemy_names[QUEST_NPC_MAGE_SCHOLAR] = "mage_scholar";
@@ -466,6 +467,7 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_ALLY_MAGE] = "ally_mage";
 	enemy_names[QUEST_NPC_ALLY_FLYING_WARRIOR] = "ally_flying_warrior";
 	enemy_names[QUEST_NPC_ALLY_FORCE_WARRIOR] = "ally_force_warrior";
+	enemy_names[QUEST_NPC_SELLER] = "quest_seller";
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
@@ -477,22 +479,23 @@ char* zyk_get_enemy_type(int enemy_type)
 
 int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 {
-	int max_levels[NUM_QUEST_NPCS] = {
-		0, 
-		2, 
-		4, 
-		4, 
-		4, 
-		4, 
-		5, 
-		6, 
-		7, 
-		8, 
-		16, 
-		12, 
-		8, 
-		8
-	};
+	int max_levels[NUM_QUEST_NPCS];
+
+	max_levels[QUEST_NPC_NONE] = 0;
+	max_levels[QUEST_NPC_MAGE_MASTER] = 12;
+	max_levels[QUEST_NPC_MAGE_MINISTER] = 8;
+	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 7;
+	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = 6;
+	max_levels[QUEST_NPC_FLYING_WARRIOR] = 5;
+	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = 4;
+	max_levels[QUEST_NPC_FLYING_CHANGELING] = 4;
+	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = 3;
+	max_levels[QUEST_NPC_CHANGELING_WARRIOR] = 3;
+	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR] = 2;
+	max_levels[QUEST_NPC_ALLY_MAGE] = 10;
+	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = 8;
+	max_levels[QUEST_NPC_ALLY_FORCE_WARRIOR] = 8;
+	max_levels[QUEST_NPC_SELLER] = 0;
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
@@ -658,6 +661,19 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 5 + skill_level_bonus;
 			}
 		}
+		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
+		{
+			Jedi_Cloak(npc_ent);
+
+			if (enemy_wave >= 3)
+			{
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave - 1 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave - 2 + skill_level_bonus);
+				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave - 2 + skill_level_bonus);
+
+				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 4 + skill_level_bonus;
+			}
+		}
 		else if (quest_npc_type == QUEST_NPC_MID_TRAINED_WARRIOR)
 		{
 			if (enemy_wave >= 3)
@@ -667,18 +683,6 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 1 + skill_level_bonus);
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 4 + skill_level_bonus;
-			}
-		}
-		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
-		{
-			Jedi_Cloak(npc_ent);
-
-			if (enemy_wave >= 3)
-			{
-				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave - 2 + skill_level_bonus);
-				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave - 1 + skill_level_bonus);
-
-				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 3 + skill_level_bonus;
 			}
 		}
 		else if (quest_npc_type == QUEST_NPC_FLYING_CHANGELING)
@@ -7129,6 +7133,7 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 100;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 10;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
@@ -7175,11 +7180,11 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 1)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. We are the Magical Spirits. We will explain to you everything you keed to know.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. We are the Magical Spirits. We will explain everything you need to know.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 	}
 	if (ent->client->pers.tutorial_step == 2)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info you need: Magic Crystals, Magic points, Stamina, etc.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see info about Magic Crystals, Magic points, Stamina, etc.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 3)
 	{
@@ -7191,7 +7196,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 5)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Anything you get (weapons, ammo, items) are stored in your inventory. To see it use ^3/list inventory^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Anything you get (weapons, ammo, items) are stored in your inventory. To see it use ^3/list inventory^7.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 6)
 	{
@@ -7207,15 +7212,15 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 9)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can magically buy stuff from the seller. Use ^3/stuff^7. You get credits by selling stuff. You can even sell Magic Crystals\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can magically buy stuff from the seller. Use ^3/stuff^7. You get credits by selling stuff. You can even sell Magic Crystals.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 10)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To upgrade or downgrade a skill, use ^3/up <skill number> ^7or ^3/down <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To upgrade or downgrade a skill, use ^3/up <skill number> ^7or ^3/down <skill number>^7.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 11)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <skill number>^7.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 12)
 	{
@@ -7223,7 +7228,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 13)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight players, use ^3/nofight^7, preventing damage to you and you cannot damage them\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight players, use ^3/nofight^7, preventing damage to you and you cannot damage them.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 14)
 	{
@@ -7231,7 +7236,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 15)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including SP ones. Use ^3/maplist ^7to list maps\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including SP ones. Use ^3/maplist ^7to list maps.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 16)
 	{
@@ -9227,6 +9232,40 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.quest_enemy_wave_event_timer = level.time + 5000;
 				}
 
+				if (ent->client->pers.quest_seller_event_step > 0 && ent->client->pers.quest_seller_event_timer < level.time)
+				{
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 0)
+					{
+						if (ent->client->pers.quest_seller_event_step == 1)
+						{
+							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hi! I am the seller that sells stuff to you. Nice to meet you.\n\"", QUESTCHAR_SELLER));
+						}
+						else if (ent->client->pers.quest_seller_event_step == 2)
+						{
+							ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 1;
+
+							save_account(ent, qtrue);
+
+							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: I want to give you this Quest Log. Use ^3/list questlog^7. It will help you in your quest!\n\"", QUESTCHAR_SELLER));
+						}
+					}
+					else
+					{
+						trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello again! I hope my Quest Log helped you!\n\"", QUESTCHAR_SELLER));
+
+						ent->client->pers.quest_seller_event_step = 2;
+					}
+
+					ent->client->pers.quest_seller_event_step++;
+
+					if (ent->client->pers.quest_seller_event_step >= 3)
+					{
+						ent->client->pers.quest_seller_event_step = 0;
+					}
+
+					ent->client->pers.quest_seller_event_timer = level.time + 5000;
+				}
+
 				// zyk: control the quest events
 				if (level.load_entities_timer == 0 && 
 					zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
@@ -9280,6 +9319,14 @@ void G_RunFrame( int levelTime ) {
 						}
 
 						zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
+
+						// zyk: theres a chance for the seller to actually come to the map
+						if (chance_to_spawn_enemy < 5)
+						{
+							zyk_NPC_Kill_f(zyk_get_enemy_type(QUEST_NPC_SELLER));
+
+							zyk_spawn_quest_npc(QUEST_NPC_SELLER, ent->client->ps.viewangles[YAW], 0, qfalse, -1);
+						}
 					}
 				}
 			}

@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.60"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.61"
 
 #define SECURITY_LOG "security.log"
 
@@ -777,6 +777,7 @@ typedef enum {
 	RPG_INVENTORY_UPGRADE_SEEKER_DRONE,
 	RPG_INVENTORY_UPGRADE_EWEB,
 	RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR,
+	RPG_INVENTORY_LEGENDARY_QUEST_LOG,
 	MAX_RPG_INVENTORY_ITEMS
 } zyk_inventory_t;
 
@@ -786,8 +787,8 @@ typedef enum {
 	QUEST_NPC_MAGE_MINISTER,
 	QUEST_NPC_MAGE_SCHOLAR,
 	QUEST_NPC_HIGH_TRAINED_WARRIOR,
-	QUEST_NPC_MID_TRAINED_WARRIOR,
 	QUEST_NPC_FLYING_WARRIOR,
+	QUEST_NPC_MID_TRAINED_WARRIOR,
 	QUEST_NPC_FLYING_CHANGELING,
 	QUEST_NPC_FORCE_SABER_WARRIOR,
 	QUEST_NPC_CHANGELING_WARRIOR,
@@ -795,6 +796,7 @@ typedef enum {
 	QUEST_NPC_ALLY_MAGE,
 	QUEST_NPC_ALLY_FLYING_WARRIOR,
 	QUEST_NPC_ALLY_FORCE_WARRIOR,
+	QUEST_NPC_SELLER,
 	NUM_QUEST_NPCS
 } zyk_quest_npc_t;
 
@@ -1037,6 +1039,8 @@ typedef struct clientPersistant_s {
 	int quest_enemy_wave_event_step;
 	int quest_enemy_wave_event_timer;
 	int quest_ally_event_timer;
+	int quest_seller_event_step;
+	int quest_seller_event_timer;
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;

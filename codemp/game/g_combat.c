@@ -2243,7 +2243,9 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				quest_player = &g_entities[attacker->client->pers.quest_npc_caller_player_id];
 			}
 
-			if (zyk_is_main_quest_complete(quest_player) == qfalse && self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
+			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2 && 
+				zyk_is_main_quest_complete(quest_player) == qfalse && 
+				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 			{
 				old_quest_defeated_enemies_value = quest_player->client->pers.quest_defeated_enemies;
 

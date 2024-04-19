@@ -4882,6 +4882,8 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.quest_enemy_wave_event_step = 0;
 			ent->client->pers.quest_enemy_wave_event_timer = 0;
 			ent->client->pers.quest_ally_event_timer = 0;
+			ent->client->pers.quest_seller_event_step = 0;
+			ent->client->pers.quest_seller_event_timer = 0;
 
 			ent->client->pers.stamina_timer = 0;
 			ent->client->pers.stamina_out_timer = 0;
@@ -5226,10 +5228,10 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 
 	if (ent->client->sess.amrpgmode == 2)
 	{
-		initialize_rpg_skills(ent, qtrue);
-
-		// zyk: set flag so the quest will not spawn npcsyet before player sees the tutorial
+		// zyk: set flag so the quest will not spawn npcs yet before player sees the tutorial
 		ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_CREATED_ACCOUNT);
+
+		initialize_rpg_skills(ent, qtrue);
 	}
 	else
 	{
@@ -5891,6 +5893,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -6027,6 +6030,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 								{
 									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, magic crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks. Second Mode increases resistance to damage to your shield from any source. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a magic crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
 								}
+								if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
+								{
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7 and can be given by the %s^7 if you find him. Stores info about the Brotherhood of Mages members. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS, QUESTCHAR_SELLER));
+								}
 							}
 							else
 							{
@@ -6057,6 +6064,24 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					else
 					{
 						trap->SendServerCommand(ent->s.number, "print \"\n^3Completed\n\n\"");
+					}
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, "print \"\n^3RPG Mode Quests\n\n^1Quests are not allowed in this server^7\n\n\"");
+				}
+			}
+			else if (Q_stricmp(arg1, "questlog") == 0)
+			{
+				if (zyk_allow_quests.integer == 1)
+				{
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 1)
+					{
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1Quest Log\n\n^3Low Trained Warrior: ^7a blue armored soldier with guns. Has no magic initially\n^3Changeling: ^7a warrior that transformed himself into a howler. Can learn Earth magic\n^3Force Saber Warrior: ^7fights with some force powers and saber. Can learn Water magic\n^3Flying Changeling: ^7a changeling that flies and shoots rockets. Has Air and Fire magic\n^3Mid Trained Warrior: ^7a force/saber warrior. Has Magic Dome, Water and Earth magic\n^3Flying Warrior: ^7a cloaked red armored soldier that flies and has Healing Area, Air and Fire magic\n^3High Trained Warrior: ^7has force/saber, guns and has Water, Earth, Air and Fire magic\n^3Mage Scholar: ^7magic user with Magic Fist ability and high level Magic Dome, Dark and Light magic\n^3Mage Minister: ^7a stronger mage with high-level Healing Area, Dark and Light magic\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. Has Magic Fist and extremely high-level of all magic powers\n\n\""));
+					}
+					else
+					{
+						trap->SendServerCommand(ent->s.number, "print \"\nYou don't have the Quest Log\n\n\"");
 					}
 				}
 				else

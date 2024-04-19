@@ -1891,14 +1891,25 @@ void TryUse( gentity_t *ent )
 		return;
 	}
 
-	if (target->NPC && target->client && target->s.NPC_class != CLASS_VEHICLE && OnSameTeam(ent,target))
+	if (target->NPC && target->client && target->s.NPC_class != CLASS_VEHICLE && OnSameTeam(ent, target))
 	{
+		if (target->client->pers.quest_npc == QUEST_NPC_SELLER && 
+			ent->client->sess.amrpgmode == 2)
+		{ // zyk: found the seller
+			ent->client->pers.quest_seller_event_step = 1;
+		}
+		
 		if (!target->client->leader)
 		{ // zyk: setting the npc leader so he follows the player
 			target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_GUARD);
 			target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
 			target->client->leader = ent;
 			target->NPC->tempBehavior = BS_FOLLOW_LEADER;
+
+			// zyk: setting use anim
+			ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+			ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
+			ent->client->ps.forceHandExtendTime = level.time + 500;
 		}
 		else if (target->client->leader == ent)
 		{ // zyk: npc will stop follow the player, which is the leader
@@ -1906,6 +1917,11 @@ void TryUse( gentity_t *ent )
 			target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
 			target->client->leader = NULL;
 			target->NPC->tempBehavior = BS_STAND_GUARD;
+
+			// zyk: setting use anim
+			ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+			ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
+			ent->client->ps.forceHandExtendTime = level.time + 500;
 		}
 	}
 
