@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.56"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.57"
 
 #define SECURITY_LOG "security.log"
 
@@ -552,6 +552,7 @@ typedef enum {
 	PLAYER_STATUS_CREATED_ACCOUNT,
 	PLAYER_STATUS_GOT_RED_CRYSTAL,
 	PLAYER_STATUS_GOT_YELLOW_CRYSTAL,
+	PLAYER_STATUS_GOT_PURPLE_CRYSTAL,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -837,10 +838,11 @@ typedef enum {
 #define DUEL_TOURNAMENT_PROTECTION_TIME 2000
 
 // zyk: tutorial duration time
-#define TUTORIAL_DURATION 120000
+#define TUTORIAL_DURATION 100000
 
 // zyk: main characters names
 #define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
+#define QUESTCHAR_ALLY "^2Ally"
 #define QUESTCHAR_SELLER "^3Seller"
 
 // zyk: quest enemies values
@@ -1031,6 +1033,7 @@ typedef struct clientPersistant_s {
 	int quest_event_timer;
 	int quest_enemy_wave_event_step;
 	int quest_enemy_wave_event_timer;
+	int quest_ally_event_timer;
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;

@@ -7169,97 +7169,81 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 1)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. We are the Magical Spirits.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. We are the Magical Spirits. We will explain to you everything you keed to know.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 	}
 	if (ent->client->pers.tutorial_step == 2)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We will explain to you everything you keed to know.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info you need: Magic Crystals, Magic points, Stamina, etc.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 3)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info you need: Magic Crystals, Magic points, Stamina, etc.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: In ^3/list rpg ^7you can see the commands that lists your skills and other commands too.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 4)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: In ^3/list rpg ^7you can see the commands that lists your skills and other commands too.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Doing actions decrease stamina. If it runs out, you will faint for some seconds. Use ^2Meditate ^7taunt to regen it.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 5)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Doing actions decrease stamina. If it runs out, you will faint for some seconds.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Anything you get (weapons, ammo, items) are stored in your inventory. To see it use ^3/list inventory^7\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 6)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Low Stamina decreases your run speed. Use meditate (in controls Menu, set the bind for it) to regen Stamina.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory stuff have weight. If it goes over the max weight, your run speed will decrease.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 7)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Anything you get (weapons, ammo, items) use your inventory. To see it use ^3/list inventory^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or items, or sell them to the seller.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 8)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory stuff have weight. If it goes over the max weight, your run speed will decrease.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Magic Crystals (the blue ones) to upgrade skills. We keep randomly placing them in the map.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 9)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or items, or sell them to the seller.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can magically buy stuff from the seller. Use ^3/stuff^7. You get credits by selling stuff. You can even sell Magic Crystals\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 10)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Magic Crystals (the blue ones) to upgrade skills. We keep randomly placing them in the map.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To upgrade or downgrade a skill, use ^3/up <skill number> ^7or ^3/down <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 11)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can magically buy stuff from the seller. Use ^3/stuff^7. You get credits by selling stuff. You can even sell Magic Crystals\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 12)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To upgrade or downgrade a skill, use ^3/up <skill number> ^7or ^3/down <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your current stats (hp, shield, mp, stamina) are saved so changing map will keep them at current values.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 13)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <skill number>^7\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight players, use ^3/nofight^7, preventing damage to you and you cannot damage them\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 14)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your current stats (hp, shield, mp, stamina) are saved so changing map will keep them at current values.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can add or remove ally players with ^3/allyadd ^7and ^3/allyremove^7.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 15)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight players, use ^3/nofight^7, preventing damage to you and you cannot damage them\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including SP ones. Use ^3/maplist ^7to list maps\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 16)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can add or remove ally players with ^3/allyadd ^7and ^3/allyremove^7.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can see your quests in ^3/list quests^7. This is the reason we came here, we need your help.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 17)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including SP ones. Use ^3/maplist ^7to list maps\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The Brotherhood of Mages is attacking everywhere in their quest for power. Their excessive magic usage is weakening us.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 18)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can see your quests in ^3/list quests^7. Any new mission will appear there\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Fight them so we can create Magic Crystals faster to help you. Maybe you can also find some Resistance allies to help.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 19)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The reason we are here is because we need your help %s^7\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are several magic crystal types that will help you in your quest.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 20)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The Brotherhood of Mages is weakening us in their quest for power.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 21)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Defeat them so we will be strong enough to defeat the rest of them.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 22)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Each one you defeat will weaken them so we can create Magic Crystals faster.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 23)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are some other crystal types that will help you in your quest.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 24)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Use ^3/tutorial ^7if you need all this information again.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
 
@@ -9145,6 +9129,36 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					zyk_set_magic_crystal_respawn_time(ent);
+				}
+
+				// zyk: get ally near the player
+				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL) && 
+					ent->client->pers.quest_ally_event_timer < level.time)
+				{
+					int j = 0;
+
+					for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+					{
+						gentity_t* ally_ent = &g_entities[j];
+
+						// zyk: get a resistance member near the player
+						if (ally_ent && ally_ent->client && ally_ent->NPC && ally_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE &&
+							ally_ent->client->pers.quest_npc_caller_player_id == ent->s.number)
+						{
+							vec3_t npc_origin;
+
+							VectorCopy(ent->client->ps.origin, npc_origin);
+							npc_origin[2] += 50;
+
+							zyk_TeleportPlayer(ally_ent, npc_origin, ent->client->ps.viewangles);
+
+							trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Hi! I came to help you fight the enemies!\n\"", QUESTCHAR_ALLY));
+
+							break;
+						}
+					}
+
+					ent->client->pers.player_statuses &= (1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL);
 				}
 
 				// zyk: when player defeats each enemy wave, Magic Spirits will appear to talk to them

@@ -2769,6 +2769,7 @@ extern void zyk_clear_magic_crystals(gentity_t* effect_ent);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 extern void zyk_set_quest_event_timer(gentity_t* ent);
 extern void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, qboolean hard_mode, int player_id);
+extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
 
 //----------------------------------------------------------
 void fx_runner_think( gentity_t *ent )
@@ -2860,9 +2861,10 @@ void fx_runner_think( gentity_t *ent )
 						int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 						int ally_bonus = player_ent->client->pers.quest_defeated_enemies + player_ent->client->pers.magic_crystals;
 
-						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7this crystal called one of the resistance allies here to fight the enemies!\n\"", QUESTCHAR_ALL_SPIRITS));
-
 						zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, player_ent->s.number);
+
+						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL);
+						player_ent->client->pers.quest_ally_event_timer = level.time + 2000;
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
 					}
