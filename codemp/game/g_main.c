@@ -2051,6 +2051,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	level.sp_map = qfalse;
 
+	level.current_map_music = MAPMUSIC_NONE;
+
 	if (Q_stricmp(level.default_map_music, "") == 0)
 	{ // zyk: if the default map music is empty (the map has no music) then set a default music
 		strcpy(level.default_map_music, "music/yavin2/yavtemp2_explore.mp3");
@@ -4706,15 +4708,6 @@ int zyk_number_of_allies(gentity_t *ent, qboolean in_rpg_mode)
 	}
 
 	return number_of_allies;
-}
-
-// zyk: starts the boss battle music
-void zyk_start_boss_battle_music(gentity_t *ent)
-{
-	if (!(ent->client->pers.player_settings & (1 << SETTINGS_QUEST_MUSIC)))
-	{
-		trap->SetConfigstring(CS_MUSIC, "music/kor_lite/korrib_action.mp3");
-	}
 }
 
 // zyk: tests if this player is one of the Duel Tournament duelists
@@ -7707,16 +7700,6 @@ void G_RunFrame( int levelTime ) {
 	trap->PrecisionTimer_Start(&timer_ItemRun);
 #endif
 
-	if (level.map_music_reset_timer > 0 && level.map_music_reset_timer < level.time)
-	{ // zyk: resets music to default one
-		level.map_music_reset_timer = 0;
-
-		if (level.current_map_music == MAPMUSIC_NONE)
-		{
-			trap->SetConfigstring(CS_MUSIC, G_NewString(level.default_map_music));
-		}
-	}
-
 	if (level.race_mode == 1 && level.race_start_timer < level.time)
 	{ // zyk: Race Mode. Tests if we should start the race
 		level.race_countdown = 3;
@@ -8574,6 +8557,20 @@ void G_RunFrame( int levelTime ) {
 			}
 
 			level.legendary_artifact_step = QUEST_SECRET_INIT_STEP;
+		}
+	}
+
+	if (level.map_music_reset_timer > 0 && level.map_music_reset_timer < level.time)
+	{ // zyk: resets music to default one
+		level.map_music_reset_timer = 0;
+
+		if (level.current_map_music == MAPMUSIC_NONE)
+		{
+			trap->SetConfigstring(CS_MUSIC, G_NewString(level.default_map_music));
+		}
+		else if (level.current_map_music == MAPMUSIC_QUEST)
+		{
+			trap->SetConfigstring(CS_MUSIC, "music/kor_lite/korrib_action.mp3");
 		}
 	}
 

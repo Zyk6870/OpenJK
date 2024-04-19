@@ -8123,7 +8123,6 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 	settings_descriptions[SETTINGS_JETPACK] = "Jetpack";
 	settings_descriptions[SETTINGS_ADMIN_PROTECT] = "Admin Protect";
 	settings_descriptions[SETTINGS_DIFFICULTY] = "Quest Difficulty";
-	settings_descriptions[SETTINGS_QUEST_MUSIC] = "Quest Final Wave Music";
 
 	if (settings_value >= 0 && settings_value < MAX_PLAYER_SETTINGS)
 	{
@@ -8200,7 +8199,7 @@ void Cmd_Settings_f( gentity_t *ent ) {
 		trap->Argv(1, arg1, sizeof( arg1 ));
 		value = atoi(arg1);
 
-		if (value < 0 || value > MAX_PLAYER_SETTINGS)
+		if (value < 0 || value >= MAX_PLAYER_SETTINGS)
 		{
 			trap->SendServerCommand(ent->s.number, "print \"Invalid settings value.\n\"");
 			return;
