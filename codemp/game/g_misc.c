@@ -2849,7 +2849,7 @@ void fx_runner_think( gentity_t *ent )
 					{
 						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7a Time crystal! We can use this power to prevent new enemies from coming for some time.\n\"", QUESTCHAR_ALL_SPIRITS));
 
-						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_YELLOW_CRYSTAL);
+						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_TIME_CRYSTAL);
 						zyk_set_quest_event_timer(player_ent);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/player/holocron.wav"));
@@ -2861,7 +2861,7 @@ void fx_runner_think( gentity_t *ent )
 
 						zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, player_ent->s.number);
 
-						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL);
+						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_ALLY_CRYSTAL);
 						player_ent->client->pers.quest_ally_event_timer = level.time + 2000;
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
@@ -2871,7 +2871,7 @@ void fx_runner_think( gentity_t *ent )
 					{ // zyk: player that has the Energy Modulator cannot play the puzzle again
 						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Press ^2Use ^7key and solve the puzzle to receive our powerful artifact!\n\"", QUESTCHAR_ALL_SPIRITS));
 
-						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_RED_CRYSTAL);
+						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
 					}
@@ -3159,7 +3159,7 @@ void SP_fx_runner( gentity_t *ent )
 		Q_stricmp(ent->targetname, "zyk_magic_dark") == 0 || Q_stricmp(ent->targetname, "zyk_magic_light") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0)
 	{
-		ent->nextthink = level.time;
+		ent->nextthink = level.time + 100;
 	}
 	else if (Q_stricmp(ent->targetname, "zyk_magic_element") == 0)
 	{

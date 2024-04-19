@@ -5329,7 +5329,7 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 
 	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
 
-	zyk_set_entity_field(new_ent, "zykmodelscale", "35");
+	zyk_set_entity_field(new_ent, "zykmodelscale", "50");
 	zyk_set_entity_field(new_ent, "targetname", "zyk_magic_crystal");
 
 	zyk_spawn_entity(new_ent);
@@ -7279,11 +7279,11 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CREATED_ACCOUNT);
 	}
 
-	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_YELLOW_CRYSTAL))
+	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_TIME_CRYSTAL))
 	{
 		interval_time += 60000;
 
-		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_YELLOW_CRYSTAL);
+		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_TIME_CRYSTAL);
 	}
 	
 	ent->client->pers.quest_event_timer = level.time + interval_time;
@@ -9121,15 +9121,15 @@ void G_RunFrame( int levelTime ) {
 						red_crystal_chance += 1;
 					}
 
-					if (magic_crystal_chance_to_spawn < 70)
+					if (magic_crystal_chance_to_spawn < 68)
 					{ // zyk: Magic Crystal
 						zyk_spawn_skill_crystal(ent, 60000, MAGIC_CRYSTAL_SKILL);
 					}
-					else if (magic_crystal_chance_to_spawn >= 70 && magic_crystal_chance_to_spawn < 75 && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					else if (magic_crystal_chance_to_spawn >= 68 && magic_crystal_chance_to_spawn < 73 && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Extra Tries Crystal
 						zyk_spawn_skill_crystal(ent, 57000, MAGIC_CRYSTAL_EXTRA_TRIES);
 					}
-					else if (magic_crystal_chance_to_spawn >= 75 && magic_crystal_chance_to_spawn < 80 && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					else if (magic_crystal_chance_to_spawn >= 73 && magic_crystal_chance_to_spawn < 80 && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Time crystal
 						zyk_spawn_skill_crystal(ent, 54000, MAGIC_CRYSTAL_TIME);
 					}
@@ -9146,7 +9146,7 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				// zyk: get ally near the player
-				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL) && 
+				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_ALLY_CRYSTAL) &&
 					ent->client->pers.quest_ally_event_timer < level.time)
 				{
 					int j = 0;
@@ -9158,7 +9158,7 @@ void G_RunFrame( int levelTime ) {
 						// zyk: get a resistance member near the player
 						if (ally_ent && ally_ent->client && ally_ent->NPC && ally_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE &&
 							ally_ent->client->pers.quest_npc_caller_player_id == ent->s.number && 
-							ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL))
+							ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_ALLY_CRYSTAL))
 						{
 							vec3_t npc_origin;
 
@@ -9167,13 +9167,13 @@ void G_RunFrame( int levelTime ) {
 
 							zyk_TeleportPlayer(ally_ent, npc_origin, ent->client->ps.viewangles);
 
-							ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL);
+							ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_ALLY_CRYSTAL);
 
 							trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Hi! I came to help you fight the enemies!\n\"", QUESTCHAR_ALLY));
 						}
 					}
 
-					ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PURPLE_CRYSTAL);
+					ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_ALLY_CRYSTAL);
 				}
 
 				// zyk: when player defeats each enemy wave, Magic Spirits will appear to talk to them

@@ -2228,7 +2228,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
 
 	// zyk: dying makes the player lose the red crystal
-	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_RED_CRYSTAL);
+	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 
 	if (self->client->pers.quest_npc > QUEST_NPC_NONE)
 	{ // zyk: quest npc died

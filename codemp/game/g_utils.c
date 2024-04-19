@@ -1694,7 +1694,7 @@ void TryUse( gentity_t *ent )
 	VectorMA( src, USE_DISTANCE, vf, dest );
 
 	if (ent->client->sess.amrpgmode == 2 && 
-		ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_RED_CRYSTAL) &&
+		ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL) &&
 		ent->client->pers.cmd.buttons & BUTTON_USE &&
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
 	{ // zyk: start the puzzle
@@ -1702,7 +1702,7 @@ void TryUse( gentity_t *ent )
 
 		level.legendary_artifact_step = QUEST_SECRET_SPAWN_CRYSTALS_STEP;
 
-		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_RED_CRYSTAL);
+		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 
 		// zyk: setting use anim
 		ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;

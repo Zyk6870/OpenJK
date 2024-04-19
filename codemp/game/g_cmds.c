@@ -6077,11 +6077,11 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 1)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1Quest Log\n\n^3Low Trained Warrior: ^7a blue armored soldier with guns. Has no magic initially\n^3Changeling: ^7a warrior that transformed himself into a howler. Can learn Earth magic\n^3Force Saber Warrior: ^7fights with some force powers and saber. Can learn Water magic\n^3Flying Changeling: ^7a changeling that flies and shoots rockets. Has Air and Fire magic\n^3Mid Trained Warrior: ^7a force/saber warrior. Has Magic Dome, Water and Earth magic\n^3Flying Warrior: ^7a cloaked red armored soldier that flies and has Healing Area, Air and Fire magic\n^3High Trained Warrior: ^7has force/saber, guns and has Water, Earth, Air and Fire magic\n^3Mage Scholar: ^7magic user with Magic Fist ability and high level Magic Dome, Dark and Light magic\n^3Mage Minister: ^7a stronger mage with high-level Healing Area, Dark and Light magic\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. Has Magic Fist and extremely high-level of all magic powers\n\n\""));
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7a blue armored soldier with guns. Has no magic initially\n^3Changeling: ^7a warrior that transformed himself into a howler. Can learn Earth magic\n^3Force Saber Warrior: ^7fights with some force powers and saber. Can learn Water magic\n^3Flying Changeling: ^7a changeling that flies and shoots rockets. Has Air and Fire magic\n^3Mid Trained Warrior: ^7a force/saber warrior. Has Magic Dome, Water and Earth magic\n^3Flying Warrior: ^7a cloaked red armored soldier that flies and has Healing Area, Air and Fire magic\n^3High Trained Warrior: ^7has force/saber, guns and has Water, Earth, Air and Fire magic\n^3Mage Scholar: ^7magic user with Magic Fist ability and high level Magic Dome, Dark and Light magic\n^3Mage Minister: ^7a stronger mage with high-level Healing Area, Dark and Light magic\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. Has Magic Fist and extremely high-level of all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 					}
 					else
 					{
-						trap->SendServerCommand(ent->s.number, "print \"\nYou don't have the Quest Log\n\n\"");
+						trap->SendServerCommand(ent->s.number, va("print \"\nYou don't have the %s^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 					}
 				}
 				else

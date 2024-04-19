@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.61"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.62"
 
 #define SECURITY_LOG "security.log"
 
@@ -552,9 +552,9 @@ typedef enum {
 	PLAYER_STATUS_DUEL_TOURNAMENT_LOSS,
 	PLAYER_STATUS_IN_FLAMES,
 	PLAYER_STATUS_CREATED_ACCOUNT,
-	PLAYER_STATUS_GOT_RED_CRYSTAL,
-	PLAYER_STATUS_GOT_YELLOW_CRYSTAL,
-	PLAYER_STATUS_GOT_PURPLE_CRYSTAL,
+	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
+	PLAYER_STATUS_GOT_TIME_CRYSTAL,
+	PLAYER_STATUS_GOT_ALLY_CRYSTAL,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
