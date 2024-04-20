@@ -517,6 +517,39 @@ void zyk_set_magic_level_for_quest_npc(gentity_t* npc_ent, zyk_quest_npc_t enemy
 	}
 }
 
+qboolean zyk_there_is_player_or_npc_in_spot(float x, float y, float z)
+{
+	int iEntityList[MAX_GENTITIES];
+	int numListedEntities = 0;
+	vec3_t mins, maxs;
+	float radius = 80;
+	int i = 0;
+
+	mins[0] = x - radius;
+	mins[1] = y - radius;
+	mins[2] = z - radius;
+
+	maxs[0] = x + radius;
+	maxs[1] = y + radius;
+	maxs[2] = z + radius;
+
+	numListedEntities = trap->EntitiesInBox(mins, maxs, iEntityList, MAX_GENTITIES);
+
+	while (i < numListedEntities)
+	{
+		gentity_t *this_ent = &g_entities[iEntityList[i]];
+
+		if (this_ent && this_ent->client)
+		{
+			return qtrue;
+		}
+
+		i++;
+	}
+
+	return qfalse;
+}
+
 // zyk: spawns a quest npc and sets additional stuff, like levels, etc
 extern int zyk_max_skill_level(int skill_index);
 extern int zyk_max_magic_power(gentity_t* ent);
@@ -535,12 +568,8 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		return;
 	}
 
-	// zyk: validating some entity types so the npc will not be stuck or telefrag other npcs
-	if (chosen_entity->NPC)
-	{
-		z += 80;
-	}
-	else if (Q_stricmp(chosen_entity->classname, "fx_runner") == 0 || 
+	// zyk: validating some entity types so the npc will not be stuck
+	if (Q_stricmp(chosen_entity->classname, "fx_runner") == 0 || 
 			chosen_entity->r.contents & CONTENTS_SOLID
 		)
 	{
@@ -577,11 +606,18 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		z += chosen_entity->s.origin[2];
 	}
 
+	// zyk: avoiding telefrag other npcs
+	if (zyk_there_is_player_or_npc_in_spot(x, y, z) == qtrue)
+	{
+		return;
+	}
+
 	npc_ent = Zyk_NPC_SpawnType(zyk_get_enemy_type(quest_npc_type), x, y, z, yaw);
 
 	if (npc_ent && npc_ent->client)
 	{
 		float quest_progress = (bonuses * 1.0) / QUEST_MAX_ENEMIES;
+		int ally_bonus = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
 		int hp_bonus = npc_ent->NPC->stats.health * quest_progress;
 		int enemy_wave = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) + 1;
 		int skill_level_bonus = 0;
@@ -616,16 +652,16 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 				Jedi_Cloak(npc_ent);
 			}
 
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave + 1 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave + 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, enemy_wave - 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, enemy_wave - 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave - 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave - 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave - 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave - 1 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave - 1 + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = enemy_wave + 1 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = enemy_wave - 1 + skill_level_bonus;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 189 + skill_level_bonus;
 		}
@@ -724,8 +760,6 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_MAGE)
 		{
-			int ally_bonus = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
-
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, ally_bonus + skill_level_bonus);
@@ -735,14 +769,12 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, ally_bonus + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + 1 + skill_level_bonus;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 40 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_FLYING_WARRIOR)
 		{
-			int ally_bonus = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
-
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, ally_bonus + skill_level_bonus);
 
@@ -750,8 +782,6 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_FORCE_WARRIOR)
 		{
-			int ally_bonus = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
-
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, ally_bonus + skill_level_bonus);
@@ -7264,7 +7294,7 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 	int quest_progress = (int)ceil((ent->client->pers.quest_defeated_enemies * 100.0) / QUEST_MAX_ENEMIES);
 
 	// zyk: decrease time based on the quest progress
-	interval_time -= (quest_progress * 150);
+	interval_time -= (quest_progress * 100);
 
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT))
 	{ //zyk: player is in tutorial for the first time. Do not spawn quest npcs yet
@@ -7275,7 +7305,7 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_TIME_CRYSTAL))
 	{
-		interval_time += 60000;
+		interval_time += 45000;
 
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_TIME_CRYSTAL);
 	}
@@ -9236,7 +9266,7 @@ void G_RunFrame( int levelTime ) {
 
 					// zyk: spawning the enemies will depend on the enemy level, lower level enemies will appear earlier in the quest
 					if (zyk_is_main_quest_complete(ent) == qfalse &&
-						zyk_quest_npcs_in_the_map() < QUEST_MAX_NPCS_IN_THE_MAP)
+						zyk_quest_npcs_in_the_map() < zyk_quest_max_npcs_in_map.integer)
 					{
 						int chance_to_spawn_enemy = Q_irand(0, 99);
 						int enemy_type = 0;
@@ -9257,8 +9287,8 @@ void G_RunFrame( int levelTime ) {
 							{0, 1, 10, 45, 60, 68, 75, 80, 93, 100},
 							{0, 2, 48, 55, 65, 70, 78, 92, 96, 100},
 							{0, 25, 60, 68, 78, 86, 89, 95, 97, 100},
-							{10, 55, 75, 80, 84, 89, 92, 95, 98, 100},
-							{50, 75, 93, 94, 95, 96, 97, 98, 99, 100}
+							{15, 55, 75, 80, 84, 89, 92, 95, 98, 100},
+							{55, 75, 93, 94, 95, 96, 97, 98, 99, 100}
 						};
 
 						for (j = 0; j < QUEST_ENEMY_TYPES; j++)
@@ -9403,19 +9433,28 @@ void G_RunFrame( int levelTime ) {
 						if (ent->client->pers.quest_npc_idle_timer < level.time)
 						{ // zyk: find another map spot
 							vec3_t npc_origin, npc_angles;
-
-							float x, y, z;
-							int min_distance = 1, max_distance = 20;
+							float x = 0, y = 0, z = 0;
+							int npc_offset = 48;
 							gentity_t* chosen_entity = NULL;
 
 							chosen_entity = zyk_find_entity_for_quest();
 
 							if (chosen_entity)
 							{ // zyk: if for some reason there was no chosen entity, try again later
-								// zyk: the distance the npc is from the chosen entity origin
-								x = Q_irand(min_distance, max_distance);
-								y = Q_irand(min_distance, max_distance);
-								z = Q_irand(min_distance, max_distance);
+								// zyk: validating some entity types so the npc will not be stuck
+								if (Q_stricmp(chosen_entity->classname, "fx_runner") == 0 ||
+									chosen_entity->r.contents & CONTENTS_SOLID
+									)
+								{
+									x += npc_offset;
+									y += npc_offset;
+								}
+								else
+								{
+									x = Q_irand(0, npc_offset);
+									y = Q_irand(0, npc_offset);
+									z = Q_irand(0, npc_offset);
+								}
 
 								if (Q_irand(0, 1) == 0)
 								{
@@ -9440,10 +9479,13 @@ void G_RunFrame( int levelTime ) {
 									z += chosen_entity->s.origin[2];
 								}
 
-
-								VectorSet(npc_origin, x, y, z);
-								VectorSet(npc_angles, 0, 0, 0);
-								zyk_TeleportPlayer(ent, npc_origin, npc_angles);
+								// zyk: avoiding telefrag
+								if (zyk_there_is_player_or_npc_in_spot(x, y, z) == qfalse)
+								{
+									VectorSet(npc_origin, x, y, z);
+									VectorSet(npc_angles, 0, 0, 0);
+									zyk_TeleportPlayer(ent, npc_origin, npc_angles);
+								}
 
 								ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
 							}
