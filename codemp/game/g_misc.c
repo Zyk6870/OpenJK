@@ -2768,7 +2768,6 @@ extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 extern void zyk_clear_magic_crystals(gentity_t* effect_ent);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 extern void zyk_set_quest_event_timer(gentity_t* ent);
-extern void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, qboolean hard_mode, int player_id);
 extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
 
 //----------------------------------------------------------
@@ -2820,8 +2819,7 @@ void fx_runner_think( gentity_t *ent )
 	if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_time_crystal") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_artifact_crystal") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_ally_crystal") == 0)
+		Q_stricmp(ent->targetname, "zyk_artifact_crystal") == 0)
 	{
 		int i = 0;
 
@@ -2847,24 +2845,10 @@ void fx_runner_think( gentity_t *ent )
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_time_crystal") == 0)
 					{
-						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7a Time crystal! We can use this power to prevent new enemies from coming for some time.\n\"", QUESTCHAR_ALL_SPIRITS));
-
 						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_TIME_CRYSTAL);
 						zyk_set_quest_event_timer(player_ent);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/player/holocron.wav"));
-					}
-					else if (Q_stricmp(ent->targetname, "zyk_ally_crystal") == 0)
-					{
-						int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
-						int ally_bonus = player_ent->client->pers.quest_defeated_enemies + player_ent->client->pers.magic_crystals;
-
-						zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, player_ent->s.number);
-
-						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_ALLY_CRYSTAL);
-						player_ent->client->pers.quest_ally_event_timer = level.time + 2000;
-
-						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_artifact_crystal") == 0 && 
 						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
@@ -2873,7 +2857,7 @@ void fx_runner_think( gentity_t *ent )
 
 						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 
-						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
 					}
 
 					zyk_add_mp(player_ent, 1);

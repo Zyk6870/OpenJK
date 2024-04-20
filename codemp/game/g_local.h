@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.62"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.63"
 
 #define SECURITY_LOG "security.log"
 
@@ -554,7 +554,6 @@ typedef enum {
 	PLAYER_STATUS_CREATED_ACCOUNT,
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
 	PLAYER_STATUS_GOT_TIME_CRYSTAL,
-	PLAYER_STATUS_GOT_ALLY_CRYSTAL,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -669,7 +668,6 @@ typedef enum {
 	MAGIC_CRYSTAL_EXTRA_TRIES,
 	MAGIC_CRYSTAL_TIME,
 	MAGIC_CRYSTAL_ARTIFACT,
-	MAGIC_CRYSTAL_ALLY,
 	NUM_MAGIC_CRYSTALS
 } zyk_magic_crystal_type_t;
 
@@ -1038,7 +1036,6 @@ typedef struct clientPersistant_s {
 	int quest_event_timer;
 	int quest_enemy_wave_event_step;
 	int quest_enemy_wave_event_timer;
-	int quest_ally_event_timer;
 	int quest_seller_event_step;
 	int quest_seller_event_timer;
 

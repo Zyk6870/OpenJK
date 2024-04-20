@@ -4881,7 +4881,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.quest_enemy_wave_event_step = 0;
 			ent->client->pers.quest_enemy_wave_event_timer = 0;
-			ent->client->pers.quest_ally_event_timer = 0;
 			ent->client->pers.quest_seller_event_step = 0;
 			ent->client->pers.quest_seller_event_timer = 0;
 
@@ -6056,10 +6055,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them and some of the Mage Masters (mages in red robes)\nso the %s ^7can end the war.\n\n^3Enemies Defeated: ^7%d/%d\n^3Masters Defeated: ^7%d/%d\n\n^3Quest tries: ^7%d (^2green ^7crystals increase this)\n\n\"", 
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them and some of the Mage Masters (mages in red robes)\nso the %s ^7can end the war.\n\n^3Enemies Defeated: ^7%d/%d\n^3Masters Defeated: ^7%d/%d\n\n^3Quest tries: ^7%d (^2green ^7crystals increase this. If 0, the quest is reset)\n^3Time for next enemy: ^7%d (^1red ^7crystals increase this time interval in miliseconds)\n\n\"", 
 							QUESTCHAR_ALL_SPIRITS, 
 							ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES, ent->client->pers.quest_defeated_masters, QUEST_MIN_MAGE_MASTERS_TO_DEFEAT, 
-							ent->client->pers.quest_tries));
+							ent->client->pers.quest_tries, (ent->client->pers.quest_event_timer - level.time)));
 					}
 					else
 					{

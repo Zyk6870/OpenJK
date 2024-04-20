@@ -538,7 +538,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 	// zyk: validating some entity types so the npc will not be stuck or telefrag other npcs
 	if (chosen_entity->NPC)
 	{
-		z += 70;
+		z += 80;
 	}
 	else if (Q_stricmp(chosen_entity->classname, "fx_runner") == 0 || 
 			chosen_entity->r.contents & CONTENTS_SOLID
@@ -5329,7 +5329,7 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 
 	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
 
-	zyk_set_entity_field(new_ent, "zykmodelscale", "50");
+	zyk_set_entity_field(new_ent, "zykmodelscale", "45");
 	zyk_set_entity_field(new_ent, "targetname", "zyk_magic_crystal");
 
 	zyk_spawn_entity(new_ent);
@@ -5402,18 +5402,13 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
 	{
 		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_time_crystal");
 		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id);
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id);
-	}
-	else if (crystal_type == MAGIC_CRYSTAL_ALLY)
-	{
-		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_ally_crystal");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id);
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id);
 	}
 	else if (crystal_type == MAGIC_CRYSTAL_ARTIFACT)
 	{
 		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_artifact_crystal");
 		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id);
 	}
 }
 
@@ -9112,68 +9107,31 @@ void G_RunFrame( int levelTime ) {
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
 					float quest_progress = (ent->client->pers.quest_defeated_enemies * 1.0) / QUEST_MAX_ENEMIES;
-					int ally_crystal_chance = 86 + (int)ceil(quest_progress * 5);
 					int red_crystal_chance = 93 + (int)ceil(quest_progress * 5);
 
 					if (ent->client->pers.quest_defeated_masters == QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
 					{
-						ally_crystal_chance += 1;
 						red_crystal_chance += 1;
 					}
 
-					if (magic_crystal_chance_to_spawn < 68)
+					if (magic_crystal_chance_to_spawn < 70)
 					{ // zyk: Magic Crystal
 						zyk_spawn_skill_crystal(ent, 60000, MAGIC_CRYSTAL_SKILL);
 					}
-					else if (magic_crystal_chance_to_spawn >= 68 && magic_crystal_chance_to_spawn < 73 && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					else if (magic_crystal_chance_to_spawn >= 70 && magic_crystal_chance_to_spawn < 75 && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Extra Tries Crystal
-						zyk_spawn_skill_crystal(ent, 57000, MAGIC_CRYSTAL_EXTRA_TRIES);
+						zyk_spawn_skill_crystal(ent, 55000, MAGIC_CRYSTAL_EXTRA_TRIES);
 					}
-					else if (magic_crystal_chance_to_spawn >= 73 && magic_crystal_chance_to_spawn < 80 && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					else if (magic_crystal_chance_to_spawn >= 75 && magic_crystal_chance_to_spawn < 82 && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Time crystal
-						zyk_spawn_skill_crystal(ent, 54000, MAGIC_CRYSTAL_TIME);
-					}
-					else if (magic_crystal_chance_to_spawn >= 80 && magic_crystal_chance_to_spawn < ally_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
-					{ // zyk: Ally call crystal
-						zyk_spawn_skill_crystal(ent, 51000, MAGIC_CRYSTAL_ALLY);
+						zyk_spawn_skill_crystal(ent, 55000, MAGIC_CRYSTAL_TIME);
 					}
 					else if (magic_crystal_chance_to_spawn >= 92 && magic_crystal_chance_to_spawn < red_crystal_chance)
 					{ // zyk: Energy Modulator puzzle crystal
-						zyk_spawn_skill_crystal(ent, 48000, MAGIC_CRYSTAL_ARTIFACT);
+						zyk_spawn_skill_crystal(ent, 50000, MAGIC_CRYSTAL_ARTIFACT);
 					}
 
 					zyk_set_magic_crystal_respawn_time(ent);
-				}
-
-				// zyk: get ally near the player
-				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_ALLY_CRYSTAL) &&
-					ent->client->pers.quest_ally_event_timer < level.time)
-				{
-					int j = 0;
-
-					for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
-					{
-						gentity_t* ally_ent = &g_entities[j];
-
-						// zyk: get a resistance member near the player
-						if (ally_ent && ally_ent->client && ally_ent->NPC && ally_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE &&
-							ally_ent->client->pers.quest_npc_caller_player_id == ent->s.number && 
-							ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_ALLY_CRYSTAL))
-						{
-							vec3_t npc_origin;
-
-							VectorCopy(ent->client->ps.origin, npc_origin);
-							npc_origin[2] += 70;
-
-							zyk_TeleportPlayer(ally_ent, npc_origin, ent->client->ps.viewangles);
-
-							ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_ALLY_CRYSTAL);
-
-							trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Hi! I came to help you fight the enemies!\n\"", QUESTCHAR_ALLY));
-						}
-					}
-
-					ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_ALLY_CRYSTAL);
 				}
 
 				// zyk: when player defeats each enemy wave, Magic Spirits will appear to talk to them
@@ -9320,12 +9278,39 @@ void G_RunFrame( int levelTime ) {
 
 						zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
 
-						// zyk: theres a chance for the seller to actually come to the map
-						if (chance_to_spawn_enemy < 5)
-						{
+						if (chance_to_spawn_enemy < 3)
+						{ // zyk: theres a chance for the seller to actually come to the map
 							zyk_NPC_Kill_f(zyk_get_enemy_type(QUEST_NPC_SELLER));
 
 							zyk_spawn_quest_npc(QUEST_NPC_SELLER, ent->client->ps.viewangles[YAW], 0, qfalse, -1);
+						}
+						else if (chance_to_spawn_enemy < (8 + ent->client->pers.magic_crystals))
+						{ // zyk: spawn an ally and get one of them near the player
+							int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
+							int ally_bonus = ent->client->pers.quest_defeated_enemies + ent->client->pers.magic_crystals;
+
+							zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
+
+							for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+							{
+								gentity_t* ally_ent = &g_entities[j];
+
+								// zyk: get a resistance member near the player
+								if (ally_ent && ally_ent->client && ally_ent->NPC && ally_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE &&
+									ally_ent->client->pers.quest_npc_caller_player_id == ent->s.number)
+								{
+									vec3_t npc_origin;
+
+									VectorCopy(ent->client->ps.origin, npc_origin);
+									npc_origin[2] += 80;
+
+									zyk_TeleportPlayer(ally_ent, npc_origin, ent->client->ps.viewangles);
+
+									trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Hi! I came to help you fight the enemies!\n\"", QUESTCHAR_ALLY));
+
+									break;
+								}
+							}
 						}
 					}
 				}
