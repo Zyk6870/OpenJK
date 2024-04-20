@@ -9266,7 +9266,7 @@ void G_RunFrame( int levelTime ) {
 
 					// zyk: spawning the enemies will depend on the enemy level, lower level enemies will appear earlier in the quest
 					if (zyk_is_main_quest_complete(ent) == qfalse &&
-						zyk_quest_npcs_in_the_map() < zyk_quest_max_npcs_in_map.integer)
+						zyk_quest_npcs_in_the_map() < QUEST_MAX_NPCS_IN_MAP)
 					{
 						int chance_to_spawn_enemy = Q_irand(0, 99);
 						int enemy_type = 0;
