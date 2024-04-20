@@ -2167,7 +2167,7 @@ qboolean zyk_completed_enemy_wave_event(gentity_t* ent, int old_quest_defeated_e
 
 qboolean zyk_is_quest_ally(gentity_t* ent)
 {
-	if (ent->NPC && ent->client->pers.quest_npc > QUEST_NPC_LOW_TRAINED_WARRIOR && ent->client->pers.quest_npc < NUM_QUEST_NPCS)
+	if (ent->NPC && ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && ent->client->pers.quest_npc <= QUEST_NPC_SELLER)
 	{
 		return qtrue;
 	}
@@ -2247,33 +2247,40 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				zyk_is_main_quest_complete(quest_player) == qfalse && 
 				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 			{
-				old_quest_defeated_enemies_value = quest_player->client->pers.quest_defeated_enemies;
-
-				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
-				{ // zyk: a mage master
-					quest_player->client->pers.quest_defeated_masters++;
-
-					if (quest_player->client->pers.quest_defeated_masters >= QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
-					{
-						quest_player->client->pers.quest_defeated_masters = QUEST_MIN_MAGE_MASTERS_TO_DEFEAT;
-					}
+				if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
+				{ // zyk: defeated the secret boss
+					quest_player->client->pers.player_statuses |= (1 << PLAYER_STATUS_DEFEATED_JORMUNGANDR);
 				}
 				else
 				{
-					quest_player->client->pers.quest_defeated_enemies++;
+					old_quest_defeated_enemies_value = quest_player->client->pers.quest_defeated_enemies;
 
-					if (quest_player->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
-					{
-						quest_player->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
+					if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+					{ // zyk: a mage master
+						quest_player->client->pers.quest_defeated_masters++;
+
+						if (quest_player->client->pers.quest_defeated_masters >= QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
+						{
+							quest_player->client->pers.quest_defeated_masters = QUEST_MIN_MAGE_MASTERS_TO_DEFEAT;
+						}
 					}
-				}
+					else
+					{
+						quest_player->client->pers.quest_defeated_enemies++;
 
-				if (zyk_completed_enemy_wave_event(quest_player, old_quest_defeated_enemies_value) == qtrue)
-				{ // zyk: defeated an enemy wave or the min mage masters required to complete the quest
-					quest_player->client->pers.quest_enemy_wave_event_step = 1;
-				}
+						if (quest_player->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
+						{
+							quest_player->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
+						}
+					}
 
-				save_account(quest_player, qtrue);
+					if (zyk_completed_enemy_wave_event(quest_player, old_quest_defeated_enemies_value) == qtrue)
+					{ // zyk: defeated an enemy wave or the min mage masters required to complete the quest
+						quest_player->client->pers.quest_enemy_wave_event_step = 1;
+					}
+
+					save_account(quest_player, qtrue);
+				}
 			}
 		}
 	}
@@ -5891,6 +5898,23 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
+			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
+			{ // zyk: Magic Armor
+				if ((mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2) ||
+					(mod == MOD_UNKNOWN && attacker && attacker->client && (attacker->client->sess.amrpgmode == 2 || attacker->NPC) &&
+					 attacker->client->pers.quest_power_status > 0)
+					)
+				{ // zyk: Absorbs Magic Fist damage and Magic power damage
+					bonus_health_resistance += 0.25;
+
+					zyk_add_mp(targ, (int)ceil(take * 0.25));
+				}
+				else
+				{
+					bonus_health_resistance += 0.05;
+				}
+			}
+
 			if (attacker && attacker->client && targ && targ->client && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC) && attacker != targ &&
 				Distance(targ->client->ps.origin, targ->client->pers.light_of_judgement_origin) < targ->client->pers.light_of_judgement_distance)
 			{ // zyk: target using Light Magic. Decreases damage taken if target is inside the light
@@ -5924,18 +5948,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 
 				zyk_set_stamina(targ, stamina_loss, qfalse);
-			}
-
-			if (attacker && attacker->client && 
-				(attacker->client->sess.amrpgmode == 2 || attacker->NPC) &&
-				attacker->client->pers.quest_power_status & (1 << MAGIC_WATER_MAGIC))
-			{ // zyk: Water Magic drain health from target
-				int heal_amount = take;
-
-				if ((attacker->health + heal_amount) < attacker->client->ps.stats[STAT_MAX_HEALTH])
-					attacker->health += heal_amount;
-				else
-					attacker->health = attacker->client->ps.stats[STAT_MAX_HEALTH];
 			}
 		}
 

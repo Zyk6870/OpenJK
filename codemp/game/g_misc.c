@@ -2816,9 +2816,10 @@ void fx_runner_think( gentity_t *ent )
 	}
 
 	// zyk: one of the crystal types. Tests if there is a RPG player touching it
-	if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0 || 
+	if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_time_crystal") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_magic_armor") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_artifact_crystal") == 0)
 	{
 		int i = 0;
@@ -2849,6 +2850,13 @@ void fx_runner_think( gentity_t *ent )
 						zyk_set_quest_event_timer(player_ent);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/player/holocron.wav"));
+					}
+					else if (Q_stricmp(ent->targetname, "zyk_magic_armor") == 0 &&
+						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
+					{
+						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
+
+						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/cairn_beam_start.mp3"));
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_artifact_crystal") == 0 && 
 						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)

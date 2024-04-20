@@ -1842,17 +1842,6 @@ static qboolean PM_CheckJump( void )
 	{//in knockdown
 		return qfalse;
 	}
-	else
-	{
-#if defined (_GAME)
-		gentity_t *player_ent = &g_entities[pm->ps->clientNum];
-
-		if (player_ent && player_ent->client && player_ent->client->pers.quest_power_status & (1 << 2))
-		{
-			return qfalse;
-		}
-#endif
-	}
 
 	if ( pm->ps->weapon == WP_SABER )
 	{

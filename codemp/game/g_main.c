@@ -464,6 +464,7 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR] = "force_saber_warrior";
 	enemy_names[QUEST_NPC_CHANGELING_HOWLER] = "changeling_howler";
 	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR] = "low_trained_warrior";
+	enemy_names[QUEST_NPC_JORMUNGANDR] = "jormungandr_serpent";
 	enemy_names[QUEST_NPC_ALLY_MAGE] = "ally_mage";
 	enemy_names[QUEST_NPC_ALLY_FLYING_WARRIOR] = "ally_flying_warrior";
 	enemy_names[QUEST_NPC_ALLY_FORCE_WARRIOR] = "ally_force_warrior";
@@ -492,6 +493,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = 4;
 	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 4;
 	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR] = 3;
+	max_levels[QUEST_NPC_JORMUNGANDR] = 10;
 	max_levels[QUEST_NPC_ALLY_MAGE] = 10;
 	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = 8;
 	max_levels[QUEST_NPC_ALLY_FORCE_WARRIOR] = 8;
@@ -539,7 +541,7 @@ qboolean zyk_there_is_player_or_npc_in_spot(float x, float y, float z)
 	{
 		gentity_t *this_ent = &g_entities[iEntityList[i]];
 
-		if (this_ent && this_ent->client)
+		if (this_ent && this_ent->client && this_ent->health > 0)
 		{
 			return qtrue;
 		}
@@ -757,6 +759,19 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave - 4 + skill_level_bonus;
 			}
+		}
+		else if (quest_npc_type == QUEST_NPC_JORMUNGANDR)
+		{ // zyk: the secret boss
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, enemy_wave + 5 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, enemy_wave + 5 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave + 5 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave + 5 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave + 5 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave + 5 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave + 5 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave + 5 + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 89 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_MAGE)
 		{
@@ -5358,7 +5373,15 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 
 	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
 
-	zyk_set_entity_field(new_ent, "zykmodelscale", "45");
+	if (strstr(model_path, "3po_torso.md3"))
+	{ // zyk: Magic Armor
+		zyk_set_entity_field(new_ent, "zykmodelscale", "100");
+	}
+	else
+	{
+		zyk_set_entity_field(new_ent, "zykmodelscale", "45");
+	}
+	
 	zyk_set_entity_field(new_ent, "targetname", "zyk_magic_crystal");
 
 	zyk_spawn_entity(new_ent);
@@ -5431,6 +5454,11 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
 	{
 		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_time_crystal");
 		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id);
+	}
+	else if (crystal_type == MAGIC_ARMOR)
+	{
+		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_magic_armor");
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/desert/3po_torso.md3", duration, crystal_effect_id);
 	}
 	else if (crystal_type == MAGIC_CRYSTAL_ARTIFACT)
 	{
@@ -5718,8 +5746,26 @@ void quest_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] < level.time)
 				{
+					int heal_amount = ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
+					int max_health = ent->client->ps.stats[STAT_MAX_HEALTH];
+
+					if (ent->client->sess.amrpgmode == 2)
+					{ // zyk: a player, not a npc, using this magic
+						max_health = ent->client->pers.max_rpg_health;
+					}
+
 					// zyk: effect on player position while magic is active
 					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_WATER_MAGIC, 700);
+
+					// zyk: restore some health
+					if ((ent->health + heal_amount) < max_health)
+					{
+						ent->health += heal_amount;
+					}
+					else
+					{
+						ent->health = max_health;
+					}
 
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
@@ -7158,6 +7204,7 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 100;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 100;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
@@ -7548,6 +7595,23 @@ void zyk_update_inventory(gentity_t* ent)
 	{ // zyk: save account with new updated inventory
 		save_account(ent, qtrue);
 	}
+}
+
+qboolean zyk_jormungandr_in_map()
+{
+	int i = 0;
+
+	for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
+	{
+		gentity_t* npc_ent = &g_entities[i];
+
+		if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
+		{
+			return qtrue;
+		}
+	}
+
+	return qfalse;
 }
 
 /*
@@ -9143,7 +9207,13 @@ void G_RunFrame( int levelTime ) {
 						red_crystal_chance += 1;
 					}
 
-					if (magic_crystal_chance_to_spawn < 70)
+					if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_DEFEATED_JORMUNGANDR))
+					{ // zyk: Magic Armor
+						ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_DEFEATED_JORMUNGANDR);
+
+						zyk_spawn_skill_crystal(ent, 120000, MAGIC_ARMOR);
+					}
+					else if (magic_crystal_chance_to_spawn < 70)
 					{ // zyk: Magic Crystal
 						zyk_spawn_skill_crystal(ent, 60000, MAGIC_CRYSTAL_SKILL);
 					}
@@ -9307,13 +9377,18 @@ void G_RunFrame( int levelTime ) {
 
 						zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
 
-						if (chance_to_spawn_enemy < 3)
+						if (chance_to_spawn_enemy < 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0 && 
+							zyk_jormungandr_in_map() == qfalse)
+						{ // zyk: the secret boss
+							zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
+						}
+						else if (chance_to_spawn_enemy < 5)
 						{ // zyk: theres a chance for the seller to actually come to the map
 							zyk_NPC_Kill_f(zyk_get_enemy_type(QUEST_NPC_SELLER));
 
 							zyk_spawn_quest_npc(QUEST_NPC_SELLER, ent->client->ps.viewangles[YAW], 0, qfalse, -1);
 						}
-						else if (chance_to_spawn_enemy < (8 + ent->client->pers.magic_crystals))
+						else if (chance_to_spawn_enemy < (10 + ent->client->pers.magic_crystals))
 						{ // zyk: spawn an ally and get one of them near the player
 							int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 							int ally_bonus = ent->client->pers.quest_defeated_enemies + ent->client->pers.magic_crystals;

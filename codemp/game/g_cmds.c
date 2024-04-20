@@ -240,7 +240,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
 		return "an energy dome appears at your position each half second, damaging enemies inside it. This power deals non-elemental damage";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
-		return "hits enemies around you with Water elemental damage. Enemies hit by Water get their hp drained to restore your health. Increases your Water element affinity. Deals extra damage to enemies with Fire affinity. Absorbs some Water damage";
+		return "hits enemies around you with Water elemental damage. While this magic is active, slowly restore your health. Increases your Water element affinity. Deals extra damage to enemies with Fire affinity. Absorbs some Water damage";
 	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
 		return "creates earthquakes and hits enemies with Earth elemental damage. Increases your Earth element affinity. Deals extra damage to enemies with Air affinity. Absorbs some Earth damage";
 	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
@@ -5893,6 +5893,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = "Magic Armor";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -5970,8 +5971,8 @@ int zyk_number_of_allies_in_map(gentity_t* ent)
 	{
 		npc_ent = &g_entities[i];
 
-		if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && npc_ent->client->pers.quest_npc < NUM_QUEST_NPCS &&
-			npc_ent->client->pers.quest_npc_caller_player_id == ent->s.number)
+		if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && npc_ent->client->pers.quest_npc <= QUEST_NPC_SELLER &&
+			npc_ent->client->pers.quest_npc_caller_player_id == ent->s.number && npc_ent->health > 0)
 		{
 			total_allies++;
 		}
@@ -6054,6 +6055,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 								if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
 								{
 									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7 and can be given by the %s^7 if you find him. Stores info about the Brotherhood of Mages members. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS, QUESTCHAR_SELLER));
+								}
+								if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
+								{
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 5 per cent, and if the source is Magic Fist or a magic power, decreases damage by 25 per cent and absorbs some magic points. It is said that ^1Jormungandr^7, the World Serpent, ate it to defy the %s^7. Defeating it will make the armor appear somewhere in the map\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS, QUESTCHAR_ALL_SPIRITS));
 								}
 							}
 							else

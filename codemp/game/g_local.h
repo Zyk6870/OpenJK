@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.4.66"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.4.67"
 
 #define SECURITY_LOG "security.log"
 
@@ -554,6 +554,7 @@ typedef enum {
 	PLAYER_STATUS_CREATED_ACCOUNT,
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
 	PLAYER_STATUS_GOT_TIME_CRYSTAL,
+	PLAYER_STATUS_DEFEATED_JORMUNGANDR,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -668,6 +669,7 @@ typedef enum {
 	MAGIC_CRYSTAL_EXTRA_TRIES,
 	MAGIC_CRYSTAL_TIME,
 	MAGIC_CRYSTAL_ARTIFACT,
+	MAGIC_ARMOR,
 	NUM_MAGIC_CRYSTALS
 } zyk_magic_crystal_type_t;
 
@@ -776,6 +778,7 @@ typedef enum {
 	RPG_INVENTORY_UPGRADE_EWEB,
 	RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR,
 	RPG_INVENTORY_LEGENDARY_QUEST_LOG,
+	RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR,
 	MAX_RPG_INVENTORY_ITEMS
 } zyk_inventory_t;
 
@@ -791,6 +794,7 @@ typedef enum {
 	QUEST_NPC_FORCE_SABER_WARRIOR,
 	QUEST_NPC_CHANGELING_HOWLER,
 	QUEST_NPC_LOW_TRAINED_WARRIOR,
+	QUEST_NPC_JORMUNGANDR,
 	QUEST_NPC_ALLY_MAGE,
 	QUEST_NPC_ALLY_FLYING_WARRIOR,
 	QUEST_NPC_ALLY_FORCE_WARRIOR,
