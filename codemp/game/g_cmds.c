@@ -5822,7 +5822,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Magic Crystals: ^7%d\n^3Skills Upgraded: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Stamina: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Blue Crystals: ^7%d\n^3Skills Upgraded: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Stamina: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
 		ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.magic_crystals, zyk_total_skillpoints(ent), RPG_MAX_SKILLPOINTS, ent->client->pers.magic_power, zyk_max_magic_power(ent),
 		ent->client->pers.current_weight, ent->client->pers.max_weight, ent->client->pers.current_stamina, ent->client->pers.max_stamina, ent->client->pers.credits));
 }
@@ -6076,7 +6076,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 1)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7a blue armored soldier with guns. Has no magic initially\n^3Changeling: ^7a warrior that transformed himself into a howler. Can learn Earth magic\n^3Force Saber Warrior: ^7fights with some force powers and saber. Can learn Water magic\n^3Flying Changeling: ^7a changeling that flies and shoots rockets. Has Air and Fire magic\n^3Mid Trained Warrior: ^7a force/saber warrior. Has Magic Dome, Water and Earth magic\n^3Flying Warrior: ^7a cloaked red armored soldier that flies and has Healing Area, Air and Fire magic\n^3High Trained Warrior: ^7has force/saber, guns and has Water, Earth, Air and Fire magic\n^3Mage Scholar: ^7magic user with Magic Fist ability and high level Magic Dome, Dark and Light magic\n^3Mage Minister: ^7a stronger mage with high-level Healing Area, Dark and Light magic\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. Has Magic Fist and extremely high-level of all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7an armored soldier with guns. ^2Magic: Healing Area, Air\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. ^2Magic: Fire\n^3Force Saber Warrior: ^7fights with force powers and saber. ^2Magic: Water\n^3Mid Trained Warrior: ^7uses force, saber and  some guns. ^2Magic: Magic Dome, Water, Earth\n^3Changeling Worm: ^7a changeling with worm form. Attacks from underground. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier. ^2Magic: Healing Area, Fire, Air\n^3High Trained Warrior: ^7has force/saber, guns. ^2Magic: Water, Earth, Fire, Air\n^3Mage Scholar: ^7magic user with Magic Fist ability. ^2Magic: high-level Magic Dome, Dark, Light\n^3Mage Minister: ^7a stronger mage. ^2Magic: high-level Healing Area, Dark, Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 					}
 					else
 					{
