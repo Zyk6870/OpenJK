@@ -200,14 +200,14 @@ void Wampa_Slash( int boltIndex, qboolean backhand )
 {
 	int			radiusEntNums[128];
 	int			numEnts;
-	const float	radius = 88;
+	const float	radius = 92; // zyk: default 88
 	const float	radiusSquared = (radius*radius);
 	int			i;
 	vec3_t		boltOrg;
 	int			damage = (backhand)?Q_irand(10,15):Q_irand(20,30);
 
 	if (NPCS.NPC->client && NPCS.NPC->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-	{ // zyk: the secret boss. Has better damage
+	{ // zyk: the secret enemy. Has better damage
 		damage *= 5;
 	}
 

@@ -493,7 +493,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = 4;
 	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 4;
 	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR] = 3;
-	max_levels[QUEST_NPC_JORMUNGANDR] = 10;
+	max_levels[QUEST_NPC_JORMUNGANDR] = 8;
 	max_levels[QUEST_NPC_ALLY_MAGE] = 10;
 	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = 8;
 	max_levels[QUEST_NPC_ALLY_FORCE_WARRIOR] = 8;
@@ -726,7 +726,6 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 			if (enemy_wave >= 2)
 			{
 				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave - 1 + skill_level_bonus);
-				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave - 1 + skill_level_bonus);
 				zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave - 2 + skill_level_bonus);
 
 				npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 4 + skill_level_bonus;
@@ -761,17 +760,11 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 			}
 		}
 		else if (quest_npc_type == QUEST_NPC_JORMUNGANDR)
-		{ // zyk: the secret boss
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, enemy_wave + 5 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, enemy_wave + 5 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave + 5 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave + 5 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave + 5 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave + 5 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, enemy_wave + 5 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, enemy_wave + 5 + skill_level_bonus);
+		{ // zyk: the secret enemy
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, enemy_wave + 3 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, enemy_wave + 3 + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 89 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 19 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_MAGE)
 		{
@@ -5375,7 +5368,8 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 
 	if (strstr(model_path, "3po_torso.md3"))
 	{ // zyk: Magic Armor
-		zyk_set_entity_field(new_ent, "zykmodelscale", "100");
+		zyk_set_entity_field(new_ent, "angles", "90 0 0");
+		zyk_set_entity_field(new_ent, "zykmodelscale", "80");
 	}
 	else
 	{
@@ -7597,23 +7591,6 @@ void zyk_update_inventory(gentity_t* ent)
 	}
 }
 
-qboolean zyk_jormungandr_in_map()
-{
-	int i = 0;
-
-	for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
-	{
-		gentity_t* npc_ent = &g_entities[i];
-
-		if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-		{
-			return qtrue;
-		}
-	}
-
-	return qfalse;
-}
-
 /*
 ================
 G_RunFrame
@@ -9200,11 +9177,17 @@ void G_RunFrame( int levelTime ) {
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
 					float quest_progress = (ent->client->pers.quest_defeated_enemies * 1.0) / QUEST_MAX_ENEMIES;
-					int red_crystal_chance = 93 + (int)ceil(quest_progress * 5);
+					int extra_tries_crystal_chance = 73 + (int)ceil(quest_progress * 4);
+					int puzzle_crystal_chance = 93 + (int)ceil(quest_progress * 5);
 
 					if (ent->client->pers.quest_defeated_masters == QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
 					{
-						red_crystal_chance += 1;
+						puzzle_crystal_chance += 1;
+					}
+
+					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+					{ // zyk: Hard Mode
+						extra_tries_crystal_chance -= 2;
 					}
 
 					if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_DEFEATED_JORMUNGANDR))
@@ -9217,15 +9200,15 @@ void G_RunFrame( int levelTime ) {
 					{ // zyk: Magic Crystal
 						zyk_spawn_skill_crystal(ent, 60000, MAGIC_CRYSTAL_SKILL);
 					}
-					else if (magic_crystal_chance_to_spawn >= 70 && magic_crystal_chance_to_spawn < 75 && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					else if (magic_crystal_chance_to_spawn >= 70 && magic_crystal_chance_to_spawn < extra_tries_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Extra Tries Crystal
 						zyk_spawn_skill_crystal(ent, 55000, MAGIC_CRYSTAL_EXTRA_TRIES);
 					}
-					else if (magic_crystal_chance_to_spawn >= 75 && magic_crystal_chance_to_spawn < 82 && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					else if (magic_crystal_chance_to_spawn >= 80 && magic_crystal_chance_to_spawn < 87 && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Time crystal
 						zyk_spawn_skill_crystal(ent, 55000, MAGIC_CRYSTAL_TIME);
 					}
-					else if (magic_crystal_chance_to_spawn >= 92 && magic_crystal_chance_to_spawn < red_crystal_chance)
+					else if (magic_crystal_chance_to_spawn >= 92 && magic_crystal_chance_to_spawn < puzzle_crystal_chance)
 					{ // zyk: Energy Modulator puzzle crystal
 						zyk_spawn_skill_crystal(ent, 50000, MAGIC_CRYSTAL_ARTIFACT);
 					}
@@ -9375,14 +9358,15 @@ void G_RunFrame( int levelTime ) {
 							hard_difficulty = qtrue;
 						}
 
+						if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0 && 
+							enemy_type == QUEST_NPC_CHANGELING_WORM && Q_irand(0, 9) < 2)
+						{ // zyk: a small chance to spawn the jormungandr changeling
+							enemy_type = QUEST_NPC_JORMUNGANDR;
+						}
+
 						zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
 
-						if (chance_to_spawn_enemy < 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0 && 
-							zyk_jormungandr_in_map() == qfalse)
-						{ // zyk: the secret boss
-							zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
-						}
-						else if (chance_to_spawn_enemy < 5)
+						if (chance_to_spawn_enemy < 5)
 						{ // zyk: theres a chance for the seller to actually come to the map
 							zyk_NPC_Kill_f(zyk_get_enemy_type(QUEST_NPC_SELLER));
 

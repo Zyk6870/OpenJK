@@ -2248,7 +2248,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 			{
 				if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-				{ // zyk: defeated the secret boss
+				{ // zyk: defeated the secret enemy
 					quest_player->client->pers.player_statuses |= (1 << PLAYER_STATUS_DEFEATED_JORMUNGANDR);
 				}
 				else
@@ -2283,6 +2283,24 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				}
 			}
 		}
+	}
+
+	if (attacker && attacker->client && attacker->NPC && attacker->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
+	{ // zyk: jormungandr "eats" the enemy it killed by regen health
+		int heal_amount = self->client->ps.stats[STAT_MAX_HEALTH];
+
+		if (self->client->sess.amrpgmode == 2)
+		{
+			heal_amount = self->client->pers.max_rpg_health;
+		}
+
+		if ((attacker->health + heal_amount) < attacker->client->ps.stats[STAT_MAX_HEALTH])
+			attacker->health += heal_amount;
+		else
+			attacker->health = attacker->client->ps.stats[STAT_MAX_HEALTH];
+
+		// zyk: also absorb some mp
+		attacker->client->pers.magic_power += heal_amount;
 	}
 
 	if (zyk_allow_quests.integer > 0 && 
