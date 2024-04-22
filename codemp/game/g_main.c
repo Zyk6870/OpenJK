@@ -628,10 +628,9 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 
 	if (npc_ent && npc_ent->client)
 	{
-		float quest_progress = (bonuses * 1.0) / QUEST_MAX_ENEMIES;
-		int ally_bonus = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES));
-		int hp_bonus = npc_ent->NPC->stats.health * quest_progress;
-		int enemy_wave = (bonuses / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES)) + 1;
+		int ally_bonus = (bonuses / QUEST_NPC_BONUS_FACTOR);
+		int hp_bonus = npc_ent->NPC->stats.health * bonuses;
+		int enemy_wave = (bonuses / QUEST_NPC_BONUS_FACTOR) + 1;
 		int skill_level_bonus = 0;
 
 		npc_ent->client->pers.quest_npc = quest_npc_type;
@@ -5353,7 +5352,7 @@ int zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration, char
 	return new_ent->s.number;
 }
 
-void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, int duration, int crystal_effect_id)
+void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, int duration, int crystal_effect_id, zyk_magic_crystal_type_t crystal_type)
 {
 	gentity_t* new_ent = G_Spawn();
 
@@ -5366,10 +5365,14 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 
 	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
 
-	if (strstr(model_path, "3po_torso.md3"))
+	if (crystal_type == MAGIC_ARMOR)
 	{ // zyk: Magic Armor
 		zyk_set_entity_field(new_ent, "angles", "90 0 0");
 		zyk_set_entity_field(new_ent, "zykmodelscale", "80");
+	}
+	else if (crystal_type == MAGIC_CRYSTAL_MASTER)
+	{
+		zyk_set_entity_field(new_ent, "zykmodelscale", "100");
 	}
 	else
 	{
@@ -5437,29 +5440,36 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
 	if (crystal_type == MAGIC_CRYSTAL_SKILL)
 	{
 		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_skill_crystal");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id, crystal_type);
 	}
 	else if (crystal_type == MAGIC_CRYSTAL_EXTRA_TRIES)
 	{
 		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_extra_tries_crystal");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id, crystal_type);
 	}
 	else if (crystal_type == MAGIC_CRYSTAL_TIME)
 	{
 		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_time_crystal");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id, crystal_type);
 	}
 	else if (crystal_type == MAGIC_ARMOR)
 	{
 		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_magic_armor");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/desert/3po_torso.md3", duration, crystal_effect_id);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/desert/3po_torso.md3", duration, crystal_effect_id, crystal_type);
 	}
 	else if (crystal_type == MAGIC_CRYSTAL_ARTIFACT)
 	{
 		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_artifact_crystal");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id);
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id);
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id, crystal_type);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id, crystal_type);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id, crystal_type);
+	}
+	else if (crystal_type == MAGIC_CRYSTAL_MASTER)
+	{
+		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_master_crystal");
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id, crystal_type);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id, crystal_type);
+		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id, crystal_type);
 	}
 }
 
@@ -7332,10 +7342,6 @@ extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
 	int interval_time = QUEST_NPC_SPAWN_TIME;
-	int quest_progress = (int)ceil((ent->client->pers.quest_defeated_enemies * 100.0) / QUEST_MAX_ENEMIES);
-
-	// zyk: decrease time based on the quest progress
-	interval_time -= (quest_progress * 100);
 
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT))
 	{ //zyk: player is in tutorial for the first time. Do not spawn quest npcs yet
@@ -7357,7 +7363,7 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 void zyk_set_magic_crystal_respawn_time(gentity_t* ent)
 {
 	int skill_progress = (int)ceil(((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 100.0) / RPG_MAX_SKILLPOINTS);
-	int quest_progress = (int)ceil((ent->client->pers.quest_defeated_enemies * 100.0) / QUEST_MAX_ENEMIES);
+	int quest_progress = ent->client->pers.quest_defeated_enemies / 2;
 
 	int interval_increase = skill_progress * RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL;
 	int interval_decrease = quest_progress * RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL;
@@ -9176,11 +9182,11 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
-					float quest_progress = (ent->client->pers.quest_defeated_enemies * 1.0) / QUEST_MAX_ENEMIES;
-					int extra_tries_crystal_chance = 73 + (int)ceil(quest_progress * 4);
-					int puzzle_crystal_chance = 93 + (int)ceil(quest_progress * 5);
+					int extra_tries_crystal_chance = 77;
+					int time_crystal_chance = 87;
+					int puzzle_crystal_chance = 93 + ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_FACTOR;
 
-					if (ent->client->pers.quest_defeated_masters == QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
+					if (ent->client->pers.master_crystals_collected == QUEST_AMOUNT_OF_MASTER_CRYSTALS)
 					{
 						puzzle_crystal_chance += 1;
 					}
@@ -9188,6 +9194,7 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
 						extra_tries_crystal_chance -= 2;
+						time_crystal_chance -= 2;
 					}
 
 					if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_DEFEATED_JORMUNGANDR))
@@ -9196,7 +9203,15 @@ void G_RunFrame( int levelTime ) {
 
 						zyk_spawn_skill_crystal(ent, 120000, MAGIC_ARMOR);
 					}
-					else if (magic_crystal_chance_to_spawn < 70)
+					
+					if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_DEFEATED_MAGE_MASTER))
+					{ // zyk: Master Crystal
+						ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_DEFEATED_MAGE_MASTER);
+
+						zyk_spawn_skill_crystal(ent, 180000, MAGIC_CRYSTAL_MASTER);
+					}
+					
+					if (magic_crystal_chance_to_spawn < 70)
 					{ // zyk: Magic Crystal
 						zyk_spawn_skill_crystal(ent, 60000, MAGIC_CRYSTAL_SKILL);
 					}
@@ -9204,7 +9219,7 @@ void G_RunFrame( int levelTime ) {
 					{ // zyk: Extra Tries Crystal
 						zyk_spawn_skill_crystal(ent, 55000, MAGIC_CRYSTAL_EXTRA_TRIES);
 					}
-					else if (magic_crystal_chance_to_spawn >= 80 && magic_crystal_chance_to_spawn < 87 && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					else if (magic_crystal_chance_to_spawn >= 80 && magic_crystal_chance_to_spawn < time_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Time crystal
 						zyk_spawn_skill_crystal(ent, 55000, MAGIC_CRYSTAL_TIME);
 					}
@@ -9217,9 +9232,9 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				// zyk: when player defeats each enemy wave, Magic Spirits will appear to talk to them
-				if (ent->client->pers.quest_enemy_wave_event_step > 0 && ent->client->pers.quest_enemy_wave_event_timer < level.time)
+				if (ent->client->pers.quest_final_event_step > 0 && ent->client->pers.quest_final_event_timer < level.time)
 				{
-					if (ent->client->pers.quest_enemy_wave_event_step == 1)
+					if (ent->client->pers.quest_final_event_step == 1)
 					{
 						zyk_spawn_magic_spirits(ent, 15000);
 					}
@@ -9227,7 +9242,7 @@ void G_RunFrame( int levelTime ) {
 					{
 						if (zyk_is_main_quest_complete(ent) == qtrue)
 						{
-							if (ent->client->pers.quest_enemy_wave_event_step == 2)
+							if (ent->client->pers.quest_final_event_step == 2)
 							{
 								int j = 0;
 
@@ -9244,32 +9259,21 @@ void G_RunFrame( int levelTime ) {
 
 								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We can now defeat the remaining of Brotherhood of Mages.\n\"", QUESTCHAR_ALL_SPIRITS));
 							}
-							else if (ent->client->pers.quest_enemy_wave_event_step == 3)
+							else if (ent->client->pers.quest_final_event_step == 3)
 							{
 								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
 							}
 						}
-						else
-						{
-							if (ent->client->pers.quest_enemy_wave_event_step == 2)
-							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated a wave of enemies.\n\"", QUESTCHAR_ALL_SPIRITS));
-							}
-							else if (ent->client->pers.quest_enemy_wave_event_step == 3)
-							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Beware, the next wave will have stronger enemies!\n\"", QUESTCHAR_ALL_SPIRITS));
-							}
-						}
 					}
 
-					ent->client->pers.quest_enemy_wave_event_step++;
+					ent->client->pers.quest_final_event_step++;
 
-					if (ent->client->pers.quest_enemy_wave_event_step >= 4)
+					if (ent->client->pers.quest_final_event_step >= 4)
 					{
-						ent->client->pers.quest_enemy_wave_event_step = 0;
+						ent->client->pers.quest_final_event_step = 0;
 					}
 
-					ent->client->pers.quest_enemy_wave_event_timer = level.time + 5000;
+					ent->client->pers.quest_final_event_timer = level.time + 5000;
 				}
 
 				if (ent->client->pers.quest_seller_event_step > 0 && ent->client->pers.quest_seller_event_timer < level.time)
@@ -9323,34 +9327,20 @@ void G_RunFrame( int levelTime ) {
 					{
 						int chance_to_spawn_enemy = Q_irand(0, 99);
 						int enemy_type = 0;
-						int enemy_tier = ent->client->pers.quest_defeated_enemies / (QUEST_MAX_ENEMIES / QUEST_ENEMY_TYPES);
+						int seller_chance = ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_FACTOR;
 						qboolean hard_difficulty = qfalse;
 						int j = 0;
 
 						/* zyk: each array has the chances of each enemy type to appear. Higher indexes increase chance of high tier npcs to appear
 							    the last index is when player defeated QUEST_MAX_ENEMIES 
 						*/
-						int enemy_chances[QUEST_ENEMY_TYPES + 1][QUEST_ENEMY_TYPES] = {
-							{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 30, 100},
-							{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 10, 60, 100},
-							{0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 10, 40, 70, 100},
-							{0, 0, 0, 0, 0, 0, 0, 0, 2, 5, 35, 50, 75, 100},
-							{0, 0, 0, 0, 0, 0, 0, 1, 5, 45, 55, 65, 78, 100},
-							{0, 0, 0, 0, 0, 0, 0, 2, 35, 48, 57, 68, 82, 100},
-							{0, 0, 0, 0, 0, 0, 1, 38, 45, 52, 60, 70, 85, 100},
-							{0, 0, 0, 0, 0, 2, 27, 39, 46, 53, 65, 75, 89, 100},
-							{0, 0, 0, 0, 1, 30, 35, 40, 47, 55, 70, 78, 90, 100},
-							{0, 0, 0, 1, 30, 34, 39, 46, 52, 62, 72, 80, 91, 100},
-							{0, 0, 1, 21, 32, 37, 45, 50, 60, 68, 75, 82, 92, 100},
-							{0, 1, 25, 35, 37, 39, 48, 55, 65, 70, 78, 92, 95, 100},
-							{0, 10, 30, 40, 48, 54, 57, 70, 78, 86, 89, 95, 97, 100},
-							{15, 55, 75, 78, 81, 84, 87, 90, 92, 94, 96, 98, 99, 100},
-							{55, 75, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100}
+						int enemy_chances[QUEST_ENEMY_TYPES] = {
+							-200, -180, -150, -130, -110, -90, -70, -50, -35, -20, -10, 0, 1, 100
 						};
 
 						for (j = 0; j < QUEST_ENEMY_TYPES; j++)
 						{
-							if (chance_to_spawn_enemy < enemy_chances[enemy_tier][j])
+							if (chance_to_spawn_enemy < enemy_chances[j])
 							{
 								enemy_type = j + 1;
 								break;
@@ -9364,7 +9354,12 @@ void G_RunFrame( int levelTime ) {
 
 						zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
 
-						if (chance_to_spawn_enemy < 5)
+						if (seller_chance > 5)
+						{
+							seller_chance = 5;
+						}
+
+						if (chance_to_spawn_enemy < seller_chance)
 						{ // zyk: theres a chance for the seller to actually come to the map
 							zyk_NPC_Kill_f(zyk_get_enemy_type(QUEST_NPC_SELLER));
 

@@ -2820,7 +2820,8 @@ void fx_runner_think( gentity_t *ent )
 		Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_time_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_armor") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_artifact_crystal") == 0)
+		Q_stricmp(ent->targetname, "zyk_artifact_crystal") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_master_crystal") == 0)
 	{
 		int i = 0;
 
@@ -2866,6 +2867,28 @@ void fx_runner_think( gentity_t *ent )
 						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
+					}
+					else if (Q_stricmp(ent->targetname, "zyk_master_crystal") == 0)
+					{
+						int old_master_crystals_collected = player_ent->client->pers.master_crystals_collected;
+
+						player_ent->client->pers.master_crystals_collected++;
+
+						if (player_ent->client->pers.master_crystals_collected >= QUEST_AMOUNT_OF_MASTER_CRYSTALS)
+						{
+							player_ent->client->pers.master_crystals_collected = QUEST_AMOUNT_OF_MASTER_CRYSTALS;
+
+							if (old_master_crystals_collected < player_ent->client->pers.master_crystals_collected)
+							{ // zyk: completed the quest
+								ent->client->pers.quest_final_event_step = 1;
+							}
+						}
+						else
+						{
+							trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Nice! Keep collecting these crystals so we can end this war!\n\"", QUESTCHAR_ALL_SPIRITS));
+						}
+
+						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/tram_boost.mp3"));
 					}
 
 					zyk_add_mp(player_ent, 1);

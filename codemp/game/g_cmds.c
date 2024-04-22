@@ -2179,7 +2179,7 @@ void load_account(gentity_t* ent)
 			ent->client->pers.quest_defeated_enemies = atoi(content);
 
 			fscanf(account_file, "%s", content);
-			ent->client->pers.quest_defeated_masters = atoi(content);
+			ent->client->pers.master_crystals_collected = atoi(content);
 
 			// zyk: last health
 			fscanf(account_file, "%s", content);
@@ -2266,7 +2266,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
 			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.quest_defeated_masters,
+				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.master_crystals_collected,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
@@ -4879,8 +4879,8 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			zyk_set_quest_event_timer(ent);
 
-			ent->client->pers.quest_enemy_wave_event_step = 0;
-			ent->client->pers.quest_enemy_wave_event_timer = 0;
+			ent->client->pers.quest_final_event_step = 0;
+			ent->client->pers.quest_final_event_timer = 0;
 			ent->client->pers.quest_seller_event_step = 0;
 			ent->client->pers.quest_seller_event_timer = 0;
 
@@ -5103,7 +5103,7 @@ void zyk_set_default_quest_fields(gentity_t* ent)
 {
 	ent->client->pers.quest_tries = MIN_QUEST_TRIES;
 	ent->client->pers.quest_defeated_enemies = 0;
-	ent->client->pers.quest_defeated_masters = 0;
+	ent->client->pers.master_crystals_collected = 0;
 }
 
 // zyk: adds a new RPG char with default values
@@ -5953,7 +5953,7 @@ void zyk_list_inventory(gentity_t* ent, int page)
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
 {
-	if (ent->client->pers.quest_defeated_enemies == QUEST_MAX_ENEMIES && ent->client->pers.quest_defeated_masters == QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
+	if (ent->client->pers.master_crystals_collected == QUEST_AMOUNT_OF_MASTER_CRYSTALS)
 	{
 		return qtrue;
 	}
@@ -6082,9 +6082,9 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them and some of the Mage Masters (mages in red robes)\nso the %s ^7can end the war.\n\n^3Enemies Defeated: ^7%d/%d\n^3Masters Defeated: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
-							QUESTCHAR_ALL_SPIRITS, 
-							ent->client->pers.quest_defeated_enemies, QUEST_MAX_ENEMIES, ent->client->pers.quest_defeated_masters, QUEST_MIN_MAGE_MASTERS_TO_DEFEAT, 
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them so the Mage Masters (mages in red robes) appear.\nDefeat them so the %s ^7can get their Master Crystals to appear in the map\nCollect them so the %s ^7can defeat all enemies and end the war.\n\n^3Enemies Defeated: ^7%d\n^3Master Crystals Collected: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
+							QUESTCHAR_ALL_SPIRITS, QUESTCHAR_ALL_SPIRITS, 
+							ent->client->pers.quest_defeated_enemies, ent->client->pers.master_crystals_collected, QUEST_AMOUNT_OF_MASTER_CRYSTALS,
 							zyk_number_of_allies_in_map(ent), ent->client->pers.quest_tries, (ent->client->pers.quest_event_timer - level.time)));
 					}
 					else
@@ -8256,8 +8256,7 @@ void Cmd_Settings_f( gentity_t *ent ) {
 			return;
 		}
 
-		if (value == SETTINGS_DIFFICULTY && 
-			(ent->client->pers.quest_defeated_enemies > 0 || ent->client->pers.quest_defeated_masters > 0))
+		if (value == SETTINGS_DIFFICULTY && ent->client->pers.quest_defeated_enemies > 0)
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"Cannot change %s after quest started.\n\"", zyk_get_settings_description(SETTINGS_DIFFICULTY)));
 			return;
