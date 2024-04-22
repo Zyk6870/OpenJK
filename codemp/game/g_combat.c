@@ -6337,7 +6337,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						int max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
 						int heal_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 						int shield_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
-						int stamina_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
+						int stamina_amount = 2 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 
 						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
 							ent->health += heal_amount;

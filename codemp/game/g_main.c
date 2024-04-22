@@ -5720,7 +5720,7 @@ void quest_power_events(gentity_t *ent)
 			{
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DOME_OF_DAMAGE] < level.time)
 				{
-					int damage = 2 * ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE];
+					int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE];
 
 					// zyk: effect on player position while magic is active
 					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_DOME_OF_DAMAGE, 700);
