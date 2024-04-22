@@ -629,8 +629,8 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 	if (npc_ent && npc_ent->client)
 	{
 		int ally_bonus = (bonuses / QUEST_NPC_BONUS_FACTOR);
-		int hp_bonus = npc_ent->NPC->stats.health * bonuses;
 		int enemy_wave = (bonuses / QUEST_NPC_BONUS_FACTOR) + 1;
+		int hp_bonus = npc_ent->NPC->stats.health * (0.005 * bonuses);
 		int skill_level_bonus = 0;
 
 		npc_ent->client->pers.quest_npc = quest_npc_type;
@@ -715,6 +715,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		else if (quest_npc_type == QUEST_NPC_NIDHOGG)
 		{
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave - 2 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave - 2 + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 5 + skill_level_bonus;
 		}
@@ -722,8 +723,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		{
 			Jedi_Cloak(npc_ent);
 
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave - 4 + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, enemy_wave - 4 + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, enemy_wave - 3 + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = enemy_wave + 3 + skill_level_bonus;
 		}
@@ -9327,20 +9327,23 @@ void G_RunFrame( int levelTime ) {
 					{
 						int chance_to_spawn_enemy = Q_irand(0, 99);
 						int enemy_type = 0;
+						int enemy_chance = 0;
+						int quest_player_chance_increase = ((zyk_total_skillpoints(ent) + ent->client->pers.magic_crystals) / 2) + (ent->client->pers.current_weight / 50);
 						int seller_chance = ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_FACTOR;
 						qboolean hard_difficulty = qfalse;
 						int j = 0;
 
-						/* zyk: each array has the chances of each enemy type to appear. Higher indexes increase chance of high tier npcs to appear
-							    the last index is when player defeated QUEST_MAX_ENEMIES 
-						*/
+						// zyk: each index has the chance of each enemy type to appear
 						int enemy_chances[QUEST_ENEMY_TYPES] = {
-							-200, -180, -150, -130, -110, -90, -70, -50, -35, -20, -10, 0, 1, 100
+							-300, -270, -245, -225, -200, -180, -155, -125, -100, -70, -45, -20, 0, 100
 						};
 
 						for (j = 0; j < QUEST_ENEMY_TYPES; j++)
 						{
-							if (chance_to_spawn_enemy < enemy_chances[j])
+							enemy_chance = enemy_chances[j] + ent->client->pers.quest_defeated_enemies + quest_player_chance_increase;
+
+							// zyk: defeating enemies makes more powerful enemies more likely to be spawned
+							if (chance_to_spawn_enemy < enemy_chance)
 							{
 								enemy_type = j + 1;
 								break;

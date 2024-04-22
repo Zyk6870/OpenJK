@@ -2226,6 +2226,8 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 			{
+				int quest_npc_score = 1 + (QUEST_ENEMY_TYPES - self->client->pers.quest_npc);
+
 				if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
 				{
 					quest_player->client->pers.player_statuses |= (1 << PLAYER_STATUS_DEFEATED_JORMUNGANDR);
@@ -2235,7 +2237,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 					quest_player->client->pers.player_statuses |= (1 << PLAYER_STATUS_DEFEATED_MAGE_MASTER);
 				}
 
-				quest_player->client->pers.quest_defeated_enemies++;
+				quest_player->client->pers.quest_defeated_enemies += quest_npc_score;
 
 				save_account(quest_player, qtrue);
 			}
@@ -5909,6 +5911,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					attacker->health = attacker->client->ps.stats[STAT_MAX_HEALTH];
 
 				attacker->client->pers.magic_power += heal_amount;
+			}
+
+			if (targ->NPC && targ->client->pers.quest_npc == QUEST_NPC_HEAVY_ARMORED_WARRIOR && mod == MOD_SABER)
+			{ // zyk: heavy armored warrior absorbs some saber damage
+				bonus_health_resistance += 0.20;
 			}
 
 			// zyk: reduces damage based on the health resistance bonuses
