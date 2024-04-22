@@ -2244,43 +2244,41 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 			}
 
 			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2 && 
-				zyk_is_main_quest_complete(quest_player) == qfalse && 
+				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 			{
 				if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-				{ // zyk: defeated the secret enemy
+				{
 					quest_player->client->pers.player_statuses |= (1 << PLAYER_STATUS_DEFEATED_JORMUNGANDR);
+				}
+
+				old_quest_defeated_enemies_value = quest_player->client->pers.quest_defeated_enemies;
+
+				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+				{ // zyk: a mage master
+					quest_player->client->pers.quest_defeated_masters++;
+
+					if (quest_player->client->pers.quest_defeated_masters >= QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
+					{
+						quest_player->client->pers.quest_defeated_masters = QUEST_MIN_MAGE_MASTERS_TO_DEFEAT;
+					}
 				}
 				else
 				{
-					old_quest_defeated_enemies_value = quest_player->client->pers.quest_defeated_enemies;
+					quest_player->client->pers.quest_defeated_enemies++;
 
-					if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
-					{ // zyk: a mage master
-						quest_player->client->pers.quest_defeated_masters++;
-
-						if (quest_player->client->pers.quest_defeated_masters >= QUEST_MIN_MAGE_MASTERS_TO_DEFEAT)
-						{
-							quest_player->client->pers.quest_defeated_masters = QUEST_MIN_MAGE_MASTERS_TO_DEFEAT;
-						}
-					}
-					else
+					if (quest_player->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
 					{
-						quest_player->client->pers.quest_defeated_enemies++;
-
-						if (quest_player->client->pers.quest_defeated_enemies >= QUEST_MAX_ENEMIES)
-						{
-							quest_player->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
-						}
+						quest_player->client->pers.quest_defeated_enemies = QUEST_MAX_ENEMIES;
 					}
-
-					if (zyk_completed_enemy_wave_event(quest_player, old_quest_defeated_enemies_value) == qtrue)
-					{ // zyk: defeated an enemy wave or the min mage masters required to complete the quest
-						quest_player->client->pers.quest_enemy_wave_event_step = 1;
-					}
-
-					save_account(quest_player, qtrue);
 				}
+
+				if (zyk_completed_enemy_wave_event(quest_player, old_quest_defeated_enemies_value) == qtrue)
+				{ // zyk: defeated an enemy wave or the min mage masters required to complete the quest
+					quest_player->client->pers.quest_enemy_wave_event_step = 1;
+				}
+
+				save_account(quest_player, qtrue);
 			}
 		}
 	}
@@ -5933,7 +5931,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (attacker && attacker->client && targ && targ->client && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC) && attacker != targ &&
+			if (attacker && attacker->client && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC) && attacker != targ &&
 				Distance(targ->client->ps.origin, targ->client->pers.light_of_judgement_origin) < targ->client->pers.light_of_judgement_distance)
 			{ // zyk: target using Light Magic. Decreases damage taken if target is inside the light
 				bonus_health_resistance += (0.025 * targ->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]);
@@ -5941,6 +5939,18 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			// zyk: Health Strength skill decreases damage taken
 			bonus_health_resistance += (0.04 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH]);
+
+			if (attacker && attacker->client && attacker->NPC && attacker->client->pers.quest_npc == QUEST_NPC_NIDHOGG)
+			{ // zyk: nidhogg absorbs hp into his hp and mp
+				int heal_amount = (int)ceil(take * 0.50);
+
+				if ((attacker->health + heal_amount) < attacker->client->ps.stats[STAT_MAX_HEALTH])
+					attacker->health += heal_amount;
+				else
+					attacker->health = attacker->client->ps.stats[STAT_MAX_HEALTH];
+
+				attacker->client->pers.magic_power += heal_amount;
+			}
 
 			// zyk: reduces damage based on the health resistance bonuses
 			take = (int)ceil(take * (1.00 - bonus_health_resistance));

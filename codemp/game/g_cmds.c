@@ -10814,6 +10814,10 @@ qboolean zyk_can_deflect_shots(gentity_t *ent)
 			return qtrue;
 		}
 	}
+	else if (ent->client && ent->NPC && ent->client->pers.quest_npc == QUEST_NPC_HEAVY_ARMORED_WARRIOR && Q_irand(0, 3) == 0)
+	{
+		return qtrue;
+	}
 
 	return qfalse;
 }
