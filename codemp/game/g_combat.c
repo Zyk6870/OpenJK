@@ -2226,7 +2226,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 			{
-				int quest_npc_score = 1 + (QUEST_ENEMY_TYPES - self->client->pers.quest_npc);
+				int quest_npc_score = 1 + ((QUEST_ENEMY_TYPES - self->client->pers.quest_npc) / 2);
 
 				if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
 				{
@@ -5900,18 +5900,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			// zyk: Health Strength skill decreases damage taken
 			bonus_health_resistance += (0.04 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH]);
-
-			if (attacker && attacker->client && attacker->NPC && attacker->client->pers.quest_npc == QUEST_NPC_NIDHOGG)
-			{ // zyk: nidhogg absorbs hp into his hp and mp
-				int heal_amount = (int)ceil(take * 0.50);
-
-				if ((attacker->health + heal_amount) < attacker->client->ps.stats[STAT_MAX_HEALTH])
-					attacker->health += heal_amount;
-				else
-					attacker->health = attacker->client->ps.stats[STAT_MAX_HEALTH];
-
-				attacker->client->pers.magic_power += heal_amount;
-			}
 
 			if (targ->NPC && targ->client->pers.quest_npc == QUEST_NPC_HEAVY_ARMORED_WARRIOR && mod == MOD_SABER)
 			{ // zyk: heavy armored warrior absorbs some saber damage

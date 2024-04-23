@@ -6082,7 +6082,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them so the Mage Masters (mages in red robes) appear.\nDefeat them so the %s ^7can get their Master Crystals to appear in the map\nCollect them so the %s ^7can defeat all enemies and end the war.\n\n^3Quest Score: ^7%d (enemies defeated increase this)\n^3Master Crystals Collected: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them so the Mage Masters (mages in red robes) appear.\nDefeat them so the %s ^7can get their Master Crystals to appear in the map\nCollect them so the %s ^7can defeat all enemies and end the war.\n\n^3Quest Score: ^7%d\n^3Master Crystals Collected: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
 							QUESTCHAR_ALL_SPIRITS, QUESTCHAR_ALL_SPIRITS, 
 							ent->client->pers.quest_defeated_enemies, ent->client->pers.master_crystals_collected, QUEST_AMOUNT_OF_MASTER_CRYSTALS,
 							zyk_number_of_allies_in_map(ent), ent->client->pers.quest_tries, (ent->client->pers.quest_event_timer - level.time)));
@@ -6127,7 +6127,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Nidhogg changeling: ^7a flying changeling that uses high-level magic and shoots rockets. ^2Magic: high-level Fire, Air\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Jormungandr changeling: ^7a more powerful version of the changeling worm. Defeating it makes a %s ^7appear somewhere in the map for some time. ^2Magic: high-level Earth, Water\n^3Force Mage: ^7uses a lot of force powers and canuse Magic Fist. ^2Magic: Healing Area, Magic Dome\n^3Mage Scholar: ^7magic user with Magic Fist ability. ^2Magic: high-level Magic Dome, Dark, Light\n^3Mage Minister: ^7a stronger mage. ^2Magic: high-level Healing Area, Dark, Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Jormungandr changeling: ^7a more powerful changeling worm. Defeating it makes a %s ^7appear somewhere in the map for some time. ^2Magic: high-level Earth, Water\n^3Mage Scholar: ^7mage with Magic Fist ability. ^2Magic: Magic Dome, Light\n^3Mage Minister: ^7a stronger mage with Magic Fist ability. ^2Magic: Magic Dome, Dark\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. Can use Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)));
 						}
 					}
 					else

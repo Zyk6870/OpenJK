@@ -2880,7 +2880,7 @@ void fx_runner_think( gentity_t *ent )
 
 							if (old_master_crystals_collected < player_ent->client->pers.master_crystals_collected)
 							{ // zyk: completed the quest
-								ent->client->pers.quest_final_event_step = 1;
+								player_ent->client->pers.quest_final_event_step = 1;
 							}
 						}
 						else
