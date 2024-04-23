@@ -206,9 +206,9 @@ void Wampa_Slash( int boltIndex, qboolean backhand )
 	vec3_t		boltOrg;
 	int			damage = (backhand)?Q_irand(10,15):Q_irand(20,30);
 
-	if (NPCS.NPC->client && NPCS.NPC->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-	{ // zyk: the secret enemy. Has better damage
-		damage *= 5;
+	if (NPCS.NPC->client && NPCS.NPC->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM)
+	{ // zyk: changeling worm has better damage
+		damage *= 2;
 	}
 
 	numEnts = NPC_GetEntsNearBolt( radiusEntNums, radius, boltIndex, boltOrg );

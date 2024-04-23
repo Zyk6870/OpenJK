@@ -2226,40 +2226,25 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 			{
-				int quest_npc_score = 1 + ((QUEST_ENEMY_TYPES - self->client->pers.quest_npc) / 2);
+				int magic_armor_chance = Q_irand(0, 99);
 
-				if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-				{
-					quest_player->client->pers.player_statuses |= (1 << PLAYER_STATUS_DEFEATED_JORMUNGANDR);
+				if ((self->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && magic_armor_chance < 20) || 
+					(self->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER && magic_armor_chance < 20) ||
+					(self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && magic_armor_chance < 50))
+				{ // zyk: mages can make the Magic Armor appear in the map
+					quest_player->client->pers.player_statuses |= (1 << PLAYER_STATUS_MAGIC_ARMOR_DROPPED);
 				}
-				else if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+				
+				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 				{
 					quest_player->client->pers.player_statuses |= (1 << PLAYER_STATUS_DEFEATED_MAGE_MASTER);
 				}
 
-				quest_player->client->pers.quest_defeated_enemies += quest_npc_score;
+				quest_player->client->pers.quest_defeated_enemies += 1;
 
 				save_account(quest_player, qtrue);
 			}
 		}
-	}
-
-	if (attacker && attacker->client && attacker->NPC && attacker->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-	{ // zyk: jormungandr "eats" the enemy it killed by regen health
-		int heal_amount = self->client->ps.stats[STAT_MAX_HEALTH];
-
-		if (self->client->sess.amrpgmode == 2)
-		{
-			heal_amount = self->client->pers.max_rpg_health;
-		}
-
-		if ((attacker->health + heal_amount) < attacker->client->ps.stats[STAT_MAX_HEALTH])
-			attacker->health += heal_amount;
-		else
-			attacker->health = attacker->client->ps.stats[STAT_MAX_HEALTH];
-
-		// zyk: also absorb some mp
-		attacker->client->pers.magic_power += heal_amount;
 	}
 
 	if (zyk_allow_quests.integer > 0 && 
@@ -5900,11 +5885,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			// zyk: Health Strength skill decreases damage taken
 			bonus_health_resistance += (0.04 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH]);
-
-			if (targ->NPC && targ->client->pers.quest_npc == QUEST_NPC_HEAVY_ARMORED_WARRIOR && mod == MOD_SABER)
-			{ // zyk: heavy armored warrior absorbs some saber damage
-				bonus_health_resistance += 0.20;
-			}
 
 			// zyk: reduces damage based on the health resistance bonuses
 			take = (int)ceil(take * (1.00 - bonus_health_resistance));

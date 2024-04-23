@@ -6058,7 +6058,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 								}
 								if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
 								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 5 per cent, and if the source is Magic Fist or a magic power, decreases damage by 25 per cent and absorbs some magic points. The jormungandr changelings (a type of changeling worm that regen health and magic points when defeating enemies, it eats them) have this type of armor^7. They don't appear often. Defeating one of them will make a %s ^7appear somewhere in the map for some time\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS, zyk_get_inventory_item_name(item_index)));
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 5 per cent, and if the source is Magic Fist or a magic power, decreases damage by 25 per cent and absorbs some magic points. All mage enemies wear this type of armor. Defeating them has a chance of making this armor appear somewhere in the map for some time so you can get it\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
 								}
 							}
 							else
@@ -6082,9 +6082,9 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them so the Mage Masters (mages in red robes) appear.\nDefeat them so the %s ^7can get their Master Crystals to appear in the map\nCollect them so the %s ^7can defeat all enemies and end the war.\n\n^3Quest Score: ^7%d\n^3Master Crystals Collected: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them so the Mage Masters (mages in red robes) appear.\nDefeat them so the %s ^7can get their Master Crystals (big magic crystals) to appear in the map\nCollect them so the %s ^7can defeat all enemies and end the war.\n\n^3Enemies defeated: ^7%d/%d\n^3Master Crystals Collected: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
 							QUESTCHAR_ALL_SPIRITS, QUESTCHAR_ALL_SPIRITS, 
-							ent->client->pers.quest_defeated_enemies, ent->client->pers.master_crystals_collected, QUEST_AMOUNT_OF_MASTER_CRYSTALS,
+							ent->client->pers.quest_defeated_enemies, QUEST_ENEMIES_TO_DEFEAT, ent->client->pers.master_crystals_collected, QUEST_AMOUNT_OF_MASTER_CRYSTALS,
 							zyk_number_of_allies_in_map(ent), ent->client->pers.quest_tries, (ent->client->pers.quest_event_timer - level.time)));
 					}
 					else
@@ -6123,11 +6123,11 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 						if (page == 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7an armored soldier with guns. ^2Magic: Healing Area, Air\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7a blue armored soldier with guns. The armor can sometimes deflect gun shots and absorb some saber damage. ^2Magic: Air\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome, Water\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier. ^2Magic: Fire\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier. ^2Magic: Air\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Jormungandr changeling: ^7a more powerful changeling worm. Defeating it makes a %s ^7appear somewhere in the map for some time. ^2Magic: high-level Earth, Water\n^3Mage Scholar: ^7mage with Magic Fist ability. ^2Magic: Magic Dome, Light\n^3Mage Minister: ^7a stronger mage with Magic Fist ability. ^2Magic: Magic Dome, Dark\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. Can use Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Mage Scholar: ^7mage with some force and Magic Fist. He is wearing the Magic Armor. ^2Magic: Magic Dome, Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: Magic Dome, Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. He is wearing all armors. Can use Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 					}
 					else
