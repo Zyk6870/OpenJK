@@ -2237,7 +2237,14 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				
 				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 				{
-					quest_player->client->pers.player_statuses |= (1 << PLAYER_STATUS_DEFEATED_MAGE_MASTER);
+					quest_player->client->pers.quest_masters_defeated += 1;
+
+					if (quest_player->client->pers.quest_masters_defeated >= QUEST_MASTERS_TO_DEFEAT)
+					{ // zyk: defeated the minimum amount of mage masters to complete the quest
+						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
+
+						quest_player->client->pers.quest_final_event_step = 1;
+					}
 				}
 
 				quest_player->client->pers.quest_defeated_enemies += 1;

@@ -2179,7 +2179,7 @@ void load_account(gentity_t* ent)
 			ent->client->pers.quest_defeated_enemies = atoi(content);
 
 			fscanf(account_file, "%s", content);
-			ent->client->pers.master_crystals_collected = atoi(content);
+			ent->client->pers.quest_masters_defeated = atoi(content);
 
 			// zyk: last health
 			fscanf(account_file, "%s", content);
@@ -2266,7 +2266,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
 			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.master_crystals_collected,
+				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
@@ -5103,7 +5103,7 @@ void zyk_set_default_quest_fields(gentity_t* ent)
 {
 	ent->client->pers.quest_tries = MIN_QUEST_TRIES;
 	ent->client->pers.quest_defeated_enemies = 0;
-	ent->client->pers.master_crystals_collected = 0;
+	ent->client->pers.quest_masters_defeated = 0;
 }
 
 // zyk: adds a new RPG char with default values
@@ -5953,7 +5953,7 @@ void zyk_list_inventory(gentity_t* ent, int page)
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
 {
-	if (ent->client->pers.master_crystals_collected == QUEST_AMOUNT_OF_MASTER_CRYSTALS)
+	if (ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
 	{
 		return qtrue;
 	}
@@ -6082,9 +6082,9 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them so the Mage Masters (mages in red robes) appear.\nDefeat them so the %s ^7can get their Master Crystals (big magic crystals) to appear in the map\nCollect them so the %s ^7can defeat all enemies and end the war.\n\n^3Enemies defeated: ^7%d/%d\n^3Master Crystals Collected: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
-							QUESTCHAR_ALL_SPIRITS, QUESTCHAR_ALL_SPIRITS, 
-							ent->client->pers.quest_defeated_enemies, QUEST_ENEMIES_TO_DEFEAT, ent->client->pers.master_crystals_collected, QUEST_AMOUNT_OF_MASTER_CRYSTALS,
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them so the Mage Masters (mages in red robes) appear.\nDefeat them so the %s ^7can defeat all enemies and end the war.\n\n^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
+							QUESTCHAR_ALL_SPIRITS, 
+							ent->client->pers.quest_defeated_enemies, QUEST_ENEMIES_TO_DEFEAT, ent->client->pers.quest_masters_defeated, QUEST_MASTERS_TO_DEFEAT,
 							zyk_number_of_allies_in_map(ent), ent->client->pers.quest_tries, (ent->client->pers.quest_event_timer - level.time)));
 					}
 					else
@@ -6123,11 +6123,15 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 						if (page == 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier. ^2Magic: Air\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier. ^2Magic: Air^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 2)
 						{
 							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Mage Scholar: ^7mage with some force and Magic Fist. He is wearing the Magic Armor. ^2Magic: Magic Dome, Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: Magic Dome, Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. He is wearing all armors. Can use Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+						}
+						else if (page == 3)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance member. Your ally. Has force/saber. Your magic crystals help boost their abilities. ^2Magic: Water, Earth, Fire, Air\n^3Ally Flying Warrior: ^7a Resistance member. Your ally. Flies and has guns. Your magic crystals help boost their abilities. ^2Magic: Healing Area, Air\n^3Ally Mage: ^7a Resistance member. Your ally. Can use Magic Fist and all magic. Your magic crystals help boost their abilities\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 					}
 					else

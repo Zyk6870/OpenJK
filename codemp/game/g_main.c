@@ -521,13 +521,13 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_MAGE_MASTER] = 12;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 8;
 	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 8;
-	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = 6;
-	max_levels[QUEST_NPC_FLYING_WARRIOR] = 4;
-	max_levels[QUEST_NPC_CHANGELING_WORM] = 4;
-	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = 4;
-	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 4;
-	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = 4;
-	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 4;
+	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = 7;
+	max_levels[QUEST_NPC_FLYING_WARRIOR] = 5;
+	max_levels[QUEST_NPC_CHANGELING_WORM] = 5;
+	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = 5;
+	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 5;
+	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = 5;
+	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 5;
 	
 	max_levels[QUEST_NPC_ALLY_MAGE] = 10;
 	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = 8;
@@ -625,7 +625,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		// zyk: bonus skill level based on the chance to appear
 		int npc_skill_level = (bonuses / QUEST_NPC_BONUS_INCREASE);
 
-		int hp_bonus = npc_ent->NPC->stats.health * (0.02 * bonuses);
+		int hp_bonus = npc_ent->NPC->stats.health * (0.01 * bonuses);
 		int skill_level_bonus = 0;
 
 		npc_ent->client->pers.quest_npc = quest_npc_type;
@@ -649,7 +649,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		// zyk: setting magic abilities. Higher tier enemies will have a better magic bonus
 		if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
 		{
-			npc_skill_level = 8;
+			npc_skill_level -= 3;
 
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 1;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 1;
@@ -665,12 +665,14 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME_OF_DAMAGE, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, npc_skill_level + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + 2 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 42 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 43 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_MINISTER)
 		{
+			npc_skill_level -= 1;
+
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, npc_skill_level + skill_level_bonus);
@@ -678,10 +680,12 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 10 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 16 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_SCHOLAR)
 		{
+			npc_skill_level -= 1;
+
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, npc_skill_level + skill_level_bonus);
@@ -689,18 +693,18 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 10 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 16 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_HIGH_TRAINED_WARRIOR)
 		{
-			npc_skill_level = 4;
+			npc_skill_level -= 2;
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, npc_skill_level + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 6 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 7 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
 		{
@@ -758,7 +762,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + 1 + skill_level_bonus;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 20 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 10 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_FLYING_WARRIOR)
 		{
@@ -5350,10 +5354,6 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 		zyk_set_entity_field(new_ent, "angles", "90 0 0");
 		zyk_set_entity_field(new_ent, "zykmodelscale", "80");
 	}
-	else if (crystal_type == MAGIC_CRYSTAL_MASTER)
-	{
-		zyk_set_entity_field(new_ent, "zykmodelscale", "100");
-	}
 	else
 	{
 		zyk_set_entity_field(new_ent, "zykmodelscale", "45");
@@ -5440,13 +5440,6 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
 	else if (crystal_type == MAGIC_CRYSTAL_ARTIFACT)
 	{
 		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_artifact_crystal");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id, crystal_type);
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id, crystal_type);
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id, crystal_type);
-	}
-	else if (crystal_type == MAGIC_CRYSTAL_MASTER)
-	{
-		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_master_crystal");
 		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id, crystal_type);
 		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id, crystal_type);
 		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id, crystal_type);
@@ -9166,7 +9159,7 @@ void G_RunFrame( int levelTime ) {
 					int time_crystal_chance = 87;
 					int puzzle_crystal_chance = 93 + ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE;
 
-					if (ent->client->pers.master_crystals_collected == QUEST_AMOUNT_OF_MASTER_CRYSTALS)
+					if (ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
 					{
 						puzzle_crystal_chance += 1;
 					}
@@ -9182,13 +9175,6 @@ void G_RunFrame( int levelTime ) {
 						ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_MAGIC_ARMOR_DROPPED);
 
 						zyk_spawn_skill_crystal(ent, 120000, MAGIC_ARMOR);
-					}
-					
-					if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_DEFEATED_MAGE_MASTER))
-					{ // zyk: Master Crystal
-						ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_DEFEATED_MAGE_MASTER);
-
-						zyk_spawn_skill_crystal(ent, 180000, MAGIC_CRYSTAL_MASTER);
 					}
 					
 					if (magic_crystal_chance_to_spawn < 70)
@@ -9211,7 +9197,7 @@ void G_RunFrame( int levelTime ) {
 					zyk_set_magic_crystal_respawn_time(ent);
 				}
 
-				// zyk: when player defeats each enemy wave, Magic Spirits will appear to talk to them
+				// zyk: final event of the quest
 				if (ent->client->pers.quest_final_event_step > 0 && ent->client->pers.quest_final_event_timer < level.time)
 				{
 					if (ent->client->pers.quest_final_event_step == 1)
@@ -9341,7 +9327,7 @@ void G_RunFrame( int levelTime ) {
 
 							zyk_spawn_quest_npc(QUEST_NPC_SELLER, ent->client->ps.viewangles[YAW], 0, qfalse, -1);
 						}
-						else if (chance_to_spawn_enemy < (10 + ent->client->pers.magic_crystals))
+						else if (chance_to_spawn_enemy < (seller_chance + 5 + ent->client->pers.magic_crystals))
 						{ // zyk: spawn an ally and get one of them near the player
 							int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 							int ally_bonus = ent->client->pers.quest_defeated_enemies + ent->client->pers.magic_crystals;

@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.5.6"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.5.7"
 
 #define SECURITY_LOG "security.log"
 
@@ -555,7 +555,6 @@ typedef enum {
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
 	PLAYER_STATUS_GOT_TIME_CRYSTAL,
 	PLAYER_STATUS_MAGIC_ARMOR_DROPPED,
-	PLAYER_STATUS_DEFEATED_MAGE_MASTER,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -670,7 +669,6 @@ typedef enum {
 	MAGIC_CRYSTAL_EXTRA_TRIES,
 	MAGIC_CRYSTAL_TIME,
 	MAGIC_CRYSTAL_ARTIFACT,
-	MAGIC_CRYSTAL_MASTER,
 	MAGIC_ARMOR,
 	NUM_MAGIC_CRYSTALS
 } zyk_magic_crystal_type_t;
@@ -855,11 +853,11 @@ typedef enum {
 
 // zyk: quest enemies values
 #define QUEST_ENEMIES_TO_DEFEAT 100
+#define QUEST_MASTERS_TO_DEFEAT 5
 #define QUEST_ENEMY_TYPES 12
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_MAX_NPCS_IN_MAP 22
 #define QUEST_NPC_SPAWN_TIME 25000
-#define QUEST_AMOUNT_OF_MASTER_CRYSTALS 5
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 45000
@@ -1038,7 +1036,7 @@ typedef struct clientPersistant_s {
 	// zyk: quest control fields
 	int quest_tries;
 	int quest_defeated_enemies;
-	int master_crystals_collected;
+	int quest_masters_defeated;
 	int quest_event_timer;
 	int quest_final_event_step;
 	int quest_final_event_timer;
