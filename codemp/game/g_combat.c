@@ -2229,11 +2229,11 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 			{
 				int magic_armor_chance = Q_irand(0, 99);
 
-				if ((self->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && magic_armor_chance < 1) || 
-					(self->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER && magic_armor_chance < 1) ||
+				if ((self->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && magic_armor_chance < 2) || 
+					(self->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER && magic_armor_chance < 2) ||
 					(self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && magic_armor_chance < 5))
 				{ // zyk: mages can drop the Magic Armor
-					zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 60000, self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2]);
+					zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 30000, self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2]);
 				}
 				
 				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
