@@ -6058,7 +6058,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 								}
 								if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
 								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 10 per cent. If the source is Magic Fist or a magic power, decreases damage by 25 per cent instead and absorbs some magic points. All mage enemies wear this type of armor. Defeating them has a chance of making them drop the armor\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 10 per cent. If the source is Magic Fist or a magic power, decreases damage by 25 per cent instead and absorbs some magic points. All mage enemies wear this type of armor. Defeating them has a chance of making them drop the armor. Blue crystals you have increase this chance\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
 								}
 							}
 							else
