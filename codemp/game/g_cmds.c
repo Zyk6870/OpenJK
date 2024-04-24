@@ -6123,7 +6123,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 						if (page == 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier. ^2Magic: Air^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Can poison targets with its melee attacks. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier. ^2Magic: Air^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 2)
 						{

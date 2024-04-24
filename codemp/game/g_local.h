@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.5.9"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.5.10"
 
 #define SECURITY_LOG "security.log"
 
@@ -554,6 +554,7 @@ typedef enum {
 	PLAYER_STATUS_CREATED_ACCOUNT,
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
 	PLAYER_STATUS_GOT_TIME_CRYSTAL,
+	PLAYER_STATUS_POISONED,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -893,6 +894,10 @@ typedef struct clientPersistant_s {
 
 	// zyk: player status flags
 	int player_statuses;
+
+	// zyk: poison status
+	int poison_debounce_timer;
+	int poison_duration;
 
 	// zyk: last health, shield, mp and stamina are saved into account
 	int last_health;

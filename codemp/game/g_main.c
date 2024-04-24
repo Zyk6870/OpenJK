@@ -5719,6 +5719,25 @@ void zyk_active_magic_mp_consumption(gentity_t* ent)
 
 // zyk: controls the quest powers stuff
 extern void initialize_rpg_skills(gentity_t *ent, qboolean init_all);
+void zyk_status_effects(gentity_t* ent)
+{
+	if (ent && ent->client && ent->health > 0 && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_POISONED))
+	{
+		if (ent->client->pers.poison_duration > level.time && ent->client->pers.poison_debounce_timer < level.time)
+		{
+			ent->client->pers.poison_debounce_timer = level.time + 100;
+
+			zyk_quest_effect_spawn(ent, ent, "zyk_status_poison", "0", "noghri_stick/gas_cloud", 100, 0, 0, 1500);
+
+			G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
+		}
+		else if (ent->client->pers.poison_duration <= level.time)
+		{
+			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_POISONED);
+		}
+	}
+}
+
 void quest_power_events(gentity_t *ent)
 {
 	if (ent && ent->client)
@@ -9049,6 +9068,7 @@ void G_RunFrame( int levelTime ) {
 
 			quest_power_events(ent);
 			fire_bolt_hits(ent);
+			zyk_status_effects(ent);
 
 			if (zyk_chat_protection_timer.integer > 0)
 			{ // zyk: chat protection. If 0, it is off. If greater than 0, set the timer to protect the player
@@ -9438,6 +9458,7 @@ void G_RunFrame( int levelTime ) {
 
 			quest_power_events(ent);
 			fire_bolt_hits(ent);
+			zyk_status_effects(ent);
 
 			// zyk: npcs cannot enter the Duel Tournament arena
 			if (level.duel_tournament_mode == 4 && 

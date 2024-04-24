@@ -2259,12 +2259,16 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		self->client->sess.amrpgmode == 2 && 
 		!(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 		zyk_is_main_quest_complete(self) == qfalse && 
-		!(attacker && attacker->client && attacker->s.number < MAX_CLIENTS) && // zyk: dying to a player will not count
+		(!(attacker && attacker->client && attacker->s.number < MAX_CLIENTS) ||
+		  (attacker == self && self->client->pers.player_statuses & (1 << PLAYER_STATUS_POISONED) &&
+		   meansOfDeath == MOD_UNKNOWN)) && // zyk: dying to a player will not count, but still count poison death
 		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_SELF_KILL) && meansOfDeath == MOD_SUICIDE) // zyk: dont reset in this case, for example, when player logs into his account
 		)
 	{ // zyk: player died in quest. Decrease number of tries
 		zyk_decrease_quest_tries(self);
 	}
+
+	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_POISONED);
 
 	if (attacker && attacker->client && attacker->client->pers.quest_npc > QUEST_NPC_NONE && attacker->enemy && attacker->enemy == self)
 	{ // zyk: quest npc defeated an enemy. Clear it to find a new one and stop all magic powers
@@ -5900,6 +5904,17 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (take < 1)
 			{ // zyk: cannot make player fully absorb all damage
 				take = 1;
+			}
+
+			// zyk: some npcs have a chance of causing poison status
+			if (attacker && attacker->client && attacker->NPC && 
+				attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER && mod == MOD_MELEE && 
+				Q_irand(0, 4) == 0)
+			{
+				targ->client->pers.poison_debounce_timer = 0;
+				targ->client->pers.poison_duration = level.time + 20000;
+
+				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_POISONED);
 			}
 
 			// zyk: damage to health alsomakes RPG player lose Stamina
