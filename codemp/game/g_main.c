@@ -516,29 +516,29 @@ char* zyk_get_enemy_type(int enemy_type)
 
 int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 {
-	int max_levels[NUM_QUEST_NPCS];
+	int bonus_increase[NUM_QUEST_NPCS];
 
-	max_levels[QUEST_NPC_NONE] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_NONE] = QUEST_NPC_BONUS_INCREASE;
 
-	max_levels[QUEST_NPC_MAGE_MASTER] = QUEST_NPC_BONUS_INCREASE;
-	max_levels[QUEST_NPC_MAGE_MINISTER] = QUEST_NPC_BONUS_INCREASE;
-	max_levels[QUEST_NPC_MAGE_SCHOLAR] = QUEST_NPC_BONUS_INCREASE;
-	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
-	max_levels[QUEST_NPC_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
-	max_levels[QUEST_NPC_CHANGELING_WORM] = QUEST_NPC_BONUS_INCREASE;
-	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
-	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 3;
-	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
-	max_levels[QUEST_NPC_CHANGELING_HOWLER] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_MAGE_MASTER] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_MAGE_MINISTER] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_MAGE_SCHOLAR] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_HIGH_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
+	bonus_increase[QUEST_NPC_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_CHANGELING_WORM] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_MID_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
+	bonus_increase[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 3;
+	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_CHANGELING_HOWLER] = QUEST_NPC_BONUS_INCREASE;
 
-	max_levels[QUEST_NPC_ALLY_MAGE] = QUEST_NPC_BONUS_INCREASE;
-	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
-	max_levels[QUEST_NPC_ALLY_FORCE_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
-	max_levels[QUEST_NPC_SELLER] = QUEST_NPC_BONUS_INCREASE * 5;
+	bonus_increase[QUEST_NPC_ALLY_MAGE] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_ALLY_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
+	bonus_increase[QUEST_NPC_ALLY_FORCE_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
+	bonus_increase[QUEST_NPC_SELLER] = QUEST_NPC_BONUS_INCREASE * 5;
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
-		return max_levels[enemy_type];
+		return bonus_increase[enemy_type];
 	}
 
 	return QUEST_NPC_BONUS_INCREASE;
@@ -5725,9 +5725,9 @@ void zyk_status_effects(gentity_t* ent)
 	{
 		if (ent->client->pers.poison_duration > level.time && ent->client->pers.poison_debounce_timer < level.time)
 		{
-			ent->client->pers.poison_debounce_timer = level.time + 100;
+			ent->client->pers.poison_debounce_timer = level.time + 200;
 
-			zyk_quest_effect_spawn(ent, ent, "zyk_status_poison", "0", "noghri_stick/gas_cloud", 100, 0, 0, 1500);
+			zyk_quest_effect_spawn(ent, ent, "zyk_status_poison", "0", "noghri_stick/gas_cloud", 100, 0, 0, 1200);
 
 			G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
 		}
