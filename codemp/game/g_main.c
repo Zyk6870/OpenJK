@@ -514,6 +514,36 @@ char* zyk_get_enemy_type(int enemy_type)
 	return "";
 }
 
+int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
+{
+	int max_levels[NUM_QUEST_NPCS];
+
+	max_levels[QUEST_NPC_NONE] = QUEST_NPC_BONUS_INCREASE;
+
+	max_levels[QUEST_NPC_MAGE_MASTER] = QUEST_NPC_BONUS_INCREASE;
+	max_levels[QUEST_NPC_MAGE_MINISTER] = QUEST_NPC_BONUS_INCREASE;
+	max_levels[QUEST_NPC_MAGE_SCHOLAR] = QUEST_NPC_BONUS_INCREASE;
+	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
+	max_levels[QUEST_NPC_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
+	max_levels[QUEST_NPC_CHANGELING_WORM] = QUEST_NPC_BONUS_INCREASE;
+	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
+	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 3;
+	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
+	max_levels[QUEST_NPC_CHANGELING_HOWLER] = QUEST_NPC_BONUS_INCREASE;
+
+	max_levels[QUEST_NPC_ALLY_MAGE] = QUEST_NPC_BONUS_INCREASE;
+	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
+	max_levels[QUEST_NPC_ALLY_FORCE_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
+	max_levels[QUEST_NPC_SELLER] = QUEST_NPC_BONUS_INCREASE * 5;
+
+	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
+	{
+		return max_levels[enemy_type];
+	}
+
+	return QUEST_NPC_BONUS_INCREASE;
+}
+
 int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 {
 	int max_levels[NUM_QUEST_NPCS];
@@ -523,11 +553,11 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_MAGE_MASTER] = 12;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 8;
 	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 8;
-	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = 7;
+	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = 6;
 	max_levels[QUEST_NPC_FLYING_WARRIOR] = 5;
 	max_levels[QUEST_NPC_CHANGELING_WORM] = 5;
 	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = 5;
-	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 5;
+	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 4;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = 5;
 	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 5;
 	
@@ -560,10 +590,10 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 {
 	if (npc_ent && npc_ent->client)
 	{
-		int ally_bonus = (bonuses / QUEST_NPC_BONUS_INCREASE);
+		int ally_bonus = (bonuses / zyk_bonus_increase_for_quest_npc(quest_npc_type));
 
 		// zyk: bonus skill level based on the chance to appear
-		int npc_skill_level = (bonuses / QUEST_NPC_BONUS_INCREASE);
+		int npc_skill_level = (bonuses / zyk_bonus_increase_for_quest_npc(quest_npc_type));
 
 		int hp_bonus = npc_ent->NPC->stats.health * (0.01 * bonuses);
 		int skill_level_bonus = 0;
@@ -586,7 +616,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
-		// zyk: setting magic abilities. Higher tier enemies will have a better magic bonus
+		// zyk: setting magic abilities
 		if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
 		{
 			npc_skill_level -= 3;
@@ -637,8 +667,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_HIGH_TRAINED_WARRIOR)
 		{
-			npc_skill_level -= 2;
-
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, npc_skill_level + skill_level_bonus);
@@ -668,7 +696,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_HEAVY_ARMORED_WARRIOR)
 		{
-			// zyk: this npc will start with the armors
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 1;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 1;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
