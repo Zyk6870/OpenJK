@@ -2181,6 +2181,7 @@ extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
+extern void zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, float x, float y, float z);
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
 	gentity_t* ent;
 	int			anim;
@@ -2228,11 +2229,11 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 			{
 				int magic_armor_chance = Q_irand(0, 99);
 
-				if ((self->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && magic_armor_chance < 20) || 
-					(self->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER && magic_armor_chance < 20) ||
-					(self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && magic_armor_chance < 50))
-				{ // zyk: mages can make the Magic Armor appear in the map
-					quest_player->client->pers.player_statuses |= (1 << PLAYER_STATUS_MAGIC_ARMOR_DROPPED);
+				if ((self->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && magic_armor_chance < 5) || 
+					(self->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER && magic_armor_chance < 5) ||
+					(self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && magic_armor_chance < 20))
+				{ // zyk: mages can drop the Magic Armor
+					zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 120000, self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2]);
 				}
 				
 				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)

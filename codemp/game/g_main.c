@@ -482,6 +482,8 @@ qboolean zyk_there_is_player_or_npc_in_spot(float x, float y, float z)
 }
 
 extern void Jedi_Cloak(gentity_t* self);
+extern int zyk_max_skill_level(int skill_index);
+extern int zyk_max_magic_power(gentity_t* ent);
 char* zyk_get_enemy_type(int enemy_type)
 {
 	char* enemy_names[NUM_QUEST_NPCS];
@@ -554,70 +556,8 @@ void zyk_set_magic_level_for_quest_npc(gentity_t* npc_ent, zyk_quest_npc_t enemy
 	}
 }
 
-// zyk: spawns a quest npc and sets additional stuff, like levels, etc
-extern int zyk_max_skill_level(int skill_index);
-extern int zyk_max_magic_power(gentity_t* ent);
-void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, qboolean hard_mode, int player_id)
+void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type, int bonuses, qboolean hard_mode, int player_id)
 {
-	gentity_t* npc_ent = NULL;
-
-	float x = 0, y = 0, z = 0;
-	int npc_offset = 48;
-	gentity_t* chosen_entity = NULL;
-
-	chosen_entity = zyk_find_entity_for_quest();
-
-	if (chosen_entity == NULL)
-	{ // zyk: if for some reason there was no chosen entity, try again later
-		return;
-	}
-
-	// zyk: validating some entity types so the npc will not be stuck
-	if (Q_stricmp(chosen_entity->classname, "fx_runner") == 0 || 
-			chosen_entity->r.contents & CONTENTS_SOLID
-		)
-	{
-		x += npc_offset;
-		y += npc_offset;
-	}
-	else
-	{
-		x = Q_irand(0, npc_offset);
-		y = Q_irand(0, npc_offset);
-		z = Q_irand(0, npc_offset);
-	}
-
-	if (Q_irand(0, 1) == 0)
-	{
-		x *= -1;
-	}
-
-	if (Q_irand(0, 1) == 0)
-	{
-		y *= -1;
-	}
-
-	if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
-	{
-		x += chosen_entity->r.currentOrigin[0];
-		y += chosen_entity->r.currentOrigin[1];
-		z += chosen_entity->r.currentOrigin[2];
-	}
-	else
-	{
-		x += chosen_entity->s.origin[0];
-		y += chosen_entity->s.origin[1];
-		z += chosen_entity->s.origin[2];
-	}
-
-	// zyk: avoiding telefrag other npcs
-	if (zyk_there_is_player_or_npc_in_spot(x, y, z) == qtrue)
-	{
-		return;
-	}
-
-	npc_ent = Zyk_NPC_SpawnType(zyk_get_enemy_type(quest_npc_type), x, y, z, yaw);
-
 	if (npc_ent && npc_ent->client)
 	{
 		int ally_bonus = (bonuses / QUEST_NPC_BONUS_INCREASE);
@@ -784,6 +724,71 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		// zyk: setting the initial amount of magic points here because it is based on the Max MP skill
 		npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
 	}
+}
+
+// zyk: spawns a quest npc and sets additional stuff, like levels, etc
+void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, qboolean hard_mode, int player_id)
+{
+	gentity_t* npc_ent = NULL;
+
+	float x = 0, y = 0, z = 0;
+	int npc_offset = 48;
+	gentity_t* chosen_entity = NULL;
+
+	chosen_entity = zyk_find_entity_for_quest();
+
+	if (chosen_entity == NULL)
+	{ // zyk: if for some reason there was no chosen entity, try again later
+		return;
+	}
+
+	// zyk: validating some entity types so the npc will not be stuck
+	if (Q_stricmp(chosen_entity->classname, "fx_runner") == 0 || 
+			chosen_entity->r.contents & CONTENTS_SOLID
+		)
+	{
+		x += npc_offset;
+		y += npc_offset;
+	}
+	else
+	{
+		x = Q_irand(0, npc_offset);
+		y = Q_irand(0, npc_offset);
+		z = Q_irand(0, npc_offset);
+	}
+
+	if (Q_irand(0, 1) == 0)
+	{
+		x *= -1;
+	}
+
+	if (Q_irand(0, 1) == 0)
+	{
+		y *= -1;
+	}
+
+	if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
+	{
+		x += chosen_entity->r.currentOrigin[0];
+		y += chosen_entity->r.currentOrigin[1];
+		z += chosen_entity->r.currentOrigin[2];
+	}
+	else
+	{
+		x += chosen_entity->s.origin[0];
+		y += chosen_entity->s.origin[1];
+		z += chosen_entity->s.origin[2];
+	}
+
+	// zyk: avoiding telefrag other npcs
+	if (zyk_there_is_player_or_npc_in_spot(x, y, z) == qtrue)
+	{
+		return;
+	}
+
+	npc_ent = Zyk_NPC_SpawnType(zyk_get_enemy_type(quest_npc_type), x, y, z, yaw);
+
+	zyk_set_quest_npc_stuff(npc_ent, quest_npc_type, bonuses, hard_mode, player_id);
 }
 
 /*
@@ -5318,12 +5323,12 @@ void zyk_clear_magic_crystals(gentity_t* effect_ent)
 }
 
 extern int zyk_total_skillpoints(gentity_t* ent);
-int zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration, char *crystal_type)
+int zyk_spawn_quest_item_effect(float x, float y, float z, int duration, char *quest_item_type)
 {
 	gentity_t* new_ent = G_Spawn();
 
 	zyk_set_entity_field(new_ent, "classname", "fx_runner");
-	zyk_set_entity_field(new_ent, "targetname", G_NewString(crystal_type));
+	zyk_set_entity_field(new_ent, "targetname", G_NewString(quest_item_type));
 	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
 
 	new_ent->s.modelindex = G_EffectIndex("force/heal2");
@@ -5336,7 +5341,7 @@ int zyk_spawn_skill_crystal_effect(float x, float y, float z, int duration, char
 	return new_ent->s.number;
 }
 
-void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, int duration, int crystal_effect_id, zyk_magic_crystal_type_t crystal_type)
+void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int duration, int quest_item_effect_id, zyk_quest_item_t quest_item_type)
 {
 	gentity_t* new_ent = G_Spawn();
 
@@ -5349,7 +5354,7 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 
 	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
 
-	if (crystal_type == MAGIC_ARMOR)
+	if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
 	{ // zyk: Magic Armor
 		zyk_set_entity_field(new_ent, "angles", "90 0 0");
 		zyk_set_entity_field(new_ent, "zykmodelscale", "80");
@@ -5363,14 +5368,14 @@ void zyk_spawn_skill_crystal_model(float x, float y, float z, char* model_path, 
 
 	zyk_spawn_entity(new_ent);
 
-	new_ent->count = crystal_effect_id;
+	new_ent->count = quest_item_effect_id;
 
 	level.special_power_effects[new_ent->s.number] = 0;
 	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
 }
 
 // zyk: spawn the model and effect used by magic crystals
-void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
+void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crystal_type)
 {
 	float x, y, z;
 	int distance_factor = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
@@ -5417,32 +5422,39 @@ void zyk_spawn_skill_crystal(gentity_t* ent, int duration, int crystal_type)
 		z += chosen_entity->s.origin[2];
 	}
 
-	if (crystal_type == MAGIC_CRYSTAL_SKILL)
+	if (crystal_type == QUEST_ITEM_SKILL_CRYSTAL)
 	{
-		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_skill_crystal");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id, crystal_type);
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_skill_crystal");
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id, crystal_type);
 	}
-	else if (crystal_type == MAGIC_CRYSTAL_EXTRA_TRIES)
+	else if (crystal_type == QUEST_ITEM_EXTRA_TRIES_CRYSTAL)
 	{
-		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_extra_tries_crystal");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id, crystal_type);
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_extra_tries_crystal");
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id, crystal_type);
 	}
-	else if (crystal_type == MAGIC_CRYSTAL_TIME)
+	else if (crystal_type == QUEST_ITEM_TIME_CRYSTAL)
 	{
-		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_time_crystal");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id, crystal_type);
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_time_crystal");
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id, crystal_type);
 	}
-	else if (crystal_type == MAGIC_ARMOR)
+	else if (crystal_type == QUEST_ITEM_ARTIFACT_CRYSTAL)
 	{
-		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_magic_armor");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/desert/3po_torso.md3", duration, crystal_effect_id, crystal_type);
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_artifact_crystal");
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id, crystal_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id, crystal_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id, crystal_type);
 	}
-	else if (crystal_type == MAGIC_CRYSTAL_ARTIFACT)
+}
+
+// zyk: spawns any of the quest item types at specific coordinates in map
+void zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, float x, float y, float z)
+{
+	int quest_item_effect_id = 0;
+
+	if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
 	{
-		crystal_effect_id = zyk_spawn_skill_crystal_effect(x, y, z, duration, "zyk_artifact_crystal");
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id, crystal_type);
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id, crystal_type);
-		zyk_spawn_skill_crystal_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id, crystal_type);
+		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_magic_armor");
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/desert/3po_torso.md3", duration, quest_item_effect_id, quest_item_type);
 	}
 }
 
@@ -9169,29 +9181,22 @@ void G_RunFrame( int levelTime ) {
 						extra_tries_crystal_chance -= 2;
 						time_crystal_chance -= 2;
 					}
-
-					if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_ARMOR_DROPPED))
-					{ // zyk: Magic Armor
-						ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_MAGIC_ARMOR_DROPPED);
-
-						zyk_spawn_skill_crystal(ent, 120000, MAGIC_ARMOR);
-					}
 					
 					if (magic_crystal_chance_to_spawn < 70)
-					{ // zyk: Magic Crystal
-						zyk_spawn_skill_crystal(ent, 60000, MAGIC_CRYSTAL_SKILL);
+					{ // zyk: Skill Crystal
+						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 					}
 					else if (magic_crystal_chance_to_spawn >= 70 && magic_crystal_chance_to_spawn < extra_tries_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Extra Tries Crystal
-						zyk_spawn_skill_crystal(ent, 55000, MAGIC_CRYSTAL_EXTRA_TRIES);
+						zyk_spawn_magic_crystal(ent, 55000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 					}
 					else if (magic_crystal_chance_to_spawn >= 80 && magic_crystal_chance_to_spawn < time_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Time crystal
-						zyk_spawn_skill_crystal(ent, 55000, MAGIC_CRYSTAL_TIME);
+						zyk_spawn_magic_crystal(ent, 55000, QUEST_ITEM_TIME_CRYSTAL);
 					}
 					else if (magic_crystal_chance_to_spawn >= 92 && magic_crystal_chance_to_spawn < puzzle_crystal_chance)
 					{ // zyk: Energy Modulator puzzle crystal
-						zyk_spawn_skill_crystal(ent, 50000, MAGIC_CRYSTAL_ARTIFACT);
+						zyk_spawn_magic_crystal(ent, 50000, QUEST_ITEM_ARTIFACT_CRYSTAL);
 					}
 
 					zyk_set_magic_crystal_respawn_time(ent);
