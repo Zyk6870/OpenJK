@@ -759,7 +759,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 	gentity_t* npc_ent = NULL;
 
 	float x = 0, y = 0, z = 0;
-	int npc_offset = 48;
+	int npc_offset = 24;
 	gentity_t* chosen_entity = NULL;
 
 	chosen_entity = zyk_find_entity_for_quest();
