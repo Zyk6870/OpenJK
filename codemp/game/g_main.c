@@ -9476,6 +9476,18 @@ void G_RunFrame( int levelTime ) {
 			{ // zyk: npcs with magic powers
 				if (ent->client->pers.quest_npc > QUEST_NPC_NONE && ent->client->pers.quest_event_timer < level.time)
 				{
+					if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR)
+					{ // zyk: changes his class so he can react in different ways sometimes
+						if (ent->client->NPC_class == CLASS_REBORN)
+						{
+							ent->client->NPC_class = CLASS_BOBAFETT;
+						}
+						else if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
+						{ // zyk: change to reborn if he is on the ground
+							ent->client->NPC_class = CLASS_REBORN;
+						}
+					}
+
 					if (ent->enemy)
 					{
 						int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
