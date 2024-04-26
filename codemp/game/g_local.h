@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.5.17"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.5.18"
 
 #define SECURITY_LOG "security.log"
 
@@ -853,12 +853,12 @@ typedef enum {
 #define QUESTCHAR_SELLER "^3Seller"
 
 // zyk: quest enemies values
-#define MAX_QUEST_PROGRESS 50000
+#define MAX_QUEST_PROGRESS 100000
 #define QUEST_SPIRIT_TREE_DEFAULT_SCALE 2
-#define QUEST_SPIRIT_TREE_RADIUS 100
-#define QUEST_SPIRIT_TREE_WITHER_DISTANCE 1000
-#define QUEST_SPIRIT_TREE_TIME 60000
-#define QUEST_ENEMY_WAVE_COUNT 50
+#define QUEST_SPIRIT_TREE_RADIUS 90
+#define QUEST_SPIRIT_TREE_WITHER_DISTANCE 500
+#define QUEST_SPIRIT_TREE_CALL_COST 10
+#define QUEST_ENEMY_WAVE_COUNT 40
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_MAX_NPCS_IN_MAP 25
 #define QUEST_NPC_SPAWN_TIME 25000
@@ -1052,7 +1052,6 @@ typedef struct clientPersistant_s {
 	int quest_final_event_step;
 	int quest_final_event_timer;
 	int quest_spirit_tree_id;
-	int quest_spirit_tree_timer;
 	int quest_progress_timer;
 	int quest_seller_event_step;
 	int quest_seller_event_timer;
