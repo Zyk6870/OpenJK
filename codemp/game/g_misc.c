@@ -2765,10 +2765,21 @@ extern int	BMS_MID;
 extern int	BMS_END;
 
 extern void zyk_add_mp(gentity_t* ent, int mp_amount);
-extern void zyk_clear_magic_crystals(gentity_t* effect_ent);
+extern void zyk_clear_quest_items(gentity_t* effect_ent);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 extern void zyk_set_quest_event_timer(gentity_t* ent);
 extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
+extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
+
+void zyk_clear_quest_effect(gentity_t* ent)
+{
+	zyk_clear_quest_items(ent);
+
+	ent->think = G_FreeEntity;
+	ent->nextthink = level.time + 100;
+
+	level.special_power_effects[ent->s.number] = -1;
+}
 
 //----------------------------------------------------------
 void fx_runner_think( gentity_t *ent )
@@ -2872,18 +2883,37 @@ void fx_runner_think( gentity_t *ent )
 
 					save_account(player_ent, qtrue);
 
-					zyk_clear_magic_crystals(ent);
-
-					ent->think = G_FreeEntity;
-					ent->nextthink = level.time + 100;
-
-					// zyk: must set this to -1 so the server will not try to clear this entity again
-					level.special_power_effects[ent->s.number] = -1;
+					zyk_clear_quest_effect(ent);
 
 					return;
 				}
 			}
 		}
+	}
+	else if (Q_stricmp(ent->targetname, "zyk_spirit_tree") == 0)
+	{ // zyk: Spirit Tree
+		int i = 0;
+
+		for (i = 0; i < level.maxclients; i++)
+		{
+			gentity_t* player_ent = &g_entities[i];
+
+			if (player_ent && player_ent->client &&
+				player_ent->client->pers.quest_spirit_tree_id == ent->s.number)
+			{ // zyk: the owner of this Spirit Tree
+				if (player_ent->client->sess.amrpgmode < 2 || 
+					player_ent->client->sess.sessionTeam == TEAM_SPECTATOR || 
+					(zyk_is_main_quest_complete(player_ent) == qtrue && player_ent->client->pers.quest_final_event_step == 0))
+				{ // zyk: in these cases, clear the Spirit Tree
+					zyk_clear_quest_effect(ent);
+				}
+
+				return;
+			}
+		}
+
+		// zyk: did not find the player, clear the Spirit Tree
+		zyk_clear_quest_effect(ent);
 	}
 
 	// zyk: Super Beam. Traces enemies and damages them

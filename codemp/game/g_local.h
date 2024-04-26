@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.5.16"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.5.17"
 
 #define SECURITY_LOG "security.log"
 
@@ -664,16 +664,6 @@ typedef enum {
 } zyk_hit_by_magic_t;
 
 typedef enum {
-	QUEST_ITEM_NONE,
-	QUEST_ITEM_SKILL_CRYSTAL,
-	QUEST_ITEM_EXTRA_TRIES_CRYSTAL,
-	QUEST_ITEM_TIME_CRYSTAL,
-	QUEST_ITEM_ARTIFACT_CRYSTAL,
-	QUEST_ITEM_MAGIC_ARMOR,
-	NUM_QUEST_ITEMS
-} zyk_quest_item_t;
-
-typedef enum {
 	SKILL_JUMP,
 	SKILL_PUSH,
 	SKILL_PULL,
@@ -783,6 +773,17 @@ typedef enum {
 } zyk_inventory_t;
 
 typedef enum {
+	QUEST_ITEM_NONE,
+	QUEST_ITEM_SKILL_CRYSTAL,
+	QUEST_ITEM_EXTRA_TRIES_CRYSTAL,
+	QUEST_ITEM_TIME_CRYSTAL,
+	QUEST_ITEM_ARTIFACT_CRYSTAL,
+	QUEST_ITEM_MAGIC_ARMOR,
+	QUEST_ITEM_SPIRIT_TREE,
+	NUM_QUEST_ITEMS
+} zyk_quest_item_t;
+
+typedef enum {
 	QUEST_NPC_NONE,
 	QUEST_NPC_MAGE_MASTER,
 	QUEST_NPC_MAGE_MINISTER,
@@ -852,14 +853,21 @@ typedef enum {
 #define QUESTCHAR_SELLER "^3Seller"
 
 // zyk: quest enemies values
-#define QUEST_ENEMIES_TO_DEFEAT 100
-#define QUEST_MASTERS_TO_DEFEAT 5
+#define MAX_QUEST_PROGRESS 50000
+#define QUEST_SPIRIT_TREE_DEFAULT_SCALE 2
+#define QUEST_SPIRIT_TREE_RADIUS 100
+#define QUEST_SPIRIT_TREE_WITHER_DISTANCE 1000
+#define QUEST_SPIRIT_TREE_TIME 60000
+#define QUEST_ENEMY_WAVE_COUNT 50
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_MAX_NPCS_IN_MAP 25
 #define QUEST_NPC_SPAWN_TIME 25000
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 45000
+
+// zyk: timer used in the final Main Quest event
+#define QUEST_FINAL_EVENT_TIMER 15000
 
 // zyk: minimum amount of quest tries
 #define MIN_QUEST_TRIES 1
@@ -1039,10 +1047,13 @@ typedef struct clientPersistant_s {
 	// zyk: quest control fields
 	int quest_tries;
 	int quest_defeated_enemies;
-	int quest_masters_defeated;
+	int quest_progress;
 	int quest_event_timer;
 	int quest_final_event_step;
 	int quest_final_event_timer;
+	int quest_spirit_tree_id;
+	int quest_spirit_tree_timer;
+	int quest_progress_timer;
 	int quest_seller_event_step;
 	int quest_seller_event_timer;
 

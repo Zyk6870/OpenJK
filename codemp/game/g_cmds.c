@@ -2179,7 +2179,7 @@ void load_account(gentity_t* ent)
 			ent->client->pers.quest_defeated_enemies = atoi(content);
 
 			fscanf(account_file, "%s", content);
-			ent->client->pers.quest_masters_defeated = atoi(content);
+			ent->client->pers.quest_progress = atoi(content);
 
 			// zyk: last health
 			fscanf(account_file, "%s", content);
@@ -2266,7 +2266,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
 			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated,
+				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.quest_progress,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
@@ -4881,6 +4881,9 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.quest_final_event_step = 0;
 			ent->client->pers.quest_final_event_timer = 0;
+			ent->client->pers.quest_progress_timer = 0;
+			ent->client->pers.quest_spirit_tree_id = -1;
+			ent->client->pers.quest_spirit_tree_timer = 0;
 			ent->client->pers.quest_seller_event_step = 0;
 			ent->client->pers.quest_seller_event_timer = 0;
 
@@ -5103,7 +5106,8 @@ void zyk_set_default_quest_fields(gentity_t* ent)
 {
 	ent->client->pers.quest_tries = MIN_QUEST_TRIES;
 	ent->client->pers.quest_defeated_enemies = 0;
-	ent->client->pers.quest_masters_defeated = 0;
+	ent->client->pers.quest_progress = 0;
+	ent->client->pers.quest_spirit_tree_id = -1;
 }
 
 // zyk: adds a new RPG char with default values
@@ -5953,7 +5957,7 @@ void zyk_list_inventory(gentity_t* ent, int page)
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
 {
-	if (ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
+	if (ent->client->pers.quest_progress == MAX_QUEST_PROGRESS)
 	{
 		return qtrue;
 	}
@@ -6058,7 +6062,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 								}
 								if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
 								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 10 per cent. If the source is Magic Fist or a magic power, decreases damage by 25 per cent instead and absorbs some magic points. All mage enemies wear this type of armor. Defeating them has a chance of making them drop the armor. Blue crystals you have increase this chance\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 10 per cent. If the source is Magic Fist or a magic power, decreases damage by 25 per cent instead and absorbs some magic points. Defeating the Mage Masters has a chance of making them drop the armor. Blue crystals you have increase this chance\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
 								}
 							}
 							else
@@ -6082,9 +6086,9 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough of them so the Mage Masters (mages in red robes) appear.\nDefeat them so the %s ^7can defeat all enemies and end the war.\n\n^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nRegenerate your Spirit Tree so the %s ^7will be powerful\nenough to defeat all enemies and end the war.\nEnemies will make the tree wither based on their distance to it.\nDefeating enemies will help regen the tree faster.\nMagic Crystals you have makes the tree regen faster.\n\n^3Enemies defeated: ^7%d\n^3Regen Progress: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
 							QUESTCHAR_ALL_SPIRITS, 
-							ent->client->pers.quest_defeated_enemies, QUEST_ENEMIES_TO_DEFEAT, ent->client->pers.quest_masters_defeated, QUEST_MASTERS_TO_DEFEAT,
+							ent->client->pers.quest_defeated_enemies, ent->client->pers.quest_progress, MAX_QUEST_PROGRESS,
 							zyk_number_of_allies_in_map(ent), ent->client->pers.quest_tries, (ent->client->pers.quest_event_timer - level.time)));
 					}
 					else

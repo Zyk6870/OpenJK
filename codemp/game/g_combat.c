@@ -2181,7 +2181,7 @@ extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
-extern void zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, float x, float y, float z);
+extern int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, float x, float y, float z);
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
 	gentity_t* ent;
 	int			anim;
@@ -2230,23 +2230,9 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				int magic_armor_chance_to_spawn = Q_irand(0, 99);
 				int magic_armor_chance = 1 + (quest_player->client->pers.magic_crystals / 2);
 
-				if ((self->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && magic_armor_chance_to_spawn < magic_armor_chance) ||
-					(self->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER && magic_armor_chance_to_spawn < magic_armor_chance) ||
-					(self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && magic_armor_chance_to_spawn < magic_armor_chance))
-				{ // zyk: mages can drop the Magic Armor
-					zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 30000, self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2]);
-				}
-				
-				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && magic_armor_chance_to_spawn < magic_armor_chance)
 				{
-					quest_player->client->pers.quest_masters_defeated += 1;
-
-					if (quest_player->client->pers.quest_masters_defeated >= QUEST_MASTERS_TO_DEFEAT)
-					{ // zyk: defeated the minimum amount of mage masters to complete the quest
-						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
-
-						quest_player->client->pers.quest_final_event_step = 1;
-					}
+					zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 30000, self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2]);
 				}
 
 				quest_player->client->pers.quest_defeated_enemies += 1;
@@ -2266,6 +2252,8 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_SELF_KILL) && meansOfDeath == MOD_SUICIDE) // zyk: dont reset in this case, for example, when player logs into his account
 		)
 	{ // zyk: player died in quest. Decrease number of tries
+		self->client->pers.quest_progress -= (MAX_QUEST_PROGRESS / 100);
+
 		zyk_decrease_quest_tries(self);
 	}
 

@@ -481,6 +481,52 @@ qboolean zyk_there_is_player_or_npc_in_spot(float x, float y, float z)
 	return qfalse;
 }
 
+int zyk_spirit_tree_wither(float x, float y, float z)
+{
+	int i = 0;
+	int total_decrease = 0;
+	vec3_t tree_origin;
+	gentity_t* npc_ent = NULL;
+
+	VectorSet(tree_origin, x, y, z);
+
+	for (i = (MAX_CLIENTS+  BODY_QUEUE_SIZE); i < level.num_entities; i++)
+	{
+		npc_ent = &g_entities[i];
+
+		if (npc_ent && npc_ent->client && npc_ent->NPC && 
+			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_CHANGELING_HOWLER)
+		{
+			int npc_distance_to_tree = Distance(tree_origin, npc_ent->r.currentOrigin);
+
+			// zyk: quest enemies will make tree wither just by being in the map. Mage Masters make the Spirit Tree wither more
+			
+			if (npc_ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+			{
+				total_decrease += 5;
+			}
+			else
+			{
+				total_decrease += 1;
+			}
+
+			if (npc_distance_to_tree < QUEST_SPIRIT_TREE_WITHER_DISTANCE)
+			{
+				if (npc_ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+				{
+					total_decrease += ((QUEST_SPIRIT_TREE_WITHER_DISTANCE - npc_distance_to_tree) / 5);
+				}
+				else
+				{
+					total_decrease += ((QUEST_SPIRIT_TREE_WITHER_DISTANCE - npc_distance_to_tree) / 20);
+				}
+			}
+		}
+	}
+
+	return total_decrease;
+}
+
 extern void Jedi_Cloak(gentity_t* self);
 extern int zyk_max_skill_level(int skill_index);
 extern int zyk_max_magic_power(gentity_t* ent);
@@ -5332,7 +5378,7 @@ void zyk_spawn_energy_modulator_model(float x, float y, float z, int model_scale
 	new_ent->count = 7;
 }
 
-void zyk_clear_magic_crystals(gentity_t* effect_ent)
+void zyk_clear_quest_items(gentity_t* effect_ent)
 {
 	int i = 0;
 
@@ -5341,7 +5387,7 @@ void zyk_clear_magic_crystals(gentity_t* effect_ent)
 		gentity_t* crystal_ent = &g_entities[i];
 
 		if (crystal_ent && Q_stricmp(crystal_ent->classname, "misc_model_breakable") == 0 && 
-			Q_stricmp(crystal_ent->targetname, "zyk_magic_crystal") == 0 &&
+			Q_stricmp(crystal_ent->targetname, "zyk_quest_item") == 0 &&
 			crystal_ent->count == effect_ent->s.number)
 		{ // zyk: found one of the models of this crystal effect, clear it
 			level.special_power_effects_timer[crystal_ent->s.number] = level.time;
@@ -5382,16 +5428,20 @@ void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int
 	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
 
 	if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
-	{ // zyk: Magic Armor
+	{
 		zyk_set_entity_field(new_ent, "angles", "90 0 0");
 		zyk_set_entity_field(new_ent, "zykmodelscale", "80");
+	}
+	else if (quest_item_type == QUEST_ITEM_SPIRIT_TREE)
+	{
+		zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", QUEST_SPIRIT_TREE_DEFAULT_SCALE));
 	}
 	else
 	{
 		zyk_set_entity_field(new_ent, "zykmodelscale", "45");
 	}
 	
-	zyk_set_entity_field(new_ent, "targetname", "zyk_magic_crystal");
+	zyk_set_entity_field(new_ent, "targetname", "zyk_quest_item");
 
 	zyk_spawn_entity(new_ent);
 
@@ -5474,15 +5524,26 @@ void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crys
 }
 
 // zyk: spawns any of the quest item types at specific coordinates in map
-void zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, float x, float y, float z)
+int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, float x, float y, float z)
 {
-	int quest_item_effect_id = 0;
+	int quest_item_effect_id = -1;
 
 	if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
 	{
 		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_magic_armor");
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/desert/3po_torso.md3", duration, quest_item_effect_id, quest_item_type);
 	}
+	else if (quest_item_type == QUEST_ITEM_SPIRIT_TREE)
+	{
+		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_spirit_tree");
+
+		// zyk: makes the tree appear a little higher so its base is in the correct spot
+		z += (QUEST_SPIRIT_TREE_DEFAULT_SCALE * 20);
+
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/yavin/tree10_b.md3", duration, quest_item_effect_id, quest_item_type);
+	}
+
+	return quest_item_effect_id;
 }
 
 // zyk: clear effects of some special powers
@@ -6086,8 +6147,6 @@ void quest_power_events(gentity_t *ent)
 						int duration = 1500;
 						int radius = 240 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]); // zyk: default distace for this effect is 540
 						int damage = ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
-
-						// zyk_quest_effect_spawn(ent, ent, "zyk_magic_light_effect", "0", "ships/sd_exhaust", 500, 0, 0, duration);
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_light", "4", "misc/possession", 500, damage, radius, duration);
 
@@ -7350,11 +7409,11 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 17)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The Brotherhood of Mages is attacking everywhere in their quest for power. Their excessive magic usage is weakening us.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The Brotherhood of Mages is attacking everywhere in a quest for power. Their excessive magic usage is weakening the Spirit Trees.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 18)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Fight them so we can create Magic Crystals faster to help you. Maybe you can also find some Resistance allies to help.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Regen your Spirit Tree so we can create magic crystals faster. Sometimes the Resistance allies will appear to fight enemies.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 19)
 	{
@@ -7377,6 +7436,8 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT))
 	{ //zyk: player is in tutorial for the first time. Do not spawn quest npcs yet
 		interval_time = TUTORIAL_DURATION;
+
+		ent->client->pers.quest_progress_timer = level.time + TUTORIAL_DURATION;
 
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CREATED_ACCOUNT);
 	}
@@ -9218,7 +9279,7 @@ void G_RunFrame( int levelTime ) {
 					int time_crystal_chance = 87;
 					int puzzle_crystal_chance = 93 + ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE;
 
-					if (ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
+					if (zyk_is_main_quest_complete(ent) == qtrue)
 					{
 						puzzle_crystal_chance += 1;
 					}
@@ -9254,7 +9315,19 @@ void G_RunFrame( int levelTime ) {
 				{
 					if (ent->client->pers.quest_final_event_step == 1)
 					{
-						zyk_spawn_magic_spirits(ent, 15000);
+						gentity_t* tree_ent = NULL;
+
+						zyk_spawn_magic_spirits(ent, QUEST_FINAL_EVENT_TIMER);
+
+						if (ent->client->pers.quest_spirit_tree_id > -1)
+						{
+							tree_ent = &g_entities[ent->client->pers.quest_spirit_tree_id];
+
+							if (tree_ent)
+							{
+								zyk_quest_effect_spawn(tree_ent, tree_ent, "zyk_spirit_tree_energy", "0", "ships/sd_exhaust", 100, 0, 0, QUEST_FINAL_EVENT_TIMER);
+							}
+						}
 					}
 					else
 					{
@@ -9333,78 +9406,217 @@ void G_RunFrame( int levelTime ) {
 					zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
 					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
-					ent->client->pers.quest_event_timer < level.time && 
 					zyk_number_of_used_entities() < (ENTITYNUM_MAX_NORMAL - 22) /* zyk: this is to guarantee the map will not crash */
 					)
 				{
-					zyk_set_quest_event_timer(ent);
-
-					// zyk: spawning the enemies will depend on the enemy level, lower level enemies will appear earlier in the quest
-					if (zyk_is_main_quest_complete(ent) == qfalse &&
-						zyk_quest_npcs_in_the_map() < QUEST_MAX_NPCS_IN_MAP)
+					// zyk: Main Quest progress
+					if (zyk_is_main_quest_complete(ent) == qfalse && ent->client->pers.quest_progress_timer < level.time)
 					{
-						int chance_to_spawn_enemy = Q_irand(0, 99);
-						int enemy_type = 0;
-						int seller_chance = ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE;
-						qboolean hard_difficulty = qfalse;
-						
-						if (ent->client->pers.quest_defeated_enemies < (QUEST_ENEMIES_TO_DEFEAT / 2))
-						{ // zyk: first enemy wave
-							enemy_type = Q_irand(QUEST_NPC_FLYING_WARRIOR, QUEST_NPC_CHANGELING_HOWLER);
-						}
-						else if (ent->client->pers.quest_defeated_enemies < QUEST_ENEMIES_TO_DEFEAT)
-						{ // zyk: second enemy wave
-							enemy_type = Q_irand(QUEST_NPC_MAGE_MINISTER, QUEST_NPC_CHANGELING_HOWLER);
+						gentity_t* tree_ent = NULL;
+						int tree_duration = 2000000000 - level.time; // zyk: a very long duration so the tree will not disappear
+
+						// zyk: get the Spirit Tree entity or spawn one
+						if (ent->client->pers.quest_spirit_tree_id > -1)
+						{
+							tree_ent = &g_entities[ent->client->pers.quest_spirit_tree_id];
 						}
 						else
-						{ // zyk: last enemy wave
-							enemy_type = Q_irand(QUEST_NPC_MAGE_MASTER, QUEST_NPC_CHANGELING_HOWLER);
-						}
-
-						if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 						{
-							hard_difficulty = qtrue;
-						}
+							gentity_t* chosen_entity = NULL;
 
-						zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
+							float tree_x;
+							float tree_y;
+							float tree_z;
 
-						if (seller_chance > 5)
-						{
-							seller_chance = 5;
-						}
+							chosen_entity = zyk_find_entity_for_quest();
 
-						if (chance_to_spawn_enemy < seller_chance)
-						{ // zyk: theres a chance for the seller to actually come to the map
-							zyk_NPC_Kill_f(zyk_get_enemy_type(QUEST_NPC_SELLER));
-
-							zyk_spawn_quest_npc(QUEST_NPC_SELLER, ent->client->ps.viewangles[YAW], 0, qfalse, -1);
-						}
-						else if (chance_to_spawn_enemy < (seller_chance + 5 + ent->client->pers.magic_crystals))
-						{ // zyk: spawn an ally and get one of them near the player
-							int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
-							int ally_bonus = ent->client->pers.quest_defeated_enemies + ent->client->pers.magic_crystals;
-							int j = 0;
-
-							zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
-
-							for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
-							{
-								gentity_t* ally_ent = &g_entities[j];
-
-								// zyk: get a resistance member near the player
-								if (ally_ent && ally_ent->client && ally_ent->NPC && ally_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE &&
-									ally_ent->client->pers.quest_npc_caller_player_id == ent->s.number)
+							if (chosen_entity)
+							{ // zyk: if for some reason there was no chosen entity, try again later
+								if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
 								{
-									vec3_t npc_origin;
+									tree_x = chosen_entity->r.currentOrigin[0];
+									tree_y = chosen_entity->r.currentOrigin[1];
+									tree_z = chosen_entity->r.currentOrigin[2];
+								}
+								else
+								{
+									tree_x = chosen_entity->s.origin[0];
+									tree_y = chosen_entity->s.origin[1];
+									tree_z = chosen_entity->s.origin[2];
+								}
 
-									VectorCopy(ent->client->ps.origin, npc_origin);
-									npc_origin[2] += 80;
+								ent->client->pers.quest_spirit_tree_id = zyk_spawn_quest_item(QUEST_ITEM_SPIRIT_TREE, tree_duration, tree_x, tree_y, tree_z);
 
-									zyk_TeleportPlayer(ally_ent, npc_origin, ent->client->ps.viewangles);
+								if (ent->client->pers.quest_spirit_tree_id > -1)
+								{
+									tree_ent = &g_entities[ent->client->pers.quest_spirit_tree_id];
 
-									trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Hi! I came to help you fight the enemies!\n\"", QUESTCHAR_ALLY));
+									ent->client->pers.quest_spirit_tree_timer = level.time + QUEST_SPIRIT_TREE_TIME;
+								}
+							}
+						}
 
-									break;
+						if (tree_ent && Q_stricmp(tree_ent->classname, "fx_runner") == 0 && Q_stricmp(tree_ent->targetname, "zyk_spirit_tree") == 0)
+						{
+							int quest_progress_change = 0;
+							int quest_progress_percentage = 0;
+							int quest_spirit_tree_scale = 0;
+
+							float tree_x = tree_ent->s.origin[0];
+							float tree_y = tree_ent->s.origin[1];
+							float tree_z = tree_ent->s.origin[2];
+
+							quest_progress_change += ((ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE) + ent->client->pers.magic_crystals);
+							quest_progress_change -= zyk_spirit_tree_wither(tree_x, tree_y, tree_z);
+
+							if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+							{ // zyk: Hard Mode
+								if (quest_progress_change > 0)
+								{
+									quest_progress_change /= 2;
+								}
+								else
+								{ // zyk: if negative, decrease quest progress even more in Hard Mode
+									quest_progress_change *= 2;
+								}
+							}
+
+							ent->client->pers.quest_progress += quest_progress_change;
+
+							if (ent->client->pers.quest_progress >= MAX_QUEST_PROGRESS)
+							{ // zyk: completed the quest
+								ent->client->pers.quest_progress = MAX_QUEST_PROGRESS;
+
+								ent->client->pers.quest_final_event_step = 1;
+							}
+							else if (ent->client->pers.quest_progress < 0)
+							{
+								ent->client->pers.quest_progress = 0;
+							}
+
+							quest_progress_percentage = (ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS;
+							quest_spirit_tree_scale = (QUEST_SPIRIT_TREE_DEFAULT_SCALE + (quest_progress_percentage * 2));
+
+							if (quest_spirit_tree_scale != tree_ent->s.iModelScale)
+							{
+								gentity_t *tree_model = NULL;
+								int j = 0;
+
+								for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+								{
+									tree_model = &g_entities[j];
+
+									if (tree_model && Q_stricmp(tree_model->targetname, "zyk_quest_item") == 0 && 
+										tree_model->count == tree_ent->s.number)
+									{ // zyk: found the Spirit Tree model
+										break;
+									}
+
+									tree_model = NULL;
+								}
+
+								// zyk: change size of the tree based on the quest progress
+								if (tree_model)
+								{
+									zyk_set_entity_field(tree_model, "zykmodelscale", va("%d", quest_spirit_tree_scale));
+									zyk_spawn_entity(tree_model);
+								}
+							}
+
+							if (Distance(ent->client->ps.origin, tree_ent->s.origin) < QUEST_SPIRIT_TREE_RADIUS)
+							{
+								trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
+							}
+						}
+						else
+						{ // zyk: if for some reason this entity is no longer the tree, reset the id
+							ent->client->pers.quest_spirit_tree_id = -1;
+							ent->client->pers.quest_spirit_tree_timer = 0;
+						}
+
+						save_account(ent, qtrue);
+
+						// zyk: remove the tree to spawn it at another location
+						if (ent->client->pers.quest_spirit_tree_timer < level.time)
+						{
+							ent->client->pers.quest_spirit_tree_id = -1;
+						}
+
+						ent->client->pers.quest_progress_timer = level.time + 1000;
+					}
+
+					// zyk: quest npcs
+					if (ent->client->pers.quest_event_timer < level.time)
+					{ 
+						zyk_set_quest_event_timer(ent);
+
+						// zyk: spawning the enemies will depend on the enemy level, lower level enemies will appear earlier in the quest
+						if (zyk_is_main_quest_complete(ent) == qfalse &&
+							zyk_quest_npcs_in_the_map() < QUEST_MAX_NPCS_IN_MAP)
+						{
+							int chance_to_spawn_enemy = Q_irand(0, 99);
+							int enemy_type = 0;
+							int seller_chance = ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE;
+							qboolean hard_difficulty = qfalse;
+
+							if (ent->client->pers.quest_defeated_enemies < QUEST_ENEMY_WAVE_COUNT)
+							{ // zyk: first enemy wave
+								enemy_type = Q_irand(QUEST_NPC_FLYING_WARRIOR, QUEST_NPC_CHANGELING_HOWLER);
+							}
+							else if (ent->client->pers.quest_defeated_enemies < (QUEST_ENEMY_WAVE_COUNT * 2))
+							{ // zyk: second enemy wave
+								enemy_type = Q_irand(QUEST_NPC_MAGE_MINISTER, QUEST_NPC_CHANGELING_HOWLER);
+							}
+							else
+							{ // zyk: last enemy wave
+								enemy_type = Q_irand(QUEST_NPC_MAGE_MASTER, QUEST_NPC_CHANGELING_HOWLER);
+							}
+
+							if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+							{
+								hard_difficulty = qtrue;
+							}
+
+							zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
+
+							if (seller_chance > 5)
+							{
+								seller_chance = 5;
+							}
+
+							if (chance_to_spawn_enemy < seller_chance)
+							{ // zyk: theres a chance for the seller to actually come to the map
+								zyk_NPC_Kill_f(zyk_get_enemy_type(QUEST_NPC_SELLER));
+
+								zyk_spawn_quest_npc(QUEST_NPC_SELLER, ent->client->ps.viewangles[YAW], 0, qfalse, -1);
+							}
+							else if (chance_to_spawn_enemy < (seller_chance + 5 + ent->client->pers.magic_crystals))
+							{ // zyk: spawn an ally and get one of them near the player
+								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
+								int ally_bonus = ent->client->pers.quest_defeated_enemies + ent->client->pers.magic_crystals;
+								int j = 0;
+
+								zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
+
+								for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+								{
+									gentity_t* ally_ent = &g_entities[j];
+
+									// zyk: get a resistance member near the player
+									if (ally_ent && ally_ent->client && ally_ent->NPC && ally_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE &&
+										ally_ent->client->pers.quest_npc_caller_player_id == ent->s.number)
+									{
+										vec3_t npc_origin;
+
+										VectorCopy(ent->client->ps.origin, npc_origin);
+										npc_origin[2] += 80;
+
+										zyk_TeleportPlayer(ally_ent, npc_origin, ent->client->ps.viewangles);
+
+										trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Hi! I came to help you fight the enemies!\n\"", QUESTCHAR_ALLY));
+
+										break;
+									}
 								}
 							}
 						}
