@@ -1696,7 +1696,7 @@ void TryUse( gentity_t *ent )
 	if (ent->client->sess.amrpgmode == 2 && 
 		ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL) &&
 		ent->client->pers.cmd.buttons & BUTTON_USE &&
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
+		level.legendary_artifact_step == QUEST_SECRET_TOUCHED_PUZZLE_ITEM)
 	{ // zyk: start the puzzle
 		VectorCopy(ent->client->ps.origin, level.legendary_artifact_origin);
 
@@ -1839,7 +1839,7 @@ void TryUse( gentity_t *ent )
 
 		return;
 	}
-	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0 &&
+	else if (ent->client->sess.amrpgmode == 2 &&
 			level.legendary_artifact_step >= QUEST_SECRET_CHOSEN_CRYSTALS_STEP && 
 			level.legendary_artifact_step < QUEST_SECRET_CORRECT_CRYSTALS_STEP && 
 			target && target->count > 0 && 
@@ -1865,23 +1865,35 @@ void TryUse( gentity_t *ent )
 
 		return;
 	}
-	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0 &&
+	else if (ent->client->sess.amrpgmode == 2 &&
 			level.legendary_artifact_step == QUEST_SECRET_SECRET_ITEM_SPAWNED_STEP &&
 			target && target->count == 7 && 
-			Q_stricmp(target->targetname, "zyk_energy_modulator_model") == 0)
-	{ // zyk: player touched the Energy Modulator after solving the puzzle
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 1;
-
-		save_account(ent, qtrue);
-
+			(Q_stricmp(target->targetname, "zyk_energy_modulator_model") == 0 || Q_stricmp(target->targetname, "zyk_magic_armor_model") == 0)
+		)
+	{ // zyk: player touched the artifact after solving the puzzle
 		target->think = G_FreeEntity;
 		target->nextthink = level.time;
 
-		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/tram_boost.mp3"));
-
 		level.legendary_artifact_step = QUEST_SECRET_CLEAR_STEP;
 
-		trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You got the legendary ^3Energy Modulator^7\n\"");
+		if (Q_stricmp(target->targetname, "zyk_energy_modulator_model") == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
+		{
+			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 1;
+			save_account(ent, qtrue);
+
+			trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You got the legendary ^3Energy Modulator^7\n\"");
+
+			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
+		}
+		else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
+		{
+			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
+			save_account(ent, qtrue);
+
+			trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You got the legendary ^5Magic Armor^7\n\"");
+
+			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/cairn_beam_start.mp3"));
+		}
 
 		// zyk: setting use anim
 		ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;

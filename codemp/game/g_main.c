@@ -5337,7 +5337,7 @@ void zyk_spawn_legendary_artifact_puzzle_model(float x, float y, float z, int mo
 	new_ent->count = crystal_number;
 }
 
-void zyk_spawn_energy_modulator_model(float x, float y, float z, int model_scale)
+void zyk_spawn_legendary_artifact_model(float x, float y, float z, int model_scale)
 {
 	gentity_t* new_ent = G_Spawn();
 
@@ -5345,14 +5345,21 @@ void zyk_spawn_energy_modulator_model(float x, float y, float z, int model_scale
 	zyk_set_entity_field(new_ent, "spawnflags", "1");
 	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
 
-	zyk_set_entity_field(new_ent, "model", "models/map_objects/danger/ship_item04.md3");
+	if (level.legendary_artifact_type == QUEST_ITEM_ENERGY_MODULATOR)
+	{
+		zyk_set_entity_field(new_ent, "model", "models/map_objects/danger/ship_item04.md3");
+		zyk_set_entity_field(new_ent, "targetname", "zyk_energy_modulator_model");
+	}
+	else
+	{
+		zyk_set_entity_field(new_ent, "model", "models/map_objects/desert/3po_torso.md3");
+		zyk_set_entity_field(new_ent, "targetname", "zyk_magic_armor_model");
+	}
 
 	zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
 
 	zyk_set_entity_field(new_ent, "mins", "-32 -32 -32");
 	zyk_set_entity_field(new_ent, "maxs", "32 32 32");
-
-	zyk_set_entity_field(new_ent, "targetname", "zyk_energy_modulator_model");
 
 	zyk_spawn_entity(new_ent);
 
@@ -5429,7 +5436,7 @@ void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int
 void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crystal_type)
 {
 	float x, y, z;
-	int distance_factor = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
+	int distance_factor = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 4;
 	gentity_t* chosen_entity = NULL;
 	int crystal_effect_id = 0;
 
@@ -5488,13 +5495,6 @@ void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crys
 		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_time_crystal");
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
-	else if (crystal_type == QUEST_ITEM_ARTIFACT_CRYSTAL)
-	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_artifact_crystal");
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", 45, duration, crystal_effect_id, crystal_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", 45, duration, crystal_effect_id, crystal_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", 45, duration, crystal_effect_id, crystal_type);
-	}
 }
 
 // zyk: spawns any of the quest item types at specific coordinates in map
@@ -5502,9 +5502,14 @@ int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int mod
 {
 	int quest_item_effect_id = -1;
 
-	if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
+	if (quest_item_type == QUEST_ITEM_ENERGY_MODULATOR)
 	{
-		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_magic_armor");
+		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_energy_modulator_puzzle");
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/danger/ship_item04.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
+	}
+	else if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
+	{
+		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_magic_armor_puzzle");
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/desert/3po_torso.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
 	}
 	else if (quest_item_type == QUEST_ITEM_SPIRIT_TREE)
@@ -7433,7 +7438,7 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 void zyk_set_magic_crystal_respawn_time(gentity_t* ent)
 {
 	int skill_progress = (int)ceil(((ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) * 100.0) / RPG_MAX_SKILLPOINTS);
-	int quest_progress = ent->client->pers.quest_defeated_enemies / 2;
+	int quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS) / 2;
 
 	int interval_increase = skill_progress * RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL;
 	int interval_decrease = quest_progress * RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL;
@@ -8696,13 +8701,19 @@ void G_RunFrame( int levelTime ) {
 			level.legendary_artifact_debounce_timer = level.time + 1500;
 		}
 		else if (level.legendary_artifact_step == QUEST_SECRET_CORRECT_CRYSTALS_STEP)
-		{ // zyk: player solved the puzzle, spawn the Energy Modulator
-			int energy_modulator_scale = 30;
+		{ // zyk: player solved the puzzle, spawn the legendary artifact
+			int legendary_artifact_scale = 30;
+
 			int model_x = level.legendary_artifact_origin[0];
 			int model_y = level.legendary_artifact_origin[1];
 			int model_z = level.legendary_artifact_origin[2];
 
-			zyk_spawn_energy_modulator_model(model_x, model_y, model_z, energy_modulator_scale);
+			if (level.legendary_artifact_type == QUEST_ITEM_MAGIC_ARMOR)
+			{
+				legendary_artifact_scale = 80;
+			}
+
+			zyk_spawn_legendary_artifact_model(model_x, model_y, model_z, legendary_artifact_scale);
 
 			level.legendary_artifact_step = QUEST_SECRET_SECRET_ITEM_SPAWNED_STEP;
 		}
@@ -9273,11 +9284,26 @@ void G_RunFrame( int levelTime ) {
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
 					int extra_tries_crystal_chance = 77;
 					int time_crystal_chance = 87;
-					int puzzle_crystal_chance = 93 + ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE;
+					int puzzle_crystal_chance = 93;
 
-					if (zyk_is_main_quest_complete(ent) == qtrue)
+					if (ent->client->pers.quest_defeated_enemies >= QUEST_ENEMY_WAVE_COUNT)
 					{
 						puzzle_crystal_chance += 1;
+					}
+
+					if (ent->client->pers.quest_defeated_enemies >= (QUEST_ENEMY_WAVE_COUNT * 2))
+					{
+						puzzle_crystal_chance += 1;
+					}
+
+					if (ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
+					{
+						puzzle_crystal_chance += 2;
+					}
+
+					if (ent->client->pers.quest_progress == MAX_QUEST_PROGRESS)
+					{
+						puzzle_crystal_chance += 2;
 					}
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
@@ -9299,8 +9325,37 @@ void G_RunFrame( int levelTime ) {
 						zyk_spawn_magic_crystal(ent, 55000, QUEST_ITEM_TIME_CRYSTAL);
 					}
 					else if (magic_crystal_chance_to_spawn >= 92 && magic_crystal_chance_to_spawn < puzzle_crystal_chance)
-					{ // zyk: Energy Modulator puzzle crystal
-						zyk_spawn_magic_crystal(ent, 50000, QUEST_ITEM_ARTIFACT_CRYSTAL);
+					{ // zyk: puzzle. Can be the Energy Modulator one or the Magic Armor one
+						float puzzle_x, puzzle_y, puzzle_z;
+						gentity_t* chosen_entity = NULL;
+
+						chosen_entity = zyk_find_entity_for_quest();
+
+						if (chosen_entity)
+						{
+							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
+							{
+								puzzle_x = chosen_entity->r.currentOrigin[0];
+								puzzle_y = chosen_entity->r.currentOrigin[1];
+								puzzle_z = chosen_entity->r.currentOrigin[2];
+							}
+							else
+							{
+								puzzle_x = chosen_entity->s.origin[0];
+								puzzle_y = chosen_entity->s.origin[1];
+								puzzle_z = chosen_entity->s.origin[2];
+							}
+
+							// zyk: it can be either the Energy Modulator puzzle or the Magic Armor puzzle
+							if (Q_irand(0, 1) == 0)
+							{
+								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, 50000, 30, puzzle_x, puzzle_y, puzzle_z);
+							}
+							else
+							{
+								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 50000, 80, puzzle_x, puzzle_y, puzzle_z);
+							}
+						}
 					}
 
 					zyk_set_magic_crystal_respawn_time(ent);

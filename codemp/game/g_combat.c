@@ -2181,7 +2181,6 @@ extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
-extern int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int model_scale, float x, float y, float z);
 extern void zyk_start_main_quest_final_event(gentity_t* ent);
 
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
@@ -2229,9 +2228,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 			{
-				int magic_armor_chance_to_spawn = Q_irand(0, 99);
-				int magic_armor_chance = 1 + quest_player->client->pers.magic_crystals;
-
 				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 				{
 					quest_player->client->pers.quest_masters_defeated += 1;
@@ -2239,11 +2235,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 					if (quest_player->client->pers.quest_masters_defeated >= QUEST_MASTERS_TO_DEFEAT)
 					{
 						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
-					}
-
-					if (magic_armor_chance_to_spawn < magic_armor_chance)
-					{
-						zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 30000, 80, self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2]);
 					}
 				}
 

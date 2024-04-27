@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.5.22"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.5.23"
 
 #define SECURITY_LOG "security.log"
 
@@ -777,7 +777,7 @@ typedef enum {
 	QUEST_ITEM_SKILL_CRYSTAL,
 	QUEST_ITEM_EXTRA_TRIES_CRYSTAL,
 	QUEST_ITEM_TIME_CRYSTAL,
-	QUEST_ITEM_ARTIFACT_CRYSTAL,
+	QUEST_ITEM_ENERGY_MODULATOR,
 	QUEST_ITEM_MAGIC_ARMOR,
 	QUEST_ITEM_SPIRIT_TREE,
 	NUM_QUEST_ITEMS
@@ -1452,6 +1452,7 @@ typedef struct {
 
 typedef enum {
 	QUEST_SECRET_INIT_STEP,
+	QUEST_SECRET_TOUCHED_PUZZLE_ITEM,
 	QUEST_SECRET_SPAWN_CRYSTALS_STEP,
 	QUEST_SECRET_START_PUZZLE_STEP,
 	QUEST_SECRET_CHOSEN_CRYSTALS_STEP = (QUEST_SECRET_START_PUZZLE_STEP + LEGENDARY_CRYSTALS_CHOSEN),
@@ -1742,6 +1743,7 @@ typedef struct level_locals_s {
 	int legendary_artifact_debounce_timer;
 	vec3_t legendary_artifact_origin;
 	int legendary_crystal_chosen[LEGENDARY_CRYSTALS_CHOSEN];
+	zyk_quest_item_t legendary_artifact_type;
 
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];
