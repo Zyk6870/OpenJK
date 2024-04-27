@@ -2179,6 +2179,9 @@ void load_account(gentity_t* ent)
 			ent->client->pers.quest_defeated_enemies = atoi(content);
 
 			fscanf(account_file, "%s", content);
+			ent->client->pers.quest_masters_defeated = atoi(content);
+
+			fscanf(account_file, "%s", content);
 			ent->client->pers.quest_progress = atoi(content);
 
 			// zyk: last health
@@ -2265,8 +2268,9 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.quest_progress,
+			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, 
+				client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
@@ -4877,7 +4881,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			zyk_calculate_current_weight(ent);
 
-			ent->client->pers.quest_progress_timer = level.time + 3000;
+			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
 
 			zyk_set_quest_event_timer(ent);
 
@@ -5106,6 +5110,7 @@ void zyk_set_default_quest_fields(gentity_t* ent)
 {
 	ent->client->pers.quest_tries = MIN_QUEST_TRIES;
 	ent->client->pers.quest_defeated_enemies = 0;
+	ent->client->pers.quest_masters_defeated = 0;
 	ent->client->pers.quest_progress = 0;
 	ent->client->pers.quest_spirit_tree_id = -1;
 }
@@ -5957,7 +5962,7 @@ void zyk_list_inventory(gentity_t* ent, int page)
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
 {
-	if (ent->client->pers.quest_progress == MAX_QUEST_PROGRESS)
+	if (ent->client->pers.quest_progress == MAX_QUEST_PROGRESS && ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
 	{
 		return qtrue;
 	}
@@ -6086,9 +6091,11 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nRegenerate your Spirit Tree so the %s ^7will be powerful\nenough to defeat all enemies and end the war.\nEnemies will make the tree wither based on their distance to it.\nDefeating enemies will help regen the tree faster.\nMeditating inside the tree also helps regen it.\nHold ^2Use ^7key while meditating to spend some mp to call your Spirit Tree and\nif you have blue crystals, it will use one of them to regen it\n\n^3Enemies defeated: ^7%d\n^3Regen Progress: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough enemies to weaken their army and make the Spirit Tree summoned.\nDefeat some Mage Masters and regenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditating in the tree and defeating enemies will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to call your Spirit Tree and regen it by spending some mp\n\n^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n^3Regen Progress: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d  (^1red ^7crystals increase this time interval)\n\n\"", 
 							QUESTCHAR_ALL_SPIRITS, 
-							ent->client->pers.quest_defeated_enemies, ent->client->pers.quest_progress, MAX_QUEST_PROGRESS,
+							ent->client->pers.quest_defeated_enemies, (QUEST_ENEMY_WAVE_COUNT * 2),
+							ent->client->pers.quest_masters_defeated, QUEST_MASTERS_TO_DEFEAT,
+							ent->client->pers.quest_progress, MAX_QUEST_PROGRESS,
 							zyk_number_of_allies_in_map(ent), ent->client->pers.quest_tries, (ent->client->pers.quest_event_timer - level.time)));
 					}
 					else
@@ -6131,11 +6138,11 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Mage Scholar: ^7mage with some force and Magic Fist. He is wearing the Magic Armor. ^2Magic: Magic Dome, Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: Magic Dome, Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. He is wearing all armors. Can use Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Mage Scholar: ^7mage with Magic Fist. He is wearing the Magic Armor. ^2Magic: Magic Dome, Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: Magic Dome, Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. He is wearing all armors. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 3)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance member. Your ally. Has force/saber. Your magic crystals help boost their abilities. ^2Magic: Water, Earth, Fire, Air\n^3Ally Flying Warrior: ^7a Resistance member. Your ally. Flies and has guns. Your magic crystals help boost their abilities. ^2Magic: Healing Area, Air\n^3Ally Mage: ^7a Resistance member. Your ally. Can use Magic Fist and all magic. Your magic crystals help boost their abilities\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance ally. Has force/saber. Your blue crystals makes them come as stronger allies. ^2Magic: Water, Earth, Fire, Air\n^3Ally Flying Warrior: ^7a Resistance ally. Flies and has guns. Your blue crystals makes them come as stronger allies. ^2Magic: Healing Area, Air\n^3Ally Mage: ^7a Resistance ally. Can use Magic Fist and all magic. Your blue crystals makes them come as stronger allies\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 					}
 					else

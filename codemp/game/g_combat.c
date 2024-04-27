@@ -2182,6 +2182,8 @@ extern void player_restore_force(gentity_t *ent);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 extern int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int model_scale, float x, float y, float z);
+extern void zyk_start_main_quest_final_event(gentity_t* ent);
+
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
 	gentity_t* ent;
 	int			anim;
@@ -2230,12 +2232,33 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				int magic_armor_chance_to_spawn = Q_irand(0, 99);
 				int magic_armor_chance = 1 + (quest_player->client->pers.magic_crystals / 2);
 
-				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && magic_armor_chance_to_spawn < magic_armor_chance)
+				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 				{
-					zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 30000, 80, self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2]);
+					quest_player->client->pers.quest_masters_defeated += 1;
+
+					if (quest_player->client->pers.quest_masters_defeated >= QUEST_MASTERS_TO_DEFEAT)
+					{
+						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
+					}
+
+					if (magic_armor_chance_to_spawn < magic_armor_chance)
+					{
+						zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 30000, 80, self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2]);
+					}
 				}
 
 				quest_player->client->pers.quest_defeated_enemies += 1;
+
+				if (quest_player->client->pers.quest_defeated_enemies == (QUEST_ENEMY_WAVE_COUNT * 2))
+				{
+					quest_player->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
+				}
+
+				// zyk: completed the quest
+				if (zyk_is_main_quest_complete(quest_player) == qtrue)
+				{
+					zyk_start_main_quest_final_event(quest_player);
+				}
 
 				save_account(quest_player, qtrue);
 			}

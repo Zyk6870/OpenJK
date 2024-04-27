@@ -786,7 +786,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 	gentity_t* npc_ent = NULL;
 
 	float x = 0, y = 0, z = 0;
-	int npc_offset = 24;
+	int npc_offset = 16;
 	gentity_t* chosen_entity = NULL;
 
 	chosen_entity = zyk_find_entity_for_quest();
@@ -7406,6 +7406,11 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 {
 	int interval_time = QUEST_NPC_SPAWN_TIME;
 
+	if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+	{
+		interval_time -= (QUEST_NPC_SPAWN_TIME / 5);
+	}
+
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT))
 	{ //zyk: player is in tutorial for the first time. Do not spawn quest npcs yet
 		interval_time = TUTORIAL_DURATION;
@@ -7659,6 +7664,24 @@ void zyk_update_inventory(gentity_t* ent)
 	if (ent->client->pers.rpg_inventory_modified == qtrue)
 	{ // zyk: save account with new updated inventory
 		save_account(ent, qtrue);
+	}
+}
+
+void zyk_start_main_quest_final_event(gentity_t* ent)
+{
+	gentity_t* tree_ent = NULL;
+
+	ent->client->pers.quest_final_event_step = 1;
+	ent->client->pers.quest_final_event_timer = level.time + 2000;
+
+	if (ent->client->pers.quest_spirit_tree_id > -1)
+	{
+		tree_ent = &g_entities[ent->client->pers.quest_spirit_tree_id];
+	}
+
+	if (tree_ent)
+	{
+		zyk_TeleportPlayer(ent, tree_ent->s.origin, ent->client->ps.viewangles);
 	}
 }
 
@@ -9385,7 +9408,9 @@ void G_RunFrame( int levelTime ) {
 					)
 				{
 					// zyk: Main Quest progress
-					if (zyk_is_main_quest_complete(ent) == qfalse && ent->client->pers.quest_progress_timer < level.time)
+					if (zyk_is_main_quest_complete(ent) == qfalse && 
+						ent->client->pers.quest_defeated_enemies >= (QUEST_ENEMY_WAVE_COUNT * 2) &&
+						ent->client->pers.quest_progress_timer < level.time)
 					{
 						gentity_t* tree_ent = NULL;
 						int tree_duration = 2000000000 - level.time; // zyk: a very long duration so the tree will not disappear
@@ -9412,6 +9437,8 @@ void G_RunFrame( int levelTime ) {
 							if (ent->client->pers.quest_spirit_tree_id > -1)
 							{
 								tree_ent = &g_entities[ent->client->pers.quest_spirit_tree_id];
+
+								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
 							}
 						}
 
@@ -9426,7 +9453,7 @@ void G_RunFrame( int levelTime ) {
 							float tree_y = tree_ent->s.origin[1];
 							float tree_z = tree_ent->s.origin[2];
 
-							quest_progress_change += ent->client->pers.quest_defeated_enemies;
+							quest_progress_change += (ent->client->pers.quest_defeated_enemies / 2);
 							quest_progress_change -= zyk_spirit_tree_wither(tree_x, tree_y, tree_z);
 
 							if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
@@ -9440,7 +9467,7 @@ void G_RunFrame( int levelTime ) {
 							{
 								if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
 								{
-									quest_progress_change += 10;
+									quest_progress_change += 20;
 								}
 
 								if (ent->client->pers.cmd.buttons & BUTTON_USE)
@@ -9455,10 +9482,8 @@ void G_RunFrame( int levelTime ) {
 										{
 											ent->client->pers.magic_crystals -= 1;
 
-											quest_progress_change += 100;
+											quest_progress_change += 200;
 										}
-
-										G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
 
 										trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
 									}
@@ -9484,10 +9509,14 @@ void G_RunFrame( int levelTime ) {
 							ent->client->pers.quest_progress += quest_progress_change;
 
 							if (ent->client->pers.quest_progress >= MAX_QUEST_PROGRESS)
-							{ // zyk: completed the quest
+							{
 								ent->client->pers.quest_progress = MAX_QUEST_PROGRESS;
 
-								ent->client->pers.quest_final_event_step = 1;
+								// zyk: completed the quest
+								if (zyk_is_main_quest_complete(ent) == qtrue)
+								{
+									zyk_start_main_quest_final_event(ent);
+								}
 							}
 							else if (ent->client->pers.quest_progress < 0)
 							{
