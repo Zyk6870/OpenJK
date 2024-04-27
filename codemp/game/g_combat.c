@@ -2230,7 +2230,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 			{
 				int magic_armor_chance_to_spawn = Q_irand(0, 99);
-				int magic_armor_chance = 1 + (quest_player->client->pers.magic_crystals / 2);
+				int magic_armor_chance = 1 + quest_player->client->pers.magic_crystals;
 
 				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 				{
@@ -4712,12 +4712,17 @@ int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int skill_inde
 	return final_dmg;
 }
 
-qboolean zyk_source_is_non_saber_weapon(int mod)
+qboolean zyk_source_is_non_saber_weapon(int mod, gentity_t* inflictor)
 {
 	if ((mod >= MOD_STUN_BATON && mod <= MOD_CONC_ALT) || 
 		mod == MOD_SENTRY || 
 		mod == MOD_TARGET_LASER)
 	{
+		if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2)
+		{ // zyk: Magic Fist
+			return qfalse;
+		}
+
 		return qtrue;
 	}
 
@@ -5862,7 +5867,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
 			{ // zyk: Deflective Armor
-				if (zyk_source_is_non_saber_weapon(mod) == qtrue)
+				if (zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue)
 				{
 					bonus_health_resistance += 0.25;
 				}
@@ -5874,7 +5879,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
 			{ // zyk: Saber Armor
-				if (zyk_source_is_non_saber_weapon(mod) == qtrue)
+				if (zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue)
 				{
 					bonus_health_resistance += 0.05;
 				}
