@@ -1885,7 +1885,7 @@ void TryUse( gentity_t *ent )
 
 			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
 		}
-		else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
+		else if (Q_stricmp(target->targetname, "zyk_magic_armor_model") == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
 		{
 			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
 			save_account(ent, qtrue);
