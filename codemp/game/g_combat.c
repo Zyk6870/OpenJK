@@ -2181,7 +2181,7 @@ extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
-extern int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, float x, float y, float z);
+extern int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int model_scale, float x, float y, float z);
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
 	gentity_t* ent;
 	int			anim;
@@ -2232,7 +2232,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && magic_armor_chance_to_spawn < magic_armor_chance)
 				{
-					zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 30000, self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2]);
+					zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 30000, 80, self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2]);
 				}
 
 				quest_player->client->pers.quest_defeated_enemies += 1;
@@ -5898,7 +5898,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			// zyk: some npcs have a chance of causing poison status
 			if (attacker && attacker->client && attacker->NPC && 
 				attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER && mod == MOD_MELEE && 
-				Q_irand(0, 4) == 0)
+				Q_irand(0, 3) == 0)
 			{
 				targ->client->pers.poison_debounce_timer = 0;
 				targ->client->pers.poison_duration = level.time + 20000;

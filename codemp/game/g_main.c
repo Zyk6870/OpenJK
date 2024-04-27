@@ -497,29 +497,16 @@ int zyk_spirit_tree_wither(float x, float y, float z)
 		if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->health > 0 && 
 			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_CHANGELING_HOWLER)
 		{
-			int npc_distance_to_tree = Distance(tree_origin, npc_ent->r.currentOrigin);
+			float npc_distance_to_tree = Distance(tree_origin, npc_ent->r.currentOrigin);
 
-			// zyk: quest enemies will make tree wither just by being in the map. Mage Masters make the Spirit Tree wither more
-			if (npc_ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+			// zyk: quest enemies will make tree wither based on the distance to the tree and their health
+			if (npc_distance_to_tree > 0.0)
 			{
-				total_decrease += 5;
+				total_decrease += (int)ceil((QUEST_SPIRIT_TREE_WITHER_RATE / npc_distance_to_tree) * npc_ent->health);
 			}
 			else
 			{
-				total_decrease += 2;
-			}
-
-			// zyk: tree will wither more if enemies are near it
-			if (npc_distance_to_tree < QUEST_SPIRIT_TREE_WITHER_DISTANCE)
-			{
-				if (npc_ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
-				{
-					total_decrease += ((QUEST_SPIRIT_TREE_WITHER_DISTANCE - npc_distance_to_tree) / 2);
-				}
-				else
-				{
-					total_decrease += ((QUEST_SPIRIT_TREE_WITHER_DISTANCE - npc_distance_to_tree) / 10);
-				}
+				total_decrease += (npc_ent->health * QUEST_SPIRIT_TREE_WITHER_RATE);
 			}
 		}
 	}
@@ -5408,7 +5395,7 @@ int zyk_spawn_quest_item_effect(float x, float y, float z, int duration, char *q
 	return new_ent->s.number;
 }
 
-void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int duration, int quest_item_effect_id, zyk_quest_item_t quest_item_type)
+void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int model_scale, int duration, int quest_item_effect_id, zyk_quest_item_t quest_item_type)
 {
 	gentity_t* new_ent = G_Spawn();
 
@@ -5424,17 +5411,10 @@ void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int
 	if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
 	{
 		zyk_set_entity_field(new_ent, "angles", "90 0 0");
-		zyk_set_entity_field(new_ent, "zykmodelscale", "80");
-	}
-	else if (quest_item_type == QUEST_ITEM_SPIRIT_TREE)
-	{
-		zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", QUEST_SPIRIT_TREE_DEFAULT_SCALE));
-	}
-	else
-	{
-		zyk_set_entity_field(new_ent, "zykmodelscale", "45");
 	}
 	
+	zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
+
 	zyk_set_entity_field(new_ent, "targetname", "zyk_quest_item");
 
 	zyk_spawn_entity(new_ent);
@@ -5496,45 +5476,44 @@ void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crys
 	if (crystal_type == QUEST_ITEM_SKILL_CRYSTAL)
 	{
 		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_skill_crystal");
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id, crystal_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
 	else if (crystal_type == QUEST_ITEM_EXTRA_TRIES_CRYSTAL)
 	{
 		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_extra_tries_crystal");
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id, crystal_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
 	else if (crystal_type == QUEST_ITEM_TIME_CRYSTAL)
 	{
 		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_time_crystal");
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id, crystal_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
 	else if (crystal_type == QUEST_ITEM_ARTIFACT_CRYSTAL)
 	{
 		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_artifact_crystal");
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", duration, crystal_effect_id, crystal_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", duration, crystal_effect_id, crystal_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", duration, crystal_effect_id, crystal_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", 45, duration, crystal_effect_id, crystal_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", 45, duration, crystal_effect_id, crystal_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
 }
 
 // zyk: spawns any of the quest item types at specific coordinates in map
-int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, float x, float y, float z)
+int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int model_scale, float x, float y, float z)
 {
 	int quest_item_effect_id = -1;
 
 	if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
 	{
 		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_magic_armor");
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/desert/3po_torso.md3", duration, quest_item_effect_id, quest_item_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/desert/3po_torso.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
 	}
 	else if (quest_item_type == QUEST_ITEM_SPIRIT_TREE)
 	{
 		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_spirit_tree");
 
-		// zyk: makes the tree appear a little higher so its base is not hidden in the ground
-		z += 100;
+		z *= QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET;
 
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/yavin/tree10_b.md3", duration, quest_item_effect_id, quest_item_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/yavin/tree10_b.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
 	}
 
 	return quest_item_effect_id;
@@ -9418,11 +9397,17 @@ void G_RunFrame( int levelTime ) {
 						}
 						else
 						{
+							int quest_progress_percentage = 0;
+							int quest_spirit_tree_scale = 0;
+
 							float tree_x = ent->client->ps.origin[0];
 							float tree_y = ent->client->ps.origin[1];
 							float tree_z = ent->client->ps.origin[2];
 
-							ent->client->pers.quest_spirit_tree_id = zyk_spawn_quest_item(QUEST_ITEM_SPIRIT_TREE, tree_duration, tree_x, tree_y, tree_z);
+							quest_progress_percentage = (ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS;
+							quest_spirit_tree_scale = (QUEST_SPIRIT_TREE_DEFAULT_SCALE + quest_progress_percentage);
+
+							ent->client->pers.quest_spirit_tree_id = zyk_spawn_quest_item(QUEST_ITEM_SPIRIT_TREE, tree_duration, quest_spirit_tree_scale, tree_x, tree_y, tree_z);
 
 							if (ent->client->pers.quest_spirit_tree_id > -1)
 							{
@@ -9435,6 +9420,7 @@ void G_RunFrame( int levelTime ) {
 							int quest_progress_change = 0;
 							int quest_progress_percentage = 0;
 							int quest_spirit_tree_scale = 0;
+							int distance_to_tree = Distance(ent->client->ps.origin, tree_ent->s.origin);
 
 							float tree_x = tree_ent->s.origin[0];
 							float tree_y = tree_ent->s.origin[1];
@@ -9443,31 +9429,43 @@ void G_RunFrame( int levelTime ) {
 							quest_progress_change += ent->client->pers.quest_defeated_enemies;
 							quest_progress_change -= zyk_spirit_tree_wither(tree_x, tree_y, tree_z);
 
+							if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
+							{
+								trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
+							}
+
 							// zyk: holding Use key while meditating calls the Spirit Tree by clearing the current tree entities so next frame will create a new one
-							if (ent->client->pers.cmd.buttons & BUTTON_USE &&
-								ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
+							if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
 								ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 							{
-								if (ent->client->pers.magic_power > QUEST_SPIRIT_TREE_CALL_COST)
+								if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
 								{
-									ent->client->pers.quest_spirit_tree_id = -1;
-
-									ent->client->pers.magic_power -= QUEST_SPIRIT_TREE_CALL_COST;
-
-									if (ent->client->pers.magic_crystals > 0)
-									{
-										ent->client->pers.magic_crystals -= 1;
-
-										quest_progress_change += 100;
-									}
-
-									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
-
-									trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
+									quest_progress_change += 10;
 								}
-								else
+
+								if (ent->client->pers.cmd.buttons & BUTTON_USE)
 								{
-									trap->SendServerCommand(ent->s.number, "cp \"Not enough MP to call your Spirit Tree\n\"");
+									if (ent->client->pers.magic_power > QUEST_SPIRIT_TREE_CALL_COST)
+									{
+										ent->client->pers.quest_spirit_tree_id = -1;
+
+										ent->client->pers.magic_power -= QUEST_SPIRIT_TREE_CALL_COST;
+
+										if (ent->client->pers.magic_crystals > 0)
+										{
+											ent->client->pers.magic_crystals -= 1;
+
+											quest_progress_change += 100;
+										}
+
+										G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
+
+										trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
+									}
+									else
+									{
+										trap->SendServerCommand(ent->s.number, "cp \"Not enough MP to call your Spirit Tree\n\"");
+									}
 								}
 							}
 
@@ -9520,14 +9518,15 @@ void G_RunFrame( int levelTime ) {
 								// zyk: change size of the tree based on the quest progress
 								if (tree_model)
 								{
+									float tree_model_x = tree_ent->s.origin[0];
+									float tree_model_y = tree_ent->s.origin[1];
+									float tree_model_z = tree_ent->s.origin[2] + (quest_spirit_tree_scale * QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET);
+
+									zyk_set_entity_field(tree_model, "origin", va("%f %f %f", tree_model_x, tree_model_y, tree_model_z));
 									zyk_set_entity_field(tree_model, "zykmodelscale", va("%d", quest_spirit_tree_scale));
+
 									zyk_spawn_entity(tree_model);
 								}
-							}
-
-							if (Distance(ent->client->ps.origin, tree_ent->s.origin) < QUEST_SPIRIT_TREE_RADIUS)
-							{
-								trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
 							}
 
 							save_account(ent, qtrue);
@@ -9585,7 +9584,7 @@ void G_RunFrame( int levelTime ) {
 
 								zyk_spawn_quest_npc(QUEST_NPC_SELLER, ent->client->ps.viewangles[YAW], 0, qfalse, -1);
 							}
-							else if (chance_to_spawn_enemy < (seller_chance + 5 + ent->client->pers.magic_crystals))
+							else if (chance_to_spawn_enemy < (seller_chance + 2 + ent->client->pers.magic_crystals))
 							{ // zyk: spawn an ally and get one of them near the player
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 								int ally_bonus = ent->client->pers.quest_defeated_enemies + ent->client->pers.magic_crystals;
