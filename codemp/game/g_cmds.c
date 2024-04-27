@@ -4891,6 +4891,9 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.quest_seller_event_step = 0;
 			ent->client->pers.quest_seller_event_timer = 0;
 
+			ent->client->pers.quest_magic_spirits_summon_timer = 0;
+			ent->client->pers.quest_magic_spirits_summon_step = 0;
+
 			ent->client->pers.stamina_timer = 0;
 			ent->client->pers.stamina_out_timer = 0;
 
@@ -6100,7 +6103,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					}
 					else
 					{
-						trap->SendServerCommand(ent->s.number, "print \"\n^3Completed\n\n\"");
+						trap->SendServerCommand(ent->s.number, va("print \"\n^3Completed\n\n^7Meditate and hold ^2Use ^7key to summon the %s ^7to attack all enemies around you\nand heal health and stamina of your allies.\n\n\"", QUESTCHAR_ALL_SPIRITS));
 					}
 				}
 				else

@@ -6346,6 +6346,47 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						}
 					}
 				}
+				else if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 &&
+					Q_stricmp(attacker->targetname, "zyk_magic_spirits_summon") == 0)
+				{
+					gentity_t* quest_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
+					int final_damage = (int)points;
+
+					// zyk: if the power user and the target are allies (player or npc), or the target is the quest power user himself, heal him
+					if (quest_power_user && quest_power_user->client && ent && ent->client && ent->health > 0 &&
+						(level.special_power_effects[attacker->s.number] == ent->s.number || OnSameTeam(quest_power_user, ent) == qtrue ||
+							npcs_on_same_team(quest_power_user, ent) == qtrue || zyk_is_ally(quest_power_user, ent) == qtrue))
+					{
+						int heal_amount = final_damage;
+						int stamina_amount = final_damage * 2;
+
+						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
+							ent->health += heal_amount;
+						else
+							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
+
+						zyk_set_stamina(ent, stamina_amount, qtrue);
+					}
+					else
+					{ // zyk: knocks down and damages enemies
+						if (ent && ent->client && ent->health > 0 && ent->client->ps.forceHandExtend != HANDEXTEND_KNOCKDOWN)
+						{
+							// zyk: if using Meditate taunt, remove it
+							if (ent->client->ps.legsAnim == BOTH_MEDITATE && ent->client->ps.torsoAnim == BOTH_MEDITATE)
+							{
+								ent->client->ps.legsAnim = ent->client->ps.torsoAnim = BOTH_MEDITATE_END;
+							}
+
+							ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
+							ent->client->ps.forceHandExtendTime = level.time + 1000;
+							ent->client->ps.velocity[2] += 300;
+							ent->client->ps.forceDodgeAnim = 0;
+							ent->client->ps.quickerGetup = qtrue;
+						}
+
+						G_Damage(ent, quest_power_user, quest_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
+					}
+				}
 				
 				if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 && level.special_power_effects[attacker->s.number] != ent->s.number)
 				{ // zyk: if it is an effect used by special power, then attacker must be the owner of the effect. Also, do not hit the owner

@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.5.21"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.5.22"
 
 #define SECURITY_LOG "security.log"
 
@@ -866,6 +866,11 @@ typedef enum {
 #define QUEST_MAX_NPCS_IN_MAP 25
 #define QUEST_NPC_SPAWN_TIME 25000
 
+// zyk: Magic Spirits summon magic
+#define QUEST_MAGIC_SPIRITS_SUMMON_DURATION 5000
+#define QUEST_MAGIC_SPIRITS_SUMMON_INTERVAL 30000
+#define QUEST_MAGIC_SPIRITS_SUMMON_MP_COST 200
+
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 45000
 
@@ -1057,6 +1062,8 @@ typedef struct clientPersistant_s {
 	int quest_final_event_timer;
 	int quest_spirit_tree_id;
 	int quest_progress_timer;
+	int quest_magic_spirits_summon_timer;
+	int quest_magic_spirits_summon_step;
 	int quest_seller_event_step;
 	int quest_seller_event_timer;
 

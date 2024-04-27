@@ -9306,6 +9306,35 @@ void G_RunFrame( int levelTime ) {
 					zyk_set_magic_crystal_respawn_time(ent);
 				}
 
+				// zyk: Magic Spirits summon
+				if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
+					ent->client->ps.forceDodgeAnim == BOTH_MEDITATE && 
+					ent->client->pers.cmd.buttons & BUTTON_USE && 
+					zyk_is_main_quest_complete(ent) == qtrue && 
+					ent->client->pers.quest_magic_spirits_summon_timer < level.time && 
+					ent->client->pers.magic_power >= QUEST_MAGIC_SPIRITS_SUMMON_MP_COST && 
+					ent->client->pers.quest_magic_spirits_summon_step == 0)
+				{
+					zyk_spawn_magic_spirits(ent, QUEST_MAGIC_SPIRITS_SUMMON_DURATION);
+
+					send_rpg_events(2000);
+
+					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
+
+					ent->client->pers.magic_power -= QUEST_MAGIC_SPIRITS_SUMMON_MP_COST;
+					ent->client->pers.quest_magic_spirits_summon_step = 1;
+					ent->client->pers.quest_magic_spirits_summon_timer = level.time + 2000;
+				}
+				else if (ent->client->pers.quest_magic_spirits_summon_step == 1)
+				{
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_spirits_summon", "4", "ships/sd_exhaust", 200, 32, 800, (QUEST_MAGIC_SPIRITS_SUMMON_DURATION - 2000));
+
+					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
+
+					ent->client->pers.quest_magic_spirits_summon_step = 0;
+					ent->client->pers.quest_magic_spirits_summon_timer = level.time + QUEST_MAGIC_SPIRITS_SUMMON_INTERVAL;
+				}
+
 				// zyk: final event of the quest
 				if (ent->client->pers.quest_final_event_step > 0 && ent->client->pers.quest_final_event_timer < level.time)
 				{
@@ -9350,7 +9379,7 @@ void G_RunFrame( int levelTime ) {
 							}
 							else if (ent->client->pers.quest_final_event_step == 3)
 							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Our victory is complete. Thank you! Use ^3/list quests ^7to see how to summon us when you need.\n\"", QUESTCHAR_ALL_SPIRITS));
 							}
 						}
 					}
