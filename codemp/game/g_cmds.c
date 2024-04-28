@@ -238,7 +238,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
 		return "creates an energy area that makes you and your allies recover health, stamina and shield. It also deals a little non-elemental damage to enemies";
 	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
-		return "an energy dome appears around you, damaging enemies inside it. This power deals non-elemental damage";
+		return "an energy dome appears around you, damaging enemies inside it. It also increases your resistance to damage to your health a little. This power deals non-elemental damage";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
 		return "hits enemies around you with Water elemental damage. While this magic is active, slowly restore your health. Increases your Water element affinity. Deals extra damage to enemies with Fire affinity. Absorbs some Water damage";
 	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
@@ -250,7 +250,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
 		return "creates a black hole, sucking everyone nearby and doing Dark elemental damage to them. The closer the enemies are, the more damage they receive. Increases your Dark element affinity. Deals extra damage to enemies with Light affinity. Absorbs some Dark damage";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
-		return "creates a lightning dome that damages enemies nearby. Creates a shining light that does Light elemental damage to enemies. While near the light, enemies will get confused/stunned, will have their MP drained to restore your MP and you will take less damage to your health. Increases your Light element affinity. Deals extra damage to enemies with Dark affinity. Absorbs some Light damage";
+		return "creates a lightning dome that damages enemies nearby. Creates a shining light that does Light elemental damage to enemies. While near the light, enemies will get confused/stunned and will have their MP drained to restore your MP. Increases your Light element affinity. Deals extra damage to enemies with Dark affinity. Absorbs some Light damage";
 
 	return "";
 }
@@ -4891,9 +4891,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.quest_seller_event_step = 0;
 			ent->client->pers.quest_seller_event_timer = 0;
 
-			ent->client->pers.quest_magic_spirits_summon_timer = 0;
-			ent->client->pers.quest_magic_spirits_summon_step = 0;
-
 			ent->client->pers.stamina_timer = 0;
 			ent->client->pers.stamina_out_timer = 0;
 
@@ -6103,7 +6100,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					}
 					else
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^3Completed\n\n^7Meditate and hold ^2Use ^7key to summon the %s ^7to attack all enemies around you\nand heal health and stamina of your allies.\n\n\"", QUESTCHAR_ALL_SPIRITS));
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n^7Magic powers will have a lower MP cost.\n\n\"", QUESTCHAR_ALL_SPIRITS));
 					}
 				}
 				else
@@ -10872,14 +10869,14 @@ Cmd_Magic_f
 int zyk_get_magic_cost(int magic_number)
 {
 	int magic_costs[MAX_MAGIC_POWERS] = {
-		40, // Healing Area
-		40, // Dome of Damage
+		50, // Healing Area
+		50, // Dome of Damage
 		50, // Water Magic
 		50, // Earth Magic
 		50, // Fire Magic
 		50, // Air Magic
-		60, // Dark Magic
-		60 // Light Magic
+		50, // Dark Magic
+		50 // Light Magic
 	};
 
 	return magic_costs[magic_number];
@@ -10923,7 +10920,14 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 		}
 		else
 		{ // zyk: use the magic power
-			if (ent->client->pers.magic_power >= zyk_get_magic_cost(magic_number))
+			int magic_cost = zyk_get_magic_cost(magic_number);
+
+			if (ent->s.number < MAX_CLIENTS && zyk_is_main_quest_complete(ent) == qtrue)
+			{
+				magic_cost /= 2;
+			}
+
+			if (ent->client->pers.magic_power >= magic_cost)
 			{
 				// zyk: magic usage effect
 				zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, magic_number, 1000);
@@ -10970,7 +10974,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				}
 
 				// zyk: magic powers cost mp
-				ent->client->pers.magic_power -= zyk_get_magic_cost(magic_number);
+				ent->client->pers.magic_power -= magic_cost;
 
 				if (ent->s.number < MAX_CLIENTS)
 				{
@@ -10981,7 +10985,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			else
 			{
 				if (ent->s.number < MAX_CLIENTS)
-					trap->SendServerCommand(ent->s.number, va("print \"You need %d mp to cast ^3%s\n\"", zyk_get_magic_cost(magic_number), zyk_skill_name(skill_index)));
+					trap->SendServerCommand(ent->s.number, va("print \"You need %d mp to cast ^3%s\n\"", magic_cost, zyk_skill_name(skill_index)));
 			}
 		}
 	}

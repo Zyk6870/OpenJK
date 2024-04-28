@@ -5897,10 +5897,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (attacker && attacker->client && targ->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC) && attacker != targ &&
-				Distance(targ->client->ps.origin, targ->client->pers.light_of_judgement_origin) < targ->client->pers.light_of_judgement_distance)
-			{ // zyk: target using Light Magic. Decreases damage taken if target is inside the light
-				bonus_health_resistance += (0.025 * targ->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]);
+			if (targ->client->pers.quest_power_status & (1 << MAGIC_DOME_OF_DAMAGE))
+			{ // zyk: target using Magic Dome
+				bonus_health_resistance += (0.02 * targ->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]);
 			}
 
 			// zyk: Health Strength skill decreases damage taken
@@ -6335,32 +6334,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								ent->client->ps.stats[STAT_ARMOR] = max_shield;
 							}
 						}
-					}
-				}
-				else if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 &&
-					Q_stricmp(attacker->targetname, "zyk_magic_spirits_summon") == 0)
-				{
-					gentity_t* quest_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
-					int final_damage = (int)points;
-
-					// zyk: if the power user and the target are allies (player or npc), or the target is the quest power user himself, heal him
-					if (quest_power_user && quest_power_user->client && ent && ent->client && ent->health > 0 &&
-						(level.special_power_effects[attacker->s.number] == ent->s.number || OnSameTeam(quest_power_user, ent) == qtrue ||
-							npcs_on_same_team(quest_power_user, ent) == qtrue || zyk_is_ally(quest_power_user, ent) == qtrue))
-					{
-						int heal_amount = final_damage;
-						int stamina_amount = final_damage * 2;
-
-						if ((ent->health + heal_amount) < ent->client->ps.stats[STAT_MAX_HEALTH])
-							ent->health += heal_amount;
-						else
-							ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-						zyk_set_stamina(ent, stamina_amount, qtrue);
-					}
-					else
-					{ // zyk: damages non-ally targets
-						G_Damage(ent, quest_power_user, quest_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
 					}
 				}
 				
