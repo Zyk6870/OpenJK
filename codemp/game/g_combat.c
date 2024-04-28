@@ -6359,22 +6359,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						zyk_set_stamina(ent, stamina_amount, qtrue);
 					}
 					else
-					{ // zyk: knocks down and damages enemies
-						if (ent && ent->client && ent->health > 0 && ent->client->ps.forceHandExtend != HANDEXTEND_KNOCKDOWN)
-						{
-							// zyk: if using Meditate taunt, remove it
-							if (ent->client->ps.legsAnim == BOTH_MEDITATE && ent->client->ps.torsoAnim == BOTH_MEDITATE)
-							{
-								ent->client->ps.legsAnim = ent->client->ps.torsoAnim = BOTH_MEDITATE_END;
-							}
-
-							ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-							ent->client->ps.forceHandExtendTime = level.time + 1000;
-							ent->client->ps.velocity[2] += 300;
-							ent->client->ps.forceDodgeAnim = 0;
-							ent->client->ps.quickerGetup = qtrue;
-						}
-
+					{ // zyk: damages non-ally targets
 						G_Damage(ent, quest_power_user, quest_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
 					}
 				}

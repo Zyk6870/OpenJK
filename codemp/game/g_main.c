@@ -9382,7 +9382,7 @@ void G_RunFrame( int levelTime ) {
 				}
 				else if (ent->client->pers.quest_magic_spirits_summon_step == 1)
 				{
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_spirits_summon", "4", "ships/sd_exhaust", 200, 32, 800, (QUEST_MAGIC_SPIRITS_SUMMON_DURATION - 2000));
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_spirits_summon", "4", "ships/sd_exhaust", 200, 28, 700, (QUEST_MAGIC_SPIRITS_SUMMON_DURATION - 2000));
 
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
