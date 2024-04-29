@@ -5012,6 +5012,7 @@ qboolean zyk_magic_effect_can_hit_target(gentity_t* attacker, gentity_t* target,
 }
 
 extern int zyk_get_magic_index(int skill_index);
+extern void zyk_remap_shaders(const char* oldShader, const char* newShader);
 
 zyk_magic_element_t zyk_get_magic_element(int magic_number)
 {
@@ -5152,9 +5153,7 @@ void zyk_spawn_black_hole_model(gentity_t* ent, int duration, int model_scale)
 
 	VectorCopy(ent->r.currentOrigin, ent->client->pers.black_hole_origin);
 
-	// zyk: remaps the sphere for Black Hole textures
-	AddRemap("models/map_objects/mp/spheretwo", "textures/mp/black", level.time * 0.001);
-	trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+	zyk_remap_shaders("models/map_objects/mp/spheretwo", "textures/mp/black");
 }
 
 // zyk: fires the Boba Fett flame thrower

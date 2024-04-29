@@ -8915,17 +8915,24 @@ void Cmd_Jetpack_f( gentity_t *ent ) {
 	}
 }
 
+extern shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
+void zyk_remap_shaders(const char* oldShader, const char* newShader)
+{
+	float f = level.time * 0.001;
+
+	AddRemap(oldShader, newShader, f);
+	trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+}
+
 /*
 ==================
 Cmd_Remap_f
 ==================
 */
-extern shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
 void Cmd_Remap_f( gentity_t *ent ) {
 	int number_of_args = trap->Argc();
 	char arg1[MAX_STRING_CHARS];
 	char arg2[MAX_STRING_CHARS];
-	float f = level.time * 0.001;
 
 	if (!(ent->client->pers.bitvalue & (1 << ADM_ENTITYSYSTEM)))
 	{ // zyk: admin command
@@ -8955,8 +8962,7 @@ void Cmd_Remap_f( gentity_t *ent ) {
 		return;
 	}
 
-	AddRemap(G_NewString(arg1), G_NewString(arg2), f);
-	trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+	zyk_remap_shaders(G_NewString(arg1), G_NewString(arg2));
 
 	trap->SendServerCommand( ent->s.number, "print \"Shader remapped\n\"" );
 }
