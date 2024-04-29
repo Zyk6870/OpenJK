@@ -9519,8 +9519,7 @@ void G_RunFrame( int levelTime ) {
 							float tree_y = tree_ent->s.origin[1];
 							float tree_z = tree_ent->s.origin[2];
 
-							quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + (ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE));
-							quest_progress_change -= zyk_spirit_tree_wither(tree_x, tree_y, tree_z);
+							quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + (ent->client->pers.quest_defeated_enemies - (QUEST_ENEMY_WAVE_COUNT * 2)));
 
 							if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
 							{
@@ -9533,7 +9532,7 @@ void G_RunFrame( int levelTime ) {
 								// zyk: meditating inside the tree makes it regen faster
 								if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
 								{
-									quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + (ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE));
+									quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + (ent->client->pers.quest_defeated_enemies - (QUEST_ENEMY_WAVE_COUNT * 2)));
 								}
 
 								// zyk: holding Use key while meditating calls the Spirit Tree by clearing the current tree entities so next frame will create a new one
@@ -9561,15 +9560,13 @@ void G_RunFrame( int levelTime ) {
 								}
 							}
 
+							quest_progress_change -= zyk_spirit_tree_wither(tree_x, tree_y, tree_z);
+
 							if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 							{ // zyk: Hard Mode
 								if (quest_progress_change > 0)
 								{
 									quest_progress_change /= 2;
-								}
-								else
-								{ // zyk: if negative, decrease quest progress even more in Hard Mode
-									quest_progress_change *= 2;
 								}
 							}
 

@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.5.29"
+#define	GAMEVERSION	"New Zyk Mod v1.0.0"
 
 #define SECURITY_LOG "security.log"
 
@@ -816,8 +816,8 @@ typedef enum {
 #define RPG_MAX_SKILLPOINTS 120
 
 // zyk: minimum amount of time to spawn magic crystals
-#define RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME 5000
-#define RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL 350
+#define RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME 6000
+#define RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL 300
 
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
 #define RPG_MAX_HEALTH_INCREASE 20
@@ -854,13 +854,13 @@ typedef enum {
 
 // zyk: quest enemies values
 #define MAX_QUEST_PROGRESS 100000
-#define QUEST_MASTERS_TO_DEFEAT 2
+#define QUEST_MASTERS_TO_DEFEAT 3
 #define QUEST_SPIRIT_TREE_DEFAULT_SCALE 2
 #define QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET 4
 #define QUEST_SPIRIT_TREE_RADIUS 50
 #define QUEST_SPIRIT_TREE_CALL_COST 10
 #define QUEST_SPIRIT_TREE_WITHER_RATE 20.0
-#define QUEST_SPIRIT_TREE_REGEN_RATE 20
+#define QUEST_SPIRIT_TREE_REGEN_RATE 40
 #define QUEST_SPIRIT_TREE_SPAWN_TIMER 3000
 #define QUEST_ENEMY_WAVE_COUNT 40
 #define QUEST_NPC_BONUS_INCREASE 10
