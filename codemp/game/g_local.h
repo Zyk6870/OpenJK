@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod Beta v0.5.26"
+#define	GAMEVERSION	"New Zyk Mod Beta v0.5.27"
 
 #define SECURITY_LOG "security.log"
 
@@ -860,6 +860,7 @@ typedef enum {
 #define QUEST_SPIRIT_TREE_RADIUS 50
 #define QUEST_SPIRIT_TREE_CALL_COST 10
 #define QUEST_SPIRIT_TREE_WITHER_RATE 20.0
+#define QUEST_SPIRIT_TREE_REGEN_RATE 20
 #define QUEST_SPIRIT_TREE_SPAWN_TIMER 3000
 #define QUEST_ENEMY_WAVE_COUNT 40
 #define QUEST_NPC_BONUS_INCREASE 10

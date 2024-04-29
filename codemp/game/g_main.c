@@ -668,7 +668,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 43 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 42 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_MINISTER)
 		{
@@ -699,7 +699,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, npc_skill_level + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 7 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 6 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
 		{
@@ -9508,7 +9508,7 @@ void G_RunFrame( int levelTime ) {
 							float tree_y = tree_ent->s.origin[1];
 							float tree_z = tree_ent->s.origin[2];
 
-							quest_progress_change += (ent->client->pers.quest_defeated_enemies / 2);
+							quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + (ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE));
 							quest_progress_change -= zyk_spirit_tree_wither(tree_x, tree_y, tree_z);
 
 							if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
@@ -9516,15 +9516,16 @@ void G_RunFrame( int levelTime ) {
 								trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
 							}
 
-							// zyk: holding Use key while meditating calls the Spirit Tree by clearing the current tree entities so next frame will create a new one
 							if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
 								ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 							{
+								// zyk: meditating inside the tree makes it regen faster
 								if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
 								{
-									quest_progress_change += 20;
+									quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + (ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE));
 								}
 
+								// zyk: holding Use key while meditating calls the Spirit Tree by clearing the current tree entities so next frame will create a new one
 								if (ent->client->pers.cmd.buttons & BUTTON_USE)
 								{
 									if (ent->client->pers.magic_power > QUEST_SPIRIT_TREE_CALL_COST)
@@ -9537,7 +9538,7 @@ void G_RunFrame( int levelTime ) {
 										{
 											ent->client->pers.magic_crystals -= 1;
 
-											quest_progress_change += 200;
+											quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE * 5);
 										}
 
 										trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
