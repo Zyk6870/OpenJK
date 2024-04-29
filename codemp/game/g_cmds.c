@@ -6100,7 +6100,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					}
 					else
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n^7Magic powers will have a lower MP cost.\n\n\"", QUESTCHAR_ALL_SPIRITS));
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
 					}
 				}
 				else
@@ -10922,10 +10922,12 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 		{ // zyk: use the magic power
 			int magic_cost = zyk_get_magic_cost(magic_number);
 
+			/*
 			if (ent->s.number < MAX_CLIENTS && zyk_is_main_quest_complete(ent) == qtrue)
 			{
 				magic_cost /= 2;
 			}
+			*/
 
 			if (ent->client->pers.magic_power >= magic_cost)
 			{
