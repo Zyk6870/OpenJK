@@ -9972,12 +9972,41 @@ void Cmd_Silence_f( gentity_t *ent ) {
 	}
 }
 
+char* zyk_get_admin_command_description(zyk_settings_t admin_value)
+{
+	char* admin_descriptions[ADM_NUM_CMDS];
+
+	admin_descriptions[ADM_NPC] = "NPC";
+	admin_descriptions[ADM_NOCLIP] = "NoClip";
+	admin_descriptions[ADM_GIVEADM] = "GiveAdmin";
+	admin_descriptions[ADM_TELE] = "Teleport";
+	admin_descriptions[ADM_ADMPROTECT] = "Admin Protect";
+	admin_descriptions[ADM_ENTITYSYSTEM] = "Entity System";
+	admin_descriptions[ADM_SILENCE] = "Silence";
+	admin_descriptions[ADM_CLIENTPRINT] = "ClientPrint";
+	admin_descriptions[ADM_KICK] = "Kick";
+	admin_descriptions[ADM_PARALYZE] = "Paralyze";
+	admin_descriptions[ADM_GIVE] = "Give";
+	admin_descriptions[ADM_SCALE] = "Scale";
+	admin_descriptions[ADM_PLAYERS] = "Players";
+	admin_descriptions[ADM_DUELARENA] = "Duel Arena";
+	admin_descriptions[ADM_CUSTOMQUEST] = "Custom Quest";
+
+	if (admin_value >= 0 && admin_value < ADM_NUM_CMDS)
+	{
+		return G_NewString(admin_descriptions[admin_value]);
+	}
+
+	return "";
+}
+
 // zyk: shows admin commands of this player. Shows info to the target_ent player
 void zyk_show_admin_commands(gentity_t *ent, gentity_t *target_ent)
 {
 	char message[1024];
 	char message_content[ADM_NUM_CMDS + 1][80];
 	int i = 0;
+
 	strcpy(message,"");
 
 	while (i < ADM_NUM_CMDS)
@@ -9987,143 +10016,17 @@ void zyk_show_admin_commands(gentity_t *ent, gentity_t *target_ent)
 	}
 	message_content[ADM_NUM_CMDS][0] = '\0';
 
-	if ((ent->client->pers.bitvalue & (1 << ADM_NPC))) 
-	{
-		strcpy(message_content[ADM_NPC],va("^3  %d ^7- NPC: ^2yes\n",ADM_NPC));
-	}
-	else
-	{
-		strcpy(message_content[ADM_NPC],va("^3  %d ^7- NPC: ^1no\n",ADM_NPC));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_NOCLIP))) 
-	{
-		strcpy(message_content[ADM_NOCLIP],va("^3  %d ^7- NoClip: ^2yes\n",ADM_NOCLIP));
-	}
-	else
-	{
-		strcpy(message_content[ADM_NOCLIP],va("^3  %d ^7- NoClip: ^1no\n",ADM_NOCLIP));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_GIVEADM))) 
-	{
-		strcpy(message_content[ADM_GIVEADM],va("^3  %d ^7- GiveAdmin: ^2yes\n",ADM_GIVEADM));
-	}
-	else
-	{
-		strcpy(message_content[ADM_GIVEADM],va("^3  %d ^7- GiveAdmin: ^1no\n",ADM_GIVEADM));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_TELE))) 
-	{
-		strcpy(message_content[ADM_TELE],va("^3  %d ^7- Teleport: ^2yes\n",ADM_TELE));
-	}
-	else
-	{
-		strcpy(message_content[ADM_TELE],va("^3  %d ^7- Teleport: ^1no\n",ADM_TELE));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_ADMPROTECT))) 
-	{
-		strcpy(message_content[ADM_ADMPROTECT],va("^3  %d ^7- AdminProtect: ^2yes\n",ADM_ADMPROTECT));
-	}
-	else
-	{
-		strcpy(message_content[ADM_ADMPROTECT],va("^3  %d ^7- AdminProtect: ^1no\n",ADM_ADMPROTECT));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_ENTITYSYSTEM))) 
-	{
-		strcpy(message_content[ADM_ENTITYSYSTEM],va("^3  %d ^7- EntitySystem: ^2yes\n",ADM_ENTITYSYSTEM));
-	}
-	else
-	{
-		strcpy(message_content[ADM_ENTITYSYSTEM],va("^3  %d ^7- EntitySystem: ^1no\n",ADM_ENTITYSYSTEM));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_SILENCE))) 
-	{
-		strcpy(message_content[ADM_SILENCE],va("^3  %d ^7- Silence: ^2yes\n",ADM_SILENCE));
-	}
-	else
-	{
-		strcpy(message_content[ADM_SILENCE],va("^3  %d ^7- Silence: ^1no\n",ADM_SILENCE));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_CLIENTPRINT))) 
-	{
-		strcpy(message_content[ADM_CLIENTPRINT],va("^3  %d ^7- ClientPrint: ^2yes\n",ADM_CLIENTPRINT));
-	}
-	else
-	{
-		strcpy(message_content[ADM_CLIENTPRINT],va("^3  %d ^7- ClientPrint: ^1no\n",ADM_CLIENTPRINT));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_KICK))) 
-	{
-		strcpy(message_content[ADM_KICK],va("^3  %d ^7- Kick: ^2yes\n",ADM_KICK));
-	}
-	else
-	{
-		strcpy(message_content[ADM_KICK],va("^3  %d ^7- Kick: ^1no\n",ADM_KICK));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_PARALYZE))) 
-	{
-		strcpy(message_content[ADM_PARALYZE],va("^3 %d ^7- Paralyze: ^2yes\n",ADM_PARALYZE));
-	}
-	else
-	{
-		strcpy(message_content[ADM_PARALYZE],va("^3 %d ^7- Paralyze: ^1no\n",ADM_PARALYZE));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_GIVE))) 
-	{
-		strcpy(message_content[ADM_GIVE],va("^3 %d ^7- Give: ^2yes\n",ADM_GIVE));
-	}
-	else
-	{
-		strcpy(message_content[ADM_GIVE],va("^3 %d ^7- Give: ^1no\n",ADM_GIVE));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_SCALE))) 
-	{
-		strcpy(message_content[ADM_SCALE],va("^3 %d ^7- Scale: ^2yes\n",ADM_SCALE));
-	}
-	else
-	{
-		strcpy(message_content[ADM_SCALE],va("^3 %d ^7- Scale: ^1no\n",ADM_SCALE));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_PLAYERS))) 
-	{
-		strcpy(message_content[ADM_PLAYERS],va("^3 %d ^7- Players: ^2yes\n",ADM_PLAYERS));
-	}
-	else
-	{
-		strcpy(message_content[ADM_PLAYERS],va("^3 %d ^7- Players: ^1no\n",ADM_PLAYERS));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_DUELARENA)))
-	{
-		strcpy(message_content[ADM_DUELARENA], va("^3 %d ^7- DuelArena: ^2yes\n", ADM_DUELARENA));
-	}
-	else
-	{
-		strcpy(message_content[ADM_DUELARENA], va("^3 %d ^7- DuelArena: ^1no\n", ADM_DUELARENA));
-	}
-
-	if ((ent->client->pers.bitvalue & (1 << ADM_CUSTOMQUEST)))
-	{
-		strcpy(message_content[ADM_CUSTOMQUEST], va("^3 %d ^7- Custom Quest: ^2yes\n", ADM_CUSTOMQUEST));
-	}
-	else
-	{
-		strcpy(message_content[ADM_CUSTOMQUEST], va("^3 %d ^7- Custom Quest: ^1no\n", ADM_CUSTOMQUEST));
-	}
-
 	for (i = 0; i < ADM_NUM_CMDS; i++)
 	{
+		if ((ent->client->pers.bitvalue & (1 << i)))
+		{
+			strcpy(message_content[i], va("^3%d ^7- %s: ^2yes\n", i, zyk_get_admin_command_description(i)));
+		}
+		else
+		{
+			strcpy(message_content[i], va("^3%d ^7- %s: ^1no\n", i, zyk_get_admin_command_description(i)));
+		}
+
 		strcpy(message,va("%s%s",message,message_content[i]));
 	}
 
