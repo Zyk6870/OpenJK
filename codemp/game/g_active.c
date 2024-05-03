@@ -1581,7 +1581,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 	{
 		int stamina_recovery = 1 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA];
 
-		if (ent->client->pers.current_weight > ent->client->pers.max_weight)
+		if (ent->client->pers.current_weight > ent->client->pers.max_weight && ent->client->pers.stamina_out_timer < level.time)
 		{ // zyk: carrying stuff over the max weight, consumes stamina based on how much above the max
 			int max_weight_stamina_decrease = ((ent->client->pers.current_weight - ent->client->pers.max_weight) / 10) + 1;
 
