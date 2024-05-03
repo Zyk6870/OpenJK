@@ -2266,8 +2266,14 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_SELF_KILL) && meansOfDeath == MOD_SUICIDE) // zyk: dont reset in this case, for example, when player logs into his account
 		)
 	{ // zyk: player died in quest. Decrease number of tries
+		// zyk: also decrease regen progress
 		self->client->pers.quest_progress -= (MAX_QUEST_PROGRESS / 100);
 
+		if (self->client->pers.quest_progress < 0)
+		{
+			self->client->pers.quest_progress = 0;
+		}
+		
 		zyk_decrease_quest_tries(self);
 	}
 

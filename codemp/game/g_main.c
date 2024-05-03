@@ -6055,7 +6055,9 @@ void quest_power_events(gentity_t *ent)
 							vec3_t dir, forward;
 							float target_distance = Distance(ent->client->pers.black_hole_origin, black_hole_target->client->ps.origin);
 							float black_hole_suck_strength = 0.0;
+							float black_hole_max_strength = 160.0 + (15.0 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
 
+							// zyk: increases strength with which target is sucked into the black hole the closer he is to it
 							if (target_distance > 0.0)
 							{
 								black_hole_suck_strength = ((ent->client->pers.black_hole_distance * 0.7) / target_distance);
@@ -6063,26 +6065,26 @@ void quest_power_events(gentity_t *ent)
 
 							VectorSubtract(ent->client->pers.black_hole_origin, black_hole_target->client->ps.origin, forward);
 							VectorNormalize(forward);
-
-							// zyk: increases strength with which target is sucked into the black hole the closer he is to it
+							
+							// zyk: tests if the target is the ground or in the air
 							if (black_hole_target->client->ps.groundEntityNum != ENTITYNUM_NONE)
 							{
 								black_hole_suck_strength *= 200.0;
 							}
 							else
 							{
-								black_hole_suck_strength *= 48.0;
+								black_hole_suck_strength *= 50.0;
 							}
 
-							// zyk: add a limit to the strength to prevent the target from being blown out of the black hole
-							if (black_hole_suck_strength > 450.0)
+							// zyk: add a limit to the strength based on the magic skill level to prevent the target from being blown out of the black hole
+							if (black_hole_suck_strength > black_hole_max_strength)
 							{
-								black_hole_suck_strength = 450.0;
+								black_hole_suck_strength = black_hole_max_strength;
 							}
 
 							if (target_distance < 64.0)
 							{ // zyk: very close to black hole center
-								VectorScale(black_hole_target->client->ps.velocity, 0.4, black_hole_target->client->ps.velocity);
+								VectorScale(black_hole_target->client->ps.velocity, 0.5, black_hole_target->client->ps.velocity);
 							}
 							else
 							{
