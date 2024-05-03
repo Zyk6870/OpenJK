@@ -6264,7 +6264,7 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_BINOCULARS][1] = 5;
 
 	seller_items_cost[SELLER_JETPACK][0] = 500;
-	seller_items_cost[SELLER_JETPACK][1] = 0;
+	seller_items_cost[SELLER_JETPACK][1] = 200;
 
 	seller_items_cost[SELLER_CLOAK_ITEM][0] = 150;
 	seller_items_cost[SELLER_CLOAK_ITEM][1] = 90;
@@ -7601,6 +7601,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (value == (SELLER_BINOCULARS + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_BINOCULARS))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_BINOCULARS);
+		sold = 1;
+	}
+	else if (value == (SELLER_JETPACK + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK))
+	{
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_JETPACK);
 		sold = 1;
 	}
 	else if (value == (SELLER_CLOAK_ITEM + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_CLOAK))
