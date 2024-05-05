@@ -6274,8 +6274,8 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_JETPACK][0] = 500;
 	seller_items_cost[SELLER_JETPACK][1] = 200;
 
-	seller_items_cost[SELLER_CLOAK_ITEM][0] = 150;
-	seller_items_cost[SELLER_CLOAK_ITEM][1] = 90;
+	seller_items_cost[SELLER_CLOAK_ITEM][0] = 450;
+	seller_items_cost[SELLER_CLOAK_ITEM][1] = 220;
 
 	seller_items_cost[SELLER_BLASTER_PISTOL][0] = 90;
 	seller_items_cost[SELLER_BLASTER_PISTOL][1] = 45;
@@ -6334,7 +6334,7 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_FORCE_FIELD_UPGRADE][0] = 1400;
 	seller_items_cost[SELLER_FORCE_FIELD_UPGRADE][1] = 800;
 
-	seller_items_cost[SELLER_CLOAK_UPGRADE][0] = 1100;
+	seller_items_cost[SELLER_CLOAK_UPGRADE][0] = 1150;
 	seller_items_cost[SELLER_CLOAK_UPGRADE][1] = 700;
 
 	seller_items_cost[SELLER_SHIELD_GENERATOR_UPGRADE][0] = 1000;
@@ -6684,7 +6684,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_CLOAK_ITEM)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to cloak himself\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to cloak himself. Npcs cannot detect you unless close enough\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_BLASTER_PISTOL)
 		{
@@ -6764,7 +6764,7 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_CLOAK_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Cloak Item will be able to cloak vehicles. Press Saber Stance key when riding a vehicle to cloak it\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Cloak Item will be able to cloak vehicles. Press Saber Stance key when riding a vehicle to cloak it. Also, when you are cloaked, npcs will only be able to detect you at a closer distance\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_SHIELD_GENERATOR_UPGRADE)
 		{

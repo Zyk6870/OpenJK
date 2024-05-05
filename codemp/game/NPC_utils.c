@@ -1134,9 +1134,28 @@ qboolean NPC_ValidEnemy( gentity_t *ent )
 	if ( ent->flags & FL_NOTARGET )
 		return qfalse;
 
-	// zyk: cloaked players or npcs will not be picked up as enemies
+	// zyk: cloaked players or npcs will have a smaller chance to be got as enemies
 	if (ent->client && (!NPCS.NPC->enemy || NPCS.NPC->enemy != ent) && ent->client->ps.powerups[PW_CLOAKED])
-		return qfalse;
+	{
+		qboolean check_cloak = qfalse;
+		int enemy_distance = Distance(NPCS.NPC->r.currentOrigin, ent->r.currentOrigin);
+		int cloak_detect_distance = NPC_CLOAK_DETECTION_DISTANCE;
+
+		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
+		{
+			cloak_detect_distance /= 2;
+		}
+
+		if (enemy_distance < cloak_detect_distance)
+		{
+			int distance_ratio = 100 - (((enemy_distance * 1.0) / cloak_detect_distance) * 100);
+
+			if (Q_irand(0, 99) < distance_ratio)
+			{
+				return qfalse;
+			}
+		}
+	}
 
 	//Must be an NPC
 	if ( ent->client == NULL )

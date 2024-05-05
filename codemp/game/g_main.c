@@ -9295,7 +9295,7 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
-					int extra_tries_crystal_chance = 79;
+					int extra_tries_crystal_chance = 78;
 					int time_crystal_chance = 89;
 					int puzzle_crystal_chance = 93;
 
