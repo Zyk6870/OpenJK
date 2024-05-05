@@ -5334,6 +5334,7 @@ extern int zyk_max_magic_power(gentity_t *ent);
 void sense_health_info(gentity_t *self, gentity_t *target)
 {
 	int client_health = 0;
+	int client_max_health = 0;
 	int client_armor = 0;
 	int client_max_armor = 0;
 	char client_name[64];
@@ -5346,6 +5347,7 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 	}
 
 	client_health = target->health;
+	client_max_health = target->client->ps.stats[STAT_MAX_HEALTH];
 	client_armor = target->client->ps.stats[STAT_ARMOR];
 	client_max_armor = target->client->ps.stats[STAT_MAX_HEALTH];
 
@@ -5355,6 +5357,11 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 	}
 	else
 	{
+		if (target->client->sess.amrpgmode == 2)
+		{
+			client_max_health = target->client->pers.max_rpg_health;
+		}
+
 		strcpy(client_name, target->client->pers.netname);
 	}
 	
@@ -5382,7 +5389,7 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 			max_magic_power = zyk_max_magic_power(target);
 		}
 
-		trap->SendServerCommand(self->s.number, va("cp \"%s\n^1%d^3/^1%d  ^2%d^3/^2%d\n^5%d^3/^5%d  ^7%d^3/^7%d\n\"", client_name, client_health, target->client->ps.stats[STAT_MAX_HEALTH], client_armor, client_max_armor, target->client->ps.fd.forcePower, target->client->ps.fd.forcePowerMax, magic_power, max_magic_power));
+		trap->SendServerCommand(self->s.number, va("cp \"%s\n^1%d^3/^1%d  ^2%d^3/^2%d\n^5%d^3/^5%d  ^7%d^3/^7%d\n\"", client_name, client_health, client_max_health, client_armor, client_max_armor, target->client->ps.fd.forcePower, target->client->ps.fd.forcePowerMax, magic_power, max_magic_power));
 	}
 }
 
