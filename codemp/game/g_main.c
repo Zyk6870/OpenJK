@@ -6055,7 +6055,7 @@ void quest_power_events(gentity_t *ent)
 							vec3_t dir, forward;
 							float target_distance = Distance(ent->client->pers.black_hole_origin, black_hole_target->client->ps.origin);
 							float black_hole_suck_strength = 0.0;
-							float black_hole_max_strength = 160.0 + (15.0 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
+							float black_hole_max_strength = 130.0 + (15.0 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
 
 							// zyk: increases strength with which target is sucked into the black hole the closer he is to it
 							if (target_distance > 0.0)
@@ -6084,7 +6084,7 @@ void quest_power_events(gentity_t *ent)
 
 							if (target_distance < 64.0)
 							{ // zyk: very close to black hole center
-								VectorScale(black_hole_target->client->ps.velocity, 0.5, black_hole_target->client->ps.velocity);
+								VectorScale(black_hole_target->client->ps.velocity, 0.4, black_hole_target->client->ps.velocity);
 							}
 							else
 							{
@@ -9295,7 +9295,7 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
-					int extra_tries_crystal_chance = 78;
+					int extra_tries_crystal_chance = 79;
 					int time_crystal_chance = 89;
 					int puzzle_crystal_chance = 93;
 

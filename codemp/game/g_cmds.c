@@ -6848,15 +6848,15 @@ void Cmd_Stuff_f( gentity_t *ent ) {
 		}
 		else if (i == SELLER_SENTRY_GUN_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes Sentry Gun stronger. Allows getting sentry guns back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes Sentry Gun have more health and damage and detect enemies at a greater distance. Allows getting sentry guns back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_SEEKER_DRONE_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes seeker drone stronger\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes seeker drone shoot faster and with more damage. It also lasts longer\n\n\"", zyk_get_seller_item_name(i)));
 		}
 		else if (i == SELLER_EWEB_UPGRADE)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes E-Web stronger\n\n\"", zyk_get_seller_item_name(i)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes E-Web have more health and damage\n\n\"", zyk_get_seller_item_name(i)));
 		}
 	}
 }

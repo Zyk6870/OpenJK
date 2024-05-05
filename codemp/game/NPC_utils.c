@@ -1146,14 +1146,13 @@ qboolean NPC_ValidEnemy( gentity_t *ent )
 			cloak_detect_distance /= 2;
 		}
 
-		if (enemy_distance < cloak_detect_distance)
+		if (enemy_distance > cloak_detect_distance)
 		{
-			int distance_ratio = 100 - (((enemy_distance * 1.0) / cloak_detect_distance) * 100);
-
-			if (Q_irand(0, 99) < distance_ratio)
-			{
-				return qfalse;
-			}
+			return qfalse;
+		}
+		else if (Q_irand(0, 4) > 0 && enemy_distance > Q_irand(0, cloak_detect_distance))
+		{ // zyk: detection chance increases the closer the enemy is. Also must be 80 per cent chance of not detecting the enemy
+			return qfalse;
 		}
 	}
 
