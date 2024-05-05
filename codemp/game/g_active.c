@@ -2625,7 +2625,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 		if (client->sess.amrpgmode == 2 && client->pers.skill_levels[SKILL_RUN_SPEED] > 0)
 		{ // zyk: Run Speed skill
-			zyk_player_speed += (client->pers.skill_levels[SKILL_RUN_SPEED] * 50.0f);
+			zyk_player_speed += (client->pers.skill_levels[SKILL_RUN_SPEED] * RPG_RUN_SPEED_SKILL_INCREASE);
 		}
 
 		if (client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))

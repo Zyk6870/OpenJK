@@ -229,7 +229,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_UNDERWATER)
 		return "Each level increases your air underwater";
 	if (skill_index == SKILL_RUN_SPEED)
-		return va("At level 0 your run speed is %f. Each level increases it by 50", g_speed.value);
+		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
 	if (skill_index == SKILL_MAGIC_FIST)
 		return "allows you to attack with magic bolts when using melee punches. Each level increases damage";
@@ -8330,6 +8330,8 @@ void Cmd_Settings_f( gentity_t *ent ) {
 
 		if (value == SETTINGS_RPG_QUESTS && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)
 		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
+			ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
+
 			G_Kill(ent);
 		}
 
@@ -10805,6 +10807,17 @@ int zyk_get_magic_cost(int magic_number)
 	return magic_costs[magic_number];
 }
 
+qboolean zyk_can_cast_magic(gentity_t* ent)
+{
+	if (ent->client->ps.forceHandExtend != HANDEXTEND_NONE || 
+		ent->client->ps.fd.forceGripBeingGripped > level.time)
+	{
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
 extern void zyk_spawn_magic_element_effect(gentity_t* ent, vec3_t effect_origin, int magic_number, int duration);
 extern void healing_area(gentity_t* ent);
 extern void dome_of_damage(gentity_t* ent);
@@ -10823,6 +10836,14 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 		if (ent->s.number < MAX_CLIENTS)
 			trap->SendServerCommand(ent->s.number, va("print \"You don't have %s.\n\"", zyk_skill_name(skill_index)));
 		
+		return;
+	}
+
+	if (zyk_can_cast_magic(ent) == qfalse)
+	{
+		if (ent->s.number < MAX_CLIENTS)
+			trap->SendServerCommand(ent->s.number, "print \"Cannot use magic now\n\"");
+
 		return;
 	}
 
