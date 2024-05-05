@@ -9295,8 +9295,8 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
 					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
-					int extra_tries_crystal_chance = 77;
-					int time_crystal_chance = 87;
+					int extra_tries_crystal_chance = 79;
+					int time_crystal_chance = 89;
 					int puzzle_crystal_chance = 93;
 
 					if (ent->client->pers.quest_defeated_enemies >= QUEST_ENEMY_WAVE_COUNT)
@@ -9321,8 +9321,8 @@ void G_RunFrame( int levelTime ) {
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
-						extra_tries_crystal_chance -= 2;
-						time_crystal_chance -= 2;
+						extra_tries_crystal_chance -= 4;
+						time_crystal_chance -= 4;
 					}
 					
 					if (magic_crystal_chance_to_spawn < 70)
