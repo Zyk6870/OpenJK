@@ -1384,6 +1384,12 @@ void SetTeam( gentity_t *ent, char *s ) {
 	// he starts at 'base'
 	client->pers.teamState.state = TEAM_BEGIN;
 	if ( oldTeam != TEAM_SPECTATOR ) {
+		// zyk: set flag so it will not reset quests of this player
+		if (ent->client->sess.amrpgmode == 2)
+		{
+			ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
+		}
+
 		// Kill him (makes sure he loses flags, etc)
 		ent->flags &= ~FL_GODMODE;
 		ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
@@ -5342,6 +5348,8 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 			initialize_rpg_skills(ent, qtrue);
 			trap->SendServerCommand( ent->s.number, "print \"^7Account loaded succesfully in ^2RPG Mode^7. Use command ^3/list^7.\n\"" );
 
+			ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
+
 			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
 				if (ent && ent->client)
@@ -8463,6 +8471,7 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 		if (ent && ent->client)
 		{
 			ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_SELF_KILL);
+			ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
 		}
 
 		G_Kill(ent);

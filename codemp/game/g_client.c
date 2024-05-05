@@ -3858,6 +3858,11 @@ void ClientSpawn(gentity_t *ent) {
 		{
 			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_SELF_KILL);
 		}
+
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_KEEP_QUEST_TRIES))
+		{
+			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
+		}
 	}
 	else if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_ADM_GIVE_FORCE))
 	{ // zyk: player received force powers from admin
