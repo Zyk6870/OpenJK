@@ -2182,6 +2182,7 @@ extern void player_restore_force(gentity_t *ent);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 extern void zyk_start_main_quest_final_event(gentity_t* ent);
+extern void zyk_set_starting_quest_progress(gentity_t* ent);
 
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
 	gentity_t* ent;
@@ -2241,7 +2242,9 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 				quest_player->client->pers.quest_defeated_enemies += 1;
 
 				if (quest_player->client->pers.quest_defeated_enemies == (QUEST_ENEMY_WAVE_COUNT * 2))
-				{
+				{ // zyk: start the second part of the quest, the Spirit Tree regen
+					zyk_set_starting_quest_progress(quest_player);
+
 					quest_player->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
 				}
 

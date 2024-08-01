@@ -640,7 +640,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		if (hard_mode == qtrue)
 		{
 			hp_bonus *= 2;
-			skill_level_bonus += 3;
+			skill_level_bonus += 2;
 		}
 
 		// zyk: setting quest npc health
@@ -7703,6 +7703,16 @@ void zyk_start_main_quest_final_event(gentity_t* ent)
 	}
 }
 
+void zyk_set_starting_quest_progress(gentity_t* ent)
+{
+	ent->client->pers.quest_progress = MAX_QUEST_PROGRESS / 20;
+
+	if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+	{ // zyk: Hard Mode
+		ent->client->pers.quest_progress = MAX_QUEST_PROGRESS / 100;
+	}
+}
+
 /*
 ================
 G_RunFrame
@@ -9584,9 +9594,13 @@ void G_RunFrame( int levelTime ) {
 									zyk_start_main_quest_final_event(ent);
 								}
 							}
-							else if (ent->client->pers.quest_progress < 0)
-							{
-								ent->client->pers.quest_progress = 0;
+							else if (ent->client->pers.quest_progress <= 0)
+							{ // zyk: if Spirit Tree is completely withered, player dies and loses a quest try
+								zyk_set_starting_quest_progress(ent);
+
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The Spirit Tree is completely withered!\n\"", QUESTCHAR_ALL_SPIRITS));
+
+								player_die(ent, ent, ent, 100000, MOD_SUICIDE);
 							}
 
 							quest_progress_percentage = (ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS;
