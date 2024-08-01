@@ -640,7 +640,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		if (hard_mode == qtrue)
 		{
 			hp_bonus *= 2;
-			skill_level_bonus += 2;
+			skill_level_bonus += 3;
 		}
 
 		// zyk: setting quest npc health

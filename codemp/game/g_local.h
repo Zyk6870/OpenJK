@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.13"
+#define	GAMEVERSION	"New Zyk Mod v1.0.14"
 
 #define SECURITY_LOG "security.log"
 
@@ -858,7 +858,7 @@ typedef enum {
 #define QUESTCHAR_ALLY "^2Ally"
 #define QUESTCHAR_SELLER "^3Seller"
 
-// zyk: quest enemies values
+// zyk: quest values
 #define MAX_QUEST_PROGRESS 100000
 #define QUEST_MASTERS_TO_DEFEAT 3
 #define QUEST_SPIRIT_TREE_DEFAULT_SCALE 2
@@ -868,7 +868,7 @@ typedef enum {
 #define QUEST_SPIRIT_TREE_WITHER_RATE 20.0
 #define QUEST_SPIRIT_TREE_REGEN_RATE 40
 #define QUEST_SPIRIT_TREE_SPAWN_TIMER 3000
-#define QUEST_ENEMY_WAVE_COUNT 40
+#define QUEST_ENEMY_WAVE_COUNT 30
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_MAX_NPCS_IN_MAP 25
 #define QUEST_NPC_SPAWN_TIME 25000
