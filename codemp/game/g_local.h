@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.12"
+#define	GAMEVERSION	"New Zyk Mod v1.0.13"
 
 #define SECURITY_LOG "security.log"
 
@@ -827,7 +827,7 @@ typedef enum {
 #define MAGIC_ANIM_TIME 1400
 
 // zyk: damage bonus of weapons
-#define RPG_WEAPON_DMG_BONUS 0.01
+#define RPG_WEAPON_DMG_BONUS 0.025
 
 // zyk: max RPG chars an account can have
 #define MAX_RPG_CHARS 15

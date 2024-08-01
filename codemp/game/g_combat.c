@@ -4702,7 +4702,15 @@ int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int skill_inde
 
 	if (ent->client->pers.skill_levels[skill_index] > 0 && ent->client->pers.rpg_inventory[inventory_index] > 1)
 	{
-		final_dmg = (int)ceil(final_dmg * (1.0 + (RPG_WEAPON_DMG_BONUS * (ent->client->pers.rpg_inventory[inventory_index] - 1) * ent->client->pers.skill_levels[skill_index])));
+		int extra_inventory_weapons = ent->client->pers.rpg_inventory[inventory_index] - 1;
+		float bonus_damage_factor = (RPG_WEAPON_DMG_BONUS * extra_inventory_weapons);
+
+		if (extra_inventory_weapons > ent->client->pers.skill_levels[skill_index])
+		{
+			bonus_damage_factor = (RPG_WEAPON_DMG_BONUS * ent->client->pers.skill_levels[skill_index]);
+		}
+
+		final_dmg = (int)ceil(final_dmg * (1.00 + bonus_damage_factor));
 	}
 
 	return final_dmg;

@@ -79,7 +79,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MELEE] = 3;
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
 	max_skill_levels[SKILL_SABER] = 10;
-	max_skill_levels[SKILL_WEAPON_DAMAGE] = 10;
+	max_skill_levels[SKILL_WEAPON_DAMAGE] = 20;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
 	max_skill_levels[SKILL_MAX_STAMINA] = 5;
 	max_skill_levels[SKILL_UNDERWATER] = 2;
@@ -221,7 +221,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_SABER)
 		return "Increases Saber damage based on this skill level";
 	if (skill_index == SKILL_WEAPON_DAMAGE)
-		return "Each level multiplies damage per amount of this weapon in your inventory and per this skill level";
+		return "Multiplies damage per amount of this weapon in your inventory by 2.5 per cent. The max amount of extra weapons used for the bonus will be the current skill level";
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio. Carrying stuff over the max weight will decrease your run speed and also decrease Stamina";
 	if (skill_index == SKILL_MAX_STAMINA)
