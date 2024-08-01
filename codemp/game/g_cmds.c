@@ -75,7 +75,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
 	max_skill_levels[SKILL_MAX_HEALTH] = 10;
-	max_skill_levels[SKILL_HEALTH_STRENGTH] = 5;
+	max_skill_levels[SKILL_HEALTH_STRENGTH] = 10;
 	max_skill_levels[SKILL_MELEE] = 3;
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
 	max_skill_levels[SKILL_SABER] = 10;
@@ -213,7 +213,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_HEALTH)
 		return "Each level increases your max health";
 	if (skill_index == SKILL_HEALTH_STRENGTH)
-		return "Each level increases your health resistance to damage";
+		return "Each level increases your health resistance to damage by 2 per cent";
 	if (skill_index == SKILL_MELEE)
 		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 1, Right hand punch does %d normal damage, left hand punch does %d normal damage and kick does %d damage. Each level increases melee damage", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	if (skill_index == SKILL_MELEE_SPEED)
