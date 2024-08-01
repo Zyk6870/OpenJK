@@ -5932,7 +5932,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			// zyk: some npcs have a chance of causing poison status
 			if (attacker && attacker->client && attacker->NPC && 
 				attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER && mod == MOD_MELEE && 
-				Q_irand(0, 3) == 0)
+				Q_irand(0, 100) < 40)
 			{
 				targ->client->pers.poison_debounce_timer = 0;
 				targ->client->pers.poison_duration = level.time + 20000;
