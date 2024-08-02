@@ -9600,6 +9600,8 @@ void G_RunFrame( int levelTime ) {
 
 								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The Spirit Tree is completely withered!\n\"", QUESTCHAR_ALL_SPIRITS));
 
+								ent->client->ps.stats[STAT_HEALTH] = ent->health = -999;
+
 								player_die(ent, ent, ent, 100000, MOD_SUICIDE);
 							}
 
