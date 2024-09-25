@@ -7484,6 +7484,7 @@ int zyk_number_of_used_entities()
 	return total_used_entities;
 }
 
+extern int zyk_number_of_allies_in_map(gentity_t* ent);
 int zyk_quest_npcs_in_the_map()
 {
 	int i = 0;
@@ -9695,7 +9696,7 @@ void G_RunFrame( int levelTime ) {
 
 								zyk_spawn_quest_npc(QUEST_NPC_SELLER, ent->client->ps.viewangles[YAW], 0, qfalse, -1);
 							}
-							else if (chance_to_spawn_enemy < (seller_chance + 2 + ent->client->pers.magic_crystals))
+							else if (chance_to_spawn_enemy < (2 + ent->client->pers.magic_crystals - (zyk_number_of_allies_in_map(ent) * 2)))
 							{ // zyk: spawn an ally and get one of them near the player
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 								int ally_bonus = ent->client->pers.quest_defeated_enemies + ent->client->pers.magic_crystals;
