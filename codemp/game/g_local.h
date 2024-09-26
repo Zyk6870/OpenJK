@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.19"
+#define	GAMEVERSION	"New Zyk Mod v1.0.20"
 
 #define SECURITY_LOG "security.log"
 
@@ -530,6 +530,7 @@ typedef enum {
 	SETTINGS_JETPACK,
 	SETTINGS_ADMIN_PROTECT,
 	SETTINGS_DIFFICULTY,
+	SETTINGS_MAGIC_CRYSTALS,
 	MAX_PLAYER_SETTINGS
 } zyk_settings_t;
 

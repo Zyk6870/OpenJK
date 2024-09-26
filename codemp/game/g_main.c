@@ -9336,7 +9336,7 @@ void G_RunFrame( int levelTime ) {
 						time_crystal_chance -= 4;
 					}
 					
-					if (magic_crystal_chance_to_spawn < 70)
+					if (magic_crystal_chance_to_spawn < 70 && !(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
 					{ // zyk: Skill Crystal
 						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 					}
