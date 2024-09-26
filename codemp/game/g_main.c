@@ -2091,10 +2091,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			{
 				G_FreeEntity(ent);
 			}
-			if (Q_stricmp(ent->classname, "info_player_deathmatch") == 0)
-			{
-				G_FreeEntity(ent);
-			}
 		}
 	}
 	else if (Q_stricmp(zyk_mapname, "mp/siege_destroyer") == 0 && g_gametype.integer == GT_FFA)
