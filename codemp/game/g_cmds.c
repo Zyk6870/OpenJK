@@ -6253,16 +6253,16 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_SENTRY_GUN][0] = 120;
 	seller_items_cost[SELLER_SENTRY_GUN][1] = 50;
 
-	seller_items_cost[SELLER_SEEKER_DRONE][0] = 140;
-	seller_items_cost[SELLER_SEEKER_DRONE][1] = 60;
+	seller_items_cost[SELLER_SEEKER_DRONE][0] = 120;
+	seller_items_cost[SELLER_SEEKER_DRONE][1] = 50;
 
-	seller_items_cost[SELLER_BACTA_CANISTER][0] = 120;
+	seller_items_cost[SELLER_BACTA_CANISTER][0] = 110;
 	seller_items_cost[SELLER_BACTA_CANISTER][1] = 50;
 
-	seller_items_cost[SELLER_FORCE_FIELD][0] = 200;
-	seller_items_cost[SELLER_FORCE_FIELD][1] = 100;
+	seller_items_cost[SELLER_FORCE_FIELD][0] = 180;
+	seller_items_cost[SELLER_FORCE_FIELD][1] = 90;
 
-	seller_items_cost[SELLER_BIG_BACTA][0] = 220;
+	seller_items_cost[SELLER_BIG_BACTA][0] = 200;
 	seller_items_cost[SELLER_BIG_BACTA][1] = 90;
 
 	seller_items_cost[SELLER_EWEB][0] = 140;
@@ -6301,8 +6301,8 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_FLECHETTE][0] = 170;
 	seller_items_cost[SELLER_FLECHETTE][1] = 90;
 
-	seller_items_cost[SELLER_CONCUSSION][0] = 300;
-	seller_items_cost[SELLER_CONCUSSION][1] = 180;
+	seller_items_cost[SELLER_CONCUSSION][0] = 280;
+	seller_items_cost[SELLER_CONCUSSION][1] = 160;
 
 	seller_items_cost[SELLER_ROCKET_LAUNCHER][0] = 250;
 	seller_items_cost[SELLER_ROCKET_LAUNCHER][1] = 120;
@@ -6313,14 +6313,14 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_STUN_BATON][0] = 20;
 	seller_items_cost[SELLER_STUN_BATON][1] = 10;
 
-	seller_items_cost[SELLER_YSALAMIRI][0] = 200;
-	seller_items_cost[SELLER_YSALAMIRI][1] = 100;
+	seller_items_cost[SELLER_YSALAMIRI][0] = 180;
+	seller_items_cost[SELLER_YSALAMIRI][1] = 90;
 
 	seller_items_cost[SELLER_JETPACK_FUEL][0] = 20;
 	seller_items_cost[SELLER_JETPACK_FUEL][1] = 0;
 
-	seller_items_cost[SELLER_FORCE_BOON][0] = 200;
-	seller_items_cost[SELLER_FORCE_BOON][1] = 100;
+	seller_items_cost[SELLER_FORCE_BOON][0] = 180;
+	seller_items_cost[SELLER_FORCE_BOON][1] = 90;
 
 	seller_items_cost[SELLER_MAGIC_CRYSTAL][0] = 0;
 	seller_items_cost[SELLER_MAGIC_CRYSTAL][1] = 100;
