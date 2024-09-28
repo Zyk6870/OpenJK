@@ -9665,13 +9665,19 @@ void G_RunFrame( int levelTime ) {
 							{ // zyk: first enemy wave
 								enemy_type = Q_irand(QUEST_NPC_FLYING_WARRIOR, QUEST_NPC_CHANGELING_HOWLER);
 							}
-							else if (ent->client->pers.quest_defeated_enemies < (QUEST_ENEMY_WAVE_COUNT * 2))
-							{ // zyk: second enemy wave
+							else
+							{ // zyk: all other enemy waves
 								enemy_type = Q_irand(QUEST_NPC_MAGE_MINISTER, QUEST_NPC_CHANGELING_HOWLER);
 							}
-							else
-							{ // zyk: last enemy wave
-								enemy_type = Q_irand(QUEST_NPC_MAGE_MASTER, QUEST_NPC_CHANGELING_HOWLER);
+
+							if (ent->client->pers.quest_defeated_enemies >= (QUEST_ENEMY_WAVE_COUNT * 2))
+							{
+								int mage_master_chance = 1 + ent->client->pers.quest_defeated_enemies - (QUEST_ENEMY_WAVE_COUNT * 2);
+
+								if (chance_to_spawn_quest_npc < mage_master_chance)
+								{
+									enemy_type = QUEST_NPC_MAGE_MASTER;
+								}
 							}
 
 							if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
