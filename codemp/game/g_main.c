@@ -584,15 +584,15 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_NONE] = 0;
 
 	max_levels[QUEST_NPC_MAGE_MASTER] = 12;
-	max_levels[QUEST_NPC_MAGE_MINISTER] = 8;
-	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 8;
-	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = 6;
-	max_levels[QUEST_NPC_FLYING_WARRIOR] = 5;
-	max_levels[QUEST_NPC_CHANGELING_WORM] = 5;
-	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = 5;
-	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 4;
-	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = 5;
-	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 5;
+	max_levels[QUEST_NPC_MAGE_MINISTER] = 9;
+	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 9;
+	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = 8;
+	max_levels[QUEST_NPC_FLYING_WARRIOR] = 7;
+	max_levels[QUEST_NPC_CHANGELING_WORM] = 7;
+	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = 6;
+	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 5;
+	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = 7;
+	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 7;
 	
 	max_levels[QUEST_NPC_ALLY_MAGE] = 10;
 	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = 8;
@@ -9789,33 +9789,58 @@ void G_RunFrame( int levelTime ) {
 			{ // zyk: npcs with magic powers
 				if (ent->client->pers.quest_npc > QUEST_NPC_NONE && ent->client->pers.quest_event_timer < level.time)
 				{
-					if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR)
-					{ // zyk: changes his class so he can react in different ways sometimes
-						if (ent->client->NPC_class == CLASS_REBORN)
-						{
-							ent->client->NPC_class = CLASS_BOBAFETT;
-						}
-						else if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-						{ // zyk: change to reborn if he is on the ground
-							ent->client->NPC_class = CLASS_REBORN;
-						}
-					}
-
 					if (ent->enemy)
 					{
 						int first_magic_skill = SKILL_MAGIC_HEALING_AREA;
 						int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
 						int magic_skill_index = first_magic_skill + random_magic;
+						int quest_npc_enemy_dist = Distance(ent->client->ps.origin, ent->enemy->r.currentOrigin);
 
 						if (ent->client->pers.skill_levels[magic_skill_index] > 0)
 						{
-							zyk_cast_magic(ent, magic_skill_index);
+							int magic_cast_dist = 250 + (50 * ent->client->pers.skill_levels[magic_skill_index]);
 
-							ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(4, 8));
+							if (quest_npc_enemy_dist < Q_irand(0, magic_cast_dist) && !(ent->client->pers.quest_power_status & (1 << random_magic)))
+							{
+								zyk_cast_magic(ent, magic_skill_index);
 
-							if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
-							{ // zyk: master mage npc will use magic more often
-								ent->client->pers.quest_event_timer -= 2000;
+								ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(4, 8));
+
+								if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER ||
+									ent->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER ||
+									ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR)
+								{ // zyk: changes his class so he can react in different ways sometimes
+									if (ent->client->NPC_class == CLASS_REBORN)
+									{
+										ent->client->NPC_class = CLASS_BOBAFETT;
+									}
+								}
+
+								if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+								{ // zyk: master mage npc will use magic more often
+									ent->client->pers.quest_event_timer -= 2000;
+								}
+							}
+							else if (ent->client->pers.quest_power_status & (1 << random_magic))
+							{ // zyk: active power, stop using the magic power
+								zyk_cast_magic(ent, magic_skill_index);
+							}
+						}
+
+						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER ||
+							ent->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER ||
+							ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR)
+						{ // zyk: changes his class so he can react in different ways sometimes
+							if ((Q_irand(0, 3) == 0 || ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER) && 
+								ent->client->NPC_class == CLASS_BOBAFETT && 
+								ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
+							{ // zyk: change to reborn if he is on the ground
+								ent->client->NPC_class = CLASS_REBORN;
+
+								if (ent->client->pers.quest_event_timer < level.time)
+								{
+									ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(2, 4));
+								}
 							}
 						}
 
