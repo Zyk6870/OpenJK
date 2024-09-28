@@ -10817,14 +10817,14 @@ Cmd_Magic_f
 int zyk_get_magic_cost(int magic_number)
 {
 	int magic_costs[MAX_MAGIC_POWERS] = {
-		50, // Healing Area
-		50, // Dome of Damage
-		50, // Water Magic
-		50, // Earth Magic
-		50, // Fire Magic
-		50, // Air Magic
-		50, // Dark Magic
-		50 // Light Magic
+		40, // Healing Area
+		40, // Dome of Damage
+		40, // Water Magic
+		40, // Earth Magic
+		40, // Fire Magic
+		40, // Air Magic
+		40, // Dark Magic
+		40 // Light Magic
 	};
 
 	return magic_costs[magic_number];
