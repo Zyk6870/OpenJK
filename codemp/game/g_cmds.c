@@ -5988,7 +5988,8 @@ int zyk_number_of_allies_in_map(gentity_t* ent)
 	{
 		npc_ent = &g_entities[i];
 
-		if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && npc_ent->client->pers.quest_npc <= QUEST_NPC_SELLER &&
+		if (npc_ent && npc_ent->client && npc_ent->NPC && 
+			npc_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && npc_ent->client->pers.quest_npc <= QUEST_NPC_SELLER &&
 			npc_ent->client->pers.quest_npc_caller_player_id == ent->s.number && npc_ent->health > 0)
 		{
 			total_allies++;
@@ -5998,6 +5999,29 @@ int zyk_number_of_allies_in_map(gentity_t* ent)
 	}
 
 	return total_allies;
+}
+
+int zyk_number_of_enemies_in_map()
+{
+	int total_enemies = 0;
+	int i = (MAX_CLIENTS + BODY_QUEUE_SIZE);
+	gentity_t* npc_ent = NULL;
+
+	while (i < level.num_entities)
+	{
+		npc_ent = &g_entities[i];
+
+		if (npc_ent && npc_ent->client && npc_ent->NPC && 
+			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_CHANGELING_HOWLER &&
+			npc_ent->health > 0)
+		{
+			total_enemies++;
+		}
+
+		i++;
+	}
+
+	return total_enemies;
 }
 
 /*

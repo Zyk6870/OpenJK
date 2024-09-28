@@ -7481,6 +7481,7 @@ int zyk_number_of_used_entities()
 }
 
 extern int zyk_number_of_allies_in_map(gentity_t* ent);
+extern int zyk_number_of_enemies_in_map();
 int zyk_quest_npcs_in_the_map()
 {
 	int i = 0;
@@ -9652,13 +9653,12 @@ void G_RunFrame( int levelTime ) {
 					{ 
 						zyk_set_quest_event_timer(ent);
 
-						// zyk: spawning the enemies will depend on the enemy level, lower level enemies will appear earlier in the quest
 						if (zyk_is_main_quest_complete(ent) == qfalse &&
 							zyk_quest_npcs_in_the_map() < QUEST_MAX_NPCS_IN_MAP)
 						{
-							int chance_to_spawn_enemy = Q_irand(0, 99);
+							int chance_to_spawn_quest_npc = Q_irand(0, 99);
 							int enemy_type = 0;
-							int seller_chance = ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE;
+							int seller_chance = 1 + (ent->client->pers.quest_defeated_enemies / 5);
 							qboolean hard_difficulty = qfalse;
 
 							if (ent->client->pers.quest_defeated_enemies < QUEST_ENEMY_WAVE_COUNT)
@@ -9681,18 +9681,14 @@ void G_RunFrame( int levelTime ) {
 
 							zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
 
-							if (seller_chance > 5)
-							{
-								seller_chance = 5;
-							}
-
-							if (chance_to_spawn_enemy < seller_chance)
+							if (chance_to_spawn_quest_npc < seller_chance)
 							{ // zyk: theres a chance for the seller to actually come to the map
 								zyk_NPC_Kill_f(zyk_get_enemy_type(QUEST_NPC_SELLER));
 
 								zyk_spawn_quest_npc(QUEST_NPC_SELLER, ent->client->ps.viewangles[YAW], 0, qfalse, -1);
 							}
-							else if (chance_to_spawn_enemy < (2 + ent->client->pers.magic_crystals - (zyk_number_of_allies_in_map(ent) * 2)))
+
+							if (chance_to_spawn_quest_npc < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 3)))
 							{ // zyk: spawn an ally and get one of them near the player
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 								int ally_bonus = ent->client->pers.quest_defeated_enemies + ent->client->pers.magic_crystals;
