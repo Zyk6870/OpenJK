@@ -6176,7 +6176,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 4)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places and sells stuff to you. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. ^2Magic: Healing Area, Magic Dome\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places and sells stuff to you. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor. ^2Magic: Healing Area, Magic Dome\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
 						}
 					}
 					else
