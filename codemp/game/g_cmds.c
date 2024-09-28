@@ -88,7 +88,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAGIC_FIST] = 5;
 	max_skill_levels[SKILL_MAX_MP] = 10;
 	max_skill_levels[SKILL_MAGIC_HEALING_AREA] = 8;
-	max_skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE] = 8;
+	max_skill_levels[SKILL_MAGIC_MAGIC_DOME] = 8;
 	max_skill_levels[SKILL_MAGIC_WATER_MAGIC] = 8;
 	max_skill_levels[SKILL_MAGIC_EARTH_MAGIC] = 8;
 	max_skill_levels[SKILL_MAGIC_FIRE_MAGIC] = 8;
@@ -146,7 +146,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAX_MP] = "Max Magic Points";
 	skill_names[SKILL_MAGIC_HEALING_AREA] = "Healing Area";
-	skill_names[SKILL_MAGIC_DOME_OF_DAMAGE] = "Magic Dome";
+	skill_names[SKILL_MAGIC_MAGIC_DOME] = "Magic Dome";
 	skill_names[SKILL_MAGIC_WATER_MAGIC] = "Water Magic";
 	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "Earth Magic";
 	skill_names[SKILL_MAGIC_FIRE_MAGIC] = "Fire Magic";
@@ -237,7 +237,7 @@ char* zyk_skill_description(int skill_index)
 		return "increases the max amount of Magic Points the player can have. This is used to cast magic powers";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
 		return "creates an energy area that makes you and your allies recover health, stamina and shield. It also deals a little non-elemental damage to enemies";
-	if (skill_index == SKILL_MAGIC_DOME_OF_DAMAGE)
+	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
 		return "an energy dome appears around you, damaging enemies inside it. It also increases your resistance to damage to your health a little. This power deals non-elemental damage";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
 		return "hits enemies around you with Water elemental damage. While this magic is active, slowly restore your health. Increases your Water element affinity. Deals extra damage to enemies with Fire affinity. Absorbs some Water damage";
@@ -6089,15 +6089,15 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							{
 								if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, magic crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks. Second Mode increases resistance to damage to your shield from any source. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a magic crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, magic crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks. Second Mode increases resistance to damage to your shield from any source. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a magic crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 								}
 								if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
 								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7 and can be given by the %s^7 if you find him. Stores info about the Brotherhood of Mages members and Resistance allies. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS, QUESTCHAR_SELLER));
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Can be given to you if you find him. Stores info about the Brotherhood of Mages members and Resistance allies. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 								}
 								if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
 								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 10 per cent. If the source is Magic Fist or a magic power, decreases damage by 25 per cent and absorbs some magic points\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 10 per cent. If the source is Magic Fist or a magic power, decreases damage by 25 per cent and absorbs some magic points\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 								}
 							}
 							else
@@ -6173,6 +6173,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						else if (page == 3)
 						{
 							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance ally. Has force/saber. Your blue crystals makes them come as stronger allies. ^2Magic: Water, Earth, Fire, Air\n^3Ally Flying Warrior: ^7a Resistance ally. Flies and has guns. Your blue crystals makes them come as stronger allies. ^2Magic: Healing Area, Air\n^3Ally Mage: ^7a Resistance ally. Can use Magic Fist and all magic. Your blue crystals makes them come as stronger allies\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+						}
+						else if (page == 4)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places and sells stuff to you. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. ^2Magic: Healing Area, Magic Dome\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
 						}
 					}
 					else
@@ -10913,7 +10917,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				{
 					healing_area(ent);
 				}
-				else if (magic_number == MAGIC_DOME_OF_DAMAGE)
+				else if (magic_number == MAGIC_MAGIC_DOME)
 				{
 					dome_of_damage(ent);
 				}

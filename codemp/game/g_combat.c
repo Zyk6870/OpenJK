@@ -5913,9 +5913,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (targ->client->pers.quest_power_status & (1 << MAGIC_DOME_OF_DAMAGE))
+			if (targ->client->pers.quest_power_status & (1 << MAGIC_MAGIC_DOME))
 			{ // zyk: target using Magic Dome
-				bonus_health_resistance += (0.02 * targ->client->pers.skill_levels[SKILL_MAGIC_DOME_OF_DAMAGE]);
+				bonus_health_resistance += (0.02 * targ->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME]);
 			}
 
 			// zyk: Health Strength skill decreases damage taken
@@ -6189,7 +6189,7 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 	zyk_magic_t magic_powers[MAX_MAGIC_POWERS] =
 	{
 		MAGIC_HEALING_AREA,
-		MAGIC_DOME_OF_DAMAGE,
+		MAGIC_MAGIC_DOME,
 		MAGIC_WATER_MAGIC,
 		MAGIC_EARTH_MAGIC,
 		MAGIC_FIRE_MAGIC,
