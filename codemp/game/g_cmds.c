@@ -4666,7 +4666,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		ent->client->ps.ammo[AMMO_DETPACK] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS];
 
 		// zyk: flame thrower fuel and jetpack fuel
-		ent->client->ps.cloakFuel = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL];
 		ent->client->ps.jetpackFuel = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL];
 		ent->client->pers.jetpack_fuel = ent->client->ps.jetpackFuel * JETPACK_SCALE;
 
@@ -5089,7 +5088,6 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 
 	// zyk: in RPG Mode, player must actually buy these
 	ent->client->ps.jetpackFuel = 0;
-	ent->client->ps.cloakFuel = 0;
 	ent->client->pers.jetpack_fuel = 0;
 
 	// zyk: so the char starts with the original health
@@ -7209,7 +7207,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (value == (SELLER_FLAME_FUEL + 1))
 		{
-			ent->client->ps.cloakFuel += 10;
+			ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] += 10;
 		}
 		else if (value == (SELLER_JETPACK_FUEL + 1))
 		{
@@ -7294,7 +7292,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
 			Add_Ammo(ent,AMMO_DETPACK,5);
 
-			ent->client->ps.cloakFuel = 50;
+			ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] += 50;
 		}
 		else if (value == (SELLER_BACTA_UPGRADE + 1))
 		{

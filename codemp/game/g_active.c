@@ -1606,6 +1606,12 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			zyk_stamina_out(ent);
 		}
 
+		// zyk: update the cloak fuel bar for the client, which is now used to show current Stamina level
+		if (ent->client->pers.max_stamina > 0)
+		{
+			ent->client->ps.cloakFuel = ((ent->client->pers.current_stamina * 1.0) / ent->client->pers.max_stamina) * 100;
+		}
+
 		ent->client->pers.stamina_timer = level.time + 200;
 	}
 }

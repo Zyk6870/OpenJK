@@ -7565,13 +7565,6 @@ void zyk_update_inventory(gentity_t* ent)
 		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
-	// zyk: Flame Thrower Fuel changed. Update inventory
-	if (ent->client->ps.cloakFuel != ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL])
-	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = ent->client->ps.cloakFuel;
-		ent->client->pers.rpg_inventory_modified = qtrue;
-	}
-
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_STUN_BATON] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)))
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_STUN_BATON);
@@ -7680,6 +7673,8 @@ void zyk_update_inventory(gentity_t* ent)
 	if (ent->client->pers.rpg_inventory_modified == qtrue)
 	{ // zyk: save account with new updated inventory
 		save_account(ent, qtrue);
+
+		ent->client->pers.rpg_inventory_modified = qfalse;
 	}
 }
 
