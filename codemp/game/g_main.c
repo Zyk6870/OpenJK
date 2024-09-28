@@ -705,6 +705,8 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		{
 			Jedi_Cloak(npc_ent);
 
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
+
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
