@@ -7458,7 +7458,7 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_TIME_CRYSTAL))
 	{
-		interval_time += 45000;
+		interval_time *= 2;
 
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_TIME_CRYSTAL);
 	}
@@ -9355,50 +9355,43 @@ void G_RunFrame( int levelTime ) {
 				// zyk: skill crystals must be spawned after a certain amount of time
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
-					int magic_crystal_chance_to_spawn = Q_irand(0, 99);
-					int extra_tries_crystal_chance = 79;
-					int time_crystal_chance = 89;
-					int puzzle_crystal_chance = 93;
-
-					if (ent->client->pers.quest_defeated_enemies >= QUEST_ENEMY_WAVE_COUNT)
-					{
-						puzzle_crystal_chance += 1;
-					}
-
-					if (ent->client->pers.quest_defeated_enemies >= (QUEST_ENEMY_WAVE_COUNT * 2))
-					{
-						puzzle_crystal_chance += 1;
-					}
+					int extra_tries_chance = 10 + (ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE);
+					int time_chance = 7 + (ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE);
+					int puzzle_chance = 3 + (ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE);
 
 					if (ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
 					{
-						puzzle_crystal_chance += 2;
+						puzzle_chance += 2;
 					}
 
 					if (ent->client->pers.quest_progress == MAX_QUEST_PROGRESS)
 					{
-						puzzle_crystal_chance += 2;
+						puzzle_chance += 2;
 					}
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
-						extra_tries_crystal_chance -= 4;
-						time_crystal_chance -= 4;
+						extra_tries_chance /= 2;
+						time_chance /= 2;
+						puzzle_chance /= 2;
 					}
 					
-					if (magic_crystal_chance_to_spawn < 70 && !(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
+					if (Q_irand(0, 99) < 70 && !(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
 					{ // zyk: Skill Crystal
 						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 					}
-					else if (magic_crystal_chance_to_spawn >= 70 && magic_crystal_chance_to_spawn < extra_tries_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					
+					if (Q_irand(0, 99) < extra_tries_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Extra Tries Crystal
-						zyk_spawn_magic_crystal(ent, 55000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
+						zyk_spawn_magic_crystal(ent, 57000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 					}
-					else if (magic_crystal_chance_to_spawn >= 80 && magic_crystal_chance_to_spawn < time_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					
+					if (Q_irand(0, 99) < time_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Time crystal
 						zyk_spawn_magic_crystal(ent, 55000, QUEST_ITEM_TIME_CRYSTAL);
 					}
-					else if (magic_crystal_chance_to_spawn >= 92 && magic_crystal_chance_to_spawn < puzzle_crystal_chance)
+					
+					if (Q_irand(0, 99) < puzzle_chance)
 					{ // zyk: puzzle. Can be the Energy Modulator one or the Magic Armor one
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
@@ -9407,6 +9400,8 @@ void G_RunFrame( int levelTime ) {
 
 						if (chosen_entity)
 						{
+							int puzzle_item_chance = Q_irand(0, 1);
+
 							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
 							{
 								puzzle_x = chosen_entity->r.currentOrigin[0];
@@ -9421,11 +9416,11 @@ void G_RunFrame( int levelTime ) {
 							}
 
 							// zyk: it can be either the Energy Modulator puzzle or the Magic Armor puzzle
-							if (Q_irand(0, 1) == 0)
+							if (puzzle_item_chance == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
 							{
 								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, 50000, 30, puzzle_x, puzzle_y, puzzle_z);
 							}
-							else
+							else if (puzzle_item_chance == 1 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
 							{
 								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 50000, 80, puzzle_x, puzzle_y, puzzle_z);
 							}
