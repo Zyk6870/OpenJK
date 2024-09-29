@@ -886,6 +886,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 	if (client->pers.send_event_timer > level.time && client->pers.send_event_interval < level.time)
 	{
+		/*
 		client->pers.send_event_interval = level.time + 100;
 
 		if (!(client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_POINTS_EVENT)))
@@ -924,6 +925,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			client->pers.player_statuses &= ~(1 << PLAYER_STATUS_JETPACK_FLAME_EVENT);
 			client->pers.player_statuses &= ~(1 << PLAYER_STATUS_MAGIC_POINTS_EVENT);
 		}
+		*/
 	}
 }
 

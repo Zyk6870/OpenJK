@@ -5640,9 +5640,9 @@ char *zyk_get_settings_values(gentity_t *ent)
 Cmd_ZykMod_f
 ==================
 */
-// zyk: sends info to the client-side menu if player has the client-side plugin
+// zyk: sends info to the client-side menu if player has the client-side plugin. No longer used in the new mod
 void Cmd_ZykMod_f( gentity_t *ent ) {
-
+	/*
 	if (Q_stricmp(ent->client->pers.guid, "NOGUID") == 0)
 	{
 		return;
@@ -5689,6 +5689,7 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 
 		trap->SendServerCommand(ent->s.number, va("zykmod \"%s\"", content));
 	}
+	*/
 }
 
 char *zyk_get_rpg_chars(gentity_t *ent, char *separator)
