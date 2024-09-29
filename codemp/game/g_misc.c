@@ -2767,9 +2767,9 @@ extern int	BMS_END;
 extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 extern void zyk_clear_quest_items(gentity_t* effect_ent);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
-extern void zyk_set_quest_event_timer(gentity_t* ent);
 extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
+extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
 
 void zyk_clear_quest_effect(gentity_t* ent)
 {
@@ -2829,7 +2829,7 @@ void fx_runner_think( gentity_t *ent )
 	// zyk: one of the crystal types. Tests if there is a RPG player touching it
 	if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_time_crystal") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_strike_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_armor_puzzle") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0)
 	{
@@ -2855,12 +2855,40 @@ void fx_runner_think( gentity_t *ent )
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
 					}
-					else if (Q_stricmp(ent->targetname, "zyk_time_crystal") == 0)
+					else if (Q_stricmp(ent->targetname, "zyk_strike_crystal") == 0)
 					{
-						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_TIME_CRYSTAL);
-						zyk_set_quest_event_timer(player_ent);
+						gentity_t* target_enemy = NULL;
+						int last_enemy_dist = 2000000000;
+						int j = 0;
 
-						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/player/holocron.wav"));
+						for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+						{
+							gentity_t* this_enemy = &g_entities[j];
+
+							if (this_enemy && this_enemy->client && this_enemy->NPC &&
+								this_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && this_enemy->client->pers.quest_npc <= QUEST_NPC_CHANGELING_HOWLER)
+							{
+								int distance_to_this_enemy = Distance(player_ent->client->ps.origin, this_enemy->client->ps.origin);
+
+								if (distance_to_this_enemy < last_enemy_dist)
+								{
+									last_enemy_dist = distance_to_this_enemy;
+
+									target_enemy = this_enemy;
+								}
+							}
+						}
+
+						if (target_enemy)
+						{ // zyk: if we found the closest enemy, strike him with Lightning
+							int red_crystal_damage = 200 + (10 * player_ent->client->pers.magic_crystals);
+
+							zyk_quest_effect_spawn(player_ent, target_enemy, "zyk_strike_crystal_effect", "0", "env/huge_lightning", 0, 0, 0, 2000);
+							G_Damage(target_enemy, player_ent, player_ent, NULL, NULL, red_crystal_damage, 0, MOD_UNKNOWN);
+
+							G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close2.mp3"));
+							G_Sound(target_enemy, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close2.mp3"));
+						}
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_magic_armor_puzzle") == 0 &&
 						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0 &&
@@ -3117,7 +3145,7 @@ void fx_runner_link( gentity_t *ent )
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 100;
 		}
-		else if (Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0)
+		else if (Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0 || Q_stricmp(ent->targetname, "zyk_strike_crystal_effect") == 0)
 		{ // zyk: starts the effect imediately for these magic powers
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 200; // wait a small bit, then start working
@@ -3193,7 +3221,7 @@ void SP_fx_runner( gentity_t *ent )
 	{
 		ent->nextthink = level.time + 100;
 	}
-	else if (Q_stricmp(ent->targetname, "zyk_magic_element") == 0)
+	else if (Q_stricmp(ent->targetname, "zyk_magic_element") == 0 || Q_stricmp(ent->targetname, "zyk_strike_crystal_effect") == 0)
 	{
 		ent->nextthink = level.time + 100;
 	}

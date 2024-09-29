@@ -5519,9 +5519,9 @@ void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crys
 		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_extra_tries_crystal");
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
-	else if (crystal_type == QUEST_ITEM_TIME_CRYSTAL)
+	else if (crystal_type == QUEST_ITEM_STRIKE_CRYSTAL)
 	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_time_crystal");
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_strike_crystal");
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
 }
@@ -7426,7 +7426,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 19)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: There are several magic crystal types that will help you in your quest.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Green crystals will give you extra tries for the quest, and red crystals will do a Lightning Strike to the nearest enemy.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 20)
 	{
@@ -7454,13 +7454,6 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 		ent->client->pers.quest_progress_timer = level.time + TUTORIAL_DURATION;
 
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CREATED_ACCOUNT);
-	}
-
-	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_TIME_CRYSTAL))
-	{
-		interval_time *= 2;
-
-		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_TIME_CRYSTAL);
 	}
 	
 	ent->client->pers.quest_event_timer = level.time + interval_time;
@@ -9355,40 +9348,36 @@ void G_RunFrame( int levelTime ) {
 				// zyk: skill crystals must be spawned after a certain amount of time
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
-					int extra_tries_chance = 10 + (ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE);
-					int time_chance = 7 + (ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE);
-					int puzzle_chance = 3 + (ent->client->pers.quest_defeated_enemies / QUEST_NPC_BONUS_INCREASE);
+					int chance_bonus = (ent->client->pers.quest_defeated_enemies / 5) + 
+										(ent->client->pers.quest_masters_defeated * 2) + 
+										(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
 
-					if (ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
-					{
-						puzzle_chance += 2;
-					}
-
-					if (ent->client->pers.quest_progress == MAX_QUEST_PROGRESS)
-					{
-						puzzle_chance += 2;
-					}
+					int skill_crystal_chance = 50 + chance_bonus;
+					int extra_tries_chance = 10 + chance_bonus;
+					int strike_chance = 10 + chance_bonus;
+					int puzzle_chance = 5 + (chance_bonus / 2);
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
+						skill_crystal_chance /= 2;
 						extra_tries_chance /= 2;
-						time_chance /= 2;
+						strike_chance /= 2;
 						puzzle_chance /= 2;
 					}
 					
-					if (Q_irand(0, 99) < 70 && !(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
+					if (Q_irand(0, 99) < skill_crystal_chance && !(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
 					{ // zyk: Skill Crystal
 						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 					}
 					
 					if (Q_irand(0, 99) < extra_tries_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Extra Tries Crystal
-						zyk_spawn_magic_crystal(ent, 57000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
+						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 					}
 					
-					if (Q_irand(0, 99) < time_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
-					{ // zyk: Time crystal
-						zyk_spawn_magic_crystal(ent, 55000, QUEST_ITEM_TIME_CRYSTAL);
+					if (Q_irand(0, 99) < strike_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					{ // zyk: Strike Crystal
+						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_STRIKE_CRYSTAL);
 					}
 					
 					if (Q_irand(0, 99) < puzzle_chance)
@@ -9418,11 +9407,11 @@ void G_RunFrame( int levelTime ) {
 							// zyk: it can be either the Energy Modulator puzzle or the Magic Armor puzzle
 							if (puzzle_item_chance == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
 							{
-								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, 50000, 30, puzzle_x, puzzle_y, puzzle_z);
+								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, 60000, 30, puzzle_x, puzzle_y, puzzle_z);
 							}
 							else if (puzzle_item_chance == 1 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
 							{
-								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 50000, 80, puzzle_x, puzzle_y, puzzle_z);
+								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 60000, 80, puzzle_x, puzzle_y, puzzle_z);
 							}
 						}
 					}
@@ -9753,7 +9742,7 @@ void G_RunFrame( int levelTime ) {
 
 							zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
 
-							if (chance_to_spawn_quest_npc < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 3)))
+							if (chance_to_spawn_quest_npc < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 							{ // zyk: spawn an ally and get one of them near the player
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 								int ally_bonus = ent->client->pers.quest_defeated_enemies + ent->client->pers.magic_crystals;

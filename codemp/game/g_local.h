@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.35"
+#define	GAMEVERSION	"New Zyk Mod v1.0.36"
 
 #define SECURITY_LOG "security.log"
 
@@ -554,7 +554,6 @@ typedef enum {
 	PLAYER_STATUS_IN_FLAMES,
 	PLAYER_STATUS_CREATED_ACCOUNT,
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
-	PLAYER_STATUS_GOT_TIME_CRYSTAL,
 	PLAYER_STATUS_POISONED,
 	PLAYER_STATUS_KEEP_QUEST_TRIES,
 	NUM_PLAYER_STATUSES
@@ -778,7 +777,7 @@ typedef enum {
 	QUEST_ITEM_NONE,
 	QUEST_ITEM_SKILL_CRYSTAL,
 	QUEST_ITEM_EXTRA_TRIES_CRYSTAL,
-	QUEST_ITEM_TIME_CRYSTAL,
+	QUEST_ITEM_STRIKE_CRYSTAL,
 	QUEST_ITEM_ENERGY_MODULATOR,
 	QUEST_ITEM_MAGIC_ARMOR,
 	QUEST_ITEM_SPIRIT_TREE,
@@ -881,7 +880,7 @@ typedef enum {
 #define QUEST_ENEMY_WAVE_COUNT 30
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_MAX_NPCS_IN_MAP 22
-#define QUEST_NPC_SPAWN_TIME 25000
+#define QUEST_NPC_SPAWN_TIME 20000
 #define QUEST_SELLER_MAP_TIME 120000
 
 // zyk: maximum time a quest npc can be idle (without enemies)
