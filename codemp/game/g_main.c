@@ -7462,24 +7462,14 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 void zyk_set_magic_crystal_respawn_time(gentity_t* ent)
 {
 	int skill_progress = ent->client->pers.magic_crystals + zyk_total_skillpoints(ent);
-	int quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS) / 2;
+	int quest_progress = ((ent->client->pers.quest_progress * 50.0) / MAX_QUEST_PROGRESS) + 
+						  (ent->client->pers.quest_defeated_enemies / 5) + 
+						  (ent->client->pers.quest_masters_defeated * 4);
 
 	int interval_increase = skill_progress * RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL;
 	int interval_decrease = quest_progress * RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL;
 
-	int total_interval = 0;
-
-	if (ent->client->pers.quest_defeated_enemies >= (QUEST_ENEMY_WAVE_COUNT * 2))
-	{
-		interval_decrease += (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * 10);
-	}
-
-	if (ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
-	{
-		interval_decrease += (RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL * 10);
-	}
-
-	total_interval = RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME + interval_increase - interval_decrease;
+	int total_interval = RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME + interval_increase - interval_decrease;
 
 	if (total_interval < RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME)
 	{
