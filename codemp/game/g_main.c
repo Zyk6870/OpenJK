@@ -9566,7 +9566,8 @@ void G_RunFrame( int levelTime ) {
 							float tree_y = tree_ent->s.origin[1];
 							float tree_z = tree_ent->s.origin[2];
 
-							quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + (ent->client->pers.quest_defeated_enemies - (QUEST_ENEMY_WAVE_COUNT * 2)));
+							quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + ent->client->pers.magic_crystals + 
+													 (ent->client->pers.quest_defeated_enemies - (QUEST_ENEMY_WAVE_COUNT * 2)));
 
 							if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
 							{
@@ -9579,7 +9580,7 @@ void G_RunFrame( int levelTime ) {
 								// zyk: meditating inside the tree makes it regen faster
 								if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
 								{
-									quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + (ent->client->pers.quest_defeated_enemies - (QUEST_ENEMY_WAVE_COUNT * 2)));
+									quest_progress_change *= 2;
 								}
 
 								// zyk: holding Use key while meditating calls the Spirit Tree by clearing the current tree entities so next frame will create a new one
@@ -9590,13 +9591,6 @@ void G_RunFrame( int levelTime ) {
 										ent->client->pers.quest_spirit_tree_id = -1;
 
 										ent->client->pers.magic_power -= QUEST_SPIRIT_TREE_CALL_COST;
-
-										if (ent->client->pers.magic_crystals > 0)
-										{
-											ent->client->pers.magic_crystals -= 1;
-
-											quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE * 5);
-										}
 
 										trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
 									}
