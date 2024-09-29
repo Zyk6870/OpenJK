@@ -2865,7 +2865,7 @@ void fx_runner_think( gentity_t *ent )
 						{
 							gentity_t* this_enemy = &g_entities[j];
 
-							if (this_enemy && this_enemy->client && this_enemy->NPC &&
+							if (this_enemy && this_enemy->client && this_enemy->NPC && this_enemy->health > 0 &&
 								this_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && this_enemy->client->pers.quest_npc <= QUEST_NPC_CHANGELING_HOWLER)
 							{
 								int distance_to_this_enemy = Distance(player_ent->client->ps.origin, this_enemy->client->ps.origin);
