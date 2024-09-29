@@ -7440,7 +7440,7 @@ void zyk_show_tutorial(gentity_t* ent)
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = QUEST_NPC_SPAWN_TIME;
+	int interval_time = QUEST_NPC_SPAWN_TIME - (ent->client->pers.quest_defeated_enemies * 50);
 
 	if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 	{
