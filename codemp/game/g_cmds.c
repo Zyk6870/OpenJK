@@ -6227,7 +6227,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 								}
 								if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
 								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Can be given to you if you find him. Stores info about the Brotherhood of Mages members and Resistance allies. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. If you find him, he can give it to you. It has very useful info for the player. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 								}
 								if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
 								{
@@ -6310,7 +6310,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 4 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 3)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places and sells stuff to you. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor. ^2Magic: Healing Area, Magic Dome\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor. ^2Magic: Healing Area, Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Keep collecting crystals. Having a lot of crystals makes your allies stronger and have a better chance to appear, but decreases the crystal spawn rate. Defeating enemies increase crystal spawn rate and also increase the chance for the Energy Modulator and Magic Armor to appear\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
 						}
 						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 4)
 						{
