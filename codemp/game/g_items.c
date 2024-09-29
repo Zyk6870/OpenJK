@@ -3116,7 +3116,7 @@ gentity_t *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity ) {
 		}
 	} else { // auto-remove after 30 seconds
 		dropped->think = G_FreeEntity;
-		dropped->nextthink = level.time + 300000;  // zyk: changed the timeout of the item to 5 minutes
+		dropped->nextthink = level.time + 120000;  // zyk: default 30000
 	}
 
 	dropped->flags = FL_DROPPED_ITEM;
