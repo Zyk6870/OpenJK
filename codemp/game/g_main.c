@@ -597,7 +597,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_ALLY_MAGE] = 10;
 	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = 8;
 	max_levels[QUEST_NPC_ALLY_FORCE_WARRIOR] = 8;
-	max_levels[QUEST_NPC_SELLER] = 0;
+	max_levels[QUEST_NPC_SELLER] = 4;
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
