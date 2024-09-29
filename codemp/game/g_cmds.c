@@ -2361,6 +2361,122 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
 	}
 }
 
+// zyk: returns only numbers and letters for the possible riddle answer
+char* zyk_parse_riddle_answer(const char* message)
+{
+	int i = 0;
+	int j = 0;
+	int k = 0;
+	char new_answer_string[MAX_STRING_CHARS];
+
+	char allowed_chars[53] = {
+		'A',
+		'B',
+		'C',
+		'D',
+		'E',
+		'F',
+		'G',
+		'H',
+		'I',
+		'J',
+		'K',
+		'L',
+		'M',
+		'N',
+		'O',
+		'P',
+		'Q',
+		'R',
+		'S',
+		'T',
+		'U',
+		'V',
+		'W',
+		'X',
+		'Y',
+		'Z',
+		'a',
+		'b',
+		'c',
+		'd',
+		'e',
+		'f',
+		'g',
+		'h',
+		'i',
+		'j',
+		'k',
+		'l',
+		'm',
+		'n',
+		'o',
+		'p',
+		'q',
+		'r',
+		's',
+		't',
+		'u',
+		'v',
+		'w',
+		'x',
+		'y',
+		'z',
+		'\0'
+	};
+
+	strcpy(new_answer_string, "");
+
+	while (message[i] != '\0')
+	{
+		qboolean valid_char = qfalse;
+
+		for (j = 0; j < 53; j++)
+		{
+			if (message[i] == allowed_chars[j])
+			{
+				valid_char = qtrue;
+				break;
+			}
+		}
+
+		if (valid_char == qtrue)
+		{
+			new_answer_string[k] = message[i];
+			k++;
+		}
+
+		i++;
+	}
+
+	new_answer_string[k] = '\0';
+
+	return G_NewString(new_answer_string);
+}
+
+qboolean zyk_riddle_answer(gentity_t* ent, const char* message)
+{
+	char riddle_answers[6][8] = {"sun", "fire", "hate", "water", "love", ""};
+	int riddle_answer_index = ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG];
+	gentity_t* seller_npc = NULL;
+
+	if (ent->client->ps.hasLookTarget)
+	{
+		seller_npc = &g_entities[ent->client->ps.lookTarget];
+	}
+
+	if (seller_npc && seller_npc->NPC && seller_npc->client && seller_npc->client->pers.quest_npc == QUEST_NPC_SELLER &&
+		Q_stricmp(zyk_parse_riddle_answer(message), G_NewString(riddle_answers[riddle_answer_index])) == 0)
+	{ // zyk: the parsed message string contains the correct riddle answer
+		seller_npc->client->pers.quest_npc_caller_player_id = ent->s.number;
+		seller_npc->client->pers.quest_seller_map_timer = level.time + 500;
+
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) {
 	int			j;
 	gentity_t	*other;
@@ -2370,6 +2486,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	char		text[MAX_SAY_TEXT];
 	char		location[64];
 	char		*locMsg = NULL;
+	qboolean zyk_riddle_answer_chat_mode = qfalse;
 
 	if ( level.gametype < GT_TEAM && mode == SAY_TEAM ) {
 		mode = SAY_ALL;
@@ -2385,6 +2502,8 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		// zyk: if player is silenced by an admin, he cannot say anything
 		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SILENCED))
 			return;
+
+		zyk_riddle_answer_chat_mode = qtrue;
 
 		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, text );
 		Com_sprintf (name, sizeof(name), "%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
@@ -2407,6 +2526,9 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 			Com_sprintf (name, sizeof(name), EC"(%s%c%c"EC")"EC": ",
 				ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		}
+
+		zyk_riddle_answer_chat_mode = qtrue;
+
 		color = COLOR_CYAN;
 		break;
 	case SAY_TELL:
@@ -2431,8 +2553,20 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		G_LogPrintf( "sayally: %s: %s\n", ent->client->pers.netname, text );
 		Com_sprintf (name, sizeof(name), EC"{%s%c%c"EC"}"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 
+		zyk_riddle_answer_chat_mode = qtrue;
+
 		color = COLOR_WHITE;
 		break;
+	}
+
+	if (zyk_riddle_answer_chat_mode == qtrue && 
+		ent->client->sess.amrpgmode == 2 && ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_ANSWER &&
+		zyk_riddle_answer(ent, text) == qtrue)
+	{ // zyk: a riddle answer
+		ent->client->pers.quest_seller_event_step = QUEST_SELLER_END_STEP;
+		ent->client->pers.quest_seller_event_timer = level.time + 500;
+
+		return;
 	}
 
 	if ( target ) {
@@ -4893,7 +5027,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.quest_final_event_step = 0;
 			ent->client->pers.quest_final_event_timer = 0;
 			ent->client->pers.quest_spirit_tree_id = -1;
-			ent->client->pers.quest_seller_event_step = 0;
+			ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_NONE;
 			ent->client->pers.quest_seller_event_timer = 0;
 
 			ent->client->pers.stamina_timer = 0;
@@ -6142,7 +6276,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				if (zyk_allow_quests.integer == 1)
 				{
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 1)
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 0)
 					{
 						int page = 1; // zyk: page the user wants to see
 						char arg2[MAX_STRING_CHARS];
@@ -6162,21 +6296,25 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						if (page <= 0)
 							page = 1;
 
-						if (page == 1)
+						if (page == 1 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 0)
 						{
 							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Can poison targets with its melee attacks. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier wearing Impact Reducer Armor. ^2Magic: Air^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
-						else if (page == 2)
+						else if (page == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 1)
 						{
 							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Mage Scholar: ^7mage with Magic Fist. He is wearing the Magic Armor. ^2Magic: Magic Dome, Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: Magic Dome, Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. He is wearing all armors. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
-						else if (page == 3)
+						else if (page == 3 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 2)
 						{
 							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance ally. Has force/saber. Your blue crystals makes them come as stronger allies. ^2Magic: Water, Earth, Fire, Air\n^3Ally Flying Warrior: ^7a Resistance ally. Flies and has guns. Your blue crystals makes them come as stronger allies. ^2Magic: Healing Area, Air\n^3Ally Mage: ^7a Resistance ally. Can use Magic Fist and all magic. Your blue crystals makes them come as stronger allies\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
-						else if (page == 4)
+						else if (page == 4 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 3)
 						{
 							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places and sells stuff to you. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor. ^2Magic: Healing Area, Magic Dome\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
+						}
+						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 4)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has magical abilities. While meditating, your Stamina will regen even faster, and you will also restore some health, shield and force. It uses some mp. It will be very useful\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 					}
 					else

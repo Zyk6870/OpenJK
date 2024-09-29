@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.31"
+#define	GAMEVERSION	"New Zyk Mod v1.0.32"
 
 #define SECURITY_LOG "security.log"
 
@@ -804,6 +804,15 @@ typedef enum {
 	NUM_QUEST_NPCS
 } zyk_quest_npc_t;
 
+typedef enum {
+	QUEST_SELLER_STEP_NONE,
+	QUEST_SELLER_STEP_TALKED,
+	QUEST_SELLER_RIDDLE_START,
+	QUEST_SELLER_RIDDLE_ANSWER,
+	QUEST_SELLER_END_STEP,
+	NUM_QUEST_SELLER_STEPS
+} zyk_quest_seller_step_t;
+
 // zyk: Minimum Stamina before player starts to get tired
 #define RPG_MIN_STAMINA 1000.0
 #define RPG_DEFAULT_STAMINA 5000
@@ -873,6 +882,7 @@ typedef enum {
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_MAX_NPCS_IN_MAP 22
 #define QUEST_NPC_SPAWN_TIME 25000
+#define QUEST_SELLER_MAP_TIME 120000
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 45000
@@ -1065,8 +1075,9 @@ typedef struct clientPersistant_s {
 	int quest_final_event_timer;
 	int quest_spirit_tree_id;
 	int quest_progress_timer;
-	int quest_seller_event_step;
+	zyk_quest_seller_step_t quest_seller_event_step;
 	int quest_seller_event_timer;
+	int quest_seller_map_timer;
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;

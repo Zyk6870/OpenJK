@@ -1616,6 +1616,7 @@ extern qboolean gSiegeRoundBegun;
 extern void save_account(gentity_t *ent, qboolean save_char_file);
 extern void NPC_BSDefault( void );
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
+extern void zyk_show_quest_riddle(gentity_t* ent);
 static vec3_t	playerMins = {-15, -15, DEFAULT_MINS_2};
 static vec3_t	playerMaxs = {15, 15, DEFAULT_MAXS_2};
 void TryUse( gentity_t *ent )
@@ -1903,37 +1904,64 @@ void TryUse( gentity_t *ent )
 		return;
 	}
 
-	if (target->NPC && target->client && target->s.NPC_class != CLASS_VEHICLE && OnSameTeam(ent, target))
+	if (target->NPC && target->client && target->health > 0 && target->s.NPC_class != CLASS_VEHICLE && OnSameTeam(ent, target))
 	{
 		if (target->client->pers.quest_npc == QUEST_NPC_SELLER && 
-			ent->client->sess.amrpgmode == 2)
+			ent->client->sess.amrpgmode == 2 && 
+			(ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE || ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_ANSWER) &&
+			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < 5 && 
+			ent->client->pers.quest_seller_event_timer < level.time)
 		{ // zyk: found the seller
-			ent->client->pers.quest_seller_event_step = 1;
-		}
-		
-		if (!target->client->leader)
-		{ // zyk: setting the npc leader so he follows the player
-			target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_GUARD);
-			target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
-			target->client->leader = ent;
-			target->NPC->tempBehavior = BS_FOLLOW_LEADER;
+			if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE)
+			{
+				ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_TALKED;
+
+				target->client->pers.quest_npc_caller_player_id = ent->s.number;
+
+				// zyk: reset seller time so the player has enough time to answer the riddle
+				target->client->pers.quest_seller_map_timer = level.time + QUEST_SELLER_MAP_TIME;
+
+				// zyk: a player is answering the riddle, do not try to teleport to another spot
+				target->client->pers.quest_npc_idle_timer = level.time + QUEST_SELLER_MAP_TIME + 2000;
+			}
+			else
+			{
+				zyk_show_quest_riddle(ent);
+
+				ent->client->pers.quest_seller_event_timer = level.time + 5000;
+			}
 
 			// zyk: setting use anim
 			ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 			ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
 			ent->client->ps.forceHandExtendTime = level.time + 500;
 		}
-		else if (target->client->leader == ent)
-		{ // zyk: npc will stop follow the player, which is the leader
-			target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_GUARD);
-			target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
-			target->client->leader = NULL;
-			target->NPC->tempBehavior = BS_STAND_GUARD;
+		else
+		{
+			if (!target->client->leader)
+			{ // zyk: setting the npc leader so he follows the player
+				target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_GUARD);
+				target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
+				target->client->leader = ent;
+				target->NPC->tempBehavior = BS_FOLLOW_LEADER;
 
-			// zyk: setting use anim
-			ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-			ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
-			ent->client->ps.forceHandExtendTime = level.time + 500;
+				// zyk: setting use anim
+				ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+				ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
+				ent->client->ps.forceHandExtendTime = level.time + 500;
+			}
+			else if (target->client->leader == ent)
+			{ // zyk: npc will stop follow the player, which is the leader
+				target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_GUARD);
+				target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
+				target->client->leader = NULL;
+				target->NPC->tempBehavior = BS_STAND_GUARD;
+
+				// zyk: setting use anim
+				ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+				ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
+				ent->client->ps.forceHandExtendTime = level.time + 500;
+			}
 		}
 	}
 

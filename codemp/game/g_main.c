@@ -567,7 +567,7 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_ALLY_MAGE] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_ALLY_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
 	bonus_increase[QUEST_NPC_ALLY_FORCE_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
-	bonus_increase[QUEST_NPC_SELLER] = QUEST_NPC_BONUS_INCREASE * 5;
+	bonus_increase[QUEST_NPC_SELLER] = QUEST_NPC_BONUS_INCREASE * 2;
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
@@ -786,6 +786,9 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, ally_bonus + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + skill_level_bonus;
+
+			// zyk: seller stays in the map only for this amount of time before going away
+			npc_ent->client->pers.quest_seller_map_timer = level.time + QUEST_SELLER_MAP_TIME;
 		}
 
 		// zyk: setting the initial amount of magic points here because it is based on the Max MP skill
@@ -797,6 +800,8 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, qboolean hard_mode, int player_id)
 {
 	gentity_t* npc_ent = NULL;
+	qboolean spawn_quest_npc = qtrue;
+	int i = 0;
 
 	float x = 0, y = 0, z = 0;
 	int npc_offset = 16;
@@ -853,9 +858,25 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		return;
 	}
 
-	npc_ent = Zyk_NPC_SpawnType(zyk_get_enemy_type(quest_npc_type), x, y, z, yaw);
+	if (quest_npc_type == QUEST_NPC_SELLER)
+	{ // zyk: only one seller can be in the map
+		for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
+		{
+			gentity_t* seller_npc = &g_entities[i];
 
-	zyk_set_quest_npc_stuff(npc_ent, quest_npc_type, bonuses, hard_mode, player_id);
+			if (seller_npc && seller_npc->client && seller_npc->NPC && seller_npc->client->pers.quest_npc == QUEST_NPC_SELLER && seller_npc->health > 0)
+			{
+				spawn_quest_npc = qfalse;
+			}
+		}
+	}
+
+	if (spawn_quest_npc == qtrue)
+	{
+		npc_ent = Zyk_NPC_SpawnType(zyk_get_enemy_type(quest_npc_type), x, y, z, yaw);
+
+		zyk_set_quest_npc_stuff(npc_ent, quest_npc_type, bonuses, hard_mode, player_id);
+	}
 }
 
 /*
@@ -7719,6 +7740,30 @@ void zyk_set_starting_quest_progress(gentity_t* ent)
 	}
 }
 
+void zyk_show_quest_riddle(gentity_t* ent)
+{
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 0)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Its size is immense, and having its energy is a must... it keeps life on Earth, on its power we can trust...\n\"", QUESTCHAR_SELLER));
+	}
+	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 1)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: One can feel warm, with the power of its energy... its power can also be evil, burning to ashes all the harmony...\n\"", QUESTCHAR_SELLER));
+	}
+	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 2)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The harsh feeling of anger, hurting deep into the soul... if one is consumed by it, their life will fall into its bowl...\n\"", QUESTCHAR_SELLER));
+	}
+	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 3)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: It has a pure essence, it can create life... but it can also be furious, like a sharp cut of a knife...\n\"", QUESTCHAR_SELLER));
+	}
+	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 4)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The pure feeling of affection, even the evil ones can sustain... if one can feel and share, their life will not be in vain...\n\"", QUESTCHAR_SELLER));
+	}
+}
+
 /*
 ================
 G_RunFrame
@@ -9449,38 +9494,48 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.quest_final_event_timer = level.time + 5000;
 				}
 
-				if (ent->client->pers.quest_seller_event_step > 0 && ent->client->pers.quest_seller_event_timer < level.time)
+				// zyk: Seller events
+				if (ent->client->pers.quest_seller_event_step > QUEST_SELLER_STEP_NONE && ent->client->pers.quest_seller_event_timer < level.time)
 				{
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 0)
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < 5)
 					{
-						if (ent->client->pers.quest_seller_event_step == 1)
+						if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_TALKED)
 						{
-							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hi! I am the seller that sells stuff to you. Nice to meet you.\n\"", QUESTCHAR_SELLER));
+							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hi! I am the seller. Answer my riddle in chat and I will give you a part of my Quest Log!\n\"", QUESTCHAR_SELLER));
 						}
-						else if (ent->client->pers.quest_seller_event_step == 2)
+						else if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_START)
+						{ // zyk: Seller riddles
+							zyk_show_quest_riddle(ent);
+						}
+						else if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_END_STEP)
 						{
-							ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 1;
+							ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] += 1;
+
+							add_credits(ent, 1000);
+							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
 							save_account(ent, qtrue);
 
-							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: I want to give you this Quest Log. Use ^3/list questlog^7. It will help you in your quest!\n\"", QUESTCHAR_SELLER));
+							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive this part of the Quest Log and 1000 credits. Use ^3/list questlog^7.\n\"", QUESTCHAR_SELLER));
 						}
 					}
 					else
 					{
 						trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello again! I hope my Quest Log helped you!\n\"", QUESTCHAR_SELLER));
 
-						ent->client->pers.quest_seller_event_step = 2;
+						ent->client->pers.quest_seller_event_step = NUM_QUEST_SELLER_STEPS;
 					}
 
-					ent->client->pers.quest_seller_event_step++;
-
-					if (ent->client->pers.quest_seller_event_step >= 3)
+					if (ent->client->pers.quest_seller_event_step != QUEST_SELLER_RIDDLE_ANSWER)
 					{
-						ent->client->pers.quest_seller_event_step = 0;
+						ent->client->pers.quest_seller_event_step++;
+						ent->client->pers.quest_seller_event_timer = level.time + 5000;
 					}
 
-					ent->client->pers.quest_seller_event_timer = level.time + 5000;
+					if (ent->client->pers.quest_seller_event_step >= NUM_QUEST_SELLER_STEPS)
+					{
+						ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_NONE;
+					}
 				}
 
 				// zyk: control the quest events
@@ -9658,15 +9713,23 @@ void G_RunFrame( int levelTime ) {
 
 					// zyk: quest npcs
 					if (ent->client->pers.quest_event_timer < level.time)
-					{ 
+					{
+						int chance_to_spawn_quest_npc = Q_irand(0, 99);
+						int quest_npcs_in_map = zyk_quest_npcs_in_the_map();
+						int seller_chance = 1 + (ent->client->pers.quest_defeated_enemies / 4);
+
 						zyk_set_quest_event_timer(ent);
 
+						if (chance_to_spawn_quest_npc < seller_chance && quest_npcs_in_map < QUEST_MAX_NPCS_IN_MAP && 
+							ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < 5)
+						{ // zyk: theres a chance for the seller to actually come to the map
+							zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, 100, qfalse, -1);
+						}
+
 						if (zyk_is_main_quest_complete(ent) == qfalse &&
-							zyk_quest_npcs_in_the_map() < QUEST_MAX_NPCS_IN_MAP)
+							quest_npcs_in_map < QUEST_MAX_NPCS_IN_MAP)
 						{
-							int chance_to_spawn_quest_npc = Q_irand(0, 99);
 							int enemy_type = 0;
-							int seller_chance = 1 + (ent->client->pers.quest_defeated_enemies / 5);
 							qboolean hard_difficulty = qfalse;
 
 							if (ent->client->pers.quest_defeated_enemies < QUEST_ENEMY_WAVE_COUNT)
@@ -9694,13 +9757,6 @@ void G_RunFrame( int levelTime ) {
 							}
 
 							zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
-
-							if (chance_to_spawn_quest_npc < seller_chance)
-							{ // zyk: theres a chance for the seller to actually come to the map
-								zyk_NPC_Kill_f(zyk_get_enemy_type(QUEST_NPC_SELLER));
-
-								zyk_spawn_quest_npc(QUEST_NPC_SELLER, ent->client->ps.viewangles[YAW], 0, qfalse, -1);
-							}
 
 							if (chance_to_spawn_quest_npc < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 3)))
 							{ // zyk: spawn an ally and get one of them near the player
@@ -9929,6 +9985,37 @@ void G_RunFrame( int levelTime ) {
 							zyk_stop_all_magic_powers(ent);
 						}
 					}
+				}
+
+				if (ent->client->pers.quest_npc == QUEST_NPC_SELLER && ent->client->pers.quest_seller_map_timer < level.time)
+				{ // zyk: the time for the Seller to stay in the map run out. He will go away
+					gentity_t* player_ent = NULL;
+
+					if (ent->client->pers.quest_npc_caller_player_id > -1)
+					{
+						gentity_t* seller_ent = NULL;
+
+						player_ent = &g_entities[ent->client->pers.quest_npc_caller_player_id];
+
+						if (player_ent && player_ent->client && player_ent->client->ps.hasLookTarget)
+						{
+							seller_ent = &g_entities[player_ent->client->ps.lookTarget];
+						}
+
+						if (player_ent && player_ent->client && player_ent->client->pers.quest_seller_event_step < QUEST_SELLER_END_STEP &&
+							seller_ent && seller_ent == ent)
+						{
+							trap->SendServerCommand(player_ent->s.number, va("chat \"%s^7: I must go away now. See you later!\n\"", QUESTCHAR_SELLER));
+						}
+					}
+
+					if (ent->client->pers.quest_power_status > 0)
+					{ // zyk: stop using all magic
+						zyk_stop_all_magic_powers(ent);
+					}
+
+					ent->think = G_FreeEntity;
+					ent->nextthink = level.time;
 				}
 
 				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy)
