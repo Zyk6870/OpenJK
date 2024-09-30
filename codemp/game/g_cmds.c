@@ -912,13 +912,6 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 		return;
 	}
 
-	// zyk: this command can only be used in Admin-Only Mode
-	if (ent->client->sess.amrpgmode == 2)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Cannot noclip in RPG Mode.\n\"" );
-		return;
-	}
-
 	if (g_gametype.integer != GT_FFA && zyk_allow_adm_in_other_gametypes.integer == 0)
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"Noclip command not allowed in gametypes other than FFA.\n\"" );
