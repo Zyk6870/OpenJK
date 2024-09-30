@@ -6639,26 +6639,26 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_FLAME_FUEL][0] = 20;
 	seller_items_cost[SELLER_FLAME_FUEL][1] = 0;
 
-	seller_items_cost[SELLER_MEDPACK][0] = 50;
+	seller_items_cost[SELLER_MEDPACK][0] = 40;
 	seller_items_cost[SELLER_MEDPACK][1] = 0;
 
-	seller_items_cost[SELLER_SHIELD_BOOSTER][0] = 50;
+	seller_items_cost[SELLER_SHIELD_BOOSTER][0] = 40;
 	seller_items_cost[SELLER_SHIELD_BOOSTER][1] = 0;
 
-	seller_items_cost[SELLER_SENTRY_GUN][0] = 120;
+	seller_items_cost[SELLER_SENTRY_GUN][0] = 100;
 	seller_items_cost[SELLER_SENTRY_GUN][1] = 50;
 
-	seller_items_cost[SELLER_SEEKER_DRONE][0] = 120;
+	seller_items_cost[SELLER_SEEKER_DRONE][0] = 100;
 	seller_items_cost[SELLER_SEEKER_DRONE][1] = 50;
 
-	seller_items_cost[SELLER_BACTA_CANISTER][0] = 110;
-	seller_items_cost[SELLER_BACTA_CANISTER][1] = 50;
+	seller_items_cost[SELLER_BACTA_CANISTER][0] = 80;
+	seller_items_cost[SELLER_BACTA_CANISTER][1] = 40;
 
-	seller_items_cost[SELLER_FORCE_FIELD][0] = 180;
-	seller_items_cost[SELLER_FORCE_FIELD][1] = 90;
+	seller_items_cost[SELLER_FORCE_FIELD][0] = 150;
+	seller_items_cost[SELLER_FORCE_FIELD][1] = 80;
 
-	seller_items_cost[SELLER_BIG_BACTA][0] = 200;
-	seller_items_cost[SELLER_BIG_BACTA][1] = 90;
+	seller_items_cost[SELLER_BIG_BACTA][0] = 160;
+	seller_items_cost[SELLER_BIG_BACTA][1] = 80;
 
 	seller_items_cost[SELLER_EWEB][0] = 140;
 	seller_items_cost[SELLER_EWEB][1] = 40;
@@ -6720,7 +6720,7 @@ int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
 	seller_items_cost[SELLER_MAGIC_CRYSTAL][0] = 0;
 	seller_items_cost[SELLER_MAGIC_CRYSTAL][1] = 100;
 
-	seller_items_cost[SELLER_MAGIC_POTION][0] = 100;
+	seller_items_cost[SELLER_MAGIC_POTION][0] = 90;
 	seller_items_cost[SELLER_MAGIC_POTION][1] = 0;
 
 	seller_items_cost[SELLER_BACTA_UPGRADE][0] = 1500;
@@ -6936,7 +6936,7 @@ Cmd_Stuff_f
 void Cmd_Stuff_f( gentity_t *ent ) {
 	if (trap->Argc() == 1)
 	{ // zyk: shows the categories of stuff
-		trap->SendServerCommand(ent->s.number, "print \"\n^7Use ^2/stuff <category> ^7to buy or sell stuff\nThe Category may be ^3ammo^7, ^3items^7, ^3weapons^7, ^3misc ^7or ^3upgrades\n^7Use ^3/stuff <number> ^7to see info about the item\n\n^7Use ^2/buy <number> ^7to buy or ^2/sell <number> ^7to sell\nStuff bought from ^3upgrades ^7category are permanent\n\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"\n^7Use ^2/stuff <category> ^7to buy or sell stuff\nThe Category may be ^3ammo^7, ^3items^7, ^3weapons^7, ^3misc ^7or ^3upgrades\n^7Use ^3/stuff <number> ^7to see info about the item\n\n^7Use ^2/buy <number> ^7to buy or ^2/sell <number> ^7to sell\n\n\"");
 		return;
 	}
 	else
