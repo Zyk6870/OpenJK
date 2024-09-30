@@ -675,7 +675,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 
@@ -686,7 +685,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 
@@ -7772,6 +7770,7 @@ extern void duel_show_table(gentity_t *ent);
 extern void WP_DisruptorAltFire(gentity_t *ent);
 extern void G_Kill( gentity_t *ent );
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
+extern void WP_FireMelee(gentity_t* ent, qboolean alt_fire);
 
 void G_RunFrame( int levelTime ) {
 	int			i;
@@ -9841,16 +9840,6 @@ void G_RunFrame( int levelTime ) {
 
 								ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(4, 8));
 
-								if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER ||
-									ent->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER ||
-									ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR)
-								{ // zyk: changes his class so he can react in different ways sometimes
-									if (ent->client->NPC_class == CLASS_REBORN)
-									{
-										ent->client->NPC_class = CLASS_BOBAFETT;
-									}
-								}
-
 								if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 								{ // zyk: master mage npc will use magic more often
 									ent->client->pers.quest_event_timer -= 2000;
@@ -9862,26 +9851,13 @@ void G_RunFrame( int levelTime ) {
 							}
 						}
 
-						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER ||
-							ent->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER ||
-							ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR)
-						{ // zyk: changes his class so he can react in different ways sometimes
-							if ((Q_irand(0, 3) == 0 || ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER) && 
-								ent->client->NPC_class == CLASS_BOBAFETT && 
-								ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-							{ // zyk: change to reborn if he is on the ground
-								ent->client->NPC_class = CLASS_REBORN;
-
-								if (ent->client->pers.quest_event_timer < level.time)
-								{
-									ent->client->pers.quest_event_timer = level.time + (1000 * Q_irand(2, 4));
-								}
-							}
-						}
-
 						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && Q_irand(0, 3) == 0)
 						{
 							Jedi_Cloak(ent);
+						}
+						else if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && Q_irand(0, 99) < 2)
+						{ // zyk: chance to use Melee, so he can use Magic Fist
+							WP_FireMelee(ent, qfalse);
 						}
 
 						ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
