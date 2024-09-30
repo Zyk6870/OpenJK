@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.44"
+#define	GAMEVERSION	"New Zyk Mod v1.0.45"
 
 #define SECURITY_LOG "security.log"
 
@@ -1064,6 +1064,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
+
+	// zyk: used to print the current MP for the player
+	int last_magic_power_shown;
 
 	// zyk: quest control fields
 	int quest_tries;

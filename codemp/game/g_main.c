@@ -9346,6 +9346,28 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 				}
 
+				// zyk: show current magic power when player gain 100 mp or loses mp
+				if ((ent->client->pers.magic_power == 0 && ent->client->pers.magic_power != ent->client->pers.last_magic_power_shown) ||
+					(ent->client->pers.magic_power / 100) != (ent->client->pers.last_magic_power_shown / 100))
+				{
+					gentity_t* plum;
+					vec3_t plum_origin;
+
+					ent->client->pers.last_magic_power_shown = ent->client->pers.magic_power;
+
+					// zyk: use score plums to show the current mp
+					VectorSet(plum_origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + DEFAULT_MAXS_2);
+
+					plum = G_TempEntity(plum_origin, EV_SCOREPLUM);
+
+					// only send this temp entity to a single client
+					plum->r.svFlags |= SVF_SINGLECLIENT;
+					plum->r.singleClient = ent->s.number;
+
+					plum->s.otherEntityNum = ent->s.number;
+					plum->s.time = ent->client->pers.magic_power;
+				}
+
 				// zyk: skill crystals must be spawned after a certain amount of time
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{

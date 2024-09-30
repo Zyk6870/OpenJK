@@ -4997,7 +4997,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		set_max_stamina(ent);
 
 		// zyk: setting rpg control attributes
-
 		if (init_all == qtrue)
 		{
 			zyk_load_common_settings(ent);
@@ -5093,6 +5092,8 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 				ent->client->pers.current_stamina = ent->client->pers.max_stamina;
 			}
 		}
+
+		ent->client->pers.last_magic_power_shown = ent->client->pers.magic_power;
 
 		// zyk: update the rpg stuff info at the client-side game
 		send_rpg_events(10000);
