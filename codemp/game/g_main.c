@@ -7330,13 +7330,16 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 100;
 
+	rpg_inventory_weights[RPG_INVENTORY_MISC_MAGIC_CRYSTAL] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 3;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 4;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 10;
+
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
 		current_weight += (ent->client->pers.rpg_inventory[i] * rpg_inventory_weights[i]);
 	}
-
-	// zyk: Magic Crystals will also hace a weight
-	current_weight += (ent->client->pers.magic_crystals * 1);
 
 	ent->client->pers.current_weight = current_weight;
 }
@@ -7554,6 +7557,12 @@ qboolean zyk_can_spawn_quest_crystal(gentity_t* ent)
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
 void zyk_update_inventory(gentity_t* ent)
 {
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MAGIC_CRYSTAL] != ent->client->pers.magic_crystals)
+	{
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MAGIC_CRYSTAL] = ent->client->pers.magic_crystals;
+		ent->client->pers.rpg_inventory_modified = qtrue;
+	}
+
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] != ent->client->ps.ammo[AMMO_BLASTER])
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] = ent->client->ps.ammo[AMMO_BLASTER];

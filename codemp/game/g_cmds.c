@@ -6046,6 +6046,12 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = "Magic Armor";
 
+	inventory_item_names[RPG_INVENTORY_MISC_MAGIC_CRYSTAL] = "Magic Crystal";
+	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "Medpack";
+	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
+	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
+	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
+
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
 		return G_NewString(inventory_item_names[inventory_index]);
@@ -6054,52 +6060,303 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	return "";
 }
 
+int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
+{
+	// zyk: costs to buy or sell for each seller item
+	int seller_items_cost[MAX_RPG_INVENTORY_ITEMS][2];
+
+	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][0] = 5;
+	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][1] = 2;
+
+	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][0] = 7;
+	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][1] = 4;
+
+	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][0] = 6;
+	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][1] = 3;
+
+	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 8;
+	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][1] = 4;
+
+	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][0] = 10;
+	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][1] = 5;
+
+	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][0] = 12;
+	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][1] = 8;
+
+	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][0] = 15;
+	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][1] = 10;
+
+	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][0] = 20;
+	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][1] = 0;
+
+	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][0] = 40;
+	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][1] = 0;
+
+	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][0] = 40;
+	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][1] = 0;
+
+	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][0] = 100;
+	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][1] = 50;
+
+	seller_items_cost[RPG_INVENTORY_ITEM_SEEKER_DRONE][0] = 100;
+	seller_items_cost[RPG_INVENTORY_ITEM_SEEKER_DRONE][1] = 50;
+
+	seller_items_cost[RPG_INVENTORY_ITEM_BACTA_CANISTER][0] = 80;
+	seller_items_cost[RPG_INVENTORY_ITEM_BACTA_CANISTER][1] = 40;
+
+	seller_items_cost[RPG_INVENTORY_ITEM_FORCE_FIELD][0] = 150;
+	seller_items_cost[RPG_INVENTORY_ITEM_FORCE_FIELD][1] = 80;
+
+	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][0] = 160;
+	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][1] = 80;
+
+	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][0] = 140;
+	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][1] = 40;
+
+	seller_items_cost[RPG_INVENTORY_ITEM_BINOCULARS][0] = 10;
+	seller_items_cost[RPG_INVENTORY_ITEM_BINOCULARS][1] = 5;
+
+	seller_items_cost[RPG_INVENTORY_ITEM_JETPACK][0] = 500;
+	seller_items_cost[RPG_INVENTORY_ITEM_JETPACK][1] = 200;
+
+	seller_items_cost[RPG_INVENTORY_ITEM_CLOAK][0] = 450;
+	seller_items_cost[RPG_INVENTORY_ITEM_CLOAK][1] = 220;
+
+	seller_items_cost[RPG_INVENTORY_WP_BLASTER_PISTOL][0] = 90;
+	seller_items_cost[RPG_INVENTORY_WP_BLASTER_PISTOL][1] = 45;
+
+	seller_items_cost[RPG_INVENTORY_WP_BRYAR_PISTOL][0] = 90;
+	seller_items_cost[RPG_INVENTORY_WP_BRYAR_PISTOL][1] = 45;
+
+	seller_items_cost[RPG_INVENTORY_WP_E11_BLASTER_RIFLE][0] = 100;
+	seller_items_cost[RPG_INVENTORY_WP_E11_BLASTER_RIFLE][1] = 50;
+
+	seller_items_cost[RPG_INVENTORY_WP_DISRUPTOR][0] = 120;
+	seller_items_cost[RPG_INVENTORY_WP_DISRUPTOR][1] = 60;
+
+	seller_items_cost[RPG_INVENTORY_WP_BOWCASTER][0] = 110;
+	seller_items_cost[RPG_INVENTORY_WP_BOWCASTER][1] = 55;
+
+	seller_items_cost[RPG_INVENTORY_WP_DEMP2][0] = 150;
+	seller_items_cost[RPG_INVENTORY_WP_DEMP2][1] = 80;
+
+	seller_items_cost[RPG_INVENTORY_WP_REPEATER][0] = 150;
+	seller_items_cost[RPG_INVENTORY_WP_REPEATER][1] = 80;
+
+	seller_items_cost[RPG_INVENTORY_WP_FLECHETTE][0] = 170;
+	seller_items_cost[RPG_INVENTORY_WP_FLECHETTE][1] = 90;
+
+	seller_items_cost[RPG_INVENTORY_WP_CONCUSSION][0] = 280;
+	seller_items_cost[RPG_INVENTORY_WP_CONCUSSION][1] = 160;
+
+	seller_items_cost[RPG_INVENTORY_WP_ROCKET_LAUNCHER][0] = 250;
+	seller_items_cost[RPG_INVENTORY_WP_ROCKET_LAUNCHER][1] = 120;
+
+	seller_items_cost[RPG_INVENTORY_WP_SABER][0] = 200;
+	seller_items_cost[RPG_INVENTORY_WP_SABER][1] = 100;
+
+	seller_items_cost[RPG_INVENTORY_WP_STUN_BATON][0] = 20;
+	seller_items_cost[RPG_INVENTORY_WP_STUN_BATON][1] = 10;
+
+	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][0] = 180;
+	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][1] = 90;
+
+	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 20;
+	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 0;
+
+	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][0] = 180;
+	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][1] = 90;
+
+	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_CRYSTAL][0] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_CRYSTAL][1] = 100;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BACTA][0] = 1500;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BACTA][1] = 900;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_FORCE_FIELD][0] = 1400;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_FORCE_FIELD][1] = 800;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_CLOAK][0] = 1150;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_CLOAK][1] = 700;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR][0] = 1000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR][1] = 500;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR][0] = 2000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR][1] = 1000;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR][0] = 2000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR][1] = 1000;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SABER_ARMOR][0] = 2000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SABER_ARMOR][1] = 1000;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][0] = 1000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][1] = 700;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_STUN_BATON][0] = 1500;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_STUN_BATON][1] = 900;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL][0] = 800;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL][1] = 300;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL][0] = 800;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL][1] = 300;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE][0] = 1200;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE][1] = 700;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_DISRUPTOR][0] = 1500;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_DISRUPTOR][1] = 900;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BOWCASTER][0] = 1400;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BOWCASTER][1] = 700;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_DEMP2][0] = 1000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_DEMP2][1] = 500;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_REPEATER][0] = 1400;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_REPEATER][1] = 700;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_FLECHETTE][0] = 1100;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_FLECHETTE][1] = 600;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_CONCUSSION][0] = 1200;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_CONCUSSION][1] = 700;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER][0] = 1200;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER][1] = 500;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_DETPACKS][0] = 1200;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_DETPACKS][1] = 500;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][0] = 5000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][1] = 2000;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_RADAR][0] = 1000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_RADAR][1] = 500;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_THERMAL_VISION][0] = 1000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_THERMAL_VISION][1] = 600;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SENTRY_GUN][0] = 1800;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SENTRY_GUN][1] = 1000;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SEEKER_DRONE][0] = 1600;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SEEKER_DRONE][1] = 900;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][0] = 1200;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][1] = 500;
+
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 3000;
+
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][0] = 0;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][1] = 3000;
+
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][0] = 0;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][1] = 3000;
+
+	if (buy_item == qtrue)
+	{
+		return seller_items_cost[item_number][0];
+	}
+
+	return seller_items_cost[item_number][1];
+}
+
+char* zyk_get_formatted_number(int number, int max_number_chars)
+{
+	char number_value[16];
+	int number_size = 0;
+	int i = 0;
+
+	strcpy(number_value, va("%d", number));
+
+	number_size = strlen(number_value);
+
+	if (max_number_chars > number_size)
+	{
+		// zyk: adds whitespaces to the difference
+		for (i = 0; i < (max_number_chars - number_size); i++)
+		{
+			strcpy(number_value, va("%s ", number_value));
+		}
+	}
+
+	return G_NewString(number_value);
+}
+
+char* zyk_get_formatted_string(char *original_str, int max_number_chars)
+{
+	char string_value[64];
+	int string_size = 0;
+	int i = 0;
+
+	strcpy(string_value, original_str);
+
+	string_size = strlen(string_value);
+
+	if (max_number_chars > string_size)
+	{
+		// zyk: adds whitespaces to the difference
+		for (i = 0; i < (max_number_chars - string_size); i++)
+		{
+			strcpy(string_value, va("%s ", string_value));
+		}
+	}
+
+	return G_NewString(string_value);
+}
+
 void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 {
 	int inventory_it = 0;
-	int results_per_page = 20; // zyk: number of results per page
+	int results_per_page = 10; // zyk: number of results per page
 	char message[MAX_STRING_CHARS];
-	char final_chars[32];
-	char current_column[64];
-	char item_number_value[8];
-	int number_of_whitespaces = 0;
-	int max_column_size = 32;
+	char current_column[96];
+	int buy_cost = 0;
+	int sell_cost = 0;
+	char buy_cost_str[16];
+	char sell_cost_str[16];
 
 	strcpy(message, "");
-	strcpy(final_chars, "");
 
 	for (inventory_it = 0; inventory_it < MAX_RPG_INVENTORY_ITEMS; inventory_it++)
 	{
 		if (inventory_it >= ((page - 1) * results_per_page) && inventory_it < (page * results_per_page))
 		{
-			if ((inventory_it + 1) < 10)
-			{ // zyk: add an extra space to keep the items aligned when printing them in console
-				strcpy(item_number_value, va(" %d", (inventory_it + 1)));
+			buy_cost = zyk_get_seller_item_cost(inventory_it, qtrue);
+			sell_cost = zyk_get_seller_item_cost(inventory_it, qfalse);
+
+			if (buy_cost > 0)
+			{
+				strcpy(buy_cost_str, zyk_get_formatted_number(buy_cost, 4));
 			}
 			else
 			{
-				strcpy(item_number_value, va("%d", (inventory_it + 1)));
+				strcpy(buy_cost_str, "n/a ");
 			}
 
-			strcpy(current_column, va("^1%s - ^7%s: ^5%d", item_number_value, zyk_get_inventory_item_name(inventory_it),
-				ent->client->pers.rpg_inventory[inventory_it]));
-
-			if ((inventory_it % 2) == 0)
-			{ // zyk: adds whitespaces in first column
-				number_of_whitespaces = max_column_size - strlen(current_column) + 6; // zyk: adds 6 which are the color chars that will not appear in console
-
-				strcpy(final_chars, va("%s ", zyk_add_whitespaces(number_of_whitespaces)));
+			if (sell_cost > 0)
+			{
+				strcpy(sell_cost_str, zyk_get_formatted_number(sell_cost, 4));
 			}
 			else
 			{
-				strcpy(final_chars, "\n");
+				strcpy(sell_cost_str, "n/a ");
 			}
 
-			strcpy(message, va("%s%s%s", message, current_column, final_chars));
+			strcpy(current_column, va("^1%s - ^7%s: ^5%s - ^3%s - %s", zyk_get_formatted_number((inventory_it + 1), 2), 
+				zyk_get_formatted_string(zyk_get_inventory_item_name(inventory_it), 25),
+				zyk_get_formatted_number(ent->client->pers.rpg_inventory[inventory_it], 5), 
+				buy_cost_str, sell_cost_str));
+
+			strcpy(message, va("%s%s\n", message, current_column));
 		}
 	}
 
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n%s\n\"", message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                     : ^5Count - ^3Buy  - Sell\n\n%s\n\"", message));
 }
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
@@ -6396,6 +6653,26 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 10 per cent. If the source is Magic Fist or a magic power, decreases damage by 25 per cent and absorbs some magic points\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 	}
+	else if (item_index == RPG_INVENTORY_MISC_MAGIC_CRYSTAL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. Used to upgrade skills and to get bonuses during the quest. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 health\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you immune to force powers for a short time\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
 }
 
 /*
@@ -6607,654 +6884,6 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 }
 
 extern gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboolean isVehicle );
-int zyk_get_seller_item_cost(zyk_seller_item_t item_number, qboolean buy_item)
-{
-	// zyk: costs to buy or sell for each seller item
-	int seller_items_cost[MAX_SELLER_ITEMS][2];
-
-	seller_items_cost[SELLER_BLASTER_PACK][0] = 5;
-	seller_items_cost[SELLER_BLASTER_PACK][1] = 2;
-
-	seller_items_cost[SELLER_POWERCELL][0] = 7;
-	seller_items_cost[SELLER_POWERCELL][1] = 4;
-
-	seller_items_cost[SELLER_METAL_BOLTS][0] = 6;
-	seller_items_cost[SELLER_METAL_BOLTS][1] = 3;
-
-	seller_items_cost[SELLER_ROCKETS][0] = 8;
-	seller_items_cost[SELLER_ROCKETS][1] = 4;
-
-	seller_items_cost[SELLER_THERMALS][0] = 10;
-	seller_items_cost[SELLER_THERMALS][1] = 5;
-
-	seller_items_cost[SELLER_TRIPMINES][0] = 12;
-	seller_items_cost[SELLER_TRIPMINES][1] = 8;
-
-	seller_items_cost[SELLER_DETPACKS][0] = 15;
-	seller_items_cost[SELLER_DETPACKS][1] = 10;
-
-	seller_items_cost[SELLER_AMMO_ALL][0] = 300;
-	seller_items_cost[SELLER_AMMO_ALL][1] = 0;
-
-	seller_items_cost[SELLER_FLAME_FUEL][0] = 20;
-	seller_items_cost[SELLER_FLAME_FUEL][1] = 0;
-
-	seller_items_cost[SELLER_MEDPACK][0] = 40;
-	seller_items_cost[SELLER_MEDPACK][1] = 0;
-
-	seller_items_cost[SELLER_SHIELD_BOOSTER][0] = 40;
-	seller_items_cost[SELLER_SHIELD_BOOSTER][1] = 0;
-
-	seller_items_cost[SELLER_SENTRY_GUN][0] = 100;
-	seller_items_cost[SELLER_SENTRY_GUN][1] = 50;
-
-	seller_items_cost[SELLER_SEEKER_DRONE][0] = 100;
-	seller_items_cost[SELLER_SEEKER_DRONE][1] = 50;
-
-	seller_items_cost[SELLER_BACTA_CANISTER][0] = 80;
-	seller_items_cost[SELLER_BACTA_CANISTER][1] = 40;
-
-	seller_items_cost[SELLER_FORCE_FIELD][0] = 150;
-	seller_items_cost[SELLER_FORCE_FIELD][1] = 80;
-
-	seller_items_cost[SELLER_BIG_BACTA][0] = 160;
-	seller_items_cost[SELLER_BIG_BACTA][1] = 80;
-
-	seller_items_cost[SELLER_EWEB][0] = 140;
-	seller_items_cost[SELLER_EWEB][1] = 40;
-
-	seller_items_cost[SELLER_BINOCULARS][0] = 10;
-	seller_items_cost[SELLER_BINOCULARS][1] = 5;
-
-	seller_items_cost[SELLER_JETPACK][0] = 500;
-	seller_items_cost[SELLER_JETPACK][1] = 200;
-
-	seller_items_cost[SELLER_CLOAK_ITEM][0] = 450;
-	seller_items_cost[SELLER_CLOAK_ITEM][1] = 220;
-
-	seller_items_cost[SELLER_BLASTER_PISTOL][0] = 90;
-	seller_items_cost[SELLER_BLASTER_PISTOL][1] = 45;
-
-	seller_items_cost[SELLER_BRYAR_PISTOL][0] = 90;
-	seller_items_cost[SELLER_BRYAR_PISTOL][1] = 45;
-
-	seller_items_cost[SELLER_E11_BLASTER][0] = 100;
-	seller_items_cost[SELLER_E11_BLASTER][1] = 50;
-
-	seller_items_cost[SELLER_DISRUPTOR][0] = 120;
-	seller_items_cost[SELLER_DISRUPTOR][1] = 60;
-
-	seller_items_cost[SELLER_BOWCASTER][0] = 110;
-	seller_items_cost[SELLER_BOWCASTER][1] = 55;
-
-	seller_items_cost[SELLER_DEMP2][0] = 150;
-	seller_items_cost[SELLER_DEMP2][1] = 80;
-
-	seller_items_cost[SELLER_REPEATER][0] = 150;
-	seller_items_cost[SELLER_REPEATER][1] = 80;
-
-	seller_items_cost[SELLER_FLECHETTE][0] = 170;
-	seller_items_cost[SELLER_FLECHETTE][1] = 90;
-
-	seller_items_cost[SELLER_CONCUSSION][0] = 280;
-	seller_items_cost[SELLER_CONCUSSION][1] = 160;
-
-	seller_items_cost[SELLER_ROCKET_LAUNCHER][0] = 250;
-	seller_items_cost[SELLER_ROCKET_LAUNCHER][1] = 120;
-
-	seller_items_cost[SELLER_LIGHTSABER][0] = 200;
-	seller_items_cost[SELLER_LIGHTSABER][1] = 100;
-
-	seller_items_cost[SELLER_STUN_BATON][0] = 20;
-	seller_items_cost[SELLER_STUN_BATON][1] = 10;
-
-	seller_items_cost[SELLER_YSALAMIRI][0] = 180;
-	seller_items_cost[SELLER_YSALAMIRI][1] = 90;
-
-	seller_items_cost[SELLER_JETPACK_FUEL][0] = 20;
-	seller_items_cost[SELLER_JETPACK_FUEL][1] = 0;
-
-	seller_items_cost[SELLER_FORCE_BOON][0] = 180;
-	seller_items_cost[SELLER_FORCE_BOON][1] = 90;
-
-	seller_items_cost[SELLER_MAGIC_CRYSTAL][0] = 0;
-	seller_items_cost[SELLER_MAGIC_CRYSTAL][1] = 100;
-
-	seller_items_cost[SELLER_MAGIC_POTION][0] = 90;
-	seller_items_cost[SELLER_MAGIC_POTION][1] = 0;
-
-	seller_items_cost[SELLER_BACTA_UPGRADE][0] = 1500;
-	seller_items_cost[SELLER_BACTA_UPGRADE][1] = 900;
-
-	seller_items_cost[SELLER_FORCE_FIELD_UPGRADE][0] = 1400;
-	seller_items_cost[SELLER_FORCE_FIELD_UPGRADE][1] = 800;
-
-	seller_items_cost[SELLER_CLOAK_UPGRADE][0] = 1150;
-	seller_items_cost[SELLER_CLOAK_UPGRADE][1] = 700;
-
-	seller_items_cost[SELLER_SHIELD_GENERATOR_UPGRADE][0] = 1000;
-	seller_items_cost[SELLER_SHIELD_GENERATOR_UPGRADE][1] = 500;
-
-	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][0] = 2000;
-	seller_items_cost[SELLER_IMPACT_REDUCER_ARMOR][1] = 1000;
-
-	seller_items_cost[SELLER_DEFLECTIVE_ARMOR][0] = 2000;
-	seller_items_cost[SELLER_DEFLECTIVE_ARMOR][1] = 1000;
-
-	seller_items_cost[SELLER_SABER_ARMOR][0] = 2000;
-	seller_items_cost[SELLER_SABER_ARMOR][1] = 1000;
-
-	seller_items_cost[SELLER_FLAME_THROWER][0] = 1000;
-	seller_items_cost[SELLER_FLAME_THROWER][1] = 700;
-
-	seller_items_cost[SELLER_STUN_BATON_UPGRADE][0] = 1500;
-	seller_items_cost[SELLER_STUN_BATON_UPGRADE][1] = 900;
-
-	seller_items_cost[SELLER_BLASTER_PISTOL_UPGRADE][0] = 800;
-	seller_items_cost[SELLER_BLASTER_PISTOL_UPGRADE][1] = 300;
-
-	seller_items_cost[SELLER_BRYAR_PISTOL_UPGRADE][0] = 800;
-	seller_items_cost[SELLER_BRYAR_PISTOL_UPGRADE][1] = 300;
-
-	seller_items_cost[SELLER_E11_BLASTER_RIFLE_UPGRADE][0] = 1200;
-	seller_items_cost[SELLER_E11_BLASTER_RIFLE_UPGRADE][1] = 700;
-
-	seller_items_cost[SELLER_DISRUPTOR_UPGRADE][0] = 1500;
-	seller_items_cost[SELLER_DISRUPTOR_UPGRADE][1] = 900;
-
-	seller_items_cost[SELLER_BOWCASTER_UPGRADE][0] = 1400;
-	seller_items_cost[SELLER_BOWCASTER_UPGRADE][1] = 700;
-
-	seller_items_cost[SELLER_DEMP2_UPGRADE][0] = 1000;
-	seller_items_cost[SELLER_DEMP2_UPGRADE][1] = 500;
-
-	seller_items_cost[SELLER_REPEATER_UPGRADE][0] = 1400;
-	seller_items_cost[SELLER_REPEATER_UPGRADE][1] = 700;
-
-	seller_items_cost[SELLER_FLECHETTE_UPGRADE][0] = 1100;
-	seller_items_cost[SELLER_FLECHETTE_UPGRADE][1] = 600;
-
-	seller_items_cost[SELLER_CONCUSSION_UPGRADE][0] = 1200;
-	seller_items_cost[SELLER_CONCUSSION_UPGRADE][1] = 700;
-
-	seller_items_cost[SELLER_ROCKETS_UPGRADE][0] = 1200;
-	seller_items_cost[SELLER_ROCKETS_UPGRADE][1] = 500;
-
-	seller_items_cost[SELLER_DETPACKS_UPGRADE][0] = 1200;
-	seller_items_cost[SELLER_DETPACKS_UPGRADE][1] = 500;
-
-	seller_items_cost[SELLER_JETPACK_UPGRADE][0] = 5000;
-	seller_items_cost[SELLER_JETPACK_UPGRADE][1] = 3000;
-
-	seller_items_cost[SELLER_GUNNER_RADAR][0] = 1000;
-	seller_items_cost[SELLER_GUNNER_RADAR][1] = 500;
-
-	seller_items_cost[SELLER_THERMAL_VISION][0] = 1000;
-	seller_items_cost[SELLER_THERMAL_VISION][1] = 600;
-
-	seller_items_cost[SELLER_SENTRY_GUN_UPGRADE][0] = 1800;
-	seller_items_cost[SELLER_SENTRY_GUN_UPGRADE][1] = 1000;
-
-	seller_items_cost[SELLER_SEEKER_DRONE_UPGRADE][0] = 16000;
-	seller_items_cost[SELLER_SEEKER_DRONE_UPGRADE][1] = 900;
-
-	seller_items_cost[SELLER_EWEB_UPGRADE][0] = 1200;
-	seller_items_cost[SELLER_EWEB_UPGRADE][1] = 500;
-
-	if (buy_item == qtrue)
-	{
-		return seller_items_cost[item_number][0];
-	}
-
-	return seller_items_cost[item_number][1];
-}
-
-// zyk: returns the seller item name
-char* zyk_get_seller_item_name(zyk_seller_item_t item_number)
-{
-	char* seller_items_names[MAX_SELLER_ITEMS];
-
-	seller_items_names[SELLER_BLASTER_PACK] = "Blaster Pack";
-	seller_items_names[SELLER_POWERCELL] = "Power Cell";
-	seller_items_names[SELLER_METAL_BOLTS] = "Metal Bolts";
-	seller_items_names[SELLER_ROCKETS] = "Rockets";
-	seller_items_names[SELLER_THERMALS] = "Thermals";
-	seller_items_names[SELLER_TRIPMINES] = "Trip Mines";
-	seller_items_names[SELLER_DETPACKS] = "Det Packs";
-	seller_items_names[SELLER_AMMO_ALL] = "Ammo All";
-	seller_items_names[SELLER_FLAME_FUEL] = "Flame Thrower Fuel";
-
-	seller_items_names[SELLER_MEDPACK] = "Medpac";
-	seller_items_names[SELLER_SHIELD_BOOSTER] = "Shield Booster";
-	seller_items_names[SELLER_SENTRY_GUN] = "Sentry Gun";
-	seller_items_names[SELLER_SEEKER_DRONE] = "Seeker Drone";
-	seller_items_names[SELLER_BACTA_CANISTER] = "Bacta Canister";
-	seller_items_names[SELLER_FORCE_FIELD] = "Force Field";
-	seller_items_names[SELLER_BIG_BACTA] = "Big Bacta";
-	seller_items_names[SELLER_EWEB] = "E-Web";
-	seller_items_names[SELLER_BINOCULARS] = "Binoculars";
-	seller_items_names[SELLER_JETPACK] = "Jetpack";
-	seller_items_names[SELLER_CLOAK_ITEM] = "Cloak Item";
-
-	seller_items_names[SELLER_BLASTER_PISTOL] = "Blaster Pistol";
-	seller_items_names[SELLER_BRYAR_PISTOL] = "Bryar Pistol";
-	seller_items_names[SELLER_E11_BLASTER] = "E11 Blaster Rifle";
-	seller_items_names[SELLER_DISRUPTOR] = "Disruptor";
-	seller_items_names[SELLER_BOWCASTER] = "Bowcaster";
-	seller_items_names[SELLER_DEMP2] = "DEMP2";
-	seller_items_names[SELLER_REPEATER] = "Repeater";
-	seller_items_names[SELLER_FLECHETTE] = "Flechette";
-	seller_items_names[SELLER_CONCUSSION] = "Concussion Rifle";
-	seller_items_names[SELLER_ROCKET_LAUNCHER] = "Rocket Launcher";
-	seller_items_names[SELLER_LIGHTSABER] = "Saber";
-	seller_items_names[SELLER_STUN_BATON] = "Stun Baton";
-
-	seller_items_names[SELLER_YSALAMIRI] = "Ysalamiri";
-	seller_items_names[SELLER_JETPACK_FUEL] = "Jetpack Fuel";
-	seller_items_names[SELLER_FORCE_BOON] = "Force Boon";
-	seller_items_names[SELLER_MAGIC_CRYSTAL] = "Magic Crystal";
-	seller_items_names[SELLER_MAGIC_POTION] = "Magic Potion";
-
-	seller_items_names[SELLER_BACTA_UPGRADE] = "Bacta Upgrade";
-	seller_items_names[SELLER_FORCE_FIELD_UPGRADE] = "Force Field Upgrade";
-	seller_items_names[SELLER_CLOAK_UPGRADE] = "Cloak Item Upgrade";
-	seller_items_names[SELLER_SHIELD_GENERATOR_UPGRADE] = "Shield Generator";
-	seller_items_names[SELLER_IMPACT_REDUCER_ARMOR] = "Impact Reducer Armor";
-	seller_items_names[SELLER_DEFLECTIVE_ARMOR] = "Deflective Armor";
-	seller_items_names[SELLER_SABER_ARMOR] = "Saber Armor";
-	seller_items_names[SELLER_FLAME_THROWER] = "Flame Thrower";
-	seller_items_names[SELLER_STUN_BATON_UPGRADE] = "Stun Baton Upgrade";
-	seller_items_names[SELLER_BLASTER_PISTOL_UPGRADE] = "Blaster Pistol Upgrade";
-	seller_items_names[SELLER_BRYAR_PISTOL_UPGRADE] = "Bryar Pistol Upgrade";
-	seller_items_names[SELLER_E11_BLASTER_RIFLE_UPGRADE] = "E11 Blaster Rifle Upgrade";
-	seller_items_names[SELLER_DISRUPTOR_UPGRADE] = "Disruptor Upgrade";
-	seller_items_names[SELLER_BOWCASTER_UPGRADE] = "Bowcaster Upgrade";
-	seller_items_names[SELLER_DEMP2_UPGRADE] = "DEMP2 Upgrade";
-	seller_items_names[SELLER_REPEATER_UPGRADE] = "Repeater Upgrade";
-	seller_items_names[SELLER_FLECHETTE_UPGRADE] = "Flechette Upgrade";
-	seller_items_names[SELLER_CONCUSSION_UPGRADE] = "Concussion Upgrade";
-	seller_items_names[SELLER_ROCKETS_UPGRADE] = "Rocket Launcher Upgrade";
-	seller_items_names[SELLER_DETPACKS_UPGRADE] = "Detpacks Upgrade";
-	seller_items_names[SELLER_JETPACK_UPGRADE] = "Jetpack Upgrade";
-	seller_items_names[SELLER_GUNNER_RADAR] = "Radar";
-	seller_items_names[SELLER_THERMAL_VISION] = "Thermal Vision";
-	seller_items_names[SELLER_SENTRY_GUN_UPGRADE] = "Sentry Gun Upgrade";
-	seller_items_names[SELLER_SEEKER_DRONE_UPGRADE] = "Seeker Drone Upgrade";
-	seller_items_names[SELLER_EWEB_UPGRADE] = "E-Web Upgrade";
-
-	if (item_number >= 0 && item_number < MAX_SELLER_ITEMS)
-	{
-		return G_NewString(seller_items_names[item_number]);
-	}
-	
-	return "";
-}
-
-void zyk_show_stuff_category(gentity_t* ent, int min_item_index, int max_item_index)
-{
-	int i = 0;
-	char content[MAX_STRING_CHARS];
-
-	strcpy(content, "");
-
-	for (i = min_item_index; i <= max_item_index; i++)
-	{
-		char buy_item_string[16];
-		char sell_item_string[16];
-		int buy_cost = zyk_get_seller_item_cost(i, qtrue);
-		int sell_cost = zyk_get_seller_item_cost(i, qfalse);
-		
-		if (buy_cost > 0)
-		{
-			strcpy(buy_item_string, va("%d", buy_cost));
-		}
-		else
-		{
-			strcpy(buy_item_string, "^1no^7");
-		}
-
-		if (sell_cost > 0)
-		{
-			strcpy(sell_item_string, va("%d", sell_cost));
-		}
-		else
-		{
-			strcpy(sell_item_string, "^1no^7");
-		}
-
-		strcpy(content, va("%s\n^3%d - %s: ^7Buy: %s, Sell: %s", content, (i + 1), zyk_get_seller_item_name(i), buy_item_string, sell_item_string));
-	}
-
-	trap->SendServerCommand(ent->s.number, va("print \"%s\n\n\"", content));
-}
-
-/*
-==================
-Cmd_Stuff_f
-==================
-*/
-void Cmd_Stuff_f( gentity_t *ent ) {
-	if (trap->Argc() == 1)
-	{ // zyk: shows the categories of stuff
-		trap->SendServerCommand(ent->s.number, "print \"\n^7Use ^2/stuff <category> ^7to buy or sell stuff\nThe Category may be ^3ammo^7, ^3items^7, ^3weapons^7, ^3misc ^7or ^3upgrades\n^7Use ^3/stuff <number> ^7to see info about the item\n\n^7Use ^2/buy <number> ^7to buy or ^2/sell <number> ^7to sell\n\n\"");
-		return;
-	}
-	else
-	{
-		char arg1[1024];
-		int i = 0;
-		int item_number = 0;
-
-		trap->Argv(1, arg1, sizeof( arg1 ));
-		item_number = atoi(arg1);
-
-		i = item_number - 1;
-
-		if (Q_stricmp(arg1, "ammo" ) == 0)
-		{
-			zyk_show_stuff_category(ent, SELLER_BLASTER_PACK, SELLER_FLAME_FUEL);
-		}
-		else if (Q_stricmp(arg1, "items" ) == 0)
-		{
-			zyk_show_stuff_category(ent, SELLER_MEDPACK, SELLER_CLOAK_ITEM);
-		}
-		else if (Q_stricmp(arg1, "weapons" ) == 0)
-		{
-			zyk_show_stuff_category(ent, SELLER_BLASTER_PISTOL, SELLER_STUN_BATON);
-		}
-		else if (Q_stricmp(arg1, "misc") == 0)
-		{
-			zyk_show_stuff_category(ent, SELLER_YSALAMIRI, SELLER_MAGIC_POTION);
-		}
-		else if (Q_stricmp(arg1, "upgrades" ) == 0)
-		{
-			if (trap->Argc() == 2)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"Must pass a page number. Example: ^3/stuff upgrades 1^7\n\"");
-			}
-			else
-			{
-				int page = 1; // zyk: page the user wants to see
-				int last_item_offset = 9;
-				int first_item_index = SELLER_BACTA_UPGRADE;
-				int last_item_index = SELLER_BACTA_UPGRADE;
-				char arg2[MAX_STRING_CHARS];
-
-				strcpy(arg2, "");
-
-				trap->Argv(2, arg2, sizeof(arg2));
-
-				page = atoi(arg2);
-
-				if (page <= 0)
-					page = 1;
-
-				first_item_index += (last_item_offset * (page - 1));
-				last_item_index += (last_item_offset * page);
-
-				if (first_item_index >= MAX_SELLER_ITEMS)
-					return;
-
-				if (last_item_index >= MAX_SELLER_ITEMS)
-					last_item_index = MAX_SELLER_ITEMS - 1;
-
-				zyk_show_stuff_category(ent, first_item_index, last_item_index);
-			}
-		}
-		else if (i == SELLER_BLASTER_PACK)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of E11 Blaster Rifle, Blaster Pistol and Bryar Pistol weapons\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_POWERCELL)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of Disruptor, Bowcaster and DEMP2 weapons\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_METAL_BOLTS)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of Repeater, Flechette and Concussion Rifle weapons\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_ROCKETS)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of Rocket Launcher weapon\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_THERMALS)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of thermals\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_TRIPMINES)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of trip mines\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_DETPACKS)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some ammo of det packs\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_AMMO_ALL)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers all ammo types, including flame thrower fuel\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_FLAME_FUEL)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers all fuel of the flame thrower\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_MEDPACK)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 25 health\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_SHIELD_BOOSTER)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers 25 shield\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_SENTRY_GUN)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable gun which is placed in the ground and shoots nearby enemies\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_SEEKER_DRONE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable remote drone that shoots enemies at sight\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_BACTA_CANISTER)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_FORCE_FIELD)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7creates a force field wall in front of the player that can hold almost any attack, except the concussion rifle alternate fire, which can get through\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_BIG_BACTA)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina. Recovers double the amount of a Bacta Canister\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_EWEB)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable emplaced gun\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_BINOCULARS)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to see far things better with the zoom feature\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_JETPACK)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to fly. Jump and press Use Key to use it\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_CLOAK_ITEM)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to cloak himself. Npcs cannot detect you unless close enough\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_BLASTER_PISTOL)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7pistol that can shoot a charged shot with alt fire. Uses blaster pack ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_BRYAR_PISTOL)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7similar to blaster pistol, but has a faster fire rate with normal fire. Uses blaster pack ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_E11_BLASTER)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Rifle that is used by the stormtroopers. Uses blaster pack ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_DISRUPTOR)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Sniper rifle which can desintegrate the enemy. Uses power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_BOWCASTER)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots green bolts, normal fire can be charged, and alt fire shoots a bouncing bolt. Uses power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_DEMP2)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7fires an electro magnetic pulse that causes bonus damage against droids. Uses power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_REPEATER)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7imperial weapon that shoots orbs and a plasma bomb with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_FLECHETTE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7it is the shotgun of the game, and can shoot 2 bombs with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_CONCUSSION)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7powerful weapon, alt fire can shoot a beam that gets through force fields. Uses metal bolts ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_ROCKET_LAUNCHER)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots rockets and a homing missile with alternate fire. Uses rockets ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_LIGHTSABER)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the weapon of a Jedi/Sith. With single, each Saber Attack skill level gives new saber stances. With duals/staff the Saber Attack skill level gives more damage\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_STUN_BATON)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that fires a small electric charge\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_YSALAMIRI)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7disables the player force powers but also protects the player from enemy force powers\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_JETPACK_FUEL)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers all fuel of the jetpack\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_FORCE_BOON)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to regenerate force faster\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_MAGIC_CRYSTAL)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Magic Crystals spawned in the map. They can be sold\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_MAGIC_POTION)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7recovers some MP\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_BACTA_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister and Big Bacta recovers more HP, more MP and more Stamina\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_FORCE_FIELD_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Force Field resists more damage. Allows getting them back pressing Use Key on them. Doing so requires some powercell ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_CLOAK_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Cloak Item will be able to cloak vehicles. Press Saber Stance key when riding a vehicle to cloak it. Also, when you are cloaked, npcs will only be able to detect you at a closer distance\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_SHIELD_GENERATOR_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to restore his shield. The max shield will be the same as the max health\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_IMPACT_REDUCER_ARMOR)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source by 15 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_DEFLECTIVE_ARMOR)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 25 per cent weapon/melee damage to your health (only 5 per cent from saber) and deflects some weapon shots\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_SABER_ARMOR)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 5 per cent weapon/melee damage to your health (25 per cent from saber)\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_FLAME_THROWER)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7gives you the flame thrower. To use it, get stun baton and use alternate fire\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_STUN_BATON_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows stun baton to open any door, including locked ones. Also makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_BLASTER_PISTOL_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Increases Blaster Pistol firerate\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_BRYAR_PISTOL_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Increases Bryar Pistol firerate\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_E11_BLASTER_RIFLE_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7E11 Blaster Rifle altfire has less spread\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_DISRUPTOR_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases firerate of Disruptor\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_BOWCASTER_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_DEMP2_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases firerate of DEMP2 main fire\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_REPEATER_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases firerate of Repeater altfire\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_FLECHETTE_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases number of bolts shot by Flechette primary fire\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_CONCUSSION_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Concussion rifle can break saber-only damage objects and can move pushable/pullable objects\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_ROCKETS_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes rockets able to damage saber-only damage objects and move pushable/pullable objects\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_DETPACKS_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes detpacks able to damage saber-only damage objects and move pushable/pullable objects\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_JETPACK_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases jetpack fuel consumption a bit and makes the jetpack more stable and faster\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_GUNNER_RADAR)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7if you have the client plugin, a radar will be displayed in the screen showing positions of other players and npcs\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_THERMAL_VISION)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes binoculars detect enemies through a thermal vision system\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_SENTRY_GUN_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes Sentry Gun have more health and damage and detect enemies at a greater distance. Allows getting sentry guns back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_SEEKER_DRONE_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes seeker drone shoot faster and with more damage. It also lasts longer\n\n\"", zyk_get_seller_item_name(i)));
-		}
-		else if (i == SELLER_EWEB_UPGRADE)
-		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes E-Web have more health and damage\n\n\"", zyk_get_seller_item_name(i)));
-		}
-	}
-}
 
 // zyk: adds some MP to the RPG player
 void zyk_add_mp(gentity_t* ent, int mp_amount)
@@ -7279,6 +6908,7 @@ Cmd_Buy_f
 void Cmd_Buy_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	int value = 0;
+	int item_index = 0;
 
 	if (trap->Argc() == 1)
 	{
@@ -7296,184 +6926,192 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (value < 1 || value > MAX_SELLER_ITEMS || zyk_get_seller_item_cost((value - 1), qtrue) == 0)
+	item_index = value - 1;
+
+	if (value < 1 || value > MAX_RPG_INVENTORY_ITEMS)
 	{
 		trap->SendServerCommand( ent->s.number, "print \"Invalid product number.\n\"" );
 		return;
 	}
 
+	if (zyk_get_seller_item_cost(item_index, qtrue) == 0)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Cannot buy this item.\n\"");
+		return;
+	}
+
 	// zyk: general validations. Some items require certain conditions to be bought
-	if (value == (SELLER_LIGHTSABER + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 0)
+	if (item_index == RPG_INVENTORY_WP_SABER && ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_LIGHTSABER)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_BACTA_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_BACTA_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_FORCE_FIELD_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_FORCE_FIELD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_FORCE_FIELD_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_CLOAK_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_CLOAK && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_CLOAK_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_SHIELD_GENERATOR_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_SHIELD_GENERATOR_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_IMPACT_REDUCER_ARMOR)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_DEFLECTIVE_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_DEFLECTIVE_ARMOR)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_SABER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_SABER_ARMOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_SABER_ARMOR)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_FLAME_THROWER + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_FLAME_THROWER)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_STUN_BATON_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_STUN_BATON_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_BLASTER_PISTOL_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_BLASTER_PISTOL_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_BRYAR_PISTOL_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_BRYAR_PISTOL_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_E11_BLASTER_RIFLE_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_E11_BLASTER_RIFLE_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_DISRUPTOR_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_DISRUPTOR_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_BOWCASTER_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_BOWCASTER_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_DEMP2_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_DEMP2_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_REPEATER_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_REPEATER_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_FLECHETTE_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_FLECHETTE_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_CONCUSSION_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_CONCUSSION_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_ROCKETS_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_ROCKETS_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_DETPACKS_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DETPACKS] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_DETPACKS && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DETPACKS] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_DETPACKS_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_JETPACK_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_JETPACK_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_GUNNER_RADAR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_RADAR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_RADAR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_RADAR] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_GUNNER_RADAR)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_THERMAL_VISION + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_THERMAL_VISION && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_THERMAL_VISION)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_SENTRY_GUN_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_SENTRY_GUN && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_SENTRY_GUN_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_SEEKER_DRONE_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_SEEKER_DRONE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_SEEKER_DRONE_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (value == (SELLER_EWEB_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_EWEB && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_seller_item_name(SELLER_EWEB_UPGRADE)));
+		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
 
 	// zyk: buying the item if player has enough credits
-	if (ent->client->pers.credits >= zyk_get_seller_item_cost((value - 1), qtrue))
+	if (ent->client->pers.credits >= zyk_get_seller_item_cost(item_index, qtrue))
 	{
-		if (value == (SELLER_BLASTER_PACK + 1))
+		if (item_index == RPG_INVENTORY_AMMO_BLASTER_PACK)
 		{
 			Add_Ammo(ent, AMMO_BLASTER, 20);
 		}
-		else if (value == (SELLER_POWERCELL + 1))
+		else if (item_index == RPG_INVENTORY_AMMO_POWERCELL)
 		{
 			Add_Ammo(ent, AMMO_POWERCELL, 20);
 		}
-		else if (value == (SELLER_METAL_BOLTS + 1))
+		else if (item_index == RPG_INVENTORY_AMMO_METAL_BOLTS)
 		{
 			Add_Ammo(ent, AMMO_METAL_BOLTS, 20);
 		}
-		else if (value == (SELLER_ROCKETS + 1))
+		else if (item_index == RPG_INVENTORY_AMMO_ROCKETS)
 		{
 			Add_Ammo(ent, AMMO_ROCKETS, 1);
 		}
-		else if (value == (SELLER_THERMALS + 1))
+		else if (item_index == RPG_INVENTORY_AMMO_THERMALS)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_THERMAL);
 			Add_Ammo(ent, AMMO_THERMAL, 1);
 		}
-		else if (value == (SELLER_TRIPMINES + 1))
+		else if (item_index == RPG_INVENTORY_AMMO_TRIPMINES)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_TRIP_MINE);
 			Add_Ammo(ent, AMMO_TRIPMINE, 1);
 		}
-		else if (value == (SELLER_DETPACKS + 1))
+		else if (item_index == RPG_INVENTORY_AMMO_DETPACKS)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
 			Add_Ammo(ent, AMMO_DETPACK, 1);
 		}
-		else if (value == (SELLER_MEDPACK + 1))
+		else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
 		{
 			if (ent->health < ent->client->pers.max_rpg_health)
 			{
@@ -7483,7 +7121,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			if (ent->health > ent->client->pers.max_rpg_health)
 				ent->health = ent->client->pers.max_rpg_health;
 		}
-		else if (value == (SELLER_SHIELD_BOOSTER + 1))
+		else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER)
 		{
 			if (ent->client->ps.stats[STAT_ARMOR] < ent->client->pers.max_rpg_shield)
 			{
@@ -7493,296 +7131,271 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			if (ent->client->ps.stats[STAT_ARMOR] > ent->client->pers.max_rpg_shield)
 				ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
 		}
-		else if (value == (SELLER_BACTA_CANISTER + 1))
+		else if (item_index == RPG_INVENTORY_ITEM_BACTA_CANISTER)
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_BACTA_CANISTER);
 		}
-		else if (value == (SELLER_BIG_BACTA + 1))
+		else if (item_index == RPG_INVENTORY_ITEM_BIG_BACTA)
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC_BIG);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_BIG_BACTA);
 		}
-		else if (value == (SELLER_SENTRY_GUN + 1))
+		else if (item_index == RPG_INVENTORY_ITEM_SENTRY_GUN)
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_SENTRY_GUN);
 		}
-		else if (value == (SELLER_SEEKER_DRONE + 1))
+		else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE)
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_SEEKER_DRONE);
 		}
-		else if (value == (SELLER_FORCE_FIELD + 1))
+		else if (item_index == RPG_INVENTORY_ITEM_FORCE_FIELD)
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_FORCE_FIELD);
 		}
-		else if (value == (SELLER_YSALAMIRI + 1))
+		else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI)
 		{
 			if (ent->client->ps.powerups[PW_YSALAMIRI] < level.time)
-				ent->client->ps.powerups[PW_YSALAMIRI] = level.time + 60000;
+				ent->client->ps.powerups[PW_YSALAMIRI] = level.time + 30000;
 			else
-				ent->client->ps.powerups[PW_YSALAMIRI] += 60000;
+				ent->client->ps.powerups[PW_YSALAMIRI] += 30000;
 		}
-		else if (value == (SELLER_E11_BLASTER + 1))
+		else if (item_index == RPG_INVENTORY_WP_E11_BLASTER_RIFLE)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BLASTER);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_E11_BLASTER_RIFLE);
 		}
-		else if (value == (SELLER_DISRUPTOR + 1))
+		else if (item_index == RPG_INVENTORY_WP_DISRUPTOR)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DISRUPTOR);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_DISRUPTOR);
 		}
-		else if (value == (SELLER_REPEATER + 1))
+		else if (item_index == RPG_INVENTORY_WP_REPEATER)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_REPEATER);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_REPEATER);
 		}
-		else if (value == (SELLER_ROCKET_LAUNCHER + 1))
+		else if (item_index == RPG_INVENTORY_WP_ROCKET_LAUNCHER)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_ROCKET_LAUNCHER);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
 		}
-		else if (value == (SELLER_BOWCASTER + 1))
+		else if (item_index == RPG_INVENTORY_WP_BOWCASTER)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BOWCASTER);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_BOWCASTER);
 		}
-		else if (value == (SELLER_BLASTER_PISTOL + 1))
+		else if (item_index == RPG_INVENTORY_WP_BLASTER_PISTOL)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_BLASTER_PISTOL);
 		}
-		else if (value == (SELLER_FLECHETTE + 1))
+		else if (item_index == RPG_INVENTORY_WP_FLECHETTE)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_FLECHETTE);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_FLECHETTE);
 		}
-		else if (value == (SELLER_CONCUSSION + 1))
+		else if (item_index == RPG_INVENTORY_WP_CONCUSSION)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_CONCUSSION);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_CONCUSSION);
 		}
-		else if (value == (SELLER_FLAME_FUEL + 1))
+		else if (item_index == RPG_INVENTORY_MISC_FLAME_THROWER_FUEL)
 		{
 			ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] += 10;
 		}
-		else if (value == (SELLER_JETPACK_FUEL + 1))
+		else if (item_index == RPG_INVENTORY_MISC_JETPACK_FUEL)
 		{
 			ent->client->pers.jetpack_fuel += (10 * JETPACK_SCALE);
 			ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel / JETPACK_SCALE;
 		}
-		else if (value == (SELLER_LIGHTSABER + 1))
+		else if (item_index == RPG_INVENTORY_WP_SABER)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_SABER);
 		}
-		else if (value == (SELLER_STUN_BATON + 1))
+		else if (item_index == RPG_INVENTORY_WP_STUN_BATON)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_STUN_BATON);
 		}
-		else if (value == (SELLER_EWEB + 1))
+		else if (item_index == RPG_INVENTORY_ITEM_EWEB)
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_EWEB);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_EWEB);
 		}
-		else if (value == (SELLER_DEMP2 + 1))
+		else if (item_index == RPG_INVENTORY_WP_DEMP2)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DEMP2);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_DEMP2);
 		}
-		else if (value == (SELLER_BRYAR_PISTOL + 1))
+		else if (item_index == RPG_INVENTORY_WP_BRYAR_PISTOL)
 		{
 			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_OLD);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_WP_BRYAR_PISTOL);
 		}
-		else if (value == (SELLER_BINOCULARS + 1))
+		else if (item_index == RPG_INVENTORY_ITEM_BINOCULARS)
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_BINOCULARS);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_BINOCULARS);
 		}
-		else if (value == (SELLER_JETPACK + 1))
+		else if (item_index == RPG_INVENTORY_ITEM_JETPACK)
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_JETPACK);
 		}
-		else if (value == (SELLER_CLOAK_ITEM + 1))
+		else if (item_index == RPG_INVENTORY_ITEM_CLOAK)
 		{
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_CLOAK);
 
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_CLOAK);
 		}
-		else if (value == (SELLER_FORCE_BOON + 1))
+		else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON)
 		{
 			if (ent->client->ps.powerups[PW_FORCE_BOON] < level.time)
-				ent->client->ps.powerups[PW_FORCE_BOON] = level.time + 60000;
+				ent->client->ps.powerups[PW_FORCE_BOON] = level.time + 30000;
 			else
-				ent->client->ps.powerups[PW_FORCE_BOON] += 60000;
+				ent->client->ps.powerups[PW_FORCE_BOON] += 30000;
 		}
-		else if (value == (SELLER_MAGIC_POTION + 1))
-		{
-			zyk_add_mp(ent, 200);
-		}
-		else if (value == (SELLER_AMMO_ALL + 1))
-		{
-			Add_Ammo(ent,AMMO_BLASTER,100);
-
-			Add_Ammo(ent,AMMO_POWERCELL,100);
-
-			Add_Ammo(ent,AMMO_METAL_BOLTS,100);
-
-			Add_Ammo(ent,AMMO_ROCKETS,5);
-
-			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_THERMAL);
-			Add_Ammo(ent,AMMO_THERMAL,5);
-
-			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_TRIP_MINE);
-			Add_Ammo(ent,AMMO_TRIPMINE,5);
-
-			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
-			Add_Ammo(ent,AMMO_DETPACK,5);
-
-			ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] += 50;
-		}
-		else if (value == (SELLER_BACTA_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_BACTA)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_BACTA);
 		}
-		else if (value == (SELLER_FORCE_FIELD_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_FORCE_FIELD)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_FORCE_FIELD);
 		}
-		else if (value == (SELLER_CLOAK_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_CLOAK)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_CLOAK);
 		}
-		else if (value == (SELLER_SHIELD_GENERATOR_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR);
 
 			set_max_shield(ent);
 		}
-		else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR);
 		}
-		else if (value == (SELLER_DEFLECTIVE_ARMOR + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR);
 		}
-		else if (value == (SELLER_SABER_ARMOR + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_SABER_ARMOR)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_SABER_ARMOR);
 		}
-		else if (value == (SELLER_FLAME_THROWER + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_FLAME_THROWER);
 		}
-		else if (value == (SELLER_STUN_BATON_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_STUN_BATON);
 		}
-		else if (value == (SELLER_BLASTER_PISTOL_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_BLASTER_PISTOL);
 		}
-		else if (value == (SELLER_BRYAR_PISTOL_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_BRYAR_PISTOL);
 		}
-		else if (value == (SELLER_E11_BLASTER_RIFLE_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE);
 		}
-		else if (value == (SELLER_DISRUPTOR_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_DISRUPTOR);
 		}
-		else if (value == (SELLER_BOWCASTER_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_BOWCASTER);
 		}
-		else if (value == (SELLER_DEMP2_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_DEMP2);
 		}
-		else if (value == (SELLER_REPEATER_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_REPEATER);
 		}
-		else if (value == (SELLER_FLECHETTE_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_FLECHETTE);
 		}
-		else if (value == (SELLER_CONCUSSION_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_CONCUSSION);
 		}
-		else if (value == (SELLER_ROCKETS_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER);
 		}
-		else if (value == (SELLER_DETPACKS_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_DETPACKS)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_DETPACKS);
 		}
-		else if (value == (SELLER_JETPACK_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_JETPACK);
 
 			// zyk: update the rpg stuff info at the client-side game
 			send_rpg_events(10000);
 		}
-		else if (value == (SELLER_GUNNER_RADAR + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_RADAR)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_RADAR);
 
 			// zyk: update the rpg stuff info at the client-side game
 			send_rpg_events(10000);
 		}
-		else if (value == (SELLER_THERMAL_VISION + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_THERMAL_VISION)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_THERMAL_VISION);
 		}
-		else if (value == (SELLER_SENTRY_GUN_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_SENTRY_GUN)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_SENTRY_GUN);
 		}
-		else if (value == (SELLER_SEEKER_DRONE_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_SEEKER_DRONE)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_SEEKER_DRONE);
 		}
-		else if (value == (SELLER_EWEB_UPGRADE + 1))
+		else if (item_index == RPG_INVENTORY_UPGRADE_EWEB)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_EWEB);
 		}
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-		ent->client->pers.credits -= zyk_get_seller_item_cost((value - 1), qtrue);
+		ent->client->pers.credits -= zyk_get_seller_item_cost(item_index, qtrue);
 		save_account(ent, qtrue);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
@@ -7824,6 +7437,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	int value = 0;
 	int sold = 0;
+	int item_index = 0;
 
 	if (trap->Argc() == 1)
 	{
@@ -7841,320 +7455,343 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (value < 1 || value > MAX_SELLER_ITEMS || zyk_get_seller_item_cost((value - 1), qfalse) == 0)
+	item_index = value - 1;
+
+	if (value < 1 || value > MAX_RPG_INVENTORY_ITEMS)
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"Invalid product number.\n\"" );
 		return;
 	}
 
-	if (value == (SELLER_BLASTER_PACK + 1) && ent->client->ps.ammo[AMMO_BLASTER] >= 20)
+	if (zyk_get_seller_item_cost(item_index, qfalse) == 0)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Cannot sell this item.\n\"");
+		return;
+	}
+
+	if (item_index == RPG_INVENTORY_AMMO_BLASTER_PACK && ent->client->ps.ammo[AMMO_BLASTER] >= 20)
 	{
 		ent->client->ps.ammo[AMMO_BLASTER] -= 20;
 		sold = 1;
 	}
-	else if (value == (SELLER_POWERCELL + 1) && ent->client->ps.ammo[AMMO_POWERCELL] >= 20)
+	else if (item_index == RPG_INVENTORY_AMMO_POWERCELL && ent->client->ps.ammo[AMMO_POWERCELL] >= 20)
 	{
 		ent->client->ps.ammo[AMMO_POWERCELL] -= 20;
 		sold = 1;
 	}
-	else if (value == (SELLER_METAL_BOLTS + 1) && ent->client->ps.ammo[AMMO_METAL_BOLTS] >= 20)
+	else if (item_index == RPG_INVENTORY_AMMO_METAL_BOLTS && ent->client->ps.ammo[AMMO_METAL_BOLTS] >= 20)
 	{
 		ent->client->ps.ammo[AMMO_METAL_BOLTS] -= 20;
 		sold = 1;
 	}
-	else if (value == (SELLER_ROCKETS + 1) && ent->client->ps.ammo[AMMO_ROCKETS] >= 1)
+	else if (item_index == RPG_INVENTORY_AMMO_ROCKETS && ent->client->ps.ammo[AMMO_ROCKETS] >= 1)
 	{
 		ent->client->ps.ammo[AMMO_ROCKETS] -= 1;
 		sold = 1;
 	}
-	else if (value == (SELLER_THERMALS + 1) && ent->client->ps.ammo[AMMO_THERMAL] >= 1)
+	else if (item_index == RPG_INVENTORY_AMMO_THERMALS && ent->client->ps.ammo[AMMO_THERMAL] >= 1)
 	{
 		ent->client->ps.ammo[AMMO_THERMAL] -= 1;
 		sold = 1;
 	}
-	else if (value == (SELLER_TRIPMINES + 1) && ent->client->ps.ammo[AMMO_TRIPMINE] >= 1)
+	else if (item_index == RPG_INVENTORY_AMMO_TRIPMINES && ent->client->ps.ammo[AMMO_TRIPMINE] >= 1)
 	{
 		ent->client->ps.ammo[AMMO_TRIPMINE] -= 1;
 		sold = 1;
 	}
-	else if (value == (SELLER_DETPACKS + 1) && ent->client->ps.ammo[AMMO_DETPACK] >= 1)
+	else if (item_index == RPG_INVENTORY_AMMO_DETPACKS && ent->client->ps.ammo[AMMO_DETPACK] >= 1)
 	{
 		ent->client->ps.ammo[AMMO_DETPACK] -= 1;
 		sold = 1;
 	}
-	else if (value == (SELLER_BACTA_CANISTER + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC))
+	else if (item_index == RPG_INVENTORY_ITEM_BACTA_CANISTER && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_MEDPAC);
 		sold = 1;
 	}
-	else if (value == (SELLER_BIG_BACTA + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC_BIG))
+	else if (item_index == RPG_INVENTORY_ITEM_BIG_BACTA && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC_BIG))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_MEDPAC_BIG);
 		sold = 1;
 	}
-	else if (value == (SELLER_SENTRY_GUN + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SENTRY_GUN))
+	else if (item_index == RPG_INVENTORY_ITEM_SENTRY_GUN && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SENTRY_GUN))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SENTRY_GUN);
 		sold = 1;
 	}
-	else if (value == (SELLER_SEEKER_DRONE + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER))
+	else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SEEKER);
 		sold = 1;
 	}
-	else if (value == (SELLER_FORCE_FIELD + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SHIELD))
+	else if (item_index == RPG_INVENTORY_ITEM_FORCE_FIELD && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SHIELD))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_SHIELD);
 		sold = 1;
 	}
-	else if (value == (SELLER_YSALAMIRI + 1) && ent->client->ps.powerups[PW_YSALAMIRI])
+	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI && ent->client->ps.powerups[PW_YSALAMIRI])
 	{
 		ent->client->ps.powerups[PW_YSALAMIRI] = 0;
 		sold = 1;
 	}
-	else if (value == (SELLER_E11_BLASTER + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BLASTER)))
+	else if (item_index == RPG_INVENTORY_WP_E11_BLASTER_RIFLE && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BLASTER)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BLASTER);
 		if (ent->client->ps.weapon == WP_BLASTER)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_DISRUPTOR + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DISRUPTOR)))
+	else if (item_index == RPG_INVENTORY_WP_DISRUPTOR && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DISRUPTOR)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_DISRUPTOR);
 		if (ent->client->ps.weapon == WP_DISRUPTOR)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_REPEATER + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_REPEATER)))
+	else if (item_index == RPG_INVENTORY_WP_REPEATER && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_REPEATER)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_REPEATER);
 		if (ent->client->ps.weapon == WP_REPEATER)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_ROCKET_LAUNCHER + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_ROCKET_LAUNCHER)))
+	else if (item_index == RPG_INVENTORY_WP_ROCKET_LAUNCHER && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_ROCKET_LAUNCHER)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_ROCKET_LAUNCHER);
 		if (ent->client->ps.weapon == WP_ROCKET_LAUNCHER)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_BOWCASTER + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BOWCASTER)))
+	else if (item_index == RPG_INVENTORY_WP_BOWCASTER && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BOWCASTER)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BOWCASTER);
 		if (ent->client->ps.weapon == WP_BOWCASTER)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_BLASTER_PISTOL + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_PISTOL)))
+	else if (item_index == RPG_INVENTORY_WP_BLASTER_PISTOL && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_PISTOL)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BRYAR_PISTOL);
 		if (ent->client->ps.weapon == WP_BRYAR_PISTOL)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_FLECHETTE + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_FLECHETTE)))
+	else if (item_index == RPG_INVENTORY_WP_FLECHETTE && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_FLECHETTE)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_FLECHETTE);
 		if (ent->client->ps.weapon == WP_FLECHETTE)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_CONCUSSION + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_CONCUSSION)))
+	else if (item_index == RPG_INVENTORY_WP_CONCUSSION && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_CONCUSSION)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_CONCUSSION);
 		if (ent->client->ps.weapon == WP_CONCUSSION)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_LIGHTSABER + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER)))
+	else if (item_index == RPG_INVENTORY_WP_SABER && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_SABER);
 		if (ent->client->ps.weapon == WP_SABER)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_STUN_BATON + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)))
+	else if (item_index == RPG_INVENTORY_WP_STUN_BATON && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_STUN_BATON);
 		if (ent->client->ps.weapon == WP_STUN_BATON)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_EWEB + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_EWEB))
+	else if (item_index == RPG_INVENTORY_ITEM_EWEB && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_EWEB))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_EWEB);
 		sold = 1;
 	}
-	else if (value == (SELLER_DEMP2 + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DEMP2)))
+	else if (item_index == RPG_INVENTORY_WP_DEMP2 && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DEMP2)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_DEMP2);
 		if (ent->client->ps.weapon == WP_DEMP2)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_BRYAR_PISTOL + 1) && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_OLD)))
+	else if (item_index == RPG_INVENTORY_WP_BRYAR_PISTOL && (ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_OLD)))
 	{
 		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BRYAR_OLD);
 		if (ent->client->ps.weapon == WP_BRYAR_OLD)
 			ent->client->ps.weapon = WP_MELEE;
 		sold = 1;
 	}
-	else if (value == (SELLER_BINOCULARS + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_BINOCULARS))
+	else if (item_index == RPG_INVENTORY_ITEM_BINOCULARS && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_BINOCULARS))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_BINOCULARS);
 		sold = 1;
 	}
-	else if (value == (SELLER_JETPACK + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK))
+	else if (item_index == RPG_INVENTORY_ITEM_JETPACK && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_JETPACK);
 		sold = 1;
 	}
-	else if (value == (SELLER_CLOAK_ITEM + 1) && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_CLOAK))
+	else if (item_index == RPG_INVENTORY_ITEM_CLOAK && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_CLOAK))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_CLOAK);
 		sold = 1;
 	}
-	else if (value == (SELLER_FORCE_BOON + 1) && ent->client->ps.powerups[PW_FORCE_BOON])
+	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON && ent->client->ps.powerups[PW_FORCE_BOON])
 	{
 		ent->client->ps.powerups[PW_FORCE_BOON] = 0;
 		sold = 1;
 	}
-	else if (value == (SELLER_MAGIC_CRYSTAL + 1) && ent->client->pers.magic_crystals > 0)
+	else if (item_index == RPG_INVENTORY_MISC_MAGIC_CRYSTAL && ent->client->pers.magic_crystals > 0)
 	{
 		ent->client->pers.magic_crystals--;
 		sold = 1;
 	}
-	else if (value == (SELLER_BACTA_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_BACTA);
 		sold = 1;
 	}
-	else if (value == (SELLER_FORCE_FIELD_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_FORCE_FIELD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_FORCE_FIELD);
 		sold = 1;
 	}
-	else if (value == (SELLER_CLOAK_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_CLOAK && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_CLOAK);
 		sold = 1;
 	}
-	else if (value == (SELLER_SHIELD_GENERATOR_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR);
 		set_max_shield(ent);
 		sold = 1;
 	}
-	else if (value == (SELLER_IMPACT_REDUCER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR);
 		sold = 1;
 	}
-	else if (value == (SELLER_DEFLECTIVE_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR);
 		sold = 1;
 	}
-	else if (value == (SELLER_SABER_ARMOR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_SABER_ARMOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_SABER_ARMOR);
 		sold = 1;
 	}
-	else if (value == (SELLER_FLAME_THROWER + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_FLAME_THROWER);
 		sold = 1;
 	}
-	else if (value == (SELLER_STUN_BATON_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_STUN_BATON);
 		sold = 1;
 	}
-	else if (value == (SELLER_BLASTER_PISTOL_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_BLASTER_PISTOL);
 		sold = 1;
 	}
-	else if (value == (SELLER_BRYAR_PISTOL_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_BRYAR_PISTOL);
 		sold = 1;
 	}
-	else if (value == (SELLER_E11_BLASTER_RIFLE_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE);
 		sold = 1;
 	}
-	else if (value == (SELLER_DISRUPTOR_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_DISRUPTOR);
 		sold = 1;
 	}
-	else if (value == (SELLER_BOWCASTER_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_BOWCASTER);
 		sold = 1;
 	}
-	else if (value == (SELLER_DEMP2_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_DEMP2);
 		sold = 1;
 	}
-	else if (value == (SELLER_REPEATER_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_REPEATER);
 		sold = 1;
 	}
-	else if (value == (SELLER_FLECHETTE_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_FLECHETTE);
 		sold = 1;
 	}
-	else if (value == (SELLER_CONCUSSION_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_CONCUSSION);
 		sold = 1;
 	}
-	else if (value == (SELLER_ROCKETS_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER);
 		sold = 1;
 	}
-	else if (value == (SELLER_DETPACKS_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DETPACKS] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_DETPACKS && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DETPACKS] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_DETPACKS);
 		sold = 1;
 	}
-	else if (value == (SELLER_JETPACK_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_JETPACK);
 		sold = 1;
 	}
-	else if (value == (SELLER_GUNNER_RADAR + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_RADAR] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_RADAR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_RADAR] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_RADAR);
 		sold = 1;
 	}
-	else if (value == (SELLER_THERMAL_VISION + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_THERMAL_VISION && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_THERMAL_VISION);
 		sold = 1;
 	}
-	else if (value == (SELLER_SENTRY_GUN_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_SENTRY_GUN && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_SENTRY_GUN);
 		sold = 1;
 	}
-	else if (value == (SELLER_SEEKER_DRONE_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_SEEKER_DRONE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_SEEKER_DRONE);
 		sold = 1;
 	}
-	else if (value == (SELLER_EWEB_UPGRADE + 1) && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
+	else if (item_index == RPG_INVENTORY_UPGRADE_EWEB && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_EWEB);
+		sold = 1;
+	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR);
+		sold = 1;
+	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_LEGENDARY_QUEST_LOG);
+		sold = 1;
+	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR);
 		sold = 1;
 	}
 
@@ -8162,7 +7799,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	
 	if (sold == 1)
 	{
-		add_credits(ent, zyk_get_seller_item_cost((value - 1), qfalse));
+		add_credits(ent, zyk_get_seller_item_cost(item_index, qfalse));
 		save_account(ent, qtrue);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
@@ -12596,7 +12233,6 @@ command_t commands[] = {
 	{ "silence",			Cmd_Silence_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "snipermode",			Cmd_SniperMode_f,			CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "snipertable",		Cmd_SniperTable_f,			CMD_NOINTERMISSION },
-	{ "stuff",				Cmd_Stuff_f,				CMD_RPG|CMD_NOINTERMISSION },
 	{ "team",				Cmd_Team_f,					CMD_NOINTERMISSION },
 //	{ "teamtask",			Cmd_TeamTask_f,				CMD_NOINTERMISSION },
 	{ "teamvote",			Cmd_TeamVote_f,				CMD_NOINTERMISSION },
