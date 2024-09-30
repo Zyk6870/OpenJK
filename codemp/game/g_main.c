@@ -9650,17 +9650,17 @@ void G_RunFrame( int levelTime ) {
 								// zyk: holding Use key while meditating calls the Spirit Tree by clearing the current tree entities so next frame will create a new one
 								if (ent->client->pers.cmd.buttons & BUTTON_USE)
 								{
-									if (ent->client->pers.magic_power > QUEST_SPIRIT_TREE_CALL_COST)
+									if (ent->client->pers.magic_crystals > QUEST_SPIRIT_TREE_CALL_COST)
 									{
 										ent->client->pers.quest_spirit_tree_id = -1;
 
-										ent->client->pers.magic_power -= QUEST_SPIRIT_TREE_CALL_COST;
+										ent->client->pers.magic_crystals -= QUEST_SPIRIT_TREE_CALL_COST;
 
 										trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
 									}
 									else
 									{
-										trap->SendServerCommand(ent->s.number, "cp \"Not enough MP to call your Spirit Tree\n\"");
+										trap->SendServerCommand(ent->s.number, "cp \"Not enough Blue Crystals to call your Spirit Tree\n\"");
 									}
 								}
 							}
