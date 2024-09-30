@@ -7349,7 +7349,10 @@ void zyk_calculate_current_weight(gentity_t* ent)
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
-		current_weight += (ent->client->pers.rpg_inventory[i] * zyk_get_item_weight(i));
+		if (ent->client->pers.rpg_inventory[i] > 0)
+		{
+			current_weight += (ent->client->pers.rpg_inventory[i] * zyk_get_item_weight(i));
+		}
 	}
 
 	ent->client->pers.current_weight = current_weight;
