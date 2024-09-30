@@ -6258,7 +6258,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					{
 						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough enemies to weaken their army and make the Spirit Tree summoned.\nDefeat some Mage Masters and regenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditating in the tree, the amount of crystals you have and defeating enemies will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to call your Spirit Tree by spending some mp\n\n^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n^3Regen Progress: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d\n\n\"", 
 							QUESTCHAR_ALL_SPIRITS, 
-							ent->client->pers.quest_defeated_enemies, (QUEST_ENEMY_WAVE_COUNT * 2),
+							ent->client->pers.quest_defeated_enemies, QUEST_MIN_ENEMIES_TO_DEFEAT,
 							ent->client->pers.quest_masters_defeated, QUEST_MASTERS_TO_DEFEAT,
 							ent->client->pers.quest_progress, MAX_QUEST_PROGRESS,
 							zyk_number_of_allies_in_map(ent), ent->client->pers.quest_tries, (ent->client->pers.quest_event_timer - level.time)));
@@ -6299,11 +6299,11 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 						if (page == 1 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 0)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Can poison targets with its melee attacks. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier wearing Impact Reducer Armor. ^2Magic: Air^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Can poison targets with its melee attacks. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier wearing Impact Reducer Armor. ^2Magic: Air\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Mage Scholar: ^7mage with Magic Fist. He is wearing the Magic Armor. ^2Magic: Magic Dome, Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: Magic Dome, Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. He is wearing all armors. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Force Mage: ^7has no weapons. Fight with Force and Magic powers. ^2Magic: Healing Area, Magic Dome, Dark, Light\n^3Mage Scholar: ^7mage with Magic Fist. He is wearing the Magic Armor. ^2Magic: high-level Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: high-level Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. He is wearing all armors. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 3 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 2)
 						{

@@ -2241,7 +2241,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 				quest_player->client->pers.quest_defeated_enemies += 1;
 
-				if (quest_player->client->pers.quest_defeated_enemies == (QUEST_ENEMY_WAVE_COUNT * 2))
+				if (quest_player->client->pers.quest_defeated_enemies == QUEST_MIN_ENEMIES_TO_DEFEAT)
 				{ // zyk: start the second part of the quest, the Spirit Tree regen
 					zyk_set_starting_quest_progress(quest_player);
 
