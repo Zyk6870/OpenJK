@@ -6765,7 +6765,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nDefeat enough enemies to weaken their army and make the Spirit Tree summoned.\nDefeat some Mage Masters and regenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditating in the tree, the amount of crystals you have and defeating enemies will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a blue crystal call your Spirit Tree\n\n^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n^3Regen Progress: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d\n\n\"", 
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nDefeat enough enemies to weaken their army and make the Spirit Tree summoned.\nDefeat some Mage Masters and regenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditating in the tree, the amount of crystals you have and defeating enemies will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a blue crystal call your Spirit Tree.\n\n^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n^3Regen Progress: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n^3Time for next enemy: ^7%d\n\n\"", 
 							QUESTCHAR_ALL_SPIRITS, 
 							ent->client->pers.quest_defeated_enemies, QUEST_MIN_ENEMIES_TO_DEFEAT,
 							ent->client->pers.quest_masters_defeated, QUEST_MASTERS_TO_DEFEAT,
@@ -6914,7 +6914,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand( ent->s.number, "print \"You must specify a product number.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"You must specify an item number.\n\"" );
 		return;
 	}
 
@@ -6932,7 +6932,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 
 	if (value < 1 || value > MAX_RPG_INVENTORY_ITEMS)
 	{
-		trap->SendServerCommand( ent->s.number, "print \"Invalid product number.\n\"" );
+		trap->SendServerCommand( ent->s.number, "print \"Invalid item number.\n\"" );
 		return;
 	}
 
@@ -7443,7 +7443,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"You must specify a product number.\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \"You must specify an item number.\n\"" );
 		return;
 	}
 
@@ -7461,7 +7461,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 
 	if (value < 1 || value > MAX_RPG_INVENTORY_ITEMS)
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid product number.\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \"Invalid item number.\n\"" );
 		return;
 	}
 
