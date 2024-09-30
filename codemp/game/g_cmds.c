@@ -6054,7 +6054,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	return "";
 }
 
-void zyk_list_inventory(gentity_t* ent, int page)
+void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 {
 	int inventory_it = 0;
 	int results_per_page = 20; // zyk: number of results per page
@@ -6099,7 +6099,7 @@ void zyk_list_inventory(gentity_t* ent, int page)
 		}
 	}
 
-	trap->SendServerCommand(ent->s.number, va("print \"\n%s\n\"", message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n%s\n\"", message));
 }
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
@@ -6247,7 +6247,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						if (page <= 0)
 							page = 1;
 
-						zyk_list_inventory(ent, page);
+						zyk_list_inventory(ent, ent, page);
 					}
 				}
 			}
@@ -10709,6 +10709,29 @@ void Cmd_Players_f( gentity_t *ent ) {
 			if (Q_stricmp(arg2, "force") == 0 || Q_stricmp(arg2, "misc") == 0 || Q_stricmp(arg2, "magic") == 0)
 			{ // zyk: show skills of the player
 				zyk_list_player_skills(player_ent, ent, G_NewString(arg2));
+			}
+			else if (Q_stricmp(arg2, "inventory") == 0)
+			{
+				if (trap->Argc() == 3)
+				{
+					trap->SendServerCommand(ent->s.number, "print \"Must pass a page number. Example: ^3/players <player name or ID> inventory 1^7\n\"");
+				}
+				else
+				{
+					int page = 1; // zyk: page the user wants to see
+					char arg3[MAX_STRING_CHARS];
+
+					strcpy(arg3, "");
+
+					trap->Argv(3, arg3, sizeof(arg3));
+
+					page = atoi(arg3);
+
+					if (page <= 0)
+						page = 1;
+
+					zyk_list_inventory(player_ent, ent, page);
+				}
 			}
 			else
 			{
