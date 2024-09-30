@@ -536,6 +536,7 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_CHANGELING_HOWLER] = "changeling_howler";
 
 	enemy_names[QUEST_NPC_ALLY_MAGE] = "ally_mage";
+	enemy_names[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = "ally_elemental_force_mage";
 	enemy_names[QUEST_NPC_ALLY_FLYING_WARRIOR] = "ally_flying_warrior";
 	enemy_names[QUEST_NPC_ALLY_FORCE_WARRIOR] = "ally_force_warrior";
 	enemy_names[QUEST_NPC_SELLER] = "quest_seller";
@@ -567,6 +568,7 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_CHANGELING_HOWLER] = QUEST_NPC_BONUS_INCREASE;
 
 	bonus_increase[QUEST_NPC_ALLY_MAGE] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_ALLY_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
 	bonus_increase[QUEST_NPC_ALLY_FORCE_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
 	bonus_increase[QUEST_NPC_SELLER] = QUEST_NPC_BONUS_INCREASE * 2;
@@ -598,8 +600,9 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 7;
 	
 	max_levels[QUEST_NPC_ALLY_MAGE] = 10;
-	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = 8;
-	max_levels[QUEST_NPC_ALLY_FORCE_WARRIOR] = 8;
+	max_levels[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = 8;
+	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = 7;
+	max_levels[QUEST_NPC_ALLY_FORCE_WARRIOR] = 7;
 	max_levels[QUEST_NPC_SELLER] = 4;
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
@@ -770,6 +773,14 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 10 + skill_level_bonus;
 		}
+		else if (quest_npc_type == QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE)
+		{
+			int random_magic_power = Q_irand(SKILL_MAGIC_WATER_MAGIC, SKILL_MAGIC_LIGHT_MAGIC);
+
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, random_magic_power, ally_bonus + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 5 + skill_level_bonus;
+			}
 		else if (quest_npc_type == QUEST_NPC_ALLY_FLYING_WARRIOR)
 		{
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, ally_bonus + skill_level_bonus);
@@ -9777,7 +9788,8 @@ void G_RunFrame( int levelTime ) {
 									gentity_t* ally_ent = &g_entities[j];
 
 									// zyk: get a resistance member near the player
-									if (ally_ent && ally_ent->client && ally_ent->NPC && ally_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE &&
+									if (ally_ent && ally_ent->client && ally_ent->NPC && 
+										ally_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && ally_ent->client->pers.quest_npc <= QUEST_NPC_ALLY_FORCE_WARRIOR &&
 										ally_ent->client->pers.quest_npc_caller_player_id == ent->s.number)
 									{
 										vec3_t npc_origin;

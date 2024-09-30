@@ -2259,6 +2259,35 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 		}
 	}
 
+	if (attacker && attacker->client && attacker->NPC && attacker->client->pers.quest_npc == QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE)
+	{ // zyk: this quest ally can restore mp to allies when he defeats an enemy
+		int mp_to_restore = self->client->ps.stats[STAT_MAX_HEALTH];
+		int npc_it = 0;
+
+		for (npc_it = (MAX_CLIENTS + BODY_QUEUE_SIZE); npc_it < level.num_entities; npc_it++)
+		{
+			gentity_t* quest_enemy = &g_entities[npc_it];
+
+			if (mp_to_restore < (QUEST_WORM_MP_TO_RESTORE * 2))
+			{
+				break;
+			}
+			else if (quest_enemy && quest_enemy->client && quest_enemy->NPC && quest_enemy->health > 0 &&
+				quest_enemy->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && quest_enemy->client->pers.quest_npc <= QUEST_NPC_ALLY_FORCE_WARRIOR &&
+				quest_enemy != attacker)
+			{ // zyk: one of his allies
+				quest_enemy->client->pers.magic_power += (QUEST_WORM_MP_TO_RESTORE * 2);
+
+				mp_to_restore -= (QUEST_WORM_MP_TO_RESTORE * 2);
+			}
+		}
+
+		if (mp_to_restore > 0)
+		{ // zyk: restore mp to himself
+			attacker->client->pers.magic_power += mp_to_restore;
+		}
+	}
+
 	if (zyk_allow_quests.integer > 0 && 
 		self->client->sess.amrpgmode == 2 && 
 		!(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 

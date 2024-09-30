@@ -6300,7 +6300,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 						if (page == 1 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 0)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Can poison targets with its melee attacks. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. His melee attacks can absorb enemy health to restore mp to his allies. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier wearing Impact Reducer Armor. ^2Magic: Air\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Can poison targets with its melee attacks. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. Attacks absorb enemy health to restore mp to his allies. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier wearing Impact Reducer Armor. ^2Magic: Air\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 1)
 						{
@@ -6308,7 +6308,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 3 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance ally. Has force/saber. Your blue crystals makes them come as stronger allies. ^2Magic: Water, Earth, Fire, Air\n^3Ally Flying Warrior: ^7a Resistance ally. Flies and has guns. Your blue crystals makes them come as stronger allies. ^2Magic: Healing Area, Air\n^3Ally Mage: ^7a Resistance ally. Can use Magic Fist and all magic. Your blue crystals makes them come as stronger allies\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance ally. Has force/saber. Your blue crystals makes them come as stronger allies. ^2Magic: Water, Earth, Fire, Air\n^3Ally Flying Warrior: ^7a Resistance ally. Flies and has guns. Your blue crystals makes them come as stronger allies. ^2Magic: Healing Area, Air\n^3Ally Elemental Force Mage: ^7has no weapons. Uses force and magic. Defeated enemy gets hp absorbed to allies mp. ^2Magic: random elemental\n^3Ally Mage: ^7a Resistance ally. Can use Magic Fist and all magic. Your blue crystals makes them come as stronger allies\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 4 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 3)
 						{

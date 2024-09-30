@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.47"
+#define	GAMEVERSION	"New Zyk Mod v1.0.48"
 
 #define SECURITY_LOG "security.log"
 
@@ -798,6 +798,7 @@ typedef enum {
 	QUEST_NPC_FORCE_SABER_WARRIOR,
 	QUEST_NPC_CHANGELING_HOWLER,
 	QUEST_NPC_ALLY_MAGE,
+	QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE,
 	QUEST_NPC_ALLY_FLYING_WARRIOR,
 	QUEST_NPC_ALLY_FORCE_WARRIOR,
 	QUEST_NPC_SELLER,
