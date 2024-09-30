@@ -7259,12 +7259,9 @@ void melee_battle_winner()
 	}
 }
 
-// zyk: calculates current weight of stuff the RPG player is carrying
-void zyk_calculate_current_weight(gentity_t* ent)
+int zyk_get_item_weight(zyk_inventory_t item_index)
 {
 	int rpg_inventory_weights[MAX_RPG_INVENTORY_ITEMS];
-	int i = 0;
-	int current_weight = 0;
 
 	rpg_inventory_weights[RPG_INVENTORY_WP_STUN_BATON] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_WP_SABER] = 15;
@@ -7331,14 +7328,28 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 100;
 
 	rpg_inventory_weights[RPG_INVENTORY_MISC_MAGIC_CRYSTAL] = 1;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 3;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 4;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 10;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 0;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 0;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 0;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 0;
+
+	if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
+	{
+		return rpg_inventory_weights[item_index];
+	}
+
+	return 0;
+}
+
+// zyk: calculates current weight of stuff the RPG player is carrying
+void zyk_calculate_current_weight(gentity_t* ent)
+{
+	int i = 0;
+	int current_weight = 0;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
-		current_weight += (ent->client->pers.rpg_inventory[i] * rpg_inventory_weights[i]);
+		current_weight += (ent->client->pers.rpg_inventory[i] * zyk_get_item_weight(i));
 	}
 
 	ent->client->pers.current_weight = current_weight;

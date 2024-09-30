@@ -6309,6 +6309,7 @@ char* zyk_get_formatted_string(char *original_str, int max_number_chars)
 	return G_NewString(string_value);
 }
 
+extern int zyk_get_item_weight(zyk_inventory_t item_index);
 void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 {
 	int inventory_it = 0;
@@ -6347,16 +6348,17 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 				strcpy(sell_cost_str, "n/a ");
 			}
 
-			strcpy(current_column, va("^1%s - ^7%s: ^5%s - ^3%s - %s", zyk_get_formatted_number((inventory_it + 1), 2), 
+			strcpy(current_column, va("^1%s - ^7%s - ^5%s - ^2%s - ^3%s - %s", zyk_get_formatted_number((inventory_it + 1), 2),
 				zyk_get_formatted_string(zyk_get_inventory_item_name(inventory_it), 25),
-				zyk_get_formatted_number(ent->client->pers.rpg_inventory[inventory_it], 5), 
+				zyk_get_formatted_number(ent->client->pers.rpg_inventory[inventory_it], 5),
+				zyk_get_formatted_number((zyk_get_item_weight(inventory_it) * ent->client->pers.rpg_inventory[inventory_it]), 6),
 				buy_cost_str, sell_cost_str));
 
 			strcpy(message, va("%s%s\n", message, current_column));
 		}
 	}
 
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                     : ^5Count - ^3Buy  - Sell\n\n%s\n\"", message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                      - ^5Count - ^2Weight - ^3Buy  - Sell\n\n%s\n\"", message));
 }
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
