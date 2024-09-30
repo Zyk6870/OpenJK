@@ -5945,18 +5945,47 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				take = 1;
 			}
 
-			// zyk: some npcs have a chance of causing poison status
-			if (attacker && attacker->client && attacker->NPC && 
-				attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER && mod == MOD_MELEE && 
-				Q_irand(0, 100) < 40)
+			// zyk: some quest npcs have special abilities
+			if (attacker && attacker->client && attacker->NPC && mod == MOD_MELEE && Q_irand(0, 100) < 50)
 			{
-				targ->client->pers.poison_debounce_timer = 0;
-				targ->client->pers.poison_duration = level.time + 20000;
+				if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER)
+				{ // zyk: poison the target
+					targ->client->pers.poison_debounce_timer = 0;
+					targ->client->pers.poison_duration = level.time + 20000;
 
-				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_POISONED);
+					targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_POISONED);
+				}
+				else if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM)
+				{ // zyk: absorbs health from target to restore mp to all quest enemies in the map
+					int mp_to_restore = take;
+					int npc_it = 0;
+
+					for (npc_it = (MAX_CLIENTS + BODY_QUEUE_SIZE); npc_it < level.num_entities; npc_it++)
+					{
+						gentity_t* quest_enemy = &g_entities[npc_it];
+
+						if (mp_to_restore < QUEST_WORM_MP_TO_RESTORE)
+						{
+							break;
+						}
+						else if (quest_enemy && quest_enemy->client && quest_enemy->NPC && quest_enemy->health > 0 && 
+							quest_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && quest_enemy->client->pers.quest_npc <= QUEST_NPC_CHANGELING_HOWLER && 
+							quest_enemy != attacker)
+						{ // zyk: one of his allies
+							quest_enemy->client->pers.magic_power += QUEST_WORM_MP_TO_RESTORE;
+
+							mp_to_restore -= QUEST_WORM_MP_TO_RESTORE;
+						}
+					}
+
+					if (mp_to_restore > 0)
+					{ // zyk: restore his own mp if there is still some mp to restore
+						attacker->client->pers.magic_power += mp_to_restore;
+					}
+				}
 			}
 
-			// zyk: damage to health alsomakes RPG player lose Stamina
+			// zyk: damage to health also makes RPG player lose Stamina
 			stamina_loss = take;
 
 			if (targ->client->sess.amrpgmode == 2)
