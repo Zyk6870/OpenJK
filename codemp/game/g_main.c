@@ -9760,7 +9760,8 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.quest_defeated_enemies >= QUEST_MIN_ENEMIES_TO_DEFEAT)
 							{
-								int mage_master_chance = 1 + ((ent->client->pers.quest_defeated_enemies - QUEST_MIN_ENEMIES_TO_DEFEAT) / 2);
+								int mage_master_chance = 1 + ((ent->client->pers.quest_defeated_enemies - QUEST_MIN_ENEMIES_TO_DEFEAT) / 4) + 
+														 ((ent->client->pers.quest_progress * 10.0) / MAX_QUEST_PROGRESS);
 
 								if (chance_to_spawn_quest_npc < mage_master_chance)
 								{
