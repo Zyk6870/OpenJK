@@ -6158,6 +6158,246 @@ int zyk_number_of_enemies_in_map()
 	return total_enemies;
 }
 
+void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
+{
+	if (item_index == RPG_INVENTORY_AMMO_BLASTER_PACK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for E11 Blaster Rifle, Blaster Pistol and Bryar Pistol weapons\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_POWERCELL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Disruptor, Bowcaster and DEMP2 weapons\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_METAL_BOLTS)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Repeater, Flechette and Concussion Rifle weapons\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_ROCKETS)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Rocket Launcher weapon\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_THERMALS)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7thermal detonators\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_TRIPMINES)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7trip mines\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_DETPACKS)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7det packs\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_FLAME_THROWER_FUEL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7fuel for the flame thrower\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_SENTRY_GUN)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable gun which is placed in the ground and shoots nearby enemies\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable remote drone that shoots enemies at sight\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_BACTA_CANISTER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_FORCE_FIELD)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7creates a force field wall in front of the player that can hold almost any attack, except the concussion rifle alternate fire, which can get through\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_BIG_BACTA)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina. Recovers double the amount of a Bacta Canister\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_EWEB)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable emplaced gun\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_BINOCULARS)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to see far things better with the zoom feature\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_JETPACK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to fly. Jump and press Use Key to use it\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_CLOAK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to cloak himself. Npcs cannot detect you unless close enough\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_BLASTER_PISTOL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7pistol that can shoot a charged shot with alt fire. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_BRYAR_PISTOL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7similar to blaster pistol, but has a faster fire rate with normal fire. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_E11_BLASTER_RIFLE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Rifle that is used by the stormtroopers. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_DISRUPTOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Sniper rifle which can desintegrate the enemy. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_BOWCASTER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots green bolts, normal fire can be charged, and alt fire shoots a bouncing bolt. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_DEMP2)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7fires an electro magnetic pulse that causes bonus damage against droids. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_REPEATER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7imperial weapon that shoots orbs and a plasma bomb with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_FLECHETTE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7it is the shotgun of the game, and can shoot 2 bombs with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_CONCUSSION)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7powerful weapon, alt fire can shoot a beam that gets through force fields. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_ROCKET_LAUNCHER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots rockets and a homing missile with alternate fire. Uses rockets ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_SABER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the weapon of a Jedi/Sith. With single, each Saber Attack skill level gives new saber stances. With duals/staff the Saber Attack skill level gives more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_STUN_BATON)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that fires a small electric charge\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_JETPACK_FUEL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7jetpack fuel\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister and Big Bacta recovers more HP, more MP and more Stamina\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_FORCE_FIELD)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Force Field resists more damage. Allows getting them back pressing Use Key on them. Doing so requires some powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_CLOAK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Cloak Item will be able to cloak vehicles. Press Saber Stance key when riding a vehicle to cloak it. Also, when you are cloaked, npcs will only be able to detect you at a closer distance\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to restore his shield. The max shield will be the same as the max health\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source by 15 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 25 per cent weapon/melee damage to your health (only 5 per cent from saber) and deflects some weapon shots\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_SABER_ARMOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 5 per cent weapon/melee damage to your health (25 per cent from saber)\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7gives you the flame thrower. To use it, get stun baton and use alternate fire\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows stun baton to open any door, including locked ones. Also makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Increases Blaster Pistol firerate\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Increases Bryar Pistol firerate\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7E11 Blaster Rifle altfire has less spread\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases firerate of Disruptor\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases firerate of DEMP2 main fire\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases firerate of Repeater altfire\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases number of bolts shot by Flechette primary fire\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Concussion rifle can break saber-only damage objects and can move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes rockets able to damage saber-only damage objects and move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_DETPACKS)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes detpacks able to damage saber-only damage objects and move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases jetpack fuel consumption a bit and makes the jetpack more stable and faster\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_RADAR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7if you have the client plugin, a radar will be displayed in the screen showing positions of other players and npcs\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_THERMAL_VISION)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes binoculars detect enemies through a thermal vision system\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_SENTRY_GUN)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes Sentry Gun have more health and damage and detect enemies at a greater distance. Allows getting sentry guns back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_SEEKER_DRONE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes seeker drone shoot faster and with more damage. It also lasts longer\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_EWEB)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes E-Web have more health and damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, magic crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks. Second Mode increases resistance to damage to your shield from any source. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a magic crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. If you find him, he can give it to you. It has very useful info for the player. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 10 per cent. If the source is Magic Fist or a magic power, decreases damage by 25 per cent and absorbs some magic points\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+	}
+}
+
 /*
 ==================
 Cmd_ListAccount_f
@@ -6223,18 +6463,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 							if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
 							{
-								if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
-								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, magic crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks. Second Mode increases resistance to damage to your shield from any source. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a magic crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
-								}
-								if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
-								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. If you find him, he can give it to you. It has very useful info for the player. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
-								}
-								if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
-								{
-									trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 10 per cent. If the source is Magic Fist or a magic power, decreases damage by 25 per cent and absorbs some magic points\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
-								}
+								zyk_get_inventory_item_description(ent, item_index);
 							}
 							else
 							{
