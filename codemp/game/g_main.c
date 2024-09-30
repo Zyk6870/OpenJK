@@ -7316,7 +7316,7 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 100;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 100;
 
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
@@ -9378,7 +9378,7 @@ void G_RunFrame( int levelTime ) {
 					int skill_crystal_chance = 50 + chance_bonus;
 					int extra_tries_chance = 10 + chance_bonus;
 					int strike_chance = 10 + chance_bonus;
-					int puzzle_chance = 5 + (chance_bonus / 2);
+					int puzzle_chance = 10 + (chance_bonus / 4);
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
@@ -9717,7 +9717,7 @@ void G_RunFrame( int levelTime ) {
 					{
 						int chance_to_spawn_quest_npc = Q_irand(0, 99);
 						int quest_npcs_in_map = zyk_quest_npcs_in_the_map();
-						int seller_chance = 1 + (ent->client->pers.quest_defeated_enemies / 4);
+						int seller_chance = 1 + (ent->client->pers.quest_defeated_enemies / 5);
 
 						zyk_set_quest_event_timer(ent);
 

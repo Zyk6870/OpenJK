@@ -1596,51 +1596,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 		}
 		else if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 		{ // zyk: meditating, recover some stamina
-			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 4 &&
-				ent->client->pers.magic_power > 0 && 
-				(ent->client->pers.current_stamina < ent->client->pers.max_stamina || 
-				 ent->health < ent->client->pers.max_rpg_health || 
-				 ent->client->ps.stats[STAT_ARMOR] < ent->client->pers.max_rpg_shield || 
-				 ent->client->ps.fd.forcePower < ent->client->ps.fd.forcePowerMax)
-				)
-			{ // zyk: player has the full Quest Log
-				zyk_set_stamina(ent, 10 * stamina_recovery, qtrue);
-
-				if ((ent->health + 1) < ent->client->pers.max_rpg_health)
-				{
-					ent->health += 1;
-				}
-				else
-				{
-					ent->health = ent->client->pers.max_rpg_health;
-				}
-
-				if ((ent->client->ps.stats[STAT_ARMOR] + 1) < ent->client->pers.max_rpg_shield)
-				{
-					ent->client->ps.stats[STAT_ARMOR] += 1;
-				}
-				else
-				{
-					ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
-				}
-
-				if (ent->client->ps.fd.forcePower < ent->client->ps.fd.forcePowerMax)
-				{
-					ent->client->ps.fd.forcePower++;
-				}
-				else
-				{
-					ent->client->ps.fd.forcePower = ent->client->ps.fd.forcePowerMax;
-				}
-
-				ent->client->pers.magic_power--;
-
-				send_rpg_events(2000);
-			}
-			else
-			{
-				zyk_set_stamina(ent, 5 * stamina_recovery, qtrue);
-			}
+			zyk_set_stamina(ent, 5 * stamina_recovery, qtrue);
 		}
 		else
 		{ // zyk: decrease stamina if player is not idle. Also check if stamina run out
@@ -2675,9 +2631,17 @@ void ClientThink_real( gentity_t *ent ) {
 			zyk_player_speed *= bgSiegeClasses[client->siegeClass].speed;
 		}
 
-		if (client->sess.amrpgmode == 2 && client->pers.skill_levels[SKILL_RUN_SPEED] > 0)
-		{ // zyk: Run Speed skill
-			zyk_player_speed += (client->pers.skill_levels[SKILL_RUN_SPEED] * RPG_RUN_SPEED_SKILL_INCREASE);
+		if (client->sess.amrpgmode == 2)
+		{ // zyk: Run Speed
+			if (client->pers.skill_levels[SKILL_RUN_SPEED] > 0)
+			{
+				zyk_player_speed += (client->pers.skill_levels[SKILL_RUN_SPEED] * RPG_RUN_SPEED_SKILL_INCREASE);
+			}
+
+			if (client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= 5)
+			{ // zyk: full Quest Log increases Run Speed
+				zyk_player_speed += RPG_RUN_SPEED_SKILL_INCREASE;
+			}
 		}
 
 		if (client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))

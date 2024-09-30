@@ -5913,6 +5913,22 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
+			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= 5)
+			{ // zyk: full Quest Log. It works as an armor, absorbing some damage to restore some force
+				int force_power_regen_amount = (int)ceil(take * 0.05);
+
+				bonus_health_resistance += 0.05;
+
+				if ((targ->client->ps.fd.forcePower + force_power_regen_amount) < targ->client->ps.fd.forcePowerMax)
+				{
+					targ->client->ps.fd.forcePower += force_power_regen_amount;
+				}
+				else
+				{
+					targ->client->ps.fd.forcePower = targ->client->ps.fd.forcePowerMax;
+				}
+			}
+
 			if (targ->client->pers.quest_power_status & (1 << MAGIC_MAGIC_DOME))
 			{ // zyk: target using Magic Dome
 				bonus_health_resistance += (0.02 * targ->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME]);
