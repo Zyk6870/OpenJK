@@ -9396,9 +9396,9 @@ void G_RunFrame( int levelTime ) {
 					int player_power_level = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
 
 					int skill_crystal_chance = 70 - player_power_level + main_quest_progress;
-					int quest_crystal_chance = 21 + ent->client->pers.magic_crystals - ent->client->pers.quest_tries - main_quest_progress;
+					int quest_crystal_chance = 16 + (ent->client->pers.magic_crystals / 2) - ent->client->pers.quest_tries - main_quest_progress;
 					int side_quest_chance = ent->client->pers.magic_crystals / 15;
-					int safety_haven_chance = (ent->client->pers.magic_crystals / 10);
+					int safety_haven_chance = ent->client->pers.magic_crystals / 10;
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
