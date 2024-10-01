@@ -9404,7 +9404,7 @@ void G_RunFrame( int levelTime ) {
 					int skill_crystal_chance = 50 + chance_bonus;
 					int extra_tries_chance = 10 + chance_bonus;
 					int strike_chance = 10 + chance_bonus;
-					int puzzle_chance = 10 + (chance_bonus / 4);
+					int puzzle_chance = 5 + (chance_bonus / 4);
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
