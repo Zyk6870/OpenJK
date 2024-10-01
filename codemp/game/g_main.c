@@ -7489,26 +7489,6 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 	ent->client->pers.quest_event_timer = level.time + interval_time;
 }
 
-void zyk_set_magic_crystal_respawn_time(gentity_t* ent)
-{
-	int skill_progress = ent->client->pers.magic_crystals + zyk_total_skillpoints(ent);
-	int quest_progress = ((ent->client->pers.quest_progress * 50.0) / MAX_QUEST_PROGRESS) + 
-						  (ent->client->pers.quest_defeated_enemies / 5) + 
-						  (ent->client->pers.quest_masters_defeated * 4);
-
-	int interval_increase = skill_progress * RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL;
-	int interval_decrease = quest_progress * RPG_MAGIC_CRYSTAL_INTERVAL_PER_CRYSTAL;
-
-	int total_interval = RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME + interval_increase - interval_decrease;
-
-	if (total_interval < RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME)
-	{
-		total_interval = RPG_MAGIC_CRYSTAL_MIN_RESPAWN_TIME;
-	}
-
-	ent->client->pers.skill_crystal_timer = level.time + total_interval;
-}
-
 int zyk_number_of_used_entities()
 {
 	int i = 0;
@@ -9394,24 +9374,24 @@ void G_RunFrame( int levelTime ) {
 					plum->s.time = ent->client->pers.magic_power;
 				}
 
-				// zyk: skill crystals must be spawned after a certain amount of time
+				// zyk: time to spawn magic crystals and side quest stuff
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
 				{
-					int chance_bonus = (ent->client->pers.quest_defeated_enemies / 5) + 
-										(ent->client->pers.quest_masters_defeated * 2) + 
-										(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
+					int main_quest_progress = (ent->client->pers.quest_defeated_enemies / 2) +
+						(ent->client->pers.quest_masters_defeated * 2) +
+						(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
 
-					int skill_crystal_chance = 50 + chance_bonus;
-					int extra_tries_chance = 10 + chance_bonus;
-					int strike_chance = 10 + chance_bonus;
-					int puzzle_chance = 5 + (chance_bonus / 4);
+					int player_power_level = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
+
+					int skill_crystal_chance = 70 - player_power_level + main_quest_progress;
+					int quest_crystal_chance = 21 + ent->client->pers.magic_crystals - ent->client->pers.quest_tries - main_quest_progress;
+					int side_quest_chance = ent->client->pers.magic_crystals / 10;
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
 						skill_crystal_chance /= 2;
-						extra_tries_chance /= 2;
-						strike_chance /= 2;
-						puzzle_chance /= 2;
+						quest_crystal_chance /= 2;
+						side_quest_chance /= 2;
 					}
 					
 					if (Q_irand(0, 99) < skill_crystal_chance && !(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
@@ -9419,18 +9399,18 @@ void G_RunFrame( int levelTime ) {
 						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 					}
 					
-					if (Q_irand(0, 99) < extra_tries_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					if (Q_irand(0, 99) < quest_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Extra Tries Crystal
 						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 					}
 					
-					if (Q_irand(0, 99) < strike_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
+					if (Q_irand(0, 99) < quest_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
 					{ // zyk: Strike Crystal
 						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_STRIKE_CRYSTAL);
 					}
 					
-					if (Q_irand(0, 99) < puzzle_chance)
-					{ // zyk: puzzle. Can be the Energy Modulator one or the Magic Armor one
+					if (Q_irand(0, 99) < side_quest_chance)
+					{ // zyk: Energy Modulator side quest
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
 
@@ -9438,8 +9418,6 @@ void G_RunFrame( int levelTime ) {
 
 						if (chosen_entity)
 						{
-							int puzzle_item_chance = Q_irand(0, 1);
-
 							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
 							{
 								puzzle_x = chosen_entity->r.currentOrigin[0];
@@ -9453,19 +9431,72 @@ void G_RunFrame( int levelTime ) {
 								puzzle_z = chosen_entity->s.origin[2];
 							}
 
-							// zyk: it can be either the Energy Modulator puzzle or the Magic Armor puzzle
-							if (puzzle_item_chance == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
+							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
 							{
 								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, 60000, 30, puzzle_x, puzzle_y, puzzle_z);
 							}
-							else if (puzzle_item_chance == 1 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
+						}
+					}
+
+					if (Q_irand(0, 99) < side_quest_chance)
+					{ // zyk: Magic Armor side quest
+						float puzzle_x, puzzle_y, puzzle_z;
+						gentity_t* chosen_entity = NULL;
+
+						chosen_entity = zyk_find_entity_for_quest();
+
+						if (chosen_entity)
+						{
+							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
+							{
+								puzzle_x = chosen_entity->r.currentOrigin[0];
+								puzzle_y = chosen_entity->r.currentOrigin[1];
+								puzzle_z = chosen_entity->r.currentOrigin[2];
+							}
+							else
+							{
+								puzzle_x = chosen_entity->s.origin[0];
+								puzzle_y = chosen_entity->s.origin[1];
+								puzzle_z = chosen_entity->s.origin[2];
+							}
+
+							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
 							{
 								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 60000, 80, puzzle_x, puzzle_y, puzzle_z);
 							}
 						}
 					}
 
-					zyk_set_magic_crystal_respawn_time(ent);
+					if (Q_irand(0, 99) < side_quest_chance)
+					{ // zyk: Quest Log side quest
+						float puzzle_x, puzzle_y, puzzle_z;
+						gentity_t* chosen_entity = NULL;
+
+						chosen_entity = zyk_find_entity_for_quest();
+
+						if (chosen_entity)
+						{
+							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
+							{
+								puzzle_x = chosen_entity->r.currentOrigin[0];
+								puzzle_y = chosen_entity->r.currentOrigin[1];
+								puzzle_z = chosen_entity->r.currentOrigin[2];
+							}
+							else
+							{
+								puzzle_x = chosen_entity->s.origin[0];
+								puzzle_y = chosen_entity->s.origin[1];
+								puzzle_z = chosen_entity->s.origin[2];
+							}
+
+							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < 5)
+							{
+								zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, 100, qfalse, -1);
+							}
+						}
+					}
+
+					ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME;
 				}
 
 				// zyk: final event of the quest
@@ -9743,15 +9774,8 @@ void G_RunFrame( int levelTime ) {
 					{
 						int chance_to_spawn_quest_npc = Q_irand(0, 99);
 						int quest_npcs_in_map = zyk_quest_npcs_in_the_map();
-						int seller_chance = 1 + (ent->client->pers.quest_defeated_enemies / 5);
 
 						zyk_set_quest_event_timer(ent);
-
-						if (chance_to_spawn_quest_npc < seller_chance && quest_npcs_in_map < QUEST_MAX_NPCS_IN_MAP && 
-							ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < 5)
-						{ // zyk: theres a chance for the seller to actually come to the map
-							zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, 100, qfalse, -1);
-						}
 
 						if (zyk_is_main_quest_complete(ent) == qfalse &&
 							quest_npcs_in_map < QUEST_MAX_NPCS_IN_MAP)

@@ -4707,7 +4707,6 @@ int zyk_total_skillpoints(gentity_t* ent)
 }
 
 // zyk: initialize RPG skills of this player
-extern void zyk_set_magic_crystal_respawn_time(gentity_t* ent);
 extern void zyk_set_quest_event_timer(gentity_t* ent);
 extern void zyk_calculate_current_weight(gentity_t* ent);
 void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
@@ -5027,7 +5026,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.magic_consumption_timer = 0;
 
-			zyk_set_magic_crystal_respawn_time(ent);
+			ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME;
 
 			// zyk: loading initial force
 			ent->client->ps.fd.forcePower = ent->client->pers.max_force_power;
@@ -6813,7 +6812,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 4 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 3)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor. ^2Magic: Healing Area, Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Keep collecting crystals. Having a lot of blue crystals makes your allies have a better chance to appear and makes them stronger, but decreases the crystal spawn rate. Defeating enemies increase crystal spawn rate and also increase the chance for the Energy Modulator and Magic Armor to appear. The blue crystals you have also increase the Lightning Strike red crystal damage\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor. ^2Magic: Healing Area, Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger, increase Lightning Strike red crystal damage, but decrease the crystal spawn rate. Defeating enemies increase crystal spawn rate. Your blue crystals and your quest progress increase the chance for the Energy Modulator and Magic Armor to appear\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
 						}
 						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 4)
 						{
