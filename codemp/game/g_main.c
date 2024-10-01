@@ -5434,15 +5434,22 @@ void zyk_clear_quest_items(gentity_t* effect_ent)
 }
 
 extern int zyk_total_skillpoints(gentity_t* ent);
-int zyk_spawn_quest_item_effect(float x, float y, float z, int duration, char *quest_item_type)
+int zyk_spawn_quest_item_effect(float x, float y, float z, int duration, char *quest_item_name, zyk_quest_item_t quest_item_type)
 {
 	gentity_t* new_ent = G_Spawn();
 
 	zyk_set_entity_field(new_ent, "classname", "fx_runner");
-	zyk_set_entity_field(new_ent, "targetname", G_NewString(quest_item_type));
+	zyk_set_entity_field(new_ent, "targetname", G_NewString(quest_item_name));
 	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
 
-	new_ent->s.modelindex = G_EffectIndex("force/heal2");
+	if (quest_item_type == QUEST_ITEM_SAFETY_HAVEN)
+	{
+		new_ent->s.modelindex = G_EffectIndex("misc/genrings");
+	}
+	else
+	{
+		new_ent->s.modelindex = G_EffectIndex("force/heal2");
+	}
 
 	zyk_spawn_entity(new_ent);
 
@@ -5532,17 +5539,17 @@ void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crys
 
 	if (crystal_type == QUEST_ITEM_SKILL_CRYSTAL)
 	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_skill_crystal");
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_skill_crystal", crystal_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
 	else if (crystal_type == QUEST_ITEM_EXTRA_TRIES_CRYSTAL)
 	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_extra_tries_crystal");
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_extra_tries_crystal", crystal_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
 	else if (crystal_type == QUEST_ITEM_STRIKE_CRYSTAL)
 	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_strike_crystal");
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_strike_crystal", crystal_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
 }
@@ -5554,21 +5561,26 @@ int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int mod
 
 	if (quest_item_type == QUEST_ITEM_ENERGY_MODULATOR)
 	{
-		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_energy_modulator_puzzle");
+		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_energy_modulator_puzzle", quest_item_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/danger/ship_item04.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
 	}
 	else if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
 	{
-		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_magic_armor_puzzle");
+		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_magic_armor_puzzle", quest_item_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/desert/3po_torso.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
 	}
 	else if (quest_item_type == QUEST_ITEM_SPIRIT_TREE)
 	{
-		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_spirit_tree");
+		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_spirit_tree", quest_item_type);
 
 		z *= QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET;
 
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/yavin/tree10_b.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
+	}
+	else if (quest_item_type == QUEST_ITEM_SAFETY_HAVEN)
+	{
+		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_safe_haven", quest_item_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/vjun/globe.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
 	}
 
 	return quest_item_effect_id;
@@ -9385,13 +9397,15 @@ void G_RunFrame( int levelTime ) {
 
 					int skill_crystal_chance = 70 - player_power_level + main_quest_progress;
 					int quest_crystal_chance = 21 + ent->client->pers.magic_crystals - ent->client->pers.quest_tries - main_quest_progress;
-					int side_quest_chance = ent->client->pers.magic_crystals / 10;
+					int side_quest_chance = ent->client->pers.magic_crystals / 15;
+					int safety_haven_chance = (ent->client->pers.magic_crystals / 10);
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
 						skill_crystal_chance /= 2;
 						quest_crystal_chance /= 2;
 						side_quest_chance /= 2;
+						safety_haven_chance /= 2;
 					}
 					
 					if (Q_irand(0, 99) < skill_crystal_chance && !(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
@@ -9493,6 +9507,32 @@ void G_RunFrame( int levelTime ) {
 							{
 								zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, 100, qfalse, -1);
 							}
+						}
+					}
+
+					if (Q_irand(0, 99) < safety_haven_chance && zyk_is_main_quest_complete(ent) == qfalse)
+					{ // zyk: Safe Haven. Regens health, shield, force, stamina and mp
+						float safe_haven_x, safe_haven_y, safe_haven_z;
+						gentity_t* chosen_entity = NULL;
+
+						chosen_entity = zyk_find_entity_for_quest();
+
+						if (chosen_entity)
+						{
+							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
+							{
+								safe_haven_x = chosen_entity->r.currentOrigin[0];
+								safe_haven_y = chosen_entity->r.currentOrigin[1];
+								safe_haven_z = chosen_entity->r.currentOrigin[2];
+							}
+							else
+							{
+								safe_haven_x = chosen_entity->s.origin[0];
+								safe_haven_y = chosen_entity->s.origin[1];
+								safe_haven_z = chosen_entity->s.origin[2];
+							}
+
+							zyk_spawn_quest_item(QUEST_ITEM_SAFETY_HAVEN, 30000, 100, safe_haven_x, safe_haven_y, safe_haven_z);
 						}
 					}
 

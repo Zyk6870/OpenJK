@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.60"
+#define	GAMEVERSION	"New Zyk Mod v1.0.61"
 
 #define SECURITY_LOG "security.log"
 
@@ -556,6 +556,7 @@ typedef enum {
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
 	PLAYER_STATUS_POISONED,
 	PLAYER_STATUS_KEEP_QUEST_TRIES,
+	PLAYER_STATUS_SAFE_HAVEN,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -719,6 +720,7 @@ typedef enum {
 	QUEST_ITEM_ENERGY_MODULATOR,
 	QUEST_ITEM_MAGIC_ARMOR,
 	QUEST_ITEM_SPIRIT_TREE,
+	QUEST_ITEM_SAFETY_HAVEN,
 	NUM_QUEST_ITEMS
 } zyk_quest_item_t;
 
@@ -949,11 +951,11 @@ typedef struct clientPersistant_s {
 	int energy_modulator_mode;
 	int energy_modulator_entity_id;
 
-	int max_force_power; // zyk: max force power the player can have based on skill_levels[54] value
+	int max_force_power; // zyk: max force power the player can have based on Force Power skill level
 
 	int credits; // zyk: the amount of credits (RPG Mode currency) this player has now
 
-	int tutorial_step; // zyk: sets the current tutorial step, to display the correct message to hthe player
+	int tutorial_step; // zyk: sets the current tutorial step, to display the correct message to the player
 	int tutorial_timer; // zyk: used by the tutorial to set the interval between messages
 
 	// zyk: Race Mode. Sets the initial position of this racer which is calculated in racemode command. Default 0. If greater than 0, player joined a race
