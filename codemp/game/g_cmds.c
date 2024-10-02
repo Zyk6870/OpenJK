@@ -240,7 +240,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
 		return "an energy dome appears around you, damaging enemies inside it. It also increases your resistance to damage to your health a little. This power deals non-elemental damage";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
-		return "hits enemies around you with Water elemental damage. While this magic is active, slowly restore your health. Increases your Water element affinity. Deals extra damage to enemies with Fire affinity. Absorbs some Water damage";
+		return "hits enemies around you with Water elemental damage. While this magic is active, slowly restore health to you and nearby ally players or ally npcs. Increases your Water element affinity. Deals extra damage to enemies with Fire affinity. Absorbs some Water damage";
 	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
 		return "creates earthquakes and hits enemies with Earth elemental damage. Increases your Earth element affinity. Deals extra damage to enemies with Air affinity. Absorbs some Earth damage";
 	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
@@ -6894,6 +6894,28 @@ void zyk_add_mp(gentity_t* ent, int mp_amount)
 	send_rpg_events(2000);
 }
 
+void zyk_add_health(gentity_t* ent, int heal_amount)
+{
+	if (ent && ent->client)
+	{
+		int max_health = ent->client->ps.stats[STAT_MAX_HEALTH];
+
+		if (ent->client->sess.amrpgmode == 2)
+		{ // zyk: a RPG player, not a npc
+			max_health = ent->client->pers.max_rpg_health;
+		}
+
+		if ((ent->health + heal_amount) < max_health)
+		{
+			ent->health += heal_amount;
+		}
+		else
+		{
+			ent->health = max_health;
+		}
+	}
+}
+
 /*
 ==================
 Cmd_Buy_f
@@ -8122,7 +8144,7 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 	settings_descriptions[SETTINGS_JETPACK] = "Jetpack";
 	settings_descriptions[SETTINGS_ADMIN_PROTECT] = "Admin Protect";
 	settings_descriptions[SETTINGS_DIFFICULTY] = "Quest Difficulty";
-	settings_descriptions[SETTINGS_MAGIC_CRYSTALS] = "Magic Crystals";
+	settings_descriptions[SETTINGS_MAGIC_CRYSTALS] = "Spawn Quest Stuff in map";
 
 	if (settings_value >= 0 && settings_value < MAX_PLAYER_SETTINGS)
 	{
@@ -10785,13 +10807,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 		{ // zyk: use the magic power
 			int magic_cost = zyk_get_magic_cost(magic_number);
 
-			/*
-			if (ent->s.number < MAX_CLIENTS && zyk_is_main_quest_complete(ent) == qtrue)
-			{
-				magic_cost /= 2;
-			}
-			*/
-
 			if (ent->client->pers.magic_power >= magic_cost)
 			{
 				// zyk: magic usage effect
@@ -10802,8 +10817,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				ent->client->ps.torsoTimer = MAGIC_ANIM_TIME;
 				ent->client->ps.legsTimer = MAGIC_ANIM_TIME;
 				ent->client->ps.weaponTime = MAGIC_ANIM_TIME;
-
-				G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder1.mp3"));
 
 				if (magic_number == MAGIC_HEALING_AREA)
 				{

@@ -2766,6 +2766,7 @@ extern int	BMS_END;
 
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
 extern void zyk_add_mp(gentity_t* ent, int mp_amount);
+extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern void zyk_clear_quest_items(gentity_t* effect_ent);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
@@ -2937,14 +2938,11 @@ void fx_runner_think( gentity_t *ent )
 			{
 				int player_distance = Distance(ent->s.origin, player_ent->r.currentOrigin);
 
-				if (player_distance < 64)
+				if (player_distance < 72)
 				{
 					if (i < MAX_CLIENTS && player_ent->client->sess.amrpgmode == 2)
 					{
-						if (player_ent->health < player_ent->client->pers.max_rpg_health)
-						{
-							player_ent->health++;
-						}
+						zyk_add_health(player_ent, 1);
 
 						if (player_ent->client->ps.stats[STAT_ARMOR] < player_ent->client->pers.max_rpg_shield)
 						{
@@ -2971,10 +2969,7 @@ void fx_runner_think( gentity_t *ent )
 					}
 					else if (player_ent->NPC && player_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && player_ent->client->pers.quest_npc <= QUEST_NPC_SELLER)
 					{
-						if (player_ent->health < player_ent->client->ps.stats[STAT_MAX_HEALTH])
-						{
-							player_ent->health++;
-						}
+						zyk_add_health(player_ent, 1);
 
 						if (player_ent->client->ps.fd.forcePower < player_ent->client->ps.fd.forcePowerMax)
 						{

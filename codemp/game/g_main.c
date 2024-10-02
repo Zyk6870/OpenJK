@@ -5633,22 +5633,25 @@ void clear_special_power_effect(gentity_t* ent)
 	}
 }
 
+extern void zyk_add_health(gentity_t* ent, int heal_amount);
+
 // zyk: Healing Area
 void healing_area(gentity_t* ent)
 {
-	int damage = 1;
-
 	ent->client->pers.quest_power_status |= (1 << MAGIC_HEALING_AREA);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_AREA] = 0;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_AREA] = 100;
+	ent->client->pers.magic_power_hit_counter[MAGIC_HEALING_AREA] = 1;
 
-	zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing_area", "4", "env/red_cyc", 0, damage, 228, 1500);
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/movers/objects/green_beam_start.mp3"));
 }
 
 // zyk: Magic Dome
 void dome_of_damage(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_MAGIC_DOME);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] = 0;
+	ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] = 100;
+
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/cairn_beam_start.mp3"));
 }
 
 // zyk: Water Magic
@@ -5656,6 +5659,8 @@ void water_magic(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_WATER_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 500;
+
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/bodyfall_water1.mp3"));
 }
 
 // zyk: Earth Magic
@@ -5663,6 +5668,9 @@ void earth_magic(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_EARTH_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 500;
+	ent->client->pers.magic_power_debounce2_timer[MAGIC_EARTH_MAGIC] = level.time + 500;
+
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
 }
 
 // zyk: Fire Magic
@@ -5670,6 +5678,8 @@ void fire_magic(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_FIRE_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] = level.time + 500;
+
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
 }
 
 // zyk: Air Magic
@@ -5677,7 +5687,9 @@ void air_magic(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_AIR_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 500;
-	ent->client->pers.magic_power_hit_counter[MAGIC_AIR_MAGIC] = 1;
+	ent->client->pers.magic_power_debounce2_timer[MAGIC_AIR_MAGIC] = level.time + 500;
+
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/vacuum.mp3"));
 }
 
 // zyk: Dark Magic
@@ -5686,6 +5698,8 @@ void dark_magic(gentity_t* ent)
 	ent->client->pers.quest_power_status |= (1 << MAGIC_DARK_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] = 1;
+
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/tractorbeam_off_1.mp3"));
 }
 
 extern void zyk_lightning_dome_detonate(gentity_t* ent);
@@ -5727,9 +5741,6 @@ void lightning_dome(gentity_t* ent, int damage)
 
 	// we don't want it to ever bounce
 	missile->bounceCount = 0;
-
-	if (ent->s.number < level.maxclients)
-		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 }
 
 // zyk: Light Magic
@@ -5738,6 +5749,8 @@ void light_magic(gentity_t* ent)
 	ent->client->pers.quest_power_status |= (1 << MAGIC_LIGHT_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] = 1;
+
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 }
 
 // zyk: calculates bonus damage factor based on element of the magic used by attacker and target magic levels of both the same element and opposite element
@@ -5854,6 +5867,13 @@ void quest_power_events(gentity_t *ent)
 					// zyk: effect on player position while magic is active
 					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_HEALING_AREA, 700);
 
+					if (ent->client->pers.magic_power_hit_counter[MAGIC_HEALING_AREA] > 0)
+					{
+						zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing_area", "4", "env/red_cyc", 0, 1, 228, 1500);
+
+						ent->client->pers.magic_power_hit_counter[MAGIC_HEALING_AREA]--;
+					}
+
 					ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_AREA] = level.time + 500;
 				}
 			}
@@ -5883,25 +5903,11 @@ void quest_power_events(gentity_t *ent)
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] < level.time)
 				{
 					int heal_amount = ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
-					int max_health = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-					if (ent->client->sess.amrpgmode == 2)
-					{ // zyk: a player, not a npc, using this magic
-						max_health = ent->client->pers.max_rpg_health;
-					}
 
 					// zyk: effect on player position while magic is active
 					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_WATER_MAGIC, 700);
 
-					// zyk: restore some health
-					if ((ent->health + heal_amount) < max_health)
-					{
-						ent->health += heal_amount;
-					}
-					else
-					{
-						ent->health = max_health;
-					}
+					zyk_add_health(ent, heal_amount);
 
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
@@ -5909,8 +5915,31 @@ void quest_power_events(gentity_t *ent)
 
 						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
-							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water", "4", "world/waterfall3", 0, damage, 200, 1000);
+							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water", "4", "world/waterfall3", 0, damage, 100, 1000);
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water_effect", "0", "env/water_impact", 0, 0, 0, 1000);
+						}
+						else if (target_ent && target_ent->client)
+						{ // zyk: heal allies
+							qboolean is_ally = qfalse;
+							int ally_distance = Distance(ent->client->ps.origin, target_ent->client->ps.origin);
+
+							if (zyk_it < level.maxclients && !ent->NPC &&
+								zyk_is_ally(ent, target_ent) == qtrue)
+							{
+								is_ally = qtrue;
+							}
+
+							if (OnSameTeam(ent, target_ent) == qtrue || npcs_on_same_team(ent, target_ent) == qtrue)
+							{ // zyk: if one of them is npc, also check for allies
+								is_ally = qtrue;
+							}
+
+							if (is_ally == qtrue && ent != target_ent && ally_distance < max_distance)
+							{
+								zyk_add_health(target_ent, heal_amount);
+
+								zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water_effect", "0", "env/water_impact", 0, 0, 0, 1000);
+							}
 						}
 					}
 
@@ -5931,6 +5960,21 @@ void quest_power_events(gentity_t *ent)
 					// zyk: effect on player position while magic is active
 					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_EARTH_MAGIC, 700);
 
+					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
+					{
+						target_ent = &g_entities[zyk_it];
+
+						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
+						{
+							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_earth", "4", "env/rock_smash", 0, damage, 100, 1000);
+						}
+					}
+
+					ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 500;
+				}
+
+				if (ent->client->pers.magic_power_debounce2_timer[MAGIC_EARTH_MAGIC] < level.time)
+				{
 					G_ScreenShake(ent->client->ps.origin, ent, 10.0f, 2000, qtrue);
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
 
@@ -5960,13 +6004,11 @@ void quest_power_events(gentity_t *ent)
 								G_ScreenShake(target_ent->client->ps.origin, target_ent, 10.0f, 2000, qtrue);
 							}
 
-							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_earth", "4", "env/rock_smash", 0, damage, 100, 2000);
-
 							G_Sound(target_ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
 						}
 					}
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 2000;
+					ent->client->pers.magic_power_debounce2_timer[MAGIC_EARTH_MAGIC] = level.time + 2000;
 				}
 			}
 
@@ -5990,7 +6032,7 @@ void quest_power_events(gentity_t *ent)
 
 						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
-							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_fire", "4", "env/fire", 0, damage, 90, 1000);
+							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_fire", "4", "env/fire", 0, damage, 100, 1000);
 
 							G_Sound(target_ent, CHAN_AUTO, G_SoundIndex("sound/effects/fire_lp.wav"));
 						}
@@ -6027,24 +6069,32 @@ void quest_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))
 			{
+				gentity_t* target_ent = NULL;
+				int zyk_it = 0;
+				int targets_hit = 0;
+				int max_distance = 200 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
+				int damage = ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC];
+
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] < level.time)
 				{
-					gentity_t* target_ent = NULL;
-					int zyk_it = 0;
-					int targets_hit = 0;
-					int max_distance = 200 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
-					int damage = ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC];
-
 					// zyk: effect on player position while magic is active
 					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_AIR_MAGIC, 700);
 
-					if (ent->client->pers.magic_power_hit_counter[MAGIC_AIR_MAGIC] > 0)
+					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
-						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/vacuum.mp3"));
+						target_ent = &g_entities[zyk_it];
 
-						ent->client->pers.magic_power_hit_counter[MAGIC_AIR_MAGIC]--;
+						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
+						{
+							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_air", "4", "env/water_steam3", 0, damage, 100, 1000);
+						}
 					}
 
+					ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 500;
+				}
+
+				if (ent->client->pers.magic_power_debounce2_timer[MAGIC_AIR_MAGIC] < level.time)
+				{
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
 						target_ent = &g_entities[zyk_it];
@@ -6053,8 +6103,6 @@ void quest_power_events(gentity_t *ent)
 						{
 							static vec3_t forward;
 							vec3_t dir;
-
-							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_air", "4", "env/water_steam3", 0, damage, 100, 500);
 
 							if (target_ent->client)
 							{ // zyk: blows the target away
@@ -6072,7 +6120,7 @@ void quest_power_events(gentity_t *ent)
 						}
 					}
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 50;
+					ent->client->pers.magic_power_debounce2_timer[MAGIC_AIR_MAGIC] = level.time + 50;
 				}
 			}
 
@@ -7539,9 +7587,9 @@ int zyk_quest_npcs_in_the_map()
 	return total_npcs;
 }
 
-qboolean zyk_can_spawn_quest_crystal(gentity_t* ent)
+qboolean zyk_can_spawn_quest_item(gentity_t* ent)
 {
-	// zyk: a quest crystal requires quests enabled and not completed
+	// zyk: a quest item requires quests enabled and not completed
 	if (zyk_allow_quests.integer > 0 && 
 		!(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 		zyk_is_main_quest_complete(ent) == qfalse)
@@ -9383,9 +9431,9 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 				}
 
-				// zyk: show current magic power when player gain 100 mp or loses mp
+				// zyk: show current magic power when player gains or loses a certain amount of mp
 				if ((ent->client->pers.magic_power == 0 && ent->client->pers.magic_power != ent->client->pers.last_magic_power_shown) ||
-					(ent->client->pers.magic_power / 100) != (ent->client->pers.last_magic_power_shown / 100))
+					(ent->client->pers.magic_power / MAGIC_CHANGE_AMOUNT) != (ent->client->pers.last_magic_power_shown / MAGIC_CHANGE_AMOUNT))
 				{
 					gentity_t* plum;
 					vec3_t plum_origin;
@@ -9406,40 +9454,70 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				// zyk: time to spawn magic crystals and side quest stuff
-				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time)
+				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time && 
+					!(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
 				{
 					int main_quest_progress = (ent->client->pers.quest_defeated_enemies / 2) +
 						(ent->client->pers.quest_masters_defeated * 2) +
 						(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
 
 					int player_power_level = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
-
 					int skill_crystal_chance = 70 - player_power_level + main_quest_progress;
-					int quest_crystal_chance = 16 + (ent->client->pers.magic_crystals / 2) - ent->client->pers.quest_tries - main_quest_progress;
-					int side_quest_chance = (ent->client->pers.magic_crystals / 20) + (main_quest_progress / 10);
-					int safe_haven_chance = (ent->client->pers.magic_crystals / 15) + (main_quest_progress / 10);
+
+					int quest_item_chance = 16 + 
+						(ent->client->pers.magic_crystals / 2) - ent->client->pers.quest_tries - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] - main_quest_progress;
+
+					int side_quest_chance = (ent->client->pers.magic_crystals / 25) + (main_quest_progress / 15);
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
 						skill_crystal_chance /= 2;
-						quest_crystal_chance /= 2;
+						quest_item_chance /= 2;
 						side_quest_chance /= 2;
-						safe_haven_chance /= 2;
 					}
 					
-					if (Q_irand(0, 99) < skill_crystal_chance && !(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
+					if (Q_irand(0, 99) < skill_crystal_chance)
 					{ // zyk: Skill Crystal
 						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 					}
 					
-					if (Q_irand(0, 99) < quest_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
-					{ // zyk: Extra Tries Crystal
-						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
-					}
-					
-					if (Q_irand(0, 99) < quest_crystal_chance && zyk_can_spawn_quest_crystal(ent) == qtrue)
-					{ // zyk: Strike Crystal
-						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_STRIKE_CRYSTAL);
+					if (zyk_can_spawn_quest_item(ent) == qtrue)
+					{
+						if (Q_irand(0, 99) < quest_item_chance)
+						{ // zyk: Extra Tries Crystal
+							zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
+						}
+
+						if (Q_irand(0, 99) < quest_item_chance)
+						{ // zyk: Strike Crystal
+							zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_STRIKE_CRYSTAL);
+						}
+
+						if (Q_irand(0, 99) < quest_item_chance)
+						{ // zyk: Safe Haven. Regens health, shield, force, stamina and mp
+							float safe_haven_x, safe_haven_y, safe_haven_z;
+							gentity_t* chosen_entity = NULL;
+
+							chosen_entity = zyk_find_entity_for_quest();
+
+							if (chosen_entity)
+							{
+								if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
+								{
+									safe_haven_x = chosen_entity->r.currentOrigin[0];
+									safe_haven_y = chosen_entity->r.currentOrigin[1];
+									safe_haven_z = chosen_entity->r.currentOrigin[2];
+								}
+								else
+								{
+									safe_haven_x = chosen_entity->s.origin[0];
+									safe_haven_y = chosen_entity->s.origin[1];
+									safe_haven_z = chosen_entity->s.origin[2];
+								}
+
+								zyk_spawn_quest_item(QUEST_ITEM_SAFETY_HAVEN, 60000, 100, safe_haven_x, safe_haven_y, safe_haven_z);
+							}
+						}
 					}
 					
 					if (Q_irand(0, 99) < side_quest_chance)
@@ -9529,32 +9607,6 @@ void G_RunFrame( int levelTime ) {
 						}
 					}
 
-					if (Q_irand(0, 99) < safe_haven_chance && zyk_is_main_quest_complete(ent) == qfalse)
-					{ // zyk: Safe Haven. Regens health, shield, force, stamina and mp
-						float safe_haven_x, safe_haven_y, safe_haven_z;
-						gentity_t* chosen_entity = NULL;
-
-						chosen_entity = zyk_find_entity_for_quest();
-
-						if (chosen_entity)
-						{
-							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
-							{
-								safe_haven_x = chosen_entity->r.currentOrigin[0];
-								safe_haven_y = chosen_entity->r.currentOrigin[1];
-								safe_haven_z = chosen_entity->r.currentOrigin[2];
-							}
-							else
-							{
-								safe_haven_x = chosen_entity->s.origin[0];
-								safe_haven_y = chosen_entity->s.origin[1];
-								safe_haven_z = chosen_entity->s.origin[2];
-							}
-
-							zyk_spawn_quest_item(QUEST_ITEM_SAFETY_HAVEN, 30000, 100, safe_haven_x, safe_haven_y, safe_haven_z);
-						}
-					}
-
 					ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME;
 				}
 
@@ -9602,12 +9654,10 @@ void G_RunFrame( int levelTime ) {
 							}
 							else if (ent->client->pers.quest_final_event_step == 3)
 							{
-								ent->client->pers.magic_crystals += (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] + (ent->client->pers.quest_tries - 1));
-
-								ent->client->pers.quest_tries = 1;
+								ent->client->pers.magic_crystals += ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL];
 								ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] = 0;
 
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your green and red crystals are converted into blue crystals\n\"", QUESTCHAR_ALL_SPIRITS));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your red crystals are converted into blue crystals.\n\"", QUESTCHAR_ALL_SPIRITS));
 							}
 							else if (ent->client->pers.quest_final_event_step == 4)
 							{

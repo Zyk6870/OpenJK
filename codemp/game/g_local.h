@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.63"
+#define	GAMEVERSION	"New Zyk Mod v1.0.64"
 
 #define SECURITY_LOG "security.log"
 
@@ -776,6 +776,9 @@ typedef enum {
 // zyk: when casting magic, use anim for this amount of time in miliseconds
 #define MAGIC_ANIM_TIME 1400
 
+// zyk: show score plum when amount of magic power changes by this amount
+#define MAGIC_CHANGE_AMOUNT 50
+
 // zyk: damage bonus of weapons
 #define RPG_WEAPON_DMG_BONUS 0.025
 
@@ -988,8 +991,11 @@ typedef struct clientPersistant_s {
 	// zyk: timers used by the magic powers hitting this player
 	int magic_power_target_timer[MAX_MAGIC_POWERS];
 
-	// zyk: magic powers debounce timer, for example, like Wind powers
+	// zyk: magic powers debounce timer
 	int magic_power_debounce_timer[MAX_MAGIC_POWERS];
+
+	// zyk: second magic powers debounce timer
+	int magic_power_debounce2_timer[MAX_MAGIC_POWERS];
 
 	// zyk: debounce timer used to consume mp when magic is active
 	int magic_consumption_timer;

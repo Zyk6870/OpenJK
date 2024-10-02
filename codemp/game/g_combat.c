@@ -5975,7 +5975,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 
 			// zyk: some quest npcs have special abilities
-			if (attacker && attacker->client && attacker->NPC && mod == MOD_MELEE && Q_irand(0, 100) < 50)
+			if (attacker && attacker->client && attacker->NPC && mod == MOD_MELEE && targ->health > 0 && Q_irand(0, 100) < 50)
 			{
 				if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER)
 				{ // zyk: poison the target
@@ -6288,6 +6288,7 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 G_RadiusDamage
 ============
 */
+extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
 extern float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t* attacker, gentity_t* target);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
@@ -6413,6 +6414,8 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							ent->health += heal_amount;
 						else
 							ent->health = max_health;
+
+						zyk_add_health(ent, heal_amount);
 
 						zyk_set_stamina(ent, stamina_amount, qtrue);
 
