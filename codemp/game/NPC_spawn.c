@@ -1771,6 +1771,8 @@ finish:
 		newent->client->pers.quest_npc = QUEST_NPC_NONE;
 		newent->client->pers.quest_npc_caller_player_id = -1;
 
+		newent->client->pers.red_crystal_npc_timer = 0;
+
 		// zyk: initializing Magic Power attributes
 		newent->client->pers.quest_power_status = 0;
 		newent->client->pers.quest_power_usage_timer = 0;

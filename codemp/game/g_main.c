@@ -5442,14 +5442,7 @@ int zyk_spawn_quest_item_effect(float x, float y, float z, int duration, char *q
 	zyk_set_entity_field(new_ent, "targetname", G_NewString(quest_item_name));
 	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
 
-	if (quest_item_type == QUEST_ITEM_SAFETY_HAVEN)
-	{
-		new_ent->s.modelindex = G_EffectIndex("misc/genrings");
-	}
-	else
-	{
-		new_ent->s.modelindex = G_EffectIndex("force/heal2");
-	}
+	new_ent->s.modelindex = G_EffectIndex("force/heal2");
 
 	zyk_spawn_entity(new_ent);
 
@@ -5547,9 +5540,9 @@ void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crys
 		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_extra_tries_crystal", crystal_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
-	else if (crystal_type == QUEST_ITEM_STRIKE_CRYSTAL)
+	else if (crystal_type == QUEST_ITEM_SPECIAL_CRYSTAL)
 	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_strike_crystal", crystal_type);
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_red_crystal", crystal_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
 }
@@ -5576,11 +5569,6 @@ int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int mod
 		z *= QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET;
 
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/yavin/tree10_b.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
-	}
-	else if (quest_item_type == QUEST_ITEM_SAFETY_HAVEN)
-	{
-		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_safe_haven", quest_item_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/vjun/globe.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
 	}
 
 	return quest_item_effect_id;
@@ -7549,24 +7537,6 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 	ent->client->pers.quest_event_timer = level.time + interval_time;
 }
 
-int zyk_number_of_used_entities()
-{
-	int i = 0;
-	int total_used_entities = (MAX_CLIENTS + BODY_QUEUE_SIZE);
-
-	for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
-	{
-		gentity_t* this_ent = &g_entities[i];
-
-		if (this_ent && Q_stricmp(this_ent->classname, "freed") != 0)
-		{ // zyk: a non-free entity
-			total_used_entities++;
-		}
-	}
-
-	return total_used_entities;
-}
-
 extern int zyk_number_of_allies_in_map(gentity_t* ent);
 extern int zyk_number_of_enemies_in_map();
 int zyk_quest_npcs_in_the_map()
@@ -9385,22 +9355,30 @@ void G_RunFrame( int levelTime ) {
 					Player_FireFlameThrower(ent, qfalse);
 				}
 
-				// zyk: Lightning Strike red crystal. Do damage to the nearest quest enemy npc
-				if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && ent->client->ps.hasLookTarget)
+				// zyk: Red crystal. Convert the enemy npc the player is looking at
+				if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && ent->client->ps.hasLookTarget && 
+					ent->client->pers.cmd.buttons & BUTTON_USE)
 				{
 					gentity_t* target_enemy = &g_entities[ent->client->ps.lookTarget];
 
 					if (target_enemy && target_enemy->client && target_enemy->NPC &&
-						target_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && target_enemy->client->pers.quest_npc <= QUEST_NPC_CHANGELING_HOWLER)
+						target_enemy->client->playerTeam != NPCTEAM_PLAYER && target_enemy->client->pers.red_crystal_npc_timer == 0)
 					{
-						int red_crystal_damage = 200 + (5 * ent->client->pers.magic_crystals, RPG_INVENTORY_MISC_RED_CRYSTAL);
-
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
+						ent->client->pers.rpg_inventory_modified = qtrue;
 
-						zyk_quest_effect_spawn(ent, target_enemy, "zyk_strike_crystal_effect", "0", "env/huge_lightning", 0, 0, 0, 2000);
-						G_Damage(target_enemy, ent, ent, NULL, NULL, red_crystal_damage, 0, MOD_UNKNOWN);
+						target_enemy->client->pers.original_playerTeam = target_enemy->client->playerTeam;
+						target_enemy->client->pers.original_enemyTeam = target_enemy->client->enemyTeam;
 
-						G_Sound(target_enemy, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close2.mp3"));
+						target_enemy->client->playerTeam = NPCTEAM_PLAYER;
+						target_enemy->client->enemyTeam = NPCTEAM_ENEMY;
+						target_enemy->enemy = NULL;
+
+						target_enemy->client->pers.red_crystal_npc_timer = level.time + 5000 + (ent->client->pers.magic_crystals * 500);
+
+						zyk_quest_effect_spawn(ent, target_enemy, "zyk_red_crystal_effect", "0", "env/btend", 0, 0, 0, 2000);
+
+						G_Sound(target_enemy, CHAN_AUTO, G_SoundIndex("sound/effects/air_burst.mp3"));
 					}
 				}
 
@@ -9489,34 +9467,8 @@ void G_RunFrame( int levelTime ) {
 						}
 
 						if (Q_irand(0, 99) < quest_item_chance)
-						{ // zyk: Strike Crystal
-							zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_STRIKE_CRYSTAL);
-						}
-
-						if (Q_irand(0, 99) < quest_item_chance)
-						{ // zyk: Safe Haven. Regens health, shield, force, stamina and mp
-							float safe_haven_x, safe_haven_y, safe_haven_z;
-							gentity_t* chosen_entity = NULL;
-
-							chosen_entity = zyk_find_entity_for_quest();
-
-							if (chosen_entity)
-							{
-								if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
-								{
-									safe_haven_x = chosen_entity->r.currentOrigin[0];
-									safe_haven_y = chosen_entity->r.currentOrigin[1];
-									safe_haven_z = chosen_entity->r.currentOrigin[2];
-								}
-								else
-								{
-									safe_haven_x = chosen_entity->s.origin[0];
-									safe_haven_y = chosen_entity->s.origin[1];
-									safe_haven_z = chosen_entity->s.origin[2];
-								}
-
-								zyk_spawn_quest_item(QUEST_ITEM_SAFETY_HAVEN, 60000, 100, safe_haven_x, safe_haven_y, safe_haven_z);
-							}
+						{ // zyk: Red Crystal
+							zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
 						}
 					}
 					
@@ -9654,10 +9606,10 @@ void G_RunFrame( int levelTime ) {
 							}
 							else if (ent->client->pers.quest_final_event_step == 3)
 							{
-								ent->client->pers.magic_crystals += ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL];
-								ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] = 0;
+								ent->client->pers.magic_crystals += ent->client->pers.quest_defeated_enemies;
 
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your red crystals are converted into blue crystals.\n\"", QUESTCHAR_ALL_SPIRITS));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive this amount of blue crystals.\n\"", 
+									QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies));
 							}
 							else if (ent->client->pers.quest_final_event_step == 4)
 							{
@@ -9724,8 +9676,7 @@ void G_RunFrame( int levelTime ) {
 				if (level.load_entities_timer == 0 && 
 					zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
 					ent->client->ps.duelInProgress == qfalse && ent->health > 0 && 
-					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
-					zyk_number_of_used_entities() < (ENTITYNUM_MAX_NORMAL - 22) /* zyk: this is to guarantee the map will not crash */
+					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR
 					)
 				{
 					// zyk: Main Quest progress
@@ -10029,7 +9980,16 @@ void G_RunFrame( int levelTime ) {
 			}
 
 			if (ent->health > 0)
-			{ // zyk: npcs with magic powers
+			{ 
+				if (ent->client->pers.red_crystal_npc_timer > 0 && ent->client->pers.red_crystal_npc_timer < level.time)
+				{ // zyk: a converted npc. Return it back to normal
+					ent->client->playerTeam = ent->client->pers.original_playerTeam;
+					ent->client->enemyTeam = ent->client->pers.original_enemyTeam;
+
+					ent->client->pers.red_crystal_npc_timer = 0;
+				}
+				
+				// zyk: npcs with magic powers
 				if (ent->client->pers.quest_npc > QUEST_NPC_NONE && ent->client->pers.quest_event_timer < level.time)
 				{
 					if (ent->enemy)

@@ -236,7 +236,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have. This is used to cast magic powers";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
-		return "creates an energy area that makes you and your allies recover health, stamina and shield. It also deals a little non-elemental damage to enemies";
+		return "creates an energy area that makes you and your allies recover health, stamina, force and shield. It also deals a little non-elemental damage to enemies";
 	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
 		return "an energy dome appears around you, damaging enemies inside it. It also increases your resistance to damage to your health a little. This power deals non-elemental damage";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
@@ -6649,7 +6649,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Do a Lightning Strike to the nearest quest enemy npc that deals damage based on the amount of blue crystals you have\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing Use key will convert a nearby enemy npc into an ally for an amount of time based on the number of blue crystals you have\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
 	{

@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.64"
+#define	GAMEVERSION	"New Zyk Mod v1.0.65"
 
 #define SECURITY_LOG "security.log"
 
@@ -556,7 +556,6 @@ typedef enum {
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
 	PLAYER_STATUS_POISONED,
 	PLAYER_STATUS_KEEP_QUEST_TRIES,
-	PLAYER_STATUS_SAFE_HAVEN,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -716,11 +715,10 @@ typedef enum {
 	QUEST_ITEM_NONE,
 	QUEST_ITEM_SKILL_CRYSTAL,
 	QUEST_ITEM_EXTRA_TRIES_CRYSTAL,
-	QUEST_ITEM_STRIKE_CRYSTAL,
+	QUEST_ITEM_SPECIAL_CRYSTAL,
 	QUEST_ITEM_ENERGY_MODULATOR,
 	QUEST_ITEM_MAGIC_ARMOR,
 	QUEST_ITEM_SPIRIT_TREE,
-	QUEST_ITEM_SAFETY_HAVEN,
 	NUM_QUEST_ITEMS
 } zyk_quest_item_t;
 
@@ -889,6 +887,11 @@ typedef struct clientPersistant_s {
 	int fire_bolt_timer;
 	int fire_bolt_user_id;
 	int fire_bolt_hits_counter;
+
+	// zyk: time this npc will be allied to the RPG player
+	int red_crystal_npc_timer;
+	npcteam_t	original_playerTeam;
+	npcteam_t	original_enemyTeam;
 
 	// zyk: cooldown time to buy or sell
 	int buy_sell_timer;

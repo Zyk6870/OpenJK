@@ -6403,6 +6403,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						int max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
 						int heal_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 						int shield_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
+						int force_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 						int stamina_amount = 2 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 
 						if (ent->client->sess.amrpgmode == 2)
@@ -6410,14 +6411,18 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							max_health = ent->client->pers.max_rpg_health;
 						}
 
-						if ((ent->health + heal_amount) < max_health)
-							ent->health += heal_amount;
-						else
-							ent->health = max_health;
-
 						zyk_add_health(ent, heal_amount);
 
 						zyk_set_stamina(ent, stamina_amount, qtrue);
+
+						if ((ent->client->ps.fd.forcePower + force_amount) < ent->client->ps.fd.forcePowerMax)
+						{
+							ent->client->ps.fd.forcePower += force_amount;
+						}
+						else
+						{
+							ent->client->ps.fd.forcePower = ent->client->ps.fd.forcePowerMax;
+						}
 
 						if (ent->client->sess.amrpgmode == 2)
 						{

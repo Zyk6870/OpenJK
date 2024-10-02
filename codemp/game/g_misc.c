@@ -2766,8 +2766,6 @@ extern int	BMS_END;
 
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
 extern void zyk_add_mp(gentity_t* ent, int mp_amount);
-extern void zyk_add_health(gentity_t* ent, int heal_amount);
-extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern void zyk_clear_quest_items(gentity_t* effect_ent);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
@@ -2831,7 +2829,7 @@ void fx_runner_think( gentity_t *ent )
 	// zyk: one of the crystal types. Tests if there is a RPG player touching it
 	if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_strike_crystal") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_red_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_armor_puzzle") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0)
 	{
@@ -2857,7 +2855,7 @@ void fx_runner_think( gentity_t *ent )
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
 					}
-					else if (Q_stricmp(ent->targetname, "zyk_strike_crystal") == 0)
+					else if (Q_stricmp(ent->targetname, "zyk_red_crystal") == 0)
 					{
 						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_MISC_RED_CRYSTAL);
 
@@ -2925,68 +2923,6 @@ void fx_runner_think( gentity_t *ent )
 
 		// zyk: did not find the player, clear the Spirit Tree
 		zyk_clear_quest_effect(ent);
-	}
-	else if (Q_stricmp(ent->targetname, "zyk_safe_haven") == 0)
-	{
-		int i = 0;
-
-		for (i = 0; i < level.num_entities; i++)
-		{
-			gentity_t* player_ent = &g_entities[i];
-
-			if (player_ent && player_ent->client && player_ent->health > 0)
-			{
-				int player_distance = Distance(ent->s.origin, player_ent->r.currentOrigin);
-
-				if (player_distance < 72)
-				{
-					if (i < MAX_CLIENTS && player_ent->client->sess.amrpgmode == 2)
-					{
-						zyk_add_health(player_ent, 1);
-
-						if (player_ent->client->ps.stats[STAT_ARMOR] < player_ent->client->pers.max_rpg_shield)
-						{
-							player_ent->client->ps.stats[STAT_ARMOR]++;
-						}
-
-						if (player_ent->client->ps.fd.forcePower < player_ent->client->ps.fd.forcePowerMax)
-						{
-							player_ent->client->ps.fd.forcePower++;
-						}
-
-						zyk_add_mp(player_ent, 1);
-
-						zyk_set_stamina(player_ent, 1, qtrue);
-
-						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/shieldcon_run.wav"));
-
-						if (!(player_ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SAFE_HAVEN)))
-						{
-							trap->SendServerCommand(player_ent->s.number, "cp \"Safe Haven\n\"");
-
-							player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_SAFE_HAVEN);
-						}
-					}
-					else if (player_ent->NPC && player_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && player_ent->client->pers.quest_npc <= QUEST_NPC_SELLER)
-					{
-						zyk_add_health(player_ent, 1);
-
-						if (player_ent->client->ps.fd.forcePower < player_ent->client->ps.fd.forcePowerMax)
-						{
-							player_ent->client->ps.fd.forcePower++;
-						}
-
-						zyk_add_mp(player_ent, 1);
-
-						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/shieldcon_run.wav"));
-					}
-				}
-				else if (i < MAX_CLIENTS && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SAFE_HAVEN))
-				{ // zyk: player left the Safe Haven
-					player_ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_SAFE_HAVEN);
-				}
-			}
-		}
 	}
 
 	// zyk: Super Beam. Traces enemies and damages them
