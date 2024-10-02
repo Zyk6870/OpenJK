@@ -7518,11 +7518,12 @@ void zyk_show_tutorial(gentity_t* ent)
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = QUEST_NPC_SPAWN_TIME - (ent->client->pers.quest_defeated_enemies * 50);
+	int player_power_level = ent->client->pers.magic_crystals + zyk_total_skillpoints(ent);
+	int interval_time = QUEST_NPC_SPAWN_TIME - (player_power_level * 100);
 
 	if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 	{
-		interval_time -= (QUEST_NPC_SPAWN_TIME / 5);
+		interval_time -= (interval_time / 5);
 	}
 
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT))
@@ -9442,8 +9443,9 @@ void G_RunFrame( int levelTime ) {
 					int player_power_level = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
 					int skill_crystal_chance = 70 - player_power_level + main_quest_progress;
 
-					int quest_item_chance = 16 + 
-						(ent->client->pers.magic_crystals / 2) - ent->client->pers.quest_tries - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] - main_quest_progress;
+					int quest_item_chance = 21 + 
+						(ent->client->pers.magic_crystals / 2) - ent->client->pers.quest_tries - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] - 
+						main_quest_progress + (ent->client->pers.quest_masters_defeated * 10);
 
 					int side_quest_chance = (ent->client->pers.magic_crystals / 25) + (main_quest_progress / 15);
 
@@ -9606,9 +9608,12 @@ void G_RunFrame( int levelTime ) {
 							}
 							else if (ent->client->pers.quest_final_event_step == 3)
 							{
-								ent->client->pers.magic_crystals += ent->client->pers.quest_defeated_enemies;
+								ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += ent->client->pers.quest_defeated_enemies;
+								ent->client->pers.rpg_inventory_modified = qtrue;
 
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive this amount of blue crystals.\n\"", 
+								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
+
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive this amount of ^1Red ^7crystals.\n\"", 
 									QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies));
 							}
 							else if (ent->client->pers.quest_final_event_step == 4)
@@ -9868,8 +9873,9 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.quest_defeated_enemies >= QUEST_MIN_ENEMIES_TO_DEFEAT)
 							{
-								int mage_master_chance = 1 + ((ent->client->pers.quest_defeated_enemies - QUEST_MIN_ENEMIES_TO_DEFEAT) / 4) + 
-														 ((ent->client->pers.quest_progress * 10.0) / MAX_QUEST_PROGRESS);
+								int mage_master_chance = 
+									(ent->client->pers.quest_defeated_enemies - QUEST_MIN_ENEMIES_TO_DEFEAT) + 
+									((ent->client->pers.quest_progress * 20.0) / MAX_QUEST_PROGRESS) - (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] * 5);
 
 								if (chance_to_spawn_quest_npc < mage_master_chance)
 								{
@@ -9908,7 +9914,7 @@ void G_RunFrame( int levelTime ) {
 
 										zyk_TeleportPlayer(ally_ent, npc_origin, ent->client->ps.viewangles);
 
-										trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Hi! I came to help you fight the enemies!\n\"", QUESTCHAR_ALLY));
+										trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Hi! I am here to help you fight the enemies!\n\"", QUESTCHAR_ALLY));
 
 										break;
 									}
