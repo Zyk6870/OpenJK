@@ -742,7 +742,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 1;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
 
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
 		}
@@ -769,9 +769,9 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, ally_bonus + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + 1 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + skill_level_bonus;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 10 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 25 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE)
 		{
@@ -779,7 +779,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, random_magic_power, ally_bonus + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 5 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 10 + skill_level_bonus;
 			}
 		else if (quest_npc_type == QUEST_NPC_ALLY_FLYING_WARRIOR)
 		{
@@ -793,7 +793,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, ally_bonus + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, ally_bonus + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + skill_level_bonus;
 		}
@@ -9893,32 +9892,9 @@ void G_RunFrame( int levelTime ) {
 							if (chance_to_spawn_quest_npc < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 							{ // zyk: spawn an ally and get one of them near the player
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
-								int ally_bonus = ent->client->pers.quest_defeated_enemies + ent->client->pers.magic_crystals;
-								int j = 0;
+								int ally_bonus = (ent->client->pers.quest_defeated_enemies / 2) + ent->client->pers.magic_crystals;
 
 								zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
-
-								for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
-								{
-									gentity_t* ally_ent = &g_entities[j];
-
-									// zyk: get a resistance member near the player
-									if (ally_ent && ally_ent->client && ally_ent->NPC && 
-										ally_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && ally_ent->client->pers.quest_npc <= QUEST_NPC_ALLY_FORCE_WARRIOR &&
-										ally_ent->client->pers.quest_npc_caller_player_id == ent->s.number)
-									{
-										vec3_t npc_origin;
-
-										VectorCopy(ent->client->ps.origin, npc_origin);
-										npc_origin[2] += 80;
-
-										zyk_TeleportPlayer(ally_ent, npc_origin, ent->client->ps.viewangles);
-
-										trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Hi! I am here to help you fight the enemies!\n\"", QUESTCHAR_ALLY));
-
-										break;
-									}
-								}
 							}
 						}
 					}
