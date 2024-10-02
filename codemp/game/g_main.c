@@ -7330,16 +7330,16 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = 22;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DETPACKS] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 50;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_RADAR] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 2;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 100;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 100;
 
-	rpg_inventory_weights[RPG_INVENTORY_MISC_MAGIC_CRYSTAL] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 0;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 0;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 0;
@@ -7555,9 +7555,9 @@ qboolean zyk_can_spawn_quest_crystal(gentity_t* ent)
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
 void zyk_update_inventory(gentity_t* ent)
 {
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MAGIC_CRYSTAL] != ent->client->pers.magic_crystals)
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] != ent->client->pers.magic_crystals)
 	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MAGIC_CRYSTAL] = ent->client->pers.magic_crystals;
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = ent->client->pers.magic_crystals;
 		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
@@ -9337,6 +9337,25 @@ void G_RunFrame( int levelTime ) {
 					Player_FireFlameThrower(ent, qfalse);
 				}
 
+				// zyk: Lightning Strike red crystal. Do damage to the nearest quest enemy npc
+				if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && ent->client->ps.hasLookTarget)
+				{
+					gentity_t* target_enemy = &g_entities[ent->client->ps.lookTarget];
+
+					if (target_enemy && target_enemy->client && target_enemy->NPC &&
+						target_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && target_enemy->client->pers.quest_npc <= QUEST_NPC_CHANGELING_HOWLER)
+					{
+						int red_crystal_damage = 200 + (5 * ent->client->pers.magic_crystals, RPG_INVENTORY_MISC_RED_CRYSTAL);
+
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
+
+						zyk_quest_effect_spawn(ent, target_enemy, "zyk_strike_crystal_effect", "0", "env/huge_lightning", 0, 0, 0, 2000);
+						G_Damage(target_enemy, ent, ent, NULL, NULL, red_crystal_damage, 0, MOD_UNKNOWN);
+
+						G_Sound(target_enemy, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close2.mp3"));
+					}
+				}
+
 				// zyk: updating RPG inventory and calculating current weight
 				zyk_update_inventory(ent);
 				zyk_calculate_current_weight(ent);
@@ -9397,15 +9416,15 @@ void G_RunFrame( int levelTime ) {
 
 					int skill_crystal_chance = 70 - player_power_level + main_quest_progress;
 					int quest_crystal_chance = 16 + (ent->client->pers.magic_crystals / 2) - ent->client->pers.quest_tries - main_quest_progress;
-					int side_quest_chance = ent->client->pers.magic_crystals / 15;
-					int safety_haven_chance = ent->client->pers.magic_crystals / 10;
+					int side_quest_chance = (ent->client->pers.magic_crystals / 20) + (main_quest_progress / 10);
+					int safe_haven_chance = (ent->client->pers.magic_crystals / 15) + (main_quest_progress / 10);
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
 						skill_crystal_chance /= 2;
 						quest_crystal_chance /= 2;
 						side_quest_chance /= 2;
-						safety_haven_chance /= 2;
+						safe_haven_chance /= 2;
 					}
 					
 					if (Q_irand(0, 99) < skill_crystal_chance && !(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
@@ -9510,7 +9529,7 @@ void G_RunFrame( int levelTime ) {
 						}
 					}
 
-					if (Q_irand(0, 99) < safety_haven_chance && zyk_is_main_quest_complete(ent) == qfalse)
+					if (Q_irand(0, 99) < safe_haven_chance && zyk_is_main_quest_complete(ent) == qfalse)
 					{ // zyk: Safe Haven. Regens health, shield, force, stamina and mp
 						float safe_haven_x, safe_haven_y, safe_haven_z;
 						gentity_t* chosen_entity = NULL;
@@ -9546,7 +9565,7 @@ void G_RunFrame( int levelTime ) {
 					{
 						gentity_t* tree_ent = NULL;
 
-						zyk_spawn_magic_spirits(ent, QUEST_FINAL_EVENT_TIMER);
+						zyk_spawn_magic_spirits(ent, QUEST_FINAL_EVENT_TIMER + 5000);
 
 						if (ent->client->pers.quest_spirit_tree_id > -1)
 						{
@@ -9583,6 +9602,15 @@ void G_RunFrame( int levelTime ) {
 							}
 							else if (ent->client->pers.quest_final_event_step == 3)
 							{
+								ent->client->pers.magic_crystals += (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] + (ent->client->pers.quest_tries - 1));
+
+								ent->client->pers.quest_tries = 1;
+								ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] = 0;
+
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your green and red crystals are converted into blue crystals\n\"", QUESTCHAR_ALL_SPIRITS));
+							}
+							else if (ent->client->pers.quest_final_event_step == 4)
+							{
 								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
 							}
 						}
@@ -9590,7 +9618,7 @@ void G_RunFrame( int levelTime ) {
 
 					ent->client->pers.quest_final_event_step++;
 
-					if (ent->client->pers.quest_final_event_step >= 4)
+					if (ent->client->pers.quest_final_event_step >= 5)
 					{
 						ent->client->pers.quest_final_event_step = 0;
 					}

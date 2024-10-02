@@ -6029,16 +6029,16 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = "Rocket Launcher Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_DETPACKS] = "Detpacks Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "Jetpack Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_RADAR] = "Radar";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = "Thermal Vision";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "Sentry Gun Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
+	inventory_item_names[RPG_INVENTORY_MISC_RED_CRYSTAL] = "Red Crystal";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = "Magic Armor";
 
-	inventory_item_names[RPG_INVENTORY_MISC_MAGIC_CRYSTAL] = "Magic Crystal";
+	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "Blue Crystal";
 	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "Medpack";
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
@@ -6159,8 +6159,11 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][0] = 180;
 	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][1] = 90;
 
-	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_CRYSTAL][0] = 0;
-	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_CRYSTAL][1] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 100;
+
+	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 200;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_BACTA][0] = 1500;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_BACTA][1] = 900;
@@ -6224,9 +6227,6 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][0] = 5000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][1] = 2000;
-
-	seller_items_cost[RPG_INVENTORY_UPGRADE_RADAR][0] = 1000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_RADAR][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_THERMAL_VISION][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_THERMAL_VISION][1] = 600;
@@ -6615,10 +6615,6 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases jetpack fuel consumption a bit and makes the jetpack more stable and faster\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_RADAR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7if you have the client plugin, a radar will be displayed in the screen showing positions of other players and npcs\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_THERMAL_VISION)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes binoculars detect enemies through a thermal vision system\n\n\"", zyk_get_inventory_item_name(item_index)));
@@ -6647,9 +6643,13 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any source by 10 per cent. If the source is Magic Fist or a magic power, decreases damage by 25 per cent and absorbs some magic points\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 	}
-	else if (item_index == RPG_INVENTORY_MISC_MAGIC_CRYSTAL)
+	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. Used to upgrade skills and to get bonuses during the quest. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Do a Lightning Strike to the nearest quest enemy npc that deals damage based on the amount of blue crystals you have\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
 	{
@@ -6940,132 +6940,8 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
 	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_FORCE_FIELD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_CLOAK && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_SABER_ARMOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_DETPACKS && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DETPACKS] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_RADAR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_RADAR] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_THERMAL_VISION && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_SENTRY_GUN && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_SEEKER_DRONE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
-		return;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_EWEB && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
+	else if (item_index >= RPG_INVENTORY_UPGRADE_BACTA && item_index <= RPG_INVENTORY_UPGRADE_EWEB &&
+			 ent->client->pers.rpg_inventory[item_index] > 0)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"You already have the %s.\n\"", zyk_get_inventory_item_name(item_index)));
 		return;
@@ -7363,13 +7239,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			// zyk: update the rpg stuff info at the client-side game
 			send_rpg_events(10000);
 		}
-		else if (item_index == RPG_INVENTORY_UPGRADE_RADAR)
-		{
-			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_RADAR);
-
-			// zyk: update the rpg stuff info at the client-side game
-			send_rpg_events(10000);
-		}
 		else if (item_index == RPG_INVENTORY_UPGRADE_THERMAL_VISION)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_THERMAL_VISION);
@@ -7637,9 +7506,14 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		ent->client->ps.powerups[PW_FORCE_BOON] = 0;
 		sold = 1;
 	}
-	else if (item_index == RPG_INVENTORY_MISC_MAGIC_CRYSTAL && ent->client->pers.magic_crystals > 0)
+	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL && ent->client->pers.magic_crystals > 0)
 	{
 		ent->client->pers.magic_crystals--;
+		sold = 1;
+	}
+	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_RED_CRYSTAL);
 		sold = 1;
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
@@ -7746,11 +7620,6 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_JETPACK);
-		sold = 1;
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_RADAR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_RADAR] > 0)
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_UPGRADE_RADAR);
 		sold = 1;
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_THERMAL_VISION && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0)
