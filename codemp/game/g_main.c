@@ -5900,7 +5900,8 @@ void magic_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
+						if (target_ent && target_ent->inuse && target_ent->health > 0 && 
+							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water", "4", "env/water_impact", 0, damage, 100, 1000);
 						}
@@ -5949,7 +5950,8 @@ void magic_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
+						if (target_ent && target_ent->inuse && target_ent->health > 0 &&
+							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_earth", "4", "env/rock_smash", 0, damage, 100, 1000);
 						}
@@ -5967,7 +5969,8 @@ void magic_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
+						if (target_ent && target_ent->inuse && target_ent->health > 0 &&
+							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
 							if (target_ent->client && target_ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 							{ // zyk: player can only be hit if he is on floor
@@ -6015,7 +6018,8 @@ void magic_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
+						if (target_ent && target_ent->inuse && target_ent->health > 0 &&
+							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_fire", "4", "env/fire", 0, damage, 100, 1000);
 
@@ -6077,7 +6081,8 @@ void magic_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
+						if (target_ent && target_ent->inuse && target_ent->health > 0 &&
+							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_air", "4", "env/water_steam3", 0, damage, 100, 1000);
 						}
@@ -6092,7 +6097,8 @@ void magic_power_events(gentity_t *ent)
 					{
 						target_ent = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
+						if (target_ent && target_ent->inuse && target_ent->health > 0 &&
+							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
 							static vec3_t forward;
 							vec3_t dir;
@@ -6113,7 +6119,7 @@ void magic_power_events(gentity_t *ent)
 						}
 					}
 
-					ent->client->pers.magic_power_debounce2_timer[MAGIC_AIR_MAGIC] = level.time + 50;
+					ent->client->pers.magic_power_debounce2_timer[MAGIC_AIR_MAGIC] = level.time + 100;
 				}
 			}
 
@@ -6143,7 +6149,7 @@ void magic_power_events(gentity_t *ent)
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "ships/proton_impact", 100, damage, radius, duration);
 
-						zyk_spawn_black_hole_model(ent, duration, (20 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]));
+						zyk_spawn_black_hole_model(ent, duration, (20 + (15 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC])));
 
 						ent->client->pers.black_hole_distance = radius;
 
@@ -6154,7 +6160,8 @@ void magic_power_events(gentity_t *ent)
 					{
 						black_hole_target = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, black_hole_target, ent->client->pers.black_hole_origin, zyk_it, 0, ent->client->pers.black_hole_distance, qfalse))
+						if (black_hole_target && black_hole_target->inuse && black_hole_target->health > 0 &&
+							zyk_magic_effect_can_hit_target(ent, black_hole_target, ent->client->pers.black_hole_origin, zyk_it, 0, ent->client->pers.black_hole_distance, qfalse))
 						{
 							vec3_t dir, forward;
 							float target_distance = Distance(ent->client->pers.black_hole_origin, black_hole_target->client->ps.origin);
@@ -6211,7 +6218,7 @@ void magic_power_events(gentity_t *ent)
 						}
 					}
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = level.time + 50;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = level.time + 100;
 				}
 			}
 
@@ -6247,7 +6254,8 @@ void magic_power_events(gentity_t *ent)
 					{
 						light_of_judgement_target = &g_entities[zyk_it];
 
-						if (zyk_magic_effect_can_hit_target(ent, light_of_judgement_target, ent->client->pers.light_of_judgement_origin, zyk_it, 0, ent->client->pers.light_of_judgement_distance, qfalse))
+						if (light_of_judgement_target && light_of_judgement_target->inuse && light_of_judgement_target->health > 0 &&
+							zyk_magic_effect_can_hit_target(ent, light_of_judgement_target, ent->client->pers.light_of_judgement_origin, zyk_it, 0, ent->client->pers.light_of_judgement_distance, qfalse))
 						{
 							int mp_to_drain = 1 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 							int max_player_mp = zyk_max_magic_power(ent);
