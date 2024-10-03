@@ -5845,7 +5845,7 @@ void magic_power_events(gentity_t *ent)
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_AREA] < level.time)
 				{
 					// zyk: effect on player position while magic is active
-					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_HEALING_AREA, 700);
+					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_HEALING_AREA, 500);
 
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_HEALING_AREA] > 0)
 					{
@@ -5854,7 +5854,7 @@ void magic_power_events(gentity_t *ent)
 						ent->client->pers.magic_power_hit_counter[MAGIC_HEALING_AREA]--;
 					}
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_AREA] = level.time + 500;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_AREA] = level.time + 400;
 				}
 			}
 
@@ -5862,99 +5862,57 @@ void magic_power_events(gentity_t *ent)
 			{
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] < level.time)
 				{
-					int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME];
+					int damage = 1 + ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME];
 
 					// zyk: effect on player position while magic is active
-					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_MAGIC_DOME, 700);
+					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_MAGIC_DOME, 500);
 
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dome", "4", "env/dome", 0, damage, 290, 1000);
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dome", "4", "env/dome", 0, damage, 290, 900);
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] = level.time + 500;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] = level.time + 400;
 				}
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_WATER_MAGIC))
 			{
-				gentity_t* target_ent = NULL;
-				int zyk_it = 0;
 				int max_distance = 200 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]);
-				int damage = ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
+				int damage = 1 + ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] < level.time)
 				{
 					int heal_amount = ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
 
 					// zyk: effect on player position while magic is active
-					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_WATER_MAGIC, 700);
+					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_WATER_MAGIC, 500);
+
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_water", "4", "env/water_impact", 0, damage, max_distance, 500);
 
 					zyk_add_health(ent, heal_amount);
 
-					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
-					{
-						target_ent = &g_entities[zyk_it];
-
-						if (target_ent && target_ent->inuse && target_ent->health > 0 && 
-							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
-						{
-							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water", "4", "env/water_impact", 0, damage, 100, 1000);
-						}
-						else if (target_ent && target_ent->client)
-						{ // zyk: heal allies
-							qboolean is_ally = qfalse;
-							int ally_distance = Distance(ent->client->ps.origin, target_ent->client->ps.origin);
-
-							if (zyk_it < level.maxclients && !ent->NPC &&
-								zyk_is_ally(ent, target_ent) == qtrue)
-							{
-								is_ally = qtrue;
-							}
-
-							if (OnSameTeam(ent, target_ent) == qtrue || npcs_on_same_team(ent, target_ent) == qtrue)
-							{ // zyk: if one of them is npc, also check for allies
-								is_ally = qtrue;
-							}
-
-							if (is_ally == qtrue && ent != target_ent && ally_distance < max_distance)
-							{
-								zyk_add_health(target_ent, heal_amount);
-								zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water_effect", "0", "env/water_impact", 0, 0, 0, 1000);
-							}
-						}
-					}
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 500;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 400;
 				}
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_EARTH_MAGIC))
 			{
-				gentity_t* target_ent = NULL;
-				int zyk_it = 0;
-				int targets_hit = 0;
 				int max_distance = 200 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]);
-				int damage = ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
+				int damage = 1 + ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] < level.time)
 				{
 					// zyk: effect on player position while magic is active
-					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_EARTH_MAGIC, 700);
+					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_EARTH_MAGIC, 500);
 
-					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
-					{
-						target_ent = &g_entities[zyk_it];
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_earth", "4", "env/rock_smash", 0, damage, max_distance, 500);
 
-						if (target_ent && target_ent->inuse && target_ent->health > 0 &&
-							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
-						{
-							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_earth", "4", "env/rock_smash", 0, damage, 100, 1000);
-						}
-					}
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 500;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 400;
 				}
 
 				if (ent->client->pers.magic_power_debounce2_timer[MAGIC_EARTH_MAGIC] < level.time)
 				{
+					gentity_t* target_ent = NULL;
+					int zyk_it = 0;
+
 					G_ScreenShake(ent->client->ps.origin, ent, 10.0f, 2000, qtrue);
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
 
@@ -5995,32 +5953,19 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_FIRE_MAGIC))
 			{
-				gentity_t* target_ent = NULL;
-				int zyk_it = 0;
 				int max_distance = 200 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
-				int damage = ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
+				int damage = 1 + ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] < level.time)
 				{
 					// zyk: effect on player position while magic is active
-					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_FIRE_MAGIC, 700);
+					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_FIRE_MAGIC, 500);
+
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_fire", "4", "env/fire", 0, damage, max_distance, 500);
 
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
 
-					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
-					{
-						target_ent = &g_entities[zyk_it];
-
-						if (target_ent && target_ent->inuse && target_ent->health > 0 &&
-							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
-						{
-							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_fire", "4", "env/fire", 0, damage, 100, 1000);
-
-							G_Sound(target_ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
-						}
-					}
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] = level.time + 500;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] = level.time + 400;
 				}
 			}
 
@@ -6032,9 +5977,9 @@ void magic_power_events(gentity_t *ent)
 
 					if (fire_magic_user && fire_magic_user->client)
 					{
-						int fire_damage = fire_magic_user->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
+						int fire_damage = fire_magic_user->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] / 2;
 
-						zyk_quest_effect_spawn(fire_magic_user, ent, "zyk_magic_fire_hit", "0", "env/fire", 0, 0, 0, 300);
+						zyk_quest_effect_spawn(fire_magic_user, ent, "zyk_magic_fire", "0", "env/fire", 0, 0, 0, 300);
 
 						fire_damage = (int)ceil(fire_damage * zyk_get_elemental_bonus_factor(MAGIC_FIRE_MAGIC, fire_magic_user, ent));
 
@@ -6059,33 +6004,24 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))
 			{
-				gentity_t* target_ent = NULL;
-				int zyk_it = 0;
-				int targets_hit = 0;
 				int max_distance = 200 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
-				int damage = ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC];
+				int damage = 1 + ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC];
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] < level.time)
 				{
 					// zyk: effect on player position while magic is active
-					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_AIR_MAGIC, 700);
+					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_AIR_MAGIC, 500);
 
-					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
-					{
-						target_ent = &g_entities[zyk_it];
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_air", "4", "env/water_steam3", 0, damage, max_distance, 500);
 
-						if (target_ent && target_ent->inuse && target_ent->health > 0 &&
-							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
-						{
-							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_air", "4", "env/water_steam3", 0, damage, 100, 1000);
-						}
-					}
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 500;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 400;
 				}
 
 				if (ent->client->pers.magic_power_debounce2_timer[MAGIC_AIR_MAGIC] < level.time)
 				{
+					gentity_t* target_ent = NULL;
+					int zyk_it = 0;
+
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
 						target_ent = &g_entities[zyk_it];
@@ -6132,12 +6068,12 @@ void magic_power_events(gentity_t *ent)
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] < level.time)
 				{
 					// zyk: effect on player position while magic is active
-					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_DARK_MAGIC, 150);
+					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_DARK_MAGIC, 200);
 
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] > 0)
 					{
 						int duration = 1500;
-						int damage = ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
+						int damage = 1 + ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
 						int radius = 240 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]); // zyk: default distace for this effect is 540
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "ships/proton_impact", 100, damage, radius, duration);
@@ -6223,13 +6159,13 @@ void magic_power_events(gentity_t *ent)
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] < level.time)
 				{
 					// zyk: effect on player position while magic is active
-					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_LIGHT_MAGIC, 150);
+					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_LIGHT_MAGIC, 200);
 
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] > 0)
 					{
 						int duration = 1500;
 						int radius = 240 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]); // zyk: default distace for this effect is 540
-						int damage = ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
+						int damage = 1 + ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_light", "4", "misc/possession", 500, damage, radius, duration);
 

@@ -6291,6 +6291,7 @@ G_RadiusDamage
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
 extern float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t* attacker, gentity_t* target);
+extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, gentity_t *missile, int mod) {
 	float		points, dist;
@@ -6446,16 +6447,30 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 				if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 && level.special_power_effects[attacker->s.number] != ent->s.number)
 				{ // zyk: if it is an effect used by special power, then attacker must be the owner of the effect. Also, do not hit the owner
 					gentity_t *quest_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
+					qboolean is_ally = qfalse;
 
 					// zyk: if the power user and the target are allies (player or npc), then do not hit
 					if (quest_power_user && quest_power_user->client && ent && ent->client &&
 						(OnSameTeam(quest_power_user, ent) == qtrue || npcs_on_same_team(quest_power_user, ent) == qtrue))
 					{
-						continue;
+						is_ally = qtrue;
 					}
 
-					if (zyk_is_ally(quest_power_user, ent) == qtrue)
+					if (quest_power_user && quest_power_user->client && ent && ent->client && 
+						zyk_is_ally(quest_power_user, ent) == qtrue)
 					{
+						is_ally = qtrue;
+					}
+
+					if (is_ally == qtrue)
+					{
+						if (Q_stricmp(attacker->targetname, "zyk_magic_water") == 0)
+						{ // zyk: Water magic heals allies
+							zyk_add_health(ent, (int)points);
+
+							zyk_quest_effect_spawn(quest_power_user, ent, "zyk_magic_water", "0", "env/water_impact", 0, 0, 0, 1000);
+						}
+
 						continue;
 					}
 
@@ -6469,9 +6484,29 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						Q_stricmp(attacker->targetname, "zyk_magic_dark") == 0 || 
 						Q_stricmp(attacker->targetname, "zyk_magic_light") == 0)
 					{
+						zyk_magic_t this_magic_power = zyk_get_magic_for_effect(attacker->targetname);
 						int final_damage = (int)points;
 
-						if (Q_stricmp(attacker->targetname, "zyk_magic_fire") == 0 && quest_power_user && quest_power_user != ent && ent->client &&  
+						if (this_magic_power == MAGIC_WATER_MAGIC)
+						{
+							zyk_quest_effect_spawn(quest_power_user, ent, "zyk_magic_water", "0", "env/water_impact", 0, 0, 0, 500);
+						}
+						else if (this_magic_power == MAGIC_EARTH_MAGIC)
+						{
+							zyk_quest_effect_spawn(quest_power_user, ent, "zyk_magic_earth", "0", "env/rock_smash", 0, 0, 0, 500);
+						}
+						else if (this_magic_power == MAGIC_FIRE_MAGIC)
+						{
+							zyk_quest_effect_spawn(quest_power_user, ent, "zyk_magic_fire", "0", "env/fire", 0, 0, 0, 500);
+							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
+						}
+						else if (this_magic_power == MAGIC_AIR_MAGIC)
+						{
+							zyk_quest_effect_spawn(quest_power_user, ent, "zyk_magic_air", "0", "env/water_steam3", 0, 0, 0, 500);
+							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh1.mp3"));
+						}
+
+						if (this_magic_power == MAGIC_FIRE_MAGIC && quest_power_user && quest_power_user != ent && ent->client &&
 								 quest_power_user->client)
 						{ // zyk: Fire Magic. If target touches the flame, will keep catching fire for some seconds
 							ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_FIRE);
@@ -6479,7 +6514,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] = 2 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
 							ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_FIRE] = level.time + 200;
 						}
-						else if (Q_stricmp(attacker->targetname, "zyk_magic_air") == 0 && quest_power_user && quest_power_user != ent && ent->client &&
+						else if (this_magic_power == MAGIC_AIR_MAGIC && quest_power_user && quest_power_user != ent && ent->client &&
 							quest_power_user->client)
 						{ // zyk: hit by Air Magic. It will make target have lower run speed
 							ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_AIR);
@@ -6488,7 +6523,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						}
 
 						// zyk: Elemental bonus. Each power gives a higher damage to target of opposite element and less damage to target of same element
-						final_damage = (int)ceil(final_damage * zyk_get_elemental_bonus_factor(zyk_get_magic_for_effect(attacker->targetname), quest_power_user, ent));
+						final_damage = (int)ceil(final_damage * zyk_get_elemental_bonus_factor(this_magic_power, quest_power_user, ent));
 
 						// zyk: must do at least 1 damage
 						if (final_damage < 1)
@@ -6496,7 +6531,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 						G_Damage (ent, quest_power_user, quest_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
 
-						if (Q_stricmp(attacker->targetname, "zyk_magic_dark") == 0 && ent && ent->client && ent->health < 1)
+						if (this_magic_power == MAGIC_DARK_MAGIC && ent && ent->client && ent->health < 1)
 						{ // zyk: Black Hole disintegrates enemies who got killed by it
 							ent->client->ps.eFlags |= EF_DISINTEGRATION;
 						}

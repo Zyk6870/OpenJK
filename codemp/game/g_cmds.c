@@ -248,7 +248,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_AIR_MAGIC)
 		return "blows people away with a strong wind, and does Air elemental damage to them. Increases your run speed. Enemies hit by Air will have their run speed decreased. Increases your Air element affinity. Deals extra damage to enemies with Earth affinity. Absorbs some Air damage";
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
-		return "creates a black hole, sucking everyone nearby and doing Dark elemental damage to them. The closer the enemies are, the more damage they receive. Increases your Dark element affinity. Deals extra damage to enemies with Light affinity. Absorbs some Dark damage";
+		return "creates a black hole, sucking everyone nearby and doing Dark elemental damage to them. Increases your Dark element affinity. Deals extra damage to enemies with Light affinity. Absorbs some Dark damage";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
 		return "creates a lightning dome that damages enemies nearby. Creates a shining light that does Light elemental damage to enemies. While near the light, enemies will get confused/stunned and will have their MP drained to restore your MP. Increases your Light element affinity. Deals extra damage to enemies with Dark affinity. Absorbs some Light damage";
 
