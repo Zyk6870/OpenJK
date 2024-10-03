@@ -3116,7 +3116,7 @@ void fx_runner_link( gentity_t *ent )
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 100;
 		}
-		else if (Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0 || Q_stricmp(ent->targetname, "zyk_strike_crystal_effect") == 0)
+		else if (Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0 || Q_stricmp(ent->targetname, "zyk_red_crystal_effect") == 0)
 		{ // zyk: starts the effect imediately for these magic powers
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 200; // wait a small bit, then start working
@@ -3192,7 +3192,7 @@ void SP_fx_runner( gentity_t *ent )
 	{
 		ent->nextthink = level.time + 100;
 	}
-	else if (Q_stricmp(ent->targetname, "zyk_magic_element") == 0 || Q_stricmp(ent->targetname, "zyk_strike_crystal_effect") == 0)
+	else if (Q_stricmp(ent->targetname, "zyk_magic_element") == 0 || Q_stricmp(ent->targetname, "zyk_red_crystal_effect") == 0)
 	{
 		ent->nextthink = level.time + 100;
 	}

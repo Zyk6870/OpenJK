@@ -6649,7 +6649,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing Use key will convert a nearby enemy npc into an ally for an amount of time based on the number of blue crystals you have\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing Use key will convert a nearby enemy npc into an ally for an amount of time based on the number of blue crystals you have. Mage enemies (specially Mage Masters) have a chance of resisting it\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
 	{
