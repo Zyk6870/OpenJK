@@ -4913,10 +4913,7 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 		zyk_set_entity_field(new_ent, "spawnflags", spawnflags);
 		zyk_set_entity_field(new_ent, "targetname", targetname);
 
-		if (Q_stricmp(targetname, "zyk_effect_scream") == 0)
-			zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)target_ent->r.currentOrigin[0], (int)target_ent->r.currentOrigin[1], (int)target_ent->r.currentOrigin[2] + 50));
-		else
-			zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)target_ent->r.currentOrigin[0], (int)target_ent->r.currentOrigin[1], (int)target_ent->r.currentOrigin[2]));
+		zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)target_ent->r.currentOrigin[0], (int)target_ent->r.currentOrigin[1], (int)target_ent->r.currentOrigin[2]));
 
 		new_ent->s.modelindex = G_EffectIndex(effect_path);
 
@@ -4939,10 +4936,7 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 		zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
 		zyk_set_entity_field(new_ent, "spawnflags", spawnflags);
 
-		if (Q_stricmp(targetname, "zyk_tree_of_life") == 0)
-			zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)target_ent->r.currentOrigin[0], (int)target_ent->r.currentOrigin[1], (int)target_ent->r.currentOrigin[2] + 350));
-		else
-			zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)target_ent->r.currentOrigin[0], (int)target_ent->r.currentOrigin[1], (int)target_ent->r.currentOrigin[2]));
+		zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)target_ent->r.currentOrigin[0], (int)target_ent->r.currentOrigin[1], (int)target_ent->r.currentOrigin[2]));
 
 		zyk_set_entity_field(new_ent, "model", effect_path);
 
@@ -5018,7 +5012,6 @@ qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target)
 	return qfalse;
 }
 
-// zyk: similar to the function above, but for powers with which the effect/model itself must be tested
 qboolean zyk_magic_effect_can_hit_target(gentity_t* attacker, gentity_t* target, vec3_t effect_origin, int i, int min_distance, int max_distance, qboolean hit_breakable)
 {
 	if (attacker->s.number != i && target && target->client && target->health > 0 && zyk_can_hit_target(attacker, target) == qtrue &&

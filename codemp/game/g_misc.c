@@ -374,19 +374,10 @@ void SP_misc_model_breakable( gentity_t *ent )
 	G_SpawnFloat( "radius", "1", &ent->radius ); // used to scale chunk code if desired by a designer
 	bHasScale = G_SpawnVector("modelscale_vec", "0 0 0", ent->modelScale);
 
-	// zyk: now the size is set correctly
-	if (Q_stricmp(ent->targetname, "zyk_tree_of_life") == 0)
-	{
-		G_SpawnVector("mins", "-70 -70 -400", ent->r.mins);
-		G_SpawnVector("maxs", "70 70 250", ent->r.maxs);
-	}
-	else
-	{
-		if (!(ent->spawnflags & 65536))
-		{ // zyk: do not set default mins and maxs if this spawnflag is set
-			G_SpawnVector("mins", "-16 -16 -16", ent->r.mins);
-			G_SpawnVector("maxs", "16 16 16", ent->r.maxs);
-		}
+	if (!(ent->spawnflags & 65536))
+	{ // zyk: do not set default mins and maxs if this spawnflag is set
+		G_SpawnVector("mins", "-16 -16 -16", ent->r.mins);
+		G_SpawnVector("maxs", "16 16 16", ent->r.maxs);
 	}
 
 	if (!bHasScale)
