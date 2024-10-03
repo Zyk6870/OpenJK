@@ -6487,6 +6487,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						zyk_magic_t this_magic_power = zyk_get_magic_for_effect(attacker->targetname);
 						int final_damage = (int)points;
 
+						if (zyk_can_hit_target(quest_power_user, ent) == qfalse)
+						{
+							continue;
+						}
+
 						if (this_magic_power == MAGIC_WATER_MAGIC)
 						{
 							zyk_quest_effect_spawn(quest_power_user, ent, "zyk_magic_water", "0", "env/water_impact", 0, 0, 0, 500);

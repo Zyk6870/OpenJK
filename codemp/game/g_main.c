@@ -4954,6 +4954,16 @@ qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target)
 {
 	if (attacker && attacker->client && target && target->client && !attacker->NPC && !target->NPC)
 	{
+		if (attacker->client->pers.connected == CON_CONNECTED && attacker->client->sess.sessionTeam == TEAM_SPECTATOR)
+		{ // zyk: cannot hit in spectator mode
+			return qfalse;
+		}
+
+		if (target->client->pers.connected == CON_CONNECTED && target->client->sess.sessionTeam == TEAM_SPECTATOR)
+		{ // zyk: cannot hit in spectator mode
+			return qfalse;
+		}
+
 		if (level.duel_tournament_mode == 4 && duel_tournament_is_duelist(attacker) != duel_tournament_is_duelist(target))
 		{ // zyk: cannot hit duelists in Duel Tournament
 			return qfalse;
