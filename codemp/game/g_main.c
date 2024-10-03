@@ -9563,75 +9563,6 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME;
 				}
 
-				// zyk: final event of the quest
-				if (ent->client->pers.quest_final_event_step > 0 && ent->client->pers.quest_final_event_timer < level.time)
-				{
-					if (ent->client->pers.quest_final_event_step == 1)
-					{
-						gentity_t* tree_ent = NULL;
-
-						zyk_spawn_magic_spirits(ent, QUEST_FINAL_EVENT_TIMER + 5000);
-
-						if (ent->client->pers.quest_spirit_tree_id > -1)
-						{
-							tree_ent = &g_entities[ent->client->pers.quest_spirit_tree_id];
-
-							if (tree_ent)
-							{
-								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
-
-								zyk_quest_effect_spawn(tree_ent, tree_ent, "zyk_spirit_tree_energy", "0", "ships/sd_exhaust", 100, 0, 0, QUEST_FINAL_EVENT_TIMER);
-							}
-						}
-					}
-					else
-					{
-						if (zyk_is_main_quest_complete(ent) == qtrue)
-						{
-							if (ent->client->pers.quest_final_event_step == 2)
-							{
-								int j = 0;
-
-								for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
-								{
-									gentity_t* npc_ent = &g_entities[j];
-
-									if (npc_ent && npc_ent->client && npc_ent->NPC && 
-										npc_ent->client->pers.quest_npc > QUEST_NPC_NONE && npc_ent->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
-									{ // zyk: one of the quest enemies
-										zyk_NPC_Kill_f(npc_ent->NPC_type);
-									}
-								}
-
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We can now defeat the remaining of Brotherhood of Mages.\n\"", QUESTCHAR_ALL_SPIRITS));
-							}
-							else if (ent->client->pers.quest_final_event_step == 3)
-							{
-								ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += ent->client->pers.quest_defeated_enemies;
-								ent->client->pers.rpg_inventory_modified = qtrue;
-
-								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
-
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive this amount of ^1Red ^7crystals.\n\"", 
-									QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies));
-							}
-							else if (ent->client->pers.quest_final_event_step == 4)
-							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
-							}
-						}
-					}
-
-					ent->client->pers.quest_final_event_step++;
-
-					if (ent->client->pers.quest_final_event_step >= 5)
-					{
-						ent->client->pers.quest_final_event_step = 0;
-					}
-
-					ent->client->pers.quest_final_event_timer = level.time + 5000;
-				}
-
 				// zyk: Seller events
 				if (ent->client->pers.quest_seller_event_step > QUEST_SELLER_STEP_NONE && ent->client->pers.quest_seller_event_timer < level.time)
 				{
@@ -9676,6 +9607,8 @@ void G_RunFrame( int levelTime ) {
 					}
 				}
 
+				
+
 				// zyk: control the quest events
 				if (level.load_entities_timer == 0 && 
 					zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
@@ -9683,6 +9616,75 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR
 					)
 				{
+					// zyk: final event of the quest
+					if (ent->client->pers.quest_final_event_step > 0 && ent->client->pers.quest_final_event_timer < level.time)
+					{
+						if (ent->client->pers.quest_final_event_step == 1)
+						{
+							gentity_t* tree_ent = NULL;
+
+							zyk_spawn_magic_spirits(ent, QUEST_FINAL_EVENT_TIMER + 5000);
+
+							if (ent->client->pers.quest_spirit_tree_id > -1)
+							{
+								tree_ent = &g_entities[ent->client->pers.quest_spirit_tree_id];
+
+								if (tree_ent)
+								{
+									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
+
+									zyk_quest_effect_spawn(tree_ent, tree_ent, "zyk_spirit_tree_energy", "0", "ships/sd_exhaust", 100, 0, 0, QUEST_FINAL_EVENT_TIMER);
+								}
+							}
+						}
+						else
+						{
+							if (zyk_is_main_quest_complete(ent) == qtrue)
+							{
+								if (ent->client->pers.quest_final_event_step == 2)
+								{
+									int j = 0;
+
+									for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
+									{
+										gentity_t* npc_ent = &g_entities[j];
+
+										if (npc_ent && npc_ent->client && npc_ent->NPC &&
+											npc_ent->client->pers.quest_npc > QUEST_NPC_NONE && npc_ent->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
+										{ // zyk: one of the quest enemies
+											zyk_NPC_Kill_f(npc_ent->NPC_type);
+										}
+									}
+
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We can now defeat the remaining of Brotherhood of Mages.\n\"", QUESTCHAR_ALL_SPIRITS));
+								}
+								else if (ent->client->pers.quest_final_event_step == 3)
+								{
+									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += ent->client->pers.quest_defeated_enemies;
+									ent->client->pers.rpg_inventory_modified = qtrue;
+
+									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
+
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive this amount of ^1Red ^7crystals.\n\"",
+										QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies));
+								}
+								else if (ent->client->pers.quest_final_event_step == 4)
+								{
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
+								}
+							}
+						}
+
+						ent->client->pers.quest_final_event_step++;
+
+						if (ent->client->pers.quest_final_event_step >= 5)
+						{
+							ent->client->pers.quest_final_event_step = 0;
+						}
+
+						ent->client->pers.quest_final_event_timer = level.time + 5000;
+					}
+
 					// zyk: Main Quest progress
 					if (zyk_is_main_quest_complete(ent) == qfalse && 
 						ent->client->pers.quest_defeated_enemies >= QUEST_MIN_ENEMIES_TO_DEFEAT &&
