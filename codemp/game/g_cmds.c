@@ -5211,6 +5211,7 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 	}
 
 	ent->client->pers.magic_crystals = 0;
+	ent->client->pers.magic_power = 0;
 	ent->client->pers.credits = RPG_INITIAL_CREDITS;
 
 	// zyk: in RPG Mode, player must actually buy these
