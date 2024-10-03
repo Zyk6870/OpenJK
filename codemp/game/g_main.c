@@ -672,7 +672,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, npc_skill_level + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level - 2 + skill_level_bonus;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 42 + skill_level_bonus;
 		}
@@ -682,7 +682,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, npc_skill_level + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level - 3 + skill_level_bonus;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 16 + skill_level_bonus;
 		}
@@ -692,7 +692,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, npc_skill_level + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level - 3 + skill_level_bonus;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 16 + skill_level_bonus;
 		}
@@ -769,7 +769,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, ally_bonus + skill_level_bonus);
 
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus - 2 + skill_level_bonus;
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + 25 + skill_level_bonus;
 		}
