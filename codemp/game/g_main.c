@@ -5022,48 +5022,6 @@ qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target)
 	return qfalse;
 }
 
-qboolean zyk_magic_effect_can_hit_target(gentity_t* attacker, gentity_t* target, vec3_t effect_origin, int i, int min_distance, int max_distance, qboolean hit_breakable)
-{
-	if (attacker->s.number != i && target && target->client && target->health > 0 && zyk_can_hit_target(attacker, target) == qtrue &&
-		(i > MAX_CLIENTS || (target->client->pers.connected == CON_CONNECTED && target->client->sess.sessionTeam != TEAM_SPECTATOR &&
-			target->client->ps.duelInProgress == qfalse)))
-	{ // zyk: target is a player or npc that can be hit by the attacker
-		int player_distance = (int)Distance(effect_origin, target->client->ps.origin);
-
-		if (player_distance > min_distance && player_distance < max_distance)
-		{
-			qboolean is_ally = qfalse;
-
-			if (i < level.maxclients && !attacker->NPC &&
-				zyk_is_ally(attacker, target) == qtrue)
-			{ // zyk: allies will not be hit by this power
-				is_ally = qtrue;
-			}
-
-			if (OnSameTeam(attacker, target) == qtrue || npcs_on_same_team(attacker, target) == qtrue)
-			{ // zyk: if one of them is npc, also check for allies
-				is_ally = qtrue;
-			}
-
-			if (is_ally == qfalse)
-			{
-				return qtrue;
-			}
-		}
-	}
-	else if (i >= MAX_CLIENTS && hit_breakable == qtrue && target && !target->client && target->health > 0 && target->takedamage == qtrue)
-	{
-		int entity_distance = (int)Distance(effect_origin, target->r.currentOrigin);
-
-		if (entity_distance > min_distance && entity_distance < max_distance)
-		{
-			return qtrue;
-		}
-	}
-
-	return qfalse;
-}
-
 extern int zyk_get_magic_index(int skill_index);
 extern void zyk_remap_shaders(const char* oldShader, const char* newShader);
 
@@ -5846,18 +5804,28 @@ void magic_power_events(gentity_t *ent)
 	{
 		if (ent->health > 0)
 		{
+			int magic_bonus = 0;
+
+			// zyk: Magic Armor improves all magic powers
+			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
+			{
+				magic_bonus = 1;
+			}
+
 			zyk_active_magic_mp_consumption(ent);
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_HEALING_AREA))
 			{
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_AREA] < level.time)
 				{
+					int damage = 1 + magic_bonus;
+
 					// zyk: effect on player position while magic is active
 					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_HEALING_AREA, 500);
 
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_HEALING_AREA] > 0)
 					{
-						zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing_area", "4", "env/red_cyc", 0, 1, 228, 1500);
+						zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing_area", "4", "env/red_cyc", 0, damage, 228, 1500);
 
 						ent->client->pers.magic_power_hit_counter[MAGIC_HEALING_AREA]--;
 					}
@@ -5870,7 +5838,7 @@ void magic_power_events(gentity_t *ent)
 			{
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] < level.time)
 				{
-					int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME];
+					int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME];
 
 					// zyk: effect on player position while magic is active
 					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_MAGIC_DOME, 500);
@@ -5883,8 +5851,8 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_WATER_MAGIC))
 			{
-				int max_distance = 200 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC]);
-				int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
+				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC] + magic_bonus));
+				int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] < level.time)
 				{
@@ -5903,8 +5871,8 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_EARTH_MAGIC))
 			{
-				int max_distance = 200 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC]);
-				int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
+				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC] + magic_bonus));
+				int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] < level.time)
 				{
@@ -5927,8 +5895,8 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_FIRE_MAGIC))
 			{
-				int max_distance = 200 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
-				int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
+				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] + magic_bonus));
+				int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] < level.time)
 				{
@@ -5978,8 +5946,8 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))
 			{
-				int max_distance = 200 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC]);
-				int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC];
+				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] + magic_bonus));
+				int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC];
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] < level.time)
 				{
@@ -6010,8 +5978,8 @@ void magic_power_events(gentity_t *ent)
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] > 0)
 					{
 						int duration = 1500;
-						int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
-						int radius = 240 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]); // zyk: default distace for this effect is 540
+						int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
+						int radius = 240 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC] + magic_bonus)); // zyk: default distace for this effect is 540
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "ships/proton_impact", 100, damage, radius, duration);
 
@@ -6036,8 +6004,8 @@ void magic_power_events(gentity_t *ent)
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] > 0)
 					{
 						int duration = 1500;
-						int radius = 240 + (50 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]); // zyk: default distace for this effect is 540
-						int damage = 2 + ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
+						int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
+						int radius = 240 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC] + magic_bonus)); // zyk: default distace for this effect is 540
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_light", "4", "misc/possession", 500, damage, radius, duration);
 

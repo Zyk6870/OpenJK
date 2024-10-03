@@ -4765,6 +4765,44 @@ qboolean zyk_source_is_non_saber_weapon(int mod, gentity_t* inflictor)
 	return qfalse;
 }
 
+zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
+{
+	int i = 0;
+
+	char* magic_powers_effects[MAX_MAGIC_POWERS] = {
+		"zyk_magic_healing_area",
+		"zyk_magic_dome",
+		"zyk_magic_water",
+		"zyk_magic_earth",
+		"zyk_magic_fire",
+		"zyk_magic_air",
+		"zyk_magic_dark",
+		"zyk_magic_light"
+	};
+
+	zyk_magic_t magic_powers[MAX_MAGIC_POWERS] =
+	{
+		MAGIC_HEALING_AREA,
+		MAGIC_MAGIC_DOME,
+		MAGIC_WATER_MAGIC,
+		MAGIC_EARTH_MAGIC,
+		MAGIC_FIRE_MAGIC,
+		MAGIC_AIR_MAGIC,
+		MAGIC_DARK_MAGIC,
+		MAGIC_LIGHT_MAGIC
+	};
+
+	for (i = 0; i < MAX_MAGIC_POWERS; i++)
+	{
+		if (effect_name && Q_stricmp(magic_powers_effects[i], effect_name) == 0)
+		{
+			return magic_powers[i];
+		}
+	}
+
+	return -1;
+}
+
 /*
 ============
 G_Damage
@@ -5669,7 +5707,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
-	// zyk: Electric Bolts of Wizard can disable jetpacks
+	// zyk: Magic Fist can disable jetpacks
 	if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2 && client)
 	{
 		if (client->jetPackOn)
@@ -5898,14 +5936,14 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
 			{ // zyk: Impact Reducer Armor
-				bonus_health_resistance += 0.15;
+				bonus_health_resistance += 0.10;
 			}
 
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
 			{ // zyk: Deflective Armor
 				if (zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue)
 				{
-					bonus_health_resistance += 0.25;
+					bonus_health_resistance += 0.20;
 				}
 				else if (mod == MOD_SABER)
 				{
@@ -5921,24 +5959,24 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 				else if (mod == MOD_SABER)
 				{
-					bonus_health_resistance += 0.25;
+					bonus_health_resistance += 0.20;
 				}
 			}
 
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
 			{ // zyk: Magic Armor
-				if ((mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2) ||
-					(mod == MOD_UNKNOWN && attacker && attacker->client && (attacker->client->sess.amrpgmode == 2 || attacker->NPC) &&
-					 attacker->client->pers.quest_power_status > 0)
+				if ((mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2) || // zyk: Magic Fist
+					(mod == MOD_UNKNOWN && attacker && attacker->client && 
+					 inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) > -1) // zyk: Magic power
 					)
 				{ // zyk: Absorbs Magic Fist damage and Magic power damage
-					bonus_health_resistance += 0.25;
+					bonus_health_resistance += 0.20;
 
-					zyk_add_mp(targ, (int)ceil(take * 0.25));
+					zyk_add_mp(targ, (int)ceil(take * 0.20));
 				}
 				else
 				{
-					bonus_health_resistance += 0.10;
+					bonus_health_resistance += 0.05;
 				}
 			}
 
@@ -5960,7 +5998,15 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			if (targ->client->pers.quest_power_status & (1 << MAGIC_MAGIC_DOME))
 			{ // zyk: target using Magic Dome
-				bonus_health_resistance += (0.02 * targ->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME]);
+				int magic_bonus = 0;
+
+				// zyk: Magic Armor improves all magic powers
+				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
+				{
+					magic_bonus = 1;
+				}
+
+				bonus_health_resistance += (0.02 * (targ->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME] + magic_bonus));
 			}
 
 			// zyk: Health Strength skill decreases damage taken
@@ -6245,44 +6291,6 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 	return qfalse;
 }
 
-zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
-{
-	int i = 0;
-
-	char *magic_powers_effects[MAX_MAGIC_POWERS] = {
-		"zyk_magic_healing_area",
-		"zyk_magic_dome",
-		"zyk_magic_water",
-		"zyk_magic_earth",
-		"zyk_magic_fire",
-		"zyk_magic_air",
-		"zyk_magic_dark",
-		"zyk_magic_light"
-	};
-
-	zyk_magic_t magic_powers[MAX_MAGIC_POWERS] =
-	{
-		MAGIC_HEALING_AREA,
-		MAGIC_MAGIC_DOME,
-		MAGIC_WATER_MAGIC,
-		MAGIC_EARTH_MAGIC,
-		MAGIC_FIRE_MAGIC,
-		MAGIC_AIR_MAGIC,
-		MAGIC_DARK_MAGIC,
-		MAGIC_LIGHT_MAGIC
-	};
-
-	for (i = 0; i < MAX_MAGIC_POWERS; i++)
-	{
-		if (Q_stricmp(magic_powers_effects[i], effect_name) == 0)
-		{
-			return magic_powers[i];
-		}
-	}
-
-	return -1;
-}
-
 void zyk_remove_emotes(gentity_t* ent)
 {
 	// zyk: removing emotes to prevent exploits
@@ -6464,6 +6472,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 				if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 && level.special_power_effects[attacker->s.number] != ent->s.number)
 				{ // zyk: if it is an effect used by special power, then attacker must be the owner of the effect. Also, do not hit the owner
 					gentity_t *magic_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
+					zyk_magic_t this_magic_power = zyk_get_magic_for_effect(attacker->targetname);
 					qboolean is_ally = qfalse;
 
 					// zyk: if the power user and the target are allies (player or npc), then do not hit
@@ -6491,18 +6500,10 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						continue;
 					}
 
-					// zyk: target will not be knocked back by these powers
+					// zyk: Magic power. Target will not be knocked back by it
 					if (magic_power_user && magic_power_user->client && magic_power_user != ent && 
-						(Q_stricmp(attacker->targetname, "zyk_magic_healing_area") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_magic_dome") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_magic_water") == 0 ||
-						Q_stricmp(attacker->targetname, "zyk_magic_earth") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_magic_fire") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_magic_air") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_magic_dark") == 0 || 
-						Q_stricmp(attacker->targetname, "zyk_magic_light") == 0))
+						this_magic_power > -1)
 					{
-						zyk_magic_t this_magic_power = zyk_get_magic_for_effect(attacker->targetname);
 						float elemental_bonus_factor = 1;
 						int final_damage = (int)points;
 
@@ -6703,7 +6704,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							}
 						}
 
-						G_Damage (ent, magic_power_user, magic_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
+						G_Damage (ent, attacker, magic_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
 
 						if (this_magic_power == MAGIC_DARK_MAGIC && ent && ent->client && ent->health < 1)
 						{ // zyk: Black Hole disintegrates enemies who got killed by it
