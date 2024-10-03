@@ -2209,113 +2209,9 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	zyk_stop_all_magic_powers(self);
 	
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
-
-	// zyk: dying makes the player lose the red crystal
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
-
-	if (self->client->pers.quest_npc > QUEST_NPC_NONE)
-	{ // zyk: quest npc died
-		if (attacker && attacker->client && 
-			(attacker->client->sess.amrpgmode == 2 || zyk_is_quest_ally(attacker) == qtrue))
-		{
-			gentity_t* quest_player = attacker;
-
-			if (attacker->NPC && attacker->client->pers.quest_npc_caller_player_id > -1)
-			{ // zyk: is a quest ally, get the player
-				quest_player = &g_entities[attacker->client->pers.quest_npc_caller_player_id];
-			}
-
-			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2 && 
-				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
-				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
-			{
-				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
-				{
-					quest_player->client->pers.quest_masters_defeated += 1;
-
-					if (quest_player->client->pers.quest_masters_defeated >= QUEST_MASTERS_TO_DEFEAT)
-					{
-						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
-					}
-				}
-
-				quest_player->client->pers.quest_defeated_enemies += 1;
-
-				if (quest_player->client->pers.quest_defeated_enemies == QUEST_MIN_ENEMIES_TO_DEFEAT)
-				{ // zyk: start the second part of the quest, the Spirit Tree regen
-					zyk_set_starting_quest_progress(quest_player);
-
-					quest_player->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
-				}
-
-				// zyk: completed the quest
-				if (zyk_is_main_quest_complete(quest_player) == qtrue)
-				{
-					zyk_start_main_quest_final_event(quest_player);
-				}
-
-				save_account(quest_player, qtrue);
-			}
-		}
-	}
-
-	if (attacker && attacker->client && attacker->NPC && attacker->client->pers.quest_npc == QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE)
-	{ // zyk: this quest ally can restore mp to allies when he defeats an enemy
-		int mp_to_restore = self->client->ps.stats[STAT_MAX_HEALTH];
-		int npc_it = 0;
-
-		for (npc_it = (MAX_CLIENTS + BODY_QUEUE_SIZE); npc_it < level.num_entities; npc_it++)
-		{
-			gentity_t* quest_enemy = &g_entities[npc_it];
-
-			if (mp_to_restore < (QUEST_WORM_MP_TO_RESTORE * 2))
-			{
-				break;
-			}
-			else if (quest_enemy && quest_enemy->client && quest_enemy->NPC && quest_enemy->health > 0 &&
-				quest_enemy->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && quest_enemy->client->pers.quest_npc <= QUEST_NPC_ALLY_FORCE_WARRIOR &&
-				quest_enemy != attacker)
-			{ // zyk: one of his allies
-				quest_enemy->client->pers.magic_power += (QUEST_WORM_MP_TO_RESTORE * 2);
-
-				mp_to_restore -= (QUEST_WORM_MP_TO_RESTORE * 2);
-			}
-		}
-
-		if (mp_to_restore > 0)
-		{ // zyk: restore mp to himself
-			attacker->client->pers.magic_power += mp_to_restore;
-		}
-	}
-
-	if (zyk_allow_quests.integer > 0 && 
-		self->client->sess.amrpgmode == 2 && 
-		!(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
-		zyk_is_main_quest_complete(self) == qfalse && 
-		!(attacker && attacker->client && attacker != self && attacker->s.number < MAX_CLIENTS) && // zyk: dying to players will not reset quest tries
-		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_KEEP_QUEST_TRIES)) // zyk: dont reset in this case, for example, when player logs into his account
-		)
-	{ // zyk: player died in quest. Decrease number of tries
-		// zyk: also decrease regen progress
-		self->client->pers.quest_progress -= (MAX_QUEST_PROGRESS / 100);
-
-		if (self->client->pers.quest_progress < 0)
-		{
-			self->client->pers.quest_progress = 0;
-		}
-		
-		zyk_decrease_quest_tries(self);
-	}
-
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_POISONED);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
-
-	if (attacker && attacker->client && attacker->client->pers.quest_npc > QUEST_NPC_NONE && attacker->enemy && attacker->enemy == self)
-	{ // zyk: quest npc defeated an enemy. Clear it to find a new one and stop all magic powers
-		attacker->enemy = NULL;
-
-		zyk_stop_all_magic_powers(attacker);
-	}
 
 	if (self->client->pers.race_position > 0) // zyk: if a player dies during a race, he loses the race
 	{
@@ -2698,6 +2594,108 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		self->client->ps.otherKillerTime > level.time)
 	{
 		attacker = &g_entities[self->client->ps.otherKiller];
+	}
+
+	// zyk: Main Quest events
+	if (self->client->pers.quest_npc > QUEST_NPC_NONE)
+	{ // zyk: quest npc died
+		if (attacker && attacker->client &&
+			(attacker->client->sess.amrpgmode == 2 || zyk_is_quest_ally(attacker) == qtrue))
+		{
+			gentity_t* quest_player = attacker;
+
+			if (attacker->NPC && attacker->client->pers.quest_npc_caller_player_id > -1)
+			{ // zyk: is a quest ally, get the player
+				quest_player = &g_entities[attacker->client->pers.quest_npc_caller_player_id];
+			}
+
+			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2 &&
+				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
+				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
+			{
+				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+				{
+					quest_player->client->pers.quest_masters_defeated += 1;
+
+					if (quest_player->client->pers.quest_masters_defeated >= QUEST_MASTERS_TO_DEFEAT)
+					{
+						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
+					}
+				}
+
+				quest_player->client->pers.quest_defeated_enemies += 1;
+
+				if (quest_player->client->pers.quest_defeated_enemies == QUEST_MIN_ENEMIES_TO_DEFEAT)
+				{ // zyk: start the second part of the quest, the Spirit Tree regen
+					zyk_set_starting_quest_progress(quest_player);
+
+					quest_player->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
+				}
+
+				// zyk: completed the quest
+				if (zyk_is_main_quest_complete(quest_player) == qtrue)
+				{
+					zyk_start_main_quest_final_event(quest_player);
+				}
+
+				save_account(quest_player, qtrue);
+			}
+		}
+	}
+
+	if (attacker && attacker->client && attacker->NPC && attacker->client->pers.quest_npc == QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE)
+	{ // zyk: this quest ally can restore mp to allies when he defeats an enemy
+		int mp_to_restore = self->client->ps.stats[STAT_MAX_HEALTH];
+		int npc_it = 0;
+
+		for (npc_it = (MAX_CLIENTS + BODY_QUEUE_SIZE); npc_it < level.num_entities; npc_it++)
+		{
+			gentity_t* quest_enemy = &g_entities[npc_it];
+
+			if (mp_to_restore < (QUEST_WORM_MP_TO_RESTORE * 2))
+			{
+				break;
+			}
+			else if (quest_enemy && quest_enemy->client && quest_enemy->NPC && quest_enemy->health > 0 &&
+				quest_enemy->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && quest_enemy->client->pers.quest_npc <= QUEST_NPC_ALLY_FORCE_WARRIOR &&
+				quest_enemy != attacker)
+			{ // zyk: one of his allies
+				quest_enemy->client->pers.magic_power += (QUEST_WORM_MP_TO_RESTORE * 2);
+
+				mp_to_restore -= (QUEST_WORM_MP_TO_RESTORE * 2);
+			}
+		}
+
+		if (mp_to_restore > 0)
+		{ // zyk: restore mp to himself
+			attacker->client->pers.magic_power += mp_to_restore;
+		}
+	}
+
+	if (zyk_allow_quests.integer > 0 &&
+		self->client->sess.amrpgmode == 2 &&
+		!(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
+		zyk_is_main_quest_complete(self) == qfalse &&
+		!(attacker && attacker->client && attacker != self && attacker->s.number < MAX_CLIENTS) && // zyk: dying to players will not reset quest tries
+		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_KEEP_QUEST_TRIES)) // zyk: dont reset in this case, for example, when player logs into his account
+		)
+	{ // zyk: player died in quest. Decrease number of tries
+		// zyk: also decrease regen progress
+		self->client->pers.quest_progress -= (MAX_QUEST_PROGRESS / 100);
+
+		if (self->client->pers.quest_progress < 0)
+		{
+			self->client->pers.quest_progress = 0;
+		}
+
+		zyk_decrease_quest_tries(self);
+	}
+
+	if (attacker && attacker->client && attacker->client->pers.quest_npc > QUEST_NPC_NONE && attacker->enemy && attacker->enemy == self)
+	{ // zyk: quest npc defeated an enemy. Clear it to find a new one and stop all magic powers
+		attacker->enemy = NULL;
+
+		zyk_stop_all_magic_powers(attacker);
 	}
 
 	// zyk: setting the credits_modifier and the bonus score for the RPG player

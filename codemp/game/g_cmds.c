@@ -2461,7 +2461,6 @@ qboolean zyk_riddle_answer(gentity_t* ent, const char* message)
 	if (seller_npc && seller_npc->NPC && seller_npc->client && seller_npc->client->pers.quest_npc == QUEST_NPC_SELLER &&
 		Q_stricmp(zyk_parse_riddle_answer(message), G_NewString(riddle_answers[riddle_answer_index])) == 0)
 	{ // zyk: the parsed message string contains the correct riddle answer
-		seller_npc->client->pers.quest_npc_caller_player_id = ent->s.number;
 		seller_npc->client->pers.quest_seller_map_timer = level.time + 500;
 
 		return qtrue;

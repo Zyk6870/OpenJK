@@ -9178,7 +9178,7 @@ void G_RunFrame( int levelTime ) {
 					plum->s.time = ent->client->pers.magic_power;
 				}
 
-				// zyk: time to spawn magic crystals and side quest stuff
+				// zyk: spawn magic crystals and side quest stuff
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time && 
 					!(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
 				{
@@ -9193,7 +9193,7 @@ void G_RunFrame( int levelTime ) {
 						(ent->client->pers.magic_crystals / 2) - ent->client->pers.quest_tries - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] - 
 						main_quest_progress + (ent->client->pers.quest_masters_defeated * 10);
 
-					int side_quest_chance = (ent->client->pers.magic_crystals / 20) + (main_quest_progress / (QUEST_MIN_ENEMIES_TO_DEFEAT / 3));
+					int side_quest_chance = (ent->client->pers.magic_crystals / 25) + (main_quest_progress / 15);
 					int side_quest_item_duration = side_quest_chance * SIDE_QUEST_STUFF_TIMER;
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
@@ -9638,7 +9638,7 @@ void G_RunFrame( int levelTime ) {
 							zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
 
 							if (chance_to_spawn_quest_npc < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
-							{ // zyk: spawn an ally and get one of them near the player
+							{ // zyk: spawn an ally
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 								int ally_bonus = (ent->client->pers.quest_defeated_enemies / 2) + ent->client->pers.magic_crystals;
 
@@ -9833,20 +9833,14 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.quest_npc == QUEST_NPC_SELLER && ent->client->pers.quest_seller_map_timer < level.time)
 				{ // zyk: the time for the Seller to stay in the map run out. He will go away
 					gentity_t* player_ent = NULL;
+					int player_it = 0;
 
-					if (ent->client->pers.quest_npc_caller_player_id > -1)
+					for (player_it = 0; player_it < level.maxclients; player_it++)
 					{
-						gentity_t* seller_ent = NULL;
+						player_ent = &g_entities[player_it];
 
-						player_ent = &g_entities[ent->client->pers.quest_npc_caller_player_id];
-
-						if (player_ent && player_ent->client && player_ent->client->ps.hasLookTarget)
-						{
-							seller_ent = &g_entities[player_ent->client->ps.lookTarget];
-						}
-
-						if (player_ent && player_ent->client && player_ent->client->pers.quest_seller_event_step < QUEST_SELLER_END_STEP &&
-							seller_ent && seller_ent == ent)
+						if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && 
+							player_ent->client->pers.quest_seller_event_step > QUEST_SELLER_STEP_NONE && player_ent->client->pers.quest_seller_event_step < QUEST_SELLER_END_STEP)
 						{
 							trap->SendServerCommand(player_ent->s.number, va("chat \"%s^7: I must go away now. See you later!\n\"", QUESTCHAR_SELLER));
 						}

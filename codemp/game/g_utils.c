@@ -1923,8 +1923,6 @@ void TryUse( gentity_t *ent )
 
 				ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_TALKED;
 
-				target->client->pers.quest_npc_caller_player_id = ent->s.number;
-
 				// zyk: reset seller time so the player has enough time to answer the riddle
 				target->client->pers.quest_seller_map_timer = level.time + seller_duration;
 
