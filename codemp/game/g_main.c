@@ -5839,7 +5839,7 @@ void zyk_status_effects(gentity_t* ent)
 	}
 }
 
-void quest_power_events(gentity_t *ent)
+void magic_power_events(gentity_t *ent)
 {
 	if (ent && ent->client)
 	{
@@ -5902,8 +5902,7 @@ void quest_power_events(gentity_t *ent)
 
 						if (zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
 						{
-							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water", "4", "world/waterfall3", 0, damage, 100, 1000);
-							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water_effect", "0", "env/water_impact", 0, 0, 0, 1000);
+							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water", "4", "env/water_impact", 0, damage, 100, 1000);
 						}
 						else if (target_ent && target_ent->client)
 						{ // zyk: heal allies
@@ -5924,7 +5923,6 @@ void quest_power_events(gentity_t *ent)
 							if (is_ally == qtrue && ent != target_ent && ally_distance < max_distance)
 							{
 								zyk_add_health(target_ent, heal_amount);
-
 								zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_water_effect", "0", "env/water_impact", 0, 0, 0, 1000);
 							}
 						}
@@ -6011,7 +6009,7 @@ void quest_power_events(gentity_t *ent)
 					// zyk: effect on player position while magic is active
 					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_FIRE_MAGIC, 700);
 
-					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fire_lp.wav"));
+					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
 
 					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
 					{
@@ -6021,7 +6019,7 @@ void quest_power_events(gentity_t *ent)
 						{
 							zyk_quest_effect_spawn(ent, target_ent, "zyk_magic_fire", "4", "env/fire", 0, damage, 100, 1000);
 
-							G_Sound(target_ent, CHAN_AUTO, G_SoundIndex("sound/effects/fire_lp.wav"));
+							G_Sound(target_ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
 						}
 					}
 
@@ -6037,9 +6035,17 @@ void quest_power_events(gentity_t *ent)
 
 					if (fire_magic_user && fire_magic_user->client)
 					{
+						int fire_damage = fire_magic_user->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
+
 						zyk_quest_effect_spawn(fire_magic_user, ent, "zyk_magic_fire_hit", "0", "env/fire", 0, 0, 0, 300);
 
-						G_Damage(ent, fire_magic_user, fire_magic_user, NULL, NULL, fire_magic_user->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC], 0, MOD_UNKNOWN);
+						fire_damage = (int)ceil(fire_damage * zyk_get_elemental_bonus_factor(MAGIC_FIRE_MAGIC, fire_magic_user, ent));
+
+						// zyk: must do at least 1 damage
+						if (fire_damage < 1)
+							fire_damage = 1;
+
+						G_Damage(ent, fire_magic_user, fire_magic_user, NULL, NULL, fire_damage, 0, MOD_UNKNOWN);
 
 						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fire_lp.wav"));
 					}
@@ -6295,9 +6301,7 @@ void quest_power_events(gentity_t *ent)
 						}
 					}
 
-					send_rpg_events(2000);
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 50;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 100;
 				}
 			}
 		}
@@ -9238,7 +9242,7 @@ void G_RunFrame( int levelTime ) {
 				}
 			}
 
-			quest_power_events(ent);
+			magic_power_events(ent);
 			fire_bolt_hits(ent);
 			zyk_status_effects(ent);
 
@@ -9970,7 +9974,7 @@ void G_RunFrame( int levelTime ) {
 			WP_SaberPositionUpdate(ent, &ent->client->pers.cmd);
 			WP_SaberStartMissileBlockCheck(ent, &ent->client->pers.cmd);
 
-			quest_power_events(ent);
+			magic_power_events(ent);
 			fire_bolt_hits(ent);
 			zyk_status_effects(ent);
 
