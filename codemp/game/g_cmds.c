@@ -246,7 +246,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
 		return "hits enemies around you with Fire elemental damage. Enemies hit by it will catch fire for some seconds. Increases your Fire element affinity. More powerful against enemies with Water affinity. Absorbs some Fire magic effects";
 	if (skill_index == SKILL_MAGIC_AIR_MAGIC)
-		return "blows people away with a strong wind, and does Air elemental damage to them. Increases your run speed. Enemies hit by Air will have their run speed decreased. Increases your Air element affinity. More powerful against enemies with Earth affinity. Absorbs some Air magic effects";
+		return "blows enemies away with a strong wind, and does Air elemental damage to them. Increases your run speed. Has a chance of knocking enemies down. Increases your Air element affinity. More powerful against enemies with Earth affinity. Absorbs some Air magic effects";
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
 		return "creates a black hole, sucking everyone nearby and doing Dark elemental damage to them. Increases your Dark element affinity. More powerful against enemies with Light affinity. Absorbs some Dark magic effects";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)

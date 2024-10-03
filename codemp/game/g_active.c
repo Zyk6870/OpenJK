@@ -2605,11 +2605,6 @@ void ClientThink_real( gentity_t *ent ) {
 			client->ps.speed *= 2;
 		}
 
-		if (client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_AIR))
-		{ // zyk: hit by Air Magic. Decrease speed
-			client->ps.speed /= client->pers.air_magic_speed_decrease_factor;
-		}
-
 		if (client->pers.stun_baton_less_speed_timer > level.time)
 		{ // zyk: stun baton 3/3 decreases speed
 			client->ps.speed /= 2;
@@ -2652,11 +2647,6 @@ void ClientThink_real( gentity_t *ent ) {
 		if (client->bodyGrabIndex != ENTITYNUM_NONE)
 		{ //can't go nearly as fast when dragging a body around
 			zyk_player_speed *= 0.2f;
-		}
-
-		if (client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_AIR))
-		{ // zyk: hit by Air Magic. Decrease speed
-			zyk_player_speed /= client->pers.air_magic_speed_decrease_factor;
 		}
 
 		if (client->pers.stun_baton_less_speed_timer > level.time)

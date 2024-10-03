@@ -6529,7 +6529,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_earth", "0", "env/rock_smash", 0, 0, 0, 500);
 
 							if (ent->client && ent->health > 0 && 
-								ent->client->ps.groundEntityNum != ENTITYNUM_NONE && ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_EARTH] < level.time)
+								ent->client->ps.groundEntityNum != ENTITYNUM_NONE && !(ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_EARTH)))
 							{// zyk: target can only be hit on the floor
 								zyk_remove_emotes(ent);
 
@@ -6546,7 +6546,8 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
 
-								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_EARTH] = level.time + (4000 / final_damage);
+								ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_EARTH);
+								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_EARTH] = level.time + (16000 / final_damage);
 							}
 						}
 						else if (this_magic_power == MAGIC_FIRE_MAGIC)
@@ -6573,20 +6574,19 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 							if (ent->client && ent->health > 0)
 							{ // zyk: blows the target away
+								int chance_for_knockdown = final_damage * 2;
 								float air_strength;
 
-								AngleVectors(ent->client->ps.viewangles, air_magic_forward, NULL, NULL);
-
+								AngleVectors(magic_power_user->client->ps.viewangles, air_magic_forward, NULL, NULL);
 								VectorNormalize(air_magic_forward);
 
 								if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-									air_strength = 25.0;
+									air_strength = 75.0;
 								else
-									air_strength = 4.5;
+									air_strength = 15.0;
 
 								// zyk: elemental bonus
 								air_strength *= final_damage;
-								ent->client->pers.air_magic_speed_decrease_factor = final_damage / 4;
 
 								VectorScale(air_magic_forward, air_strength, air_magic_dir);
 
@@ -6594,9 +6594,18 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 								zyk_remove_emotes(ent);
 
-								// zyk: hit by Air Magic. It will make target have lower run speed
-								ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_AIR);
-								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_AIR] = level.time + 500;
+								// zyk: hit by Air Magic. Has a chance to knock down the target
+								if (Q_irand(0, 99) < chance_for_knockdown && !(ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_AIR)))
+								{
+									ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
+									ent->client->ps.forceHandExtendTime = level.time + 800;
+									ent->client->ps.velocity[2] += 100;
+									ent->client->ps.forceDodgeAnim = 0;
+									ent->client->ps.quickerGetup = qtrue;
+
+									ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_AIR);
+									ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_AIR] = level.time + 2000;
+								}
 							}
 						}
 						else if (this_magic_power == MAGIC_DARK_MAGIC)
@@ -6606,7 +6615,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								vec3_t dark_magic_dir, dark_magic_forward;
 								float target_distance = Distance(magic_power_user->client->pers.black_hole_origin, ent->client->ps.origin);
 								float black_hole_suck_strength = 0.0;
-								float black_hole_max_strength = 130.0 + (15.0 * magic_power_user->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
+								float black_hole_max_strength = 300.0 + (15.0 * final_damage);
 
 								// zyk: increases strength with which target is sucked into the black hole the closer he is to it
 								if (target_distance > 0.0)
@@ -6620,11 +6629,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								// zyk: tests if the target is on the ground or in the air
 								if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 								{
-									black_hole_suck_strength *= 28.0;
+									black_hole_suck_strength *= 90.0;
 								}
 								else
 								{
-									black_hole_suck_strength *= 7.0;
+									black_hole_suck_strength *= 18.0;
 								}
 
 								// zyk: elemental bonus
@@ -6638,7 +6647,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 								if (target_distance < 64.0)
 								{ // zyk: very close to black hole center
-									VectorScale(ent->client->ps.velocity, 0.4, ent->client->ps.velocity);
+									VectorScale(ent->client->ps.velocity, 0.25, ent->client->ps.velocity);
 								}
 								else
 								{
@@ -6654,7 +6663,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						{
 							if (ent->client && ent->health > 0)
 							{
-								int chance_for_confusion = final_damage * 5;
+								int chance_for_confusion = final_damage * 2;
 								int mp_to_drain = magic_power_user->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 								int max_player_mp = zyk_max_magic_power(ent);
 
@@ -6678,13 +6687,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 									ent->client->pers.magic_power = max_player_mp;
 								}
 
-								// zyk: setting confuse effect
 								zyk_remove_emotes(ent);
-
-								if (ent->client->jetPackOn)
-								{
-									Jetpack_Off(ent);
-								}
 
 								// zyk: confuses the target
 								if (ent->client->ps.forceDodgeAnim != BOTH_SONICPAIN_END && 

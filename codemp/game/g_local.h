@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.76"
+#define	GAMEVERSION	"New Zyk Mod v1.0.77"
 
 #define SECURITY_LOG "security.log"
 
@@ -984,8 +984,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: bitvalue. If this player is hit by some enemy magic, set a flag
 	int hit_by_magic;
-
-	int air_magic_speed_decrease_factor;
 
 	// zyk: cooldown between quest power uses
 	int quest_power_usage_timer;
