@@ -1914,12 +1914,19 @@ void TryUse( gentity_t *ent )
 		{ // zyk: found the seller
 			if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE)
 			{
+				int main_quest_progress = (ent->client->pers.quest_defeated_enemies / 2) +
+					(ent->client->pers.quest_masters_defeated * 2) +
+					(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
+
+				int side_quest_chance = (ent->client->pers.magic_crystals / 20) + (main_quest_progress / (QUEST_MIN_ENEMIES_TO_DEFEAT / 3));
+				int seller_duration = side_quest_chance * SIDE_QUEST_STUFF_TIMER;
+
 				ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_TALKED;
 
 				target->client->pers.quest_npc_caller_player_id = ent->s.number;
 
 				// zyk: reset seller time so the player has enough time to answer the riddle
-				target->client->pers.quest_seller_map_timer = level.time + QUEST_SELLER_MAP_TIME;
+				target->client->pers.quest_seller_map_timer = level.time + seller_duration;
 
 				// zyk: a player is answering the riddle, do not try to teleport to another spot
 				target->client->pers.quest_npc_idle_timer = level.time + QUEST_SELLER_MAP_TIME + 2000;

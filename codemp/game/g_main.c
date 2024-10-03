@@ -9193,7 +9193,8 @@ void G_RunFrame( int levelTime ) {
 						(ent->client->pers.magic_crystals / 2) - ent->client->pers.quest_tries - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] - 
 						main_quest_progress + (ent->client->pers.quest_masters_defeated * 10);
 
-					int side_quest_chance = (ent->client->pers.magic_crystals / 25) + (main_quest_progress / 15);
+					int side_quest_chance = (ent->client->pers.magic_crystals / 20) + (main_quest_progress / (QUEST_MIN_ENEMIES_TO_DEFEAT / 3));
+					int side_quest_item_duration = side_quest_chance * SIDE_QUEST_STUFF_TIMER;
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
@@ -9244,7 +9245,7 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
 							{
-								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, 60000, 30, puzzle_x, puzzle_y, puzzle_z);
+								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, side_quest_item_duration, 30, puzzle_x, puzzle_y, puzzle_z);
 							}
 						}
 					}
@@ -9273,7 +9274,7 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
 							{
-								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, 60000, 80, puzzle_x, puzzle_y, puzzle_z);
+								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, side_quest_item_duration, 80, puzzle_x, puzzle_y, puzzle_z);
 							}
 						}
 					}
