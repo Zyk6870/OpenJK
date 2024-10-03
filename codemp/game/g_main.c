@@ -5658,7 +5658,6 @@ void earth_magic(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_EARTH_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 500;
-	ent->client->pers.magic_power_debounce2_timer[MAGIC_EARTH_MAGIC] = level.time + 500;
 
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
 }
@@ -5677,7 +5676,6 @@ void air_magic(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_AIR_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 500;
-	ent->client->pers.magic_power_debounce2_timer[MAGIC_AIR_MAGIC] = level.time + 500;
 
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/vacuum.mp3"));
 }
@@ -5917,48 +5915,6 @@ void magic_power_events(gentity_t *ent)
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] = level.time + 400;
 				}
-
-				if (ent->client->pers.magic_power_debounce2_timer[MAGIC_EARTH_MAGIC] < level.time)
-				{
-					gentity_t* target_ent = NULL;
-					int zyk_it = 0;
-
-					G_ScreenShake(ent->client->ps.origin, ent, 10.0f, 2000, qtrue);
-					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
-
-					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
-					{
-						target_ent = &g_entities[zyk_it];
-
-						if (target_ent && target_ent->inuse && target_ent->health > 0 &&
-							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
-						{
-							if (target_ent->client && target_ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-							{ // zyk: player can only be hit if he is on floor
-								// zyk: if using Meditate taunt, remove it
-								if (target_ent->client->ps.legsAnim == BOTH_MEDITATE && target_ent->client->ps.torsoAnim == BOTH_MEDITATE)
-								{
-									target_ent->client->ps.legsAnim = target_ent->client->ps.torsoAnim = BOTH_MEDITATE_END;
-								}
-
-								target_ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-								target_ent->client->ps.forceHandExtendTime = level.time + 800;
-								target_ent->client->ps.velocity[2] += 300;
-								target_ent->client->ps.forceDodgeAnim = 0;
-								target_ent->client->ps.quickerGetup = qtrue;
-							}
-
-							if (target_ent->client && zyk_it < level.maxclients)
-							{
-								G_ScreenShake(target_ent->client->ps.origin, target_ent, 10.0f, 2000, qtrue);
-							}
-
-							G_Sound(target_ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
-						}
-					}
-
-					ent->client->pers.magic_power_debounce2_timer[MAGIC_EARTH_MAGIC] = level.time + 2000;
-				}
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_FIRE_MAGIC))
@@ -6026,40 +5982,6 @@ void magic_power_events(gentity_t *ent)
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] = level.time + 400;
 				}
-
-				if (ent->client->pers.magic_power_debounce2_timer[MAGIC_AIR_MAGIC] < level.time)
-				{
-					gentity_t* target_ent = NULL;
-					int zyk_it = 0;
-
-					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
-					{
-						target_ent = &g_entities[zyk_it];
-
-						if (target_ent && target_ent->inuse && target_ent->health > 0 &&
-							zyk_magic_effect_can_hit_target(ent, target_ent, ent->r.currentOrigin, zyk_it, 0, max_distance, qtrue))
-						{
-							static vec3_t forward;
-							vec3_t dir;
-
-							if (target_ent->client)
-							{ // zyk: blows the target away
-								AngleVectors(ent->client->ps.viewangles, forward, NULL, NULL);
-
-								VectorNormalize(forward);
-
-								if (target_ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-									VectorScale(forward, 215.0, dir);
-								else
-									VectorScale(forward, 40.0, dir);
-
-								VectorAdd(target_ent->client->ps.velocity, dir, target_ent->client->ps.velocity);
-							}
-						}
-					}
-
-					ent->client->pers.magic_power_debounce2_timer[MAGIC_AIR_MAGIC] = level.time + 100;
-				}
 			}
 
 			if (ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_AIR))
@@ -6072,13 +5994,10 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_DARK_MAGIC))
 			{
-				gentity_t* black_hole_target = NULL;
-				int zyk_it = 0;
-
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] < level.time)
 				{
 					// zyk: effect on player position while magic is active
-					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_DARK_MAGIC, 200);
+					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_DARK_MAGIC, 500);
 
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC] > 0)
 					{
@@ -6094,82 +6013,17 @@ void magic_power_events(gentity_t *ent)
 
 						ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC]--;
 					}
-					
-					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
-					{
-						black_hole_target = &g_entities[zyk_it];
 
-						if (black_hole_target && black_hole_target->inuse && black_hole_target->health > 0 &&
-							zyk_magic_effect_can_hit_target(ent, black_hole_target, ent->client->pers.black_hole_origin, zyk_it, 0, ent->client->pers.black_hole_distance, qfalse))
-						{
-							vec3_t dir, forward;
-							float target_distance = Distance(ent->client->pers.black_hole_origin, black_hole_target->client->ps.origin);
-							float black_hole_suck_strength = 0.0;
-							float black_hole_max_strength = 130.0 + (15.0 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]);
-
-							// zyk: increases strength with which target is sucked into the black hole the closer he is to it
-							if (target_distance > 0.0)
-							{
-								black_hole_suck_strength = ((ent->client->pers.black_hole_distance * 0.7) / target_distance);
-							}
-
-							VectorSubtract(ent->client->pers.black_hole_origin, black_hole_target->client->ps.origin, forward);
-							VectorNormalize(forward);
-							
-							// zyk: tests if the target is the ground or in the air
-							if (black_hole_target->client->ps.groundEntityNum != ENTITYNUM_NONE)
-							{
-								black_hole_suck_strength *= 200.0;
-							}
-							else
-							{
-								black_hole_suck_strength *= 50.0;
-							}
-
-							// zyk: add a limit to the strength based on the magic skill level to prevent the target from being blown out of the black hole
-							if (black_hole_suck_strength > black_hole_max_strength)
-							{
-								black_hole_suck_strength = black_hole_max_strength;
-							}
-
-							if (target_distance < 64.0)
-							{ // zyk: very close to black hole center
-								VectorScale(black_hole_target->client->ps.velocity, 0.4, black_hole_target->client->ps.velocity);
-							}
-							else
-							{
-								VectorScale(forward, black_hole_suck_strength, dir);
-								VectorAdd(black_hole_target->client->ps.velocity, dir, black_hole_target->client->ps.velocity);
-							}
-
-							// zyk: removing emotes to prevent exploits
-							if (black_hole_target->client->pers.player_statuses & (1 << PLAYER_STATUS_EMOTE))
-							{
-								black_hole_target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_EMOTE);
-								black_hole_target->client->ps.forceHandExtendTime = level.time;
-							}
-
-							// zyk: if using Meditate taunt, remove it
-							if (black_hole_target->client->ps.legsAnim == BOTH_MEDITATE && black_hole_target->client->ps.torsoAnim == BOTH_MEDITATE)
-							{
-								black_hole_target->client->ps.legsAnim = black_hole_target->client->ps.torsoAnim = BOTH_MEDITATE_END;
-							}
-						}
-					}
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = level.time + 100;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = level.time + 400;
 				}
 			}
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC))
 			{
-				gentity_t* light_of_judgement_target = NULL;
-				int zyk_it = 0;
-
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] < level.time)
 				{
 					// zyk: effect on player position while magic is active
-					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_LIGHT_MAGIC, 200);
+					zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, MAGIC_LIGHT_MAGIC, 500);
 
 					if (ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] > 0)
 					{
@@ -6189,66 +6043,7 @@ void magic_power_events(gentity_t *ent)
 						ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC]--;
 					}
 
-					for (zyk_it = 0; zyk_it < level.num_entities; zyk_it++)
-					{
-						light_of_judgement_target = &g_entities[zyk_it];
-
-						if (light_of_judgement_target && light_of_judgement_target->inuse && light_of_judgement_target->health > 0 &&
-							zyk_magic_effect_can_hit_target(ent, light_of_judgement_target, ent->client->pers.light_of_judgement_origin, zyk_it, 0, ent->client->pers.light_of_judgement_distance, qfalse))
-						{
-							int mp_to_drain = 1 * ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
-							int max_player_mp = zyk_max_magic_power(ent);
-
-							// zyk: drains mp from target
-							if (light_of_judgement_target->client->pers.magic_power >= mp_to_drain)
-							{
-								ent->client->pers.magic_power += mp_to_drain;
-								light_of_judgement_target->client->pers.magic_power -= mp_to_drain;
-							}
-							else if (light_of_judgement_target->client->pers.magic_power > 0)
-							{
-								ent->client->pers.magic_power += light_of_judgement_target->client->pers.magic_power;
-								light_of_judgement_target->client->pers.magic_power = 0;
-							}
-
-							if (ent->client->pers.magic_power > max_player_mp)
-							{
-								ent->client->pers.magic_power = max_player_mp;
-							}
-
-							// zyk: setting confuse effect
-							// zyk: removing emotes to prevent exploits
-							if (light_of_judgement_target->client->pers.player_statuses & (1 << PLAYER_STATUS_EMOTE))
-							{
-								light_of_judgement_target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_EMOTE);
-								light_of_judgement_target->client->ps.forceHandExtendTime = level.time;
-							}
-
-							// zyk: if using Meditate taunt, remove it
-							if (light_of_judgement_target->client->ps.legsAnim == BOTH_MEDITATE && light_of_judgement_target->client->ps.torsoAnim == BOTH_MEDITATE)
-							{
-								light_of_judgement_target->client->ps.legsAnim = light_of_judgement_target->client->ps.torsoAnim = BOTH_MEDITATE_END;
-							}
-
-							if (light_of_judgement_target->client->jetPackOn)
-							{
-								Jetpack_Off(light_of_judgement_target);
-							}
-
-							// zyk: confuses the target
-							if (light_of_judgement_target->client->ps.forceDodgeAnim != BOTH_SONICPAIN_END)
-							{
-								light_of_judgement_target->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-								light_of_judgement_target->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
-								light_of_judgement_target->client->ps.forceHandExtendTime = level.time + 1500;
-
-								// zyk: target cant attack while confused
-								light_of_judgement_target->client->ps.weaponTime = 1500;
-							}
-						}
-					}
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 100;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 400;
 				}
 			}
 		}
