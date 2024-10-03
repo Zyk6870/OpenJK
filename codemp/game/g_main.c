@@ -9851,7 +9851,7 @@ void G_RunFrame( int levelTime ) {
 						zyk_set_quest_event_timer(ent);
 
 						if (zyk_is_main_quest_complete(ent) == qfalse &&
-							quest_npcs_in_map < QUEST_MAX_NPCS_IN_MAP)
+							quest_npcs_in_map < zyk_max_quest_npcs.integer)
 						{
 							int enemy_type = 0;
 							int enemy_wave_count = (QUEST_MIN_ENEMIES_TO_DEFEAT / 3);
