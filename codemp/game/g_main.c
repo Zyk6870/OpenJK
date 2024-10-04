@@ -9627,12 +9627,12 @@ void G_RunFrame( int levelTime ) {
 								hard_difficulty = qtrue;
 							}
 
-							if (zyk_number_of_enemies_in_map() <= (zyk_max_quest_npcs.integer / 2))
+							if (zyk_number_of_enemies_in_map() < (zyk_max_quest_npcs.integer / 2))
 							{
 								zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
 							}
 
-							if (zyk_number_of_allies_in_map(NULL) <= (zyk_max_quest_npcs.integer / 2) &&
+							if (zyk_number_of_allies_in_map(NULL) < (zyk_max_quest_npcs.integer / 2) &&
 								Q_irand(0, 99) < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 							{ // zyk: spawn an ally
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
