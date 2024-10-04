@@ -9614,6 +9614,7 @@ void G_RunFrame( int levelTime ) {
 							{
 								int mage_master_chance = 
 									(ent->client->pers.quest_defeated_enemies - QUEST_MIN_ENEMIES_TO_DEFEAT) + 
+									(ent->client->pers.quest_masters_defeated * 4) + 
 									((ent->client->pers.quest_progress * 20.0) / MAX_QUEST_PROGRESS);
 
 								if (Q_irand(0, 99) < mage_master_chance)
