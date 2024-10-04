@@ -1905,14 +1905,7 @@ void TryUse( gentity_t *ent )
 		{ // zyk: found the seller
 			if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE)
 			{
-				int main_quest_progress = (ent->client->pers.quest_defeated_enemies / 2) +
-					(ent->client->pers.quest_masters_defeated * 2) +
-					(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
-
-				int seller_chance = (ent->client->pers.magic_crystals / 2) +
-					(main_quest_progress / 10);
-
-				int seller_duration = seller_chance * SIDE_QUEST_STUFF_TIMER;
+				int seller_duration = ent->client->pers.magic_crystals * SIDE_QUEST_STUFF_TIMER;
 
 				if (seller_duration < (SIDE_QUEST_STUFF_TIMER + 5000))
 				{

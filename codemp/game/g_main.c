@@ -1263,6 +1263,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.server_empty_change_map_timer = 0;
 	level.num_fully_connected_clients = 0;
 
+	level.energy_modulator_timer = 0;
+	level.magic_armor_timer = 0;
+
 	// zyk: initializing Duel Tournament variables
 	level.duel_tournament_mode = 0;
 	level.duel_tournament_paused = qfalse;
@@ -9189,30 +9192,25 @@ void G_RunFrame( int levelTime ) {
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] -
 						main_quest_progress + (ent->client->pers.quest_masters_defeated * 10);
 
-					int energy_modulator_chance = (ent->client->pers.magic_crystals / 20) + 
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] - 
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] +
-						(main_quest_progress / 10);
-					int energy_modulator_item_duration = energy_modulator_chance * SIDE_QUEST_STUFF_TIMER;
+					int side_quest_item_chance_modifier = ENERGY_MODULATOR_PARTS * QUEST_LOG_PARTS;
 
-					int magic_armor_chance = (ent->client->pers.magic_crystals / 20) + 
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] +
-						(main_quest_progress / 10);
-					int magic_armor_item_duration = magic_armor_chance * SIDE_QUEST_STUFF_TIMER;
+					int side_quest_item_chance = ent->client->pers.magic_crystals - side_quest_item_chance_modifier +
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] + 
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] -
+						(ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] * (side_quest_item_chance_modifier / ENERGY_MODULATOR_PARTS)) -
+						(ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] * side_quest_item_chance_modifier) -
+						(ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] * (side_quest_item_chance_modifier / QUEST_LOG_PARTS)) +
+						(main_quest_progress / 5);
 
-					int seller_chance = (ent->client->pers.magic_crystals / 2) + 
-						(main_quest_progress / 10);
+					int side_quest_item_duration = side_quest_item_chance * SIDE_QUEST_STUFF_TIMER;
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
 						skill_crystal_chance /= 2;
 						green_crystal_chance /= 2;
 						red_crystal_chance /= 2;
-						energy_modulator_chance /= 2;
-						magic_armor_chance /= 2;
-						seller_chance /= 2;
-						energy_modulator_item_duration /= 2;
-						magic_armor_item_duration /= 2;
+						side_quest_item_chance /= 2;
+						side_quest_item_duration /= 2;
 					}
 					
 					if (Q_irand(0, 99) < skill_crystal_chance)
@@ -9233,7 +9231,7 @@ void G_RunFrame( int levelTime ) {
 						}
 					}
 					
-					if (Q_irand(0, 99) < energy_modulator_chance)
+					if (Q_irand(0, 99) < side_quest_item_chance && level.energy_modulator_timer < level.time)
 					{ // zyk: Energy Modulator side quest
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
@@ -9257,12 +9255,13 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
 							{
-								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, energy_modulator_item_duration, 30, puzzle_x, puzzle_y, puzzle_z);
+								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, side_quest_item_duration, 30, puzzle_x, puzzle_y, puzzle_z);
+								level.energy_modulator_timer = level.time + side_quest_item_duration;
 							}
 						}
 					}
 
-					if (Q_irand(0, 99) < magic_armor_item_duration)
+					if (Q_irand(0, 99) < side_quest_item_chance && level.magic_armor_timer < level.time)
 					{ // zyk: Magic Armor side quest
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
@@ -9286,12 +9285,13 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
 							{
-								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, magic_armor_item_duration, 80, puzzle_x, puzzle_y, puzzle_z);
+								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, side_quest_item_duration, 80, puzzle_x, puzzle_y, puzzle_z);
+								level.magic_armor_timer = level.time + side_quest_item_duration;
 							}
 						}
 					}
 
-					if (Q_irand(0, 99) < seller_chance)
+					if (Q_irand(0, 99) < side_quest_item_chance)
 					{ // zyk: Quest Log side quest
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
@@ -9315,7 +9315,7 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < QUEST_LOG_PARTS)
 							{
-								zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, seller_chance, qfalse, -1);
+								zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, side_quest_item_chance, qfalse, -1);
 							}
 						}
 					}

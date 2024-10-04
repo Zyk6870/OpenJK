@@ -2868,9 +2868,16 @@ void fx_runner_think( gentity_t *ent )
 					else if (Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0 && 
 						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
 					{
-						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Found an Energy Modulator part!\n\"", QUESTCHAR_ALL_SPIRITS));
-
 						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] += 1;
+
+						if (player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
+						{
+							trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Found an Energy Modulator part!\n\"", QUESTCHAR_ALL_SPIRITS));
+						}
+						else
+						{
+							trap->SendServerCommand(player_ent->s.number, "chat \"^3Quest System: ^7You got the legendary ^2Energy Modulator^7\n\"");
+						}
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
 					}

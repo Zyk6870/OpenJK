@@ -6672,7 +6672,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							{
 								int chance_for_confusion = final_damage * 2;
 								int mp_to_drain = magic_power_user->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
-								int max_player_mp = zyk_max_magic_power(ent);
+								int max_player_mp = zyk_max_magic_power(magic_power_user);
 
 								// zyk: elemental bonus
 								mp_to_drain = final_damage;
@@ -6689,9 +6689,9 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 									ent->client->pers.magic_power = 0;
 								}
 
-								if (ent->client->pers.magic_power > max_player_mp)
+								if (magic_power_user->client->pers.magic_power > max_player_mp)
 								{
-									ent->client->pers.magic_power = max_player_mp;
+									magic_power_user->client->pers.magic_power = max_player_mp;
 								}
 
 								zyk_remove_emotes(ent);

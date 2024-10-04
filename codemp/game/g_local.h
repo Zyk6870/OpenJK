@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.0.91"
+#define	GAMEVERSION	"New Zyk Mod v1.0.92"
 
 #define SECURITY_LOG "security.log"
 
@@ -1709,6 +1709,10 @@ typedef struct level_locals_s {
 	vec3_t legendary_artifact_origin;
 	int legendary_crystal_chosen[LEGENDARY_CRYSTALS_CHOSEN];
 	zyk_quest_item_t legendary_artifact_type;
+
+	// zyk: time to spawn the same side quest secret item again
+	int energy_modulator_timer;
+	int magic_armor_timer;
 
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];

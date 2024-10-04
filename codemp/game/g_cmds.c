@@ -6658,11 +6658,11 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. Give extra tries for the main quest. Keeping some in the inventory increase Magic Armor chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. Give extra tries for the main quest. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing Use key will convert a nearby enemy npc into an ally for an amount of time based on the number of blue crystals you have. Mage enemies (specially Mage Masters) have a chance of resisting it. Keeping some in the inventory increase Energy Modulator chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing Use key will convert a nearby enemy npc into an ally for an amount of time based on the number of blue crystals you have. Mage enemies (specially Mage Masters) have a chance of resisting it. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
 	{
@@ -6830,7 +6830,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 4 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 3)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor. ^2Magic: Healing Area, Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger, increase red crystal damage, increase the chance for the green crystal, red crystal, Energy Modulator, Magic Armor and Safe Haven to appear. Blue crystals appear less often as you get more of them. Your quest progress increase blue crystal spawn rate\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor. ^2Magic: Healing Area, Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger, increase the chance for the green crystal, red crystal, Energy Modulator, Magic Armor and me to appear. Blue crystals appear less often as you get more of them. Your quest progress increase blue crystal spawn rate\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
 						}
 						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 4)
 						{
