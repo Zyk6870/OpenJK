@@ -1918,15 +1918,15 @@ void TryUse( gentity_t *ent )
 					(ent->client->pers.quest_masters_defeated * 2) +
 					(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
 
-				int side_quest_chance = (ent->client->pers.magic_crystals / 10) - 
-					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] + 
+				int side_quest_chance = (ent->client->pers.magic_crystals / 2) -
+					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] +
 					(main_quest_progress / 10);
 
 				int seller_duration = side_quest_chance * SIDE_QUEST_STUFF_TIMER;
 
-				if (seller_duration < SIDE_QUEST_STUFF_TIMER)
+				if (seller_duration < (SIDE_QUEST_STUFF_TIMER + 5000))
 				{
-					seller_duration = SIDE_QUEST_STUFF_TIMER / 2;
+					seller_duration = SIDE_QUEST_STUFF_TIMER + 5000;
 				}
 
 				ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_TALKED;

@@ -5388,7 +5388,7 @@ void zyk_clear_quest_items(gentity_t* effect_ent)
 			Q_stricmp(crystal_ent->targetname, "zyk_quest_item") == 0 &&
 			crystal_ent->count == effect_ent->s.number)
 		{ // zyk: found one of the models of this crystal effect, clear it
-			level.special_power_effects_timer[crystal_ent->s.number] = level.time;
+			level.special_power_effects_timer[crystal_ent->s.number] = level.time + 100;
 		}
 	}
 }
@@ -9193,6 +9193,7 @@ void G_RunFrame( int levelTime ) {
 						(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
 
 					int player_power_level = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
+
 					int skill_crystal_chance = 70 - player_power_level + main_quest_progress;
 
 					int quest_item_chance = 21 + 
@@ -9200,16 +9201,11 @@ void G_RunFrame( int levelTime ) {
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] -
 						main_quest_progress + (ent->client->pers.quest_masters_defeated * 10);
 
-					int side_quest_chance = (ent->client->pers.magic_crystals / 10) -
+					int side_quest_chance = (ent->client->pers.magic_crystals / 2) -
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] +
 						(main_quest_progress / 10);
 
 					int side_quest_item_duration = side_quest_chance * SIDE_QUEST_STUFF_TIMER;
-
-					if (side_quest_item_duration < SIDE_QUEST_STUFF_TIMER)
-					{
-						side_quest_item_duration = SIDE_QUEST_STUFF_TIMER / 2;
-					}
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
@@ -9610,7 +9606,6 @@ void G_RunFrame( int levelTime ) {
 					// zyk: quest npcs
 					if (ent->client->pers.quest_event_timer < level.time)
 					{
-						int chance_to_spawn_quest_npc = Q_irand(0, 99);
 						int quest_npcs_in_map = zyk_quest_npcs_in_the_map();
 
 						zyk_set_quest_event_timer(ent);
@@ -9639,9 +9634,9 @@ void G_RunFrame( int levelTime ) {
 							{
 								int mage_master_chance = 
 									(ent->client->pers.quest_defeated_enemies - QUEST_MIN_ENEMIES_TO_DEFEAT) + 
-									((ent->client->pers.quest_progress * 20.0) / MAX_QUEST_PROGRESS) - (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] * 5);
+									((ent->client->pers.quest_progress * 20.0) / MAX_QUEST_PROGRESS);
 
-								if (chance_to_spawn_quest_npc < mage_master_chance)
+								if (Q_irand(0, 99) < mage_master_chance)
 								{
 									enemy_type = QUEST_NPC_MAGE_MASTER;
 								}
@@ -9654,7 +9649,7 @@ void G_RunFrame( int levelTime ) {
 
 							zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
 
-							if (chance_to_spawn_quest_npc < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
+							if (Q_irand(0, 99) < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 							{ // zyk: spawn an ally
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 								int ally_bonus = (ent->client->pers.quest_defeated_enemies / 2) + ent->client->pers.magic_crystals;
@@ -9859,6 +9854,8 @@ void G_RunFrame( int levelTime ) {
 						if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && 
 							player_ent->client->pers.quest_seller_event_step > QUEST_SELLER_STEP_NONE && player_ent->client->pers.quest_seller_event_step < QUEST_SELLER_END_STEP)
 						{
+							player_ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_NONE;
+
 							trap->SendServerCommand(player_ent->s.number, va("chat \"%s^7: I must go away now. See you later!\n\"", QUESTCHAR_SELLER));
 						}
 					}
