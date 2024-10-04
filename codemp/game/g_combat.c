@@ -2211,7 +2211,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_POISONED);
-	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
 
 	if (self->client->pers.race_position > 0) // zyk: if a player dies during a race, he loses the race
 	{
@@ -2690,6 +2689,8 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 		zyk_decrease_quest_tries(self);
 	}
+
+	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
 
 	if (attacker && attacker->client && attacker->client->pers.quest_npc > QUEST_NPC_NONE && attacker->enemy && attacker->enemy == self)
 	{ // zyk: quest npc defeated an enemy. Clear it to find a new one and stop all magic powers
