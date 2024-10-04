@@ -2856,7 +2856,7 @@ void fx_runner_think( gentity_t *ent )
 						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0 &&
 						level.legendary_artifact_step == QUEST_SECRET_INIT_STEP)
 					{
-						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Press ^2Use ^7key and solve the puzzle to receive a powerful artifact!\n\"", QUESTCHAR_ALL_SPIRITS));
+						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Press ^2Use ^7key and solve the puzzle to receive the Magic Armor!\n\"", QUESTCHAR_ALL_SPIRITS));
 
 						level.legendary_artifact_type = QUEST_ITEM_MAGIC_ARMOR;
 						level.legendary_artifact_step = QUEST_SECRET_TOUCHED_PUZZLE_ITEM;
@@ -2866,15 +2866,11 @@ void fx_runner_think( gentity_t *ent )
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/cairn_beam_start.mp3"));
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0 && 
-						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0 &&
-						level.legendary_artifact_step == QUEST_SECRET_INIT_STEP)
+						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
 					{
-						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Press ^2Use ^7key and solve the puzzle to receive a powerful artifact!\n\"", QUESTCHAR_ALL_SPIRITS));
+						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Found an Energy Modulator part!\n\"", QUESTCHAR_ALL_SPIRITS));
 
-						level.legendary_artifact_type = QUEST_ITEM_ENERGY_MODULATOR;
-						level.legendary_artifact_step = QUEST_SECRET_TOUCHED_PUZZLE_ITEM;
-
-						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
+						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] += 1;
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
 					}

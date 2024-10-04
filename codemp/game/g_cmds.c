@@ -4053,7 +4053,7 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 	trace_t tr;
 	vec3_t forward, fwdOrg;
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] > 0)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] >= ENERGY_MODULATOR_PARTS)
 	{ // zyk: Energy Modulator Upgrade
 		zyk_energy_modulator(ent);
 	}
@@ -5240,6 +5240,8 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 void zyk_set_default_quest_fields(gentity_t* ent)
 {
 	ent->client->pers.quest_tries = MIN_QUEST_TRIES;
+	ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] = 0;
+
 	ent->client->pers.quest_defeated_enemies = 0;
 	ent->client->pers.quest_masters_defeated = 0;
 	ent->client->pers.quest_progress = 0;
@@ -6640,7 +6642,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, magic crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 40 per cent. Second Mode increases resistance to damage to your shield from any source by 40 per cent. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a magic crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, magic crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. You must find all 3 parts to use it. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a magic crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
 	{
@@ -6656,11 +6658,11 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. Give extra tries for the main quest. The ones you keep in inventory decrease chance for side quest events to happen. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. Give extra tries for the main quest. Keeping some in the inventory increase Magic Armor chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing Use key will convert a nearby enemy npc into an ally for an amount of time based on the number of blue crystals you have. Mage enemies (specially Mage Masters) have a chance of resisting it. The ones you keep in inventory decrease chance for side quest events to happen. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing Use key will convert a nearby enemy npc into an ally for an amount of time based on the number of blue crystals you have. Mage enemies (specially Mage Masters) have a chance of resisting it. Keeping some in the inventory increase Energy Modulator chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
 	{

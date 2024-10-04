@@ -571,7 +571,7 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_ALLY_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
 	bonus_increase[QUEST_NPC_ALLY_FORCE_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
-	bonus_increase[QUEST_NPC_SELLER] = QUEST_NPC_BONUS_INCREASE * 2;
+	bonus_increase[QUEST_NPC_SELLER] = QUEST_NPC_BONUS_INCREASE;
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
@@ -808,7 +808,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + skill_level_bonus;
 
 			// zyk: seller stays in the map only for this amount of time before going away
-			npc_ent->client->pers.quest_seller_map_timer = level.time + QUEST_SELLER_MAP_TIME;
+			npc_ent->client->pers.quest_seller_map_timer = level.time + (SIDE_QUEST_STUFF_TIMER * bonuses);
 		}
 
 		// zyk: setting the initial amount of magic points here because it is based on the Max MP skill
@@ -9179,22 +9179,40 @@ void G_RunFrame( int levelTime ) {
 
 					int skill_crystal_chance = 70 - player_power_level + main_quest_progress;
 
-					int quest_item_chance = 21 + 
+					int green_crystal_chance = 21 +
 						(ent->client->pers.magic_crystals / 2) - 
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] -
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] -
 						main_quest_progress + (ent->client->pers.quest_masters_defeated * 10);
 
-					int side_quest_chance = (ent->client->pers.magic_crystals / 2) -
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] +
-						(main_quest_progress / 10);
+					int red_crystal_chance = 21 +
+						(ent->client->pers.magic_crystals / 2) -
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] -
+						main_quest_progress + (ent->client->pers.quest_masters_defeated * 10);
 
-					int side_quest_item_duration = side_quest_chance * SIDE_QUEST_STUFF_TIMER;
+					int energy_modulator_chance = (ent->client->pers.magic_crystals / 20) + 
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] - 
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] +
+						(main_quest_progress / 10);
+					int energy_modulator_item_duration = energy_modulator_chance * SIDE_QUEST_STUFF_TIMER;
+
+					int magic_armor_chance = (ent->client->pers.magic_crystals / 20) + 
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] +
+						(main_quest_progress / 10);
+					int magic_armor_item_duration = magic_armor_chance * SIDE_QUEST_STUFF_TIMER;
+
+					int seller_chance = (ent->client->pers.magic_crystals / 2) + 
+						(main_quest_progress / 10);
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
 						skill_crystal_chance /= 2;
-						quest_item_chance /= 2;
-						side_quest_chance /= 2;
+						green_crystal_chance /= 2;
+						red_crystal_chance /= 2;
+						energy_modulator_chance /= 2;
+						magic_armor_chance /= 2;
+						seller_chance /= 2;
+						energy_modulator_item_duration /= 2;
+						magic_armor_item_duration /= 2;
 					}
 					
 					if (Q_irand(0, 99) < skill_crystal_chance)
@@ -9204,18 +9222,18 @@ void G_RunFrame( int levelTime ) {
 					
 					if (zyk_can_spawn_quest_item(ent) == qtrue)
 					{
-						if (Q_irand(0, 99) < quest_item_chance)
+						if (Q_irand(0, 99) < green_crystal_chance)
 						{ // zyk: Extra Tries Crystal
 							zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 						}
 
-						if (Q_irand(0, 99) < quest_item_chance)
+						if (Q_irand(0, 99) < red_crystal_chance)
 						{ // zyk: Red Crystal
 							zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
 						}
 					}
 					
-					if (Q_irand(0, 99) < side_quest_chance)
+					if (Q_irand(0, 99) < energy_modulator_chance)
 					{ // zyk: Energy Modulator side quest
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
@@ -9237,14 +9255,14 @@ void G_RunFrame( int levelTime ) {
 								puzzle_z = chosen_entity->s.origin[2];
 							}
 
-							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
+							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
 							{
-								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, side_quest_item_duration, 30, puzzle_x, puzzle_y, puzzle_z);
+								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, energy_modulator_item_duration, 30, puzzle_x, puzzle_y, puzzle_z);
 							}
 						}
 					}
 
-					if (Q_irand(0, 99) < side_quest_chance)
+					if (Q_irand(0, 99) < magic_armor_item_duration)
 					{ // zyk: Magic Armor side quest
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
@@ -9268,12 +9286,12 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
 							{
-								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, side_quest_item_duration, 80, puzzle_x, puzzle_y, puzzle_z);
+								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, magic_armor_item_duration, 80, puzzle_x, puzzle_y, puzzle_z);
 							}
 						}
 					}
 
-					if (Q_irand(0, 99) < side_quest_chance)
+					if (Q_irand(0, 99) < seller_chance)
 					{ // zyk: Quest Log side quest
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
@@ -9295,9 +9313,9 @@ void G_RunFrame( int levelTime ) {
 								puzzle_z = chosen_entity->s.origin[2];
 							}
 
-							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < 5)
+							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < QUEST_LOG_PARTS)
 							{
-								zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, 100, qfalse, -1);
+								zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, seller_chance, qfalse, -1);
 							}
 						}
 					}
@@ -9308,7 +9326,7 @@ void G_RunFrame( int levelTime ) {
 				// zyk: Seller events
 				if (ent->client->pers.quest_seller_event_step > QUEST_SELLER_STEP_NONE && ent->client->pers.quest_seller_event_timer < level.time)
 				{
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < 5)
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < QUEST_LOG_PARTS)
 					{
 						if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_TALKED)
 						{
@@ -9400,15 +9418,17 @@ void G_RunFrame( int levelTime ) {
 								}
 								else if (ent->client->pers.quest_final_event_step == 3)
 								{
-									int red_crystal_prize = ent->client->pers.quest_defeated_enemies / 10;
+									int quest_crystal_prize = ent->client->pers.quest_defeated_enemies / 10;
 
-									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += red_crystal_prize;
+									ent->client->pers.quest_tries += quest_crystal_prize;
+									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] += quest_crystal_prize;
+									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += quest_crystal_prize;
 									ent->client->pers.rpg_inventory_modified = qtrue;
 
 									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
 
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive %d ^1Red ^7crystals.\n\"",
-										QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies, red_crystal_prize));
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive %d ^2Green ^7and ^1Red ^7crystals.\n\"",
+										QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies, quest_crystal_prize));
 								}
 								else if (ent->client->pers.quest_final_event_step == 4)
 								{

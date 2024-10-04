@@ -1869,7 +1869,7 @@ void TryUse( gentity_t *ent )
 	else if (ent->client->sess.amrpgmode == 2 &&
 			level.legendary_artifact_step == QUEST_SECRET_SECRET_ITEM_SPAWNED_STEP &&
 			target && target->count == 7 && 
-			(Q_stricmp(target->targetname, "zyk_energy_modulator_model") == 0 || Q_stricmp(target->targetname, "zyk_magic_armor_model") == 0)
+			Q_stricmp(target->targetname, "zyk_magic_armor_model") == 0
 		)
 	{ // zyk: player touched the artifact after solving the puzzle
 		target->think = G_FreeEntity;
@@ -1877,16 +1877,7 @@ void TryUse( gentity_t *ent )
 
 		level.legendary_artifact_step = QUEST_SECRET_CLEAR_STEP;
 
-		if (Q_stricmp(target->targetname, "zyk_energy_modulator_model") == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
-		{
-			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 1;
-			save_account(ent, qtrue);
-
-			trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You got the legendary ^3Energy Modulator^7\n\"");
-
-			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
-		}
-		else if (Q_stricmp(target->targetname, "zyk_magic_armor_model") == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
+		if (Q_stricmp(target->targetname, "zyk_magic_armor_model") == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
 		{
 			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
 			save_account(ent, qtrue);
@@ -1909,7 +1900,7 @@ void TryUse( gentity_t *ent )
 		if (target->client->pers.quest_npc == QUEST_NPC_SELLER && 
 			ent->client->sess.amrpgmode == 2 && 
 			(ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE || ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_ANSWER) &&
-			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < 5 && 
+			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < QUEST_LOG_PARTS &&
 			ent->client->pers.quest_seller_event_timer < level.time)
 		{ // zyk: found the seller
 			if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE)
@@ -1918,11 +1909,10 @@ void TryUse( gentity_t *ent )
 					(ent->client->pers.quest_masters_defeated * 2) +
 					(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
 
-				int side_quest_chance = (ent->client->pers.magic_crystals / 2) -
-					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] +
+				int seller_chance = (ent->client->pers.magic_crystals / 2) +
 					(main_quest_progress / 10);
 
-				int seller_duration = side_quest_chance * SIDE_QUEST_STUFF_TIMER;
+				int seller_duration = seller_chance * SIDE_QUEST_STUFF_TIMER;
 
 				if (seller_duration < (SIDE_QUEST_STUFF_TIMER + 5000))
 				{
@@ -1935,7 +1925,7 @@ void TryUse( gentity_t *ent )
 				target->client->pers.quest_seller_map_timer = level.time + seller_duration;
 
 				// zyk: a player is answering the riddle, do not try to teleport to another spot
-				target->client->pers.quest_npc_idle_timer = level.time + QUEST_SELLER_MAP_TIME + 2000;
+				target->client->pers.quest_npc_idle_timer = level.time + seller_duration + 2000;
 			}
 			else
 			{

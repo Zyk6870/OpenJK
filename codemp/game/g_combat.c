@@ -4960,7 +4960,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (attacker->client->pers.energy_modulator_mode == 1)
 		{ // zyk: Energy Modulator mode 1 increases damage
-			damage = (int)ceil(damage * 1.40);
+			damage = (int)ceil(damage * 1.25);
 		}
 	}
 
@@ -5491,7 +5491,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		{ // zyk: RPG resistance bonuses
 			if (targ->client->pers.energy_modulator_mode == 2)
 			{ // zyk: Energy Modulator mode 2
-				bonus_resistance += 0.40;
+				bonus_resistance += 0.25;
 
 				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 			}
@@ -5979,7 +5979,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= 5)
+			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
 			{ // zyk: full Quest Log. It works as an armor, absorbing some damage to restore some force
 				int force_power_regen_amount = (int)ceil(take * 0.05);
 
@@ -6430,19 +6430,26 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						int shield_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 						int force_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 						int stamina_amount = 2 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
+						int magic_armor_bonus = 0;
 
 						if (ent->client->sess.amrpgmode == 2)
 						{
 							max_health = ent->client->pers.max_rpg_health;
 						}
 
-						zyk_add_health(ent, heal_amount);
-
-						zyk_set_stamina(ent, stamina_amount, qtrue);
-
-						if ((ent->client->ps.fd.forcePower + force_amount) < ent->client->ps.fd.forcePowerMax)
+						// zyk: Magic Armor
+						if (quest_power_user->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
 						{
-							ent->client->ps.fd.forcePower += force_amount;
+							magic_armor_bonus = 1;
+						}
+
+						zyk_add_health(ent, (heal_amount + magic_armor_bonus));
+
+						zyk_set_stamina(ent, (stamina_amount + magic_armor_bonus), qtrue);
+
+						if ((ent->client->ps.fd.forcePower + (force_amount + magic_armor_bonus)) < ent->client->ps.fd.forcePowerMax)
+						{
+							ent->client->ps.fd.forcePower += (force_amount + magic_armor_bonus);
 						}
 						else
 						{
@@ -6456,9 +6463,9 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 						if (!ent->NPC && ent->health >= max_health)
 						{
-							if ((ent->client->ps.stats[STAT_ARMOR] + shield_amount) < max_shield)
+							if ((ent->client->ps.stats[STAT_ARMOR] + (shield_amount + magic_armor_bonus)) < max_shield)
 							{
-								ent->client->ps.stats[STAT_ARMOR] += shield_amount;
+								ent->client->ps.stats[STAT_ARMOR] += (shield_amount + magic_armor_bonus);
 							}
 							else
 							{
