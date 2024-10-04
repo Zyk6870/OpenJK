@@ -6237,10 +6237,10 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][1] = 3000;
 
 	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 20;
-	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 10;
 
 	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][0] = 20;
-	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][1] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][1] = 10;
 
 	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][0] = 40;
 	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][1] = 0;
@@ -7697,6 +7697,17 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR);
+		sold = 1;
+	}
+	else if (item_index == RPG_INVENTORY_MISC_FLAME_THROWER_FUEL && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] >= 10)
+	{
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] -= 10;
+		sold = 1;
+	}
+	else if (item_index == RPG_INVENTORY_MISC_JETPACK_FUEL && ent->client->pers.jetpack_fuel >= (10 * JETPACK_SCALE))
+	{
+		ent->client->pers.jetpack_fuel -= (10 * JETPACK_SCALE);
+		ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel / JETPACK_SCALE;
 		sold = 1;
 	}
 
