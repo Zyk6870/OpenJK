@@ -9425,7 +9425,7 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += quest_crystal_prize;
 									ent->client->pers.rpg_inventory_modified = qtrue;
 
-									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
+									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
 									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive %d ^2Green ^7and ^1Red ^7crystals.\n\"",
 										QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies, quest_crystal_prize));
