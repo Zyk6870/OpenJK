@@ -7261,23 +7261,6 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 
 extern int zyk_number_of_allies_in_map(gentity_t* ent);
 extern int zyk_number_of_enemies_in_map();
-int zyk_quest_npcs_in_the_map()
-{
-	int i = 0;
-	int total_npcs = 0;
-
-	for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
-	{
-		gentity_t* npc_ent = &g_entities[i];
-
-		if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->client->pers.quest_npc > QUEST_NPC_NONE)
-		{
-			total_npcs++;
-		}
-	}
-
-	return total_npcs;
-}
 
 qboolean zyk_can_spawn_quest_item(gentity_t* ent)
 {
@@ -9606,12 +9589,9 @@ void G_RunFrame( int levelTime ) {
 					// zyk: quest npcs
 					if (ent->client->pers.quest_event_timer < level.time)
 					{
-						int quest_npcs_in_map = zyk_quest_npcs_in_the_map();
-
 						zyk_set_quest_event_timer(ent);
 
-						if (zyk_is_main_quest_complete(ent) == qfalse &&
-							quest_npcs_in_map < zyk_max_quest_npcs.integer)
+						if (zyk_is_main_quest_complete(ent) == qfalse)
 						{
 							int enemy_type = 0;
 							int enemy_wave_count = (QUEST_MIN_ENEMIES_TO_DEFEAT / 3);
@@ -9647,9 +9627,13 @@ void G_RunFrame( int levelTime ) {
 								hard_difficulty = qtrue;
 							}
 
-							zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
+							if (zyk_number_of_enemies_in_map() <= (zyk_max_quest_npcs.integer / 2))
+							{
+								zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
+							}
 
-							if (Q_irand(0, 99) < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
+							if (zyk_number_of_allies_in_map(NULL) <= (zyk_max_quest_npcs.integer / 2) &&
+								Q_irand(0, 99) < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 							{ // zyk: spawn an ally
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 								int ally_bonus = (ent->client->pers.quest_defeated_enemies / 2) + ent->client->pers.magic_crystals;

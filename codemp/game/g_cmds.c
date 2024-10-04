@@ -6368,6 +6368,7 @@ qboolean zyk_is_main_quest_complete(gentity_t* ent)
 	return qfalse;
 }
 
+// zyk: if ent is NULL, counts all quest allies from all players
 int zyk_number_of_allies_in_map(gentity_t* ent)
 {
 	int total_allies = 0;
@@ -6380,7 +6381,8 @@ int zyk_number_of_allies_in_map(gentity_t* ent)
 
 		if (npc_ent && npc_ent->client && npc_ent->NPC && 
 			npc_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && npc_ent->client->pers.quest_npc <= QUEST_NPC_SELLER &&
-			npc_ent->client->pers.quest_npc_caller_player_id == ent->s.number && npc_ent->health > 0)
+			npc_ent->health > 0 && 
+			(ent == NULL || npc_ent->client->pers.quest_npc_caller_player_id == ent->s.number))
 		{
 			total_allies++;
 		}
