@@ -7091,12 +7091,12 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 2;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 100;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 100;
-
-	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 0;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 0;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 0;
@@ -7298,6 +7298,12 @@ void zyk_update_inventory(gentity_t* ent)
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] != ent->client->pers.magic_crystals)
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = ent->client->pers.magic_crystals;
+		ent->client->pers.rpg_inventory_modified = qtrue;
+	}
+
+	if (ent->client->pers.quest_tries > 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] != (ent->client->pers.quest_tries - MIN_QUEST_TRIES))
+	{
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = (ent->client->pers.quest_tries - MIN_QUEST_TRIES);
 		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
@@ -9190,11 +9196,20 @@ void G_RunFrame( int levelTime ) {
 					int skill_crystal_chance = 70 - player_power_level + main_quest_progress;
 
 					int quest_item_chance = 21 + 
-						(ent->client->pers.magic_crystals / 2) - ent->client->pers.quest_tries - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] - 
+						(ent->client->pers.magic_crystals / 2) - 
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] -
 						main_quest_progress + (ent->client->pers.quest_masters_defeated * 10);
 
-					int side_quest_chance = (ent->client->pers.magic_crystals / 25) + (main_quest_progress / 15);
+					int side_quest_chance = (ent->client->pers.magic_crystals / 10) -
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] - ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] +
+						(main_quest_progress / 10);
+
 					int side_quest_item_duration = side_quest_chance * SIDE_QUEST_STUFF_TIMER;
+
+					if (side_quest_item_duration < SIDE_QUEST_STUFF_TIMER)
+					{
+						side_quest_item_duration = SIDE_QUEST_STUFF_TIMER / 2;
+					}
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
@@ -9406,13 +9421,15 @@ void G_RunFrame( int levelTime ) {
 								}
 								else if (ent->client->pers.quest_final_event_step == 3)
 								{
-									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += ent->client->pers.quest_defeated_enemies;
+									int red_crystal_prize = ent->client->pers.quest_defeated_enemies / 10;
+
+									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += red_crystal_prize;
 									ent->client->pers.rpg_inventory_modified = qtrue;
 
 									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
 
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive this amount of ^1Red ^7crystals.\n\"",
-										QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies));
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive %d ^1Red ^7crystals.\n\"",
+										QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies, red_crystal_prize));
 								}
 								else if (ent->client->pers.quest_final_event_step == 4)
 								{

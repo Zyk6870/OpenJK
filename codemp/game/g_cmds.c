@@ -6005,9 +6005,6 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_ITEM_CLOAK] = "Cloak Item";
 	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "Jetpack";
 
-	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "Jetpack Fuel";
-	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "Flame Thrower Fuel";
-
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BACTA] = "Bacta Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "Force Field Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
@@ -6033,12 +6030,17 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "Sentry Gun Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
+
+	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "Blue Crystal";
+	inventory_item_names[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = "Green Crystal";
 	inventory_item_names[RPG_INVENTORY_MISC_RED_CRYSTAL] = "Red Crystal";
+
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = "Magic Armor";
 
-	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "Blue Crystal";
+	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "Jetpack Fuel";
+	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "Flame Thrower Fuel";
 	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "Medpack";
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
@@ -6077,15 +6079,6 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 
 	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][0] = 15;
 	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][1] = 10;
-
-	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][0] = 20;
-	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][1] = 0;
-
-	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][0] = 40;
-	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][1] = 0;
-
-	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][0] = 40;
-	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][1] = 0;
 
 	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][0] = 100;
 	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][1] = 50;
@@ -6149,21 +6142,6 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 
 	seller_items_cost[RPG_INVENTORY_WP_STUN_BATON][0] = 20;
 	seller_items_cost[RPG_INVENTORY_WP_STUN_BATON][1] = 10;
-
-	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][0] = 180;
-	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][1] = 90;
-
-	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 20;
-	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 0;
-
-	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][0] = 180;
-	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][1] = 90;
-
-	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 0;
-	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 100;
-
-	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 0;
-	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 200;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_BACTA][0] = 1500;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_BACTA][1] = 900;
@@ -6240,6 +6218,15 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][1] = 500;
 
+	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 100;
+
+	seller_items_cost[RPG_INVENTORY_MISC_GREEN_CRYSTAL][0] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_GREEN_CRYSTAL][1] = 100;
+
+	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 100;
+
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 3000;
 
@@ -6248,6 +6235,24 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][0] = 0;
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][1] = 3000;
+
+	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 20;
+	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 0;
+
+	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][0] = 20;
+	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][1] = 0;
+
+	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][0] = 40;
+	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][1] = 0;
+
+	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][0] = 40;
+	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][1] = 0;
+
+	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][0] = 180;
+	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][1] = 0;
+
+	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][0] = 180;
+	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][1] = 0;
 
 	if (buy_item == qtrue)
 	{
@@ -6645,11 +6650,15 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. Used to upgrade skills and to get bonuses during the quest. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. Used to upgrade skills. The ones you keep in your inventory increase the chance for main quest events and for side quest events to happen. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. Give extra tries for the main quest. The ones you keep in inventory decrease chance for side quest events to happen. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing Use key will convert a nearby enemy npc into an ally for an amount of time based on the number of blue crystals you have. Mage enemies (specially Mage Masters) have a chance of resisting it\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing Use key will convert a nearby enemy npc into an ally for an amount of time based on the number of blue crystals you have. Mage enemies (specially Mage Masters) have a chance of resisting it. The ones you keep in inventory decrease chance for side quest events to happen. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
 	{
@@ -6757,12 +6766,18 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					if (zyk_is_main_quest_complete(ent) == qfalse)
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nDefeat enough enemies to weaken their army and make the Spirit Tree summoned.\nDefeat some Mage Masters and regenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditating in the tree, the amount of ^4Blue ^7crystals you have and defeating enemies will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^4Blue ^7crystal call your Spirit Tree.\n^1Red ^7crystals you have decrease chance for Mage Masters to appear\n\n^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n^3Regen Progress: ^7%d/%d\n\n^3Number of Allies: ^7%d  (^5blue ^7crystals strengthen new allies)\n^3Quest Tries: ^7%d  (^2green ^7crystals increase this)\n\n\"", 
+						char quest_desc[MAX_STRING_CHARS];
+
+						strcpy(quest_desc, "\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nDefeat enough enemies to weaken their army and make the Spirit Tree summoned.\nDefeat some Mage Masters and regenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditating in the tree, the amount of ^4Blue ^7crystals you have and defeating enemies will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^4Blue ^7crystal call your Spirit Tree.\n^4Blue ^7crystals makes new allies stronger and appear more often.\n^2Green ^7crystals increase your Quest Tries.\n^1Red ^7crystals you have decrease chance for Mage Masters to appear.\n\n");
+
+						trap->SendServerCommand(ent->s.number, 
+							va("print \"%s^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n^3Quest Tries: ^7%d\n\n\"", 
+							quest_desc,
 							QUESTCHAR_ALL_SPIRITS, 
 							ent->client->pers.quest_defeated_enemies, QUEST_MIN_ENEMIES_TO_DEFEAT,
 							ent->client->pers.quest_masters_defeated, QUEST_MASTERS_TO_DEFEAT,
 							ent->client->pers.quest_progress, MAX_QUEST_PROGRESS,
-							zyk_number_of_allies_in_map(ent), ent->client->pers.quest_tries));
+							zyk_number_of_allies_in_map(ent), zyk_number_of_enemies_in_map(), ent->client->pers.quest_tries));
 					}
 					else
 					{
@@ -7531,6 +7546,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL && ent->client->pers.magic_crystals > 0)
 	{
 		ent->client->pers.magic_crystals--;
+		sold = 1;
+	}
+	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL && ent->client->pers.quest_tries > 0)
+	{
+		ent->client->pers.quest_tries--;
 		sold = 1;
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
