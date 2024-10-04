@@ -7548,7 +7548,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		ent->client->pers.magic_crystals--;
 		sold = 1;
 	}
-	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL && ent->client->pers.quest_tries > 0)
+	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL && ent->client->pers.quest_tries > MIN_QUEST_TRIES)
 	{
 		ent->client->pers.quest_tries--;
 		sold = 1;
