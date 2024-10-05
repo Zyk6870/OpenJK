@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.0"
+#define	GAMEVERSION	"New Zyk Mod v1.1.1"
 
 #define SECURITY_LOG "security.log"
 
@@ -891,6 +891,9 @@ typedef struct clientPersistant_s {
 	int fire_bolt_timer;
 	int fire_bolt_user_id;
 	int fire_bolt_hits_counter;
+
+	// zyk: timer when player is using crystals
+	int special_crystal_timer;
 
 	// zyk: time this npc will be allied to the RPG player
 	int red_crystal_npc_timer;

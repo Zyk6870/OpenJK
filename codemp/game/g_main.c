@@ -5591,6 +5591,8 @@ void clear_special_power_effect(gentity_t* ent)
 }
 
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
+extern void zyk_add_mp(gentity_t* ent, int mp_amount);
+extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 
 // zyk: Healing Area
 void healing_area(gentity_t* ent)
@@ -7254,7 +7256,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 17)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Green crystals will give you extra tries for the quest, and red crystals can convert the nearest enemy into an ally.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Green crystals give extra tries for quest, and red crystals can convert the nearest enemy into an ally.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 18)
 	{
@@ -9097,54 +9099,76 @@ void G_RunFrame( int levelTime ) {
 					Player_FireFlameThrower(ent, qfalse);
 				}
 
-				// zyk: Red crystal. Convert the enemy npc the player is looking at
-				if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && ent->client->ps.hasLookTarget && 
-					ent->client->pers.cmd.buttons & BUTTON_USE)
+				if (ent->client->pers.special_crystal_timer < level.time)
 				{
-					gentity_t* target_enemy = &g_entities[ent->client->ps.lookTarget];
-
-					if (target_enemy && target_enemy->client && target_enemy->NPC &&
-						target_enemy->client->playerTeam != NPCTEAM_PLAYER && target_enemy->client->pers.red_crystal_npc_timer == 0)
+					// zyk: Green crystal. Can be used to regen some mp and Stamina
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] > 0 && ent->client->ps.groundEntityNum != ENTITYNUM_NONE &&
+						ent->client->pers.cmd.buttons & BUTTON_USE && ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
+						ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 					{
-						int chance_to_convert = Q_irand(0, 99);
-						qboolean is_converted = qtrue;
+						ent->client->pers.quest_tries--;
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL]--;
+						ent->client->pers.rpg_inventory_modified = qtrue;
 
-						if (chance_to_convert < 75 && target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
-						{
-							is_converted = qfalse;
-						}
-						else if (chance_to_convert < 40 &&
-							(target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER || target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR))
-						{
-							is_converted = qfalse;
-						}
-						else if (chance_to_convert < 20 && target_enemy->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE)
-						{
-							is_converted = qfalse;
-						}
+						zyk_add_mp(ent, 20);
+						zyk_set_stamina(ent, 100, qtrue);
 
-						zyk_quest_effect_spawn(ent, ent, "zyk_red_crystal_effect", "0", "env/btend", 0, 0, 0, 2000);
+						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
 
-						if (is_converted == qtrue)
+						ent->client->pers.special_crystal_timer = level.time + 500;
+					}
+
+					// zyk: Red crystal. Convert the enemy npc the player is looking at
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && ent->client->ps.hasLookTarget &&
+						ent->client->pers.cmd.buttons & BUTTON_USE)
+					{
+						gentity_t* target_enemy = &g_entities[ent->client->ps.lookTarget];
+
+						if (target_enemy && target_enemy->client && target_enemy->NPC &&
+							target_enemy->client->playerTeam != NPCTEAM_PLAYER && target_enemy->client->pers.red_crystal_npc_timer == 0)
 						{
+							int chance_to_convert = Q_irand(0, 99);
+							qboolean is_converted = qtrue;
+
+							if (chance_to_convert < 75 && target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+							{
+								is_converted = qfalse;
+							}
+							else if (chance_to_convert < 40 &&
+								(target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER || target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR))
+							{
+								is_converted = qfalse;
+							}
+							else if (chance_to_convert < 20 && target_enemy->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE)
+							{
+								is_converted = qfalse;
+							}
+
+							zyk_quest_effect_spawn(ent, ent, "zyk_red_crystal_effect", "0", "env/btend", 0, 0, 0, 2000);
+
+							if (is_converted == qtrue)
+							{
+								target_enemy->client->pers.original_playerTeam = target_enemy->client->playerTeam;
+								target_enemy->client->pers.original_enemyTeam = target_enemy->client->enemyTeam;
+
+								target_enemy->client->playerTeam = NPCTEAM_PLAYER;
+								target_enemy->client->enemyTeam = NPCTEAM_ENEMY;
+								target_enemy->enemy = NULL;
+
+								target_enemy->client->pers.red_crystal_npc_timer = level.time + 5000 + (ent->client->pers.magic_crystals * 500);
+
+								zyk_quest_effect_spawn(ent, target_enemy, "zyk_red_crystal_effect", "0", "env/btend", 0, 0, 0, 2000);
+								G_Sound(target_enemy, CHAN_AUTO, G_SoundIndex("sound/player/ysalimari.mp3"));
+							}
+							else
+							{
+								G_Sound(target_enemy, CHAN_AUTO, G_SoundIndex("sound/effects/air_burst.mp3"));
+							}
+
 							ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
 							ent->client->pers.rpg_inventory_modified = qtrue;
 
-							target_enemy->client->pers.original_playerTeam = target_enemy->client->playerTeam;
-							target_enemy->client->pers.original_enemyTeam = target_enemy->client->enemyTeam;
-
-							target_enemy->client->playerTeam = NPCTEAM_PLAYER;
-							target_enemy->client->enemyTeam = NPCTEAM_ENEMY;
-							target_enemy->enemy = NULL;
-
-							target_enemy->client->pers.red_crystal_npc_timer = level.time + 5000 + (ent->client->pers.magic_crystals * 500);
-
-							zyk_quest_effect_spawn(ent, target_enemy, "zyk_red_crystal_effect", "0", "env/btend", 0, 0, 0, 2000);
-							G_Sound(target_enemy, CHAN_AUTO, G_SoundIndex("sound/player/ysalimari.mp3"));
-						}
-						else
-						{
-							G_Sound(target_enemy, CHAN_AUTO, G_SoundIndex("sound/effects/air_burst.mp3"));
+							ent->client->pers.special_crystal_timer = level.time + 500;
 						}
 					}
 				}
@@ -9208,7 +9232,7 @@ void G_RunFrame( int levelTime ) {
 
 					int player_power_level = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
 
-					int skill_crystal_chance = 70 - player_power_level + main_quest_progress;
+					int skill_crystal_chance = 60 - player_power_level + main_quest_progress;
 
 					int green_crystal_chance = 21 +
 						(ent->client->pers.magic_crystals / 2) - 
