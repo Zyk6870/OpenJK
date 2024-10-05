@@ -2832,25 +2832,46 @@ void fx_runner_think( gentity_t *ent )
 
 			if (player_ent && player_ent->client && player_ent->health > 0 && player_ent->client->sess.amrpgmode == 2)
 			{ // zyk: a logged RPG player
-				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < 48)
+				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < QUEST_ITEM_DISTANCE)
 				{
 					if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0)
 					{
 						player_ent->client->pers.magic_crystals++;
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+
+						zyk_add_mp(player_ent, 1);
+						save_account(player_ent, qtrue);
+
+						zyk_clear_quest_effect(ent);
+
+						return;
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0)
 					{
 						player_ent->client->pers.quest_tries++;
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
+
+						zyk_add_mp(player_ent, 1);
+						save_account(player_ent, qtrue);
+
+						zyk_clear_quest_effect(ent);
+
+						return;
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_red_crystal") == 0)
 					{
 						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_MISC_RED_CRYSTAL);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
+
+						zyk_add_mp(player_ent, 1);
+						save_account(player_ent, qtrue);
+
+						zyk_clear_quest_effect(ent);
+
+						return;
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_magic_armor_puzzle") == 0 &&
 						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0 &&
@@ -2864,31 +2885,59 @@ void fx_runner_think( gentity_t *ent )
 						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/cairn_beam_start.mp3"));
+
+						save_account(player_ent, qtrue);
+
+						zyk_clear_quest_effect(ent);
+
+						return;
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0 && 
 						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
 					{
-						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] += 1;
-
-						if (player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
+						if (player_ent->client->pers.cmd.buttons & BUTTON_USE)
 						{
-							trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Found an Energy Modulator part!\n\"", QUESTCHAR_ALL_SPIRITS));
-						}
-						else
-						{
-							trap->SendServerCommand(player_ent->s.number, "chat \"^3Quest System: ^7You got the legendary ^2Energy Modulator^7\n\"");
-						}
+							if (player_ent->client->isHacking != ent->s.number)
+							{
+								int quest_item_hacking_time = (SIDE_QUEST_STUFF_TIMER * (player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] + 3));
 
-						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
+								player_ent->client->isHacking = ent->s.number;
+								VectorCopy(player_ent->client->ps.viewangles, player_ent->client->hackingAngles);
+								player_ent->client->ps.hackingTime = level.time + quest_item_hacking_time;
+								player_ent->client->ps.hackingBaseTime = quest_item_hacking_time;
+
+								if (player_ent->client->ps.hackingBaseTime > 60000)
+								{ //don't allow a bit overflow
+									player_ent->client->ps.hackingTime = level.time + 60000;
+									player_ent->client->ps.hackingBaseTime = 60000;
+								}
+							}
+							else if (player_ent->client->ps.hackingTime < level.time)
+							{
+								player_ent->client->isHacking = 0; //can't hack a client
+								player_ent->client->ps.hackingTime = 0;
+
+								player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] += 1;
+
+								if (player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
+								{
+									trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Found an Energy Modulator part!\n\"", QUESTCHAR_ALL_SPIRITS));
+								}
+								else
+								{
+									trap->SendServerCommand(player_ent->s.number, "chat \"^3Quest System: ^7You got the legendary ^2Energy Modulator^7\n\"");
+								}
+
+								G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
+
+								save_account(player_ent, qtrue);
+
+								zyk_clear_quest_effect(ent);
+
+								return;
+							}
+						}
 					}
-
-					zyk_add_mp(player_ent, 1);
-
-					save_account(player_ent, qtrue);
-
-					zyk_clear_quest_effect(ent);
-
-					return;
 				}
 			}
 		}

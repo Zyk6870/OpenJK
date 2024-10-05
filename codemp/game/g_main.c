@@ -8732,7 +8732,9 @@ void G_RunFrame( int levelTime ) {
 					ent->client->isHacking = 0;
 					ent->client->ps.hackingTime = 0;
 				}
-				else if (!G_PointInBounds( ent->client->ps.origin, hacked->r.absmin, hacked->r.absmax ))
+				else if (!G_PointInBounds( ent->client->ps.origin, hacked->r.absmin, hacked->r.absmax ) || 
+					(Q_stricmp(hacked->targetname, "zyk_energy_modulator_puzzle") == 0 &&
+					(Distance(ent->client->ps.origin, hacked->s.origin) >= QUEST_ITEM_DISTANCE))) // zyk: quest item effects
 				{ //they stepped outside the thing they're hacking, so reset hacking time
 					ent->client->isHacking = 0;
 					ent->client->ps.hackingTime = 0;
