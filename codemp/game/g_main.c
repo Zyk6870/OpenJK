@@ -4922,17 +4922,20 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 
 		zyk_spawn_entity(new_ent);
 
-		if (damage > 0)
-			new_ent->splashDamage = damage;
+		if (new_ent && new_ent->inuse)
+		{ // zyk: do not set these if for some reason the entity was not spawned
+			if (damage > 0)
+				new_ent->splashDamage = damage;
 
-		if (radius > 0)
-			new_ent->splashRadius = radius;
+			if (radius > 0)
+				new_ent->splashRadius = radius;
 
-		if (start_time > 0)
-			new_ent->nextthink = level.time + start_time;
+			if (start_time > 0)
+				new_ent->nextthink = level.time + start_time;
 
-		level.special_power_effects[new_ent->s.number] = ent->s.number;
-		level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+			level.special_power_effects[new_ent->s.number] = ent->s.number;
+			level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+		}
 	}
 	else
 	{ // zyk: model power
@@ -4947,8 +4950,11 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 
 		zyk_spawn_entity(new_ent);
 
-		level.special_power_effects[new_ent->s.number] = ent->s.number;
-		level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+		if (new_ent && new_ent->inuse)
+		{ // zyk: do not set these if for some reason the entity was not spawned
+			level.special_power_effects[new_ent->s.number] = ent->s.number;
+			level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+		}
 	}
 }
 
