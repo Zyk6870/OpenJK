@@ -6043,7 +6043,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 							break;
 						}
 						else if (quest_enemy && quest_enemy->client && quest_enemy->NPC && quest_enemy->health > 0 && 
-							quest_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && quest_enemy->client->pers.quest_npc <= QUEST_NPC_CHANGELING_HOWLER && 
+							quest_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && quest_enemy->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR4 &&
 							quest_enemy != attacker)
 						{ // zyk: one of his allies
 							quest_enemy->client->pers.magic_power += QUEST_WORM_MP_TO_RESTORE;

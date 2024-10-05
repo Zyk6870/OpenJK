@@ -495,7 +495,7 @@ int zyk_spirit_tree_wither(float x, float y, float z)
 		npc_ent = &g_entities[i];
 
 		if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->health > 0 && 
-			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_CHANGELING_HOWLER)
+			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR4)
 		{
 			float npc_distance_to_tree = Distance(tree_origin, npc_ent->r.currentOrigin);
 
@@ -534,6 +534,10 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = "heavy_armored_warrior";
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR] = "force_saber_warrior";
 	enemy_names[QUEST_NPC_CHANGELING_HOWLER] = "changeling_howler";
+	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR1] = "low_trained_warrior1";
+	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR2] = "low_trained_warrior2";
+	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR3] = "low_trained_warrior3";
+	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR4] = "low_trained_warrior4";
 
 	enemy_names[QUEST_NPC_ALLY_MAGE] = "ally_mage";
 	enemy_names[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = "ally_elemental_force_mage";
@@ -563,9 +567,13 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_MID_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 1.5;
 	bonus_increase[QUEST_NPC_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_CHANGELING_WORM] = QUEST_NPC_BONUS_INCREASE;
-	bonus_increase[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
+	bonus_increase[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 1.8;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_CHANGELING_HOWLER] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_LOW_TRAINED_WARRIOR1] = QUEST_NPC_BONUS_INCREASE * 2;
+	bonus_increase[QUEST_NPC_LOW_TRAINED_WARRIOR2] = QUEST_NPC_BONUS_INCREASE * 2;
+	bonus_increase[QUEST_NPC_LOW_TRAINED_WARRIOR3] = QUEST_NPC_BONUS_INCREASE * 2;
+	bonus_increase[QUEST_NPC_LOW_TRAINED_WARRIOR4] = QUEST_NPC_BONUS_INCREASE * 2;
 
 	bonus_increase[QUEST_NPC_ALLY_MAGE] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = QUEST_NPC_BONUS_INCREASE;
@@ -598,6 +606,10 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 5;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = 7;
 	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 7;
+	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR1] = 4;
+	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR2] = 4;
+	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR3] = 4;
+	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR4] = 4;
 	
 	max_levels[QUEST_NPC_ALLY_MAGE] = 10;
 	max_levels[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = 8;
@@ -755,6 +767,34 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_HOWLER)
 		{
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR1)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR2)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR3)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR4)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
 		}
@@ -9666,20 +9706,24 @@ void G_RunFrame( int levelTime ) {
 						if (zyk_is_main_quest_complete(ent) == qfalse)
 						{
 							int enemy_type = 0;
-							int enemy_wave_count = (QUEST_MIN_ENEMIES_TO_DEFEAT / 3);
+							int enemy_wave_count = (QUEST_MIN_ENEMIES_TO_DEFEAT / 4);
 							qboolean hard_difficulty = qfalse;
 
 							if (ent->client->pers.quest_defeated_enemies < enemy_wave_count)
-							{ // zyk: first enemy wave
-								enemy_type = Q_irand(QUEST_NPC_FLYING_WARRIOR, QUEST_NPC_CHANGELING_HOWLER);
+							{
+								enemy_type = Q_irand(QUEST_NPC_LOW_TRAINED_WARRIOR1, QUEST_NPC_LOW_TRAINED_WARRIOR4);
 							}
 							else if (ent->client->pers.quest_defeated_enemies < (enemy_wave_count * 2))
-							{ // zyk: second enemy wave
-								enemy_type = Q_irand(QUEST_NPC_FORCE_MAGE, QUEST_NPC_CHANGELING_HOWLER);
+							{
+								enemy_type = Q_irand(QUEST_NPC_FLYING_WARRIOR, QUEST_NPC_LOW_TRAINED_WARRIOR4);
+							}
+							else if (ent->client->pers.quest_defeated_enemies < (enemy_wave_count * 3))
+							{
+								enemy_type = Q_irand(QUEST_NPC_HIGH_TRAINED_WARRIOR, QUEST_NPC_LOW_TRAINED_WARRIOR4);
 							}
 							else
 							{ // zyk: all other enemy waves
-								enemy_type = Q_irand(QUEST_NPC_MAGE_MINISTER, QUEST_NPC_CHANGELING_HOWLER);
+								enemy_type = Q_irand(QUEST_NPC_MAGE_MINISTER, QUEST_NPC_LOW_TRAINED_WARRIOR4);
 							}
 
 							if (ent->client->pers.quest_defeated_enemies >= QUEST_MIN_ENEMIES_TO_DEFEAT)
