@@ -6496,11 +6496,12 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 					if (is_ally == qtrue)
 					{
-						if (Q_stricmp(attacker->targetname, "zyk_magic_water") == 0)
+						if (this_magic_power == MAGIC_WATER_MAGIC)
 						{ // zyk: Water magic heals allies
 							zyk_add_health(ent, (int)points);
 
-							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_water", "0", "env/water_impact", 0, 0, 0, 1000);
+							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_water", "0", "env/waterfall_splash", 0, 0, 0, 500);
+							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/footsteps/water_wade_01.mp3"));
 						}
 
 						continue;
@@ -6670,7 +6671,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						{
 							if (ent->client && ent->health > 0)
 							{
-								int chance_for_confusion = final_damage * 2;
+								int chance_for_confusion = final_damage * 3;
 								int mp_to_drain = magic_power_user->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 								int max_player_mp = zyk_max_magic_power(magic_power_user);
 

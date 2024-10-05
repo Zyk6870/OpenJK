@@ -5679,13 +5679,14 @@ void lightning_dome(gentity_t* ent, int damage)
 	missile->count = 9;
 
 	missile->classname = "demp2_alt_proj";
+	missile->targetname = "zyk_magic_light";
 	missile->s.weapon = WP_DEMP2;
 
 	missile->think = zyk_lightning_dome_detonate;
 	missile->nextthink = level.time;
 
 	missile->splashDamage = missile->damage = damage;
-	missile->splashMethodOfDeath = missile->methodOfDeath = MOD_DEMP2;
+	missile->splashMethodOfDeath = missile->methodOfDeath = MOD_UNKNOWN;
 
 	missile->splashRadius = 768;
 
@@ -6037,7 +6038,7 @@ void magic_power_events(gentity_t *ent)
 						VectorCopy(ent->client->ps.origin, ent->client->pers.light_of_judgement_origin);
 
 						// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
-						lightning_dome(ent, damage * 3);
+						lightning_dome(ent, damage * 2);
 
 						ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC]--;
 					}

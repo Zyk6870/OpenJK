@@ -1528,6 +1528,7 @@ static void WP_FireDEMP2( gentity_t *ent, qboolean altFire )
 }
 
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
+extern float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t* attacker, gentity_t* target);
 void zyk_lightning_dome_radius_damage( gentity_t *ent )
 {
 	float		frac = ( level.time - ent->genericValue5 ) / 800.0f; // / 1600.0f; // synchronize with demp2 effect
@@ -1632,12 +1633,22 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 
 		if (gent != myOwner)
 		{
+			int final_damage = ent->damage;
+
 			if (OnSameTeam(myOwner, gent) == qtrue || npcs_on_same_team(myOwner, gent) == qtrue)
 			{ // zyk: dont hit players or npcs on the same team
 				continue;
 			}
 
-			G_Damage( gent, myOwner, myOwner, dir, ent->r.currentOrigin, ent->damage, DAMAGE_DEATH_KNOCKBACK, ent->splashMethodOfDeath );
+			// zyk: Elemental bonus. Each power gives a higher damage to target of opposite element and less damage to target of same element
+			final_damage = (int)ceil(final_damage * zyk_get_elemental_bonus_factor(MAGIC_LIGHT_MAGIC, myOwner, gent));
+
+			// zyk: must do at least 1 damage
+			if (final_damage < 1)
+				final_damage = 1;
+
+			G_Damage( gent, ent, myOwner, dir, ent->r.currentOrigin, final_damage, DAMAGE_DEATH_KNOCKBACK, ent->splashMethodOfDeath );
+
 			if ( gent->takedamage
 				&& gent->client )
 			{
