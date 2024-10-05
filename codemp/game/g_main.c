@@ -9799,11 +9799,15 @@ void G_RunFrame( int levelTime ) {
 						{
 							Jedi_Cloak(ent);
 						}
-						else if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && Q_irand(0, 99) < 2)
+						else if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && Q_irand(0, 99) < 10)
 						{ // zyk: chance to use Melee, so he can use Magic Fist
 							WP_FireMelee(ent, qfalse);
 						}
 
+						// zyk: must add a little interval to avoid performance issues
+						ent->client->pers.quest_event_timer = level.time + 200;
+
+						// zyk: has an enemy. Reset the idle timer
 						ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
 					}
 					else
