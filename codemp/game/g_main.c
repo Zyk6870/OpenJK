@@ -5755,37 +5755,6 @@ void zyk_stop_all_magic_powers(gentity_t* ent)
 	}
 }
 
-// zyk: keeps using mp while magic powers are active
-void zyk_active_magic_mp_consumption(gentity_t* ent)
-{
-	if (ent->client->pers.quest_power_status > 0 && ent->client->pers.magic_consumption_timer < level.time)
-	{
-		int i = 0;
-		int total_mp_usage = 0;
-
-		for (i = SKILL_MAGIC_HEALING_AREA; i < (SKILL_MAGIC_HEALING_AREA + MAX_MAGIC_POWERS); i++)
-		{
-			int magic_number = i - SKILL_MAGIC_HEALING_AREA;
-
-			if (ent->client->pers.quest_power_status & (1 << magic_number))
-			{ // zyk: active magic, consume mp
-				total_mp_usage++;
-			}
-		}
-
-		if (ent->client->pers.magic_power >= total_mp_usage)
-		{
-			ent->client->pers.magic_power -= total_mp_usage;
-		}
-		else
-		{ // zyk: players run out of mp, stop all magic
-			zyk_stop_all_magic_powers(ent);
-		}
-
-		ent->client->pers.magic_consumption_timer = level.time + 200;
-	}
-}
-
 // zyk: controls the quest powers stuff
 extern void initialize_rpg_skills(gentity_t *ent, qboolean init_all);
 void zyk_status_effects(gentity_t* ent)
@@ -5821,10 +5790,20 @@ void magic_power_events(gentity_t *ent)
 				magic_bonus = 1;
 			}
 
-			zyk_active_magic_mp_consumption(ent);
+			if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power <= 0)
+			{ // zyk: run out of mp, stop all magic
+				ent->client->pers.magic_power = 0;
+
+				zyk_stop_all_magic_powers(ent);
+			}
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_HEALING_AREA))
 			{
+				if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power > 0)
+				{
+					ent->client->pers.magic_power--;
+				}
+
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_AREA] < level.time)
 				{
 					int damage = 1 + magic_bonus;
@@ -5845,6 +5824,11 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_MAGIC_DOME))
 			{
+				if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power > 0)
+				{
+					ent->client->pers.magic_power--;
+				}
+
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] < level.time)
 				{
 					int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME];
@@ -5862,6 +5846,11 @@ void magic_power_events(gentity_t *ent)
 			{
 				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC] + magic_bonus));
 				int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
+
+				if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power > 0)
+				{
+					ent->client->pers.magic_power--;
+				}
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] < level.time)
 				{
@@ -5882,6 +5871,11 @@ void magic_power_events(gentity_t *ent)
 			{
 				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC] + magic_bonus));
 				int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
+
+				if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power > 0)
+				{
+					ent->client->pers.magic_power--;
+				}
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_EARTH_MAGIC] < level.time)
 				{
@@ -5906,6 +5900,11 @@ void magic_power_events(gentity_t *ent)
 			{
 				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] + magic_bonus));
 				int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
+
+				if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power > 0)
+				{
+					ent->client->pers.magic_power--;
+				}
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_MAGIC] < level.time)
 				{
@@ -5958,6 +5957,11 @@ void magic_power_events(gentity_t *ent)
 				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] + magic_bonus));
 				int damage = 2 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC];
 
+				if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power > 0)
+				{
+					ent->client->pers.magic_power--;
+				}
+
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_AIR_MAGIC] < level.time)
 				{
 					// zyk: effect on player position while magic is active
@@ -5979,6 +5983,11 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_DARK_MAGIC))
 			{
+				if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power > 0)
+				{
+					ent->client->pers.magic_power--;
+				}
+
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] < level.time)
 				{
 					// zyk: effect on player position while magic is active
@@ -6005,6 +6014,11 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_LIGHT_MAGIC))
 			{
+				if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power > 0)
+				{
+					ent->client->pers.magic_power--;
+				}
+
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] < level.time)
 				{
 					// zyk: effect on player position while magic is active
@@ -6030,6 +6044,11 @@ void magic_power_events(gentity_t *ent)
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 400;
 				}
+			}
+
+			if (ent->client->pers.magic_consumption_timer < level.time)
+			{
+				ent->client->pers.magic_consumption_timer = level.time + 200;
 			}
 		}
 	}
