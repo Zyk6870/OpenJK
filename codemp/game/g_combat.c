@@ -6637,11 +6637,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								// zyk: tests if the target is on the ground or in the air
 								if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 								{
-									black_hole_suck_strength *= 85.0;
+									black_hole_suck_strength *= 90.0;
 								}
 								else
 								{
-									black_hole_suck_strength *= 17.0;
+									black_hole_suck_strength *= 18.0;
 								}
 
 								// zyk: elemental bonus
