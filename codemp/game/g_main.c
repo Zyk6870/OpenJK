@@ -884,7 +884,7 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 	int i = 0;
 
 	float x = 0, y = 0, z = 0;
-	int npc_offset = 16;
+	int npc_offset = 8;
 	gentity_t* chosen_entity = NULL;
 
 	chosen_entity = zyk_find_entity_for_quest();
@@ -894,20 +894,9 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 		return;
 	}
 
-	// zyk: validating some entity types so the npc will not be stuck
-	if (Q_stricmp(chosen_entity->classname, "fx_runner") == 0 || 
-			chosen_entity->r.contents & CONTENTS_SOLID
-		)
-	{
-		x += npc_offset;
-		y += npc_offset;
-	}
-	else
-	{
-		x = Q_irand(0, npc_offset);
-		y = Q_irand(0, npc_offset);
-		z = Q_irand(0, npc_offset);
-	}
+	x = Q_irand(0, npc_offset);
+	y = Q_irand(0, npc_offset);
+	z = Q_irand(0, npc_offset);
 
 	if (Q_irand(0, 1) == 0)
 	{
@@ -940,21 +929,8 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 	
 	if (level.special_quest_npc_in_map & (1 << quest_npc_type))
 	{ // zyk: only one seller can be in the map
-		/*
-		for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
-		{
-			gentity_t* seller_npc = &g_entities[i];
-
-			if (seller_npc && seller_npc->client && seller_npc->NPC && seller_npc->client->pers.quest_npc == QUEST_NPC_SELLER && seller_npc->health > 0)
-			{
-				spawn_quest_npc = qfalse;
-			}
-		}
-		*/
-
 		spawn_quest_npc = qfalse;
 	}
-	
 
 	if (spawn_quest_npc == qtrue)
 	{
@@ -5522,7 +5498,7 @@ void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int
 void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crystal_type)
 {
 	float x, y, z;
-	int distance_factor = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 4;
+	int distance_factor = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 6;
 	gentity_t* chosen_entity = NULL;
 	int crystal_effect_id = 0;
 
@@ -9925,27 +9901,16 @@ void G_RunFrame( int levelTime ) {
 						{ // zyk: find another map spot
 							vec3_t npc_origin, npc_angles;
 							float x = 0, y = 0, z = 0;
-							int npc_offset = 48;
+							int npc_offset = 8;
 							gentity_t* chosen_entity = NULL;
 
 							chosen_entity = zyk_find_entity_for_quest();
 
 							if (chosen_entity)
 							{ // zyk: if for some reason there was no chosen entity, try again later
-								// zyk: validating some entity types so the npc will not be stuck
-								if (Q_stricmp(chosen_entity->classname, "fx_runner") == 0 ||
-									chosen_entity->r.contents & CONTENTS_SOLID
-									)
-								{
-									x += npc_offset;
-									y += npc_offset;
-								}
-								else
-								{
-									x = Q_irand(0, npc_offset);
-									y = Q_irand(0, npc_offset);
-									z = Q_irand(0, npc_offset);
-								}
+								x = Q_irand(0, npc_offset);
+								y = Q_irand(0, npc_offset);
+								z = Q_irand(0, npc_offset);
 
 								if (Q_irand(0, 1) == 0)
 								{
