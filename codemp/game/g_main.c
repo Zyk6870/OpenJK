@@ -405,16 +405,6 @@ void zyk_NPC_Kill_f(char* name)
 	}
 }
 
-qboolean zyk_valid_entity_for_quest(gentity_t* ent)
-{
-	if (ent && Q_stricmp(ent->classname, "freed") != 0 && Q_stricmp(ent->classname, "lightsaber") != 0)
-	{
-		return qtrue;
-	}
-
-	return qfalse;
-}
-
 gentity_t* zyk_find_entity_for_quest()
 {
 	int min_entity_id = (MAX_CLIENTS + BODY_QUEUE_SIZE);
@@ -434,8 +424,17 @@ gentity_t* zyk_find_entity_for_quest()
 	{
 		gentity_t* current_entity = &g_entities[i];
 
-		if (zyk_valid_entity_for_quest(current_entity) == qtrue)
-		{
+		if (current_entity && Q_stricmp(current_entity->classname, "freed") != 0 && Q_stricmp(current_entity->classname, "lightsaber") != 0 && 
+			Q_stricmp(current_entity->classname, "light") != 0 && 
+			Q_stricmp(current_entity->classname, "noclass") != 0 && 
+			Q_stricmp(current_entity->classname, "NPC_goal") != 0 && 
+			!strstr(current_entity->classname, "fx_") != 0 && 
+			!strstr(current_entity->classname, "func_") && 
+			!strstr(current_entity->classname, "misc_") && 
+			!strstr(current_entity->classname, "trigger_") && 
+			!strstr(current_entity->classname, "target_") && 
+			!strstr(current_entity->classname, "zyk_") != 0)
+		{ // zyk: a valid entity for quest
 			total_valid_entities++;
 			valid_entities[j] = current_entity;
 			j++;
@@ -9178,23 +9177,24 @@ void G_RunFrame( int levelTime ) {
 						if (target_enemy && target_enemy->client && target_enemy->NPC &&
 							target_enemy->client->playerTeam != NPCTEAM_PLAYER && target_enemy->client->pers.red_crystal_npc_timer == 0)
 						{
-							int chance_to_convert = Q_irand(0, 99);
+							int chance_to_resist_conversion = Q_irand(0, 99);
 							qboolean is_converted = qtrue;
 
-							if (chance_to_convert < 1 && target_enemy->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && target_enemy->client->pers.quest_npc <= QUEST_NPC_CHIMERA)
+							if (chance_to_resist_conversion < 98 && 
+								target_enemy->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && target_enemy->client->pers.quest_npc <= QUEST_NPC_CHIMERA)
 							{
 								is_converted = qfalse;
 							}
-							else if (chance_to_convert < 75 && target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+							else if (chance_to_resist_conversion < 75 && target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 							{
 								is_converted = qfalse;
 							}
-							else if (chance_to_convert < 40 &&
+							else if (chance_to_resist_conversion < 40 &&
 								(target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER || target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR))
 							{
 								is_converted = qfalse;
 							}
-							else if (chance_to_convert < 20 && target_enemy->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE)
+							else if (chance_to_resist_conversion < 20 && target_enemy->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE)
 							{
 								is_converted = qfalse;
 							}

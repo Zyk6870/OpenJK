@@ -2655,7 +2655,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			{ // zyk: defeated a side quest super enemy
 				if (self->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH)
 				{
-					quest_player->client->pers.quest_tries += 20;
+					quest_player->client->pers.quest_tries += 25;
 
 					G_Sound(quest_player, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
 
@@ -2663,7 +2663,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				}
 				else if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
 				{
-					quest_player->client->pers.magic_crystals += 20;
+					quest_player->client->pers.magic_crystals += 25;
 
 					G_Sound(quest_player, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
@@ -2671,7 +2671,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				}
 				else if (self->client->pers.quest_npc == QUEST_NPC_CHIMERA)
 				{
-					quest_player->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += 20;
+					quest_player->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += 25;
 					quest_player->client->pers.rpg_inventory_modified = qtrue;
 
 					G_Sound(quest_player, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
