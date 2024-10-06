@@ -2629,6 +2629,12 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 				quest_player->client->pers.quest_defeated_enemies += 1;
 
+				// zyk: add an interval in this case so player has enough time to prepare
+				if ((quest_player->client->pers.quest_defeated_enemies % QUEST_NPC_BONUS_INCREASE) == 0)
+				{
+					quest_player->client->pers.quest_event_timer += QUEST_NPC_SPAWN_TIME;
+				}
+
 				if (quest_player->client->pers.quest_defeated_enemies == QUEST_MIN_ENEMIES_TO_DEFEAT)
 				{ // zyk: start the second part of the quest, the Spirit Tree regen
 					zyk_set_starting_quest_progress(quest_player);

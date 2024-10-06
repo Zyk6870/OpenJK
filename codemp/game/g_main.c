@@ -9933,6 +9933,10 @@ void G_RunFrame( int levelTime ) {
 
 								ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
 							}
+							else
+							{
+								ent->client->pers.quest_npc_idle_timer = level.time + 1000;
+							}
 						}
 						else if (ent->client->pers.quest_power_status > 0)
 						{ // zyk: stop using all magic
