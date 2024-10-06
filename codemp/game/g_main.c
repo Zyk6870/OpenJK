@@ -599,9 +599,9 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 
 	max_levels[QUEST_NPC_NONE] = 0;
 
-	max_levels[QUEST_NPC_ANGEL_OF_DEATH] = 16;
-	max_levels[QUEST_NPC_JORMUNGANDR] = 16;
-	max_levels[QUEST_NPC_CHIMERA] = 16;
+	max_levels[QUEST_NPC_ANGEL_OF_DEATH] = 12;
+	max_levels[QUEST_NPC_JORMUNGANDR] = 12;
+	max_levels[QUEST_NPC_CHIMERA] = 12;
 
 	max_levels[QUEST_NPC_MAGE_MASTER] = 16;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 10;
@@ -9717,7 +9717,7 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.quest_event_timer < level.time)
 					{
 						qboolean hard_difficulty = qfalse;
-						int chance_for_side_quest_npc = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 20;
+						int chance_for_side_quest_npc = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 60;
 
 						if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 						{
@@ -9728,17 +9728,17 @@ void G_RunFrame( int levelTime ) {
 
 						if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_ANGEL_OF_DEATH)) && Q_irand(0, 99) < chance_for_side_quest_npc)
 						{
-							zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], 140, hard_difficulty, -1);
+							zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], 100, hard_difficulty, -1);
 						}
 
 						if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_JORMUNGANDR)) && Q_irand(0, 99) < chance_for_side_quest_npc)
 						{
-							zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], 140, hard_difficulty, -1);
+							zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], 100, hard_difficulty, -1);
 						}
 
 						if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_CHIMERA)) && Q_irand(0, 99) < chance_for_side_quest_npc)
 						{
-							zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], 140, hard_difficulty, -1);
+							zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], 100, hard_difficulty, -1);
 						}
 
 						if (zyk_is_main_quest_complete(ent) == qfalse)
