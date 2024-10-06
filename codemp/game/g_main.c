@@ -7168,9 +7168,9 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 1;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 50;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 30;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 150;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 40;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 180;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 0;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 0;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 0;
