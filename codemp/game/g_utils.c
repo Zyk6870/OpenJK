@@ -946,6 +946,11 @@ void G_FreeEntity( gentity_t *ed ) {
 		return;
 	}
 
+	if (ed->client && ed->NPC && ed->client->pers.quest_npc == QUEST_NPC_SELLER)
+	{
+		level.special_quest_npc_in_map &= ~(1 << QUEST_NPC_SELLER);
+	}
+
 	// zyk: if npc is cleaned directly, test if goal entity is still there. If it is, clean the goal entity too
 	if (ed->NPC && ed->NPC->tempGoal)
 	{

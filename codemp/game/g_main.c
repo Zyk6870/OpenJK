@@ -495,7 +495,7 @@ int zyk_spirit_tree_wither(float x, float y, float z)
 		npc_ent = &g_entities[i];
 
 		if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->health > 0 && 
-			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR4)
+			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
 		{
 			float npc_distance_to_tree = Distance(tree_origin, npc_ent->r.currentOrigin);
 
@@ -534,10 +534,7 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = "heavy_armored_warrior";
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR] = "force_saber_warrior";
 	enemy_names[QUEST_NPC_CHANGELING_HOWLER] = "changeling_howler";
-	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR1] = "low_trained_warrior1";
-	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR2] = "low_trained_warrior2";
-	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR3] = "low_trained_warrior3";
-	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR4] = "low_trained_warrior4";
+	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR] = "low_trained_warrior";
 
 	enemy_names[QUEST_NPC_ALLY_MAGE] = "ally_mage";
 	enemy_names[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = "ally_elemental_force_mage";
@@ -570,10 +567,7 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 1.8;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_CHANGELING_HOWLER] = QUEST_NPC_BONUS_INCREASE;
-	bonus_increase[QUEST_NPC_LOW_TRAINED_WARRIOR1] = QUEST_NPC_BONUS_INCREASE * 2;
-	bonus_increase[QUEST_NPC_LOW_TRAINED_WARRIOR2] = QUEST_NPC_BONUS_INCREASE * 2;
-	bonus_increase[QUEST_NPC_LOW_TRAINED_WARRIOR3] = QUEST_NPC_BONUS_INCREASE * 2;
-	bonus_increase[QUEST_NPC_LOW_TRAINED_WARRIOR4] = QUEST_NPC_BONUS_INCREASE * 2;
+	bonus_increase[QUEST_NPC_LOW_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 1.5;
 
 	bonus_increase[QUEST_NPC_ALLY_MAGE] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = QUEST_NPC_BONUS_INCREASE;
@@ -606,10 +600,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 5;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = 7;
 	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 7;
-	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR1] = 4;
-	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR2] = 4;
-	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR3] = 4;
-	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR4] = 4;
+	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR] = 4;
 	
 	max_levels[QUEST_NPC_ALLY_MAGE] = 10;
 	max_levels[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = 8;
@@ -770,31 +761,17 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
 		}
-		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR1)
+		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, npc_skill_level + skill_level_bonus);
+			if (bonuses < (QUEST_NPC_BONUS_INCREASE / 2))
+			{
+				npc_ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_BLASTER);
+
+				npc_ent->s.weapon = WP_MELEE;
+				npc_ent->client->ps.weapon = WP_MELEE;
+			}
+
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
-
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
-		}
-		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR2)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, npc_skill_level + skill_level_bonus);
-
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
-		}
-		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR3)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, npc_skill_level + skill_level_bonus);
-
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
-		}
-		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR4)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
 		}
@@ -917,9 +894,10 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 	{
 		return;
 	}
-
-	if (quest_npc_type == QUEST_NPC_SELLER)
+	
+	if (level.special_quest_npc_in_map & (1 << quest_npc_type))
 	{ // zyk: only one seller can be in the map
+		/*
 		for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
 		{
 			gentity_t* seller_npc = &g_entities[i];
@@ -929,7 +907,11 @@ void zyk_spawn_quest_npc(zyk_quest_npc_t quest_npc_type, int yaw, int bonuses, q
 				spawn_quest_npc = qfalse;
 			}
 		}
+		*/
+
+		spawn_quest_npc = qfalse;
 	}
+	
 
 	if (spawn_quest_npc == qtrue)
 	{
@@ -1305,6 +1287,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	level.energy_modulator_timer = 0;
 	level.magic_armor_timer = 0;
+
+	level.special_quest_npc_in_map = 0;
 
 	// zyk: initializing Duel Tournament variables
 	level.duel_tournament_mode = 0;
@@ -9706,32 +9690,21 @@ void G_RunFrame( int levelTime ) {
 						if (zyk_is_main_quest_complete(ent) == qfalse)
 						{
 							int enemy_type = 0;
-							int enemy_wave_count = (QUEST_MIN_ENEMIES_TO_DEFEAT / 4);
+							zyk_quest_npc_t stronger_enemy_type = QUEST_NPC_LOW_TRAINED_WARRIOR - (ent->client->pers.quest_defeated_enemies / 5);
 							qboolean hard_difficulty = qfalse;
 
-							if (ent->client->pers.quest_defeated_enemies < enemy_wave_count)
+							if (ent->client->pers.quest_defeated_enemies < QUEST_MIN_ENEMIES_TO_DEFEAT)
 							{
-								enemy_type = Q_irand(QUEST_NPC_LOW_TRAINED_WARRIOR1, QUEST_NPC_LOW_TRAINED_WARRIOR4);
-							}
-							else if (ent->client->pers.quest_defeated_enemies < (enemy_wave_count * 2))
-							{
-								enemy_type = Q_irand(QUEST_NPC_FLYING_WARRIOR, QUEST_NPC_LOW_TRAINED_WARRIOR4);
-							}
-							else if (ent->client->pers.quest_defeated_enemies < (enemy_wave_count * 3))
-							{
-								enemy_type = Q_irand(QUEST_NPC_HIGH_TRAINED_WARRIOR, QUEST_NPC_LOW_TRAINED_WARRIOR4);
+								enemy_type = Q_irand(stronger_enemy_type, QUEST_NPC_LOW_TRAINED_WARRIOR);
 							}
 							else
-							{ // zyk: all other enemy waves
-								enemy_type = Q_irand(QUEST_NPC_MAGE_MINISTER, QUEST_NPC_LOW_TRAINED_WARRIOR4);
-							}
-
-							if (ent->client->pers.quest_defeated_enemies >= QUEST_MIN_ENEMIES_TO_DEFEAT)
 							{
 								int mage_master_chance = 
 									(ent->client->pers.quest_defeated_enemies - QUEST_MIN_ENEMIES_TO_DEFEAT) + 
 									(ent->client->pers.quest_masters_defeated * 4) + 
 									((ent->client->pers.quest_progress * 20.0) / MAX_QUEST_PROGRESS);
+
+								enemy_type = Q_irand(QUEST_NPC_MAGE_MINISTER, QUEST_NPC_LOW_TRAINED_WARRIOR);
 
 								if (Q_irand(0, 99) < mage_master_chance)
 								{
@@ -9835,6 +9808,11 @@ void G_RunFrame( int levelTime ) {
 				// zyk: npcs with magic powers
 				if (ent->client->pers.quest_npc > QUEST_NPC_NONE && ent->client->pers.quest_event_timer < level.time)
 				{
+					if (ent->client->pers.quest_npc == QUEST_NPC_SELLER)
+					{ // zyk: there can only be one seller in the map
+						level.special_quest_npc_in_map |= (1 << QUEST_NPC_SELLER);
+					}
+
 					if (ent->enemy)
 					{
 						int first_magic_skill = SKILL_MAGIC_HEALING_AREA;

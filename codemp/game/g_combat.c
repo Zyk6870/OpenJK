@@ -2598,6 +2598,11 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	// zyk: Main Quest events
 	if (self->client->pers.quest_npc > QUEST_NPC_NONE)
 	{ // zyk: quest npc died
+		if (self->client->pers.quest_npc == QUEST_NPC_SELLER)
+		{
+			level.special_quest_npc_in_map &= ~(1 << QUEST_NPC_SELLER);
+		}
+
 		if (attacker && attacker->client &&
 			(attacker->client->sess.amrpgmode == 2 || zyk_is_quest_ally(attacker) == qtrue))
 		{
@@ -6043,7 +6048,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 							break;
 						}
 						else if (quest_enemy && quest_enemy->client && quest_enemy->NPC && quest_enemy->health > 0 && 
-							quest_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && quest_enemy->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR4 &&
+							quest_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && quest_enemy->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR &&
 							quest_enemy != attacker)
 						{ // zyk: one of his allies
 							quest_enemy->client->pers.magic_power += QUEST_WORM_MP_TO_RESTORE;

@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.2"
+#define	GAMEVERSION	"New Zyk Mod v1.1.3"
 
 #define SECURITY_LOG "security.log"
 
@@ -737,10 +737,7 @@ typedef enum {
 	QUEST_NPC_CHANGELING_WORM,
 	QUEST_NPC_FORCE_SABER_WARRIOR,
 	QUEST_NPC_CHANGELING_HOWLER,
-	QUEST_NPC_LOW_TRAINED_WARRIOR1,
-	QUEST_NPC_LOW_TRAINED_WARRIOR2,
-	QUEST_NPC_LOW_TRAINED_WARRIOR3,
-	QUEST_NPC_LOW_TRAINED_WARRIOR4,
+	QUEST_NPC_LOW_TRAINED_WARRIOR,
 	QUEST_NPC_ALLY_MAGE,
 	QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE,
 	QUEST_NPC_ALLY_FLYING_WARRIOR,
@@ -835,7 +832,7 @@ typedef enum {
 #define QUEST_WORM_MP_TO_RESTORE 5
 
 // zyk: maximum time a quest npc can be idle (without enemies)
-#define QUEST_NPC_IDLE_TIME 47000
+#define QUEST_NPC_IDLE_TIME 43000
 
 // zyk: timer used in the final Main Quest event
 #define QUEST_FINAL_EVENT_TIMER 20000
@@ -1717,6 +1714,9 @@ typedef struct level_locals_s {
 	vec3_t legendary_artifact_origin;
 	int legendary_crystal_chosen[LEGENDARY_CRYSTALS_CHOSEN];
 	zyk_quest_item_t legendary_artifact_type;
+
+	// zyk: bitvalue. Has npcs where only one of them can be in the map
+	int special_quest_npc_in_map;
 
 	// zyk: time to spawn the same side quest secret item again
 	int energy_modulator_timer;

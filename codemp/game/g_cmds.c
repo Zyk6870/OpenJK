@@ -6408,7 +6408,7 @@ int zyk_number_of_enemies_in_map()
 		npc_ent = &g_entities[i];
 
 		if (npc_ent && npc_ent->client && npc_ent->NPC && 
-			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR4 &&
+			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR &&
 			npc_ent->health > 0)
 		{
 			total_enemies++;
