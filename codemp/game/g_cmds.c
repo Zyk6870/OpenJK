@@ -6660,7 +6660,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. Give extra tries for the main quest. Pressing Use while meditating will restore some mp and Stamina. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. Give extra tries for the main quest. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
@@ -6774,7 +6774,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					{
 						char quest_desc[MAX_STRING_CHARS];
 
-						strcpy(quest_desc, va("\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nDefeat enough enemies to weaken their army and make the Spirit Tree summoned.\nDefeat some Mage Masters and regenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditating in the tree, the amount of ^4Blue ^7crystals you have and defeating enemies will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^4Blue ^7crystal call your Spirit Tree.\n^4Blue ^7crystals makes new allies stronger and appear more often.\n^2Green ^7crystals increase Quest Tries and restore mp and Stamina pressing Use key while meditating.\n^1Red ^7crystals can convert enemies into allies for a short time pressing Use key near them.\n\n", QUESTCHAR_ALL_SPIRITS));
+						strcpy(quest_desc, va("\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nDefeat enough enemies to weaken their army and make the Spirit Tree summoned.\nDefeat some Mage Masters and regenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditating in the tree, the amount of ^4Blue ^7crystals you have and defeating enemies will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^4Blue ^7crystal call your Spirit Tree.\n^4Blue ^7crystals makes new allies stronger and appear more often.\n^2Green ^7crystals increase Quest Tries.\n^1Red ^7crystals can convert enemies into allies for a short time pressing Use key near them.\n\n", QUESTCHAR_ALL_SPIRITS));
 
 						trap->SendServerCommand(ent->s.number, 
 							va("print \"%s^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n^3Quest Tries: ^7%d\n\n\"", 

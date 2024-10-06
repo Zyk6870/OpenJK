@@ -9136,23 +9136,6 @@ void G_RunFrame( int levelTime ) {
 
 				if (ent->client->pers.special_crystal_timer < level.time)
 				{
-					// zyk: Green crystal. Can be used to regen some mp and Stamina
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] > 0 && ent->client->ps.groundEntityNum != ENTITYNUM_NONE &&
-						ent->client->pers.cmd.buttons & BUTTON_USE && ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
-						ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
-					{
-						ent->client->pers.quest_tries--;
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL]--;
-						ent->client->pers.rpg_inventory_modified = qtrue;
-
-						zyk_add_mp(ent, 20);
-						zyk_set_stamina(ent, 100, qtrue);
-
-						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
-
-						ent->client->pers.special_crystal_timer = level.time + 500;
-					}
-
 					// zyk: Red crystal. Convert the enemy npc the player is looking at
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && ent->client->ps.hasLookTarget &&
 						ent->client->pers.cmd.buttons & BUTTON_USE)
