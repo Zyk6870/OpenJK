@@ -529,6 +529,7 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_FORCE_MAGE] = "force_mage";
 	enemy_names[QUEST_NPC_HIGH_TRAINED_WARRIOR] = "high_trained_warrior";
 	enemy_names[QUEST_NPC_MID_TRAINED_WARRIOR] = "mid_trained_warrior";
+	enemy_names[QUEST_NPC_CHANGELING_SENTRY] = "changeling_sentry";
 	enemy_names[QUEST_NPC_FLYING_WARRIOR] = "flying_warrior";
 	enemy_names[QUEST_NPC_CHANGELING_WORM] = "changeling_worm";
 	enemy_names[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = "heavy_armored_warrior";
@@ -562,6 +563,7 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_FORCE_MAGE] = QUEST_NPC_BONUS_INCREASE * 1.2;
 	bonus_increase[QUEST_NPC_HIGH_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 1.2;
 	bonus_increase[QUEST_NPC_MID_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 1.5;
+	bonus_increase[QUEST_NPC_CHANGELING_SENTRY] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_CHANGELING_WORM] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 1.8;
@@ -595,6 +597,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_FORCE_MAGE] = 8;
 	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = 8;
 	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = 7;
+	max_levels[QUEST_NPC_CHANGELING_SENTRY] = 7;
 	max_levels[QUEST_NPC_FLYING_WARRIOR] = 7;
 	max_levels[QUEST_NPC_CHANGELING_WORM] = 7;
 	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 5;
@@ -723,13 +726,21 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
 		}
+		else if (quest_npc_type == QUEST_NPC_CHANGELING_SENTRY)
+		{
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
+
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
+		}
 		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
 		{
 			Jedi_Cloak(npc_ent);
 
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
 
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
 		}
@@ -771,7 +782,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 				npc_ent->client->ps.weapon = WP_MELEE;
 			}
 
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_HEALING_AREA, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + skill_level_bonus;
 		}
@@ -9692,6 +9703,11 @@ void G_RunFrame( int levelTime ) {
 							int enemy_type = 0;
 							zyk_quest_npc_t stronger_enemy_type = QUEST_NPC_LOW_TRAINED_WARRIOR - (ent->client->pers.quest_defeated_enemies / 5);
 							qboolean hard_difficulty = qfalse;
+
+							if (stronger_enemy_type < QUEST_NPC_MAGE_MINISTER)
+							{
+								stronger_enemy_type = QUEST_NPC_MAGE_MINISTER;
+							}
 
 							if (ent->client->pers.quest_defeated_enemies < QUEST_MIN_ENEMIES_TO_DEFEAT)
 							{

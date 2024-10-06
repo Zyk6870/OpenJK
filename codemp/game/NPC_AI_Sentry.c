@@ -195,8 +195,8 @@ void Sentry_Fire (void)
 
 	G_PlayEffectID( G_EffectIndex("bryar/muzzle_flash"), muzzle, forward );
 
-	// zyk: added this condition for guardian of wind
-	if (Q_stricmp(NPCS.NPC->NPC_type, "guardian_boss_7") == 0)
+	// zyk: quest npc
+	if (NPCS.NPC->client && NPCS.NPC->client->pers.quest_npc == QUEST_NPC_CHANGELING_SENTRY)
 	{
 		missile = CreateMissile( muzzle, forward, 5000, 10000, NPCS.NPC, qfalse );
 
@@ -209,7 +209,7 @@ void Sentry_Fire (void)
 
 		NPCS.NPCInfo->burstCount++;
 		NPCS.NPC->attackDebounceTime = level.time + 150;
-		missile->damage = 80;
+		missile->damage = 50;
 	}
 	else
 	{
@@ -224,7 +224,7 @@ void Sentry_Fire (void)
 
 		NPCS.NPCInfo->burstCount++;
 		NPCS.NPC->attackDebounceTime = level.time + 150; // zyk: default 50
-		missile->damage = 30; // zyk: default 5
+		missile->damage = 25; // zyk: default 5
 	}
 }
 
