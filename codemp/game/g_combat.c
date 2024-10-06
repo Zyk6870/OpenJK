@@ -2615,7 +2615,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2 &&
 				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
-				self->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && self->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
+				self->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && self->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
 			{
 				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 				{
@@ -2624,6 +2624,22 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 					if (quest_player->client->pers.quest_masters_defeated >= QUEST_MASTERS_TO_DEFEAT)
 					{
 						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
+					}
+				}
+
+				if (self->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && self->client->pers.quest_npc <= QUEST_NPC_CHIMERA)
+				{ // zyk: defeated a side quest super enemy
+					if (self->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH)
+					{
+						quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_ANGEL_OF_DEATH);
+					}
+					else if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
+					{
+						quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_JORMUNGANDR);
+					}
+					else if (self->client->pers.quest_npc == QUEST_NPC_CHIMERA)
+					{
+						quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_CHIMERA);
 					}
 				}
 
@@ -2649,35 +2665,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				}
 
 				save_account(quest_player, qtrue);
-			}
-			else if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2 &&
-					 self->client->pers.quest_npc > QUEST_NPC_NONE && self->client->pers.quest_npc < QUEST_NPC_MAGE_MASTER)
-			{ // zyk: defeated a side quest super enemy
-				if (self->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH)
-				{
-					quest_player->client->pers.quest_tries += 25;
-
-					G_Sound(quest_player, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
-
-					quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_ANGEL_OF_DEATH);
-				}
-				else if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-				{
-					quest_player->client->pers.magic_crystals += 25;
-
-					G_Sound(quest_player, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
-
-					quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_JORMUNGANDR);
-				}
-				else if (self->client->pers.quest_npc == QUEST_NPC_CHIMERA)
-				{
-					quest_player->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += 25;
-					quest_player->client->pers.rpg_inventory_modified = qtrue;
-
-					G_Sound(quest_player, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
-
-					quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_CHIMERA);
-				}
 			}
 		}
 	}

@@ -6829,7 +6829,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Force Mage: ^7has no weapons. Fight with Force and Magic powers. ^2Magic: Healing Area, Magic Dome, Dark, Light\n^3Mage Scholar: ^7mage with Magic Fist. He is wearing the Magic Armor. ^2Magic: high-level Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: high-level Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. He is wearing all armors. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Force Mage: ^7has no weapons. Fight with Force and Magic powers. ^2Magic: Healing Area, Magic Dome, Dark, Light\n^3Mage Scholar: ^7mage with Magic Fist. He is wearing the Magic Armor. ^2Magic: high-level Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: high-level Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. He is wearing all armors. Has Magic Fist and extremely high-level of all magic. Can summon the legendary creatures: Chimera (^2Fire, Light^7), Jormungandr (^2Water, Earth^7) or the Angel of Death (^2Air, Dark^7)\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 3 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 2)
 						{
@@ -6841,7 +6841,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 4)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures: Chimera, Jormungandr and the Angel of Death. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals to restore their health and mp. Each one you defeat will give a reward in crystals and will not appear for you again.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures, the Chimera, the Jormungandr and the Angel of Death. Mage Masters can summon them. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals to restore their health and mp. Each one you defeat will not appear for you again.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 					}
 					else

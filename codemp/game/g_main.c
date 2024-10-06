@@ -9717,7 +9717,6 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.quest_event_timer < level.time)
 					{
 						qboolean hard_difficulty = qfalse;
-						int chance_for_side_quest_npc = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 60;
 
 						if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 						{
@@ -9725,21 +9724,6 @@ void G_RunFrame( int levelTime ) {
 						}
 
 						zyk_set_quest_event_timer(ent);
-
-						if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_ANGEL_OF_DEATH)) && Q_irand(0, 99) < chance_for_side_quest_npc)
-						{
-							zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], 100, hard_difficulty, -1);
-						}
-
-						if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_JORMUNGANDR)) && Q_irand(0, 99) < chance_for_side_quest_npc)
-						{
-							zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], 100, hard_difficulty, -1);
-						}
-
-						if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_CHIMERA)) && Q_irand(0, 99) < chance_for_side_quest_npc)
-						{
-							zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], 100, hard_difficulty, -1);
-						}
 
 						if (zyk_is_main_quest_complete(ent) == qfalse)
 						{
@@ -9874,6 +9858,9 @@ void G_RunFrame( int levelTime ) {
 						int magic_skill_index = first_magic_skill + random_magic;
 						int quest_npc_enemy_dist = Distance(ent->client->ps.origin, ent->enemy->r.currentOrigin);
 
+						// zyk: must add a little interval to avoid performance issues
+						ent->client->pers.quest_event_timer = level.time + 200;
+
 						if (ent->client->pers.skill_levels[magic_skill_index] > 0)
 						{
 							int magic_cast_dist = 250 + (50 * ent->client->pers.skill_levels[magic_skill_index]);
@@ -9895,17 +9882,39 @@ void G_RunFrame( int levelTime ) {
 							}
 						}
 
-						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && Q_irand(0, 3) == 0)
+						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 						{
-							Jedi_Cloak(ent);
+							int summoned_npc_bonuses = ent->client->ps.stats[STAT_MAX_HEALTH] / 5;
+							int chance_for_summon = summoned_npc_bonuses / 80;
+							gentity_t* quest_player = ent->enemy;
+
+							if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2)
+							{
+								if (!(quest_player->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_ANGEL_OF_DEATH)) && Q_irand(0, 99) < chance_for_summon)
+								{
+									zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], summoned_npc_bonuses, qfalse, -1);
+								}
+
+								if (!(quest_player->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_JORMUNGANDR)) && Q_irand(0, 99) < chance_for_summon)
+								{
+									zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], summoned_npc_bonuses, qfalse, -1);
+								}
+
+								if (!(quest_player->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_CHIMERA)) && Q_irand(0, 99) < chance_for_summon)
+								{
+									zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], summoned_npc_bonuses, qfalse, -1);
+								}
+							}
+
+							if (Q_irand(0, 3) == 0)
+							{
+								Jedi_Cloak(ent);
+							}
 						}
 						else if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && Q_irand(0, 99) < 10)
 						{ // zyk: chance to use Melee, so he can use Magic Fist
 							WP_FireMelee(ent, qfalse);
 						}
-
-						// zyk: must add a little interval to avoid performance issues
-						ent->client->pers.quest_event_timer = level.time + 200;
 
 						// zyk: has an enemy. Reset the idle timer
 						ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
