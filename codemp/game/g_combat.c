@@ -2609,13 +2609,13 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			gentity_t* quest_player = attacker;
 
 			if (attacker->NPC && attacker->client->pers.quest_npc_caller_player_id > -1)
-			{ // zyk: is a quest ally, get the player
+			{ // zyk: get the player in this case
 				quest_player = &g_entities[attacker->client->pers.quest_npc_caller_player_id];
 			}
 
 			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2 &&
 				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
-				self->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
+				self->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && self->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
 			{
 				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 				{
@@ -2649,6 +2649,35 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				}
 
 				save_account(quest_player, qtrue);
+			}
+			else if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2 &&
+					 self->client->pers.quest_npc > QUEST_NPC_NONE && self->client->pers.quest_npc < QUEST_NPC_MAGE_MASTER)
+			{ // zyk: defeated a side quest super enemy
+				if (self->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH)
+				{
+					quest_player->client->pers.quest_tries += 20;
+
+					G_Sound(quest_player, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
+
+					quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_ANGEL_OF_DEATH);
+				}
+				else if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
+				{
+					quest_player->client->pers.magic_crystals += 20;
+
+					G_Sound(quest_player, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+
+					quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_JORMUNGANDR);
+				}
+				else if (self->client->pers.quest_npc == QUEST_NPC_CHIMERA)
+				{
+					quest_player->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += 20;
+					quest_player->client->pers.rpg_inventory_modified = qtrue;
+
+					G_Sound(quest_player, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
+
+					quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_CHIMERA);
+				}
 			}
 		}
 	}
@@ -6030,46 +6059,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				take = 1;
 			}
 
-			// zyk: some quest npcs have special abilities
-			if (attacker && attacker->client && attacker->NPC && mod == MOD_MELEE && targ->health > 0 && Q_irand(0, 100) < 50)
-			{
-				if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER)
-				{ // zyk: poison the target
-					targ->client->pers.poison_debounce_timer = 0;
-					targ->client->pers.poison_duration = level.time + 20000;
-
-					targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_POISONED);
-				}
-				else if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM)
-				{ // zyk: absorbs health from target to restore mp to all quest enemies in the map
-					int mp_to_restore = take;
-					int npc_it = 0;
-
-					for (npc_it = (MAX_CLIENTS + BODY_QUEUE_SIZE); npc_it < level.num_entities; npc_it++)
-					{
-						gentity_t* quest_enemy = &g_entities[npc_it];
-
-						if (mp_to_restore < QUEST_WORM_MP_TO_RESTORE)
-						{
-							break;
-						}
-						else if (quest_enemy && quest_enemy->client && quest_enemy->NPC && quest_enemy->health > 0 && 
-							quest_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && quest_enemy->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR &&
-							quest_enemy != attacker)
-						{ // zyk: one of his allies
-							quest_enemy->client->pers.magic_power += QUEST_WORM_MP_TO_RESTORE;
-
-							mp_to_restore -= QUEST_WORM_MP_TO_RESTORE;
-						}
-					}
-
-					if (mp_to_restore > 0)
-					{ // zyk: restore his own mp if there is still some mp to restore
-						attacker->client->pers.magic_power += mp_to_restore;
-					}
-				}
-			}
-
 			// zyk: damage to health also makes RPG player lose Stamina
 			stamina_loss = take;
 
@@ -6086,6 +6075,74 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 
 				zyk_set_stamina(targ, stamina_loss, qfalse);
+			}
+		}
+
+		// zyk: some quest npcs have special abilities
+		if (attacker && attacker->client && attacker->NPC && targ->health > 0 && targ->client && Q_irand(0, 100) < 50)
+		{
+			if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER && mod == MOD_MELEE)
+			{ // zyk: poison the target
+				targ->client->pers.poison_debounce_timer = 0;
+				targ->client->pers.poison_duration = level.time + 20000;
+
+				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_POISONED);
+			}
+			else if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM && mod == MOD_MELEE)
+			{ // zyk: absorbs health from target to restore mp to all quest enemies in the map
+				int mp_to_restore = take;
+				int npc_it = 0;
+
+				for (npc_it = (MAX_CLIENTS + BODY_QUEUE_SIZE); npc_it < level.num_entities; npc_it++)
+				{
+					gentity_t* quest_enemy = &g_entities[npc_it];
+
+					if (mp_to_restore < QUEST_WORM_MP_TO_RESTORE)
+					{
+						break;
+					}
+					else if (quest_enemy && quest_enemy->client && quest_enemy->NPC && quest_enemy->health > 0 &&
+						quest_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && quest_enemy->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR &&
+						quest_enemy != attacker)
+					{ // zyk: one of his allies
+						quest_enemy->client->pers.magic_power += QUEST_WORM_MP_TO_RESTORE;
+
+						mp_to_restore -= QUEST_WORM_MP_TO_RESTORE;
+					}
+				}
+
+				if (mp_to_restore > 0)
+				{ // zyk: restore his own mp if there is still some mp to restore
+					attacker->client->pers.magic_power += mp_to_restore;
+				}
+			}
+			else if (attacker->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH && mod == MOD_BRYAR_PISTOL && targ->client->sess.amrpgmode == 2)
+			{
+				targ->client->pers.quest_tries--;
+
+				attacker->health += 20;
+				attacker->client->pers.magic_power += 20;
+
+				G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
+			}
+			else if (attacker->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
+			{
+				targ->client->pers.magic_crystals--;
+
+				attacker->health += 20;
+				attacker->client->pers.magic_power += 20;
+
+				G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
+			}
+			else if (attacker->client->pers.quest_npc == QUEST_NPC_CHIMERA && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
+			{
+				targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
+				targ->client->pers.rpg_inventory_modified = qtrue;
+
+				attacker->health += 20;
+				attacker->client->pers.magic_power += 20;
+
+				G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
 			}
 		}
 

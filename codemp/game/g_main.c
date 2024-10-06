@@ -523,6 +523,10 @@ char* zyk_get_enemy_type(int enemy_type)
 
 	enemy_names[QUEST_NPC_NONE] = "";
 
+	enemy_names[QUEST_NPC_ANGEL_OF_DEATH] = "legendary_angel_of_death";
+	enemy_names[QUEST_NPC_JORMUNGANDR] = "legendary_jormungandr";
+	enemy_names[QUEST_NPC_CHIMERA] = "legendary_chimera";
+
 	enemy_names[QUEST_NPC_MAGE_MASTER] = "mage_master";
 	enemy_names[QUEST_NPC_MAGE_MINISTER] = "mage_minister";
 	enemy_names[QUEST_NPC_MAGE_SCHOLAR] = "mage_scholar";
@@ -557,6 +561,10 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 
 	bonus_increase[QUEST_NPC_NONE] = QUEST_NPC_BONUS_INCREASE;
 
+	bonus_increase[QUEST_NPC_ANGEL_OF_DEATH] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_JORMUNGANDR] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_CHIMERA] = QUEST_NPC_BONUS_INCREASE;
+
 	bonus_increase[QUEST_NPC_MAGE_MASTER] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_MAGE_MINISTER] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_MAGE_SCHOLAR] = QUEST_NPC_BONUS_INCREASE;
@@ -590,6 +598,10 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	int max_levels[NUM_QUEST_NPCS];
 
 	max_levels[QUEST_NPC_NONE] = 0;
+
+	max_levels[QUEST_NPC_ANGEL_OF_DEATH] = 16;
+	max_levels[QUEST_NPC_JORMUNGANDR] = 16;
+	max_levels[QUEST_NPC_CHIMERA] = 16;
 
 	max_levels[QUEST_NPC_MAGE_MASTER] = 16;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 10;
@@ -662,7 +674,28 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
 		// zyk: setting magic abilities
-		if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
+		if (quest_npc_type == QUEST_NPC_ANGEL_OF_DEATH)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 50 + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_JORMUNGANDR)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 50 + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_CHIMERA)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 50 + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
 		{
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 1;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 1;
@@ -9148,7 +9181,11 @@ void G_RunFrame( int levelTime ) {
 							int chance_to_convert = Q_irand(0, 99);
 							qboolean is_converted = qtrue;
 
-							if (chance_to_convert < 75 && target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+							if (chance_to_convert < 1 && target_enemy->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && target_enemy->client->pers.quest_npc <= QUEST_NPC_CHIMERA)
+							{
+								is_converted = qfalse;
+							}
+							else if (chance_to_convert < 75 && target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 							{
 								is_converted = qfalse;
 							}
@@ -9478,7 +9515,7 @@ void G_RunFrame( int levelTime ) {
 										gentity_t* npc_ent = &g_entities[j];
 
 										if (npc_ent && npc_ent->client && npc_ent->NPC &&
-											npc_ent->client->pers.quest_npc > QUEST_NPC_NONE && npc_ent->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
+											npc_ent->client->pers.quest_npc > QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
 										{ // zyk: one of the quest enemies
 											zyk_NPC_Kill_f(npc_ent->NPC_type);
 										}
@@ -9679,14 +9716,36 @@ void G_RunFrame( int levelTime ) {
 					// zyk: quest npcs
 					if (ent->client->pers.quest_event_timer < level.time)
 					{
+						qboolean hard_difficulty = qfalse;
+						int chance_for_side_quest_npc = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 20;
+
+						if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+						{
+							hard_difficulty = qtrue;
+						}
+
 						zyk_set_quest_event_timer(ent);
+
+						if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_ANGEL_OF_DEATH)) && Q_irand(0, 99) < chance_for_side_quest_npc)
+						{
+							zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], 140, hard_difficulty, -1);
+						}
+
+						if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_JORMUNGANDR)) && Q_irand(0, 99) < chance_for_side_quest_npc)
+						{
+							zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], 140, hard_difficulty, -1);
+						}
+
+						if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_CHIMERA)) && Q_irand(0, 99) < chance_for_side_quest_npc)
+						{
+							zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], 140, hard_difficulty, -1);
+						}
 
 						if (zyk_is_main_quest_complete(ent) == qfalse)
 						{
 							int enemy_type = 0;
 							zyk_quest_npc_t stronger_enemy_type = QUEST_NPC_LOW_TRAINED_WARRIOR - (ent->client->pers.quest_defeated_enemies / 5);
-							qboolean hard_difficulty = qfalse;
-
+							
 							if (stronger_enemy_type < QUEST_NPC_MAGE_MINISTER)
 							{
 								stronger_enemy_type = QUEST_NPC_MAGE_MINISTER;
@@ -9709,11 +9768,6 @@ void G_RunFrame( int levelTime ) {
 								{
 									enemy_type = QUEST_NPC_MAGE_MASTER;
 								}
-							}
-
-							if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
-							{
-								hard_difficulty = qtrue;
 							}
 
 							if (zyk_number_of_enemies_in_map() < (zyk_max_quest_npcs.integer / 2))
@@ -9807,9 +9861,10 @@ void G_RunFrame( int levelTime ) {
 				// zyk: npcs with magic powers
 				if (ent->client->pers.quest_npc > QUEST_NPC_NONE && ent->client->pers.quest_event_timer < level.time)
 				{
-					if (ent->client->pers.quest_npc == QUEST_NPC_SELLER)
-					{ // zyk: there can only be one seller in the map
-						level.special_quest_npc_in_map |= (1 << QUEST_NPC_SELLER);
+					if (ent->client->pers.quest_npc == QUEST_NPC_SELLER || 
+						(ent->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && ent->client->pers.quest_npc <= QUEST_NPC_CHIMERA))
+					{ // zyk: there can only be one of these npcs in the map
+						level.special_quest_npc_in_map |= (1 << ent->client->pers.quest_npc);
 					}
 
 					if (ent->enemy)

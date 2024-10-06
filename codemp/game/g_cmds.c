@@ -2183,6 +2183,9 @@ void load_account(gentity_t* ent)
 			fscanf(account_file, "%s", content);
 			ent->client->pers.quest_progress = atoi(content);
 
+			fscanf(account_file, "%s", content);
+			ent->client->pers.side_quest_secrets_found = atoi(content);
+
 			// zyk: last health
 			fscanf(account_file, "%s", content);
 			ent->client->pers.last_health = atoi(content);
@@ -2267,9 +2270,9 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
 				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, 
-				client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress,
+				client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress, client->pers.side_quest_secrets_found, 
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
 
 			fclose(account_file);
@@ -5248,6 +5251,8 @@ void zyk_set_default_quest_fields(gentity_t* ent)
 	ent->client->pers.quest_masters_defeated = 0;
 	ent->client->pers.quest_progress = 0;
 	ent->client->pers.quest_spirit_tree_id = -1;
+
+	ent->client->pers.side_quest_secrets_found = 0;
 }
 
 // zyk: adds a new RPG char with default values
@@ -6836,7 +6841,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 4)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, and also absorbs 5 per cent damage from any source to restore some Force.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures: Chimera, Jormungandr and the Angel of Death. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals to restore their health and mp.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 					}
 					else

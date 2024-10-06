@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.7"
+#define	GAMEVERSION	"New Zyk Mod v1.1.8"
 
 #define SECURITY_LOG "security.log"
 
@@ -726,6 +726,9 @@ typedef enum {
 
 typedef enum {
 	QUEST_NPC_NONE,
+	QUEST_NPC_ANGEL_OF_DEATH,
+	QUEST_NPC_JORMUNGANDR,
+	QUEST_NPC_CHIMERA,
 	QUEST_NPC_MAGE_MASTER,
 	QUEST_NPC_MAGE_MINISTER,
 	QUEST_NPC_MAGE_SCHOLAR,
@@ -755,6 +758,13 @@ typedef enum {
 	QUEST_SELLER_END_STEP,
 	NUM_QUEST_SELLER_STEPS
 } zyk_quest_seller_step_t;
+
+typedef enum {
+	SIDE_QUEST_ANGEL_OF_DEATH,
+	SIDE_QUEST_JORMUNGANDR,
+	SIDE_QUEST_CHIMERA,
+	NUM_SIDE_QUEST_SECRETS
+} zyk_side_quest_secrets_t;
 
 // zyk: Minimum Stamina before player starts to get tired
 #define RPG_MIN_STAMINA 1000.0
@@ -1037,6 +1047,9 @@ typedef struct clientPersistant_s {
 	zyk_quest_seller_step_t quest_seller_event_step;
 	int quest_seller_event_timer;
 	int quest_seller_map_timer;
+
+	// zyk: bitvalue. Has side quest missions completed
+	int side_quest_secrets_found;
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;
