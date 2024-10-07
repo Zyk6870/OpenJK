@@ -6650,7 +6650,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any non-magic source by 5 per cent. If the source is Magic Fist or a magic power, decreases damage by 20 per cent and absorb it to regen magic points. Reduces all magic powers mp cost and increases their strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any non-magic source by 5 per cent. If the source is Magic Fist or a magic power, decreases damage by 20 per cent and absorb it to regen magic points. Reduces active magic mp usage and all magic powers mp cost. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{

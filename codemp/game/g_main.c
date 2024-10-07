@@ -5835,6 +5835,7 @@ void magic_power_events(gentity_t *ent)
 			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
 			{
 				magic_bonus = 1;
+				magic_mp_usage = MAGIC_MP_USAGE / 2;
 			}
 
 			if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power <= 0)
@@ -5905,7 +5906,7 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_WATER_MAGIC))
 			{
-				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC] + magic_bonus));
+				int max_distance = MAGIC_MIN_RANGE + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC] + magic_bonus));
 				int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
 
 				if (ent->client->pers.magic_consumption_timer < level.time)
@@ -5937,7 +5938,7 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_EARTH_MAGIC))
 			{
-				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC] + magic_bonus));
+				int max_distance = MAGIC_MIN_RANGE + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC] + magic_bonus));
 				int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC];
 
 				if (ent->client->pers.magic_consumption_timer < level.time)
@@ -5973,7 +5974,7 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_FIRE_MAGIC))
 			{
-				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] + magic_bonus));
+				int max_distance = MAGIC_MIN_RANGE + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] + magic_bonus));
 				int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
 
 				if (ent->client->pers.magic_consumption_timer < level.time)
@@ -6036,7 +6037,7 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))
 			{
-				int max_distance = 200 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] + magic_bonus));
+				int max_distance = MAGIC_MIN_RANGE + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] + magic_bonus));
 				int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC];
 
 				if (ent->client->pers.magic_consumption_timer < level.time)
@@ -6093,7 +6094,7 @@ void magic_power_events(gentity_t *ent)
 					{
 						int duration = 1500;
 						int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC];
-						int radius = 240 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC] + magic_bonus)); // zyk: default distace for this effect is 540
+						int radius = MAGIC_MIN_RANGE + MAGIC_LIGHT_DARK_RANGE_BONUS + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC] + magic_bonus)); // zyk: default distace for this effect is 540
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "ships/proton_impact", 100, damage, radius, duration);
 
@@ -6131,7 +6132,7 @@ void magic_power_events(gentity_t *ent)
 					{
 						int duration = 1500;
 						int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
-						int radius = 240 + (50 * (ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC] + magic_bonus)); // zyk: default distace for this effect is 540
+						int radius = MAGIC_MIN_RANGE + MAGIC_LIGHT_DARK_RANGE_BONUS + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC] + magic_bonus)); // zyk: default distace for this effect is 540
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_light", "4", "misc/possession", 500, damage, radius, duration);
 
@@ -9873,7 +9874,23 @@ void G_RunFrame( int levelTime ) {
 
 						if (ent->client->pers.skill_levels[magic_skill_index] > 0)
 						{
-							int magic_cast_dist = 250 + (50 * ent->client->pers.skill_levels[magic_skill_index]);
+							int magic_cast_dist = 0;
+							int magic_bonus = 0;
+
+							// zyk: Magic Armor improves all magic powers
+							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
+							{
+								magic_bonus = 1;
+							}
+
+							if (magic_skill_index == SKILL_MAGIC_DARK_MAGIC || magic_skill_index == SKILL_MAGIC_LIGHT_MAGIC)
+							{
+								magic_cast_dist = MAGIC_MIN_RANGE + MAGIC_LIGHT_DARK_RANGE_BONUS + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[magic_skill_index] + magic_bonus));
+							}
+							else
+							{
+								magic_cast_dist = MAGIC_MIN_RANGE + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[magic_skill_index] + magic_bonus));
+							}
 
 							if (quest_npc_enemy_dist < Q_irand(0, magic_cast_dist) && !(ent->client->pers.quest_power_status & (1 << random_magic)))
 							{
