@@ -2746,7 +2746,6 @@ qboolean CheckItemCanBePickedUpByNPC( gentity_t *item, gentity_t *pickerupper )
 Touch_Item
 ===============
 */
-extern void save_account(gentity_t *ent, qboolean save_char_file);
 void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	int			respawn;
 	qboolean	predict;

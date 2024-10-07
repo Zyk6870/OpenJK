@@ -7412,62 +7412,52 @@ void zyk_update_inventory(gentity_t* ent)
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] != ent->client->pers.magic_crystals)
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = ent->client->pers.magic_crystals;
-		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
 	if (ent->client->pers.quest_tries > 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] != (ent->client->pers.quest_tries - MIN_QUEST_TRIES))
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = (ent->client->pers.quest_tries - MIN_QUEST_TRIES);
-		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] != ent->client->ps.ammo[AMMO_BLASTER])
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] = ent->client->ps.ammo[AMMO_BLASTER];
-		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] != ent->client->ps.ammo[AMMO_POWERCELL])
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] = ent->client->ps.ammo[AMMO_POWERCELL];
-		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS] != ent->client->ps.ammo[AMMO_METAL_BOLTS])
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS] = ent->client->ps.ammo[AMMO_METAL_BOLTS];
-		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_ROCKETS] != ent->client->ps.ammo[AMMO_ROCKETS])
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_ROCKETS] = ent->client->ps.ammo[AMMO_ROCKETS];
-		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_THERMALS] != ent->client->ps.ammo[AMMO_THERMAL])
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_THERMALS] = ent->client->ps.ammo[AMMO_THERMAL];
-		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_TRIPMINES] != ent->client->ps.ammo[AMMO_TRIPMINE])
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_TRIPMINES] = ent->client->ps.ammo[AMMO_TRIPMINE];
-		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS] != ent->client->ps.ammo[AMMO_DETPACK])
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS] = ent->client->ps.ammo[AMMO_DETPACK];
-		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
 	// zyk: Jetpack Fuel changed. Update inventory
 	if (ent->client->ps.jetpackFuel != ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL])
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL] = ent->client->ps.jetpackFuel;
-		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_STUN_BATON] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)))
@@ -7573,13 +7563,6 @@ void zyk_update_inventory(gentity_t* ent)
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_JETPACK] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)))
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_JETPACK);
-	}
-
-	if (ent->client->pers.rpg_inventory_modified == qtrue)
-	{ // zyk: save account with new updated inventory
-		save_account(ent, qtrue);
-
-		ent->client->pers.rpg_inventory_modified = qfalse;
 	}
 }
 
@@ -9143,17 +9126,14 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.last_shield = ent->client->ps.stats[STAT_ARMOR];
 					ent->client->pers.last_mp = ent->client->pers.magic_power;
 					ent->client->pers.last_stamina = ent->client->pers.current_stamina;
-
-					ent->client->pers.save_stats_changes = qtrue;
 				}
 
-				if (ent->client->pers.save_stats_changes == qtrue && ent->client->pers.save_stat_changes_timer < level.time)
+				if (ent->client->pers.save_stat_changes_timer < level.time)
 				{
 					save_account(ent, qtrue);
 
 					// zyk: timer to save account to prevent too much file IO
-					ent->client->pers.save_stats_changes = qfalse;
-					ent->client->pers.save_stat_changes_timer = level.time + 400;
+					ent->client->pers.save_stat_changes_timer = level.time + 500;
 				}
 
 				// zyk: Weapon Upgrades
@@ -9254,7 +9234,6 @@ void G_RunFrame( int levelTime ) {
 							}
 
 							ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
-							ent->client->pers.rpg_inventory_modified = qtrue;
 
 							ent->client->pers.special_crystal_timer = level.time + 500;
 						}
@@ -9483,8 +9462,6 @@ void G_RunFrame( int levelTime ) {
 							add_credits(ent, 1000);
 							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-							save_account(ent, qtrue);
-
 							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive this part of the Quest Log and 1000 credits. Use ^3/list questlog^7.\n\"", QUESTCHAR_SELLER));
 						}
 					}
@@ -9563,7 +9540,6 @@ void G_RunFrame( int levelTime ) {
 									ent->client->pers.quest_tries += quest_crystal_prize;
 									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] += quest_crystal_prize;
 									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += quest_crystal_prize;
-									ent->client->pers.rpg_inventory_modified = qtrue;
 
 									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
@@ -9735,8 +9711,6 @@ void G_RunFrame( int levelTime ) {
 									zyk_spawn_entity(tree_model);
 								}
 							}
-
-							save_account(ent, qtrue);
 						}
 						else
 						{ // zyk: if for some reason this entity is no longer the tree, reset the id

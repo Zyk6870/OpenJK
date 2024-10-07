@@ -3745,7 +3745,6 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 		ent->client->pers.flame_thrower_timer = level.time + 1500;
 
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] -= flame_thrower_fuel_usage;
-		ent->client->pers.rpg_inventory_modified = qtrue;
 	}
 
 	if ( tr.entityNum >= ENTITYNUM_WORLD )

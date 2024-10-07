@@ -2758,7 +2758,6 @@ extern int	BMS_END;
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
 extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 extern void zyk_clear_quest_items(gentity_t* effect_ent);
-extern void save_account(gentity_t* ent, qboolean save_char_file);
 extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 
@@ -2841,7 +2840,6 @@ void fx_runner_think( gentity_t *ent )
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
 						zyk_add_mp(player_ent, 1);
-						save_account(player_ent, qtrue);
 
 						zyk_clear_quest_effect(ent);
 
@@ -2854,7 +2852,6 @@ void fx_runner_think( gentity_t *ent )
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
 
 						zyk_add_mp(player_ent, 1);
-						save_account(player_ent, qtrue);
 
 						zyk_clear_quest_effect(ent);
 
@@ -2867,7 +2864,6 @@ void fx_runner_think( gentity_t *ent )
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
 
 						zyk_add_mp(player_ent, 1);
-						save_account(player_ent, qtrue);
 
 						zyk_clear_quest_effect(ent);
 
@@ -2885,8 +2881,6 @@ void fx_runner_think( gentity_t *ent )
 						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/cairn_beam_start.mp3"));
-
-						save_account(player_ent, qtrue);
 
 						zyk_clear_quest_effect(ent);
 
@@ -2929,8 +2923,6 @@ void fx_runner_think( gentity_t *ent )
 								}
 
 								G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/green_lightning1.mp3"));
-
-								save_account(player_ent, qtrue);
 
 								zyk_clear_quest_effect(ent);
 

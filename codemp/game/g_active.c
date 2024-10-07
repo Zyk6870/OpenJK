@@ -2106,7 +2106,6 @@ once for each server frame, which makes for smooth demo recording.
 ==============
 */
 extern void Boba_FlyStop( gentity_t *self );
-extern void save_account(gentity_t *ent, qboolean save_char_file);
 extern void TossClientWeapon(gentity_t *self, vec3_t direction, float speed);
 extern qboolean saberKnockOutOfHand(gentity_t *saberent, gentity_t *saberOwner, vec3_t velocity);
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);

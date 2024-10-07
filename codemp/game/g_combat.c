@@ -2663,8 +2663,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				{
 					zyk_start_main_quest_final_event(quest_player);
 				}
-
-				save_account(quest_player, qtrue);
 			}
 		}
 	}
@@ -6124,7 +6122,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_CHIMERA && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
 			{
 				targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
-				targ->client->pers.rpg_inventory_modified = qtrue;
 
 				attacker->health += 20;
 				attacker->client->pers.magic_power += 20;

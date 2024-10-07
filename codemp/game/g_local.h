@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.16"
+#define	GAMEVERSION	"New Zyk Mod v1.1.17"
 
 #define SECURITY_LOG "security.log"
 
@@ -897,7 +897,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: if health, shield or mp changes, save it into account after this time in miliseconds
 	int save_stat_changes_timer;
-	qboolean save_stats_changes;
 
 	// zyk: used to backup player force powers before some event that does not allow them. They will be restored after event ends
 	int zyk_saved_force_powers;
@@ -998,9 +997,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: all stuff the player can carry. Used to determine if player is carrying above the max weight
 	int rpg_inventory[MAX_RPG_INVENTORY_ITEMS];
-
-	// zyk: if qtrue, must save player account with the updated inventory
-	qboolean rpg_inventory_modified;
 
 	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
 	int quest_power_status;

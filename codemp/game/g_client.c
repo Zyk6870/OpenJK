@@ -2720,7 +2720,6 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 
 	// zyk: initialize timer when health, shield and mp changes
 	client->pers.save_stat_changes_timer = 0;
-	client->pers.save_stats_changes = qfalse;
 	client->pers.last_health = 100;
 	client->pers.last_shield = 0;
 	client->pers.last_mp = 0;

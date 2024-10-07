@@ -4726,11 +4726,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			}
 		}
 
-		if (init_all == qtrue)
-		{
-			ent->client->pers.rpg_inventory_modified = qfalse;
-		}
-
 		// zyk: loading initial inventory
 		ent->client->ps.stats[STAT_WEAPONS] = 0;
 		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_NONE);
@@ -5183,8 +5178,6 @@ void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_invent
 
 		}
 	}
-
-	ent->client->pers.rpg_inventory_modified = qtrue;
 }
 
 /*

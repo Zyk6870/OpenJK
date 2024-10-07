@@ -1618,7 +1618,6 @@ Try and use an entity in the world, directly ahead of us
 
 extern void Touch_Button(gentity_t *ent, gentity_t *other, trace_t *trace );
 extern qboolean gSiegeRoundBegun;
-extern void save_account(gentity_t *ent, qboolean save_char_file);
 extern void NPC_BSDefault( void );
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
 extern void zyk_show_quest_riddle(gentity_t* ent);
@@ -1885,7 +1884,6 @@ void TryUse( gentity_t *ent )
 		if (Q_stricmp(target->targetname, "zyk_magic_armor_model") == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
 		{
 			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
-			save_account(ent, qtrue);
 
 			trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You got the legendary ^5Magic Armor^7\n\"");
 
