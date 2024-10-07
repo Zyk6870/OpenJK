@@ -1541,26 +1541,41 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 	{
 		int stamina_recovery = 1 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA];
 
-		if (ent->client->pers.current_weight > ent->client->pers.max_weight && ent->client->pers.stamina_out_timer < level.time)
-		{ // zyk: carrying stuff over the max weight, consumes stamina based on how much above the max
-			int max_weight_stamina_decrease = ((ent->client->pers.current_weight - ent->client->pers.max_weight) / 20) + 1;
-
-			zyk_set_stamina(ent, max_weight_stamina_decrease, qfalse);
-		}
-
 		if (ent->client->pers.stamina_out_timer > level.time)
 		{ // zyk: passed out, recover some stamina
 			zyk_set_stamina(ent, 50 * stamina_recovery, qtrue);
 		}
-		else if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
-		{ // zyk: meditating, recover some stamina
-			zyk_set_stamina(ent, 7 * stamina_recovery, qtrue);
-		}
 		else
-		{ // zyk: decrease stamina if player is not idle. Also check if stamina run out
-			if (zyk_is_player_idle(ent, ucmd) == qfalse)
+		{
+			int stamina_usage = 0;
+			int i = 0;
+
+			if (ent->client->pers.current_weight > ent->client->pers.max_weight)
+			{ // zyk: carrying stuff over the max weight, consumes stamina based on how much above the max
+				stamina_usage += (((ent->client->pers.current_weight - ent->client->pers.max_weight) / 20) + 1);
+			}
+
+			// zyk: active magic uses stamina
+			for (i = 0; i < MAX_MAGIC_POWERS; i++)
 			{
-				zyk_set_stamina(ent, 1, qfalse);
+				if (ent->client->pers.quest_power_status & (1 << i))
+				{
+					stamina_usage += 1;
+				}
+			}
+
+			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+			{ // zyk: meditating, recover some stamina
+				zyk_set_stamina(ent, 7 * stamina_recovery, qtrue);
+			}
+			else if (zyk_is_player_idle(ent, ucmd) == qfalse)
+			{
+				stamina_usage += 1;
+			}
+
+			if (stamina_usage > 0)
+			{
+				zyk_set_stamina(ent, stamina_usage, qfalse);
 			}
 
 			zyk_stamina_out(ent);
