@@ -9136,47 +9136,50 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.save_stat_changes_timer = level.time + 500;
 				}
 
-				// zyk: Weapon Upgrades
-				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0 &&
-					ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 0.6))
+				// zyk: Weapon Upgrades. Do not change weaponTime if player has no stamina
+				if (ent->client->pers.stamina_out_timer < level.time)
 				{
-					ent->client->ps.weaponTime = weaponData[WP_DISRUPTOR].fireTime * 0.6;
-				}
+					if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0 &&
+						ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 0.6))
+					{
+						ent->client->ps.weaponTime = weaponData[WP_DISRUPTOR].fireTime * 0.6;
+					}
 
-				if (ent->client->ps.weapon == WP_DEMP2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0 &&
-					ent->client->ps.weaponTime > (weaponData[WP_DEMP2].fireTime * 0.7))
-				{
-					ent->client->ps.weaponTime = weaponData[WP_DEMP2].fireTime * 0.7;
-				}
+					if (ent->client->ps.weapon == WP_DEMP2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0 &&
+						ent->client->ps.weaponTime > (weaponData[WP_DEMP2].fireTime * 0.7))
+					{
+						ent->client->ps.weaponTime = weaponData[WP_DEMP2].fireTime * 0.7;
+					}
 
-				if (ent->client->ps.weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
-					ent->client->ps.weaponTime > (weaponData[WP_BRYAR_PISTOL].fireTime * 0.6))
-				{
-					ent->client->ps.weaponTime = weaponData[WP_BRYAR_PISTOL].fireTime * 0.6;
-				}
+					if (ent->client->ps.weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
+						ent->client->ps.weaponTime > (weaponData[WP_BRYAR_PISTOL].fireTime * 0.6))
+					{
+						ent->client->ps.weaponTime = weaponData[WP_BRYAR_PISTOL].fireTime * 0.6;
+					}
 
-				if (ent->client->ps.weapon == WP_BRYAR_OLD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0 &&
-					ent->client->ps.weaponTime > (weaponData[WP_BRYAR_OLD].fireTime * 0.6))
-				{
-					ent->client->ps.weaponTime = weaponData[WP_BRYAR_OLD].fireTime * 0.6;
-				}
+					if (ent->client->ps.weapon == WP_BRYAR_OLD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0 &&
+						ent->client->ps.weaponTime > (weaponData[WP_BRYAR_OLD].fireTime * 0.6))
+					{
+						ent->client->ps.weaponTime = weaponData[WP_BRYAR_OLD].fireTime * 0.6;
+					}
 
-				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0 && 
-					ent->client->ps.weaponTime > (weaponData[WP_REPEATER].altFireTime * 0.5))
-				{
-					ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime * 0.5;
-				}
+					if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0 &&
+						ent->client->ps.weaponTime > (weaponData[WP_REPEATER].altFireTime * 0.5))
+					{
+						ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime * 0.5;
+					}
 
-				// zyk: Melee Punch Speed skill
-				if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[SKILL_MELEE_SPEED] > 0 && 
-					ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * (1.0 - (0.2 * ent->client->pers.skill_levels[SKILL_MELEE_SPEED]))))
-				{
-					ent->client->ps.weaponTime = (weaponData[WP_MELEE].fireTime * (1.0 - (0.2 * ent->client->pers.skill_levels[SKILL_MELEE_SPEED])));
-				}
+					// zyk: Melee Punch Speed skill
+					if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[SKILL_MELEE_SPEED] > 0 &&
+						ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * (1.0 - (0.2 * ent->client->pers.skill_levels[SKILL_MELEE_SPEED]))))
+					{
+						ent->client->ps.weaponTime = (weaponData[WP_MELEE].fireTime * (1.0 - (0.2 * ent->client->pers.skill_levels[SKILL_MELEE_SPEED])));
+					}
 
-				if (ent->client->pers.flame_thrower_timer > level.time && ent->client->cloakDebReduce < level.time)
-				{ // zyk: fires the flame thrower
-					Player_FireFlameThrower(ent, qfalse);
+					if (ent->client->pers.flame_thrower_timer > level.time && ent->client->cloakDebReduce < level.time)
+					{ // zyk: fires the flame thrower
+						Player_FireFlameThrower(ent, qfalse);
+					}
 				}
 
 				if (ent->client->pers.special_crystal_timer < level.time)

@@ -1596,7 +1596,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 		}
 		else if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 		{ // zyk: meditating, recover some stamina
-			zyk_set_stamina(ent, 9 * stamina_recovery, qtrue);
+			zyk_set_stamina(ent, 7 * stamina_recovery, qtrue);
 		}
 		else
 		{ // zyk: decrease stamina if player is not idle. Also check if stamina run out
