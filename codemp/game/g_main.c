@@ -9547,6 +9547,11 @@ void G_RunFrame( int levelTime ) {
 								{
 									int quest_crystal_prize = ent->client->pers.quest_defeated_enemies / 10;
 
+									if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+									{ // zyk: Hard Mode
+										quest_crystal_prize *= 2;
+									}
+
 									ent->client->pers.quest_tries += quest_crystal_prize;
 									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] += quest_crystal_prize;
 									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += quest_crystal_prize;
