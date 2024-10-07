@@ -211,7 +211,7 @@ char* zyk_skill_description(int skill_index)
 		return "increases the max force power you have. Necessary to allow you to use force powers and force-based skills";
 
 	if (skill_index == SKILL_MAX_HEALTH)
-		return "Each level increases your max health";
+		return va("Each level increases your max health by %d", RPG_MAX_HEALTH_INCREASE);
 	if (skill_index == SKILL_HEALTH_STRENGTH)
 		return "Each level increases your health resistance to damage by 2 per cent";
 	if (skill_index == SKILL_MELEE)
@@ -219,7 +219,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MELEE_SPEED)
 		return "Each level increases how fast you can punch with Melee";
 	if (skill_index == SKILL_SABER)
-		return "Increases Saber damage based on this skill level";
+		return "Each level increases Saber damage by 5 per cent";
 	if (skill_index == SKILL_WEAPON_DAMAGE)
 		return "Multiplies damage per amount of this weapon in your inventory by 2.5 per cent. The max amount of extra weapons used for the bonus will be the current skill level";
 	if (skill_index == SKILL_MAX_WEIGHT)
@@ -227,14 +227,14 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_STAMINA)
 		return "Each level increases your max stamina. Stamina is used by any action the player does. Low stamina makes run speed slower. You can also lose some stamina when taking damage. If Stamina runs out you will pass out for some seconds. Each skill level decreases time you need to rest. Meditating recovers stamina faster, and the amount recovered increases with each skill level. Use bacta canister or big bacta items to regen stamina";
 	if (skill_index == SKILL_UNDERWATER)
-		return "Each level increases your air underwater";
+		return "Each level increases time you can be underwater before running out of air";
 	if (skill_index == SKILL_RUN_SPEED)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
 	if (skill_index == SKILL_MAGIC_FIST)
-		return "allows you to attack with magic bolts when using melee punches. Each level increases damage";
+		return va("allows you to attack with magic bolts when using melee punches. Damage per bolt is %d + ((%d / 2) * (this skill level))", zyk_magic_fist_damage.integer, zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAX_MP)
-		return "increases the max amount of Magic Points the player can have. This is used to cast magic powers";
+		return "increases the max amount of Magic Points the player can have. Each level increases it by 100. This is used to cast magic powers";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
 		return "creates an energy area that makes you and your allies recover health, stamina, force and shield. It also deals a little non-elemental damage to enemies";
 	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
@@ -6364,7 +6364,7 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 		}
 	}
 
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                      - ^5Count - ^2Weight - ^3Buy  - Sell\n\n%s\n\"", message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                      - ^5Count - ^2Weight - ^3Buy  - Sell\n\n%s\n^7Use ^3/buy <item number> ^7or ^3/sell <item number> ^7to buy or sell items\n\"", message));
 }
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
@@ -6875,7 +6875,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			}
 			else if (Q_stricmp( arg1, "commands" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill.\n^3/down [skill number]: ^7downgrades a skill.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
+				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill.\n^3/down [skill number]: ^7downgrades a skill.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/rpgchar: ^7shows your chars (characters) and the char commands.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
 			}
 			else
 			{ // zyk: the player can also list the specific info of a skill passing the skill number as argument
