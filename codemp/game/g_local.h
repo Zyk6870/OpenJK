@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.14"
+#define	GAMEVERSION	"New Zyk Mod v1.1.15"
 
 #define SECURITY_LOG "security.log"
 
@@ -790,6 +790,10 @@ typedef enum {
 
 // zyk: show score plum when amount of magic power changes by this amount
 #define MAGIC_CHANGE_AMOUNT 50
+
+// zyk: minimum damage of magic powers and mp usage
+#define MAGIC_MIN_DMG 1
+#define MAGIC_MP_USAGE 2
 
 // zyk: damage bonus of weapons
 #define RPG_WEAPON_DMG_BONUS 0.025

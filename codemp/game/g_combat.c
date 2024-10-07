@@ -6623,7 +6623,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							{
 								ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_FIRE);
 								ent->client->pers.magic_power_user_id[MAGIC_HIT_BY_FIRE] = magic_power_user->s.number;
-								ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] = 2 * magic_power_user->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC];
+								ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] = final_damage * 1.5;
 								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_FIRE] = level.time + 200;
 							}
 						}
