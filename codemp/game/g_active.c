@@ -883,50 +883,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			trap->SendServerCommand( ent->s.number, va("cp \"%s\"", zyk_screen_message.string) );
 		}
 	}
-
-	if (client->pers.send_event_timer > level.time && client->pers.send_event_interval < level.time)
-	{
-		/*
-		client->pers.send_event_interval = level.time + 100;
-
-		if (!(client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_POINTS_EVENT)))
-		{
-			int scaled_magic_power = ((float)client->pers.magic_power/zyk_max_magic_power(ent)) * 100.0;
-
-			G_AddEvent(ent, EV_USE_ITEM13, scaled_magic_power);
-
-			client->pers.player_statuses |= (1 << PLAYER_STATUS_MAGIC_POINTS_EVENT);
-		}
-		else if (!(client->pers.player_statuses & (1 << PLAYER_STATUS_RADAR_EVENT)))
-		{ // zyk: send this event after some seconds in map and if the player did not received this event yet
-			// must wait some seconds because after a map change, sometimes the event is not received by the client-side game right away
-			if (client->sess.amrpgmode == 2 && client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_RADAR] > 0)
-			{
-				G_AddEvent(ent, EV_ITEMUSEFAIL, 5);
-			}
-			else // zyk: removing rpg stuff from client-side game
-				G_AddEvent(ent, EV_ITEMUSEFAIL, 6);
-
-			client->pers.player_statuses |= (1 << PLAYER_STATUS_RADAR_EVENT);
-		}
-		else if (!(client->pers.player_statuses & (1 << PLAYER_STATUS_JETPACK_FLAME_EVENT)))
-		{
-			// zyk: event to set the blue jetpack flame
-			if (client->sess.amrpgmode == 2 && client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
-				G_AddEvent(ent, EV_ITEMUSEFAIL, 7);
-			else
-				G_AddEvent(ent, EV_ITEMUSEFAIL, 8);
-
-			client->pers.player_statuses |= (1 << PLAYER_STATUS_JETPACK_FLAME_EVENT);
-		}
-		else
-		{
-			client->pers.player_statuses &= ~(1 << PLAYER_STATUS_RADAR_EVENT);
-			client->pers.player_statuses &= ~(1 << PLAYER_STATUS_JETPACK_FLAME_EVENT);
-			client->pers.player_statuses &= ~(1 << PLAYER_STATUS_MAGIC_POINTS_EVENT);
-		}
-		*/
-	}
 }
 
 /*
@@ -1405,6 +1361,8 @@ void zyk_stamina_out(gentity_t* ent)
 
 		// zyk: also lose some health
 		G_Damage(ent, ent, ent, NULL, NULL, 50, 0, MOD_UNKNOWN);
+
+		ent->client->pers.is_getting_up = qfalse;
 
 		trap->SendServerCommand(ent->s.number, va("chat \"^3%s: ^7I am tired...\"", ent->client->pers.netname));
 	}

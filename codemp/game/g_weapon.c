@@ -3912,8 +3912,6 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			ent->client->pers.magic_power -= zyk_magic_fist_mp_cost.integer;
 
 			G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/demp2/fire.mp3"));
-
-			send_rpg_events(2000);
 		}
 
 		VectorCopy(ent->client->ps.origin, muzzlePunch);

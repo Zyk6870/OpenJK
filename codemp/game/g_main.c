@@ -9182,6 +9182,12 @@ void G_RunFrame( int levelTime ) {
 						Player_FireFlameThrower(ent, qfalse);
 					}
 				}
+				else if (ent->client->pers.is_getting_up == qfalse && (ent->client->pers.stamina_out_timer - level.time) < 1200)
+				{ // zyk: setting the getup anim
+					G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_GETUP1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+
+					ent->client->pers.is_getting_up = qtrue;
+				}
 
 				if (ent->client->pers.special_crystal_timer < level.time)
 				{

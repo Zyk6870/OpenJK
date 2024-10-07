@@ -1763,7 +1763,6 @@ finish:
 		newent->client->pers.player_statuses = 0;
 		newent->client->pers.race_position = 0;
 		newent->client->pers.stun_baton_less_speed_timer = 0;
-		newent->client->pers.send_event_timer = 0;
 
 		newent->client->sess.ally1 = 0;
 		newent->client->sess.ally2 = 0;

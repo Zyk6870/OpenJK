@@ -3474,12 +3474,10 @@ void zyk_regen_unit_think(gentity_t *ent)
 				if ((this_ent->client->pers.magic_power + ent->count) < max_magic_power)
 				{
 					this_ent->client->pers.magic_power += ent->count;
-					send_rpg_events(2000);
 				}
 				else if (this_ent->client->pers.magic_power < max_magic_power)
 				{
 					this_ent->client->pers.magic_power = max_magic_power;
-					send_rpg_events(2000);
 				}
 			}
 

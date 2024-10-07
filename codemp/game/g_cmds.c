@@ -4492,28 +4492,6 @@ void Cmd_AddBot_f( gentity_t *ent ) {
 
 // zyk: new functions
 
-// zyk: send the rpg events to the client-side game to all players so players who connect later than one already in the map
-//      will receive the events of the one in the map
-void send_rpg_events(int send_event_timer)
-{
-	int i = 0;
-	gentity_t *player_ent = NULL;
-
-	for (i = 0; i < level.maxclients; i++)
-	{
-		player_ent = &g_entities[i];
-
-		if (player_ent && player_ent->client && player_ent->client->pers.connected == CON_CONNECTED && 
-			player_ent->client->sess.sessionTeam != TEAM_SPECTATOR)
-		{
-			player_ent->client->pers.send_event_timer = level.time + send_event_timer;
-			player_ent->client->pers.send_event_interval = level.time + 100;
-			player_ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_RADAR_EVENT);
-			player_ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_JETPACK_FLAME_EVENT);
-		}
-	}
-}
-
 // zyk: sets the Max HP a player can have in RPG Mode
 void set_max_health(gentity_t *ent)
 {
@@ -5020,6 +4998,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.stamina_timer = 0;
 			ent->client->pers.stamina_out_timer = 0;
+			ent->client->pers.is_getting_up = qtrue;
 
 			ent->client->pers.magic_consumption_timer = 0;
 
@@ -5085,9 +5064,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		}
 
 		ent->client->pers.last_magic_power_shown = ent->client->pers.magic_power;
-
-		// zyk: update the rpg stuff info at the client-side game
-		send_rpg_events(10000);
 	}
 }
 
@@ -5584,9 +5560,6 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 
 	if (level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE)
 		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
-
-	// zyk: update the rpg stuff info at the client-side game
-	send_rpg_events(10000);
 			
 	trap->SendServerCommand( ent-g_entities, "print \"Account logout finished succesfully.\n\"" );
 }
@@ -6908,8 +6881,6 @@ void zyk_add_mp(gentity_t* ent, int mp_amount)
 	{
 		ent->client->pers.magic_power = zyk_max_magic_power(ent);
 	}
-
-	send_rpg_events(2000);
 }
 
 void zyk_add_health(gentity_t* ent, int heal_amount)
@@ -7275,9 +7246,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK)
 		{
 			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_UPGRADE_JETPACK);
-
-			// zyk: update the rpg stuff info at the client-side game
-			send_rpg_events(10000);
 		}
 		else if (item_index == RPG_INVENTORY_UPGRADE_THERMAL_VISION)
 		{
@@ -10897,7 +10865,6 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				if (ent->s.number < MAX_CLIENTS)
 				{
 					display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
-					send_rpg_events(2000);
 				}
 			}
 			else

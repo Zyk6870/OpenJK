@@ -2709,10 +2709,6 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 		level.melee_mode_quantity--;
 	}
 
-	// zyk: sending events to client game
-	client->pers.send_event_timer = level.time + 3000;
-	client->pers.send_event_interval = level.time + 100;
-
 	client->pers.stun_baton_less_speed_timer = 0;
 
 	VectorSet(client->pers.teleport_point,0,0,0);

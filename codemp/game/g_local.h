@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.19"
+#define	GAMEVERSION	"New Zyk Mod v1.1.20"
 
 #define SECURITY_LOG "security.log"
 
@@ -537,14 +537,11 @@ typedef enum {
 typedef enum {
 	PLAYER_STATUS_SILENCED,
 	PLAYER_STATUS_EMOTE,
-	PLAYER_STATUS_RADAR_EVENT,
-	PLAYER_STATUS_JETPACK_FLAME_EVENT,
 	PLAYER_STATUS_SCALED,
 	PLAYER_STATUS_CHAT_PROTECTION,
 	PLAYER_STATUS_PARALYZED,
 	PLAYER_STATUS_ADM_GIVE_FORCE,
 	PLAYER_STATUS_ADM_GIVE_GUNS,
-	PLAYER_STATUS_MAGIC_POINTS_EVENT,
 	PLAYER_STATUS_NPC_ORDER_GUARD,
 	PLAYER_STATUS_NPC_ORDER_COVER,
 	PLAYER_STATUS_SELF_KILL,
@@ -926,10 +923,6 @@ typedef struct clientPersistant_s {
 	// zyk: chat protection cooldown timer. After this time, player will be protected against damage
 	int chat_protection_timer;
 
-	// zyk: timer to send events to client game
-	int send_event_timer;
-	int send_event_interval;
-
 	// zyk: point marked in map so player can teleport to this point
 	vec3_t teleport_point;
 	vec3_t teleport_angles;
@@ -965,6 +958,7 @@ typedef struct clientPersistant_s {
 	int current_stamina;
 	int max_stamina;
 	int stamina_out_timer;
+	qboolean is_getting_up;
 
 	// zyk: in time, player Stamina changes
 	int stamina_timer;
@@ -1747,7 +1741,6 @@ typedef struct level_locals_s {
 // zyk: functions used in a lot of places
 qboolean zyk_is_ally(gentity_t *ent, gentity_t *other);
 int zyk_number_of_allies(gentity_t *ent, qboolean in_rpg_mode);
-void send_rpg_events(int send_event_timer);
 int zyk_get_remap_count();
 qboolean zyk_can_deflect_shots(gentity_t *ent);
 
