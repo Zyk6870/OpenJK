@@ -2146,6 +2146,7 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 {
 	int	damage	= zyk_rocket_damage.integer;
 	int splash_damage = zyk_rocket_splash_damage.integer;
+	int splash_radius = ROCKET_SPLASH_RADIUS;
 	int	vel = zyk_rocket_velocity.integer;
 	int dif = 0;
 	float rTime;
@@ -2203,6 +2204,11 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 	{
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
 		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
+
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0)
+		{
+			splash_radius = ROCKET_SPLASH_RADIUS + (ROCKET_SPLASH_RADIUS / 2);
+		}
 	}
 
 	missile->damage = damage;
@@ -2227,7 +2233,7 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 	missile->clipmask = MASK_SHOT;
 
 	missile->splashDamage = splash_damage;
-	missile->splashRadius = ROCKET_SPLASH_RADIUS;
+	missile->splashRadius = splash_radius;
 
 	// we don't want it to ever bounce
 	missile->bounceCount = 0;
@@ -3163,6 +3169,7 @@ void DetPackDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
 void drop_charge (gentity_t *self, vec3_t start, vec3_t dir)
 {
 	gentity_t	*bolt;
+	int splash_radius = 200;
 
 	VectorNormalize (dir);
 
@@ -3179,7 +3186,14 @@ void drop_charge (gentity_t *self, vec3_t start, vec3_t dir)
 	bolt->r.ownerNum = self->s.number;
 	bolt->damage = zyk_detpack_damage.integer; // zyk: default 100
 	bolt->splashDamage = zyk_detpack_splash_damage.integer; // zyk: default 200
-	bolt->splashRadius = 200;
+
+	if (self && self->client && self->client->sess.amrpgmode == 2 && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DETPACKS] > 0)
+	{
+		splash_radius *= 2;
+	}
+
+	bolt->splashRadius = splash_radius;
+
 	bolt->methodOfDeath = MOD_DET_PACK_SPLASH;
 	bolt->splashMethodOfDeath = MOD_DET_PACK_SPLASH;
 	bolt->clipmask = MASK_SHOT;
@@ -3652,6 +3666,7 @@ static void WP_FireConcussion( gentity_t *ent )
 	vec3_t	start;
 	int		damage	= zyk_concussion_damage.integer;
 	int		splash_damage = zyk_concussion_splash_damage.integer;
+	int		splash_radius = CONC_SPLASH_RADIUS;
 	float	vel = zyk_concussion_velocity.integer;
 	gentity_t *missile;
 
@@ -3684,6 +3699,11 @@ static void WP_FireConcussion( gentity_t *ent )
 	{
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_CONCUSSION);
 		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_CONCUSSION);
+
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0)
+		{
+			splash_radius = CONC_SPLASH_RADIUS + (CONC_SPLASH_RADIUS / 2);
+		}
 	}
 
 	missile->damage = damage;
@@ -3694,7 +3714,7 @@ static void WP_FireConcussion( gentity_t *ent )
 
 	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
 	missile->splashDamage = splash_damage;
-	missile->splashRadius = CONC_SPLASH_RADIUS;
+	missile->splashRadius = splash_radius;
 
 	// we don't want it to ever bounce
 	missile->bounceCount = 0;

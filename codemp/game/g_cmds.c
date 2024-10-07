@@ -6583,15 +6583,15 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Concussion rifle can break saber-only damage objects and can move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Concussion rifle has better splash radius, can break saber-only damage objects and can move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes rockets able to damage saber-only damage objects and move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DETPACKS)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes detpacks able to damage saber-only damage objects and move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes detpacks have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK)
 	{
