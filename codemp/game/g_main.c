@@ -424,15 +424,19 @@ gentity_t* zyk_find_entity_for_quest()
 	{
 		gentity_t* current_entity = &g_entities[i];
 
-		if (current_entity && Q_stricmp(current_entity->classname, "freed") != 0 && Q_stricmp(current_entity->classname, "lightsaber") != 0 && 
-			Q_stricmp(current_entity->classname, "light") != 0 && 
-			Q_stricmp(current_entity->classname, "noclass") != 0 && 
-			Q_stricmp(current_entity->classname, "NPC_goal") != 0 && 
-			!strstr(current_entity->classname, "fx_") != 0 && 
-			!strstr(current_entity->classname, "func_") && 
-			!strstr(current_entity->classname, "misc_") && 
-			!strstr(current_entity->classname, "trigger_") && 
-			!strstr(current_entity->classname, "target_") && 
+		if (current_entity &&
+			Q_stricmp(current_entity->classname, "freed") != 0 &&
+			Q_stricmp(current_entity->classname, "lightsaber") != 0 &&
+			Q_stricmp(current_entity->classname, "tempEntity") != 0 &&
+			Q_stricmp(current_entity->classname, "light") != 0 &&
+			Q_stricmp(current_entity->classname, "noclass") != 0 &&
+			Q_stricmp(current_entity->classname, "NPC_goal") != 0 &&
+			current_entity->s.eType != ET_MISSILE &&
+			!strstr(current_entity->classname, "fx_") != 0 &&
+			!strstr(current_entity->classname, "func_") &&
+			!strstr(current_entity->classname, "misc_") &&
+			!strstr(current_entity->classname, "trigger_") &&
+			!strstr(current_entity->classname, "target_") &&
 			!strstr(current_entity->classname, "zyk_") != 0)
 		{ // zyk: a valid entity for quest
 			total_valid_entities++;

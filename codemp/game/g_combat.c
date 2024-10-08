@@ -6469,19 +6469,19 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 				if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 && 
 					Q_stricmp(attacker->targetname, "zyk_magic_healing_area") == 0)
 				{ // zyk: Healing Area. Heals the user and his allies
-					gentity_t *quest_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
+					gentity_t * magic_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
 
 					// zyk: if the power user and the target are allies (player or npc), or the target is the quest power user himself, heal him
-					if (quest_power_user && quest_power_user->client && ent && ent->client && ent->health > 0 && 
-						(level.special_power_effects[attacker->s.number] == ent->s.number || OnSameTeam(quest_power_user, ent) == qtrue || 
-						npcs_on_same_team(quest_power_user, ent) == qtrue || zyk_is_ally(quest_power_user,ent) == qtrue))
+					if (magic_power_user && magic_power_user->client && magic_power_user->health > 0 && ent && ent->client && ent->health > 0 &&
+						(level.special_power_effects[attacker->s.number] == ent->s.number || OnSameTeam(magic_power_user, ent) == qtrue ||
+						npcs_on_same_team(magic_power_user, ent) == qtrue || zyk_is_ally(magic_power_user,ent) == qtrue))
 					{
 						int max_health = ent->client->ps.stats[STAT_MAX_HEALTH];
 						int max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
-						int heal_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
-						int shield_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
-						int force_amount = 1 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
-						int stamina_amount = 2 * quest_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
+						int heal_amount = 1 * magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
+						int shield_amount = 1 * magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
+						int force_amount = 1 * magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
+						int stamina_amount = 2 * magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 						int magic_armor_bonus = 0;
 
 						if (ent->client->sess.amrpgmode == 2)
@@ -6490,7 +6490,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						}
 
 						// zyk: Magic Armor
-						if (quest_power_user->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
+						if (magic_power_user->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
 						{
 							magic_armor_bonus = 1;
 						}
@@ -6532,6 +6532,12 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					gentity_t *magic_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
 					zyk_magic_t this_magic_power = zyk_get_magic_for_effect(attacker->targetname);
 					qboolean is_ally = qfalse;
+
+					// zyk: magic user must be alive
+					if (!(magic_power_user && magic_power_user->client && magic_power_user->health > 0))
+					{
+						continue;
+					}
 
 					// zyk: if the power user and the target are allies (player or npc), then do not hit
 					if (magic_power_user && magic_power_user->client && ent && ent->client &&
