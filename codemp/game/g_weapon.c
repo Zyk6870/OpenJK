@@ -3898,7 +3898,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 		{ // zyk: Magic fist attacks. Shoots an electric bolt
 			gentity_t	*missile;
 			vec3_t origin, dir, zyk_forward;
-			int fist_damage = zyk_magic_fist_damage.integer + (ent->client->pers.skill_levels[SKILL_MAGIC_FIST] * (zyk_magic_fist_damage.integer / 2));
+			int fist_damage = zyk_magic_fist_damage.integer + (ent->client->pers.skill_levels[SKILL_MAGIC_FIST] * (zyk_magic_fist_damage.integer * 0.30));
 
 			if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 				VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 12);
