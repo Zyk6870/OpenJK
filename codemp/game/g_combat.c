@@ -6635,21 +6635,21 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							if (ent->client && ent->health > 0)
 							{ // zyk: blows the target away
 								int chance_for_knockdown = final_damage * 2;
-								float air_strength;
+								float air_strength = 1.0 + (final_damage / 2);
 
-								AngleVectors(magic_power_user->client->ps.viewangles, air_magic_forward, NULL, NULL);
+								VectorSubtract(ent->client->ps.origin, magic_power_user->client->ps.origin, air_magic_forward);
 								VectorNormalize(air_magic_forward);
 
 								if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-									air_strength = 75.0;
+								{
+									air_strength *= 90.0;
+								}
 								else
-									air_strength = 15.0;
-
-								// zyk: elemental bonus
-								air_strength *= final_damage;
+								{
+									air_strength *= 18.0;
+								}
 
 								VectorScale(air_magic_forward, air_strength, air_magic_dir);
-
 								VectorAdd(ent->client->ps.velocity, air_magic_dir, ent->client->ps.velocity);
 
 								zyk_remove_emotes(ent);
@@ -6672,16 +6672,10 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						{
 							if (ent->client && ent->health > 0)
 							{
+								int chance_for_draining = final_damage * 3;
 								vec3_t dark_magic_dir, dark_magic_forward;
 								float target_distance = Distance(magic_power_user->client->pers.black_hole_origin, ent->client->ps.origin);
-								float black_hole_suck_strength = 0.0;
-								float black_hole_max_strength = 300.0 + (15.0 * final_damage);
-
-								// zyk: increases strength with which target is sucked into the black hole the closer he is to it
-								if (target_distance > 0.0)
-								{
-									black_hole_suck_strength = ((magic_power_user->client->pers.black_hole_distance * 0.7) / target_distance);
-								}
+								float black_hole_suck_strength = 1.0 + (final_damage / 2);
 
 								VectorSubtract(magic_power_user->client->pers.black_hole_origin, ent->client->ps.origin, dark_magic_forward);
 								VectorNormalize(dark_magic_forward);
@@ -6696,27 +6690,23 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 									black_hole_suck_strength *= 18.0;
 								}
 
-								// zyk: elemental bonus
-								black_hole_suck_strength *= final_damage;
-
-								// zyk: add a limit to the strength based on the magic skill level to prevent the target from being blown out of the black hole
-								if (black_hole_suck_strength > black_hole_max_strength)
-								{
-									black_hole_suck_strength = black_hole_max_strength;
-								}
-
-								if (target_distance < 64.0)
+								if (target_distance < 48.0)
 								{ // zyk: very close to black hole center
 									VectorScale(ent->client->ps.velocity, 0.25, ent->client->ps.velocity);
 								}
 								else
 								{
 									VectorScale(dark_magic_forward, black_hole_suck_strength, dark_magic_dir);
-
 									VectorAdd(ent->client->ps.velocity, dark_magic_dir, ent->client->ps.velocity);
 								}
 
 								zyk_remove_emotes(ent);
+
+								// zyk: confuses the target
+								if (Q_irand(0, 99) < chance_for_draining)
+								{
+									zyk_add_health(magic_power_user, 1);
+								}
 							}
 						}
 						else if (this_magic_power == MAGIC_LIGHT_MAGIC)

@@ -5830,13 +5830,12 @@ void magic_power_events(gentity_t *ent)
 		if (ent->health > 0)
 		{
 			int magic_bonus = 0;
-			int magic_mp_usage = MAGIC_MP_USAGE;
+			int magic_mp_usage = 1;
 
 			// zyk: Magic Armor improves all magic powers
 			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
 			{
 				magic_bonus = 1;
-				magic_mp_usage = MAGIC_MP_USAGE / 2;
 			}
 
 			if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power <= 0)
@@ -5850,6 +5849,8 @@ void magic_power_events(gentity_t *ent)
 			{
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
+					magic_mp_usage += (ent->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA] / 2);
+
 					if (ent->client->pers.magic_power >= magic_mp_usage)
 					{
 						ent->client->pers.magic_power -= magic_mp_usage;
@@ -5882,6 +5883,8 @@ void magic_power_events(gentity_t *ent)
 			{
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
+					magic_mp_usage += (ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME] / 2);
+
 					if (ent->client->pers.magic_power >= magic_mp_usage)
 					{
 						ent->client->pers.magic_power -= magic_mp_usage;
@@ -5912,6 +5915,8 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
+					magic_mp_usage += (ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC] / 2);
+
 					if (ent->client->pers.magic_power >= magic_mp_usage)
 					{
 						ent->client->pers.magic_power -= magic_mp_usage;
@@ -5944,6 +5949,8 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
+					magic_mp_usage += (ent->client->pers.skill_levels[SKILL_MAGIC_EARTH_MAGIC] / 2);
+
 					if (ent->client->pers.magic_power >= magic_mp_usage)
 					{
 						ent->client->pers.magic_power -= magic_mp_usage;
@@ -5980,6 +5987,8 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
+					magic_mp_usage += (ent->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] / 2);
+
 					if (ent->client->pers.magic_power >= magic_mp_usage)
 					{
 						ent->client->pers.magic_power -= magic_mp_usage;
@@ -6043,6 +6052,8 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
+					magic_mp_usage += (ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] / 2);
+
 					if (ent->client->pers.magic_power >= magic_mp_usage)
 					{
 						ent->client->pers.magic_power -= magic_mp_usage;
@@ -6076,6 +6087,8 @@ void magic_power_events(gentity_t *ent)
 			{
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
+					magic_mp_usage += (ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC] / 2);
+
 					if (ent->client->pers.magic_power >= magic_mp_usage)
 					{
 						ent->client->pers.magic_power -= magic_mp_usage;
@@ -6099,7 +6112,7 @@ void magic_power_events(gentity_t *ent)
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "ships/proton_impact", 100, damage, radius, duration);
 
-						zyk_spawn_black_hole_model(ent, duration, (20 + (15 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC])));
+						zyk_spawn_black_hole_model(ent, duration, (15 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]));
 
 						ent->client->pers.black_hole_distance = radius;
 
@@ -6114,6 +6127,8 @@ void magic_power_events(gentity_t *ent)
 			{
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
+					magic_mp_usage += (ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC] / 2);
+
 					if (ent->client->pers.magic_power >= magic_mp_usage)
 					{
 						ent->client->pers.magic_power -= magic_mp_usage;
@@ -7171,11 +7186,11 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] = 18;
 	rpg_inventory_weights[RPG_INVENTORY_WP_DISRUPTOR] = 18;
 	rpg_inventory_weights[RPG_INVENTORY_WP_BOWCASTER] = 22;
-	rpg_inventory_weights[RPG_INVENTORY_WP_REPEATER] = 24;
+	rpg_inventory_weights[RPG_INVENTORY_WP_REPEATER] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_WP_DEMP2] = 23;
 	rpg_inventory_weights[RPG_INVENTORY_WP_FLECHETTE] = 27;
-	rpg_inventory_weights[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = 35;
-	rpg_inventory_weights[RPG_INVENTORY_WP_CONCUSSION] = 40;
+	rpg_inventory_weights[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = 30;
+	rpg_inventory_weights[RPG_INVENTORY_WP_CONCUSSION] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_WP_BRYAR_PISTOL] = 15;
 
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_BLASTER_PACK] = 1;
@@ -7202,10 +7217,10 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 8;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 100;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 200;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 200;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 200;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 150;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 225;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 225;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 225;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 80;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 10;
@@ -7229,7 +7244,7 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 20;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 200;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 225;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 0;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 0;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 0;
@@ -9323,9 +9338,10 @@ void G_RunFrame( int levelTime ) {
 						(ent->client->pers.quest_masters_defeated * 2) +
 						(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
 
-					int player_power_level = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 2;
+					int player_power_level = (ent->client->pers.magic_crystals + 
+						zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60)) / 4;
 
-					int skill_crystal_chance = 60 - player_power_level + main_quest_progress;
+					int skill_crystal_chance = 50 - player_power_level;
 
 					int green_crystal_chance = 21 +
 						(ent->client->pers.magic_crystals / 2) - 

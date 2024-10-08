@@ -1552,7 +1552,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 
 			if (ent->client->pers.current_weight > ent->client->pers.max_weight)
 			{ // zyk: carrying stuff over the max weight, consumes stamina based on how much above the max
-				stamina_usage += (((ent->client->pers.current_weight - ent->client->pers.max_weight) / 20) + 1);
+				stamina_usage += (((ent->client->pers.current_weight - ent->client->pers.max_weight) / 10) + 1);
 			}
 
 			// zyk: active magic uses stamina
@@ -1566,11 +1566,18 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 
 			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 			{ // zyk: meditating, recover some stamina
-				zyk_set_stamina(ent, 7 * stamina_recovery, qtrue);
+				zyk_set_stamina(ent, 9 * stamina_recovery, qtrue);
 			}
 			else if (zyk_is_player_idle(ent, ucmd) == qfalse)
 			{
-				stamina_usage += 1;
+				if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
+				{
+					stamina_usage += 1;
+				}
+				else
+				{
+					stamina_usage += 2;
+				}
 			}
 
 			if (stamina_usage > 0)

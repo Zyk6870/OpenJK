@@ -248,7 +248,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_AIR_MAGIC)
 		return "blows enemies away with a strong wind, and does Air elemental damage to them. Increases your run speed. Has a chance of knocking enemies down. Increases your Air element affinity. More powerful against enemies with Earth affinity. Absorbs some Air magic effects";
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
-		return "creates a black hole, sucking enemies nearby and doing Dark elemental damage to them. Increases your Dark element affinity. More powerful against enemies with Light affinity. Absorbs some Dark magic effects";
+		return "creates a black hole, sucking enemies nearby and doing Dark elemental damage to them. Has a chance of draining health from enemies. Increases your Dark element affinity. More powerful against enemies with Light affinity. Absorbs some Dark magic effects";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
 		return "creates a lightning dome that damages enemies nearby. Creates a shining light that does Light elemental damage to enemies. While near the light, enemies will have their MP drained to restore your MP and have a chance to get confused/stunned. Increases your Light element affinity. More powerful against enemies with Dark affinity. Absorbs some Light magic effects";
 
@@ -4526,7 +4526,7 @@ void set_max_weight(gentity_t* ent)
 // zyk: set the Max Stamina of this player
 void set_max_stamina(gentity_t* ent)
 {
-	ent->client->pers.max_stamina = RPG_DEFAULT_STAMINA + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 3000);
+	ent->client->pers.max_stamina = RPG_DEFAULT_STAMINA + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * RPG_DEFAULT_STAMINA);
 }
 
 // zyk: increases or decreases RPG player stamina
@@ -5022,11 +5022,11 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 				ent->client->pers.last_health <= 0)
 			{ // zyk: reload player stats if he died and he did not use /kill command
 				// zyk: loading initial health
-				ent->health = 100;
+				ent->health = ent->client->pers.max_rpg_health / 2;
 				ent->client->ps.stats[STAT_HEALTH] = ent->health;
 
-				// zyk: loading initial Stamina as the last value plus the minimum Stamina
-				zyk_set_stamina(ent, RPG_MIN_STAMINA, qtrue);
+				// zyk: loading initial Stamina as the last value plus the default Stamina
+				zyk_set_stamina(ent, RPG_DEFAULT_STAMINA, qtrue);
 			}
 			else
 			{ // zyk: reload the last stats
@@ -6194,13 +6194,13 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 0;
-	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_MISC_GREEN_CRYSTAL][0] = 0;
-	seller_items_cost[RPG_INVENTORY_MISC_GREEN_CRYSTAL][1] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_GREEN_CRYSTAL][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 0;
-	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 3000;
@@ -6623,7 +6623,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any non-magic source by 5 per cent. If the source is Magic Fist or a magic power, decreases damage by 20 per cent and absorb it to regen magic points. Reduces active magic mp usage and all magic powers mp cost. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any non-magic source by 5 per cent. If the source is Magic Fist or a magic power, decreases damage by 20 per cent and absorb it to regen magic points. Reduces all magic powers mp cost. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
@@ -6805,9 +6805,9 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						{
 							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor. ^2Magic: Healing Area, Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger, increase the chance for the green crystal, red crystal, Energy Modulator, Magic Armor and me to appear. Blue crystals appear less often as you get more of them. Your quest progress increase blue crystal spawn rate\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
 						}
-						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 4)
+						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures, the Chimera, the Jormungandr and the Angel of Death. Mage Masters can summon them. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals to restore their health and mp. Each one you defeat will not appear for you again.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, reduces Stamina usage a little, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures, the Chimera, the Jormungandr and the Angel of Death. Mage Masters can summon them. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals to restore their health and mp. Each one you defeat will not appear for you again.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 					}
 					else
@@ -10812,7 +10812,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			// zyk: Magic Armor reduces mp cost
 			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
 			{
-				magic_cost *= 0.75;
+				magic_cost /= 2;
 			}
 
 			if (ent->client->pers.magic_power >= magic_cost)
