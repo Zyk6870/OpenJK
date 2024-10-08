@@ -4543,6 +4543,16 @@ void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
 	}
 	else if (ent->client->pers.stamina_out_timer <= level.time)
 	{
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
+		{
+			amount /= 2;
+
+			if (amount < 1)
+			{
+				amount = 1;
+			}
+		}
+
 		ent->client->pers.current_stamina -= amount;
 	}
 }
@@ -6203,13 +6213,13 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 3000;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][0] = 0;
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][1] = 3000;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][0] = 0;
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][1] = 3000;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 20;
 	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 10;
@@ -6535,7 +6545,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 20 per cent weapon/melee damage to your health (only 5 per cent from saber) and deflects some weapon shots\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 20 per cent weapon/melee damage to your health (only 5 per cent from saber) and has a chance to deflect some weapon shots\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_SABER_ARMOR)
 	{
@@ -6807,7 +6817,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, reduces Stamina usage a little, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures, the Chimera, the Jormungandr and the Angel of Death. Mage Masters can summon them. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals to restore their health and mp. Each one you defeat will not appear for you again.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures, the Chimera, the Jormungandr and the Angel of Death. Mage Masters can summon them. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals to restore their health and mp. Each one you defeat will not appear for you again.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 					}
 					else
@@ -10713,15 +10723,8 @@ void Cmd_Saber_f( gentity_t *ent ) {
 // zyk: tests if some weapon shots will be deflected when hitting this player
 qboolean zyk_can_deflect_shots(gentity_t *ent)
 {
-	if (ent->client && ent->client->sess.amrpgmode == 2)
-	{
-		// zyk: Deflective Armor
-		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
-		{
-			return qtrue;
-		}
-	}
-	else if (ent->client && ent->NPC && ent->client->pers.quest_npc == QUEST_NPC_HEAVY_ARMORED_WARRIOR && Q_irand(0, 3) == 0)
+	// zyk: Deflective Armor
+	if (ent && ent->client && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0 && Q_irand(0, 1) == 0)
 	{
 		return qtrue;
 	}

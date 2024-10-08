@@ -2183,6 +2183,7 @@ extern void zyk_stop_all_magic_powers(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 extern void zyk_start_main_quest_final_event(gentity_t* ent);
 extern void zyk_set_starting_quest_progress(gentity_t* ent);
+extern void zyk_spawn_crystal(float x, float y, float z, int duration, zyk_quest_item_t crystal_type);
 
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
 	gentity_t* ent;
@@ -2211,6 +2212,10 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_POISONED);
+
+	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_EARTH);
+	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_FIRE);
+	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_AIR);
 
 	if (self->client->pers.race_position > 0) // zyk: if a player dies during a race, he loses the race
 	{
@@ -2593,6 +2598,53 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		self->client->ps.otherKillerTime > level.time)
 	{
 		attacker = &g_entities[self->client->ps.otherKiller];
+	}
+
+	// zyk: enemy npcs have chance to drop crystal
+	if (self->NPC && self->client->NPC_class != CLASS_VEHICLE && self->client->playerTeam != NPCTEAM_PLAYER)
+	{
+		int crystal_random_chance = Q_irand(0, 99);
+		zyk_quest_item_t crystal_type = QUEST_ITEM_NONE;
+
+		if (self->client->pers.quest_npc > QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
+		{
+			if (self->client->pers.quest_npc == QUEST_NPC_FORCE_SABER_WARRIOR ||
+				self->client->pers.quest_npc == QUEST_NPC_MID_TRAINED_WARRIOR ||
+				self->client->pers.quest_npc == QUEST_NPC_HIGH_TRAINED_WARRIOR ||
+				self->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE ||
+				self->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR ||
+				self->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER)
+			{
+				crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
+			}
+			else if (self->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER || 
+					self->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM || 
+				self->client->pers.quest_npc == QUEST_NPC_CHANGELING_SENTRY)
+			{
+				crystal_type = QUEST_ITEM_EXTRA_TRIES_CRYSTAL;
+			}
+			else if (self->client->pers.quest_npc == QUEST_NPC_LOW_TRAINED_WARRIOR || 
+				self->client->pers.quest_npc == QUEST_NPC_FLYING_WARRIOR ||
+				self->client->pers.quest_npc == QUEST_NPC_HEAVY_ARMORED_WARRIOR)
+			{
+				crystal_type = QUEST_ITEM_SPECIAL_CRYSTAL;
+			}
+		}
+		else if (self->client->pers.quest_npc == QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
+		{
+			crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
+		}
+
+		if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
+		{
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
+		}
+		else if (crystal_type > QUEST_ITEM_NONE)
+		{
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, crystal_type);
+		}
 	}
 
 	// zyk: Main Quest events
@@ -6648,11 +6700,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 								if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 								{
-									air_strength *= 80.0;
+									air_strength *= 75.0;
 								}
 								else
 								{
-									air_strength *= 16.0;
+									air_strength *= 15.0;
 								}
 
 								VectorScale(air_magic_forward, air_strength, air_magic_dir);
@@ -6689,11 +6741,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								// zyk: tests if the target is on the ground or in the air
 								if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 								{
-									black_hole_suck_strength *= 80.0;
+									black_hole_suck_strength *= 75.0;
 								}
 								else
 								{
-									black_hole_suck_strength *= 16.0;
+									black_hole_suck_strength *= 15.0;
 								}
 
 								VectorScale(dark_magic_forward, black_hole_suck_strength, dark_magic_dir);

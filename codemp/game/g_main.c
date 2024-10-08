@@ -5517,14 +5517,34 @@ void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int
 	}
 }
 
+void zyk_spawn_crystal(float x, float y, float z, int duration, zyk_quest_item_t crystal_type)
+{
+	int crystal_effect_id = 0;
+
+	if (crystal_type == QUEST_ITEM_SKILL_CRYSTAL)
+	{
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_skill_crystal", crystal_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", 45, duration, crystal_effect_id, crystal_type);
+	}
+	else if (crystal_type == QUEST_ITEM_EXTRA_TRIES_CRYSTAL)
+	{
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_extra_tries_crystal", crystal_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", 45, duration, crystal_effect_id, crystal_type);
+	}
+	else if (crystal_type == QUEST_ITEM_SPECIAL_CRYSTAL)
+	{
+		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_red_crystal", crystal_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", 45, duration, crystal_effect_id, crystal_type);
+	}
+}
+
 // zyk: spawn the model and effect used by magic crystals
 void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crystal_type)
 {
 	float x, y, z;
 	int distance_factor = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 6;
 	gentity_t* chosen_entity = NULL;
-	int crystal_effect_id = 0;
-
+	
 	chosen_entity = zyk_find_entity_for_quest();
 
 	if (!chosen_entity)
@@ -5565,21 +5585,7 @@ void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crys
 		z += chosen_entity->s.origin[2];
 	}
 
-	if (crystal_type == QUEST_ITEM_SKILL_CRYSTAL)
-	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_skill_crystal", crystal_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", 45, duration, crystal_effect_id, crystal_type);
-	}
-	else if (crystal_type == QUEST_ITEM_EXTRA_TRIES_CRYSTAL)
-	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_extra_tries_crystal", crystal_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", 45, duration, crystal_effect_id, crystal_type);
-	}
-	else if (crystal_type == QUEST_ITEM_SPECIAL_CRYSTAL)
-	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_red_crystal", crystal_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", 45, duration, crystal_effect_id, crystal_type);
-	}
+	zyk_spawn_crystal(x, y, z, duration, crystal_type);
 }
 
 // zyk: spawns any of the quest item types at specific coordinates in map
@@ -5834,7 +5840,12 @@ void zyk_status_effects(gentity_t* ent)
 
 void zyk_mp_usage(gentity_t* ent, int magic_skill_index)
 {
-	int magic_mp_usage = ent->client->pers.skill_levels[magic_skill_index];
+	int magic_mp_usage = (ent->client->pers.skill_levels[magic_skill_index] / 2);
+
+	if (magic_mp_usage < 1)
+	{
+		magic_mp_usage = 1;
+	}
 
 	if (ent->client->pers.magic_power >= magic_mp_usage)
 	{
@@ -7298,7 +7309,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == 16)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Regen your Spirit Tree so we can create magic crystals faster. Sometimes Resistance allies will appear to fight enemies.\n\"", QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Defeat the enemies and regen your Spirit Tree. Sometimes Resistance allies will appear to fight enemies.\n\"", QUESTCHAR_ALL_SPIRITS));
 	}
 	if (ent->client->pers.tutorial_step == 17)
 	{
@@ -9267,20 +9278,19 @@ void G_RunFrame( int levelTime ) {
 						(ent->client->pers.quest_masters_defeated * 2) +
 						(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
 
-					int player_power_level = (ent->client->pers.magic_crystals + 
+					int player_power_level = (ent->client->pers.magic_crystals +
 						zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60)) / 4;
 
-					int skill_crystal_chance = 50 - player_power_level;
+					int skill_crystal_chance = 50 - player_power_level -
+						main_quest_progress;
 
-					int green_crystal_chance = 21 +
-						(ent->client->pers.magic_crystals / 2) - 
+					int green_crystal_chance = 20 - player_power_level -
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] -
-						main_quest_progress + (ent->client->pers.quest_masters_defeated * 10);
+						main_quest_progress;
 
-					int red_crystal_chance = 21 +
-						(ent->client->pers.magic_crystals / 2) -
+					int red_crystal_chance = 20 - player_power_level -
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] -
-						main_quest_progress + (ent->client->pers.quest_masters_defeated * 10);
+						main_quest_progress;
 
 					int side_quest_item_chance_modifier = ENERGY_MODULATOR_PARTS * QUEST_LOG_PARTS;
 

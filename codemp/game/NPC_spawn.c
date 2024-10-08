@@ -1782,6 +1782,11 @@ finish:
 			newent->client->pers.skill_levels[zyk_it] = 0;
 		}
 
+		for (zyk_it = 0; zyk_it < MAX_RPG_INVENTORY_ITEMS; zyk_it++)
+		{
+			newent->client->pers.rpg_inventory[zyk_it] = 0;
+		}
+
 		newent->client->cloakDebReduce = 0;
 
 		// zyk: saboteur npcs start with cloak
