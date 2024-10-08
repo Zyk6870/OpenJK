@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.29"
+#define	GAMEVERSION	"New Zyk Mod v1.1.30"
 
 #define SECURITY_LOG "security.log"
 
@@ -1019,11 +1019,7 @@ typedef struct clientPersistant_s {
 	// zyk: player ids which are hitting the target player with magic
 	int magic_power_user_id[MAX_MAGIC_POWERS];
 
-	float black_hole_distance;
 	vec3_t black_hole_origin;
-
-	float light_of_judgement_distance;
-	vec3_t light_of_judgement_origin;
 
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;

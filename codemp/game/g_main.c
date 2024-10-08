@@ -5131,8 +5131,11 @@ void zyk_spawn_magic_element_effect(gentity_t* ent, vec3_t effect_origin, int ma
 
 	zyk_spawn_entity(new_ent);
 
-	level.special_power_effects[new_ent->s.number] = ent->s.number;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+	if (new_ent && new_ent->inuse)
+	{ // zyk: do not set these if for some reason the entity was not spawned
+		level.special_power_effects[new_ent->s.number] = ent->s.number;
+		level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+	}
 }
 
 extern void Jedi_Decloak(gentity_t *self);
@@ -5216,10 +5219,11 @@ void zyk_spawn_black_hole_model(gentity_t* ent, int duration, int model_scale)
 
 	zyk_spawn_entity(new_ent);
 
-	level.special_power_effects[new_ent->s.number] = ent->s.number;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
-
-	VectorCopy(ent->r.currentOrigin, ent->client->pers.black_hole_origin);
+	if (new_ent && new_ent->inuse)
+	{ // zyk: do not set these if for some reason the entity was not spawned
+		level.special_power_effects[new_ent->s.number] = ent->s.number;
+		level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+	}
 
 	zyk_remap_shaders("models/map_objects/mp/spheretwo", "textures/mp/black");
 }
@@ -5369,8 +5373,11 @@ void zyk_spawn_puzzle_effect(gentity_t *crystal_model)
 
 	zyk_spawn_entity(new_ent);
 
-	level.special_power_effects[new_ent->s.number] = 0;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + 1500;
+	if (new_ent && new_ent->inuse)
+	{ // zyk: do not set these if for some reason the entity was not spawned
+		level.special_power_effects[new_ent->s.number] = 0;
+		level.special_power_effects_timer[new_ent->s.number] = level.time + 1500;
+	}
 }
 
 // zyk: used in puzzles to get Legendary Artifacts, like the Energy Modulator
@@ -5463,40 +5470,51 @@ int zyk_spawn_quest_item_effect(float x, float y, float z, int duration, char *q
 
 	zyk_spawn_entity(new_ent);
 
-	level.special_power_effects[new_ent->s.number] = 0;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+	if (new_ent && new_ent->inuse)
+	{ // zyk: do not set these if for some reason the entity was not spawned
+		level.special_power_effects[new_ent->s.number] = 0;
+		level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
 
-	return new_ent->s.number;
+		return new_ent->s.number;
+	}
+
+	return -1;
 }
 
 void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int model_scale, int duration, int quest_item_effect_id, zyk_quest_item_t quest_item_type)
 {
-	gentity_t* new_ent = G_Spawn();
-
-	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
-
-	// zyk: only the usable crystals will be solid, to avoid a bug in which player cannot use the correct crystals
-	zyk_set_entity_field(new_ent, "spawnflags", "0");
-
-	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
-
-	zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
-
-	if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
+	if (quest_item_effect_id > -1)
 	{
-		zyk_set_entity_field(new_ent, "angles", "90 0 0");
+		gentity_t* new_ent = G_Spawn();
+
+		zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
+
+		// zyk: only the usable crystals will be solid, to avoid a bug in which player cannot use the correct crystals
+		zyk_set_entity_field(new_ent, "spawnflags", "0");
+
+		zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
+
+		zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
+
+		if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
+		{
+			zyk_set_entity_field(new_ent, "angles", "90 0 0");
+		}
+
+		zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
+
+		zyk_set_entity_field(new_ent, "targetname", "zyk_quest_item");
+
+		zyk_spawn_entity(new_ent);
+
+		if (new_ent && new_ent->inuse)
+		{ // zyk: do not set these if for some reason the entity was not spawned
+			new_ent->count = quest_item_effect_id;
+
+			level.special_power_effects[new_ent->s.number] = 0;
+			level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
+		}
 	}
-	
-	zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
-
-	zyk_set_entity_field(new_ent, "targetname", "zyk_quest_item");
-
-	zyk_spawn_entity(new_ent);
-
-	new_ent->count = quest_item_effect_id;
-
-	level.special_power_effects[new_ent->s.number] = 0;
-	level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
 }
 
 // zyk: spawn the model and effect used by magic crystals
@@ -6118,7 +6136,7 @@ void magic_power_events(gentity_t *ent)
 
 						zyk_spawn_black_hole_model(ent, duration, (15 * ent->client->pers.skill_levels[SKILL_MAGIC_DARK_MAGIC]));
 
-						ent->client->pers.black_hole_distance = radius;
+						VectorCopy(ent->r.currentOrigin, ent->client->pers.black_hole_origin);
 
 						ent->client->pers.magic_power_hit_counter[MAGIC_DARK_MAGIC]--;
 					}
@@ -6155,10 +6173,6 @@ void magic_power_events(gentity_t *ent)
 						int radius = MAGIC_MIN_RANGE + MAGIC_LIGHT_DARK_RANGE_BONUS + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC] + magic_bonus)); // zyk: default distace for this effect is 540
 
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_light", "4", "misc/possession", 500, damage, radius, duration);
-
-						ent->client->pers.light_of_judgement_distance = radius;
-
-						VectorCopy(ent->client->ps.origin, ent->client->pers.light_of_judgement_origin);
 
 						// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
 						lightning_dome(ent, damage * 2);
