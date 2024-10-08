@@ -1706,6 +1706,7 @@ void TryUse( gentity_t *ent )
 		VectorCopy(ent->client->ps.origin, level.legendary_artifact_origin);
 
 		level.legendary_artifact_step = QUEST_SECRET_SPAWN_CRYSTALS_STEP;
+		level.legendary_artifact_timer = level.time + SIDE_QUEST_PUZZLE_TIMER;
 
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 

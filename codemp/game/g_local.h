@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.23"
+#define	GAMEVERSION	"New Zyk Mod v1.1.24"
 
 #define SECURITY_LOG "security.log"
 
@@ -830,6 +830,7 @@ typedef enum {
 // zyk: quest values
 #define MAX_QUEST_PROGRESS 100000
 #define SIDE_QUEST_STUFF_TIMER 1000
+#define SIDE_QUEST_PUZZLE_TIMER 90000
 #define ENERGY_MODULATOR_PARTS 3
 #define QUEST_ITEM_DISTANCE 48
 #define QUEST_LOG_PARTS 5
@@ -1725,6 +1726,7 @@ typedef struct level_locals_s {
 	vec3_t legendary_artifact_origin;
 	int legendary_crystal_chosen[LEGENDARY_CRYSTALS_CHOSEN];
 	zyk_quest_item_t legendary_artifact_type;
+	int legendary_artifact_timer;
 
 	// zyk: bitvalue. Has npcs where only one of them can be in the map
 	int special_quest_npc_in_map;

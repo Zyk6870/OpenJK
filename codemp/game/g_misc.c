@@ -2877,6 +2877,7 @@ void fx_runner_think( gentity_t *ent )
 
 						level.legendary_artifact_type = QUEST_ITEM_MAGIC_ARMOR;
 						level.legendary_artifact_step = QUEST_SECRET_TOUCHED_PUZZLE_ITEM;
+						level.legendary_artifact_timer = level.time + SIDE_QUEST_PUZZLE_TIMER;
 
 						player_ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 

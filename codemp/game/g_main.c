@@ -1131,6 +1131,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	level.legendary_artifact_step = QUEST_SECRET_INIT_STEP;
 	level.legendary_artifact_debounce_timer = 0;
+	level.legendary_artifact_timer = 0;
 
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString(qfalse);
@@ -8578,9 +8579,14 @@ void G_RunFrame( int levelTime ) {
 		level.load_entities_timer = 0;
 	}
 
-	if (level.load_entities_timer == 0 && level.legendary_artifact_step >= QUEST_SECRET_SPAWN_CRYSTALS_STEP &&
+	if (level.load_entities_timer == 0 && level.legendary_artifact_step > QUEST_SECRET_INIT_STEP &&
 		level.legendary_artifact_debounce_timer < level.time)
 	{ // zyk: map has an legendary artifact
+		if (level.legendary_artifact_timer < level.time)
+		{ // zyk: time to solve puzzle run out
+			level.legendary_artifact_step = QUEST_SECRET_CLEAR_STEP;
+		}
+
 		if (level.legendary_artifact_step == QUEST_SECRET_SPAWN_CRYSTALS_STEP)
 		{ // zyk: spawns the crystal models
 			int crystal_scale = 90;
@@ -8650,6 +8656,16 @@ void G_RunFrame( int levelTime ) {
 		else if (level.legendary_artifact_step == QUEST_SECRET_CLEAR_STEP)
 		{ // zyk: clear the crystals
 			int j = 0;
+
+			for (j = 0; j < level.maxclients; j++)
+			{
+				gentity_t* player_ent = &g_entities[j];
+
+				if (player_ent && player_ent->client)
+				{
+					player_ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
+				}
+			}
 
 			for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
 			{ // zyk: show effect in the chosen crystal position
