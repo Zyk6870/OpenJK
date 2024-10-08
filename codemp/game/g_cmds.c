@@ -4520,7 +4520,7 @@ void set_max_force(gentity_t* ent)
 // zyk: sets the Max Weight of stuff the player can carry
 void set_max_weight(gentity_t* ent)
 {
-	ent->client->pers.max_weight = 400 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 160);
+	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 250);
 }
 
 // zyk: set the Max Stamina of this player
