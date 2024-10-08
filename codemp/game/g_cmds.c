@@ -10818,7 +10818,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			if (ent->client->pers.magic_power >= magic_cost)
 			{
 				// zyk: magic usage effect
-				zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, magic_number, 1000);
+				zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, magic_number, 1500);
 
 				// zyk: magic usage anim
 				G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCE_RAGE, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);

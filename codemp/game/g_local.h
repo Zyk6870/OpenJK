@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.30"
+#define	GAMEVERSION	"New Zyk Mod v1.1.31"
 
 #define SECURITY_LOG "security.log"
 
@@ -789,10 +789,9 @@ typedef enum {
 #define MAGIC_CHANGE_AMOUNT 50
 
 // zyk: magic power stats
-#define MAGIC_MIN_DMG 1
+#define MAGIC_MIN_DMG 2
 #define MAGIC_MIN_RANGE 225
 #define MAGIC_RANGE_BONUS 25
-#define MAGIC_LIGHT_DARK_RANGE_BONUS 90
 
 // zyk: damage bonus of weapons
 #define RPG_WEAPON_DMG_BONUS 0.025
@@ -1018,8 +1017,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: player ids which are hitting the target player with magic
 	int magic_power_user_id[MAX_MAGIC_POWERS];
-
-	vec3_t black_hole_origin;
 
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;

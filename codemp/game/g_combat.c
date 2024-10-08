@@ -6680,31 +6680,24 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							{
 								int chance_for_draining = final_damage * 3;
 								vec3_t dark_magic_dir, dark_magic_forward;
-								float target_distance = Distance(magic_power_user->client->pers.black_hole_origin, ent->client->ps.origin);
+								float target_distance = Distance(magic_power_user->client->ps.origin, ent->client->ps.origin);
 								float black_hole_suck_strength = 1.0 + (final_damage / 2);
 
-								VectorSubtract(magic_power_user->client->pers.black_hole_origin, ent->client->ps.origin, dark_magic_forward);
+								VectorSubtract(magic_power_user->client->ps.origin, ent->client->ps.origin, dark_magic_forward);
 								VectorNormalize(dark_magic_forward);
 
 								// zyk: tests if the target is on the ground or in the air
 								if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 								{
-									black_hole_suck_strength *= 90.0;
+									black_hole_suck_strength *= 95.0;
 								}
 								else
 								{
-									black_hole_suck_strength *= 18.0;
+									black_hole_suck_strength *= 19.0;
 								}
 
-								if (target_distance < 48.0)
-								{ // zyk: very close to black hole center
-									VectorScale(ent->client->ps.velocity, 0.25, ent->client->ps.velocity);
-								}
-								else
-								{
-									VectorScale(dark_magic_forward, black_hole_suck_strength, dark_magic_dir);
-									VectorAdd(ent->client->ps.velocity, dark_magic_dir, ent->client->ps.velocity);
-								}
+								VectorScale(dark_magic_forward, black_hole_suck_strength, dark_magic_dir);
+								VectorAdd(ent->client->ps.velocity, dark_magic_dir, ent->client->ps.velocity);
 
 								zyk_remove_emotes(ent);
 
