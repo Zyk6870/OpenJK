@@ -5948,7 +5948,10 @@ void magic_power_events(gentity_t *ent)
 
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_water", "4", "env/water_impact", 0, damage, max_distance, 400);
 
-					zyk_add_health(ent, heal_amount);
+					if (ent->health > 0)
+					{
+						zyk_add_health(ent, heal_amount);
+					}
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 300;
 				}

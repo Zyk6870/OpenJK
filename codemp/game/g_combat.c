@@ -4912,6 +4912,7 @@ vec3_t gPainPoint;
 
 extern void Jedi_Decloak( gentity_t *self );
 extern void Boba_FlyStop( gentity_t *self );
+extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern void zyk_add_mp(gentity_t* ent, int mp_amount);
@@ -6115,6 +6116,14 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 		}
 
+		// zyk: Dark Magic drains health
+		if (mod == MOD_UNKNOWN && attacker && attacker->client && attacker->health > 0 && 
+			inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) == MAGIC_DARK_MAGIC &&
+			targ->client && Q_irand(0, 99) < (take * 4))
+		{
+			zyk_add_health(attacker, take);
+		}
+
 		// zyk: some quest npcs have special abilities
 		if (attacker && attacker->client && attacker->NPC && targ->health > 0 && targ->client && Q_irand(0, 100) < 50)
 		{
@@ -6415,7 +6424,6 @@ void zyk_remove_emotes(gentity_t* ent)
 G_RadiusDamage
 ============
 */
-extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern int zyk_max_magic_power(gentity_t* ent);
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
 extern float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t* attacker, gentity_t* target);
@@ -6592,13 +6600,13 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					}
 
 					// zyk: if the power user and the target are allies (player or npc), then do not hit
-					if (magic_power_user && magic_power_user->client && ent && ent->client &&
+					if (magic_power_user && magic_power_user->client && ent->client &&
 						(OnSameTeam(magic_power_user, ent) == qtrue || npcs_on_same_team(magic_power_user, ent) == qtrue))
 					{
 						is_ally = qtrue;
 					}
 
-					if (magic_power_user && magic_power_user->client && ent && ent->client &&
+					if (magic_power_user && magic_power_user->client && ent->client &&
 						zyk_is_ally(magic_power_user, ent) == qtrue)
 					{
 						is_ally = qtrue;
@@ -6606,7 +6614,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 					if (is_ally == qtrue)
 					{
-						if (this_magic_power == MAGIC_WATER_MAGIC)
+						if (this_magic_power == MAGIC_WATER_MAGIC && ent->client && ent->health > 0)
 						{ // zyk: Water magic heals allies
 							zyk_add_health(ent, (int)points);
 
@@ -6730,7 +6738,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						{
 							if (ent->client && ent->health > 0)
 							{
-								int chance_for_draining = final_damage * 3;
 								vec3_t dark_magic_dir, dark_magic_forward;
 								float target_distance = Distance(magic_power_user->client->ps.origin, ent->client->ps.origin);
 								float black_hole_suck_strength = 1.0 + (final_damage / 2);
@@ -6752,12 +6759,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								VectorAdd(ent->client->ps.velocity, dark_magic_dir, ent->client->ps.velocity);
 
 								zyk_remove_emotes(ent);
-
-								// zyk: confuses the target
-								if (Q_irand(0, 99) < chance_for_draining)
-								{
-									zyk_add_health(magic_power_user, 1);
-								}
 							}
 						}
 						else if (this_magic_power == MAGIC_LIGHT_MAGIC)
