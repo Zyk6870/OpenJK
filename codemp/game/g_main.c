@@ -9232,7 +9232,7 @@ void G_RunFrame( int levelTime ) {
 					{
 						gentity_t* target_enemy = &g_entities[ent->client->ps.lookTarget];
 
-						if (target_enemy && target_enemy->client && target_enemy->NPC &&
+						if (target_enemy && target_enemy->client && target_enemy->NPC && target_enemy->client->NPC_class != CLASS_VEHICLE &&
 							target_enemy->client->playerTeam != NPCTEAM_PLAYER && target_enemy->client->pers.red_crystal_npc_timer == 0)
 						{
 							int chance_to_resist_conversion = Q_irand(0, 99);
