@@ -6648,11 +6648,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 								if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 								{
-									air_strength *= 90.0;
+									air_strength *= 80.0;
 								}
 								else
 								{
-									air_strength *= 18.0;
+									air_strength *= 16.0;
 								}
 
 								VectorScale(air_magic_forward, air_strength, air_magic_dir);
@@ -6689,11 +6689,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								// zyk: tests if the target is on the ground or in the air
 								if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
 								{
-									black_hole_suck_strength *= 90.0;
+									black_hole_suck_strength *= 80.0;
 								}
 								else
 								{
-									black_hole_suck_strength *= 18.0;
+									black_hole_suck_strength *= 16.0;
 								}
 
 								VectorScale(dark_magic_forward, black_hole_suck_strength, dark_magic_dir);

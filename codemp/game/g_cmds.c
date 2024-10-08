@@ -5919,7 +5919,7 @@ void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, int lowest_
 		strcpy(message, va("%s\n", message));
 	}
 
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n%s^7\n\"", message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n%s^7\nUse ^3/up <skill number> ^7to upgrade skill or ^3/down <skill number> ^7to downgrade it\n\"", message));
 }
 
 void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
