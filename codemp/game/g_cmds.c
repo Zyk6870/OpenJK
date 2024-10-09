@@ -5982,26 +5982,26 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	// zyk: costs to buy or sell for each seller item
 	int seller_items_cost[MAX_RPG_INVENTORY_ITEMS][2];
 
-	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][0] = 5;
-	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][1] = 2;
+	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][0] = 2;
+	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][0] = 7;
-	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][1] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][0] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][0] = 6;
-	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][1] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][0] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 8;
-	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][1] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][0] = 10;
-	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][1] = 5;
+	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][0] = 12;
-	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][1] = 8;
+	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][0] = 15;
-	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][1] = 10;
+	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][0] = 5;
+	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][1] = 2;
 
 	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][0] = 100;
 	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][1] = 50;
@@ -6159,11 +6159,11 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][0] = 0;
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 20;
-	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 10;
+	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 2;
+	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][0] = 20;
-	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][1] = 10;
+	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][0] = 2;
+	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][1] = 1;
 
 	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][0] = 40;
 	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][1] = 0;
