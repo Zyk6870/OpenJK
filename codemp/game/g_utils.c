@@ -1853,9 +1853,16 @@ void TryUse( gentity_t *ent )
 	{ // zyk: player touched one of the puzzle crystals
 		if (level.legendary_crystal_chosen[level.legendary_artifact_step - QUEST_SECRET_CHOSEN_CRYSTALS_STEP] == target->count)
 		{ // zyk: one of the crystals chosen in the correct order
+			int crystal_quantity_decrease = QUEST_SECRET_CORRECT_CRYSTALS_STEP - (ent->client->pers.magic_crystals / 20);
+
 			G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/interface/pickup_battery.mp3"));
 
 			level.legendary_artifact_step++;
+
+			if (level.legendary_artifact_step > crystal_quantity_decrease)
+			{
+				level.legendary_artifact_step = QUEST_SECRET_CORRECT_CRYSTALS_STEP;
+			}
 		}
 		else
 		{ // zyk: wrong crystal in the order, stop the puzzle
