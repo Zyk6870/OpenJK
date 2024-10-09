@@ -2202,6 +2202,10 @@ void load_account(gentity_t* ent)
 			fscanf(account_file, "%s", content);
 			ent->client->pers.last_stamina = atoi(content);
 
+			// zyk: tutorial shown
+			fscanf(account_file, "%s", content);
+			ent->client->pers.tutorial_shown = atoi(content);
+
 			if (ent->client->sess.amrpgmode == 1)
 			{
 				ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
@@ -2270,10 +2274,10 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
-			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
+			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
 				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, 
 				client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress, client->pers.side_quest_secrets_found, 
-				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina);
+				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina, client->pers.tutorial_shown);
 
 			fclose(account_file);
 		}
@@ -5240,6 +5244,14 @@ void add_new_char(gentity_t *ent)
 	zyk_set_default_rpg_stuff(ent);
 
 	zyk_set_default_quest_fields(ent);
+
+	// zyk: set flag so the quest will not spawn npcs yet before player sees the tutorial
+	ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_CREATED_ACCOUNT);
+
+	// zyk: starting the tutorial, to help players use the mod features
+	ent->client->pers.tutorial_shown = 0;
+	ent->client->pers.tutorial_step = TUTORIAL_NEW_CHAR_START;
+	ent->client->pers.tutorial_timer = level.time + 1000;
 }
 
 // zyk: creates the directory correctly depending on the OS
@@ -5355,20 +5367,12 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 
 	if (ent->client->sess.amrpgmode == 2)
 	{
-		// zyk: set flag so the quest will not spawn npcs yet before player sees the tutorial
-		ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_CREATED_ACCOUNT);
-
 		initialize_rpg_skills(ent, qtrue);
 	}
 	else
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Account created successfully in ^2Admin-Only ^7Mode\n\"");
 	}
-
-	// zyk: starting the tutorial, to help players use the mod features
-	ent->client->pers.tutorial_step = 0;
-	ent->client->pers.tutorial_timer = level.time + 1000;
-	ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_TUTORIAL);
 }
 
 /*
@@ -6817,7 +6821,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures, the Chimera, the Jormungandr and the Angel of Death. Mage Masters can summon them. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals to restore their health and mp. Each one you defeat will not appear for you again.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures, the Chimera, the Jormungandr and the Angel of Death. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals (all types) to restore their health and mp. Each one you defeat will not appear for you again.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 					}
 					else
@@ -6851,7 +6855,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			}
 			else if (Q_stricmp( arg1, "commands" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/up [skill number]: ^7upgrades a skill.\n^3/down [skill number]: ^7downgrades a skill.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/rpgchar: ^7shows your chars (characters) and the char commands.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives the player an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command from a player.\n^3/settings: ^7turn on or off player settings.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
+				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/nofight: ^7makes you unable to damage other players and they also cannot damage you.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/rpgchar: ^7shows your chars (characters) and the char commands.\n^3/allyadd [player id or name]: ^7adds player as ally.\n^3/allyremove [player id or name]: ^7removes an ally player.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command.\n^3/settings: ^7player settings.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
 			}
 			else
 			{ // zyk: the player can also list the specific info of a skill passing the skill number as argument
@@ -11590,9 +11594,10 @@ Cmd_Tutorial_f
 ==================
 */
 void Cmd_Tutorial_f(gentity_t *ent) {
-	ent->client->pers.tutorial_step = 0;
+	ent->client->pers.tutorial_shown = 0;
+	ent->client->pers.tutorial_shown |= (1 << TUTORIAL_NEW_CHAR);
+	ent->client->pers.tutorial_step = TUTORIAL_NEW_CHAR_START;
 	ent->client->pers.tutorial_timer = level.time + 1000;
-	ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_TUTORIAL);
 }
 
 /*

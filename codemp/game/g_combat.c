@@ -6182,30 +6182,39 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH && mod == MOD_BRYAR_PISTOL && targ->client->sess.amrpgmode == 2)
 			{
-				targ->client->pers.quest_tries--;
+				if (targ->client->pers.quest_tries > MIN_QUEST_TRIES)
+				{
+					targ->client->pers.quest_tries--;
 
-				attacker->health += 20;
-				attacker->client->pers.magic_power += 20;
+					attacker->health += 10;
+					attacker->client->pers.magic_power += 10;
 
-				G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
+					G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble.wav"));
+				}
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
 			{
-				targ->client->pers.magic_crystals--;
+				if (targ->client->pers.magic_crystals > 0)
+				{
+					targ->client->pers.magic_crystals--;
 
-				attacker->health += 20;
-				attacker->client->pers.magic_power += 20;
+					attacker->health += 50;
+					attacker->client->pers.magic_power += 50;
 
-				G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
+					G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble.wav"));
+				}
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_CHIMERA && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
 			{
-				targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
+				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
+				{
+					targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
 
-				attacker->health += 20;
-				attacker->client->pers.magic_power += 20;
+					attacker->health += 30;
+					attacker->client->pers.magic_power += 30;
 
-				G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble3.wav"));
+					G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble.wav"));
+				}
 			}
 		}
 
@@ -6821,6 +6830,14 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 									ent->client->ps.weaponTime = 1500;
 								}
 							}
+						}
+
+						if (ent->client && !(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)))
+						{
+							ent->client->pers.tutorial_shown |= (1 << TUTORIAL_MAGIC);
+
+							ent->client->pers.tutorial_step = TUTORIAL_MAGIC_START;
+							ent->client->pers.tutorial_timer = level.time + 1000;
 						}
 
 						G_Damage (ent, attacker, magic_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);

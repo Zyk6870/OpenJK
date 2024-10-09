@@ -7246,84 +7246,110 @@ void zyk_spawn_magic_spirits(gentity_t* ent, int duration)
 
 void zyk_show_tutorial(gentity_t* ent)
 {
-	if (ent->client->pers.tutorial_step == 0)
+	if (ent->client->pers.tutorial_step >= TUTORIAL_NEW_CHAR_START && ent->client->pers.tutorial_step <= TUTORIAL_NEW_CHAR_END)
 	{
-		zyk_spawn_magic_spirits(ent, TUTORIAL_DURATION);
-	}
-	if (ent->client->pers.tutorial_step == 1)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. We are the Magical Spirits. We will explain everything you need to know.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
-	}
-	if (ent->client->pers.tutorial_step == 2)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see info about Magic Crystals, Magic points, Stamina, Weight, etc.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 3)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: In ^3/list rpg ^7you can see the commands that lists your skills and other commands too.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 4)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Doing actions decrease stamina. If it runs out, you will faint for some seconds. Use ^2Meditate ^7taunt to regen it.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 5)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list inventory^7. You can remotely buy and sell stuff with ^3/buy ^7or ^3/sell^7.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 6)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over the max weight, your run speed will decrease.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 7)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or items.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 8)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Magic Crystals (the blue ones) to upgrade skills. We keep randomly placing them in the map.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 9)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To upgrade or downgrade a skill, use ^3/up <skill number> ^7or ^3/down <skill number>^7.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 10)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <skill number>^7.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 11)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your current stats (hp, shield, mp, stamina) are saved so changing map will keep them at current values.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 12)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: If you don't want to fight players, use ^3/nofight^7, preventing damage to you and you cannot damage them.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 13)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can add or remove ally players with ^3/allyadd ^7and ^3/allyremove^7.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 14)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can use ^3/callvote map mapname ^7to change to any map, including SP ones. Use ^3/maplist ^7to list maps.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 15)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We are here because we need your help! Use ^3/list quests^7 too see all info you need to help us.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 16)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Defeat the enemies and regen your Spirit Tree. Sometimes Resistance allies will appear to fight enemies.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 17)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Green crystals give extra tries for quest, and red crystals can convert the nearest enemy into an ally.\n\"", QUESTCHAR_ALL_SPIRITS));
-	}
-	if (ent->client->pers.tutorial_step == 18)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Use ^3/tutorial ^7if you need all this information again.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+		if (ent->client->pers.tutorial_step == TUTORIAL_NEW_CHAR_START)
+		{
+			zyk_spawn_magic_spirits(ent, TUTORIAL_DURATION);
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 1))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. We are the Magical Spirits. We will explain everything you need to know.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 2))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info. From there you can find all other commands.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 3))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We are here because we need your help! Use ^3/list quests^7 too see all info you need to help us.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 4))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Use ^3/tutorial ^7if you need all this information again.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+		}
 
-		// zyk: end of tutorial
-		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_TUTORIAL);
+		ent->client->pers.tutorial_step++;
+	}
+	else if (ent->client->pers.tutorial_step >= TUTORIAL_STAMINA_START && ent->client->pers.tutorial_step <= TUTORIAL_STAMINA_END)
+	{
+		if (ent->client->pers.tutorial_step == TUTORIAL_STAMINA_START)
+		{
+			zyk_spawn_magic_spirits(ent, 10000);
+
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Doing actions decrease stamina. It is the blue bar at the right of your screen.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_STAMINA_START + 1))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^2Meditate ^7taunt to regen it. If Stamina runs out, you will faint for some seconds.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+
+		ent->client->pers.tutorial_step++;
+	}
+	else if (ent->client->pers.tutorial_step >= TUTORIAL_INVENTORY_START && ent->client->pers.tutorial_step <= TUTORIAL_INVENTORY_END)
+	{
+		if (ent->client->pers.tutorial_step == TUTORIAL_INVENTORY_START)
+		{
+			zyk_spawn_magic_spirits(ent, 20000);
+
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list inventory^7. Everything you pickup up is stored there. Each inventory page shows 10 items.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 1))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over the max weight, your run speed will decrease and Stamina will decrease faster.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 2))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: When seeing your inventory, you can also see the commands to buy or sell items.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 3))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or get melee to drop items. Use ^3/jetpack ^7to drop your jetpack.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+
+		ent->client->pers.tutorial_step++;
+	}
+	else if (ent->client->pers.tutorial_step >= TUTORIAL_QUEST_ITEMS_START && ent->client->pers.tutorial_step <= TUTORIAL_QUEST_ITEMS_END)
+	{
+		if (ent->client->pers.tutorial_step == TUTORIAL_QUEST_ITEMS_START)
+		{
+			zyk_spawn_magic_spirits(ent, 20000);
+
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Blue Crystals to upgrade skills. We keep randomly placing them in the map. Some enemies drop them.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 1))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list force^7 or ^3/list misc ^7or ^3/list magic ^7to see skills. It also show commands to upgrade them.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 2))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Green crystals give extra tries for quest and Red crystals converts enemies into allies by pressing Use key near them.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+
+		ent->client->pers.tutorial_step++;
+	}
+	else if (ent->client->pers.tutorial_step >= TUTORIAL_MAGIC_START && ent->client->pers.tutorial_step <= TUTORIAL_MAGIC_END)
+	{
+		if (ent->client->pers.tutorial_step == TUTORIAL_MAGIC_START)
+		{
+			zyk_spawn_magic_spirits(ent, 10000);
+
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: That was a Magic Power! You can learn them too.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_MAGIC_START + 1))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <skill number>^7.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_MAGIC_START + 2))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need MP (Magic Points) to cast magic. Upgrade the Max Magic Points skill to be able to have MP.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_MAGIC_START + 3))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by collecting crystals and using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+
+		ent->client->pers.tutorial_step++;
 	}
 }
 
@@ -9061,16 +9087,6 @@ void G_RunFrame( int levelTime ) {
 				}
 			}
 
-			// zyk: tutorial, which teaches the player the RPG Mode features
-			if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_TUTORIAL) && ent->client->pers.tutorial_timer < level.time)
-			{
-				zyk_show_tutorial(ent);
-
-				// zyk: interval between messages
-				ent->client->pers.tutorial_step++;
-				ent->client->pers.tutorial_timer = level.time + 5000;
-			}
-
 			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
 				
@@ -9101,6 +9117,15 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.last_shield = ent->client->ps.stats[STAT_ARMOR];
 					ent->client->pers.last_mp = ent->client->pers.magic_power;
 					ent->client->pers.last_stamina = ent->client->pers.current_stamina;
+				}
+
+				// zyk: tutorial, which teaches the player the RPG Mode features
+				if (ent->client->pers.tutorial_step > TUTORIAL_NONE && ent->client->pers.tutorial_step < MAX_TUTORIAL_STEPS && ent->client->pers.tutorial_timer < level.time)
+				{
+					zyk_show_tutorial(ent);
+
+					// zyk: interval between messages
+					ent->client->pers.tutorial_timer = level.time + 5000;
 				}
 
 				if (ent->client->pers.save_stat_changes_timer < level.time)
@@ -9770,7 +9795,7 @@ void G_RunFrame( int levelTime ) {
 								zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60));
 
 							int summon_power_level = (player_power_level + ent->client->pers.quest_defeated_enemies) / 2;
-							int chance_for_summon = summon_power_level / 10;
+							int chance_for_summon = summon_power_level / 20;
 
 							if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_ANGEL_OF_DEATH)) && Q_irand(0, 99) < chance_for_summon)
 							{

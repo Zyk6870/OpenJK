@@ -1553,6 +1553,14 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			if (ent->client->pers.current_weight > ent->client->pers.max_weight)
 			{ // zyk: carrying stuff over the max weight, consumes stamina based on how much above the max
 				stamina_usage += (((ent->client->pers.current_weight - ent->client->pers.max_weight) / 10) + 1);
+
+				if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)))
+				{
+					ent->client->pers.tutorial_shown |= (1 << TUTORIAL_INVENTORY);
+
+					ent->client->pers.tutorial_step = TUTORIAL_INVENTORY_START;
+					ent->client->pers.tutorial_timer = level.time + 1000;
+				}
 			}
 
 			// zyk: active magic uses stamina
@@ -1583,6 +1591,15 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			if (stamina_usage > 0)
 			{
 				zyk_set_stamina(ent, stamina_usage, qfalse);
+
+				if (ent->client->pers.current_stamina < RPG_MIN_STAMINA && 
+					!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)))
+				{
+					ent->client->pers.tutorial_shown |= (1 << TUTORIAL_STAMINA);
+
+					ent->client->pers.tutorial_step = TUTORIAL_STAMINA_START;
+					ent->client->pers.tutorial_timer = level.time + 1000;
+				}
 			}
 
 			zyk_stamina_out(ent);

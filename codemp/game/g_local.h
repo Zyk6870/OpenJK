@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.39"
+#define	GAMEVERSION	"New Zyk Mod v1.1.40"
 
 #define SECURITY_LOG "security.log"
 
@@ -545,7 +545,6 @@ typedef enum {
 	PLAYER_STATUS_NPC_ORDER_GUARD,
 	PLAYER_STATUS_NPC_ORDER_COVER,
 	PLAYER_STATUS_SELF_KILL,
-	PLAYER_STATUS_TUTORIAL,
 	PLAYER_STATUS_NO_FIGHT,
 	PLAYER_STATUS_DUEL_TOURNAMENT_LOSS,
 	PLAYER_STATUS_IN_FLAMES,
@@ -763,6 +762,26 @@ typedef enum {
 	NUM_SIDE_QUEST_SECRETS
 } zyk_side_quest_secrets_t;
 
+typedef enum {
+	TUTORIAL_NONE,
+	TUTORIAL_NEW_CHAR,
+	TUTORIAL_STAMINA,
+	TUTORIAL_INVENTORY,
+	TUTORIAL_QUEST_ITEMS,
+	TUTORIAL_MAGIC,
+	TUTORIAL_NEW_CHAR_START = 10,
+	TUTORIAL_NEW_CHAR_END = 14,
+	TUTORIAL_STAMINA_START = 20,
+	TUTORIAL_STAMINA_END = 21,
+	TUTORIAL_INVENTORY_START = 30,
+	TUTORIAL_INVENTORY_END = 33,
+	TUTORIAL_QUEST_ITEMS_START = 40,
+	TUTORIAL_QUEST_ITEMS_END = 42,
+	TUTORIAL_MAGIC_START = 50,
+	TUTORIAL_MAGIC_END = 53,
+	MAX_TUTORIAL_STEPS
+} zyk_tutorial_t;
+
 // zyk: Minimum Stamina before player starts to get tired
 #define RPG_MIN_STAMINA 1000.0
 #define RPG_DEFAULT_STAMINA 5000
@@ -813,7 +832,7 @@ typedef enum {
 #define DUEL_TOURNAMENT_PROTECTION_TIME 2000
 
 // zyk: tutorial duration time
-#define TUTORIAL_DURATION 90000
+#define TUTORIAL_DURATION 25000
 
 // zyk: npc cloak detection distance
 #define NPC_CLOAK_DETECTION_DISTANCE 1000
@@ -985,8 +1004,9 @@ typedef struct clientPersistant_s {
 
 	int credits; // zyk: the amount of credits (RPG Mode currency) this player has now
 
-	int tutorial_step; // zyk: sets the current tutorial step, to display the correct message to the player
+	zyk_tutorial_t tutorial_step; // zyk: sets the current tutorial step, to display the correct message to the player
 	int tutorial_timer; // zyk: used by the tutorial to set the interval between messages
+	int tutorial_shown; // zyk: bitvalue, has all tutorials shown to the player
 
 	// zyk: Race Mode. Sets the initial position of this racer which is calculated in racemode command. Default 0. If greater than 0, player joined a race
 	int race_position;
