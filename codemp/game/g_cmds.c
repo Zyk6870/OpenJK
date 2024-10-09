@@ -5100,7 +5100,7 @@ void zyk_change_item_in_inventory(gentity_t* ent, holdable_t item_type, qboolean
 
 	if (zyk_item_types[item_type] != -1)
 	{
-		zyk_update_inventory_quantity(ent, qfalse, zyk_item_types[item_type], 1);
+		zyk_update_inventory_quantity(ent, add_item, zyk_item_types[item_type], 1);
 	}
 }
 

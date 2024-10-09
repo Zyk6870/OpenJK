@@ -9229,9 +9229,16 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
 				{ // zyk: if player stops using binoculars, stop the Thermal Vision
 					ent->client->pers.thermal_vision = qfalse;
+
 					ent->client->ps.fd.forcePowersActive &= ~(1 << FP_SEE);
-					ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
-					ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_0;
+
+					// zyk: loading Sense value
+					if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SEE)) && ent->client->pers.skill_levels[SKILL_SENSE] > 0)
+						ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
+					if (ent->client->pers.skill_levels[SKILL_SENSE] == 0)
+						ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
+
+					ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[SKILL_SENSE];
 
 					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 				}
@@ -9239,6 +9246,7 @@ void G_RunFrame( int levelTime ) {
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0)
 				{ // zyk: Thermal Vision Upgrade, activate the Thermal Vision
 					ent->client->pers.thermal_vision = qtrue;
+
 					ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
 					ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_3;
 					ent->client->ps.fd.forcePowersActive |= (1 << FP_SEE);
@@ -9768,7 +9776,7 @@ void G_RunFrame( int levelTime ) {
 								zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60));
 
 							int summon_power_level = (player_power_level + ent->client->pers.quest_defeated_enemies) / 2;
-							int chance_for_summon = summon_power_level / 20;
+							int chance_for_summon = summon_power_level / 25;
 
 							if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_ANGEL_OF_DEATH)) && Q_irand(0, 99) < chance_for_summon)
 							{
@@ -9938,7 +9946,7 @@ void G_RunFrame( int levelTime ) {
 						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 						{
 							int summoned_npc_bonuses = ent->client->ps.stats[STAT_MAX_HEALTH] / 5;
-							int chance_for_summon = summoned_npc_bonuses / 80;
+							int chance_for_summon = summoned_npc_bonuses / 100;
 							gentity_t* quest_player = ent->enemy;
 
 							if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2)
