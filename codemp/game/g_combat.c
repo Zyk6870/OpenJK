@@ -2608,26 +2608,26 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 		if (self->client->pers.quest_npc > QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
 		{
-			if (self->client->pers.quest_npc == QUEST_NPC_FORCE_SABER_WARRIOR ||
-				self->client->pers.quest_npc == QUEST_NPC_MID_TRAINED_WARRIOR ||
-				self->client->pers.quest_npc == QUEST_NPC_HIGH_TRAINED_WARRIOR ||
+			if (self->client->pers.quest_npc == QUEST_NPC_HIGH_TRAINED_WARRIOR ||
 				self->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE ||
 				self->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR ||
 				self->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER)
 			{
-				crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
+				crystal_type = QUEST_ITEM_EXTRA_TRIES_CRYSTAL;
 			}
 			else if (self->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER || 
 					self->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM || 
 				self->client->pers.quest_npc == QUEST_NPC_CHANGELING_SENTRY)
 			{
-				crystal_type = QUEST_ITEM_EXTRA_TRIES_CRYSTAL;
+				crystal_type = QUEST_ITEM_SPECIAL_CRYSTAL;
 			}
-			else if (self->client->pers.quest_npc == QUEST_NPC_LOW_TRAINED_WARRIOR || 
+			else if (self->client->pers.quest_npc == QUEST_NPC_MID_TRAINED_WARRIOR || 
+				self->client->pers.quest_npc == QUEST_NPC_FORCE_SABER_WARRIOR ||
+				self->client->pers.quest_npc == QUEST_NPC_LOW_TRAINED_WARRIOR ||
 				self->client->pers.quest_npc == QUEST_NPC_FLYING_WARRIOR ||
 				self->client->pers.quest_npc == QUEST_NPC_HEAVY_ARMORED_WARRIOR)
 			{
-				crystal_type = QUEST_ITEM_SPECIAL_CRYSTAL;
+				crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
 			}
 		}
 		else if (self->client->pers.quest_npc == QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
@@ -2635,7 +2635,25 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
 		}
 
-		if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
+		if (self->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH)
+		{
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
+		}
+		else if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
+		{
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
+		}
+		else if (self->client->pers.quest_npc == QUEST_NPC_CHIMERA)
+		{
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
+		}
+		else if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
 		{
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);

@@ -602,9 +602,9 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 
 	max_levels[QUEST_NPC_NONE] = 0;
 
-	max_levels[QUEST_NPC_ANGEL_OF_DEATH] = 12;
-	max_levels[QUEST_NPC_JORMUNGANDR] = 12;
-	max_levels[QUEST_NPC_CHIMERA] = 12;
+	max_levels[QUEST_NPC_ANGEL_OF_DEATH] = 14;
+	max_levels[QUEST_NPC_JORMUNGANDR] = 14;
+	max_levels[QUEST_NPC_CHIMERA] = 14;
 
 	max_levels[QUEST_NPC_MAGE_MASTER] = 16;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 10;
@@ -9762,6 +9762,29 @@ void G_RunFrame( int levelTime ) {
 								int ally_bonus = (ent->client->pers.quest_defeated_enemies / 2) + ent->client->pers.magic_crystals;
 
 								zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
+							}
+						}
+						else
+						{
+							int player_power_level = (ent->client->pers.magic_crystals +
+								zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60));
+
+							int summon_power_level = (player_power_level + ent->client->pers.quest_defeated_enemies) / 2;
+							int chance_for_summon = summon_power_level / 10;
+
+							if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_ANGEL_OF_DEATH)) && Q_irand(0, 99) < chance_for_summon)
+							{
+								zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
+							}
+
+							if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_JORMUNGANDR)) && Q_irand(0, 99) < chance_for_summon)
+							{
+								zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
+							}
+
+							if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_CHIMERA)) && Q_irand(0, 99) < chance_for_summon)
+							{
+								zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
 							}
 						}
 					}
