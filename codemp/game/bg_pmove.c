@@ -6424,9 +6424,9 @@ int PM_ItemUsable(playerState_t *ps, int forcedUse)
 	case HI_MEDPAC:
 #if defined( _GAME )
 		if (item_user && item_user->client && item_user->client->sess.amrpgmode == 2)
-		{ // zyk: bacta canister with Bacta upgrade. Must allow even with max health to regen MP and stamina
+		{ // zyk: bacta canister. Must allow even with max health to regen MP and stamina
 			if (ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] && 
-				(item_user->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0 && item_user->client->pers.magic_power == zyk_max_magic_power(item_user)) &&
+				item_user->client->pers.magic_power == zyk_max_magic_power(item_user) &&
 				item_user->client->pers.current_stamina == item_user->client->pers.max_stamina)
 				return 0;
 
@@ -6457,7 +6457,9 @@ int PM_ItemUsable(playerState_t *ps, int forcedUse)
 #if defined( _GAME )
 		if (item_user && item_user->client && item_user->client->sess.amrpgmode == 2)
 		{ // zyk: Big Bacta. Must allow even with max health to regen stamina
-			if (ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] && item_user->client->pers.current_stamina == item_user->client->pers.max_stamina)
+			if (ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] && 
+				item_user->client->pers.magic_power == zyk_max_magic_power(item_user) &&
+				item_user->client->pers.current_stamina == item_user->client->pers.max_stamina)
 				return 0;
 
 			if (ps->stats[STAT_HEALTH] <= 0 ||
@@ -7074,6 +7076,12 @@ backAgain:
 		PM_SetAnim(SETANIM_BOTH, Anim, iFlags);
 	}
 }
+
+#ifdef _GAME
+
+extern void zyk_remove_ammo_from_inventory(gentity_t* ent, ammo_t ammo_type, int amount);
+
+#endif
 
 /*
 ==============
@@ -8041,10 +8049,21 @@ static void PM_Weapon( void )
 	// take an ammo away if not infinite
 	if ( pm->ps->clientNum < MAX_CLIENTS && pm->ps->ammo[ weaponData[pm->ps->weapon].ammoIndex ] != -1 )
 	{
+#ifdef _GAME
+		gentity_t* player_ent = &g_entities[pm->ps->clientNum];
+#endif
 		// enough energy to fire this weapon?
 		if ((pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] - amount) >= 0)
 		{
 			pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= amount;
+
+#ifdef _GAME
+			// zyk: player in RPG Mode has the inventory
+			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+			{
+				zyk_remove_ammo_from_inventory(player_ent, weaponData[pm->ps->weapon].ammoIndex, amount);
+			}
+#endif
 		}
 		else	// Not enough energy
 		{

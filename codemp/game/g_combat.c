@@ -486,6 +486,8 @@ TossClientItems
 rww - Toss the weapon away from the player in the specified direction
 =================
 */
+extern void zyk_change_weapon_in_inventory(gentity_t* ent, weapon_t weapon, qboolean add_weapon);
+extern void zyk_remove_ammo_from_inventory(gentity_t* ent, ammo_t ammo_type, int amount);
 void TossClientWeapon(gentity_t *self, vec3_t direction, float speed)
 {
 	vec3_t vel;
@@ -541,6 +543,12 @@ void TossClientWeapon(gentity_t *self, vec3_t direction, float speed)
 	{
 		launched->count -= (-self->client->ps.ammo[weaponData[weapon].ammoIndex]);
 		self->client->ps.ammo[weaponData[weapon].ammoIndex] = 0;
+	}
+
+	if (self->client->sess.amrpgmode == 2)
+	{
+		zyk_change_weapon_in_inventory(self, weapon, qfalse);
+		zyk_remove_ammo_from_inventory(self, weaponData[weapon].ammoIndex, launched->count);
 	}
 
 	if ((self->client->ps.ammo[weaponData[weapon].ammoIndex] < 1 && weapon != WP_DET_PACK) ||
@@ -654,6 +662,12 @@ void TossClientItems( gentity_t *self ) {
 				launched->count = (current_ammo / zyk_add_ammo_scale.value);
 			else
 				launched->count = -1; // zyk: in this case, player has no ammo, so weapon should add no ammo to the player who picks up this weapon
+
+			if (self->client->sess.amrpgmode == 2)
+			{
+				zyk_change_weapon_in_inventory(self, weapon, qfalse);
+				zyk_remove_ammo_from_inventory(self, weaponData[weapon].ammoIndex, current_ammo);
+			}
 		}
 		else
 		{
@@ -662,6 +676,12 @@ void TossClientItems( gentity_t *self ) {
 				launched->count = (ammo_count / zyk_add_ammo_scale.value);
 			else
 				launched->count = -1; // zyk: in this case, player has no ammo, so weapon should add no ammo to the player who picks up this weapon
+
+			if (self->client->sess.amrpgmode == 2)
+			{
+				zyk_change_weapon_in_inventory(self, weapon, qfalse);
+				zyk_remove_ammo_from_inventory(self, weaponData[weapon].ammoIndex, ammo_count);
+			}
 		}
 
 		if ((self->client->ps.ammo[weaponData[weapon].ammoIndex] < 1 && weapon != WP_DET_PACK) ||

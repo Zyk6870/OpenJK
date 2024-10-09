@@ -2755,7 +2755,7 @@ extern int	BMS_START;
 extern int	BMS_MID;
 extern int	BMS_END;
 
-extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
+extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 extern void zyk_clear_quest_items(gentity_t* effect_ent);
 extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
@@ -2867,7 +2867,7 @@ void fx_runner_think( gentity_t *ent )
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_red_crystal") == 0)
 					{
-						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_MISC_RED_CRYSTAL);
+						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_MISC_RED_CRYSTAL, 1);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
 

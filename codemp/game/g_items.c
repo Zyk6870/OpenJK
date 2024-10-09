@@ -119,7 +119,7 @@ static qhandle_t	shieldActivateSound=0;
 static qhandle_t	shieldDeactivateSound=0;
 static qhandle_t	shieldDamageSound=0;
 
-
+extern void zyk_change_item_in_inventory(gentity_t* ent, holdable_t item_type, qboolean add_item);
 void ShieldRemove(gentity_t *self)
 {
 	self->think = G_FreeEntity;
@@ -526,7 +526,7 @@ qboolean PlaceShield(gentity_t *playerent)
 	return qfalse;
 }
 
-extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
+extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 
 void ItemUse_Binoculars(gentity_t *ent)
 {
@@ -569,6 +569,11 @@ void ItemUse_Binoculars(gentity_t *ent)
 
 void ItemUse_Shield(gentity_t *ent)
 {
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_FORCE_FIELD, 1);
+	}
+
 	PlaceShield(ent);
 }
 
@@ -1237,6 +1242,8 @@ void ItemUse_Sentry( gentity_t *ent )
 		{
 			ent->client->ps.fd.sentryDeployed = qfalse;
 		}
+
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_SENTRY_GUN, 1);
 	}
 }
 
@@ -1274,6 +1281,10 @@ void ItemUse_Seeker(gentity_t *ent)
 			ent->client->ps.droneExistTime = level.time + 60000; // zyk: the seeker drone lifetime, changed from 30000 to 60000
 		ent->client->ps.droneFireTime = level.time + 500;   // zyk: fire time of seeker drone changed from 1500 to 500
 
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+		{
+			zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_SEEKER_DRONE, 1);
+		}
 	}
 }
 
@@ -1329,6 +1340,8 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 			// zyk: Big Bacta can regen some stamina
 			zyk_set_stamina(ent, 1000, qtrue);
 		}
+
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_BIG_BACTA, 1);
 	}
 	else
 	{
@@ -1359,6 +1372,8 @@ void ItemUse_MedPack(gentity_t *ent)
 			// zyk: Bacta Canister can regen some stamina
 			zyk_set_stamina(ent, 500, qtrue);
 		}
+
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_BACTA_CANISTER, 1);
 	}
 	else
 	{
@@ -1689,6 +1704,12 @@ void EWebDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int dam
 
 			//take it away from him, it is gone forever.
 			owner->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1<<HI_EWEB);
+
+			// zyk: updating the RPG inventory
+			if (owner->client->sess.amrpgmode == 2)
+			{
+				zyk_change_item_in_inventory(owner, HI_EWEB, qfalse);
+			}
 
 			if (owner->client->ps.stats[STAT_HOLDABLE_ITEM] > 0 &&
 				bg_itemlist[owner->client->ps.stats[STAT_HOLDABLE_ITEM]].giType == IT_HOLDABLE &&
@@ -2341,32 +2362,7 @@ int Pickup_Holdable( gentity_t *ent, gentity_t *other ) {
 	// zyk: updating the RPG inventory
 	if (other->client->sess.amrpgmode == 2)
 	{
-		if (ent->item->giTag == HI_BINOCULARS)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_BINOCULARS);
-
-		if (ent->item->giTag == HI_MEDPAC)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_BACTA_CANISTER);
-
-		if (ent->item->giTag == HI_SENTRY_GUN)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_SENTRY_GUN);
-
-		if (ent->item->giTag == HI_SEEKER)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_SEEKER_DRONE);
-
-		if (ent->item->giTag == HI_EWEB)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_EWEB);
-
-		if (ent->item->giTag == HI_MEDPAC_BIG)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_BIG_BACTA);
-
-		if (ent->item->giTag == HI_SHIELD)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_FORCE_FIELD);
-
-		if (ent->item->giTag == HI_CLOAK)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_CLOAK);
-
-		if (ent->item->giTag == HI_JETPACK)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_ITEM_JETPACK);
+		zyk_change_item_in_inventory(other, ent->item->giTag, qtrue);
 	}
 
 	G_LogWeaponItem(other->s.number, ent->item->giTag);
@@ -2403,42 +2399,56 @@ void Add_Ammo (gentity_t *ent, int weapon, int count)
 			ent->client->ps.ammo[weapon] += count;
 		else if (ent->client->ps.ammo[weapon] < max_blasterpack_ammo)
 			ent->client->ps.ammo[weapon] = max_blasterpack_ammo;
+
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_AMMO_BLASTER_PACK, count);
 	}
 	else if (weapon == AMMO_POWERCELL){
 		if (max_powercell_ammo - ent->client->ps.ammo[weapon] > count)
 			ent->client->ps.ammo[weapon] += count;
 		else if (ent->client->ps.ammo[weapon] < max_powercell_ammo)
 			ent->client->ps.ammo[weapon] = max_powercell_ammo;
+
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_AMMO_POWERCELL, count);
 	}
 	else if (weapon == AMMO_METAL_BOLTS){
 		if (max_metalbolt_ammo - ent->client->ps.ammo[weapon] > count)
 			ent->client->ps.ammo[weapon] += count;
 		else if (ent->client->ps.ammo[weapon] < max_metalbolt_ammo)
 			ent->client->ps.ammo[weapon] = max_metalbolt_ammo;
+
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_AMMO_METAL_BOLTS, count);
 	}
 	else if (weapon == AMMO_ROCKETS){
 		if (max_rocket_ammo - ent->client->ps.ammo[weapon] > count)
 			ent->client->ps.ammo[weapon] += count;
 		else if (ent->client->ps.ammo[weapon] < max_rocket_ammo)
 			ent->client->ps.ammo[weapon] = max_rocket_ammo;
+
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_AMMO_ROCKETS, count);
 	}
 	else if (weapon == AMMO_THERMAL){
 		if (max_thermal_ammo - ent->client->ps.ammo[weapon] > count)
 			ent->client->ps.ammo[weapon] += count;
 		else if (ent->client->ps.ammo[weapon] < max_thermal_ammo)
 			ent->client->ps.ammo[weapon] = max_thermal_ammo;
+
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_AMMO_THERMALS, count);
 	}
 	else if (weapon == AMMO_TRIPMINE){
 		if (max_tripmine_ammo - ent->client->ps.ammo[weapon] > count)
 			ent->client->ps.ammo[weapon] += count;
 		else if (ent->client->ps.ammo[weapon] < max_tripmine_ammo)
 			ent->client->ps.ammo[weapon] = max_tripmine_ammo;
+
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_AMMO_TRIPMINES, count);
 	}
 	else if (weapon == AMMO_DETPACK){
 		if (max_detpack_ammo - ent->client->ps.ammo[weapon] > count)
 			ent->client->ps.ammo[weapon] += count;
 		else if (ent->client->ps.ammo[weapon] < max_detpack_ammo)
 			ent->client->ps.ammo[weapon] = max_detpack_ammo;
+
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_AMMO_DETPACKS, count);
 	}
 }
 
@@ -2491,7 +2501,7 @@ int Pickup_Ammo (gentity_t *ent, gentity_t *other)
 
 //======================================================================
 
-
+extern void zyk_change_weapon_in_inventory(gentity_t* ent, weapon_t weapon, qboolean add_weapon);
 int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 	int		quantity;
 
@@ -2535,38 +2545,7 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 	// zyk: updating the RPG inventory
 	if (other->client->sess.amrpgmode == 2)
 	{
-		if (ent->item->giTag == WP_STUN_BATON)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_STUN_BATON);
-
-		if (ent->item->giTag == WP_BRYAR_PISTOL)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_BLASTER_PISTOL);
-
-		if (ent->item->giTag == WP_BLASTER)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_E11_BLASTER_RIFLE);
-
-		if (ent->item->giTag == WP_DISRUPTOR)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_DISRUPTOR);
-
-		if (ent->item->giTag == WP_BOWCASTER)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_BOWCASTER);
-
-		if (ent->item->giTag == WP_REPEATER)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_REPEATER);
-
-		if (ent->item->giTag == WP_DEMP2)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_DEMP2);
-
-		if (ent->item->giTag == WP_FLECHETTE)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_FLECHETTE);
-
-		if (ent->item->giTag == WP_ROCKET_LAUNCHER)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
-
-		if (ent->item->giTag == WP_CONCUSSION)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_CONCUSSION);
-
-		if (ent->item->giTag == WP_BRYAR_OLD)
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_WP_BRYAR_PISTOL);
+		zyk_change_weapon_in_inventory(other, ent->item->giTag, qtrue);
 	}
 
 	//Add_Ammo( other, ent->item->giTag, quantity );

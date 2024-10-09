@@ -1619,7 +1619,7 @@ Try and use an entity in the world, directly ahead of us
 extern void Touch_Button(gentity_t *ent, gentity_t *other, trace_t *trace );
 extern qboolean gSiegeRoundBegun;
 extern void NPC_BSDefault( void );
-extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
+extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern void zyk_show_quest_riddle(gentity_t* ent);
 static vec3_t	playerMins = {-15, -15, DEFAULT_MINS_2};
 static vec3_t	playerMaxs = {15, 15, DEFAULT_MAXS_2};
@@ -1821,12 +1821,14 @@ void TryUse( gentity_t *ent )
 
 		ent->client->ps.ammo[AMMO_POWERCELL] -= 2;
 
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 2);
+
 		G_FreeEntity(target);
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));
 
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
 
-		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_SENTRY_GUN);
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_SENTRY_GUN, 1);
 
 		return;
 	}
@@ -1836,12 +1838,14 @@ void TryUse( gentity_t *ent )
 	{ // zyk: Force Field Upgrade allows recovering force fields. Uses some power cell ammo
 		ent->client->ps.ammo[AMMO_POWERCELL] -= 4;
 
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 4);
+
 		G_FreeEntity(target);
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/weapons/w_pkup.wav"));
 
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
 
-		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_FORCE_FIELD);
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_FORCE_FIELD, 1);
 
 		return;
 	}

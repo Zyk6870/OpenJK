@@ -7392,7 +7392,6 @@ qboolean zyk_can_spawn_quest_item(gentity_t* ent)
 	return qfalse;
 }
 
-extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item);
 void zyk_update_inventory(gentity_t* ent)
 {
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] != ent->client->pers.magic_crystals)
@@ -7405,150 +7404,124 @@ void zyk_update_inventory(gentity_t* ent)
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = (ent->client->pers.quest_tries - MIN_QUEST_TRIES);
 	}
 
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] != ent->client->ps.ammo[AMMO_BLASTER])
+	// zyk: loading initial inventory
+	ent->client->ps.stats[STAT_WEAPONS] = 0;
+	ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_NONE);
+	ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_MELEE);
+	ent->client->ps.ammo[AMMO_BLASTER] = 0;
+	ent->client->ps.ammo[AMMO_POWERCELL] = 0;
+	ent->client->ps.ammo[AMMO_METAL_BOLTS] = 0;
+	ent->client->ps.ammo[AMMO_ROCKETS] = 0;
+	ent->client->ps.ammo[AMMO_THERMAL] = 0;
+	ent->client->ps.ammo[AMMO_TRIPMINE] = 0;
+	ent->client->ps.ammo[AMMO_DETPACK] = 0;
+	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = 0;
+
+	// zyk: weapons inventory
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_STUN_BATON] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_BLASTER_PISTOL] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BLASTER);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_DISRUPTOR] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DISRUPTOR);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_BOWCASTER] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BOWCASTER);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_REPEATER] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_REPEATER);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_DEMP2] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DEMP2);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_FLECHETTE] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_FLECHETTE);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_ROCKET_LAUNCHER] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_ROCKET_LAUNCHER);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_CONCUSSION] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_CONCUSSION);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_BRYAR_PISTOL] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_OLD);
+
+	// zyk: ammo inventory
+	ent->client->ps.ammo[AMMO_BLASTER] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK];
+	ent->client->ps.ammo[AMMO_POWERCELL] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL];
+	ent->client->ps.ammo[AMMO_METAL_BOLTS] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS];
+	ent->client->ps.ammo[AMMO_ROCKETS] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_ROCKETS];
+	ent->client->ps.ammo[AMMO_THERMAL] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_THERMALS];
+	ent->client->ps.ammo[AMMO_TRIPMINE] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_TRIPMINES];
+	ent->client->ps.ammo[AMMO_DETPACK] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS];
+
+	// zyk: jetpack fuel
+	ent->client->ps.jetpackFuel = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL];
+	ent->client->pers.jetpack_fuel = ent->client->ps.jetpackFuel * JETPACK_SCALE;
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_THERMALS] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_THERMAL);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_TRIPMINES] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_TRIP_MINE);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS] > 0)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
+
+	// zyk: holdable items inventory
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_BINOCULARS] > 0)
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_BINOCULARS);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_BACTA_CANISTER] > 0)
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_SENTRY_GUN] > 0)
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SENTRY_GUN);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_SEEKER_DRONE] > 0)
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_EWEB] > 0)
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_EWEB);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_BIG_BACTA] > 0)
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_MEDPAC_BIG);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_FORCE_FIELD] > 0)
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SHIELD);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_CLOAK] > 0)
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_CLOAK);
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_JETPACK] > 0)
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
+
+	// zyk: if player does not have this weapon, set melee
+	if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << ent->client->ps.weapon)))
 	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] = ent->client->ps.ammo[AMMO_BLASTER];
+		ent->client->ps.weapon = WP_MELEE;
 	}
 
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] != ent->client->ps.ammo[AMMO_POWERCELL])
-	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] = ent->client->ps.ammo[AMMO_POWERCELL];
+	if (!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_BINOCULARS)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC)) &&
+		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SENTRY_GUN)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER)) &&
+		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_EWEB)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC_BIG)) &&
+		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SHIELD)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_CLOAK)))
+	{ // zyk: if player has no items left, deselect the held item
+		ent->client->ps.stats[STAT_HOLDABLE_ITEM] = 0;
 	}
 
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS] != ent->client->ps.ammo[AMMO_METAL_BOLTS])
+	// zyk: if player no longer has Cloak Item and is cloaked, decloaks
+	if (!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_CLOAK)) && ent->client->ps.powerups[PW_CLOAKED])
 	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS] = ent->client->ps.ammo[AMMO_METAL_BOLTS];
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_ROCKETS] != ent->client->ps.ammo[AMMO_ROCKETS])
-	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_ROCKETS] = ent->client->ps.ammo[AMMO_ROCKETS];
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_THERMALS] != ent->client->ps.ammo[AMMO_THERMAL])
-	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_THERMALS] = ent->client->ps.ammo[AMMO_THERMAL];
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_TRIPMINES] != ent->client->ps.ammo[AMMO_TRIPMINE])
-	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_TRIPMINES] = ent->client->ps.ammo[AMMO_TRIPMINE];
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS] != ent->client->ps.ammo[AMMO_DETPACK])
-	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS] = ent->client->ps.ammo[AMMO_DETPACK];
-	}
-
-	// zyk: Jetpack Fuel changed. Update inventory
-	if (ent->client->ps.jetpackFuel != ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL])
-	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL] = ent->client->ps.jetpackFuel;
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_STUN_BATON] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_STUN_BATON)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_STUN_BATON);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_SABER);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_BLASTER_PISTOL] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_PISTOL)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_BLASTER_PISTOL);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BLASTER)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_E11_BLASTER_RIFLE);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_DISRUPTOR] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DISRUPTOR)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_DISRUPTOR);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_BOWCASTER] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BOWCASTER)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_BOWCASTER);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_REPEATER] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_REPEATER)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_REPEATER);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_DEMP2] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_DEMP2)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_DEMP2);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_FLECHETTE] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_FLECHETTE)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_FLECHETTE);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_ROCKET_LAUNCHER] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_ROCKET_LAUNCHER)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_CONCUSSION] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_CONCUSSION)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_CONCUSSION);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_BRYAR_PISTOL] > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_OLD)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_BRYAR_PISTOL);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_BINOCULARS] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_BINOCULARS)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_BINOCULARS);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_BACTA_CANISTER] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_BACTA_CANISTER);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_SENTRY_GUN] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SENTRY_GUN)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_SENTRY_GUN);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_SEEKER_DRONE] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_SEEKER_DRONE);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_EWEB] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_EWEB)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_EWEB);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_BIG_BACTA] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC_BIG)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_BIG_BACTA);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_FORCE_FIELD] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SHIELD)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_FORCE_FIELD);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_CLOAK] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_CLOAK)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_CLOAK);
-	}
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_JETPACK] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)))
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_JETPACK);
+		Jedi_Decloak(ent);
 	}
 }
 
