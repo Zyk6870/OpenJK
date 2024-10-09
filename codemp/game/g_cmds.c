@@ -188,7 +188,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_PROTECT)
 		return "decreases damage done to you by non-force power attacks. At level 4 decreases force consumption when receiving damage";
 	if (skill_index == SKILL_MIND_TRICK)
-		return "makes yourself invisible to the players affected by this force power. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds";
+		return "makes yourself invisible to the players affected by this force power. Works on some npcs. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds";
 	if (skill_index == SKILL_TEAM_HEAL)
 		return "restores some health to players near you";
 	if (skill_index == SKILL_LIGHTNING)

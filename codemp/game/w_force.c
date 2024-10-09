@@ -458,6 +458,8 @@ void WP_SpawnInitForcePowers( gentity_t *ent )
 	ent->client->ps.fd.forceMindtrickTargetIndex3 = 0;
 	ent->client->ps.fd.forceMindtrickTargetIndex4 = 0;
 
+	ent->client->pers.number_of_npcs_tricked_by_player = 0;
+
 	ent->client->ps.holocronBits = 0;
 
 	i = 0;
@@ -2803,6 +2805,54 @@ qboolean ForceTelepathyCheckDirectNPCTarget( gentity_t *self, trace_t *tr, qbool
 	return qtrue;
 }
 
+void zyk_add_mind_tricked_npc(gentity_t* self, gentity_t* target)
+{
+	if (self->NPC)
+	{ // zyk: for now only players can mind trick npcs
+		return;
+	}
+
+	if (!target->client)
+	{
+		return;
+	}
+
+	if (self->s.number < 31)
+	{
+		target->client->pers.mind_tricker_player_ids1 |= (1 << self->s.number);
+	}
+	else
+	{
+		target->client->pers.mind_tricker_player_ids2 |= (1 << self->s.number);
+	}
+
+	self->client->pers.number_of_npcs_tricked_by_player++;
+}
+
+void zyk_remove_mind_tricked_npc(gentity_t* self, gentity_t* target)
+{
+	if (self->NPC)
+	{ // zyk: for now only players can mind trick npcs
+		return;
+	}
+
+	if (!target->client)
+	{
+		return;
+	}
+
+	if (self->s.number < 31)
+	{
+		target->client->pers.mind_tricker_player_ids1 &= ~(1 << self->s.number);
+	}
+	else
+	{
+		target->client->pers.mind_tricker_player_ids2 &= ~(1 << self->s.number);
+	}
+
+	self->client->pers.number_of_npcs_tricked_by_player--;
+}
+
 void ForceTelepathy(gentity_t *self)
 {
 	trace_t tr;
@@ -2900,7 +2950,13 @@ void ForceTelepathy(gentity_t *self)
 			}
 
 			if (!tricked_entity->NPC) // zyk: NPCs wont have the glowing head effect of mind trick because of how the game handles the tricked entities
+			{
 				WP_AddAsMindtricked(&self->client->ps.fd, tr.entityNum);
+			}
+			else
+			{ // zyk: now it is possible to Mind Trick npcs
+				zyk_add_mind_tricked_npc(self, tricked_entity);
+			}
 
 			if ( !tookPower )
 			{
@@ -2971,7 +3027,13 @@ void ForceTelepathy(gentity_t *self)
 				gotatleastone = qtrue;
 
 				if (!ent->NPC) // zyk: NPCs wont have the glowing head effect of mind trick because of how the game handles the tricked entities
+				{
 					WP_AddAsMindtricked(&self->client->ps.fd, ent->s.number);
+				}
+				else
+				{ // zyk: now it is possible to Mind Trick npcs
+					zyk_add_mind_tricked_npc(self, ent);
+				}
 			}
 			e++;
 		}
@@ -4010,6 +4072,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower )
 {
 	int wasActive = self->client->ps.fd.forcePowersActive;
+	int i = 0;
 
 	self->client->ps.fd.forcePowersActive &= ~( 1 << forcePower );
 
@@ -4040,6 +4103,24 @@ void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower )
 		self->client->ps.fd.forceMindtrickTargetIndex2 = 0;
 		self->client->ps.fd.forceMindtrickTargetIndex3 = 0;
 		self->client->ps.fd.forceMindtrickTargetIndex4 = 0;
+
+		self->client->pers.number_of_npcs_tricked_by_player = 0;
+
+		// zyk: stop mind trick on npcs tricked by this player
+		if (self->s.number < MAX_CLIENTS)
+		{
+			for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
+			{
+				gentity_t* this_npc = &g_entities[i];
+
+				if (this_npc && this_npc->client && this_npc->NPC && this_npc->health > 0)
+				{
+					this_npc->client->pers.mind_tricker_player_ids1 = 0;
+					this_npc->client->pers.mind_tricker_player_ids2 = 0;
+				}
+			}
+		}
+
 		break;
 	case FP_SEE:
 		if (wasActive & (1 << FP_SEE))
@@ -4437,7 +4518,13 @@ static void WP_UpdateMindtrickEnts(gentity_t *self)
 				(ent->client->sess.amrpgmode < 2 || ent->client->pers.thermal_vision == qfalse)) )
 			{ // zyk: do not cancel Mind Trick if enemy is using Thermal Vision
 				if (ent && !ent->NPC) // zyk: remove tricked entity only for players
+				{
 					RemoveTrickedEnt(&self->client->ps.fd, i);
+				}
+				else if (ent && ent->NPC)
+				{
+					zyk_remove_mind_tricked_npc(self, ent);
+				}
 			}
 			else if ((level.time - self->client->dangerTime) < g_TimeSinceLastFrame*4)
 			{ //Untrick this entity if the tricker (self) fires while in his fov
@@ -4445,7 +4532,13 @@ static void WP_UpdateMindtrickEnts(gentity_t *self)
 					OrgVisible(ent->client->ps.origin, self->client->ps.origin, ent->s.number))
 				{
 					if (ent && !ent->NPC) // zyk: remove tricked entity only for players
+					{
 						RemoveTrickedEnt(&self->client->ps.fd, i);
+					}
+					else if (ent && ent->NPC)
+					{
+						zyk_remove_mind_tricked_npc(self, ent);
+					}
 				}
 			}
 			else if (BG_HasYsalamiri(level.gametype, &ent->client->ps))
@@ -4460,7 +4553,8 @@ static void WP_UpdateMindtrickEnts(gentity_t *self)
 	if (!self->client->ps.fd.forceMindtrickTargetIndex &&
 		!self->client->ps.fd.forceMindtrickTargetIndex2 &&
 		!self->client->ps.fd.forceMindtrickTargetIndex3 &&
-		!self->client->ps.fd.forceMindtrickTargetIndex4)
+		!self->client->ps.fd.forceMindtrickTargetIndex4 &&
+		self->client->pers.number_of_npcs_tricked_by_player == 0) // zyk: npcs can be mind tricked too
 	{ //everyone who we had tricked is no longer tricked, so stop the power
 		WP_ForcePowerStop(self, FP_TELEPATHY);
 	}

@@ -1156,6 +1156,12 @@ qboolean NPC_ValidEnemy( gentity_t *ent )
 		}
 	}
 
+	if (ent->client && ent->s.number < MAX_CLIENTS && NPCS.NPC->client && 
+		(NPCS.NPC->client->pers.mind_tricker_player_ids1 & (1 << ent->s.number) || NPCS.NPC->client->pers.mind_tricker_player_ids2 & (1 << ent->s.number)))
+	{ // zyk: this NPC is mind tricked by this player
+		return qfalse;
+	}
+
 	//Must be an NPC
 	if ( ent->client == NULL )
 	{

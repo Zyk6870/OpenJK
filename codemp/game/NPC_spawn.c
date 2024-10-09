@@ -1767,6 +1767,10 @@ finish:
 		newent->client->sess.ally1 = 0;
 		newent->client->sess.ally2 = 0;
 
+		newent->client->pers.mind_tricker_player_ids1 = 0;
+		newent->client->pers.mind_tricker_player_ids2 = 0;
+		newent->client->pers.mind_trick_effect_timer = 0;
+
 		newent->client->pers.quest_npc = QUEST_NPC_NONE;
 		newent->client->pers.quest_npc_caller_player_id = -1;
 

@@ -9852,7 +9852,34 @@ void G_RunFrame( int levelTime ) {
 			}
 
 			if (ent->health > 0)
-			{ 
+			{
+				if ((ent->client->pers.mind_tricker_player_ids1 > 0 || ent->client->pers.mind_tricker_player_ids2 > 0) &&
+					ent->client->pers.mind_trick_effect_timer < level.time)
+				{ // zyk: a mind tricked npc. Show effect on head
+					gentity_t* plum;
+					vec3_t plum_origin;
+					int player_it = 0;
+
+					for (player_it = 0; player_it < level.maxclients; player_it++)
+					{
+						if (ent->client->pers.mind_tricker_player_ids1 & (1 << player_it) || ent->client->pers.mind_tricker_player_ids2 & (1 << player_it))
+						{
+							VectorSet(plum_origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + DEFAULT_MAXS_2);
+
+							plum = G_TempEntity(plum_origin, EV_SCOREPLUM);
+
+							// only send this temp entity to a single client
+							plum->r.svFlags |= SVF_SINGLECLIENT;
+							plum->r.singleClient = player_it;
+
+							plum->s.otherEntityNum = player_it;
+							plum->s.time = player_it;
+						}
+					}
+
+					ent->client->pers.mind_trick_effect_timer = level.time + 500;
+				}
+
 				if (ent->client->pers.red_crystal_npc_timer > 0 && ent->client->pers.red_crystal_npc_timer < level.time)
 				{ // zyk: a converted npc. Return it back to normal
 					ent->client->playerTeam = ent->client->pers.original_playerTeam;

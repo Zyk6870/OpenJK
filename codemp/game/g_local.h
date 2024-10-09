@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.38"
+#define	GAMEVERSION	"New Zyk Mod v1.1.39"
 
 #define SECURITY_LOG "security.log"
 
@@ -883,6 +883,12 @@ typedef struct clientPersistant_s {
 
 	// zyk: player status flags
 	int player_statuses;
+
+	// zyk: Mind trick works on npcs. Sets the player ids if this npc is mind-tricked
+	int number_of_npcs_tricked_by_player;
+	int mind_tricker_player_ids1;
+	int mind_tricker_player_ids2;
+	int mind_trick_effect_timer;
 
 	// zyk: poison status
 	int poison_debounce_timer;
