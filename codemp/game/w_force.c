@@ -5487,7 +5487,7 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 			max_magic_power = zyk_max_magic_power(target);
 		}
 
-		trap->SendServerCommand(self->s.number, va("cp \"%s\n^1%d^3/^1%d  ^2%d^3/^2%d\n^5%d^3/^5%d  ^7%d^3/^7%d\n^3%d/%d\n\"", 
+		trap->SendServerCommand(self->s.number, va("cp \"%s\n^1%d^3/^1%d  ^2%d^3/^2%d\n^5%d^3/^5%d  ^6%d^3/^6%d\n^4%d^3/^4%d\n\"", 
 			client_name, client_health, client_max_health, client_armor, client_max_armor, target->client->ps.fd.forcePower, target->client->ps.fd.forcePowerMax, 
 			magic_power, max_magic_power, stamina, max_stamina));
 	}

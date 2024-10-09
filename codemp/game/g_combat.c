@@ -2625,6 +2625,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	{
 		int crystal_random_chance = Q_irand(0, 99);
 		zyk_quest_item_t crystal_type = QUEST_ITEM_NONE;
+		gentity_t* quest_player = attacker;
 
 		if (self->client->pers.quest_npc > QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
 		{
@@ -2660,18 +2661,33 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
+
+			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2)
+			{
+				quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_ANGEL_OF_DEATH);
+			}
 		}
 		else if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
 		{
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
+
+			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2)
+			{
+				quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_JORMUNGANDR);
+			}
 		}
 		else if (self->client->pers.quest_npc == QUEST_NPC_CHIMERA)
 		{
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
+
+			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2)
+			{
+				quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_CHIMERA);
+			}
 		}
 		else if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
 		{
@@ -2714,22 +2730,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 					if (quest_player->client->pers.quest_masters_defeated >= QUEST_MASTERS_TO_DEFEAT)
 					{
 						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
-					}
-				}
-
-				if (self->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && self->client->pers.quest_npc <= QUEST_NPC_CHIMERA)
-				{ // zyk: defeated a side quest super enemy
-					if (self->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH)
-					{
-						quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_ANGEL_OF_DEATH);
-					}
-					else if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-					{
-						quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_JORMUNGANDR);
-					}
-					else if (self->client->pers.quest_npc == QUEST_NPC_CHIMERA)
-					{
-						quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_CHIMERA);
 					}
 				}
 
@@ -6720,7 +6720,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
 
 								ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_EARTH);
-								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_EARTH] = level.time + (16000 / final_damage);
+								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_EARTH] = level.time + 16000 - (final_damage * 1000);
 							}
 						}
 						else if (this_magic_power == MAGIC_FIRE_MAGIC)
@@ -6733,7 +6733,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							{
 								ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_FIRE);
 								ent->client->pers.magic_power_user_id[MAGIC_HIT_BY_FIRE] = magic_power_user->s.number;
-								ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] = final_damage * 1.5;
+								ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] = final_damage * 1.6;
 								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_FIRE] = level.time + 200;
 							}
 						}
@@ -6767,8 +6767,9 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 								zyk_remove_emotes(ent);
 
-								// zyk: hit by Air Magic. Has a chance to knock down the target
-								if (Q_irand(0, 99) < chance_for_knockdown && !(ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_AIR)))
+								// zyk: hit by Air Magic. Has a chance to knock down the target while midair
+								if (Q_irand(0, 99) < chance_for_knockdown && ent->client->ps.groundEntityNum == ENTITYNUM_NONE && 
+									!(ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_AIR)))
 								{
 									ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
 									ent->client->ps.forceHandExtendTime = level.time + 800;
