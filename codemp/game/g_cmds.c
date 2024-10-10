@@ -6630,11 +6630,11 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				zyk_list_player_skills(ent, ent, G_NewString(arg1));
 			}
-			else if (Q_stricmp(arg1, "inventory") == 0)
+			else if (Q_stricmp(arg1, "inv") == 0 || Q_stricmp(arg1, "inventory") == 0)
 			{
 				if (trap->Argc() == 2)
 				{
-					trap->SendServerCommand(ent->s.number, "print \"Must pass a page number or ^3desc ^7to see inventory item description. Example: ^3/list inventory 1^7 or ^3/list inventory desc 1^7\n\"");
+					trap->SendServerCommand(ent->s.number, "print \"Must pass a page number or ^3desc ^7to see inventory item description. Examples: ^3/list inventory 1, /list inventory desc 1, /list inv 1, /list inv desc 1^7\n\"");
 				}
 				else
 				{
@@ -6689,7 +6689,37 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				if (zyk_allow_quests.integer == 1)
 				{
-					if (zyk_is_main_quest_complete(ent) == qfalse)
+					if (zyk_is_main_quest_complete(ent) == qtrue)
+					{
+						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
+					}
+					else if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)) || !(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)))
+					{
+						char quest_desc[MAX_STRING_CHARS];
+
+						strcpy(quest_desc, "^1Tutorial Quest\n\n^7Before playing the Main Quest, complete the following tutorials.\nA tutorial for magic powers will appear later when you need it\n\n");
+
+						if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)))
+						{
+							strcpy(quest_desc, va("%s^3Stamina Tutorial: ^1no\n", quest_desc));
+						}
+						else
+						{
+							strcpy(quest_desc, va("%s^3Stamina Tutorial: ^2yes\n", quest_desc));
+						}
+
+						if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)))
+						{
+							strcpy(quest_desc, va("%s^3Inventory Weight Tutorial: ^1no\n", quest_desc));
+						}
+						else
+						{
+							strcpy(quest_desc, va("%s^3Inventory Weight Tutorial: ^2yes\n", quest_desc));
+						}
+
+						trap->SendServerCommand(ent->s.number, va("%s\n", quest_desc));
+					}
+					else
 					{
 						char quest_desc[MAX_STRING_CHARS];
 
@@ -6702,10 +6732,6 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							ent->client->pers.quest_masters_defeated, QUEST_MASTERS_TO_DEFEAT,
 							ent->client->pers.quest_progress, MAX_QUEST_PROGRESS,
 							zyk_number_of_allies_in_map(ent), zyk_number_of_enemies_in_map(), ent->client->pers.quest_tries));
-					}
-					else
-					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
 					}
 				}
 				else
