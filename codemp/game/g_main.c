@@ -5209,7 +5209,7 @@ void zyk_spawn_black_hole_model(gentity_t* ent, int duration, int model_scale)
 
 	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
 	zyk_set_entity_field(new_ent, "spawnflags", "65536");
-	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2] - 20));
+	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2] - 15));
 
 	zyk_set_entity_field(new_ent, "model", "models/map_objects/mp/sphere_1.md3");
 
@@ -6075,9 +6075,9 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] < level.time)
 				{
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "repeater/concussion", 0, damage, radius, duration);
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dark", "4", "force/rage2", 0, damage, radius, duration);
 
-					zyk_spawn_black_hole_model(ent, duration, (5 * damage));
+					zyk_spawn_black_hole_model(ent, duration, (4 * damage));
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_DARK_MAGIC] = level.time + 300;
 				}
