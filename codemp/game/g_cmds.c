@@ -250,7 +250,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
 		return "creates a black hole, sucking enemies nearby and doing Dark elemental damage to them. Drains a small amount of health from enemies. Increases your Dark element affinity. More powerful against enemies with Light affinity. Absorbs some Dark magic effects";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
-		return "creates a lightning dome that damages enemies nearby. Creates a shining light that does Light elemental damage to enemies. While near the light, enemies will have their MP drained to restore your MP and have a chance to get confused/stunned. Increases your Light element affinity. More powerful against enemies with Dark affinity. Absorbs some Light magic effects";
+		return "creates a shining light that does Light elemental damage to enemies. While near the light, enemies will have their MP drained to restore your MP and have a chance to get confused/stunned. Increases your Light element affinity. More powerful against enemies with Dark affinity. Absorbs some Light magic effects";
 
 	return "";
 }
@@ -6583,7 +6583,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing Use key will convert a nearby enemy npc into an ally for an amount of time based on the number of blue crystals you have. Mage enemies (specially Mage Masters) have a chance of resisting it. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing Use key will create a Lightning Dome damaging enemies nearby. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
 	{

@@ -5740,7 +5740,7 @@ void lightning_dome(gentity_t* ent, int damage)
 	missile->count = 9;
 
 	missile->classname = "demp2_alt_proj";
-	missile->targetname = "zyk_magic_light";
+	// missile->targetname = "zyk_magic_light";
 	missile->s.weapon = WP_DEMP2;
 
 	missile->think = zyk_lightning_dome_detonate;
@@ -5767,7 +5767,7 @@ void light_magic(gentity_t* ent)
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 500;
 	ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] = 1;
 
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
 }
 
 // zyk: calculates bonus damage factor based on element of the magic used by attacker and target magic levels of both the same element and opposite element
@@ -6096,14 +6096,6 @@ void magic_power_events(gentity_t *ent)
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] < level.time)
 				{
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_light", "4", "howler/sonic", 0, damage, radius, 400);
-
-					if (ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] > 0)
-					{
-						// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
-						lightning_dome(ent, damage * 2);
-
-						ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC]--;
-					}
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 300;
 				}
@@ -7323,7 +7315,7 @@ void zyk_show_tutorial(gentity_t* ent)
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 2))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Green crystals give extra tries for quest and Red crystals converts enemies into allies by pressing Use key near them.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Green crystals give extra tries for quest and Red crystals creates a Lightning Dome by pressing Use key.\n\"", QUESTCHAR_ALL_SPIRITS));
 		}
 
 		ent->client->pers.tutorial_step++;
@@ -9195,62 +9187,17 @@ void G_RunFrame( int levelTime ) {
 
 				if (ent->client->pers.special_crystal_timer < level.time)
 				{
-					// zyk: Red crystal. Convert the enemy npc the player is looking at
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && ent->client->ps.hasLookTarget &&
-						ent->client->pers.cmd.buttons & BUTTON_USE)
+					// zyk: Red crystal
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && ent->client->pers.cmd.buttons & BUTTON_USE)
 					{
-						gentity_t* target_enemy = &g_entities[ent->client->ps.lookTarget];
+						// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
+						lightning_dome(ent, 20);
 
-						if (target_enemy && target_enemy->client && target_enemy->NPC && target_enemy->client->NPC_class != CLASS_VEHICLE &&
-							target_enemy->client->playerTeam != NPCTEAM_PLAYER && target_enemy->client->pers.red_crystal_npc_timer == 0)
-						{
-							int chance_to_resist_conversion = Q_irand(0, 99);
-							qboolean is_converted = qtrue;
+						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
-							if (chance_to_resist_conversion < 98 && 
-								target_enemy->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && target_enemy->client->pers.quest_npc <= QUEST_NPC_CHIMERA)
-							{
-								is_converted = qfalse;
-							}
-							else if (chance_to_resist_conversion < 75 && target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
-							{
-								is_converted = qfalse;
-							}
-							else if (chance_to_resist_conversion < 40 &&
-								(target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER || target_enemy->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR))
-							{
-								is_converted = qfalse;
-							}
-							else if (chance_to_resist_conversion < 20 && target_enemy->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE)
-							{
-								is_converted = qfalse;
-							}
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
 
-							zyk_quest_effect_spawn(ent, ent, "zyk_red_crystal_effect", "0", "env/btend", 0, 0, 0, 2000);
-
-							if (is_converted == qtrue)
-							{
-								target_enemy->client->pers.original_playerTeam = target_enemy->client->playerTeam;
-								target_enemy->client->pers.original_enemyTeam = target_enemy->client->enemyTeam;
-
-								target_enemy->client->playerTeam = NPCTEAM_PLAYER;
-								target_enemy->client->enemyTeam = NPCTEAM_ENEMY;
-								target_enemy->enemy = NULL;
-
-								target_enemy->client->pers.red_crystal_npc_timer = level.time + 5000 + (ent->client->pers.magic_crystals * 500);
-
-								zyk_quest_effect_spawn(ent, target_enemy, "zyk_red_crystal_effect", "0", "env/btend", 0, 0, 0, 2000);
-								G_Sound(target_enemy, CHAN_AUTO, G_SoundIndex("sound/player/ysalimari.mp3"));
-							}
-							else
-							{
-								G_Sound(target_enemy, CHAN_AUTO, G_SoundIndex("sound/effects/air_burst.mp3"));
-							}
-
-							ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
-
-							ent->client->pers.special_crystal_timer = level.time + 500;
-						}
+						ent->client->pers.special_crystal_timer = level.time + 500;
 					}
 				}
 
@@ -9626,7 +9573,7 @@ void G_RunFrame( int levelTime ) {
 							{
 								tree_ent = &g_entities[ent->client->pers.quest_spirit_tree_id];
 
-								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
+								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/holocron.wav"));
 							}
 						}
 
@@ -9922,14 +9869,6 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					ent->client->pers.mind_trick_effect_timer = level.time + 500;
-				}
-
-				if (ent->client->pers.red_crystal_npc_timer > 0 && ent->client->pers.red_crystal_npc_timer < level.time)
-				{ // zyk: a converted npc. Return it back to normal
-					ent->client->playerTeam = ent->client->pers.original_playerTeam;
-					ent->client->enemyTeam = ent->client->pers.original_enemyTeam;
-
-					ent->client->pers.red_crystal_npc_timer = 0;
 				}
 				
 				// zyk: npcs with magic powers
