@@ -4702,8 +4702,6 @@ int zyk_total_skillpoints(gentity_t* ent)
 
 // zyk: initialize RPG skills of this player
 extern void zyk_set_quest_event_timer(gentity_t* ent);
-extern void zyk_update_inventory(gentity_t* ent);
-extern void zyk_calculate_current_weight(gentity_t* ent);
 void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 {
 	if (ent->client->sess.amrpgmode == 2)
@@ -4718,9 +4716,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 				ent->client->pers.skill_levels[i]--;
 			}
 		}
-
-		// zyk: loading initial inventory
-		zyk_update_inventory(ent);
 
 		// zyk: loading Jump value
 		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_LEVITATION)) && ent->client->pers.skill_levels[SKILL_JUMP] > 0)
@@ -4757,7 +4752,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
 		ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[SKILL_SENSE];
 
-		// zyk: loading Saber Offense value
+		// zyk: loading Saber Attack value
 		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABER_OFFENSE)) && ent->client->pers.skill_levels[SKILL_SABER_ATTACK] > 0)
 		{
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_SABER_OFFENSE);
@@ -4767,6 +4762,12 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SABER_OFFENSE);
 		}
 		ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] = ent->client->pers.skill_levels[SKILL_SABER_ATTACK];
+
+		if (ent->client->pers.skill_levels[SKILL_SABER_ATTACK] == 0 && ent->client->pers.skill_levels[SKILL_SABER_THROW] > 0)
+		{ // zyk: in this case, give at least Saber Offense level 1 to avoid bug where player tries to throw saber and it drops to the ground and he gets a new saber in hand
+			ent->client->ps.fd.forcePowersKnown |= (1 << FP_SABER_OFFENSE);
+			ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] = 1;
+		}
 
 		// zyk: loading Saber Defense value
 		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABER_DEFENSE)) && ent->client->pers.skill_levels[SKILL_SABER_DEFENSE] > 0)
@@ -4898,8 +4899,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.energy_modulator_mode = 0;
 
 			ent->client->pers.buy_sell_timer = 0;
-
-			zyk_calculate_current_weight(ent);
+			ent->client->pers.inventory_update_timer = level.time + 100;
 
 			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
 
@@ -6868,7 +6868,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"You must specify an item number and an optional amount. Example: ^3/buy 1 ^7or ^3/buy 1 20^7. Max amount of 100.\n\"" );
+		trap->SendServerCommand(ent->s.number, va("print \"You must specify an item number and an optional amount. Example: ^3/buy 1 ^7or ^3/buy 1 20^7. Max amount of %d.\n\"", RPG_MAX_BUY_AMOUNT));
 		return;
 	}
 
@@ -6906,9 +6906,9 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			trap->SendServerCommand(ent->s.number, "print \"Minimum amount of 1.\n\"");
 			return;
 		}
-		else if (amount > 100)
+		else if (amount > RPG_MAX_BUY_AMOUNT)
 		{
-			trap->SendServerCommand(ent->s.number, "print \"Max amount of 100.\n\"");
+			trap->SendServerCommand(ent->s.number, va("print \"Max amount of %d.\n\"", RPG_MAX_BUY_AMOUNT));
 			return;
 		}
 	}
@@ -6982,6 +6982,9 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		ent->client->pers.credits -= total_cost;
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
+
+		// zyk: buying and selling must use Stamina
+		rpg_skill_counter(ent, amount);
 
 		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Thanks %s^7!\n\"", QUESTCHAR_SELLER, ent->client->pers.netname));
 
@@ -7076,6 +7079,9 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		add_credits(ent, (zyk_get_seller_item_cost(item_index, qfalse) * amount));
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
+
+		// zyk: buying and selling must use Stamina
+		rpg_skill_counter(ent, amount);
 
 		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Thanks %s^7!\n\"", QUESTCHAR_SELLER, ent->client->pers.netname));
 	}
@@ -10190,6 +10196,8 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 
 		if (ent->client->pers.quest_power_status & (1 << magic_number))
 		{ // zyk: stop using the magic power
+			rpg_skill_counter(ent, 50);
+
 			zyk_stop_magic_power(ent, magic_number);
 
 			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/boon.mp3"));
@@ -10255,6 +10263,8 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				// zyk: magic powers cost mp
 				ent->client->pers.magic_power -= magic_cost;
 
+				rpg_skill_counter(ent, 100);
+
 				if (ent->s.number < MAX_CLIENTS)
 				{
 					display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
@@ -10299,8 +10309,6 @@ void Cmd_Magic_f( gentity_t *ent ) {
 		}
 
 		zyk_cast_magic(ent, skill_index);
-
-		rpg_skill_counter(ent, 200);
 	}
 }
 

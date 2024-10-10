@@ -5943,10 +5943,6 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 	if ( !(self->client->ps.fd.forcePowersActive & (1<<FP_LIGHTNING)) )
 		self->client->force.lightningDebounce = level.time;
 
-	// zyk: saber throw now increases skill counter
-	if (self->client->ps.saberInFlight && self->client->ps.saberEntityNum != 0)
-		rpg_skill_counter(self,1);
-
 	if ( (!self->client->ps.fd.forcePowersActive || self->client->ps.fd.forcePowersActive == (1 << FP_DRAIN)) &&
 		(!self->client->ps.saberInFlight || self->client->ps.saberEntityNum == 0) && // zyk: now force regenerates if saber is dropped in the ground after being thrown
 		(self->client->ps.weapon != WP_SABER || !BG_SaberInSpecial(self->client->ps.saberMove)) )

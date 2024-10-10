@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.44"
+#define	GAMEVERSION	"New Zyk Mod v1.1.45"
 
 #define SECURITY_LOG "security.log"
 
@@ -552,6 +552,7 @@ typedef enum {
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
 	PLAYER_STATUS_POISONED,
 	PLAYER_STATUS_KEEP_QUEST_TRIES,
+	PLAYER_STATUS_RESET_TO_MELEE,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -788,6 +789,7 @@ typedef enum {
 
 // zyk: initial credits in RPG Mode
 #define RPG_INITIAL_CREDITS 0
+#define RPG_MAX_BUY_AMOUNT 100
 
 // zyk: amount of Magic Crystals to upgrade a skill
 #define MAGIC_CRYSTALS_TO_UPGRADE_SKILL 1
@@ -941,6 +943,8 @@ typedef struct clientPersistant_s {
 
 	// zyk: cooldown time to buy or sell
 	int buy_sell_timer;
+
+	int inventory_update_timer;
 
 	int player_scale;
 

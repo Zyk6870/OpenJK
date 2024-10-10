@@ -154,9 +154,6 @@ static QINLINE int G_SaberAttackPower(gentity_t *ent, qboolean attacking)
 	if (attacking)
 	{ //the attacker gets a boost to help penetrate defense.
 		//General boost up so the individual levels make a bigger difference.
-		// zyk: saber counter
-		rpg_skill_counter(ent,1);
-
 		baseLevel *= 2;
 
 		baseLevel++;
@@ -4215,9 +4212,6 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 							{ //staff kata
 								dmg = G_GetAttackDamage(self, 60, 70, 0.5f);
 							}
-
-							// zyk: katas increase skill_counter
-							rpg_skill_counter(self,1);
 						}
 						else
 						{

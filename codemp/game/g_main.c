@@ -7504,18 +7504,27 @@ void zyk_update_inventory(gentity_t* ent)
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_JETPACK] > 0)
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 
-	// zyk: if player does not have this weapon, set melee
-	if (!(ent->client->ps.stats[STAT_WEAPONS] & (1 << ent->client->ps.weapon)))
-	{
-		ent->client->ps.weapon = WP_MELEE;
-	}
-
 	if (!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_BINOCULARS)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC)) &&
 		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SENTRY_GUN)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER)) &&
 		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_EWEB)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC_BIG)) &&
 		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SHIELD)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_CLOAK)))
 	{ // zyk: if player has no items left, deselect the held item
 		ent->client->ps.stats[STAT_HOLDABLE_ITEM] = 0;
+	}
+
+	// zyk: if RPG player does not have this weapon, set melee
+	if (ent->health > 0 && !(ent->client->ps.stats[STAT_WEAPONS] & (1 << ent->client->ps.weapon)))
+	{
+		ent->s.weapon = WP_MELEE;
+		ent->client->ps.weapon = WP_MELEE;
+
+		ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_RESET_TO_MELEE);
+	}
+
+	// zyk: PLAYER_STATUS_RESET_TO_MELEE used because, after setting it PLAYER_STATUS_RESET_TO_MELEE, client still sends pers.cmd.weapon as the old weapon
+	if (ent->client->ps.weapon == ent->client->pers.cmd.weapon && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_RESET_TO_MELEE))
+	{
+		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_RESET_TO_MELEE);
 	}
 
 	// zyk: if player no longer has Cloak Item and is cloaked, decloaks
@@ -9223,8 +9232,13 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				// zyk: updating RPG inventory and calculating current weight
-				zyk_update_inventory(ent);
-				zyk_calculate_current_weight(ent);
+				if (ent->client->pers.inventory_update_timer < level.time)
+				{
+					zyk_update_inventory(ent);
+					zyk_calculate_current_weight(ent);
+
+					ent->client->pers.inventory_update_timer = level.time + 100;
+				}
 				
 				if (ent->client->pers.thermal_vision == qtrue && ent->client->ps.zoomMode == 0)
 				{ // zyk: if player stops using binoculars, stop the Thermal Vision
