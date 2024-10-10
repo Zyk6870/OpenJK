@@ -1445,8 +1445,8 @@ void ItemUse_Jetpack( gentity_t *ent )
 	}
 
 	if (!ent->client->jetPackOn &&
-		// ent->client->ps.jetpackFuel < 5
-		ent->client->pers.jetpack_fuel < JETPACK_SCALE)
+		// ent->client->ps.jetpackFuel < 5 // zyk: original condition, need 5 jetpack fuel
+		ent->client->pers.jetpack_fuel < JETPACK_FUEL_USAGE)
 	{ //too low on fuel to start it up
 		return;
 	}

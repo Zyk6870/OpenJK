@@ -6717,7 +6717,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							strcpy(quest_desc, va("%s^3Inventory Weight Tutorial: ^2yes\n", quest_desc));
 						}
 
-						trap->SendServerCommand(ent->s.number, va("%s\n", quest_desc));
+						trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", quest_desc));
 					}
 					else
 					{

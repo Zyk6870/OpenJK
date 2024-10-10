@@ -7128,21 +7128,21 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_WP_BLASTER_PISTOL] = 15;
 	rpg_inventory_weights[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] = 18;
 	rpg_inventory_weights[RPG_INVENTORY_WP_DISRUPTOR] = 18;
-	rpg_inventory_weights[RPG_INVENTORY_WP_BOWCASTER] = 22;
-	rpg_inventory_weights[RPG_INVENTORY_WP_REPEATER] = 25;
-	rpg_inventory_weights[RPG_INVENTORY_WP_DEMP2] = 23;
-	rpg_inventory_weights[RPG_INVENTORY_WP_FLECHETTE] = 27;
-	rpg_inventory_weights[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = 30;
-	rpg_inventory_weights[RPG_INVENTORY_WP_CONCUSSION] = 30;
+	rpg_inventory_weights[RPG_INVENTORY_WP_BOWCASTER] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_WP_REPEATER] = 22;
+	rpg_inventory_weights[RPG_INVENTORY_WP_DEMP2] = 21;
+	rpg_inventory_weights[RPG_INVENTORY_WP_FLECHETTE] = 24;
+	rpg_inventory_weights[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = 27;
+	rpg_inventory_weights[RPG_INVENTORY_WP_CONCUSSION] = 27;
 	rpg_inventory_weights[RPG_INVENTORY_WP_BRYAR_PISTOL] = 15;
 
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_BLASTER_PACK] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_POWERCELL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_METAL_BOLTS] = 1;
-	rpg_inventory_weights[RPG_INVENTORY_AMMO_ROCKETS] = 4;
-	rpg_inventory_weights[RPG_INVENTORY_AMMO_THERMALS] = 5;
-	rpg_inventory_weights[RPG_INVENTORY_AMMO_TRIPMINES] = 6;
-	rpg_inventory_weights[RPG_INVENTORY_AMMO_DETPACKS] = 7;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_ROCKETS] = 2;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_THERMALS] = 3;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_TRIPMINES] = 4;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_DETPACKS] = 5;
 
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_BINOCULARS] = 3;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_BACTA_CANISTER] = 5;
@@ -7464,8 +7464,16 @@ void zyk_update_inventory(gentity_t* ent)
 	ent->client->ps.ammo[AMMO_DETPACK] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS];
 
 	// zyk: jetpack fuel
-	ent->client->ps.jetpackFuel = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL];
-	ent->client->pers.jetpack_fuel = ent->client->ps.jetpackFuel * JETPACK_SCALE;
+	ent->client->pers.jetpack_fuel = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL];
+
+	if (ent->client->pers.jetpack_fuel < 100)
+	{
+		ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
+	}
+	else
+	{
+		ent->client->ps.jetpackFuel = 100;
+	}
 
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_THERMALS] > 0)
 		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_THERMAL);
@@ -8844,11 +8852,11 @@ void G_RunFrame( int levelTime ) {
 			//      then we scale and set it to the jetpackFuel attribute to display the fuel bar correctly to the player
 			if (ent->client->jetPackOn && ent->client->jetPackDebReduce < level.time)
 			{
-				int jetpack_debounce_amount = 20;
+				int jetpack_debounce_amount = JETPACK_FUEL_USAGE;
 
 				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 				{ // zyk: Jetpack Upgrade decreases fuel debounce
-					jetpack_debounce_amount -= 4;
+					jetpack_debounce_amount /= 2;
 				}
 
 				if (ent->client->pers.cmd.upmove > 0)
@@ -8864,7 +8872,22 @@ void G_RunFrame( int levelTime ) {
 					Jetpack_Off(ent);
 				}
 
-				ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel/JETPACK_SCALE;
+				ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel / JETPACK_SCALE;
+
+				if (ent->client->sess.amrpgmode == 2)
+				{
+					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL] = ent->client->pers.jetpack_fuel;
+
+					if (ent->client->pers.jetpack_fuel < 100)
+					{
+						ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
+					}
+					else
+					{
+						ent->client->ps.jetpackFuel = 100;
+					}
+				}
+
 				ent->client->jetPackDebReduce = level.time + 200; // zyk: JETPACK_DEFUEL_RATE. Original value: 200
 			}
 

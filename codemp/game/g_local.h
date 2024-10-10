@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.48"
+#define	GAMEVERSION	"New Zyk Mod v1.1.49"
 
 #define SECURITY_LOG "security.log"
 
@@ -824,8 +824,9 @@ typedef enum {
 #define MAX_ACC_NAME_SIZE 30
 
 // zyk: max jetpack fuel the player can have
-#define MAX_JETPACK_FUEL 10000
-#define JETPACK_SCALE 100 // zyk: used to scale the MAX_JETPACK_FUEL to set the jetpackFuel attribute. Dividing MAX_JETPACK_FUEL per JETPACK_SCALE must result in 100
+#define MAX_JETPACK_FUEL 500
+#define JETPACK_SCALE 5 // zyk: used to scale the MAX_JETPACK_FUEL to set the jetpackFuel attribute. Dividing MAX_JETPACK_FUEL per JETPACK_SCALE must result in 100
+#define JETPACK_FUEL_USAGE 2
 
 // zyk: default size of the globe model used as the Duel Tournament arena
 #define DUEL_TOURNAMENT_ARENA_SIZE 64
