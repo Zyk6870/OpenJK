@@ -1407,6 +1407,7 @@ void ForceTeamHeal( gentity_t *self )
 	}
 }
 
+extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 void ForceTeamForceReplenish( gentity_t *self )
 {
 	float radius = 256;
@@ -1417,7 +1418,6 @@ void ForceTeamForceReplenish( gentity_t *self )
 	int pl[MAX_CLIENTS];
 	int poweradd = 0;
 	gentity_t *te = NULL;
-	int max_blasterpack_ammo = 0;
 	int max_powercell_ammo = 0;
 
 	if ( self->health <= 0 )
@@ -1449,7 +1449,6 @@ void ForceTeamForceReplenish( gentity_t *self )
 	{
 		ent = &g_entities[i];
 
-		max_blasterpack_ammo = zyk_max_blaster_pack_ammo.integer;
 		max_powercell_ammo = zyk_max_power_cell_ammo.integer;
 
 		// zyk: created new condition so we can use Team Energize in FFA. Also restore ammo of the target player
@@ -1457,7 +1456,7 @@ void ForceTeamForceReplenish( gentity_t *self )
 			(ent->client->ps.fd.forcePower < ent->client->ps.fd.forcePowerMax || 
 			 (self->client->sess.amrpgmode == 2 && !ent->NPC && 
 			  ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
-			  (ent->client->ps.ammo[AMMO_BLASTER] < max_blasterpack_ammo || ent->client->ps.ammo[AMMO_POWERCELL] < max_powercell_ammo)
+			  (ent->client->pers.current_stamina < ent->client->pers.max_stamina || ent->client->ps.ammo[AMMO_POWERCELL] < max_powercell_ammo)
 			 )
 			) && 
 			ForcePowerUsableOn(self, ent, FP_TEAM_FORCE) &&
@@ -1506,7 +1505,7 @@ void ForceTeamForceReplenish( gentity_t *self )
 		// zyk: Team Energize now can recover ammo if the player has full force
 		if (self->client->sess.amrpgmode == 2 && !g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.fd.forcePower == g_entities[pl[i]].client->ps.fd.forcePowerMax)
 		{
-			Add_Ammo(&g_entities[pl[i]], AMMO_BLASTER, 5);
+			zyk_set_stamina(&g_entities[pl[i]], poweradd, qtrue);
 			Add_Ammo(&g_entities[pl[i]], AMMO_POWERCELL, 5);
 			G_Sound(&g_entities[pl[i]], CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 		}

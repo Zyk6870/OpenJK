@@ -200,7 +200,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_RAGE)
 		return "makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage";
 	if (skill_index == SKILL_TEAM_ENERGIZE)
-		return "restores some force power to players near you. Regens some blaster pack and power cell ammo of the target players";
+		return "restores some force power to players near you. If force power is full, restores some Stamina and power cell ammo";
 	if (skill_index == SKILL_SENSE_HEALTH)
 		return "allows you to see info about someone, including npcs. Level 1 shows current health. Level 2 shows name, health and shield. Level 3 shows name, health and max health, shield and max shield, force and max force, mp and max mp, Stamina and Max Stamina. To use it, when you are near a player or npc, use ^3Sense ^7force power";
 	if (skill_index == SKILL_SHIELD_HEALING)

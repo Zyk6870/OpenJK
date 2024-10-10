@@ -1596,16 +1596,10 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			else if (zyk_is_player_idle(ent, ucmd) == qfalse)
 			{
 				stamina_usage += 1;
-				trap->SendServerCommand(ent->s.number, va("print \"Test %d %d\n\"", ent->client->pers.cmd.weapon, ent->client->ps.weapon));
 			}
 
 			if (stamina_usage > 0)
 			{
-				if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS && stamina_usage > 1)
-				{
-					stamina_usage /= 2;
-				}
-
 				zyk_set_stamina(ent, stamina_usage, qfalse);
 
 				if (ent->client->pers.current_stamina < RPG_MIN_STAMINA && 
