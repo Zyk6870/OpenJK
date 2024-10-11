@@ -6118,6 +6118,12 @@ void PM_RocketLock( float lockDist, qboolean vehicleLock )
 	}
 }
 
+#ifdef _GAME
+
+extern void zyk_remove_ammo_from_inventory(gentity_t* ent, ammo_t ammo_type, int amount);
+
+#endif
+
 //---------------------------------------
 static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh )
 //---------------------------------------
@@ -6299,8 +6305,20 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			{
 				if (pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime)
 				{
+#ifdef _GAME
+					gentity_t* player_ent = &g_entities[pm->ps->clientNum];
+#endif
+
 					pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].altChargeSub;
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].altChargeSubTime;
+
+#ifdef _GAME
+					// zyk: player in RPG Mode has the inventory
+					if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+					{
+						zyk_remove_ammo_from_inventory(player_ent, weaponData[pm->ps->weapon].ammoIndex, weaponData[pm->ps->weapon].altChargeSub);
+					}
+#endif
 				}
 			}
 		}
@@ -6337,8 +6355,20 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			{
 				if (pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime)
 				{
+#ifdef _GAME
+					gentity_t* player_ent = &g_entities[pm->ps->clientNum];
+#endif
+
 					pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].chargeSub;
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].chargeSubTime;
+
+#ifdef _GAME
+					// zyk: player in RPG Mode has the inventory
+					if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+					{
+						zyk_remove_ammo_from_inventory(player_ent, weaponData[pm->ps->weapon].ammoIndex, weaponData[pm->ps->weapon].chargeSub);
+					}
+#endif
 				}
 			}
 		}
@@ -7076,12 +7106,6 @@ backAgain:
 		PM_SetAnim(SETANIM_BOTH, Anim, iFlags);
 	}
 }
-
-#ifdef _GAME
-
-extern void zyk_remove_ammo_from_inventory(gentity_t* ent, ammo_t ammo_type, int amount);
-
-#endif
 
 /*
 ==============
