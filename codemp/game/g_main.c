@@ -9193,7 +9193,7 @@ void G_RunFrame( int levelTime ) {
 						if (ent->client->pers.special_crystal_counter >= 5)
 						{
 							// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
-							lightning_dome(ent, 20);
+							lightning_dome(ent, 30);
 
 							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
