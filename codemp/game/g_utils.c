@@ -1606,6 +1606,18 @@ qboolean TryHeal(gentity_t *ent, gentity_t *target)
 	return qfalse;
 }
 
+void zyk_use_red_crystal(gentity_t* ent)
+{
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 &&
+		ent->client->pers.special_crystal_timer < level.time && ent->client->pers.special_crystal_counter < RED_CRYSTAL_MAX_CHARGE)
+	{ // zyk: Charging Red Crystal
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/energy_crackle.wav"));
+
+		ent->client->pers.special_crystal_counter++;
+		ent->client->pers.special_crystal_timer = level.time + 200;
+	}
+}
+
 /*
 ==============
 TryUse
@@ -1811,19 +1823,6 @@ void TryUse( gentity_t *ent )
 
 			return;
 		}
-	}
-
-	if ((!target || !target->inuse) && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && 
-		ent->client->pers.special_crystal_timer < level.time && ent->client->pers.special_crystal_counter < RED_CRYSTAL_MAX_CHARGE)
-	{ // zyk: Charging Red Crystal
-
-		if (ent->client->pers.special_crystal_counter == 0)
-		{
-			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/electric_beam_lp.wav"));
-		}
-
-		ent->client->pers.special_crystal_counter++;
-		ent->client->pers.special_crystal_timer = level.time + 200;
 	}
 
 	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0 &&
@@ -2084,6 +2083,11 @@ void TryUse( gentity_t *ent )
 		return;
 	}
 
+	if (!target || !target->inuse)
+	{
+		zyk_use_red_crystal(ent);
+	}
+
 tryJetPack:
 	//if we got here, we didn't actually use anything else, so try to toggle jetpack if we are in the air, or if it is already on
 	if (ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK))
@@ -2093,6 +2097,8 @@ tryJetPack:
 			ItemUse_Jetpack(ent);
 			return;
 		}
+
+		zyk_use_red_crystal(ent);
 	}
 
 	if ( (ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_AMMODISP)) /*&&
