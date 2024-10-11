@@ -9701,7 +9701,11 @@ void G_RunFrame( int levelTime ) {
 
 					// zyk: quest npcs
 					if (ent->client->pers.quest_event_timer < level.time && 
-						ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA) && ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY))
+						(ent->client->pers.quest_defeated_enemies > 0 || 
+						ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY) ||
+						ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA) ||
+						ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC) ||
+						ent->client->pers.tutorial_shown & (1 << TUTORIAL_QUEST_ITEMS)))
 					{
 						qboolean hard_difficulty = qfalse;
 

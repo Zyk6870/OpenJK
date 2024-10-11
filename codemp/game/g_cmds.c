@@ -6693,28 +6693,34 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					{
 						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
 					}
-					else if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)) || !(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)))
+					else if (ent->client->pers.quest_defeated_enemies == 0 && 
+						!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)) &&
+						!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)) && 
+						!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)) &&
+						!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_QUEST_ITEMS)))
 					{
 						char quest_desc[MAX_STRING_CHARS];
 
-						strcpy(quest_desc, "^1Tutorial Quest\n\n^7Before playing the Main Quest, complete the following tutorials.\nA tutorial for magic powers will appear later when you need it\n\n");
+						strcpy(quest_desc, "^1Tutorial Quest\n\n^7Main Quest will start after at least one the following tutorials.\nThey will appear when you need them.\n\n");
 
 						if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)))
 						{
-							strcpy(quest_desc, va("%s^3Stamina Tutorial: ^1no\n", quest_desc));
-						}
-						else
-						{
-							strcpy(quest_desc, va("%s^3Stamina Tutorial: ^2yes\n", quest_desc));
+							strcpy(quest_desc, va("%s^3Stamina Tutorial\n", quest_desc));
 						}
 
 						if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)))
 						{
-							strcpy(quest_desc, va("%s^3Inventory Weight Tutorial: ^1no\n", quest_desc));
+							strcpy(quest_desc, va("%s^3Inventory Weight Tutorial\n", quest_desc));
 						}
-						else
+
+						if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)))
 						{
-							strcpy(quest_desc, va("%s^3Inventory Weight Tutorial: ^2yes\n", quest_desc));
+							strcpy(quest_desc, va("%s^3Magic Tutorial\n", quest_desc));
+						}
+
+						if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_QUEST_ITEMS)))
+						{
+							strcpy(quest_desc, va("%s^3Quest Items Tutorial\n", quest_desc));
 						}
 
 						trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", quest_desc));
@@ -9895,7 +9901,7 @@ void Cmd_Players_f( gentity_t *ent ) {
 			{ // zyk: show skills of the player
 				zyk_list_player_skills(player_ent, ent, G_NewString(arg2));
 			}
-			else if (Q_stricmp(arg2, "inventory") == 0)
+			else if (Q_stricmp(arg2, "inv") == 0 || Q_stricmp(arg2, "inventory") == 0)
 			{
 				if (trap->Argc() == 3)
 				{
