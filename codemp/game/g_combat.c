@@ -2627,7 +2627,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		zyk_quest_item_t crystal_type = QUEST_ITEM_NONE;
 		gentity_t* quest_player = attacker;
 
-		if (self->client->pers.quest_npc > QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
+		if (self->client->pers.quest_npc > QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 5))
 		{
 			if (self->client->pers.quest_npc == QUEST_NPC_HIGH_TRAINED_WARRIOR ||
 				self->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE ||
@@ -2651,7 +2651,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
 			}
 		}
-		else if (self->client->pers.quest_npc == QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
+		else if (self->client->pers.quest_npc == QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 5))
 		{
 			crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
 		}

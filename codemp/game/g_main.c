@@ -9190,14 +9190,25 @@ void G_RunFrame( int levelTime ) {
 					// zyk: Red crystal
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && ent->client->pers.cmd.buttons & BUTTON_USE)
 					{
-						// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
-						lightning_dome(ent, 20);
+						if (ent->client->pers.special_crystal_counter >= 5)
+						{
+							// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
+							lightning_dome(ent, 20);
 
-						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
+							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
+							ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
+						}
+						else
+						{
+							ent->client->pers.special_crystal_counter++;
+						}
 
-						ent->client->pers.special_crystal_timer = level.time + 500;
+						ent->client->pers.special_crystal_timer = level.time + 200;
+					}
+					else
+					{
+						ent->client->pers.special_crystal_counter = 0;
 					}
 				}
 
@@ -9274,14 +9285,14 @@ void G_RunFrame( int levelTime ) {
 					int player_power_level = (ent->client->pers.magic_crystals +
 						zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60)) / 4;
 
-					int skill_crystal_chance = 50 - player_power_level -
+					int skill_crystal_chance = 60 - player_power_level -
 						main_quest_progress;
 
-					int green_crystal_chance = 20 - player_power_level -
+					int green_crystal_chance = 30 - player_power_level -
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] -
 						main_quest_progress;
 
-					int red_crystal_chance = 20 - player_power_level -
+					int red_crystal_chance = 30 - player_power_level -
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] -
 						main_quest_progress;
 
