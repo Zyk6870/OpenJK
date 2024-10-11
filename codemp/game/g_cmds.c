@@ -8229,8 +8229,11 @@ void Cmd_Drop_f( gentity_t *ent ) {
 		{
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << weapon);
 
-			ent->s.weapon = WP_MELEE;
-			ent->client->ps.weapon = WP_MELEE;
+			if (ent->client->sess.amrpgmode < 2)
+			{
+				ent->s.weapon = WP_MELEE;
+				ent->client->ps.weapon = WP_MELEE;
+			}
 		}
 	}
 }
