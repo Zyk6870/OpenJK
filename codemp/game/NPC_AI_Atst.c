@@ -22,7 +22,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "b_local.h"
 
-#define	MIN_MELEE_RANGE		640
+#define	MIN_MELEE_RANGE		320   // zyk: default 640
 #define	MIN_MELEE_RANGE_SQR	( MIN_MELEE_RANGE * MIN_MELEE_RANGE )
 
 #define MIN_DISTANCE		128
@@ -46,7 +46,7 @@ void NPC_ATST_Precache(void)
 
 //	RegisterItem( BG_FindItemForWeapon( WP_ATST_MAIN ));	//precache the weapon
 	//rwwFIXMEFIXME: add this weapon
-	RegisterItem( BG_FindItemForWeapon( WP_BOWCASTER ));	//precache the weapon
+	RegisterItem( BG_FindItemForWeapon( WP_BOWCASTER ));	//precache the weapon // zyk: default WP_BOWCASTER
 	RegisterItem( BG_FindItemForWeapon( WP_ROCKET_LAUNCHER ));	//precache the weapon
 
 	G_EffectIndex( "env/med_explode2" );
@@ -168,20 +168,77 @@ void ATST_Hunt( qboolean visible, qboolean advance )
 ATST_Ranged
 -------------------------
 */
+extern void RocketDie(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int mod);
 void ATST_Ranged( qboolean visible, qboolean advance, qboolean altAttack )
 {
 
 	if ( TIMER_Done( NPCS.NPC, "atkDelay" ) && visible )	// Attack?
 	{
+		gentity_t* missile;
+		vec3_t shot_origin, forward;
+
 		TIMER_Set( NPCS.NPC, "atkDelay", Q_irand( 500, 3000 ) );
 
+		VectorSet(shot_origin, NPCS.NPC->r.currentOrigin[0], NPCS.NPC->r.currentOrigin[1], NPCS.NPC->r.currentOrigin[2] + 128);
+
+		VectorSubtract(NPCS.NPC->enemy->client->ps.origin, shot_origin, forward);
+		VectorNormalize(forward);
+
+		// zyk: it can fire rockets now
 		if (altAttack)
 		{
 			NPCS.ucmd.buttons |= BUTTON_ATTACK|BUTTON_ALT_ATTACK;
+
+			if (NPCS.NPC->enemy)
+			{
+				int rocket_damage = 150;
+
+				missile = CreateMissile(shot_origin, forward, 1200, 30000, NPCS.NPC, qfalse);
+
+				missile->classname = "rocket_proj";
+				missile->s.weapon = WP_ROCKET_LAUNCHER;
+
+				// Make it easier to hit things
+				VectorSet(missile->r.maxs, 3, 3, 3);
+				VectorScale(missile->r.maxs, -1, missile->r.mins);
+
+				missile->damage = rocket_damage;
+				missile->dflags = DAMAGE_DEATH_KNOCKBACK;
+				missile->methodOfDeath = MOD_ROCKET;
+				missile->splashMethodOfDeath = MOD_ROCKET_SPLASH;
+
+				//===testing being able to shoot rockets out of the air==================================
+				missile->health = 10;
+				missile->takedamage = qtrue;
+				missile->r.contents = MASK_SHOT;
+				missile->die = RocketDie;
+				//===testing being able to shoot rockets out of the air==================================
+
+				missile->clipmask = MASK_SHOT;
+
+				missile->splashDamage = rocket_damage;
+				missile->splashRadius = 200;
+
+				// we don't want it to ever bounce
+				missile->bounceCount = 0;
+			}
 		}
 		else
-		{
+		{ // zyk: it can also fire blaster shots
 			NPCS.ucmd.buttons |= BUTTON_ATTACK;
+
+			missile = CreateMissile(shot_origin, forward, 5000, 10000, NPCS.NPC, qfalse);
+
+			missile->classname = "blaster_proj";
+			missile->s.weapon = WP_BLASTER;
+
+			missile->damage = 50;
+			missile->dflags = DAMAGE_DEATH_KNOCKBACK;
+			missile->methodOfDeath = MOD_BLASTER;
+			missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
+
+			// we don't want it to bounce forever
+			missile->bounceCount = 8;
 		}
 	}
 
@@ -234,6 +291,13 @@ void ATST_Attack( void )
 	{
 	case DIST_MELEE:
 //		NPC_ChangeWeapon( WP_ATST_MAIN );
+		
+		// zyk: crushing the enemy
+		if (NPCS.NPC->enemy && NPCS.NPC->client->ps.groundEntityNum == NPCS.NPC->enemy->s.number)
+		{
+			G_Damage(NPCS.NPC->enemy, NPCS.NPC, NPCS.NPC, NULL, NPCS.NPC->r.currentOrigin, 300, 0, MOD_CRUSH);
+		}
+
 		break;
 
 	case DIST_LONG:
