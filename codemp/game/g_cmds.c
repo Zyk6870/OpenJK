@@ -6127,8 +6127,8 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_UPGRADE_DETPACKS][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_DETPACKS][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][0] = 5000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][1] = 2000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][0] = 3000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][1] = 1500;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_THERMAL_VISION][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_THERMAL_VISION][1] = 600;

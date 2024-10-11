@@ -9188,7 +9188,8 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.special_crystal_timer < level.time)
 				{
 					// zyk: Red crystal
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && ent->client->pers.cmd.buttons & BUTTON_USE)
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && 
+						ent->client->pers.cmd.buttons & BUTTON_USE && !ent->client->isHacking)
 					{
 						if (ent->client->pers.special_crystal_counter >= 5)
 						{
