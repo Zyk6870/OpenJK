@@ -9199,6 +9199,8 @@ void G_RunFrame( int levelTime ) {
 							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
 							ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
+
+							ent->client->pers.special_crystal_counter = 0;
 						}
 						else
 						{
