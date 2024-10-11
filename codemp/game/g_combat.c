@@ -2659,7 +2659,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		}
 		else if (self->client->pers.quest_npc == QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 5))
 		{
-			crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
+			crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
 		}
 
 		if (self->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH)

@@ -7371,19 +7371,6 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 extern int zyk_number_of_allies_in_map(gentity_t* ent);
 extern int zyk_number_of_enemies_in_map();
 
-qboolean zyk_can_spawn_quest_item(gentity_t* ent)
-{
-	// zyk: a quest item requires quests enabled and not completed
-	if (zyk_allow_quests.integer > 0 && 
-		!(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
-		zyk_is_main_quest_complete(ent) == qfalse)
-	{
-		return qtrue;
-	}
-
-	return qfalse;
-}
-
 void zyk_update_inventory(gentity_t* ent)
 {
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] != ent->client->pers.magic_crystals)
@@ -9185,34 +9172,24 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.is_getting_up = qtrue;
 				}
 
-				if (ent->client->pers.special_crystal_timer < level.time)
-				{
-					// zyk: Red crystal
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && 
-						ent->client->pers.cmd.buttons & BUTTON_USE && !ent->client->isHacking)
-					{
-						if (ent->client->pers.special_crystal_counter >= 5)
-						{
-							// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
-							lightning_dome(ent, 30);
+				if (ent->client->pers.special_crystal_timer < level.time && 
+					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && 
+					ent->client->pers.special_crystal_counter >= RED_CRYSTAL_MAX_CHARGE)
+				{ // zyk: Red crystal is fully charged
+					// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
+					lightning_dome(ent, 20 + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL]);
 
-							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
+					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
-							ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
+					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
 
-							ent->client->pers.special_crystal_counter = 0;
-						}
-						else
-						{
-							ent->client->pers.special_crystal_counter++;
-						}
+					ent->client->pers.special_crystal_counter = 0;
+					ent->client->pers.special_crystal_timer = level.time + 200;
 
-						ent->client->pers.special_crystal_timer = level.time + 200;
-					}
-					else
-					{
-						ent->client->pers.special_crystal_counter = 0;
-					}
+				}
+				else if (!(ent->client->pers.cmd.buttons & BUTTON_USE))
+				{ // zyk: not holding Use, reset charge
+					ent->client->pers.special_crystal_counter = 0;
 				}
 
 				// zyk: updating RPG inventory and calculating current weight
@@ -9321,21 +9298,18 @@ void G_RunFrame( int levelTime ) {
 					}
 					
 					if (Q_irand(0, 99) < skill_crystal_chance)
-					{ // zyk: Skill Crystal
+					{ // zyk: Blue Crystal
 						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 					}
 					
-					if (zyk_can_spawn_quest_item(ent) == qtrue)
-					{
-						if (Q_irand(0, 99) < green_crystal_chance)
-						{ // zyk: Extra Tries Crystal
-							zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
-						}
+					if (Q_irand(0, 99) < green_crystal_chance)
+					{ // zyk: Green Crystal
+						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
+					}
 
-						if (Q_irand(0, 99) < red_crystal_chance)
-						{ // zyk: Red Crystal
-							zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
-						}
+					if (Q_irand(0, 99) < red_crystal_chance)
+					{ // zyk: Red Crystal
+						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
 					}
 					
 					if (Q_irand(0, 99) < side_quest_item_chance && level.energy_modulator_timer < level.time)

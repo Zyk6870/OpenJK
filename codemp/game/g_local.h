@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.60"
+#define	GAMEVERSION	"New Zyk Mod v1.1.61"
 
 #define SECURITY_LOG "security.log"
 
@@ -793,6 +793,7 @@ typedef enum {
 
 // zyk: amount of Magic Crystals to upgrade a skill
 #define MAGIC_CRYSTALS_TO_UPGRADE_SKILL 1
+#define RED_CRYSTAL_MAX_CHARGE 7
 
 // zyk: max RPG skillpoints
 #define RPG_MAX_SKILLPOINTS 120
@@ -840,7 +841,7 @@ typedef enum {
 // zyk: npc cloak detection distance
 #define NPC_CLOAK_DETECTION_DISTANCE 1000
 
-#define RPG_RUN_SPEED_SKILL_INCREASE 25.0f
+#define RPG_RUN_SPEED_SKILL_INCREASE 20.0f
 
 // zyk: main characters names
 #define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
