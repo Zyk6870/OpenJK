@@ -6103,7 +6103,7 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.magic_consumption_timer < level.time)
 			{
-				ent->client->pers.magic_consumption_timer = level.time + 200;
+				ent->client->pers.magic_consumption_timer = level.time + 250;
 			}
 		}
 	}
@@ -8880,7 +8880,7 @@ void G_RunFrame( int levelTime ) {
 					}
 				}
 
-				ent->client->jetPackDebReduce = level.time + 200; // zyk: JETPACK_DEFUEL_RATE. Original value: 200
+				ent->client->jetPackDebReduce = level.time + 250; // zyk: JETPACK_DEFUEL_RATE. Original value: 200
 			}
 
 			// zyk: Duel Tournament. Do not let anyone enter or anyone leave the globe arena
