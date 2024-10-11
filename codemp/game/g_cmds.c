@@ -6604,6 +6604,67 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 }
 
+void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
+{
+	if (zyk_allow_quests.integer == 1)
+	{
+		if (zyk_is_main_quest_complete(ent) == qtrue)
+		{
+			trap->SendServerCommand(target_ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.quest_defeated_enemies == 0 &&
+			!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)) &&
+			!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)) &&
+			!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)) &&
+			!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_QUEST_ITEMS)))
+		{
+			char quest_desc[MAX_STRING_CHARS];
+
+			strcpy(quest_desc, "^1Tutorial Quest\n\n^7Main Quest will start after at least one the following tutorials.\nThey will appear when you need them.\n\n");
+
+			if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)))
+			{
+				strcpy(quest_desc, va("%s^3Stamina Tutorial\n", quest_desc));
+			}
+
+			if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)))
+			{
+				strcpy(quest_desc, va("%s^3Inventory Weight Tutorial\n", quest_desc));
+			}
+
+			if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)))
+			{
+				strcpy(quest_desc, va("%s^3Magic Tutorial\n", quest_desc));
+			}
+
+			if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_QUEST_ITEMS)))
+			{
+				strcpy(quest_desc, va("%s^3Quest Items Tutorial\n", quest_desc));
+			}
+
+			trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", quest_desc));
+		}
+		else
+		{
+			char quest_desc[MAX_STRING_CHARS];
+
+			strcpy(quest_desc, va("\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nDefeat enough enemies to weaken their army and make the Spirit Tree summoned.\nDefeat some Mage Masters and regenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditating in the tree, the amount of ^4Blue ^7crystals you have and defeating enemies will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^4Blue ^7crystal call your Spirit Tree.\n^4Blue ^7crystals makes new allies stronger and appear more often.\n^2Green ^7crystals increase Quest Tries.\n^1Red ^7crystals creates a Lightning Dome by holding Use key.\n\n", QUESTCHAR_ALL_SPIRITS));
+
+			trap->SendServerCommand(target_ent->s.number,
+				va("print \"%s^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n^3Quest Tries: ^7%d\n\n\"",
+					quest_desc,
+					ent->client->pers.quest_defeated_enemies, QUEST_MIN_ENEMIES_TO_DEFEAT,
+					ent->client->pers.quest_masters_defeated, QUEST_MASTERS_TO_DEFEAT,
+					ent->client->pers.quest_progress, MAX_QUEST_PROGRESS,
+					zyk_number_of_allies_in_map(ent), zyk_number_of_enemies_in_map(), ent->client->pers.quest_tries));
+		}
+	}
+	else
+	{
+		trap->SendServerCommand(target_ent->s.number, "print \"\n^3RPG Mode Quests\n\n^1Quests are not allowed in this server^7\n\n\"");
+	}
+}
+
 /*
 ==================
 Cmd_ListAccount_f
@@ -6688,63 +6749,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			}
 			else if (Q_stricmp( arg1, "quests" ) == 0)
 			{
-				if (zyk_allow_quests.integer == 1)
-				{
-					if (zyk_is_main_quest_complete(ent) == qtrue)
-					{
-						trap->SendServerCommand(ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
-					}
-					else if (ent->client->pers.quest_defeated_enemies == 0 && 
-						!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)) &&
-						!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)) && 
-						!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)) &&
-						!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_QUEST_ITEMS)))
-					{
-						char quest_desc[MAX_STRING_CHARS];
-
-						strcpy(quest_desc, "^1Tutorial Quest\n\n^7Main Quest will start after at least one the following tutorials.\nThey will appear when you need them.\n\n");
-
-						if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)))
-						{
-							strcpy(quest_desc, va("%s^3Stamina Tutorial\n", quest_desc));
-						}
-
-						if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)))
-						{
-							strcpy(quest_desc, va("%s^3Inventory Weight Tutorial\n", quest_desc));
-						}
-
-						if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)))
-						{
-							strcpy(quest_desc, va("%s^3Magic Tutorial\n", quest_desc));
-						}
-
-						if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_QUEST_ITEMS)))
-						{
-							strcpy(quest_desc, va("%s^3Quest Items Tutorial\n", quest_desc));
-						}
-
-						trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", quest_desc));
-					}
-					else
-					{
-						char quest_desc[MAX_STRING_CHARS];
-
-						strcpy(quest_desc, va("\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nDefeat enough enemies to weaken their army and make the Spirit Tree summoned.\nDefeat some Mage Masters and regenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditating in the tree, the amount of ^4Blue ^7crystals you have and defeating enemies will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^4Blue ^7crystal call your Spirit Tree.\n^4Blue ^7crystals makes new allies stronger and appear more often.\n^2Green ^7crystals increase Quest Tries.\n^1Red ^7crystals creates a Lightning Dome by holding Use key.\n\n", QUESTCHAR_ALL_SPIRITS));
-
-						trap->SendServerCommand(ent->s.number, 
-							va("print \"%s^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n^3Quest Tries: ^7%d\n\n\"", 
-							quest_desc,
-							ent->client->pers.quest_defeated_enemies, QUEST_MIN_ENEMIES_TO_DEFEAT,
-							ent->client->pers.quest_masters_defeated, QUEST_MASTERS_TO_DEFEAT,
-							ent->client->pers.quest_progress, MAX_QUEST_PROGRESS,
-							zyk_number_of_allies_in_map(ent), zyk_number_of_enemies_in_map(), ent->client->pers.quest_tries));
-					}
-				}
-				else
-				{
-					trap->SendServerCommand(ent->s.number, "print \"\n^3RPG Mode Quests\n\n^1Quests are not allowed in this server^7\n\n\"");
-				}
+				zyk_list_quests(ent, ent);
 			}
 			else if (Q_stricmp(arg1, "questlog") == 0)
 			{
@@ -9400,7 +9405,7 @@ void zyk_show_admin_commands(gentity_t *ent, gentity_t *target_ent)
 		strcpy(message,va("%s%s",message,message_content[i]));
 	}
 
-	trap->SendServerCommand( target_ent->s.number, va("print \"\n%s^7\n%s\n^7Use ^3/adminlist <number> ^7to see command info\n\n\"", ent->client->pers.netname, message) );
+	trap->SendServerCommand( target_ent->s.number, va("print \"\n%s^7\n%s\n^7Use ^3/adminlist <number> ^7to see command info or ^3/adminlist show <player ID or name>^7, if you have GiveAdmin, to show the player's commands\n\n\"", ent->client->pers.netname, message) );
 }
 
 /*
@@ -9834,7 +9839,7 @@ void Cmd_Players_f( gentity_t *ent ) {
 
 	if (!(ent->client->pers.bitvalue & (1 << ADM_PLAYERS)))
 	{ // zyk: admin command
-		trap->SendServerCommand( ent-g_entities, "print \"You don't have this admin command.\n\"" );
+		trap->SendServerCommand(ent->s.number, "print \"You don't have this admin command.\n\"" );
 		return;
 	}
 
@@ -9865,7 +9870,7 @@ void Cmd_Players_f( gentity_t *ent ) {
 			}
 		}
 
-		trap->SendServerCommand( ent-g_entities, va("print \"%s\"", content) );
+		trap->SendServerCommand(ent->s.number, va("print \"%s\"", content) );
 	}
 	else
 	{
@@ -9884,7 +9889,7 @@ void Cmd_Players_f( gentity_t *ent ) {
 
 		if (player_ent->client->sess.amrpgmode != 2)
 		{
-			trap->SendServerCommand( ent-g_entities, va("print \"Player %s ^7is not in RPG Mode.\n\"", player_ent->client->pers.netname) );
+			trap->SendServerCommand(ent->s.number, va("print \"Player %s ^7is not in RPG Mode.\n\"", player_ent->client->pers.netname) );
 			return;
 		}
 
@@ -9925,9 +9930,13 @@ void Cmd_Players_f( gentity_t *ent ) {
 					zyk_list_inventory(player_ent, ent, page);
 				}
 			}
+			else if (Q_stricmp(arg2, "quests") == 0)
+			{
+				zyk_list_quests(player_ent, ent);
+			}
 			else
 			{
-				trap->SendServerCommand( ent-g_entities, "print \"Invalid option.\n\"" );
+				trap->SendServerCommand(ent->s.number, "print \"Invalid option.\n\"" );
 			}
 		}
 	}
