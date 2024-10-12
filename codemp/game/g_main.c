@@ -5540,10 +5540,10 @@ void zyk_spawn_crystal(float x, float y, float z, int duration, zyk_quest_item_t
 }
 
 // zyk: spawn the model and effect used by magic crystals
-void zyk_spawn_magic_crystal(gentity_t* ent, int duration, zyk_quest_item_t crystal_type)
+void zyk_spawn_magic_crystal(int duration, zyk_quest_item_t crystal_type)
 {
 	float x, y, z;
-	int distance_factor = (ent->client->pers.magic_crystals + zyk_total_skillpoints(ent)) / 6;
+	int distance_factor = 20;
 	gentity_t* chosen_entity = NULL;
 	
 	chosen_entity = zyk_find_entity_for_quest();
@@ -7312,7 +7312,7 @@ void zyk_show_tutorial(gentity_t* ent)
 		{
 			zyk_spawn_magic_spirits(ent, 20000);
 
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Blue Crystals to upgrade skills. We keep randomly placing them in the map. Some enemies drop them.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Blue Crystals to upgrade skills. We will randomly place some of them in the map. Enemies defeated have a chance to drop them.\n\"", QUESTCHAR_ALL_SPIRITS));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 1))
 		{
@@ -9136,8 +9136,15 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && 
 					ent->client->pers.special_crystal_counter >= RED_CRYSTAL_MAX_CHARGE)
 				{ // zyk: Red crystal is fully charged
+					int red_crystal_dmg = 10 + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL];
+
+					if (red_crystal_dmg > 100)
+					{
+						red_crystal_dmg = 100;
+					}
+
 					// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
-					lightning_dome(ent, 10 + (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] / 2));
+					lightning_dome(ent, red_crystal_dmg);
 
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
@@ -9222,20 +9229,6 @@ void G_RunFrame( int levelTime ) {
 						(ent->client->pers.quest_masters_defeated * 2) +
 						(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
 
-					int player_power_level = (ent->client->pers.magic_crystals +
-						zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60)) / 4;
-
-					int skill_crystal_chance = 45 - player_power_level -
-						main_quest_progress;
-
-					int green_crystal_chance = 20 - player_power_level -
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] -
-						main_quest_progress;
-
-					int red_crystal_chance = 20 - player_power_level -
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] -
-						main_quest_progress;
-
 					int side_quest_item_chance_modifier = ENERGY_MODULATOR_PARTS * QUEST_LOG_PARTS;
 
 					int side_quest_item_chance = ent->client->pers.magic_crystals - side_quest_item_chance_modifier +
@@ -9250,26 +9243,15 @@ void G_RunFrame( int levelTime ) {
 
 					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 					{ // zyk: Hard Mode
-						skill_crystal_chance /= 2;
-						green_crystal_chance /= 2;
-						red_crystal_chance /= 2;
 						side_quest_item_chance /= 2;
 						side_quest_item_duration /= 2;
 					}
 					
-					if (Q_irand(0, 99) < skill_crystal_chance)
-					{ // zyk: Blue Crystal
-						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SKILL_CRYSTAL);
-					}
-					
-					if (Q_irand(0, 99) < green_crystal_chance)
-					{ // zyk: Green Crystal
-						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
-					}
+					if (Q_irand(0, 99) < 4)
+					{ // zyk: crystals
+						zyk_quest_item_t crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
 
-					if (Q_irand(0, 99) < red_crystal_chance)
-					{ // zyk: Red Crystal
-						zyk_spawn_magic_crystal(ent, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
+						zyk_spawn_magic_crystal(60000, crystal_type);
 					}
 					
 					if (Q_irand(0, 99) < side_quest_item_chance && level.energy_modulator_timer < level.time)

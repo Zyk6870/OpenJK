@@ -6143,13 +6143,13 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 200;
 	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 50;
 
-	seller_items_cost[RPG_INVENTORY_MISC_GREEN_CRYSTAL][0] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_GREEN_CRYSTAL][0] = 200;
 	seller_items_cost[RPG_INVENTORY_MISC_GREEN_CRYSTAL][1] = 50;
 
-	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 200;
 	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
@@ -7001,6 +7001,14 @@ void Cmd_Buy_f( gentity_t *ent ) {
 				ent->client->ps.powerups[PW_FORCE_BOON] = level.time + (30000 * amount);
 			else
 				ent->client->ps.powerups[PW_FORCE_BOON] += (30000 * amount);
+		}
+		else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
+		{
+			ent->client->pers.magic_crystals += amount;
+		}
+		else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
+		{
+			ent->client->pers.quest_tries += amount;
 		}
 		else
 		{
