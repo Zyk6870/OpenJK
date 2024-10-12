@@ -8999,57 +8999,8 @@ void G_RunFrame( int levelTime ) {
 							zyk_TeleportPlayer(&g_entities[ent->client->ps.m_iVehicleNum], origin, yaw);
 						}
 					}
-					else if (level.race_map == 2)
-					{ // zyk: t3_stamp map
-						if ((int)ent->client->ps.origin[1] > -174 && (int)ent->client->ps.origin[2] < -170)
-						{ // zyk: player reached the finish line
-							level.race_last_player_position++;
-							ent->client->pers.race_position = 0;
-
-							if (level.race_last_player_position == 1)
-							{ // zyk: this player won the race. Send message to everyone and give his prize
-								if (ent->client->sess.amrpgmode == 2)
-								{ // zyk: give him credits
-									add_credits(ent, 500);
-									save_account(ent, qtrue);
-									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
-									trap->SendServerCommand(-1, va("chat \"^3Race System: ^7Winner: %s^7 - Prize: 500 Credits!\"", ent->client->pers.netname));
-								}
-								else
-								{ // zyk: give him some stuff
-									ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DISRUPTOR) | (1 << WP_REPEATER);
-									ent->client->ps.ammo[AMMO_POWERCELL] = zyk_max_power_cell_ammo.integer;
-									ent->client->ps.ammo[AMMO_METAL_BOLTS] = zyk_max_metal_bolt_ammo.integer;
-									ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_SEEKER);
-									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
-									trap->SendServerCommand(-1, va("chat \"^3Race System: ^7Winner: %s^7 - Prize: Nice Stuff!\"", ent->client->pers.netname));
-								}
-							}
-							else if (level.race_last_player_position == 2)
-							{ // zyk: second place
-								trap->SendServerCommand(-1, va("chat \"^3Race System: ^72nd Place - %s\"", ent->client->pers.netname));
-							}
-							else if (level.race_last_player_position == 3)
-							{ // zyk: third place
-								trap->SendServerCommand(-1, va("chat \"^3Race System: ^73rd Place - %s\"", ent->client->pers.netname));
-							}
-							else
-							{
-								trap->SendServerCommand(-1, va("chat \"^3Race System: ^7%dth Place - %s\"", level.race_last_player_position, ent->client->pers.netname));
-							}
-
-							try_finishing_race();
-						}
-					}
 				}
 				else if (level.race_map == 1 && (int)ent->client->ps.origin[0] < -4536)
-				{ // zyk: player cant start racing before the countdown timer
-					ent->client->pers.race_position = 0;
-					trap->SendServerCommand(-1, va("chat \"^3Race System: ^7%s ^7lost for trying to race before it starts!\n\"", ent->client->pers.netname));
-
-					try_finishing_race();
-				}
-				else if (level.race_map == 2 && (int)ent->client->ps.origin[1] < 1230)
 				{ // zyk: player cant start racing before the countdown timer
 					ent->client->pers.race_position = 0;
 					trap->SendServerCommand(-1, va("chat \"^3Race System: ^7%s ^7lost for trying to race before it starts!\n\"", ent->client->pers.netname));
@@ -9273,14 +9224,14 @@ void G_RunFrame( int levelTime ) {
 					int player_power_level = (ent->client->pers.magic_crystals +
 						zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60)) / 4;
 
-					int skill_crystal_chance = 50 - player_power_level -
+					int skill_crystal_chance = 45 - player_power_level -
 						main_quest_progress;
 
-					int green_crystal_chance = 25 - player_power_level -
+					int green_crystal_chance = 20 - player_power_level -
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] -
 						main_quest_progress;
 
-					int red_crystal_chance = 25 - player_power_level -
+					int red_crystal_chance = 20 - player_power_level -
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] -
 						main_quest_progress;
 
@@ -9759,7 +9710,7 @@ void G_RunFrame( int levelTime ) {
 								zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60));
 
 							int summon_power_level = (player_power_level + ent->client->pers.quest_defeated_enemies) / 2;
-							int chance_for_summon = summon_power_level / 50;
+							int chance_for_summon = summon_power_level / 60;
 
 							if (Q_irand(0, 99) < chance_for_summon)
 							{

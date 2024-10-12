@@ -7912,7 +7912,7 @@ void Cmd_RaceMode_f( gentity_t *ent ) {
 
 			if (swoop_number == -1)
 			{ // zyk: exceeded the MAX_RACERS
-				trap->SendServerCommand( ent-g_entities, "print \"The race is already full of racers! Try again later!\n\"" );
+				trap->SendServerCommand(ent->s.number, "print \"The race is already full of racers! Try again later!\n\"" );
 				return;
 			}
 			
@@ -7984,124 +7984,9 @@ void Cmd_RaceMode_f( gentity_t *ent ) {
 				trap->SendServerCommand( -1, va("chat \"^3Race System: ^7%s ^7joined the race!\n\"",ent->client->pers.netname) );
 			}
 		}
-		else if (Q_stricmp(zyk_mapname, "t3_stamp") == 0)
-		{
-			int i = 0;
-
-			level.race_map = 2;
-
-			// zyk: initializing array of occupied_positions
-			for (j = 0; j < MAX_CLIENTS; j++)
-			{
-				occupied_positions[j] = 0;
-			}
-
-			// zyk: calculates which position the swoop of this player must be spawned
-			for (j = 0; j < MAX_CLIENTS; j++)
-			{
-				this_ent = &g_entities[j];
-				if (this_ent && ent != this_ent && this_ent->client && this_ent->inuse && this_ent->health > 0 && this_ent->client->sess.sessionTeam != TEAM_SPECTATOR && this_ent->client->pers.race_position > 0)
-					occupied_positions[this_ent->client->pers.race_position - 1] = 1;
-			}
-
-			for (j = 0; j < MAX_RACERS; j++)
-			{
-				if (occupied_positions[j] == 0)
-				{ // zyk: an empty race position, use this one
-					swoop_number = j;
-					break;
-				}
-			}
-
-			if (swoop_number == -1)
-			{ // zyk: exceeded the MAX_RACERS
-				trap->SendServerCommand(ent - g_entities, "print \"The race is already full of racers! Try again later!\n\"");
-				return;
-			}
-
-			origin[0] = (1020 - ((swoop_number % 4) * 90));
-			origin[1] = (1370 + ((swoop_number/4) * 90));
-			origin[2] = 97;
-
-			yaw[0] = 0.0f;
-			yaw[1] = -90.0f;
-			yaw[2] = 0.0f;
-
-			if (level.race_mode == 0)
-			{ // zyk: if this is the first player entering the race, clean the old race swoops left in the map
-				int k = 0;
-
-				for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
-				{ // zyk: removing all entities except the spawnpoints
-					gentity_t *removed_ent = &g_entities[i];
-
-					if (removed_ent && Q_stricmp(removed_ent->classname, "func_breakable") == 0 && removed_ent->s.number >= 471 && removed_ent->s.number <= 472)
-					{
-						GlobalUse(removed_ent, removed_ent, removed_ent);
-					}
-					else if (removed_ent && Q_stricmp(removed_ent->classname, "info_player_deathmatch") != 0)
-					{
-						G_FreeEntity(removed_ent);
-					}
-				}
-
-				for (k = 0; k < MAX_RACERS; k++)
-				{
-					if (level.race_mode_vehicle[k] != -1)
-					{
-						gentity_t *vehicle_ent = &g_entities[level.race_mode_vehicle[k]];
-						if (vehicle_ent)
-						{
-							G_FreeEntity(vehicle_ent);
-						}
-
-						level.race_mode_vehicle[k] = -1;
-					}
-				}
-
-				// zyk: starting line
-				zyk_spawn_race_line(660, 1198, 88, 1);
-				zyk_spawn_race_line(1070, 1198, 88, 179);
-
-				// zyk: finish line
-				zyk_spawn_race_line(-6425, -168, -263, -1);
-				zyk_spawn_race_line(-5700, -180, -263, 179);
-			}
-
-			if (swoop_number < MAX_RACERS)
-			{
-				// zyk: removing a possible swoop that was in the same position by a player who tried to race before in this position
-				if (level.race_mode_vehicle[swoop_number] != -1)
-				{
-					gentity_t *vehicle_ent = &g_entities[level.race_mode_vehicle[swoop_number]];
-
-					if (vehicle_ent && vehicle_ent->NPC && Q_stricmp(vehicle_ent->NPC_type, "tauntaun") == 0)
-					{
-						G_FreeEntity(vehicle_ent);
-					}
-				}
-
-				// zyk: teleporting player to the swoop area
-				zyk_TeleportPlayer(ent, origin, yaw);
-
-				ent->client->pers.race_position = swoop_number + 1;
-
-				this_ent = NPC_SpawnType(ent, "tauntaun", NULL, qtrue);
-				if (this_ent)
-				{ // zyk: setting the vehicle id and increasing tauntaun hp
-					this_ent->health *= 5;
-					level.race_mode_vehicle[swoop_number] = this_ent->s.number;
-				}
-
-				level.race_start_timer = level.time + zyk_start_race_timer.integer; // zyk: race will start some seconds after the last player who joined the race
-				level.race_mode = 1;
-
-				trap->SendServerCommand(-1, va("chat \"^3Race System: ^7%s ^7joined the race!\n\"", ent->client->pers.netname));
-			}
-		}
 		else
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"Races can only be done in ^3t2_trip ^7and ^3t3_stamp ^7maps.\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"Races can only be done in ^3t2_trip ^7map.\n\"" );
 		}
 	}
 	else
