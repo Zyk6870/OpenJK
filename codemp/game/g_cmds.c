@@ -6612,8 +6612,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			trap->SendServerCommand(target_ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
 		}
-		else if (ent->client->pers.quest_defeated_enemies == 0 &&
-			!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_START)))
+		else if (ent->client->pers.quest_defeated_enemies == 0 && !(ent->client->pers.quest_missions & (1 << MAIN_QUEST_START)))
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
@@ -6639,7 +6638,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 				strcpy(quest_desc, va("%s^3Quest Items Tutorial\n", quest_desc));
 			}
 
-			trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", quest_desc));
+			trap->SendServerCommand(target_ent->s.number, va("print \"%s\n\"", quest_desc));
 		}
 		else
 		{

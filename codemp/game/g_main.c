@@ -9273,14 +9273,14 @@ void G_RunFrame( int levelTime ) {
 					int player_power_level = (ent->client->pers.magic_crystals +
 						zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60)) / 4;
 
-					int skill_crystal_chance = 60 - player_power_level -
+					int skill_crystal_chance = 50 - player_power_level -
 						main_quest_progress;
 
-					int green_crystal_chance = 30 - player_power_level -
+					int green_crystal_chance = 25 - player_power_level -
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] -
 						main_quest_progress;
 
-					int red_crystal_chance = 30 - player_power_level -
+					int red_crystal_chance = 25 - player_power_level -
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] -
 						main_quest_progress;
 
@@ -9699,11 +9699,7 @@ void G_RunFrame( int levelTime ) {
 
 					// zyk: quest npcs
 					if (ent->client->pers.quest_event_timer < level.time && 
-						(ent->client->pers.quest_defeated_enemies > 0 || 
-						ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY) ||
-						ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA) ||
-						ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC) ||
-						ent->client->pers.tutorial_shown & (1 << TUTORIAL_QUEST_ITEMS)))
+						(ent->client->pers.quest_defeated_enemies > 0 || ent->client->pers.quest_missions & (1 << MAIN_QUEST_START)))
 					{
 						qboolean hard_difficulty = qfalse;
 
