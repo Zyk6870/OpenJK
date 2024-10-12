@@ -2630,9 +2630,10 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	if (self->NPC && self->client->NPC_class != CLASS_VEHICLE && self->client->playerTeam != NPCTEAM_PLAYER)
 	{
 		int crystal_random_chance = Q_irand(0, 99);
+		int chance_to_spawn_crystal = 25 + (self->client->ps.stats[STAT_MAX_HEALTH] / 20);
 		zyk_quest_item_t crystal_type = QUEST_ITEM_NONE;
 
-		if (self->client->pers.quest_npc > QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 4))
+		if (self->client->pers.quest_npc > QUEST_NPC_NONE && crystal_random_chance < chance_to_spawn_crystal)
 		{
 			if (self->client->pers.quest_npc == QUEST_NPC_HIGH_TRAINED_WARRIOR ||
 				self->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE ||
@@ -2656,7 +2657,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
 			}
 		}
-		else if (self->client->pers.quest_npc == QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 4))
+		else if (self->client->pers.quest_npc == QUEST_NPC_NONE && crystal_random_chance < chance_to_spawn_crystal)
 		{
 			crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
 		}

@@ -9138,9 +9138,9 @@ void G_RunFrame( int levelTime ) {
 				{ // zyk: Red crystal is fully charged
 					int red_crystal_dmg = 10 + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL];
 
-					if (red_crystal_dmg > 100)
+					if (red_crystal_dmg > 90)
 					{
-						red_crystal_dmg = 100;
+						red_crystal_dmg = 90;
 					}
 
 					// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
@@ -9247,7 +9247,7 @@ void G_RunFrame( int levelTime ) {
 						side_quest_item_duration /= 2;
 					}
 					
-					if (Q_irand(0, 99) < 4)
+					if (Q_irand(0, 99) < 5)
 					{ // zyk: crystals
 						zyk_quest_item_t crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
 
@@ -9674,30 +9674,14 @@ void G_RunFrame( int levelTime ) {
 								zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60));
 
 							int summon_power_level = (player_power_level + ent->client->pers.quest_defeated_enemies) / 2;
-							int chance_for_summon = summon_power_level / 90;
 
-							if (level.special_npc_timer < level.time)
+							if (level.special_npc_timer < level.time && Q_irand(0, 99) < 2)
 							{
-								if (Q_irand(0, 99) < chance_for_summon)
-								{
-									zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
+								zyk_quest_npc_t rare_npc = Q_irand(QUEST_NPC_ANGEL_OF_DEATH, QUEST_NPC_CHIMERA);
 
-									level.special_npc_timer = level.time + SPECIAL_NPC_TIMER;
-								}
+								zyk_spawn_quest_npc(rare_npc, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
 
-								if (Q_irand(0, 99) < chance_for_summon)
-								{
-									zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
-
-									level.special_npc_timer = level.time + SPECIAL_NPC_TIMER;
-								}
-
-								if (Q_irand(0, 99) < chance_for_summon)
-								{
-									zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
-
-									level.special_npc_timer = level.time + SPECIAL_NPC_TIMER;
-								}
+								level.special_npc_timer = level.time + SPECIAL_NPC_TIMER;
 							}
 						}
 					}
