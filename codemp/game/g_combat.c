@@ -6153,7 +6153,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		// zyk: Dark Magic drains health
 		if (mod == MOD_UNKNOWN && attacker && attacker->client && attacker->health > 0 && 
 			inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) == MAGIC_DARK_MAGIC &&
-			targ->client && Q_irand(0, 99) < (take * 4))
+			targ->client && Q_irand(0, 99) < (take * 3))
 		{
 			zyk_add_health(attacker, take);
 		}
@@ -6695,10 +6695,13 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						}
 						else if (this_magic_power == MAGIC_EARTH_MAGIC)
 						{
+							int chance_for_knockdown = final_damage;
+
 							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_earth", "0", "env/rock_smash", 0, 0, 0, 500);
 
 							if (ent->client && ent->health > 0 && 
-								ent->client->ps.groundEntityNum != ENTITYNUM_NONE && !(ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_EARTH)))
+								Q_irand(0, 99) < chance_for_knockdown && ent->client->ps.groundEntityNum != ENTITYNUM_NONE && 
+								!(ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_EARTH)))
 							{// zyk: target can only be hit on the floor
 								zyk_remove_emotes(ent);
 
@@ -6716,7 +6719,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
 
 								ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_EARTH);
-								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_EARTH] = level.time + 16000 - (final_damage * 1000);
+								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_EARTH] = level.time + 5000;
 							}
 						}
 						else if (this_magic_power == MAGIC_FIRE_MAGIC)
@@ -6743,7 +6746,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 							if (ent->client && ent->health > 0)
 							{ // zyk: blows the target away
-								int chance_for_knockdown = final_damage * 2;
+								int chance_for_knockdown = final_damage;
 								float air_strength = 1.0 + (final_damage / 2);
 
 								VectorSubtract(ent->client->ps.origin, magic_power_user->client->ps.origin, air_magic_forward);
@@ -6774,7 +6777,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 									ent->client->ps.quickerGetup = qtrue;
 
 									ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_AIR);
-									ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_AIR] = level.time + 2000;
+									ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_AIR] = level.time + 5000;
 								}
 							}
 						}
@@ -6809,7 +6812,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						{
 							if (ent->client && ent->health > 0)
 							{
-								int chance_for_confusion = final_damage * 2;
+								int chance_for_confusion = final_damage;
 								int mp_to_drain = magic_power_user->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
 								int max_player_mp = zyk_max_magic_power(magic_power_user);
 
