@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.67"
+#define	GAMEVERSION	"New Zyk Mod v1.1.68"
 
 #define SECURITY_LOG "security.log"
 
@@ -870,6 +870,7 @@ typedef enum {
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 43000
+#define SPECIAL_NPC_TIMER 60000
 
 // zyk: timer used in the final Main Quest event
 #define QUEST_FINAL_EVENT_TIMER 20000
@@ -1061,6 +1062,7 @@ typedef struct clientPersistant_s {
 	int quest_final_event_step;
 	int quest_final_event_timer;
 	int quest_spirit_tree_id;
+	int quest_spirit_tree_call_timer;
 	int quest_progress_timer;
 	zyk_quest_seller_step_t quest_seller_event_step;
 	int quest_seller_event_timer;
@@ -1750,6 +1752,7 @@ typedef struct level_locals_s {
 
 	// zyk: bitvalue. Has npcs where only one of them can be in the map
 	int special_quest_npc_in_map;
+	int special_npc_timer;
 
 	// zyk: time to spawn the same side quest secret item again
 	int energy_modulator_timer;

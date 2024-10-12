@@ -2694,9 +2694,9 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	// zyk: Main Quest events
 	if (self->client->pers.quest_npc > QUEST_NPC_NONE)
 	{ // zyk: quest npc died
-		if (self->client->pers.quest_npc == QUEST_NPC_SELLER)
+		if (level.special_quest_npc_in_map & (1 << self->client->pers.quest_npc))
 		{
-			level.special_quest_npc_in_map &= ~(1 << QUEST_NPC_SELLER);
+			level.special_quest_npc_in_map &= ~(1 << self->client->pers.quest_npc);
 		}
 
 		if (attacker && attacker->client &&

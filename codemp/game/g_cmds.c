@@ -4908,6 +4908,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.quest_final_event_step = 0;
 			ent->client->pers.quest_final_event_timer = 0;
 			ent->client->pers.quest_spirit_tree_id = -1;
+			ent->client->pers.quest_spirit_tree_call_timer = 0;
 			ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_NONE;
 			ent->client->pers.quest_seller_event_timer = 0;
 

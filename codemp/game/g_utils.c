@@ -946,9 +946,9 @@ void G_FreeEntity( gentity_t *ed ) {
 		return;
 	}
 
-	if (ed->client && ed->NPC && ed->client->pers.quest_npc == QUEST_NPC_SELLER)
+	if (ed->client && ed->NPC && level.special_quest_npc_in_map & (1 << ed->client->pers.quest_npc))
 	{
-		level.special_quest_npc_in_map &= ~(1 << QUEST_NPC_SELLER);
+		level.special_quest_npc_in_map &= ~(1 << ed->client->pers.quest_npc);
 	}
 
 	// zyk: if npc is cleaned directly, test if goal entity is still there. If it is, clean the goal entity too
@@ -1606,15 +1606,38 @@ qboolean TryHeal(gentity_t *ent, gentity_t *target)
 	return qfalse;
 }
 
-void zyk_use_red_crystal(gentity_t* ent)
+void zyk_use_rpg_stuff(gentity_t* ent)
 {
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 &&
-		ent->client->pers.special_crystal_timer < level.time && ent->client->pers.special_crystal_counter < RED_CRYSTAL_MAX_CHARGE)
-	{ // zyk: Charging Red Crystal
-		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/energy_crackle.wav"));
+	if (ent->client->sess.amrpgmode == 2)
+	{
+		if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE)) && ent->client->pers.quest_spirit_tree_id > -1 &&
+			ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
+			ent->client->ps.forceDodgeAnim == BOTH_MEDITATE &&
+			ent->client->pers.quest_spirit_tree_call_timer < level.time)
+		{
+			if (ent->client->pers.magic_crystals > QUEST_SPIRIT_TREE_CALL_COST)
+			{
+				ent->client->pers.quest_spirit_tree_id = -1;
+				ent->client->pers.quest_spirit_tree_call_timer = level.time + 2000;
 
-		ent->client->pers.special_crystal_counter++;
-		ent->client->pers.special_crystal_timer = level.time + 200;
+				ent->client->pers.magic_crystals -= QUEST_SPIRIT_TREE_CALL_COST;
+
+				trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
+			}
+			else
+			{
+				trap->SendServerCommand(ent->s.number, "cp \"Not enough Blue Crystals to call your Spirit Tree\n\"");
+			}
+		}
+
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 &&
+			ent->client->pers.special_crystal_timer < level.time && ent->client->pers.special_crystal_counter < RED_CRYSTAL_MAX_CHARGE)
+		{ // zyk: Charging Red Crystal
+			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/energy_crackle.wav"));
+
+			ent->client->pers.special_crystal_counter++;
+			ent->client->pers.special_crystal_timer = level.time + 200;
+		}
 	}
 }
 
@@ -2085,7 +2108,7 @@ void TryUse( gentity_t *ent )
 
 	if (!target || !target->inuse)
 	{
-		zyk_use_red_crystal(ent);
+		zyk_use_rpg_stuff(ent);
 	}
 
 tryJetPack:
@@ -2119,7 +2142,7 @@ tryJetPack:
 		}
 	}
 
-	zyk_use_red_crystal(ent);
+	zyk_use_rpg_stuff(ent);
 }
 
 qboolean G_PointInBounds( vec3_t point, vec3_t mins, vec3_t maxs )

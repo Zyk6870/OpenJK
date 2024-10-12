@@ -1313,6 +1313,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.magic_armor_timer = 0;
 
 	level.special_quest_npc_in_map = 0;
+	level.special_npc_timer = 0;
 
 	// zyk: initializing Duel Tournament variables
 	level.duel_tournament_mode = 0;
@@ -9546,30 +9547,11 @@ void G_RunFrame( int levelTime ) {
 							}
 
 							if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
-								ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+								ent->client->ps.forceDodgeAnim == BOTH_MEDITATE && 
+								distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
 							{
 								// zyk: meditating inside the tree makes it regen faster
-								if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
-								{
-									quest_progress_change *= 2;
-								}
-
-								// zyk: holding Use key while meditating calls the Spirit Tree by clearing the current tree entities so next frame will create a new one
-								if (ent->client->pers.cmd.buttons & BUTTON_USE)
-								{
-									if (ent->client->pers.magic_crystals > QUEST_SPIRIT_TREE_CALL_COST)
-									{
-										ent->client->pers.quest_spirit_tree_id = -1;
-
-										ent->client->pers.magic_crystals -= QUEST_SPIRIT_TREE_CALL_COST;
-
-										trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
-									}
-									else
-									{
-										trap->SendServerCommand(ent->s.number, "cp \"Not enough Blue Crystals to call your Spirit Tree\n\"");
-									}
-								}
+								quest_progress_change *= 2;
 							}
 
 							quest_progress_change -= zyk_spirit_tree_wither(tree_x, tree_y, tree_z);
@@ -9710,21 +9692,30 @@ void G_RunFrame( int levelTime ) {
 								zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60));
 
 							int summon_power_level = (player_power_level + ent->client->pers.quest_defeated_enemies) / 2;
-							int chance_for_summon = summon_power_level / 60;
+							int chance_for_summon = summon_power_level / 90;
 
-							if (Q_irand(0, 99) < chance_for_summon)
+							if (level.special_npc_timer < level.time)
 							{
-								zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
-							}
+								if (Q_irand(0, 99) < chance_for_summon)
+								{
+									zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
 
-							if (Q_irand(0, 99) < chance_for_summon)
-							{
-								zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
-							}
+									level.special_npc_timer = level.time + SPECIAL_NPC_TIMER;
+								}
 
-							if (Q_irand(0, 99) < chance_for_summon)
-							{
-								zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
+								if (Q_irand(0, 99) < chance_for_summon)
+								{
+									zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
+
+									level.special_npc_timer = level.time + SPECIAL_NPC_TIMER;
+								}
+
+								if (Q_irand(0, 99) < chance_for_summon)
+								{
+									zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
+
+									level.special_npc_timer = level.time + SPECIAL_NPC_TIMER;
+								}
 							}
 						}
 					}
