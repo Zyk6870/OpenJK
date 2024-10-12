@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.64"
+#define	GAMEVERSION	"New Zyk Mod v1.1.65"
 
 #define SECURITY_LOG "security.log"
 
@@ -793,7 +793,7 @@ typedef enum {
 
 // zyk: amount of Magic Crystals to upgrade a skill
 #define MAGIC_CRYSTALS_TO_UPGRADE_SKILL 1
-#define RED_CRYSTAL_MAX_CHARGE 7
+#define RED_CRYSTAL_MAX_CHARGE 5
 
 // zyk: max RPG skillpoints
 #define RPG_MAX_SKILLPOINTS 120

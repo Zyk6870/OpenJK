@@ -2097,8 +2097,6 @@ tryJetPack:
 			ItemUse_Jetpack(ent);
 			return;
 		}
-
-		zyk_use_red_crystal(ent);
 	}
 
 	if ( (ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_AMMODISP)) /*&&
@@ -2120,6 +2118,8 @@ tryJetPack:
 			return;
 		}
 	}
+
+	zyk_use_red_crystal(ent);
 }
 
 qboolean G_PointInBounds( vec3_t point, vec3_t mins, vec3_t maxs )

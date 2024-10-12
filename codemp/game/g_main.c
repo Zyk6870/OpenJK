@@ -9185,7 +9185,7 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.special_crystal_counter >= RED_CRYSTAL_MAX_CHARGE)
 				{ // zyk: Red crystal is fully charged
 					// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
-					lightning_dome(ent, 20 + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL]);
+					lightning_dome(ent, 10 + (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] / 2));
 
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
