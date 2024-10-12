@@ -2184,7 +2184,7 @@ void load_account(gentity_t* ent)
 			ent->client->pers.quest_progress = atoi(content);
 
 			fscanf(account_file, "%s", content);
-			ent->client->pers.side_quest_secrets_found = atoi(content);
+			ent->client->pers.quest_missions = atoi(content);
 
 			// zyk: last health
 			fscanf(account_file, "%s", content);
@@ -2276,7 +2276,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
 				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, 
-				client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress, client->pers.side_quest_secrets_found, 
+				client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress, client->pers.quest_missions,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina, client->pers.tutorial_shown);
 
 			fclose(account_file);
@@ -5170,7 +5170,7 @@ void zyk_set_default_quest_fields(gentity_t* ent)
 	ent->client->pers.quest_progress = 0;
 	ent->client->pers.quest_spirit_tree_id = -1;
 
-	ent->client->pers.side_quest_secrets_found = 0;
+	ent->client->pers.quest_missions = 0;
 }
 
 // zyk: adds a new RPG char with default values
@@ -6613,10 +6613,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 			trap->SendServerCommand(target_ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
 		}
 		else if (ent->client->pers.quest_defeated_enemies == 0 &&
-			!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)) &&
-			!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)) &&
-			!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)) &&
-			!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_QUEST_ITEMS)))
+			!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_START)))
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
@@ -6781,7 +6778,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Force Mage: ^7has no weapons. Fight with Force and Magic powers. ^2Magic: Healing Area, Magic Dome, Dark, Light\n^3Mage Scholar: ^7mage with Magic Fist. He is wearing the Magic Armor. ^2Magic: high-level Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: high-level Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. He is wearing all armors. Has Magic Fist and extremely high-level of all magic. Can summon the legendary creatures: Chimera (^2Fire, Light^7), Jormungandr (^2Water, Earth^7) or the Angel of Death (^2Air, Dark^7)\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Force Mage: ^7has no weapons. Fight with Force and Magic powers. ^2Magic: Healing Area, Magic Dome, Dark, Light\n^3Mage Scholar: ^7mage with Magic Fist. He is wearing the Magic Armor. ^2Magic: high-level Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: high-level Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. He is wearing all armors. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 3 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 2)
 						{
@@ -6793,7 +6790,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures, the Chimera, the Jormungandr and the Angel of Death. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals (all types) to restore their health and mp. Each one you defeat will not appear for you again.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures, the Chimera, the Jormungandr and the Angel of Death. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals (all types) to restore their health and mp\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 					}
 					else

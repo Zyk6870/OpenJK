@@ -7274,6 +7274,8 @@ void zyk_show_tutorial(gentity_t* ent)
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_STAMINA_START + 1))
 		{
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^2Meditate ^7taunt to regen it. If Stamina runs out, you will faint for some seconds.\n\"", QUESTCHAR_ALL_SPIRITS));
+		
+			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 		}
 
 		ent->client->pers.tutorial_step++;
@@ -7297,6 +7299,8 @@ void zyk_show_tutorial(gentity_t* ent)
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 3))
 		{
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or get melee to drop items. Use ^3/jetpack ^7to drop your jetpack.\n\"", QUESTCHAR_ALL_SPIRITS));
+		
+			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 		}
 
 		ent->client->pers.tutorial_step++;
@@ -7316,6 +7320,8 @@ void zyk_show_tutorial(gentity_t* ent)
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 2))
 		{
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Green crystals give extra tries for quest and Red crystals creates a Lightning Dome by pressing Use key.\n\"", QUESTCHAR_ALL_SPIRITS));
+		
+			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 		}
 
 		ent->client->pers.tutorial_step++;
@@ -7339,6 +7345,8 @@ void zyk_show_tutorial(gentity_t* ent)
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_MAGIC_START + 3))
 		{
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by collecting crystals and using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_ALL_SPIRITS));
+		
+			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 		}
 
 		ent->client->pers.tutorial_step++;
@@ -9516,6 +9524,8 @@ void G_RunFrame( int levelTime ) {
 								else if (ent->client->pers.quest_final_event_step == 4)
 								{
 									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
+
+									ent->client->pers.quest_missions |= (1 << MAIN_QUEST_SECOND_PART_COMPLETE);
 								}
 							}
 						}
@@ -9753,19 +9763,19 @@ void G_RunFrame( int levelTime ) {
 								zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60));
 
 							int summon_power_level = (player_power_level + ent->client->pers.quest_defeated_enemies) / 2;
-							int chance_for_summon = summon_power_level / 25;
+							int chance_for_summon = summon_power_level / 50;
 
-							if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_ANGEL_OF_DEATH)) && Q_irand(0, 99) < chance_for_summon)
+							if (Q_irand(0, 99) < chance_for_summon)
 							{
 								zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
 							}
 
-							if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_JORMUNGANDR)) && Q_irand(0, 99) < chance_for_summon)
+							if (Q_irand(0, 99) < chance_for_summon)
 							{
 								zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
 							}
 
-							if (!(ent->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_CHIMERA)) && Q_irand(0, 99) < chance_for_summon)
+							if (Q_irand(0, 99) < chance_for_summon)
 							{
 								zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
 							}
@@ -9912,34 +9922,9 @@ void G_RunFrame( int levelTime ) {
 							}
 						}
 
-						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && Q_irand(0, 3) == 0)
 						{
-							int summoned_npc_bonuses = ent->client->ps.stats[STAT_MAX_HEALTH] / 5;
-							int chance_for_summon = summoned_npc_bonuses / 100;
-							gentity_t* quest_player = ent->enemy;
-
-							if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2)
-							{
-								if (!(quest_player->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_ANGEL_OF_DEATH)) && Q_irand(0, 99) < chance_for_summon)
-								{
-									zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], summoned_npc_bonuses, qfalse, -1);
-								}
-
-								if (!(quest_player->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_JORMUNGANDR)) && Q_irand(0, 99) < chance_for_summon)
-								{
-									zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], summoned_npc_bonuses, qfalse, -1);
-								}
-
-								if (!(quest_player->client->pers.side_quest_secrets_found & (1 << SIDE_QUEST_CHIMERA)) && Q_irand(0, 99) < chance_for_summon)
-								{
-									zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], summoned_npc_bonuses, qfalse, -1);
-								}
-							}
-
-							if (Q_irand(0, 3) == 0)
-							{
-								Jedi_Cloak(ent);
-							}
+							Jedi_Cloak(ent);
 						}
 						else if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && Q_irand(0, 99) < 10)
 						{ // zyk: chance to use Melee, so he can use Magic Fist

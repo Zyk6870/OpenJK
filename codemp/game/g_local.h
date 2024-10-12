@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.63"
+#define	GAMEVERSION	"New Zyk Mod v1.1.64"
 
 #define SECURITY_LOG "security.log"
 
@@ -757,11 +757,11 @@ typedef enum {
 } zyk_quest_seller_step_t;
 
 typedef enum {
-	SIDE_QUEST_ANGEL_OF_DEATH,
-	SIDE_QUEST_JORMUNGANDR,
-	SIDE_QUEST_CHIMERA,
-	NUM_SIDE_QUEST_SECRETS
-} zyk_side_quest_secrets_t;
+	MAIN_QUEST_START,
+	MAIN_QUEST_FIRST_PART_COMPLETE,
+	MAIN_QUEST_SECOND_PART_COMPLETE,
+	NUM_QUEST_MISSIONS
+} zyk_quest_mission_t;
 
 typedef enum {
 	TUTORIAL_NONE,
@@ -1067,7 +1067,7 @@ typedef struct clientPersistant_s {
 	int quest_seller_map_timer;
 
 	// zyk: bitvalue. Has side quest missions completed
-	int side_quest_secrets_found;
+	int quest_missions;
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;

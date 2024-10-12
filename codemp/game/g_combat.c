@@ -2631,7 +2631,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	{
 		int crystal_random_chance = Q_irand(0, 99);
 		zyk_quest_item_t crystal_type = QUEST_ITEM_NONE;
-		gentity_t* quest_player = attacker;
 
 		if (self->client->pers.quest_npc > QUEST_NPC_NONE && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 5))
 		{
@@ -2667,33 +2666,18 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
-
-			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2)
-			{
-				quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_ANGEL_OF_DEATH);
-			}
 		}
 		else if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
 		{
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
-
-			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2)
-			{
-				quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_JORMUNGANDR);
-			}
 		}
 		else if (self->client->pers.quest_npc == QUEST_NPC_CHIMERA)
 		{
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
-
-			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2)
-			{
-				quest_player->client->pers.side_quest_secrets_found |= (1 << SIDE_QUEST_CHIMERA);
-			}
 		}
 		else if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
 		{
@@ -2740,6 +2724,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				}
 
 				quest_player->client->pers.quest_defeated_enemies += 1;
+				quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 
 				// zyk: add an interval in this case so player has enough time to prepare
 				if ((quest_player->client->pers.quest_defeated_enemies % QUEST_NPC_BONUS_INCREASE) == 0)
@@ -2747,11 +2732,16 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 					quest_player->client->pers.quest_event_timer += QUEST_NPC_SPAWN_TIME;
 				}
 
-				if (quest_player->client->pers.quest_defeated_enemies == QUEST_MIN_ENEMIES_TO_DEFEAT)
-				{ // zyk: start the second part of the quest, the Spirit Tree regen
-					zyk_set_starting_quest_progress(quest_player);
+				if (quest_player->client->pers.quest_defeated_enemies >= QUEST_MIN_ENEMIES_TO_DEFEAT)
+				{
+					quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_FIRST_PART_COMPLETE);
 
-					quest_player->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
+					if (quest_player->client->pers.quest_defeated_enemies == QUEST_MIN_ENEMIES_TO_DEFEAT)
+					{ // zyk: start the second part of the quest, the Spirit Tree regen
+						zyk_set_starting_quest_progress(quest_player);
+
+						quest_player->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
+					}
 				}
 
 				// zyk: completed the quest
