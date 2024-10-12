@@ -1313,7 +1313,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.magic_armor_timer = 0;
 
 	level.special_quest_npc_in_map = 0;
-	level.special_npc_timer = 0;
 
 	// zyk: initializing Duel Tournament variables
 	level.duel_tournament_mode = 0;
@@ -7158,9 +7157,9 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 200;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 200;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 50;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 10;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 10;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 25;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DISRUPTOR] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BOWCASTER] = 25;
@@ -9247,7 +9246,7 @@ void G_RunFrame( int levelTime ) {
 						side_quest_item_duration /= 2;
 					}
 					
-					if (Q_irand(0, 99) < 5)
+					if (Q_irand(0, 99) < 10)
 					{ // zyk: crystals
 						zyk_quest_item_t crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
 
@@ -9675,13 +9674,11 @@ void G_RunFrame( int levelTime ) {
 
 							int summon_power_level = (player_power_level + ent->client->pers.quest_defeated_enemies) / 2;
 
-							if (level.special_npc_timer < level.time && Q_irand(0, 99) < 2)
+							if (Q_irand(0, 99) < 1)
 							{
 								zyk_quest_npc_t rare_npc = Q_irand(QUEST_NPC_ANGEL_OF_DEATH, QUEST_NPC_CHIMERA);
 
 								zyk_spawn_quest_npc(rare_npc, ent->client->ps.viewangles[YAW], summon_power_level, hard_difficulty, -1);
-
-								level.special_npc_timer = level.time + SPECIAL_NPC_TIMER;
 							}
 						}
 					}

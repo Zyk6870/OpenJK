@@ -229,6 +229,16 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire, int weapon )
 		{
 			count = 1;
 		}
+		else if (ent && ent->client && ent->client->sess.amrpgmode == 2 &&
+			weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 && count > 2)
+		{
+			count = 5;
+		}
+		else if (ent && ent->client && ent->client->sess.amrpgmode == 2 &&
+				weapon == WP_BRYAR_OLD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0 && count > 5)
+		{
+			count = 10;
+		}
 		else if ( count > 5 )
 		{
 			count = 5;
@@ -1025,7 +1035,7 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 static void WP_BowcasterMainFire( gentity_t *ent )
 //---------------------------------------------------------
 {
-	int	damage	= zyk_bowcaster_damage.integer, count;
+	int	count;
 	float bowcaster_spread = BOWCASTER_ALT_SPREAD;
 	float		vel;
 	vec3_t		angs, dir;
@@ -1072,6 +1082,8 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 
 	for (i = 0; i < count; i++ )
 	{
+		int damage = zyk_bowcaster_damage.integer;
+
 		// create a range of different velocities
 		vel = zyk_bowcaster_velocity.integer * ( Q_flrand(-1.0f, 1.0f) * BOWCASTER_VEL_RANGE + 1.0f );
 

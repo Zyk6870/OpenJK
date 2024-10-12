@@ -2630,7 +2630,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	if (self->NPC && self->client->NPC_class != CLASS_VEHICLE && self->client->playerTeam != NPCTEAM_PLAYER)
 	{
 		int crystal_random_chance = Q_irand(0, 99);
-		int chance_to_spawn_crystal = 25 + (self->client->ps.stats[STAT_MAX_HEALTH] / 20);
+		int chance_to_spawn_crystal = 40 + (self->client->ps.stats[STAT_MAX_HEALTH] / 20);
 		zyk_quest_item_t crystal_type = QUEST_ITEM_NONE;
 
 		if (self->client->pers.quest_npc > QUEST_NPC_NONE && crystal_random_chance < chance_to_spawn_crystal)
@@ -6232,6 +6232,21 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 					G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble.wav"));
 				}
+			}
+		}
+
+		if (mod == MOD_STUN_BATON && attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && 
+			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
+		{
+			int shield_regen_amount = 1 + (take / 10);
+
+			if ((attacker->client->ps.stats[STAT_ARMOR] + shield_regen_amount) < attacker->client->pers.max_rpg_shield)
+			{
+				attacker->client->ps.stats[STAT_ARMOR] += shield_regen_amount;
+			}
+			else
+			{
+				attacker->client->ps.stats[STAT_ARMOR] = attacker->client->pers.max_rpg_shield;
 			}
 		}
 
