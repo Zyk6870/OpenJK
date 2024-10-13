@@ -816,11 +816,6 @@ ClientTimerActions
 Actions that happen once a second
 ==================
 */
-extern void zyk_add_mp(gentity_t* ent, int mp_amount);
-extern int zyk_max_magic_power(gentity_t *ent);
-extern void Add_Ammo (gentity_t *ent, int weapon, int count);
-extern void zyk_energy_modulator(gentity_t* ent);
-extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 void ClientTimerActions( gentity_t *ent, int msec ) {
 	gclient_t	*client;
 
@@ -840,39 +835,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		if (client->ps.ammo[AMMO_TRIPMINE] == 0)
 		{
 			client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_TRIP_MINE);
-		}
-
-		if (client->sess.amrpgmode == 2)
-		{ // zyk: healing abilities
-			if (client->pers.energy_modulator_mode > 0)
-			{ // zyk: Energy Modulator consumes mp or ammo while active
-				if (ent->health < 1)
-				{ // zyk: if player dies, deactivate Energy Modulator
-					ent->client->pers.energy_modulator_mode = 2;
-
-					zyk_energy_modulator(ent);
-				}
-				else if (client->pers.magic_power < 1 && client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] < 1 && client->ps.ammo[AMMO_POWERCELL] < 1)
-				{ // zyk: no more ammo to keep it active. Turn it off
-					ent->client->pers.energy_modulator_mode = 2;
-
-					zyk_energy_modulator(ent);
-				}
-				else if (client->pers.magic_power >= 1)
-				{
-					client->pers.magic_power -= 1;
-				}
-				else if (client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0)
-				{
-					client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]--;
-					zyk_add_mp(ent, 100);
-				}
-				else
-				{
-					client->ps.ammo[AMMO_POWERCELL] -= 1;
-					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
-				}
-			}
 		}
 
 		if (zyk_vote_timer.integer > 0 && client->sess.vote_timer > 0)

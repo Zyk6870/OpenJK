@@ -5182,9 +5182,27 @@ void energy_modulator_spawn_model(gentity_t* ent, char *model_path)
 	ent->client->pers.energy_modulator_entity_id = new_ent->s.number;
 }
 
+qboolean zyk_has_resources_for_energy_modulator(gentity_t* ent)
+{
+	if (ent->client->pers.magic_power < 1 &&
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] < 1 &&
+		ent->client->ps.ammo[AMMO_POWERCELL] < 1)
+	{
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
 // zyk: spawns the entity when turning it on or free it when turning it off
 void zyk_energy_modulator(gentity_t* ent)
 {
+	if (zyk_has_resources_for_energy_modulator(ent) == qfalse)
+	{
+		ent->client->pers.energy_modulator_mode = 0;
+		return;
+	}
+
 	if (ent->client->pers.energy_modulator_mode == 0)
 	{ // zyk: if it is Off, turn it on and spawns the model
 		ent->client->pers.energy_modulator_mode = 1;
@@ -7405,13 +7423,6 @@ void zyk_update_inventory(gentity_t* ent)
 	ent->client->ps.stats[STAT_WEAPONS] = 0;
 	ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_NONE);
 	ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_MELEE);
-	ent->client->ps.ammo[AMMO_BLASTER] = 0;
-	ent->client->ps.ammo[AMMO_POWERCELL] = 0;
-	ent->client->ps.ammo[AMMO_METAL_BOLTS] = 0;
-	ent->client->ps.ammo[AMMO_ROCKETS] = 0;
-	ent->client->ps.ammo[AMMO_THERMAL] = 0;
-	ent->client->ps.ammo[AMMO_TRIPMINE] = 0;
-	ent->client->ps.ammo[AMMO_DETPACK] = 0;
 	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = 0;
 
 	// zyk: weapons inventory
@@ -7478,7 +7489,7 @@ void zyk_update_inventory(gentity_t* ent)
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_TRIPMINES] > 0)
 		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_TRIP_MINE);
 
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS] > 0)
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS] > 0 || ent->client->ps.hasDetPackPlanted)
 		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_DET_PACK);
 
 	// zyk: holdable items inventory

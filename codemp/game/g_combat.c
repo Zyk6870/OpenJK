@@ -2234,6 +2234,11 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 
 	// zyk: stop all magic powers
 	zyk_stop_all_magic_powers(self);
+
+	if (self->client->sess.amrpgmode == 2 && self->client->pers.energy_modulator_mode > 0)
+	{ // zyk: if player dies, deactivate Energy Modulator
+		self->client->pers.energy_modulator_mode = 0;
+	}
 	
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
@@ -4920,6 +4925,31 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 	return -1;
 }
 
+extern void zyk_add_mp(gentity_t* ent, int mp_amount);
+extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
+extern qboolean zyk_has_resources_for_energy_modulator(gentity_t* ent);
+void zyk_energy_modulator_resource_usage(gentity_t* ent)
+{
+	if (zyk_has_resources_for_energy_modulator(ent) == qfalse)
+	{ // zyk: no more resources to keep it active. Turn it off
+		ent->client->pers.energy_modulator_mode = 0;
+	}
+	else if (ent->client->pers.magic_power >= 1)
+	{
+		ent->client->pers.magic_power -= 1;
+	}
+	else if (ent->client->pers.magic_power <= 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0)
+	{
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]--;
+		zyk_add_mp(ent, 100);
+	}
+	else
+	{
+		ent->client->ps.ammo[AMMO_POWERCELL] -= 1;
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
+	}
+}
+
 /*
 ============
 G_Damage
@@ -4956,7 +4986,6 @@ extern void Boba_FlyStop( gentity_t *self );
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
-extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
 	int			take, asave = 0, knockback;
@@ -5080,6 +5109,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		if (attacker->client->pers.energy_modulator_mode == 1)
 		{ // zyk: Energy Modulator mode 1 increases damage
 			damage = (int)ceil(damage * 1.25);
+
+			zyk_energy_modulator_resource_usage(attacker);
 		}
 	}
 
@@ -5613,6 +5644,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				bonus_resistance += 0.25;
 
 				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
+
+				zyk_energy_modulator_resource_usage(targ);
 			}
 
 			scaled_damage = (int)ceil(take * (1.0 - bonus_resistance));
