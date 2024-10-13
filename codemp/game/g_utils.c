@@ -1615,12 +1615,12 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 			ent->client->ps.forceDodgeAnim == BOTH_MEDITATE &&
 			ent->client->pers.quest_spirit_tree_call_timer < level.time)
 		{
-			if (ent->client->pers.magic_crystals > QUEST_SPIRIT_TREE_CALL_COST)
+			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > QUEST_SPIRIT_TREE_CALL_COST)
 			{
 				ent->client->pers.quest_spirit_tree_id = -1;
 				ent->client->pers.quest_spirit_tree_call_timer = level.time + 2000;
 
-				ent->client->pers.magic_crystals -= QUEST_SPIRIT_TREE_CALL_COST;
+				ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] -= QUEST_SPIRIT_TREE_CALL_COST;
 
 				trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
 			}
@@ -1894,7 +1894,7 @@ void TryUse( gentity_t *ent )
 	{ // zyk: player touched one of the puzzle crystals
 		if (level.legendary_crystal_chosen[level.legendary_artifact_step - QUEST_SECRET_CHOSEN_CRYSTALS_STEP] == target->count)
 		{ // zyk: one of the crystals chosen in the correct order
-			int crystal_quantity_decrease = QUEST_SECRET_CORRECT_CRYSTALS_STEP - (ent->client->pers.magic_crystals / 20);
+			int crystal_quantity_decrease = QUEST_SECRET_CORRECT_CRYSTALS_STEP - (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] / 20);
 
 			G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/interface/pickup_battery.mp3"));
 
@@ -1957,7 +1957,7 @@ void TryUse( gentity_t *ent )
 		{ // zyk: found the seller
 			if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE)
 			{
-				int seller_duration = ent->client->pers.magic_crystals * SIDE_QUEST_STUFF_TIMER;
+				int seller_duration = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] * SIDE_QUEST_STUFF_TIMER;
 
 				if (seller_duration < (SIDE_QUEST_STUFF_TIMER + 5000))
 				{

@@ -6212,9 +6212,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
 			{
-				if (targ->client->pers.magic_crystals > 0)
+				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0)
 				{
-					targ->client->pers.magic_crystals--;
+					targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]--;
 
 					attacker->health += 50;
 					attacker->client->pers.magic_power += 50;
@@ -6238,7 +6238,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 		{
-			if (mod == MOD_STUN_BATON && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
+			if (mod == MOD_STUN_BATON && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 && 
+				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON1))
 			{
 				int shield_regen_amount = 1 + (take / 10);
 
@@ -6254,8 +6255,15 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			else if (mod == MOD_FLECHETTE && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 && 
 					targ && targ->health > 0 && targ->client)
 			{ // zyk: bleeding
-				targ->client->pers.bleeding_debounce_timer = 0;
-				targ->client->pers.bleeding_duration = level.time + 5000;
+				if (targ->client->pers.bleeding_duration < level.time)
+				{
+					targ->client->pers.bleeding_debounce_timer = 0;
+					targ->client->pers.bleeding_duration = level.time + (200 * take);
+				}
+				else
+				{
+					targ->client->pers.bleeding_duration += (200 * take);
+				}
 
 				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_BLEEDING);
 			}

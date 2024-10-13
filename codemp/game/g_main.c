@@ -7369,7 +7369,7 @@ void zyk_show_tutorial(gentity_t* ent)
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int player_power_level = ent->client->pers.magic_crystals + zyk_total_skillpoints(ent);
+	int player_power_level = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] + zyk_total_skillpoints(ent);
 	int interval_time = QUEST_NPC_SPAWN_TIME - (player_power_level * 100);
 
 	if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
@@ -7394,11 +7394,6 @@ extern int zyk_number_of_enemies_in_map();
 
 void zyk_update_inventory(gentity_t* ent)
 {
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] != ent->client->pers.magic_crystals)
-	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = ent->client->pers.magic_crystals;
-	}
-
 	if (ent->client->pers.quest_tries > 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] != (ent->client->pers.quest_tries - MIN_QUEST_TRIES))
 	{
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = (ent->client->pers.quest_tries - MIN_QUEST_TRIES);
@@ -9107,12 +9102,14 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					if (ent->client->ps.weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
+						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BLASTER_PISTOL1) && 
 						ent->client->ps.weaponTime > (weaponData[WP_BRYAR_PISTOL].fireTime * 0.6))
 					{
 						ent->client->ps.weaponTime = weaponData[WP_BRYAR_PISTOL].fireTime * 0.6;
 					}
 
 					if (ent->client->ps.weapon == WP_BRYAR_OLD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0 &&
+						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BRYAR_PISTOL1) &&
 						ent->client->ps.weaponTime > (weaponData[WP_BRYAR_OLD].fireTime * 0.6))
 					{
 						ent->client->ps.weaponTime = weaponData[WP_BRYAR_OLD].fireTime * 0.6;
@@ -9242,7 +9239,7 @@ void G_RunFrame( int levelTime ) {
 
 					int side_quest_item_chance_modifier = ENERGY_MODULATOR_PARTS * QUEST_LOG_PARTS;
 
-					int side_quest_item_chance = ent->client->pers.magic_crystals - side_quest_item_chance_modifier +
+					int side_quest_item_chance = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] - side_quest_item_chance_modifier +
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] + 
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] -
 						(ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] * (side_quest_item_chance_modifier / ENERGY_MODULATOR_PARTS)) -
@@ -9258,7 +9255,7 @@ void G_RunFrame( int levelTime ) {
 						side_quest_item_duration /= 2;
 					}
 					
-					if (Q_irand(0, 99) < 10)
+					if (Q_irand(0, 99) < 9)
 					{ // zyk: crystals
 						zyk_quest_item_t crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
 
@@ -9529,7 +9526,7 @@ void G_RunFrame( int levelTime ) {
 							float tree_y = tree_ent->s.origin[1];
 							float tree_z = tree_ent->s.origin[2];
 
-							quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + ent->client->pers.magic_crystals + 
+							quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] +
 													 (ent->client->pers.quest_defeated_enemies - QUEST_MIN_ENEMIES_TO_DEFEAT));
 
 							if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
@@ -9671,17 +9668,17 @@ void G_RunFrame( int levelTime ) {
 							}
 
 							if (zyk_number_of_allies_in_map(NULL) < (zyk_max_quest_npcs.integer / 2) &&
-								Q_irand(0, 99) < (1 + ent->client->pers.magic_crystals + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
+								Q_irand(0, 99) < (1 + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 							{ // zyk: spawn an ally
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
-								int ally_bonus = (ent->client->pers.quest_defeated_enemies / 2) + ent->client->pers.magic_crystals;
+								int ally_bonus = (ent->client->pers.quest_defeated_enemies / 2) + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
 
 								zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
 							}
 						}
 						else
 						{
-							int player_power_level = (ent->client->pers.magic_crystals +
+							int player_power_level = (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] +
 								zyk_total_skillpoints(ent) + (((1.0 * ent->client->pers.current_weight) / 3000) * 60));
 
 							int summon_power_level = (player_power_level + ent->client->pers.quest_defeated_enemies) / 2;

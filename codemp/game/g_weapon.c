@@ -230,12 +230,14 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire, int weapon )
 			count = 1;
 		}
 		else if (ent && ent->client && ent->client->sess.amrpgmode == 2 &&
-			weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 && count > 2)
+			weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 && 
+			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BLASTER_PISTOL2) && count > 2)
 		{
 			count = 5;
 		}
 		else if (ent && ent->client && ent->client->sess.amrpgmode == 2 &&
-				weapon == WP_BRYAR_OLD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0 && count > 5)
+				weapon == WP_BRYAR_OLD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0 && 
+			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BRYAR_PISTOL2) && count > 5)
 		{
 			count = 10;
 		}
@@ -3788,8 +3790,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	tr_ent = &g_entities[tr.entityNum];
 
 	// zyk: Stun Baton with Stun Baton Upgrade in RPG Mode allows the player to open any door
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 && zyk_allow_stun_baton_upgrade.integer == 1 && 
-		Q_stricmp(tr_ent->classname, "func_door") == 0)
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 && 
+		ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON1) && zyk_allow_stun_baton_upgrade.integer == 1 && Q_stricmp(tr_ent->classname, "func_door") == 0)
 	{
 		GlobalUse(tr_ent, ent, ent);
 	}
@@ -3842,7 +3844,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 				tr_ent->client->ps.electrifyTime = level.time + 700;
 
 				// zyk: if the player has stun baton upgrade in RPG mode, enemy has its speed decreased
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 && 
+					ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON2))
 				{
 					// zyk: allies cant be hit by it
 					if (zyk_is_ally(ent,tr_ent) == qtrue)

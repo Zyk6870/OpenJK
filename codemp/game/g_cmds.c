@@ -2140,7 +2140,7 @@ void load_account(gentity_t* ent)
 		{
 			// zyk: loading Skillpoints value
 			fscanf(account_file, "%s", content);
-			ent->client->pers.magic_crystals = atoi(content);
+			ent->client->pers.active_inventory_upgrades = atoi(content);
 
 			// zyk: loading skill levels
 			for (i = 0; i < NUMBER_OF_SKILLS; i++)
@@ -2275,7 +2275,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
 
 			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.magic_crystals, content, client->pers.credits, client->pers.quest_tries, 
+				client->pers.active_inventory_upgrades, content, client->pers.credits, client->pers.quest_tries,
 				client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress, client->pers.quest_missions,
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina, client->pers.tutorial_shown);
 
@@ -5133,7 +5133,7 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 		ent->client->pers.rpg_inventory[i] = 0;
 	}
 
-	ent->client->pers.magic_crystals = 0;
+	ent->client->pers.active_inventory_upgrades = 0;
 	ent->client->pers.magic_power = 0;
 	ent->client->pers.credits = RPG_INITIAL_CREDITS;
 
@@ -5519,7 +5519,7 @@ qboolean rpg_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont_show
 	if (ent->client->pers.skill_levels[upgrade_value - 1] < zyk_max_skill_level(upgrade_value - 1))
 	{
 		ent->client->pers.skill_levels[upgrade_value - 1]++;
-		ent->client->pers.magic_crystals -= MAGIC_CRYSTALS_TO_UPGRADE_SKILL;
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] -= MAGIC_CRYSTALS_TO_UPGRADE_SKILL;
 	}
 	else
 	{
@@ -5687,7 +5687,7 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 	}
 
 	// zyk: the user must have skillpoints to get a new skill level
-	if (ent->client->pers.magic_crystals < MAGIC_CRYSTALS_TO_UPGRADE_SKILL)
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] < MAGIC_CRYSTALS_TO_UPGRADE_SKILL)
 	{
 		if (dont_show_message == qfalse)
 			trap->SendServerCommand( ent->s.number, "print \"Not enough magic crystals.\n\"" );
@@ -5891,7 +5891,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
 	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Blue Crystals: ^7%d\n^3Skills Upgraded: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Stamina: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
-		ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.magic_crystals, zyk_total_skillpoints(ent), RPG_MAX_SKILLPOINTS, ent->client->pers.magic_power, zyk_max_magic_power(ent),
+		ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL], zyk_total_skillpoints(ent), RPG_MAX_SKILLPOINTS, ent->client->pers.magic_power, zyk_max_magic_power(ent),
 		ent->client->pers.current_weight, ent->client->pers.max_weight, ent->client->pers.current_stamina, ent->client->pers.max_stamina, ent->client->pers.credits));
 }
 
@@ -6497,15 +6497,15 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Increases Blaster Pistol firerate. Altfire reaches full charge faster\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Increases Blaster Pistol firerate. Upgrade ^32^7: Altfire reaches full charge faster\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Increases Bryar Pistol firerate. Altfire can charge more for more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Increases Bryar Pistol firerate. Upgrade ^32^7: Altfire can charge more for more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE)
 	{
@@ -6605,6 +6605,97 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 }
 
+void zyk_use_inventory_item(gentity_t* ent, int item_index)
+{
+	if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
+	{
+		if (ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON1))
+		{
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_STUN_BATON1);
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_STUN_BATON2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Stun Baton Upgrade 2 ^2ON^7\n\n\"");
+		}
+		else
+		{
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_STUN_BATON1);
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_STUN_BATON2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Stun Baton Upgrade 1 ^2ON^7\n\n\"");
+		}
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
+	{
+		if (ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BLASTER_PISTOL1))
+		{
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRAGE_BLASTER_PISTOL1);
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRAGE_BLASTER_PISTOL2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Blaster Pistol Upgrade 2 ^2ON^7\n\n\"");
+		}
+		else
+		{
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRAGE_BLASTER_PISTOL1);
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRAGE_BLASTER_PISTOL2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Blaster Pistol Upgrade 1 ^2ON^7\n\n\"");
+		}
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL)
+	{
+		if (ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BRYAR_PISTOL1))
+		{
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRAGE_BRYAR_PISTOL1);
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRAGE_BRYAR_PISTOL2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Bryar Pistol Upgrade 2 ^2ON^7\n\n\"");
+		}
+		else
+		{
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRAGE_BRYAR_PISTOL1);
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRAGE_BRYAR_PISTOL2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Bryar Pistol Upgrade 1 ^2ON^7\n\n\"");
+		}
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE)
+	{
+		
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR)
+	{
+		
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER)
+	{
+		
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2)
+	{
+		
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER)
+	{
+		
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
+	{
+		
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
+	{
+		
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
+	{
+		
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_DETPACKS)
+	{
+		
+	}
+}
+
 void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 {
 	if (zyk_allow_quests.integer == 1)
@@ -6693,7 +6784,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				if (trap->Argc() == 2)
 				{
-					trap->SendServerCommand(ent->s.number, "print \"Must pass a page number or ^3desc ^7to see inventory item description. Examples: ^3/list inventory 1, /list inventory desc 1, /list inv 1, /list inv desc 1^7\n\"");
+					trap->SendServerCommand(ent->s.number, "print \"Must pass a page number, ^3desc ^7to see inventory item description, or ^3use ^7to toggle a weapon upgrade. Examples: ^3/list inventory 1, /list inventory desc 1, /list inv 1, /list inv desc 1, /list inv use 42^7\n\"");
 				}
 				else
 				{
@@ -6732,6 +6823,35 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							else
 							{
 								trap->SendServerCommand(ent->s.number, va("print \"Item number must be between 1 and %d\n\"", MAX_RPG_INVENTORY_ITEMS));
+							}
+						}
+					}
+					else if (Q_stricmp(arg2, "use") == 0)
+					{
+						char arg3[MAX_STRING_CHARS];
+						int item_number = 0;
+						int item_index = 0;
+
+						strcpy(arg3, "");
+
+						if (trap->Argc() == 3)
+						{
+							trap->SendServerCommand(ent->s.number, "print \"Must pass a number to toggle upgrade. Example: ^3/list inventory use 42^7\n\"");
+						}
+						else
+						{
+							trap->Argv(3, arg3, sizeof(arg3));
+
+							item_number = atoi(arg3);
+							item_index = item_number - 1;
+
+							if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_DETPACKS)
+							{
+								zyk_use_inventory_item(ent, item_index);
+							}
+							else
+							{
+								trap->SendServerCommand(ent->s.number, va("print \"Item number must be between %d and %d\n\"", RPG_INVENTORY_UPGRADE_STUN_BATON, RPG_INVENTORY_UPGRADE_DETPACKS));
 							}
 						}
 					}
@@ -7002,10 +7122,6 @@ void Cmd_Buy_f( gentity_t *ent ) {
 			else
 				ent->client->ps.powerups[PW_FORCE_BOON] += (30000 * amount);
 		}
-		else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
-		{
-			ent->client->pers.magic_crystals += amount;
-		}
 		else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
 		{
 			ent->client->pers.quest_tries += amount;
@@ -7095,12 +7211,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		}
 	}
 
-	if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL && ent->client->pers.magic_crystals >= amount)
-	{
-		ent->client->pers.magic_crystals -= amount;
-		sold = qtrue;
-	}
-	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL && ent->client->pers.quest_tries >= (amount + MIN_QUEST_TRIES))
+	if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL && ent->client->pers.quest_tries >= (amount + MIN_QUEST_TRIES))
 	{
 		ent->client->pers.quest_tries -= amount;
 		sold = qtrue;

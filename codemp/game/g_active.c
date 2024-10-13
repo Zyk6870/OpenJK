@@ -852,7 +852,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 					zyk_energy_modulator(ent);
 				}
-				else if (client->pers.magic_power < 1 && client->pers.magic_crystals < 1 && client->ps.ammo[AMMO_POWERCELL] < 1)
+				else if (client->pers.magic_power < 1 && client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] < 1 && client->ps.ammo[AMMO_POWERCELL] < 1)
 				{ // zyk: no more ammo to keep it active. Turn it off
 					ent->client->pers.energy_modulator_mode = 2;
 
@@ -862,9 +862,9 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				{
 					client->pers.magic_power -= 1;
 				}
-				else if (client->pers.magic_crystals > 0)
+				else if (client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0)
 				{
-					client->pers.magic_crystals--;
+					client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]--;
 					zyk_add_mp(ent, 100);
 				}
 				else

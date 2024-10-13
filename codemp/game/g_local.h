@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.75"
+#define	GAMEVERSION	"New Zyk Mod v1.1.76"
 
 #define SECURITY_LOG "security.log"
 
@@ -712,6 +712,16 @@ typedef enum {
 } zyk_inventory_t;
 
 typedef enum {
+	INV_UPGRADE_STUN_BATON1,
+	INV_UPGRADE_STUN_BATON2,
+	INV_UPGRAGE_BLASTER_PISTOL1,
+	INV_UPGRAGE_BLASTER_PISTOL2,
+	INV_UPGRAGE_BRYAR_PISTOL1,
+	INV_UPGRAGE_BRYAR_PISTOL2,
+	MAX_INV_UPGRADES
+} zyk_inv_upgrade_toggle_t;
+
+typedef enum {
 	QUEST_ITEM_NONE,
 	QUEST_ITEM_SKILL_CRYSTAL,
 	QUEST_ITEM_EXTRA_TRIES_CRYSTAL,
@@ -940,8 +950,6 @@ typedef struct clientPersistant_s {
 	int zyk_saved_force_powers;
 	int zyk_saved_force_power_levels[NUM_FORCE_POWERS];
 
-
-
 	// zyk: timer when player is using crystals
 	int special_crystal_timer;
 	int special_crystal_counter;
@@ -961,8 +969,6 @@ typedef struct clientPersistant_s {
 	vec3_t teleport_angles;
 
 	int	bitvalue; // zyk: player is considered as admin if bitvalue is > 0, because he has at least 1 admin command
-	
-	int magic_crystals; // zyk: Magic Crystals. Used to upgrade skill levels
 
 	char password[32]; // zyk: account password
 
@@ -1028,6 +1034,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: all stuff the player can carry. Used to determine if player is carrying above the max weight
 	int rpg_inventory[MAX_RPG_INVENTORY_ITEMS];
+
+	// zyk: has the flags of the Upgrades being used right now
+	int active_inventory_upgrades;
 
 	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
 	int quest_power_status;
