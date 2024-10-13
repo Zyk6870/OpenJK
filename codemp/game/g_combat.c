@@ -2745,8 +2745,9 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 					}
 				}
 
-				// zyk: completed the quest
-				if (zyk_is_main_quest_complete(quest_player) == qtrue)
+				// zyk: completed second part of the quest
+				if (quest_player->client->pers.quest_progress == MAX_QUEST_PROGRESS && 
+					quest_player->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
 				{
 					zyk_start_main_quest_final_event(quest_player);
 				}

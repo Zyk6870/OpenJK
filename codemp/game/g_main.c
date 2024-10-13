@@ -9429,49 +9429,46 @@ void G_RunFrame( int levelTime ) {
 						}
 						else
 						{
-							if (zyk_is_main_quest_complete(ent) == qtrue)
+							if (ent->client->pers.quest_final_event_step == 2)
 							{
-								if (ent->client->pers.quest_final_event_step == 2)
+								int j = 0;
+
+								for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
 								{
-									int j = 0;
+									gentity_t* npc_ent = &g_entities[j];
 
-									for (j = (MAX_CLIENTS + BODY_QUEUE_SIZE); j < level.num_entities; j++)
-									{
-										gentity_t* npc_ent = &g_entities[j];
-
-										if (npc_ent && npc_ent->client && npc_ent->NPC &&
-											npc_ent->client->pers.quest_npc > QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
-										{ // zyk: one of the quest enemies
-											zyk_NPC_Kill_f(npc_ent->NPC_type);
-										}
+									if (npc_ent && npc_ent->client && npc_ent->NPC &&
+										npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc < QUEST_NPC_ALLY_MAGE)
+									{ // zyk: one of the quest enemies
+										zyk_NPC_Kill_f(npc_ent->NPC_type);
 									}
-
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We can now defeat the remaining of Brotherhood of Mages.\n\"", QUESTCHAR_ALL_SPIRITS));
 								}
-								else if (ent->client->pers.quest_final_event_step == 3)
-								{
-									int quest_crystal_prize = ent->client->pers.quest_defeated_enemies / 10;
 
-									if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
-									{ // zyk: Hard Mode
-										quest_crystal_prize *= 2;
-									}
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We can now defeat the remaining of Brotherhood of Mages.\n\"", QUESTCHAR_ALL_SPIRITS));
+							}
+							else if (ent->client->pers.quest_final_event_step == 3)
+							{
+								int quest_crystal_prize = ent->client->pers.quest_defeated_enemies / 10;
 
-									ent->client->pers.quest_tries += quest_crystal_prize;
-									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] += quest_crystal_prize;
-									ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += quest_crystal_prize;
-
-									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
-
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive %d ^2Green ^7and ^1Red ^7crystals.\n\"",
-										QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies, quest_crystal_prize));
+								if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+								{ // zyk: Hard Mode
+									quest_crystal_prize *= 2;
 								}
-								else if (ent->client->pers.quest_final_event_step == 4)
-								{
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
 
-									ent->client->pers.quest_missions |= (1 << MAIN_QUEST_SECOND_PART_COMPLETE);
-								}
+								ent->client->pers.quest_tries += quest_crystal_prize;
+								ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] += quest_crystal_prize;
+								ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += quest_crystal_prize;
+
+								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive %d ^2Green ^7and ^1Red ^7crystals.\n\"",
+									QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies, quest_crystal_prize));
+							}
+							else if (ent->client->pers.quest_final_event_step == 4)
+							{
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Our victory is complete. Thank you!\n\"", QUESTCHAR_ALL_SPIRITS));
+
+								ent->client->pers.quest_missions |= (1 << MAIN_QUEST_SECOND_PART_COMPLETE);
 							}
 						}
 
@@ -9486,7 +9483,8 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					// zyk: Main Quest progress
-					if (zyk_is_main_quest_complete(ent) == qfalse && 
+					if (!(ent->client->pers.quest_progress == MAX_QUEST_PROGRESS &&
+						ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT) &&
 						ent->client->pers.quest_defeated_enemies >= QUEST_MIN_ENEMIES_TO_DEFEAT &&
 						ent->client->pers.quest_progress_timer < level.time)
 					{
@@ -9563,8 +9561,9 @@ void G_RunFrame( int levelTime ) {
 							{
 								ent->client->pers.quest_progress = MAX_QUEST_PROGRESS;
 
-								// zyk: completed the quest
-								if (zyk_is_main_quest_complete(ent) == qtrue)
+								// zyk: completed the second part of the quest
+								if (ent->client->pers.quest_progress == MAX_QUEST_PROGRESS &&
+									ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
 								{
 									zyk_start_main_quest_final_event(ent);
 								}
@@ -9636,7 +9635,8 @@ void G_RunFrame( int levelTime ) {
 
 						zyk_set_quest_event_timer(ent);
 
-						if (zyk_is_main_quest_complete(ent) == qfalse)
+						if (!(ent->client->pers.quest_progress == MAX_QUEST_PROGRESS &&
+							ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT))
 						{
 							int enemy_type = 0;
 							zyk_quest_npc_t stronger_enemy_type = QUEST_NPC_LOW_TRAINED_WARRIOR - (ent->client->pers.quest_defeated_enemies / 5);

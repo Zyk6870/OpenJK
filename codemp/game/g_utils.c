@@ -1631,6 +1631,7 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 		}
 
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 &&
+			!(ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE) && 
 			ent->client->pers.special_crystal_timer < level.time && ent->client->pers.special_crystal_counter < RED_CRYSTAL_MAX_CHARGE)
 		{ // zyk: Charging Red Crystal
 			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/energy_crackle.wav"));
@@ -1675,6 +1676,7 @@ void TryUse( gentity_t *ent )
 		(ent->client->ps.pm_flags & PMF_FOLLOW) || ent->client->sess.sessionTeam == TEAM_SPECTATOR || ent->client->tempSpectate >= level.time ||
 		(ent->client->ps.forceHandExtend != HANDEXTEND_NONE && ent->client->ps.forceHandExtend != HANDEXTEND_DRAGGING))
 	{
+		zyk_use_rpg_stuff(ent);
 		return;
 	}
 

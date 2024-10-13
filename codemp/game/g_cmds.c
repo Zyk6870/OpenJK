@@ -6285,7 +6285,7 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
 {
-	if (ent->client->pers.quest_progress == MAX_QUEST_PROGRESS && ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
+	if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE))
 	{
 		return qtrue;
 	}
