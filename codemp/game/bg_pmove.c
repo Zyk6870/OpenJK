@@ -5949,6 +5949,10 @@ PM_FinishWeaponChange
 void PM_FinishWeaponChange( void ) {
 	int		weapon;
 
+#ifdef _GAME
+	gentity_t* player_ent = &g_entities[pm->ps->clientNum];
+#endif
+
 	weapon = pm->cmd.weapon;
 	if ( weapon < WP_NONE || weapon >= WP_NUM_WEAPONS ) {
 		weapon = WP_NONE;
@@ -5970,6 +5974,16 @@ void PM_FinishWeaponChange( void ) {
 	pm->ps->weapon = weapon;
 	pm->ps->weaponstate = WEAPON_RAISING;
 	pm->ps->weaponTime += 250;
+
+#ifdef _GAME
+	// zyk: player in RPG Mode has the inventory
+	if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && weapon == WP_BRYAR_PISTOL && 
+		player_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
+		player_ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BLASTER_PISTOL2))
+	{
+		player_ent->client->pers.quickdraw_timer = level.time + 1000;
+	}
+#endif
 }
 
 #ifdef _GAME

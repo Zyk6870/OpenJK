@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.79"
+#define	GAMEVERSION	"New Zyk Mod v1.1.80"
 
 #define SECURITY_LOG "security.log"
 
@@ -1053,6 +1053,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: has the flags of the Upgrades being used right now
 	int active_inventory_upgrades;
+
+	// zyk: quickdraw pistol upgrade uses this
+	int quickdraw_timer;
 
 	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
 	int quest_power_status;

@@ -225,13 +225,9 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire, int weapon )
 
 		count = ( level.time - ent->client->ps.weaponChargeTime ) / BRYAR_CHARGE_UNIT;
 
-		if ( count < 1 )
-		{
-			count = 1;
-		}
-		else if (ent && ent->client && ent->client->sess.amrpgmode == 2 &&
-			weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 && 
-			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BLASTER_PISTOL2) && count > 2)
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2 &&
+			weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
+			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BLASTER_PISTOL2) && ent->client->pers.quickdraw_timer > level.time)
 		{
 			count = 5;
 		}
@@ -240,6 +236,10 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire, int weapon )
 			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BRYAR_PISTOL2) && count > 5)
 		{
 			count = 10;
+		}
+		else if (count < 1)
+		{
+			count = 1;
 		}
 		else if ( count > 5 )
 		{

@@ -4897,6 +4897,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->cloakDebReduce = 0;
 
 			ent->client->pers.energy_modulator_mode = 0;
+			ent->client->pers.quickdraw_timer = 0;
 
 			ent->client->pers.buy_sell_timer = 0;
 			ent->client->pers.inventory_update_timer = level.time + 100;
@@ -5996,14 +5997,14 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 3;
 	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][0] = 3;
 	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][0] = 3;
 	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][0] = 5;
-	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][1] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][1] = 2;
 
 	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][0] = 100;
 	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][1] = 50;
@@ -6501,7 +6502,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Increases Blaster Pistol firerate. Upgrade ^32^7: Altfire reaches full charge faster\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Increases Blaster Pistol firerate. Upgrade ^32^7: quickdraw. If shooting with pistol right after changing weapon to it, shoots a full charged shot\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL)
 	{
