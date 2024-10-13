@@ -9106,9 +9106,10 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					if (ent->client->ps.weapon == WP_DEMP2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0 &&
-						ent->client->ps.weaponTime > (weaponData[WP_DEMP2].fireTime * 0.7))
+						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DEMP21) &&
+						ent->client->ps.weaponTime > (weaponData[WP_DEMP2].fireTime * 0.5))
 					{
-						ent->client->ps.weaponTime = weaponData[WP_DEMP2].fireTime * 0.7;
+						ent->client->ps.weaponTime = weaponData[WP_DEMP2].fireTime * 0.5;
 					}
 
 					if (ent->client->ps.weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
@@ -9126,9 +9127,17 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0 &&
+						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_REPEATER1) &&
 						ent->client->ps.weaponTime > (weaponData[WP_REPEATER].altFireTime * 0.5))
 					{
 						ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime * 0.5;
+					}
+
+					if (ent->client->ps.weapon == WP_ROCKET_LAUNCHER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0 &&
+						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_ROCKET2) &&
+						ent->client->ps.weaponTime > (weaponData[WP_ROCKET_LAUNCHER].altFireTime * 0.5))
+					{
+						ent->client->ps.weaponTime = weaponData[WP_ROCKET_LAUNCHER].altFireTime * 0.5;
 					}
 
 					// zyk: Melee Punch Speed skill

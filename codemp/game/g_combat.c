@@ -4810,23 +4810,28 @@ void G_Knockdown( gentity_t *victim )
 }
 
 // zyk: tests if this rpg player can damage saber-only damage things
+extern int zyk_max_skill_level(int skill_index);
 qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *inflictor, int mod)
 {
 	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 	{
 		if ((mod == MOD_ROCKET || mod == MOD_ROCKET_HOMING || mod == MOD_ROCKET_SPLASH || mod == MOD_ROCKET_HOMING_SPLASH) && 
-			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0)
+			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0 && 
+			attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_ROCKET1))
 		{
 			return qtrue;
 		}
 	
-		if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0)
+		if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && 
+			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0 && 
+			attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_CONCUSSION1))
 		{
 			return qtrue;
 		}
 
-		if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_CONCUSSION)
-		{ // zyk: Ultra Bolt
+		if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2 && 
+			attacker->client->pers.skill_levels[SKILL_MAGIC_FIST] == zyk_max_skill_level(SKILL_MAGIC_FIST))
+		{ // zyk: Magic Fist
 			return qtrue;
 		}
 
@@ -6261,6 +6266,42 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_IN_FLAMES);
 			}
+			else if (mod == MOD_BOWCASTER && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0 &&
+				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_BOWCASTER2) && targ && targ->health > 0 && targ->client &&
+				Q_irand(0, 1) == 0)
+			{ // zyk: poison
+				targ->client->pers.poison_debounce_timer = 0;
+				targ->client->pers.poison_duration = level.time + 5000;
+
+				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_POISONED);
+			}
+			else if ((inflictor && inflictor->s.weapon == WP_DEMP2 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT)) && 
+				attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0 &&
+				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DEMP22) && targ && targ->health > 0 && targ->client)
+			{
+				targ->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+				targ->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
+				targ->client->ps.forceHandExtendTime = level.time + 1000;
+
+				// zyk: target cant attack
+				targ->client->ps.weaponTime = 1000;
+			}
+			else if ((mod == MOD_REPEATER_ALT || mod == MOD_REPEATER_ALT_SPLASH) &&
+				inflictor && 
+				attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0 &&
+				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_REPEATER2) && targ && targ->health > 0 && targ->client)
+			{
+				int distance_to_impact = Distance(inflictor->s.origin, targ->client->ps.origin);
+
+				if (Q_irand(0, distance_to_impact) < 32)
+				{
+					targ->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
+					targ->client->ps.forceHandExtendTime = level.time + 800;
+					targ->client->ps.velocity[2] += 300;
+					targ->client->ps.forceDodgeAnim = 0;
+					targ->client->ps.quickerGetup = qtrue;
+				}
+			}
 			else if (mod == MOD_FLECHETTE && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 && 
 				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_FLECHETTE2) && targ && targ->health > 0 && targ->client)
 			{ // zyk: bleeding
@@ -6892,10 +6933,10 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								{
 									ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 									ent->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
-									ent->client->ps.forceHandExtendTime = level.time + 1500;
+									ent->client->ps.forceHandExtendTime = level.time + 1200;
 
 									// zyk: target cant attack while confused
-									ent->client->ps.weaponTime = 1500;
+									ent->client->ps.weaponTime = 1200;
 								}
 							}
 						}

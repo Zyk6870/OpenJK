@@ -232,7 +232,7 @@ char* zyk_skill_description(int skill_index)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
 	if (skill_index == SKILL_MAGIC_FIST)
-		return va("allows you to attack with magic bolts when using melee punches. Damage per bolt is %d + ((%d / 2) * (this skill level))", zyk_magic_fist_damage.integer, zyk_magic_fist_damage.integer);
+		return va("allows you to attack with magic bolts when using melee punches. At max level, can damage saber-only damage objects and move pushable/pullable objects. Damage per bolt is %d + ((%d / 2) * (this skill level))", zyk_magic_fist_damage.integer, zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have. Each level increases it by 100. This is used to cast magic powers";
 	if (skill_index == SKILL_MAGIC_HEALING_AREA)
@@ -6517,15 +6517,15 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times. Upgrade ^32^7: shots have a chance to poison targets\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases firerate of DEMP2 main fire\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases firerate of DEMP2 main fire. Upgrade ^32^7: primary and altfire shots can stun targets for a longer time\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases firerate of Repeater altfire\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases accuracy of primary fire and firerate of Repeater altfire. Upgrade ^32^7: altfire has chance to knockdown targets based on distance to the impact\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
 	{
@@ -6533,11 +6533,11 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Concussion rifle has better splash radius, can break saber-only damage objects and can move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Concussion rifle has better splash radius, can break saber-only damage objects and can move pushable/pullable objects. Upgrade ^32^7: altfire stronger knockdown and for a longer time\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: increases firerate of primary fire\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DETPACKS)
 	{
@@ -6614,14 +6614,14 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_STUN_BATON1);
 			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_STUN_BATON2);
 
-			trap->SendServerCommand(ent->s.number, "print \"\n^3Stun Baton Upgrade 2 ^2ON^7\n\n\"");
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Stun Baton Mode 2 ^2ON^7\n\n\"");
 		}
 		else
 		{
 			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_STUN_BATON1);
 			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_STUN_BATON2);
 
-			trap->SendServerCommand(ent->s.number, "print \"\n^3Stun Baton Upgrade 1 ^2ON^7\n\n\"");
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Stun Baton Mode 1 ^2ON^7\n\n\"");
 		}
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
@@ -6631,14 +6631,14 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRAGE_BLASTER_PISTOL1);
 			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRAGE_BLASTER_PISTOL2);
 
-			trap->SendServerCommand(ent->s.number, "print \"\n^3Blaster Pistol Upgrade 2 ^2ON^7\n\n\"");
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Blaster Pistol Mode 2 ^2ON^7\n\n\"");
 		}
 		else
 		{
 			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRAGE_BLASTER_PISTOL1);
 			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRAGE_BLASTER_PISTOL2);
 
-			trap->SendServerCommand(ent->s.number, "print \"\n^3Blaster Pistol Upgrade 1 ^2ON^7\n\n\"");
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Blaster Pistol Mode 1 ^2ON^7\n\n\"");
 		}
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL)
@@ -6648,35 +6648,100 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRAGE_BRYAR_PISTOL1);
 			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRAGE_BRYAR_PISTOL2);
 
-			trap->SendServerCommand(ent->s.number, "print \"\n^3Bryar Pistol Upgrade 2 ^2ON^7\n\n\"");
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Bryar Pistol Mode 2 ^2ON^7\n\n\"");
 		}
 		else
 		{
 			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRAGE_BRYAR_PISTOL1);
 			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRAGE_BRYAR_PISTOL2);
 
-			trap->SendServerCommand(ent->s.number, "print \"\n^3Bryar Pistol Upgrade 1 ^2ON^7\n\n\"");
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Bryar Pistol Mode 1 ^2ON^7\n\n\"");
 		}
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE)
 	{
-		
+		if (ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_E11_BLASTER1))
+		{
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_E11_BLASTER1);
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_E11_BLASTER2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3E11 Blaster Rifle Mode 2 ^2ON^7\n\n\"");
+		}
+		else
+		{
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_E11_BLASTER1);
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_E11_BLASTER2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3E11 Blaster Rifle Mode 1 ^2ON^7\n\n\"");
+		}
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR)
 	{
-		
+		if (ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DISRUPTOR1))
+		{
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_DISRUPTOR1);
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_DISRUPTOR2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Disruptor Mode 2 ^2ON^7\n\n\"");
+		}
+		else
+		{
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_DISRUPTOR1);
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_DISRUPTOR2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Disruptor Mode 1 ^2ON^7\n\n\"");
+		}
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER)
 	{
-		
+		if (ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_BOWCASTER1))
+		{
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_BOWCASTER1);
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_BOWCASTER2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Bowcaster Mode 2 ^2ON^7\n\n\"");
+		}
+		else
+		{
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_BOWCASTER1);
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_BOWCASTER2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Bowcaster Mode 1 ^2ON^7\n\n\"");
+		}
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2)
 	{
-		
+		if (ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DEMP21))
+		{
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_DEMP21);
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_DEMP22);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3DEMP2 Mode 2 ^2ON^7\n\n\"");
+		}
+		else
+		{
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_DEMP21);
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_DEMP22);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3DEMP2 Mode 1 ^2ON^7\n\n\"");
+		}
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER)
 	{
-		
+		if (ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_REPEATER1))
+		{
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_REPEATER1);
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_REPEATER2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Repeater Mode 2 ^2ON^7\n\n\"");
+		}
+		else
+		{
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_REPEATER1);
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_REPEATER2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Repeater Mode 1 ^2ON^7\n\n\"");
+		}
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
 	{
@@ -6685,27 +6750,49 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_FLECHETTE1);
 			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_FLECHETTE2);
 
-			trap->SendServerCommand(ent->s.number, "print \"\n^3Flechette Upgrade 2 ^2ON^7\n\n\"");
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Flechette Mode 2 ^2ON^7\n\n\"");
 		}
 		else
 		{
 			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_FLECHETTE1);
 			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_FLECHETTE2);
 
-			trap->SendServerCommand(ent->s.number, "print \"\n^3Flechette Upgrade 1 ^2ON^7\n\n\"");
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Flechette Mode 1 ^2ON^7\n\n\"");
 		}
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 	{
-		
+		if (ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_CONCUSSION1))
+		{
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_CONCUSSION1);
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_CONCUSSION2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Concussion Rifle Mode 2 ^2ON^7\n\n\"");
+		}
+		else
+		{
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_CONCUSSION1);
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_CONCUSSION2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Concussion Rifle Mode 1 ^2ON^7\n\n\"");
+		}
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
 	{
-		
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_DETPACKS)
-	{
-		
+		if (ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_ROCKET1))
+		{
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_ROCKET1);
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_ROCKET2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Rocket Launcher Mode 2 ^2ON^7\n\n\"");
+		}
+		else
+		{
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_ROCKET1);
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_ROCKET2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Rocket Launcher Mode 1 ^2ON^7\n\n\"");
+		}
 	}
 }
 

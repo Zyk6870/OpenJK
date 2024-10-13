@@ -1040,7 +1040,8 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 	missile->flags |= FL_BOUNCE;
 
 	// zyk: this is the bounce count used to count how many times the shot bounces, default: 3. In RPG Mode bounces more times with Upgrade
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0)
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0 && 
+		ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_BOWCASTER1))
 		missile->bounceCount = 18;  
 	else
 		missile->bounceCount = 3;  
@@ -1073,7 +1074,8 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 	else if ( count > 5 )
 	{
 		// zyk: Bowcaster with Power Cell Weapons Upgrade in RPG Mode can shoot more missiles
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0)
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0 && 
+			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_BOWCASTER1))
 		{
 			if (count > 7)
 				count = 7;
@@ -1090,7 +1092,8 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 		count--;
 	}
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0)
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0 && 
+		ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_BOWCASTER1))
 	{ // zyk: decrease spread
 		bowcaster_spread = BOWCASTER_ALT_SPREAD * 0.7;
 	}
@@ -1240,7 +1243,8 @@ static void WP_FireRepeater( gentity_t *ent, qboolean altFire )
 	else
 	{
 		// add some slop to the alt-fire direction
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0)
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0 && 
+			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_REPEATER1))
 		{ // zyk: with Repeater Upgrade, repeater will be more accurate
 			angs[PITCH] += Q_flrand(-1.0f, 1.0f) * (REPEATER_SPREAD/2);
 			angs[YAW]	+= Q_flrand(-1.0f, 1.0f) * (REPEATER_SPREAD/2);
@@ -2241,7 +2245,8 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
 		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
 
-		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0)
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0 && 
+			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_ROCKET1))
 		{
 			splash_radius = ROCKET_SPLASH_RADIUS + (ROCKET_SPLASH_RADIUS / 2);
 		}
@@ -3613,7 +3618,15 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 									traceEnt->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
 									traceEnt->client->ps.forceHandExtendTime = level.time + 1100;
 									traceEnt->client->ps.forceDodgeAnim = 0; //this toggles between 1 and 0, when it's 1 we should play the get up anim
+
+									if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0 &&
+										ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_CONCUSSION2))
+									{ // zyk: increases knockdown strength and time
+										traceEnt->client->ps.forceHandExtendTime += 1100;
+										pStr *= 2;
+									}
 								}
+
 								traceEnt->client->ps.otherKiller = ent->s.number;
 								traceEnt->client->ps.otherKillerTime = level.time + 5000;
 								traceEnt->client->ps.otherKillerDebounceTime = level.time + 100;
@@ -3736,7 +3749,8 @@ static void WP_FireConcussion( gentity_t *ent )
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_CONCUSSION);
 		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_CONCUSSION);
 
-		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0)
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0 && 
+			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_CONCUSSION1))
 		{
 			splash_radius = CONC_SPLASH_RADIUS + (CONC_SPLASH_RADIUS / 2);
 		}

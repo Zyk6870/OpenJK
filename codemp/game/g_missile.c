@@ -359,6 +359,7 @@ G_MissileImpact
 */
 void WP_SaberBlockNonRandom( gentity_t *self, vec3_t hitloc, qboolean missileBlock );
 void WP_flechette_alt_blow( gentity_t *ent );
+extern int zyk_max_skill_level(int skill_index);
 extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
 void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	gentity_t		*other;
@@ -431,13 +432,15 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		}
 	}
 
-	// zyk: rockets and concussion, both with upgrade, and Ultra Bolt, can use force pushable/pullable entities, like the rock at start of t3_rift map
+	// zyk: rockets and concussion, both with upgrade, and Magic Fist, can use force pushable/pullable entities, like the rock at start of t3_rift map
 	if (Q_stricmp(other->classname, "func_static") == 0 && (other->spawnflags & 1 || other->spawnflags & 2) && 
 		ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && 
-		((ent->s.weapon == WP_ROCKET_LAUNCHER && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0) ||
-		(ent->s.weapon == WP_CONCUSSION && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0) ||
+		((ent->s.weapon == WP_ROCKET_LAUNCHER && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0 && 
+			ent->parent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_ROCKET1)) ||
+		(ent->s.weapon == WP_CONCUSSION && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0 && 
+			ent->parent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_CONCUSSION1)) ||
 		(ent->s.weapon == WP_DET_PACK && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DETPACKS] > 0) || 
-		(ent->s.weapon == WP_CONCUSSION && ent->methodOfDeath == MOD_MELEE)))
+		(ent->s.weapon == WP_DEMP2 && ent->methodOfDeath == MOD_MELEE && ent->parent->client->pers.skill_levels[SKILL_MAGIC_FIST] == zyk_max_skill_level(SKILL_MAGIC_FIST))))
 	{
 		GlobalUse(other, ent->parent, ent->parent);
 		goto killProj;
