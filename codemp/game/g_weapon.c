@@ -1746,7 +1746,8 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 	int i;
 	int zyk_number_of_shots = FLECHETTE_SHOTS;
 
-	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0)
+	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 && 
+		ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_FLECHETTE1))
 	{ // zyk: Flechette Upgrade makes flechette have more shots
 		zyk_number_of_shots += 2;
 	}

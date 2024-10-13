@@ -6477,7 +6477,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to restore his shield. The max shield will be the same as the max health\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to restore his shield\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR)
 	{
@@ -6529,7 +6529,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases number of bolts shot by Flechette primary fire, and they cause bleeding\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases number of bolts shot by Flechette primary fire. Upgrade ^32^7: primary fire shots cause bleeding damage\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 	{
@@ -6680,7 +6680,20 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
 	{
-		
+		if (ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_FLECHETTE1))
+		{
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_FLECHETTE1);
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_FLECHETTE2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Flechette Upgrade 2 ^2ON^7\n\n\"");
+		}
+		else
+		{
+			ent->client->pers.active_inventory_upgrades |= (1 << INV_UPGRADE_FLECHETTE1);
+			ent->client->pers.active_inventory_upgrades &= ~(1 << INV_UPGRADE_FLECHETTE2);
+
+			trap->SendServerCommand(ent->s.number, "print \"\n^3Flechette Upgrade 1 ^2ON^7\n\n\"");
+		}
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 	{

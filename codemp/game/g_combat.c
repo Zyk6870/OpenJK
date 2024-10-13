@@ -6239,7 +6239,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 		{
 			if (mod == MOD_STUN_BATON && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 && 
-				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON1))
+				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON1) && targ && targ->health > 0 && targ->client)
 			{
 				int shield_regen_amount = 1 + (take / 10);
 
@@ -6253,7 +6253,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 			else if (mod == MOD_FLECHETTE && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 && 
-					targ && targ->health > 0 && targ->client)
+				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_FLECHETTE2) && targ && targ->health > 0 && targ->client)
 			{ // zyk: bleeding
 				if (targ->client->pers.bleeding_duration < level.time)
 				{
