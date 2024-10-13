@@ -5651,7 +5651,6 @@ void clear_special_power_effect(gentity_t* ent)
 }
 
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
-extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 
 // zyk: Healing Area
@@ -5827,11 +5826,13 @@ void zyk_status_effects(gentity_t* ent)
 		{
 			if (ent->client->pers.poison_duration > level.time && ent->client->pers.poison_debounce_timer < level.time)
 			{
-				ent->client->pers.poison_debounce_timer = level.time + 200;
+				ent->client->pers.poison_debounce_timer = level.time + 250;
 
 				zyk_quest_effect_spawn(ent, ent, "zyk_status_poison", "0", "noghri_stick/gas_cloud", 100, 0, 0, 1200);
 
 				G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
+
+				zyk_set_stamina(ent, 50, qfalse);
 			}
 			else if (ent->client->pers.poison_duration <= level.time)
 			{
@@ -5846,13 +5847,14 @@ void zyk_status_effects(gentity_t* ent)
 
 			zyk_quest_effect_spawn(fire_bolt_user, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 300);
 
-			G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 4, 0, MOD_UNKNOWN);
+			G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 10, 0, MOD_UNKNOWN);
 
 			ent->client->pers.fire_bolt_hits_counter--;
 			ent->client->pers.fire_bolt_timer = level.time + 200;
 
 			// zyk: no more do fire bolt damage if counter is 0
-			if (ent->client->pers.fire_bolt_hits_counter == 0)
+			if (ent->client->pers.fire_bolt_hits_counter <= 0)
+
 				ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
 		}
 
@@ -5860,7 +5862,7 @@ void zyk_status_effects(gentity_t* ent)
 		{
 			if (ent->client->pers.bleeding_duration > level.time && ent->client->pers.bleeding_debounce_timer < level.time)
 			{
-				ent->client->pers.bleeding_debounce_timer = level.time + 200;
+				ent->client->pers.bleeding_debounce_timer = level.time + 100;
 
 				G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
 			}
@@ -9089,7 +9091,15 @@ void G_RunFrame( int levelTime ) {
 				// zyk: Weapon Upgrades. Do not change weaponTime if player has no stamina
 				if (ent->client->pers.stamina_out_timer < level.time)
 				{
+					if (ent->client->ps.weapon == WP_BLASTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 &&
+						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_E11_BLASTER1) &&
+						ent->client->ps.weaponTime > (weaponData[WP_BLASTER].fireTime * 0.7))
+					{
+						ent->client->ps.weaponTime = weaponData[WP_BLASTER].fireTime * 0.7;
+					}
+
 					if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0 &&
+						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DISRUPTOR1) && 
 						ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 0.6))
 					{
 						ent->client->ps.weaponTime = weaponData[WP_DISRUPTOR].fireTime * 0.6;

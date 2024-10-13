@@ -2616,6 +2616,11 @@ void ClientThink_real( gentity_t *ent ) {
 			client->ps.speed /= 2;
 		}
 
+		if (client->pers.player_statuses & (1 << PLAYER_STATUS_POISONED))
+		{ // zyk: poisoned
+			client->ps.speed *= 0.75;
+		}
+
 		client->ps.basespeed = client->ps.speed;
 	}
 	else if (!client->ps.m_iVehicleNum &&
@@ -2658,6 +2663,11 @@ void ClientThink_real( gentity_t *ent ) {
 		if (client->pers.stun_baton_less_speed_timer > level.time)
 		{ // zyk: stun baton 3/3 decreases speed
 			zyk_player_speed /= 2;
+		}
+
+		if (client->pers.player_statuses & (1 << PLAYER_STATUS_POISONED))
+		{ // zyk: poisoned
+			zyk_player_speed *= 0.75;
 		}
 
 		if (client->sess.amrpgmode == 2 && client->pers.current_weight > client->pers.max_weight)

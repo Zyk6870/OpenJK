@@ -510,7 +510,8 @@ static void WP_FireBlaster( gentity_t *ent, qboolean altFire )
 	if ( altFire )
 	{
 		// add some slop to the alt-fire direction
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0)
+		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 && 
+			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_E11_BLASTER1))
 		{ // zyk: Blaster Pack Upgrade improves accuracy
 			angs[PITCH] += Q_flrand(-1.0f, 1.0f) * (BLASTER_SPREAD/2.0);
 			angs[YAW]       += Q_flrand(-1.0f, 1.0f) * (BLASTER_SPREAD/2.0);
@@ -713,7 +714,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 	int			traces = DISRUPTOR_ALT_TRACES;
 	qboolean	fullCharge = qfalse;
 
-	damage = zyk_disruptor_alt_damage.integer-30;
+	damage = zyk_disruptor_alt_damage.integer - 30;
 
 	//VectorCopy( muzzle, muzzle2 ); // making a backup copy
 
@@ -887,6 +888,12 @@ void WP_DisruptorAltFire( gentity_t *ent )
 						if (ent->client && ent->client->sess.amrpgmode == 2)
 						{
 							damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_DISRUPTOR);
+
+							if (fullCharge == qtrue && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0 &&
+								ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DISRUPTOR2))
+							{
+								damage *= 4;
+							}
 						}
 
 						G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage,
@@ -927,6 +934,12 @@ void WP_DisruptorAltFire( gentity_t *ent )
 				if (ent->client && ent->client->sess.amrpgmode == 2)
 				{
 					damage = zyk_calculate_rpg_weapon_damage(ent, damage, SKILL_WEAPON_DAMAGE, RPG_INVENTORY_WP_DISRUPTOR);
+
+					if (fullCharge == qtrue && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0 &&
+						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DISRUPTOR2))
+					{
+						damage *= 4;
+					}
 				}
 
 				G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, DAMAGE_NO_KNOCKBACK, MOD_DISRUPTOR_SNIPER );
@@ -1938,13 +1951,20 @@ static void WP_FlechetteAltFire( gentity_t *self )
 {
 	vec3_t 	dir, fwd, start, angs;
 	int i;
+	int flechette_bombs = 2;
 
 	vectoangles( forward, angs );
 	VectorCopy( muzzle, start );
 
 	WP_TraceSetStart( self, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
-	for ( i = 0; i < 2; i++ )
+	if (self->client && self->client->sess.amrpgmode == 2 && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 &&
+		self->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_FLECHETTE1))
+	{ // zyk: Flechette Upgrade makes flechette have more shots
+		flechette_bombs += 1;
+	}
+
+	for ( i = 0; i < flechette_bombs; i++ )
 	{
 		VectorCopy( angs, dir );
 

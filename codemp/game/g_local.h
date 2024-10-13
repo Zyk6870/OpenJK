@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.77"
+#define	GAMEVERSION	"New Zyk Mod v1.1.78"
 
 #define SECURITY_LOG "security.log"
 
@@ -718,6 +718,10 @@ typedef enum {
 	INV_UPGRAGE_BLASTER_PISTOL2,
 	INV_UPGRAGE_BRYAR_PISTOL1,
 	INV_UPGRAGE_BRYAR_PISTOL2,
+	INV_UPGRADE_E11_BLASTER1,
+	INV_UPGRADE_E11_BLASTER2,
+	INV_UPGRADE_DISRUPTOR1,
+	INV_UPGRADE_DISRUPTOR2,
 	INV_UPGRADE_FLECHETTE1,
 	INV_UPGRADE_FLECHETTE2,
 	MAX_INV_UPGRADES

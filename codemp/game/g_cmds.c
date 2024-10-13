@@ -5987,13 +5987,13 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][0] = 2;
 	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][0] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][0] = 2;
 	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][0] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][0] = 2;
 	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 3;
 	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][1] = 2;
 
 	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][0] = 4;
@@ -6003,7 +6003,7 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][1] = 2;
 
 	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][0] = 5;
-	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][1] = 2;
+	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][1] = 3;
 
 	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][0] = 100;
 	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][1] = 50;
@@ -6509,11 +6509,11 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7E11 Blaster Rifle altfire has less spread\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: E11 Blaster Rifle altfire has less spread and faster firerate. Upgrade ^32^7: has a chance to make target burn\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases firerate of Disruptor\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases Disruptor firerate. Upgrade ^32^7: altfire full charged shot has a lot more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER)
 	{
@@ -6529,7 +6529,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases number of bolts shot by Flechette primary fire. Upgrade ^32^7: primary fire shots cause bleeding damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases number of bolts shot by Flechette primary and alt fires. Upgrade ^32^7: primary fire shots cause bleeding damage\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 	{

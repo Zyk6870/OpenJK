@@ -1160,7 +1160,7 @@ void ForceHeal( gentity_t *self )
 	}
 
 	// zyk: Heal will have a cooldown time
-	self->client->ps.fd.forceHealTime = level.time + 500;
+	self->client->ps.fd.forceHealTime = level.time + 1000;
 
 	if ( self->health >= self->client->ps.stats[STAT_MAX_HEALTH])
 	{

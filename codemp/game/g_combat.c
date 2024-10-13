@@ -6252,6 +6252,15 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					attacker->client->ps.stats[STAT_ARMOR] = attacker->client->pers.max_rpg_shield;
 				}
 			}
+			else if (mod == MOD_BLASTER && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 &&
+				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_E11_BLASTER2) && targ && targ->health > 0 && targ->client && 
+				Q_irand(0, 3) == 0)
+			{ // zyk: fire
+				targ->client->pers.fire_bolt_hits_counter += 5;
+				targ->client->pers.fire_bolt_user_id = attacker->s.number;
+
+				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_IN_FLAMES);
+			}
 			else if (mod == MOD_FLECHETTE && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 && 
 				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_FLECHETTE2) && targ && targ->health > 0 && targ->client)
 			{ // zyk: bleeding
