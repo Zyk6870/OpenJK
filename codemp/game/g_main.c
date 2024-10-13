@@ -9506,7 +9506,7 @@ void G_RunFrame( int levelTime ) {
 							float tree_z = ent->client->ps.origin[2];
 
 							quest_progress_percentage = (ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS;
-							quest_spirit_tree_scale = (QUEST_SPIRIT_TREE_DEFAULT_SCALE + quest_progress_percentage);
+							quest_spirit_tree_scale = (QUEST_SPIRIT_TREE_DEFAULT_SCALE + quest_progress_percentage) / 2;
 
 							ent->client->pers.quest_spirit_tree_id = zyk_spawn_quest_item(QUEST_ITEM_SPIRIT_TREE, tree_duration, quest_spirit_tree_scale, tree_x, tree_y, tree_z);
 
@@ -9580,7 +9580,7 @@ void G_RunFrame( int levelTime ) {
 							}
 
 							quest_progress_percentage = (ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS;
-							quest_spirit_tree_scale = (QUEST_SPIRIT_TREE_DEFAULT_SCALE + quest_progress_percentage);
+							quest_spirit_tree_scale = (QUEST_SPIRIT_TREE_DEFAULT_SCALE + quest_progress_percentage) / 2;
 
 							if (quest_spirit_tree_scale != tree_ent->s.iModelScale)
 							{
