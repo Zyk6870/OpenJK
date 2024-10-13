@@ -6235,18 +6235,28 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 		}
 
-		if (mod == MOD_STUN_BATON && attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && 
-			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
+		if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
 		{
-			int shield_regen_amount = 1 + (take / 10);
+			if (mod == MOD_STUN_BATON && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0)
+			{
+				int shield_regen_amount = 1 + (take / 10);
 
-			if ((attacker->client->ps.stats[STAT_ARMOR] + shield_regen_amount) < attacker->client->pers.max_rpg_shield)
-			{
-				attacker->client->ps.stats[STAT_ARMOR] += shield_regen_amount;
+				if ((attacker->client->ps.stats[STAT_ARMOR] + shield_regen_amount) < attacker->client->pers.max_rpg_shield)
+				{
+					attacker->client->ps.stats[STAT_ARMOR] += shield_regen_amount;
+				}
+				else
+				{
+					attacker->client->ps.stats[STAT_ARMOR] = attacker->client->pers.max_rpg_shield;
+				}
 			}
-			else
-			{
-				attacker->client->ps.stats[STAT_ARMOR] = attacker->client->pers.max_rpg_shield;
+			else if (mod == MOD_FLECHETTE && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 && 
+					targ && targ->health > 0 && targ->client)
+			{ // zyk: bleeding
+				targ->client->pers.bleeding_debounce_timer = 0;
+				targ->client->pers.bleeding_duration = level.time + 5000;
+
+				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_BLEEDING);
 			}
 		}
 

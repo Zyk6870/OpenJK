@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.72"
+#define	GAMEVERSION	"New Zyk Mod v1.1.73"
 
 #define SECURITY_LOG "security.log"
 
@@ -548,9 +548,10 @@ typedef enum {
 	PLAYER_STATUS_NO_FIGHT,
 	PLAYER_STATUS_DUEL_TOURNAMENT_LOSS,
 	PLAYER_STATUS_IN_FLAMES,
+	PLAYER_STATUS_POISONED,
+	PLAYER_STATUS_BLEEDING,
 	PLAYER_STATUS_CREATED_ACCOUNT,
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
-	PLAYER_STATUS_POISONED,
 	PLAYER_STATUS_KEEP_QUEST_TRIES,
 	PLAYER_STATUS_RESET_TO_MELEE,
 	NUM_PLAYER_STATUSES
@@ -917,6 +918,15 @@ typedef struct clientPersistant_s {
 	int poison_debounce_timer;
 	int poison_duration;
 
+	// zyk: On Fire status
+	int fire_bolt_timer;
+	int fire_bolt_user_id;
+	int fire_bolt_hits_counter;
+
+	// zyk: bleeding status
+	int bleeding_duration;
+	int bleeding_debounce_timer;
+
 	// zyk: last health, shield, mp and stamina are saved into account
 	int last_health;
 	int last_shield;
@@ -930,10 +940,7 @@ typedef struct clientPersistant_s {
 	int zyk_saved_force_powers;
 	int zyk_saved_force_power_levels[NUM_FORCE_POWERS];
 
-	// zyk: timer used to keep spawning fire effects on player who catch fire after being hit by Fire Bolt
-	int fire_bolt_timer;
-	int fire_bolt_user_id;
-	int fire_bolt_hits_counter;
+
 
 	// zyk: timer when player is using crystals
 	int special_crystal_timer;

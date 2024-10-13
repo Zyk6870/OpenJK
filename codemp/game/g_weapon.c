@@ -1743,7 +1743,6 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 	gentity_t	*missile;
 	int i;
 	int zyk_number_of_shots = FLECHETTE_SHOTS;
-	int damage = zyk_flechette_damage.integer;
 
 	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0)
 	{ // zyk: Flechette Upgrade makes flechette have more shots
@@ -1752,6 +1751,8 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 
 	for (i = 0; i < zyk_number_of_shots; i++ )
 	{
+		int damage = zyk_flechette_damage.integer;
+
 		vectoangles( forward, angs );
 
 		if (i != 0)

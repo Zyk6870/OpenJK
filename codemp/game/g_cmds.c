@@ -6529,7 +6529,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases number of bolts shot by Flechette primary fire\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases number of bolts shot by Flechette primary fire, and they cause bleeding\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 	{

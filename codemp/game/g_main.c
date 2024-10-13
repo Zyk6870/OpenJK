@@ -5821,19 +5821,53 @@ void zyk_stop_all_magic_powers(gentity_t* ent)
 extern void initialize_rpg_skills(gentity_t *ent, qboolean init_all);
 void zyk_status_effects(gentity_t* ent)
 {
-	if (ent && ent->client && ent->health > 0 && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_POISONED))
+	if (ent && ent->client && ent->health > 0)
 	{
-		if (ent->client->pers.poison_duration > level.time && ent->client->pers.poison_debounce_timer < level.time)
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_POISONED))
 		{
-			ent->client->pers.poison_debounce_timer = level.time + 200;
+			if (ent->client->pers.poison_duration > level.time && ent->client->pers.poison_debounce_timer < level.time)
+			{
+				ent->client->pers.poison_debounce_timer = level.time + 200;
 
-			zyk_quest_effect_spawn(ent, ent, "zyk_status_poison", "0", "noghri_stick/gas_cloud", 100, 0, 0, 1200);
+				zyk_quest_effect_spawn(ent, ent, "zyk_status_poison", "0", "noghri_stick/gas_cloud", 100, 0, 0, 1200);
 
-			G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
+				G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
+			}
+			else if (ent->client->pers.poison_duration <= level.time)
+			{
+				ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_POISONED);
+			}
 		}
-		else if (ent->client->pers.poison_duration <= level.time)
+
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_IN_FLAMES) && ent->client->pers.fire_bolt_hits_counter > 0 &&
+			ent->client->pers.fire_bolt_timer < level.time)
 		{
-			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_POISONED);
+			gentity_t* fire_bolt_user = &g_entities[ent->client->pers.fire_bolt_user_id];
+
+			zyk_quest_effect_spawn(fire_bolt_user, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 300);
+
+			G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 4, 0, MOD_UNKNOWN);
+
+			ent->client->pers.fire_bolt_hits_counter--;
+			ent->client->pers.fire_bolt_timer = level.time + 200;
+
+			// zyk: no more do fire bolt damage if counter is 0
+			if (ent->client->pers.fire_bolt_hits_counter == 0)
+				ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
+		}
+
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_BLEEDING))
+		{
+			if (ent->client->pers.bleeding_duration > level.time && ent->client->pers.bleeding_debounce_timer < level.time)
+			{
+				ent->client->pers.bleeding_debounce_timer = level.time + 200;
+
+				G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
+			}
+			else if (ent->client->pers.bleeding_duration <= level.time)
+			{
+				ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_BLEEDING);
+			}
 		}
 	}
 }
@@ -6106,27 +6140,6 @@ void magic_power_events(gentity_t *ent)
 				ent->client->pers.magic_consumption_timer = level.time + 250;
 			}
 		}
-	}
-}
-
-// zyk: damages target player with Fire Bolt flames
-void fire_bolt_hits(gentity_t* ent)
-{
-	if (ent && ent->client && ent->health > 0 && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_IN_FLAMES) && ent->client->pers.fire_bolt_hits_counter > 0 &&
-		ent->client->pers.fire_bolt_timer < level.time)
-	{
-		gentity_t* fire_bolt_user = &g_entities[ent->client->pers.fire_bolt_user_id];
-
-		zyk_quest_effect_spawn(fire_bolt_user, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 300);
-
-		G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 4, 0, MOD_UNKNOWN);
-
-		ent->client->pers.fire_bolt_hits_counter--;
-		ent->client->pers.fire_bolt_timer = level.time + 200;
-
-		// zyk: no more do fire bolt damage if counter is 0
-		if (ent->client->pers.fire_bolt_hits_counter == 0)
-			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
 	}
 }
 
@@ -7150,12 +7163,12 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = 1;
 
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 5;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 8;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 150;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 200;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 200;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 200;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 225;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 225;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 225;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 25;
@@ -7179,7 +7192,7 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 20;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 200;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 225;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 0;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 0;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 0;
@@ -9010,7 +9023,6 @@ void G_RunFrame( int levelTime ) {
 			}
 
 			magic_power_events(ent);
-			fire_bolt_hits(ent);
 			zyk_status_effects(ent);
 
 			if (zyk_chat_protection_timer.integer > 0)
@@ -9730,7 +9742,6 @@ void G_RunFrame( int levelTime ) {
 			WP_SaberStartMissileBlockCheck(ent, &ent->client->pers.cmd);
 
 			magic_power_events(ent);
-			fire_bolt_hits(ent);
 			zyk_status_effects(ent);
 
 			// zyk: npcs cannot enter the Duel Tournament arena
