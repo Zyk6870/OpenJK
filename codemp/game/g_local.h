@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.81"
+#define	GAMEVERSION	"New Zyk Mod v1.1.82"
 
 #define SECURITY_LOG "security.log"
 
@@ -550,6 +550,7 @@ typedef enum {
 	PLAYER_STATUS_IN_FLAMES,
 	PLAYER_STATUS_POISONED,
 	PLAYER_STATUS_BLEEDING,
+	PLAYER_STATUS_MAGIC_SHIELD,
 	PLAYER_STATUS_CREATED_ACCOUNT,
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
 	PLAYER_STATUS_KEEP_QUEST_TRIES,
@@ -704,7 +705,7 @@ typedef enum {
 	RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR,
 	RPG_INVENTORY_MISC_JETPACK_FUEL,
 	RPG_INVENTORY_MISC_FLAME_THROWER_FUEL,
-	RPG_INVENTORY_MISC_MEDPACK,
+	RPG_INVENTORY_MISC_MAGIC_SHIELD,
 	RPG_INVENTORY_MISC_SHIELD_BOOSTER,
 	RPG_INVENTORY_MISC_YSALAMIRI,
 	RPG_INVENTORY_MISC_FORCE_BOON,
@@ -952,6 +953,9 @@ typedef struct clientPersistant_s {
 	// zyk: bleeding status
 	int bleeding_duration;
 	int bleeding_debounce_timer;
+
+	// zyk: Magic Shield status
+	int magic_shield_duration;
 
 	// zyk: last health, shield, mp and stamina are saved into account
 	int last_health;

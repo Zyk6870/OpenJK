@@ -4898,6 +4898,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.energy_modulator_mode = 0;
 			ent->client->pers.quickdraw_timer = 0;
+			ent->client->pers.magic_shield_duration = 0;
 
 			ent->client->pers.buy_sell_timer = 0;
 			ent->client->pers.inventory_update_timer = level.time + 100;
@@ -5967,7 +5968,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 
 	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "Jetpack Fuel";
 	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "Flame Thrower Fuel";
-	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "Medpack";
+	inventory_item_names[RPG_INVENTORY_MISC_MAGIC_SHIELD] = "Magic Shield";
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
@@ -6168,17 +6169,17 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][0] = 2;
 	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][0] = 40;
-	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][1] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_SHIELD][0] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_SHIELD][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][0] = 40;
-	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][1] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][1] = 20;
 
-	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][0] = 180;
-	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][1] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][0] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][1] = 50;
 
-	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][0] = 180;
-	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][1] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][0] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][1] = 50;
 
 	if (buy_item == qtrue)
 	{
@@ -6588,21 +6589,21 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Damage is based on the amount of Green Crystals. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
-	else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
+	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 health\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7prevents being hit my magic powers. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_MAGIC_SHIELD));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_SHIELD_BOOSTER));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you immune to force powers for a short time\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you immune to force powers for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_YSALAMIRI));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_FORCE_BOON));
 	}
 }
 
@@ -6795,6 +6796,68 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 			trap->SendServerCommand(ent->s.number, "print \"\n^3Rocket Launcher Mode 1 ^2ON^7\n\n\"");
 		}
 	}
+	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MAGIC_SHIELD] > 0)
+	{
+		if (ent->client->pers.magic_shield_duration < level.time)
+		{
+			ent->client->pers.magic_shield_duration = level.time + 30000;
+		}
+		else
+		{
+			ent->client->pers.magic_shield_duration += 30000;
+		}
+
+		ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_MAGIC_SHIELD);
+
+		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close2.mp3"));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_SHIELD_BOOSTER] > 0)
+	{
+		if ((ent->client->ps.stats[STAT_ARMOR] + 25) < ent->client->pers.max_rpg_shield)
+		{
+			ent->client->ps.stats[STAT_ARMOR] += 25;
+		}
+		else
+		{
+			ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
+		}
+
+		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_YSALAMIRI] > 0)
+	{
+		if (ent->client->ps.powerups[PW_YSALAMIRI] < level.time)
+		{
+			ent->client->ps.powerups[PW_YSALAMIRI] = level.time + 30000;
+		}
+		else
+		{
+			ent->client->ps.powerups[PW_YSALAMIRI] += 30000;
+		}
+
+		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/ysalimari.mp3"));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FORCE_BOON] > 0)
+	{
+		if (ent->client->ps.powerups[PW_FORCE_BOON] < level.time)
+		{
+			ent->client->ps.powerups[PW_FORCE_BOON] = level.time + 30000;
+		}
+		else
+		{
+			ent->client->ps.powerups[PW_FORCE_BOON] += 30000;
+		}
+
+		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/boon.mp3"));
+	}
 }
 
 void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
@@ -6950,9 +7013,15 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							{
 								zyk_use_inventory_item(ent, item_index);
 							}
+							else if (item_index >= RPG_INVENTORY_MISC_MAGIC_SHIELD && item_index <= RPG_INVENTORY_MISC_FORCE_BOON)
+							{ // zyk: these items can be used
+								zyk_use_inventory_item(ent, item_index);
+							}
 							else
 							{
-								trap->SendServerCommand(ent->s.number, va("print \"Item number must be between %d and %d\n\"", RPG_INVENTORY_UPGRADE_STUN_BATON, RPG_INVENTORY_UPGRADE_DETPACKS));
+								trap->SendServerCommand(ent->s.number, va("print \"Item number must be between %d and %d or between %d and %d\n\"", 
+									(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_DETPACKS + 1), 
+									(RPG_INVENTORY_MISC_MAGIC_SHIELD + 1), (RPG_INVENTORY_MISC_FORCE_BOON + 1)));
 							}
 						}
 					}
@@ -7189,41 +7258,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	// zyk: buying the item if player has enough credits
 	if (ent->client->pers.credits >= total_cost)
 	{
-		if (item_index == RPG_INVENTORY_MISC_MEDPACK)
-		{
-			if (ent->health < ent->client->pers.max_rpg_health)
-			{
-				ent->health += (25 * amount);
-			}
-
-			if (ent->health > ent->client->pers.max_rpg_health)
-				ent->health = ent->client->pers.max_rpg_health;
-		}
-		else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER)
-		{
-			if (ent->client->ps.stats[STAT_ARMOR] < ent->client->pers.max_rpg_shield)
-			{
-				ent->client->ps.stats[STAT_ARMOR] += (25 * amount);
-			}
-
-			if (ent->client->ps.stats[STAT_ARMOR] > ent->client->pers.max_rpg_shield)
-				ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
-		}
-		else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI)
-		{
-			if (ent->client->ps.powerups[PW_YSALAMIRI] < level.time)
-				ent->client->ps.powerups[PW_YSALAMIRI] = level.time + (30000 * amount);
-			else
-				ent->client->ps.powerups[PW_YSALAMIRI] += (30000 * amount);
-		}
-		else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON)
-		{
-			if (ent->client->ps.powerups[PW_FORCE_BOON] < level.time)
-				ent->client->ps.powerups[PW_FORCE_BOON] = level.time + (30000 * amount);
-			else
-				ent->client->ps.powerups[PW_FORCE_BOON] += (30000 * amount);
-		}
-		else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
+		if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
 		{
 			ent->client->pers.quest_tries += amount;
 		}

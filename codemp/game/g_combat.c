@@ -2243,6 +2243,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_POISONED);
+	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_MAGIC_SHIELD);
 
 	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_EARTH);
 	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_FIRE);
@@ -5542,8 +5543,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				targ->client->ps.eFlags &= ~EF_INVULNERABLE;
 			}
-			else
-			{
+			else if (!((targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_SHIELD)))
+			{ // zyk: Magic Shield
 				return;
 			}
 		}
@@ -6795,6 +6796,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 						if (zyk_can_hit_target(magic_power_user, ent) == qfalse)
 						{
+							continue;
+						}
+
+						if (ent->client && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_SHIELD))
+						{ // zyk: Magic Shield fully protects against Magic
 							continue;
 						}
 

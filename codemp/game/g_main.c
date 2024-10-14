@@ -5889,6 +5889,22 @@ void zyk_status_effects(gentity_t* ent)
 				ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_BLEEDING);
 			}
 		}
+
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_SHIELD))
+		{
+			if (ent->client->pers.magic_shield_duration > level.time)
+			{
+				ent->client->ps.eFlags |= EF_INVULNERABLE;
+				ent->client->invulnerableTimer = ent->client->pers.magic_shield_duration;
+			}
+			else
+			{
+				ent->client->ps.eFlags &= ~EF_INVULNERABLE;
+				ent->client->invulnerableTimer = 0;
+
+				ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_MAGIC_SHIELD);
+			}
+		}
 	}
 }
 
@@ -7213,10 +7229,10 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 225;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 0;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 0;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 0;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 0;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_MAGIC_SHIELD] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 5;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 10;
 
 	if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
 	{
