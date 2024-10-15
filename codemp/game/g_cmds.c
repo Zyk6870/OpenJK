@@ -5892,9 +5892,54 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n^3Blue Crystals: ^7%d\n^3Skills Upgraded: ^7%d/%d\n^3Magic Points: ^7%d/%d\n^3Weight: ^7%d/%d\n^3Stamina: ^7%d/%d\n^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
-		ent->client->sess.filename, ent->client->sess.rpgchar, ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL], zyk_total_skillpoints(ent), RPG_MAX_SKILLPOINTS, ent->client->pers.magic_power, zyk_max_magic_power(ent),
-		ent->client->pers.current_weight, ent->client->pers.max_weight, ent->client->pers.current_stamina, ent->client->pers.max_stamina, ent->client->pers.credits));
+	char message[MAX_STRING_CHARS];
+	int total_skill_points = zyk_total_skillpoints(ent);
+	int max_magic_power = zyk_max_magic_power(ent);
+
+	strcpy(message, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n", ent->client->sess.filename, ent->client->sess.rpgchar));
+
+	if (total_skill_points < RPG_MAX_SKILLPOINTS)
+	{
+		strcpy(message, va("%s^3Skills Upgraded: ^7%d/%d\n", message, total_skill_points, RPG_MAX_SKILLPOINTS));
+	}
+	else
+	{
+		strcpy(message, va("%s^3Skills Upgraded: ^2%d/%d\n", message, total_skill_points, RPG_MAX_SKILLPOINTS));
+	}
+
+	if (ent->client->pers.magic_power < max_magic_power)
+	{
+		strcpy(message, va("%s^3Magic Points: ^7%d/%d\n", message, ent->client->pers.magic_power, max_magic_power));
+	}
+	else
+	{
+		strcpy(message, va("%s^3Magic Points: ^2%d/%d\n", message, ent->client->pers.magic_power, max_magic_power));
+	}
+
+	if (ent->client->pers.current_weight < ent->client->pers.max_weight)
+	{
+		strcpy(message, va("%s^3Weight: ^7%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
+	}
+	else if (ent->client->pers.current_weight == ent->client->pers.max_weight)
+	{
+		strcpy(message, va("%s^3Weight: ^2%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
+	}
+	else
+	{
+		strcpy(message, va("%s^3Weight: ^1%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
+	}
+
+	if (ent->client->pers.current_stamina < ent->client->pers.max_stamina)
+	{
+		strcpy(message, va("%s^3Stamina: ^7%d/%d\n", message, ent->client->pers.current_stamina, ent->client->pers.max_stamina));
+	}
+	else
+	{
+		strcpy(message, va("%s^3Stamina: ^2%d/%d\n", message, ent->client->pers.current_stamina, ent->client->pers.max_stamina));
+	}
+
+	trap->SendServerCommand(target_ent->s.number, va("%s^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
+		message, ent->client->pers.credits));
 }
 
 char* zyk_get_inventory_item_name(int inventory_index)
