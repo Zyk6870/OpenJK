@@ -7152,18 +7152,11 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	// zyk: buying the item if player has enough credits
 	if (ent->client->pers.credits >= total_cost)
 	{
-		if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
-		{
-			ent->client->pers.quest_tries += amount;
-		}
-		else
-		{
-			zyk_update_inventory_quantity(ent, qtrue, item_index, amount);
+		zyk_update_inventory_quantity(ent, qtrue, item_index, amount);
 
-			if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR)
-			{
-				set_max_shield(ent);
-			}
+		if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR)
+		{
+			set_max_shield(ent);
 		}
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
@@ -7241,12 +7234,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		}
 	}
 
-	if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL && ent->client->pers.quest_tries >= (amount + MIN_QUEST_TRIES))
-	{
-		ent->client->pers.quest_tries -= amount;
-		sold = qtrue;
-	}
-	else if (ent->client->pers.rpg_inventory[item_index] >= amount)
+	if (ent->client->pers.rpg_inventory[item_index] >= amount)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, item_index, amount);
 

@@ -1606,6 +1606,7 @@ qboolean TryHeal(gentity_t *ent, gentity_t *target)
 	return qfalse;
 }
 
+extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 void zyk_use_rpg_stuff(gentity_t* ent)
 {
 	if (ent->client->sess.amrpgmode == 2)
@@ -1620,7 +1621,7 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 				ent->client->pers.quest_spirit_tree_id = -1;
 				ent->client->pers.quest_spirit_tree_call_timer = level.time + 2000;
 
-				ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] -= QUEST_SPIRIT_TREE_CALL_COST;
+				zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_BLUE_CRYSTAL, QUEST_SPIRIT_TREE_CALL_COST);
 
 				trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
 			}
@@ -1632,6 +1633,7 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 &&
 			!(ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE) && 
+			!(ent->client->isHacking) &&
 			ent->client->pers.special_crystal_timer < level.time && ent->client->pers.special_crystal_counter < RED_CRYSTAL_MAX_CHARGE)
 		{ // zyk: Charging Red Crystal
 			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/energy_crackle.wav"));
@@ -1655,7 +1657,6 @@ Try and use an entity in the world, directly ahead of us
 extern void Touch_Button(gentity_t *ent, gentity_t *other, trace_t *trace );
 extern qboolean gSiegeRoundBegun;
 extern void NPC_BSDefault( void );
-extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern void zyk_show_quest_riddle(gentity_t* ent);
 static vec3_t	playerMins = {-15, -15, DEFAULT_MINS_2};
 static vec3_t	playerMaxs = {15, 15, DEFAULT_MAXS_2};
@@ -1932,7 +1933,7 @@ void TryUse( gentity_t *ent )
 
 		if (Q_stricmp(target->targetname, "zyk_magic_armor_model") == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
 		{
-			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR, 1);
 
 			trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You got the legendary ^5Magic Armor^7\n\"");
 

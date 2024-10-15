@@ -7430,11 +7430,6 @@ extern int zyk_number_of_enemies_in_map();
 
 void zyk_update_inventory(gentity_t* ent)
 {
-	if (ent->client->pers.quest_tries > 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] != (ent->client->pers.quest_tries - MIN_QUEST_TRIES))
-	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = (ent->client->pers.quest_tries - MIN_QUEST_TRIES);
-	}
-
 	// zyk: loading initial inventory
 	ent->client->ps.stats[STAT_WEAPONS] = 0;
 	ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_NONE);
@@ -7487,18 +7482,6 @@ void zyk_update_inventory(gentity_t* ent)
 	ent->client->ps.ammo[AMMO_TRIPMINE] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_TRIPMINES];
 	ent->client->ps.ammo[AMMO_DETPACK] = ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_DETPACKS];
 
-	// zyk: jetpack fuel
-	ent->client->pers.jetpack_fuel = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL];
-
-	if (ent->client->pers.jetpack_fuel < 100)
-	{
-		ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
-	}
-	else
-	{
-		ent->client->ps.jetpackFuel = 100;
-	}
-
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_THERMALS] > 0)
 		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_THERMAL);
 
@@ -7535,6 +7518,18 @@ void zyk_update_inventory(gentity_t* ent)
 
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_JETPACK] > 0)
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
+
+	// zyk: jetpack fuel
+	ent->client->pers.jetpack_fuel = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL];
+
+	if (ent->client->pers.jetpack_fuel < 100)
+	{
+		ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
+	}
+	else
+	{
+		ent->client->ps.jetpackFuel = 100;
+	}
 
 	if (!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_BINOCULARS)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC)) &&
 		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SENTRY_GUN)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_SEEKER)) &&
@@ -7642,6 +7637,7 @@ extern void set_max_shield(gentity_t *ent);
 extern void duel_show_table(gentity_t *ent);
 extern void WP_DisruptorAltFire(gentity_t *ent);
 extern void G_Kill( gentity_t *ent );
+extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void WP_FireMelee(gentity_t* ent, qboolean alt_fire);
 
@@ -9498,13 +9494,13 @@ void G_RunFrame( int levelTime ) {
 									quest_crystal_prize *= 2;
 								}
 
-								ent->client->pers.quest_tries += quest_crystal_prize;
-								ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] += quest_crystal_prize;
-								ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] += quest_crystal_prize;
+								zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_BLUE_CRYSTAL, quest_crystal_prize);
+								zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_GREEN_CRYSTAL, quest_crystal_prize);
+								zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_RED_CRYSTAL, quest_crystal_prize);
 
 								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive %d ^2Green ^7and ^1Red ^7crystals.\n\"",
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You defeated %d enemies. Receive %d of each crystal type.\n\"",
 									QUESTCHAR_ALL_SPIRITS, ent->client->pers.quest_defeated_enemies, quest_crystal_prize));
 							}
 							else if (ent->client->pers.quest_final_event_step == 4)

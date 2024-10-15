@@ -2154,9 +2154,17 @@ extern void zyk_NPC_Kill_f(char* name);
 extern char* zyk_get_enemy_type(int enemy_type);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 extern void zyk_set_default_quest_fields(gentity_t* ent);
+extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 void zyk_decrease_quest_tries(gentity_t *ent)
 {
-	ent->client->pers.quest_tries--;
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_GREEN_CRYSTAL, 1);
+	}
+	else
+	{
+		ent->client->pers.quest_tries--;
+	}
 
 	if (ent->client->pers.quest_tries <= 0)
 	{
@@ -4927,7 +4935,6 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 }
 
 extern void zyk_add_mp(gentity_t* ent, int mp_amount);
-extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern qboolean zyk_has_resources_for_energy_modulator(gentity_t* ent);
 void zyk_energy_modulator_resource_usage(gentity_t* ent)
 {
@@ -6239,9 +6246,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH && mod == MOD_BRYAR_PISTOL && targ->client->sess.amrpgmode == 2)
 			{
-				if (targ->client->pers.quest_tries > MIN_QUEST_TRIES)
+				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] > 0)
 				{
-					targ->client->pers.quest_tries--;
+					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_MISC_GREEN_CRYSTAL, 1);
 
 					attacker->health += 10;
 					attacker->client->pers.magic_power += 10;
@@ -6253,7 +6260,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0)
 				{
-					targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]--;
+					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_MISC_BLUE_CRYSTAL, 1);
 
 					attacker->health += 50;
 					attacker->client->pers.magic_power += 50;
@@ -6265,7 +6272,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
 				{
-					targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
+					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_MISC_RED_CRYSTAL, 1);
 
 					attacker->health += 30;
 					attacker->client->pers.magic_power += 30;

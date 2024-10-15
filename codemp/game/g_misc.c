@@ -2843,7 +2843,7 @@ void fx_runner_think( gentity_t *ent )
 
 					if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0)
 					{
-						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]++;
+						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_MISC_BLUE_CRYSTAL, 1);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
@@ -2855,7 +2855,7 @@ void fx_runner_think( gentity_t *ent )
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0)
 					{
-						player_ent->client->pers.quest_tries++;
+						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_MISC_GREEN_CRYSTAL, 1);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
 
@@ -2920,7 +2920,7 @@ void fx_runner_think( gentity_t *ent )
 								player_ent->client->isHacking = 0; //can't hack a client
 								player_ent->client->ps.hackingTime = 0;
 
-								player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] += 1;
+								zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR, 1);
 
 								if (player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
 								{
