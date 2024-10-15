@@ -7166,24 +7166,24 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 
 	rpg_inventory_weights[RPG_INVENTORY_WP_STUN_BATON] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_WP_SABER] = 10;
-	rpg_inventory_weights[RPG_INVENTORY_WP_BLASTER_PISTOL] = 10;
-	rpg_inventory_weights[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] = 14;
-	rpg_inventory_weights[RPG_INVENTORY_WP_DISRUPTOR] = 15;
-	rpg_inventory_weights[RPG_INVENTORY_WP_BOWCASTER] = 17;
-	rpg_inventory_weights[RPG_INVENTORY_WP_REPEATER] = 18;
-	rpg_inventory_weights[RPG_INVENTORY_WP_DEMP2] = 16;
-	rpg_inventory_weights[RPG_INVENTORY_WP_FLECHETTE] = 18;
-	rpg_inventory_weights[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = 20;
-	rpg_inventory_weights[RPG_INVENTORY_WP_CONCUSSION] = 20;
-	rpg_inventory_weights[RPG_INVENTORY_WP_BRYAR_PISTOL] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_WP_BLASTER_PISTOL] = 7;
+	rpg_inventory_weights[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_WP_DISRUPTOR] = 12;
+	rpg_inventory_weights[RPG_INVENTORY_WP_BOWCASTER] = 12;
+	rpg_inventory_weights[RPG_INVENTORY_WP_REPEATER] = 14;
+	rpg_inventory_weights[RPG_INVENTORY_WP_DEMP2] = 12;
+	rpg_inventory_weights[RPG_INVENTORY_WP_FLECHETTE] = 15;
+	rpg_inventory_weights[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = 17;
+	rpg_inventory_weights[RPG_INVENTORY_WP_CONCUSSION] = 18;
+	rpg_inventory_weights[RPG_INVENTORY_WP_BRYAR_PISTOL] = 7;
 
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_BLASTER_PACK] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_POWERCELL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_METAL_BOLTS] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_ROCKETS] = 2;
 	rpg_inventory_weights[RPG_INVENTORY_AMMO_THERMALS] = 3;
-	rpg_inventory_weights[RPG_INVENTORY_AMMO_TRIPMINES] = 4;
-	rpg_inventory_weights[RPG_INVENTORY_AMMO_DETPACKS] = 5;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_TRIPMINES] = 3;
+	rpg_inventory_weights[RPG_INVENTORY_AMMO_DETPACKS] = 4;
 
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_BINOCULARS] = 3;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_BACTA_CANISTER] = 5;

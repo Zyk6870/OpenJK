@@ -6300,7 +6300,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 			else if (mod == MOD_BLASTER && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 &&
 				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_E11_BLASTER2) && targ && targ->health > 0 && targ->client && 
-				Q_irand(0, 3) == 0)
+				Q_irand(0, 1) == 0)
 			{ // zyk: fire
 				targ->client->pers.fire_bolt_hits_counter += 5;
 				targ->client->pers.fire_bolt_user_id = attacker->s.number;
