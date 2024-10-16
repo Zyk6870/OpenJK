@@ -439,7 +439,8 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			ent->parent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_ROCKET1)) ||
 		(ent->s.weapon == WP_CONCUSSION && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0 && 
 			ent->parent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_CONCUSSION1)) ||
-		(ent->s.weapon == WP_DET_PACK && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DETPACKS] > 0) || 
+		((ent->s.weapon == WP_THERMAL || ent->s.weapon == WP_TRIP_MINE || ent->s.weapon == WP_DET_PACK) && 
+			ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && ent->parent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1)) ||
 		(ent->s.weapon == WP_DEMP2 && ent->methodOfDeath == MOD_MELEE && ent->parent->client->pers.skill_levels[SKILL_MAGIC_FIST] == zyk_max_skill_level(SKILL_MAGIC_FIST))))
 	{
 		GlobalUse(other, ent->parent, ent->parent);

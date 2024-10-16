@@ -2280,6 +2280,16 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 	missile->bounceCount = 0;
 }
 
+extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
+void zyk_create_fire_area(gentity_t* ent, gentity_t *owner)
+{
+	if (owner && owner->client && owner->client->sess.amrpgmode == 2 &&
+		owner->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && owner->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE2))
+	{
+		zyk_quest_effect_spawn(owner, ent, "zyk_explosive_fire", "1", "explosions/explosion1", 0, ent->splashDamage, ent->splashRadius, 2500);
+	}
+}
+
 /*
 ======================================================================
 
@@ -2326,6 +2336,8 @@ void thermalDetonatorExplode( gentity_t *ent )
 		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ) );
 		ent->freeAfterEvent = qtrue;
 
+		zyk_create_fire_area(ent, ent->parent);
+
 		if (G_RadiusDamage( ent->r.currentOrigin, ent->parent,  ent->splashDamage, ent->splashRadius,
 				ent, ent, ent->splashMethodOfDeath))
 		{
@@ -2356,6 +2368,9 @@ gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean altFire )
 	gentity_t	*bolt;
 	vec3_t		dir, start;
 	float chargeAmount = 1.0f; // default of full charge
+	int damage = zyk_thermal_damage.integer;
+	int splash_damage = zyk_thermal_splash_damage.integer;
+	int splash_radius = TD_SPLASH_RAD;
 
 	VectorCopy( forward, dir );
 	VectorCopy( muzzle, start );
@@ -2413,10 +2428,19 @@ gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean altFire )
 	bolt->s.loopSound = G_SoundIndex( "sound/weapons/thermal/thermloop.wav" );
 	bolt->s.loopIsSoundset = qfalse;
 
-	bolt->damage = zyk_thermal_damage.integer;
+	if (ent && ent->client && ent->client->sess.amrpgmode == 2 &&
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1))
+	{
+		damage *= 1.5;
+		splash_damage *= 1.5;
+		splash_radius *= 1.5;
+	}
+
+	bolt->damage = damage;
 	bolt->dflags = 0;
-	bolt->splashDamage = zyk_thermal_splash_damage.integer;
-	bolt->splashRadius = TD_SPLASH_RAD;
+	bolt->splashDamage = splash_damage;
+
+	bolt->splashRadius = splash_radius;
 
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
@@ -2621,7 +2645,11 @@ void laserTrapExplode( gentity_t *self )
 			}
 		}
 		else
-			G_RadiusDamage( self->r.currentOrigin, self->activator, self->splashDamage, self->splashRadius, self, self, MOD_TRIP_MINE_SPLASH/*MOD_LT_SPLASH*/ );
+		{
+			zyk_create_fire_area(self, self->parent);
+
+			G_RadiusDamage(self->r.currentOrigin, self->activator, self->splashDamage, self->splashRadius, self, self, MOD_TRIP_MINE_SPLASH/*MOD_LT_SPLASH*/);
+		}
 	}
 
 	if (self->s.weapon != WP_FLECHETTE)
@@ -2892,12 +2920,25 @@ void TrapThink(gentity_t *ent)
 
 void CreateLaserTrap( gentity_t *laserTrap, vec3_t start, gentity_t *owner )
 { //create a laser trap entity
+	int damage = zyk_tripmine_damage.integer;
+	int splash_damage = zyk_tripmine_splash_damage.integer;
+	int splash_radius = LT_SPLASH_RAD;
+
 	laserTrap->classname = "laserTrap";
 	laserTrap->flags |= FL_BOUNCE_HALF;
 	laserTrap->s.eFlags |= EF_MISSILE_STICK;
-	laserTrap->splashDamage = zyk_tripmine_splash_damage.integer;
-	laserTrap->splashRadius = LT_SPLASH_RAD;
-	laserTrap->damage = zyk_tripmine_damage.integer;
+
+	if (owner && owner->client && owner->client->sess.amrpgmode == 2 &&
+		owner->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && owner->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1))
+	{
+		damage *= 1.5;
+		splash_damage *= 1.5;
+		splash_radius *= 1.5;
+	}
+
+	laserTrap->splashDamage = splash_damage;
+	laserTrap->splashRadius = splash_radius;
+	laserTrap->damage = damage;
 	laserTrap->methodOfDeath = MOD_TRIP_MINE_SPLASH;
 	laserTrap->splashMethodOfDeath = MOD_TRIP_MINE_SPLASH;
 	laserTrap->s.eType = ET_GENERAL;
@@ -3189,6 +3230,8 @@ void DetPackBlow(gentity_t *self)
 
 	G_PlayEffect(EFFECT_EXPLOSION_DETPACK, self->r.currentOrigin, v);
 
+	zyk_create_fire_area(self, self->parent);
+
 	self->think = G_FreeEntity;
 	self->nextthink = level.time;
 }
@@ -3210,6 +3253,8 @@ void DetPackDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
 void drop_charge (gentity_t *self, vec3_t start, vec3_t dir)
 {
 	gentity_t	*bolt;
+	int damage = zyk_detpack_damage.integer;
+	int splash_damage = zyk_detpack_splash_damage.integer;
 	int splash_radius = 200;
 
 	VectorNormalize (dir);
@@ -3225,14 +3270,17 @@ void drop_charge (gentity_t *self, vec3_t start, vec3_t dir)
 
 	bolt->parent = self;
 	bolt->r.ownerNum = self->s.number;
-	bolt->damage = zyk_detpack_damage.integer; // zyk: default 100
-	bolt->splashDamage = zyk_detpack_splash_damage.integer; // zyk: default 200
 
-	if (self && self->client && self->client->sess.amrpgmode == 2 && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DETPACKS] > 0)
+	if (self && self->client && self->client->sess.amrpgmode == 2 && 
+		self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && self->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1))
 	{
-		splash_radius *= 2;
+		damage *= 1.5;
+		splash_damage *= 1.5;
+		splash_radius *= 1.5;
 	}
 
+	bolt->damage = damage; // zyk: default 100
+	bolt->splashDamage = splash_damage; // zyk: default 200
 	bolt->splashRadius = splash_radius;
 
 	bolt->methodOfDeath = MOD_DET_PACK_SPLASH;

@@ -4835,8 +4835,9 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 			return qtrue;
 		}
 
-		if (mod == MOD_DET_PACK_SPLASH && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DETPACKS] > 0)
-		{ // zyk: detpacks
+		if ((mod == MOD_THERMAL || mod == MOD_THERMAL_SPLASH || mod == MOD_TRIP_MINE_SPLASH || mod == MOD_TIMED_MINE_SPLASH || mod == MOD_DET_PACK_SPLASH) &&
+			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1))
+		{ // zyk: explosive upgrade
 			return qtrue;
 		}
 	}
@@ -6778,6 +6779,17 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						}
 
 						continue;
+					}
+
+					// zyk: Explosive Upgrade mode 2
+					// zyk: target catches fire
+					if (ent->client && ent->health > 0 && magic_power_user && magic_power_user->client && 
+						Q_stricmp(attacker->targetname, "zyk_explosive_fire") == 0)
+					{
+						ent->client->pers.fire_bolt_hits_counter += (int)points;
+						ent->client->pers.fire_bolt_user_id = magic_power_user->s.number;
+
+						ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_IN_FLAMES);
 					}
 
 					// zyk: Magic power. Target will not be knocked back by it

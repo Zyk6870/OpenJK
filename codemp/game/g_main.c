@@ -7143,10 +7143,10 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 8;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 150;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 350;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 350;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 350;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 200;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 300;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 300;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 300;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 30;
@@ -7159,7 +7159,7 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLECHETTE] = 40;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CONCUSSION] = 40;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = 40;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DETPACKS] = 25;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EXPLOSIVE] = 35;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 100;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = 15;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = 25;
@@ -7169,8 +7169,8 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 100;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 40;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 350;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 60;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 300;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_MAGIC_SHIELD] = 15;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 7;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 15;

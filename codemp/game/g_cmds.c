@@ -5996,7 +5996,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLECHETTE] = "Flechette Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CONCUSSION] = "Concussion Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = "Rocket Launcher Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_DETPACKS] = "Detpacks Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_EXPLOSIVE] = "Explosive Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "Jetpack Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = "Thermal Vision";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "Sentry Gun Upgrade";
@@ -6172,8 +6172,8 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_UPGRADE_DETPACKS][0] = 1200;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_DETPACKS][1] = 500;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_EXPLOSIVE][0] = 1200;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_EXPLOSIVE][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][0] = 3000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][1] = 1500;
@@ -6280,7 +6280,7 @@ char* zyk_get_formatted_string(char *original_str, int max_number_chars)
 
 int zyk_upgrade_mode_in_use(gentity_t* ent, int item_index)
 {
-	int weapon_upgrades[11][2] = {
+	int weapon_upgrades[12][2] = {
 		{INV_UPGRADE_STUN_BATON1, INV_UPGRADE_STUN_BATON2},
 		{INV_UPGRAGE_BLASTER_PISTOL1, INV_UPGRAGE_BLASTER_PISTOL2},
 		{INV_UPGRAGE_BRYAR_PISTOL1, INV_UPGRAGE_BRYAR_PISTOL2},
@@ -6291,10 +6291,11 @@ int zyk_upgrade_mode_in_use(gentity_t* ent, int item_index)
 		{INV_UPGRADE_REPEATER1, INV_UPGRADE_REPEATER2},
 		{INV_UPGRADE_FLECHETTE1, INV_UPGRADE_FLECHETTE2},
 		{INV_UPGRADE_CONCUSSION1, INV_UPGRADE_CONCUSSION2},
-		{INV_UPGRADE_ROCKET1, INV_UPGRADE_ROCKET2}
+		{INV_UPGRADE_ROCKET1, INV_UPGRADE_ROCKET2},
+		{INV_UPGRADE_EXPLOSIVE1, INV_UPGRADE_EXPLOSIVE2}
 	};
 
-	if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
+	if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_EXPLOSIVE)
 	{
 		int weapon_upgrade_index = item_index - RPG_INVENTORY_UPGRADE_STUN_BATON;
 
@@ -6634,9 +6635,9 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: increases firerate of primary fire\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_DETPACKS)
+	else if (item_index == RPG_INVENTORY_UPGRADE_EXPLOSIVE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes detpacks have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: makes thermals, trip mines and detpacks have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: thermals, trip mines and detpacks create a fire area when explosive, making targets catch fire\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK)
 	{
@@ -6702,7 +6703,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 
 void zyk_use_inventory_item(gentity_t* ent, int item_index)
 {
-	int weapon_upgrades[11][2] = {
+	int weapon_upgrades[12][2] = {
 		{INV_UPGRADE_STUN_BATON1, INV_UPGRADE_STUN_BATON2},
 		{INV_UPGRAGE_BLASTER_PISTOL1, INV_UPGRAGE_BLASTER_PISTOL2},
 		{INV_UPGRAGE_BRYAR_PISTOL1, INV_UPGRAGE_BRYAR_PISTOL2},
@@ -6713,10 +6714,11 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 		{INV_UPGRADE_REPEATER1, INV_UPGRADE_REPEATER2},
 		{INV_UPGRADE_FLECHETTE1, INV_UPGRADE_FLECHETTE2},
 		{INV_UPGRADE_CONCUSSION1, INV_UPGRADE_CONCUSSION2},
-		{INV_UPGRADE_ROCKET1, INV_UPGRADE_ROCKET2}
+		{INV_UPGRADE_ROCKET1, INV_UPGRADE_ROCKET2},
+		{INV_UPGRADE_EXPLOSIVE1, INV_UPGRADE_EXPLOSIVE2}
 	};
 
-	if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
+	if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_EXPLOSIVE)
 	{
 		int weapon_upgrade_index = item_index - RPG_INVENTORY_UPGRADE_STUN_BATON;
 
@@ -6949,7 +6951,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							item_number = atoi(arg3);
 							item_index = item_number - 1;
 
-							if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_DETPACKS)
+							if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_EXPLOSIVE)
 							{
 								zyk_use_inventory_item(ent, item_index);
 							}
@@ -6960,7 +6962,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							else
 							{
 								trap->SendServerCommand(ent->s.number, va("print \"Item number must be between %d and %d or between %d and %d\n\"", 
-									(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_DETPACKS + 1), 
+									(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_EXPLOSIVE + 1),
 									(RPG_INVENTORY_MISC_MAGIC_SHIELD + 1), (RPG_INVENTORY_MISC_FORCE_BOON + 1)));
 							}
 						}
