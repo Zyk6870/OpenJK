@@ -211,21 +211,6 @@ void Sentry_Fire (void)
 		NPCS.NPC->attackDebounceTime = level.time + 150;
 		missile->damage = 40;
 	}
-	else if (NPCS.NPC->client && NPCS.NPC->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH)
-	{
-		missile = CreateMissile(muzzle, forward, 5000, 10000, NPCS.NPC, qfalse);
-
-		missile->classname = "bryar_proj";
-		missile->s.weapon = WP_BRYAR_PISTOL;
-
-		missile->dflags = DAMAGE_DEATH_KNOCKBACK;
-		missile->methodOfDeath = MOD_BRYAR_PISTOL;
-		missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
-
-		NPCS.NPCInfo->burstCount++;
-		NPCS.NPC->attackDebounceTime = level.time + 150;
-		missile->damage = 90;
-	}
 	else
 	{
 		missile = CreateMissile( muzzle, forward, 3000, 10000, NPCS.NPC, qfalse ); // zyk: changed velocity. Default 1600

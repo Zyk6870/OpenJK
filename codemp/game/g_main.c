@@ -493,10 +493,6 @@ char* zyk_get_enemy_type(int enemy_type)
 
 	enemy_names[QUEST_NPC_NONE] = "";
 
-	enemy_names[QUEST_NPC_ANGEL_OF_DEATH] = "legendary_angel_of_death";
-	enemy_names[QUEST_NPC_JORMUNGANDR] = "legendary_jormungandr";
-	enemy_names[QUEST_NPC_CHIMERA] = "legendary_chimera";
-
 	enemy_names[QUEST_NPC_MAGE_MASTER] = "mage_master";
 	enemy_names[QUEST_NPC_MAGE_MINISTER] = "mage_minister";
 	enemy_names[QUEST_NPC_MAGE_SCHOLAR] = "mage_scholar";
@@ -530,10 +526,6 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	int bonus_increase[NUM_QUEST_NPCS];
 
 	bonus_increase[QUEST_NPC_NONE] = QUEST_NPC_BONUS_INCREASE;
-
-	bonus_increase[QUEST_NPC_ANGEL_OF_DEATH] = QUEST_NPC_BONUS_INCREASE;
-	bonus_increase[QUEST_NPC_JORMUNGANDR] = QUEST_NPC_BONUS_INCREASE;
-	bonus_increase[QUEST_NPC_CHIMERA] = QUEST_NPC_BONUS_INCREASE;
 
 	bonus_increase[QUEST_NPC_MAGE_MASTER] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_MAGE_MINISTER] = QUEST_NPC_BONUS_INCREASE;
@@ -569,11 +561,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 
 	max_levels[QUEST_NPC_NONE] = 0;
 
-	max_levels[QUEST_NPC_ANGEL_OF_DEATH] = 16;
-	max_levels[QUEST_NPC_JORMUNGANDR] = 16;
-	max_levels[QUEST_NPC_CHIMERA] = 16;
-
-	max_levels[QUEST_NPC_MAGE_MASTER] = 14;
+	max_levels[QUEST_NPC_MAGE_MASTER] = 16;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 10;
 	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 10;
 	max_levels[QUEST_NPC_FORCE_MAGE] = 8;
@@ -644,28 +632,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
 		// zyk: setting magic abilities
-		if (quest_npc_type == QUEST_NPC_ANGEL_OF_DEATH)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, npc_skill_level + skill_level_bonus);
-
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 60 + skill_level_bonus;
-		}
-		else if (quest_npc_type == QUEST_NPC_JORMUNGANDR)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, npc_skill_level + skill_level_bonus);
-
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 60 + skill_level_bonus;
-		}
-		else if (quest_npc_type == QUEST_NPC_CHIMERA)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, npc_skill_level + skill_level_bonus);
-
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 60 + skill_level_bonus;
-		}
-		else if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
+		if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
 		{
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 1;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 1;
@@ -683,7 +650,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level - 1 + skill_level_bonus;
 
-			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 42 + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 54 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_MINISTER)
 		{
@@ -7542,6 +7509,8 @@ void zyk_start_main_quest_spirits_event(gentity_t* ent)
 	ent->client->pers.quest_spirits_event_step = 1;
 	ent->client->pers.quest_spirits_event_timer = level.time + 2000;
 
+	level.reality_shift_mode = REALITY_SHIFT_NONE;
+
 	if (ent->client->pers.quest_spirit_tree_id > -1)
 	{
 		tree_ent = &g_entities[ent->client->pers.quest_spirit_tree_id];
@@ -7613,6 +7582,12 @@ int zyk_spirit_tree_wither(float x, float y, float z)
 			else
 			{
 				total_decrease += (npc_ent->health * QUEST_SPIRIT_TREE_WITHER_RATE);
+			}
+
+			// zyk: Mage Masters wither the Tree more
+			if (npc_ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+			{
+				total_decrease *= 2;
 			}
 		}
 	}
@@ -9630,18 +9605,28 @@ void G_RunFrame( int levelTime ) {
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 3)
 								{
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: But is is not over yet! The Elemental Demon is coming!\n\"",
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: They are defeated. Nature was unbalanced because of their actions, but now...\n\"",
 										QUESTCHAR_ALL_SPIRITS));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 4)
 								{
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The Mages actions unbalanced Nature and awakened him. He is attracted by magic usage and Spirit Trees.\n\"", QUESTCHAR_ALL_SPIRITS));
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ...it will become balanced again thanks to you.\n\"", QUESTCHAR_ALL_SPIRITS));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 5)
 								{
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You must defeat him for the victory to be complete!\n\"", QUESTCHAR_ALL_SPIRITS));
+									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+
+									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_BLUE_CRYSTAL, 20);
+									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_GREEN_CRYSTAL, 20);
+									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_RED_CRYSTAL, 20);
+
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Receive 20 crystals of each type! A reward for your efforts.\n\"", QUESTCHAR_ALL_SPIRITS));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 6)
+								{
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now it is our time to go. See you again sometime.\n\"", QUESTCHAR_ALL_SPIRITS));
+								}
+								else if (ent->client->pers.quest_spirits_event_step == 7)
 								{
 									ent->client->pers.quest_missions |= (1 << MAIN_QUEST_SECOND_PART_COMPLETE);
 								}
@@ -9649,48 +9634,7 @@ void G_RunFrame( int levelTime ) {
 
 							ent->client->pers.quest_spirits_event_step++;
 
-							if (ent->client->pers.quest_spirits_event_step >= 7)
-							{
-								ent->client->pers.quest_spirits_event_step = 0;
-							}
-						}
-						else if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_THIRD_PART_COMPLETE)))
-						{
-							if (ent->client->pers.quest_spirits_event_step == 1)
-							{
-								zyk_spawn_magic_spirits(ent, QUEST_FINAL_EVENT_TIMER);
-							}
-							else
-							{
-								if (ent->client->pers.quest_spirits_event_step == 2)
-								{
-									zyk_NPC_Kill_f("all");
-
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Nice! You did it! Our victory is complete.\n\"", QUESTCHAR_ALL_SPIRITS));
-								}
-								else if (ent->client->pers.quest_spirits_event_step == 3)
-								{
-									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
-
-									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_BLUE_CRYSTAL, 10);
-									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_GREEN_CRYSTAL, 10);
-									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_RED_CRYSTAL, 10);
-
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Receive these crystals!\n\"", QUESTCHAR_ALL_SPIRITS));
-								}
-								else if (ent->client->pers.quest_spirits_event_step == 4)
-								{
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Nature is balanced again. Thank you.\n\"", QUESTCHAR_ALL_SPIRITS));
-								}
-								else if (ent->client->pers.quest_spirits_event_step == 5)
-								{
-									ent->client->pers.quest_missions |= (1 << MAIN_QUEST_THIRD_PART_COMPLETE);
-								}
-							}
-
-							ent->client->pers.quest_spirits_event_step++;
-
-							if (ent->client->pers.quest_spirits_event_step >= 6)
+							if (ent->client->pers.quest_spirits_event_step >= 8)
 							{
 								ent->client->pers.quest_spirits_event_step = 0;
 							}
@@ -9706,41 +9650,6 @@ void G_RunFrame( int levelTime ) {
 						ent->client->pers.quest_progress_timer < level.time)
 					{
 						zyk_spirit_tree_events(ent);
-
-						ent->client->pers.quest_progress_timer = level.time + 1000;
-					}
-					else if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE) && 
-							!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_THIRD_PART_COMPLETE)) &&
-							ent->client->pers.quest_spirits_event_step == 0 &&
-							ent->client->pers.quest_progress_timer < level.time)
-					{ // zyk: final battle
-						qboolean hard_difficulty = qfalse;
-
-						if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
-						{
-							hard_difficulty = qtrue;
-						}
-
-						if (!(level.special_quest_npc_in_map & (1 << QUEST_NPC_ANGEL_OF_DEATH)) && !(ent->client->pers.quest_missions & (1 << MAIN_QUEST_ANGEL_OF_DEATH)))
-						{
-							zyk_spawn_quest_npc(QUEST_NPC_ANGEL_OF_DEATH, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
-						}
-						else if (!(level.special_quest_npc_in_map & (1 << QUEST_NPC_JORMUNGANDR)) && !(ent->client->pers.quest_missions & (1 << MAIN_QUEST_JORMUNGANDR)))
-						{
-							zyk_spawn_quest_npc(QUEST_NPC_JORMUNGANDR, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
-						}
-						else if (!(level.special_quest_npc_in_map & (1 << QUEST_NPC_CHIMERA)) && !(ent->client->pers.quest_missions & (1 << MAIN_QUEST_CHIMERA)))
-						{
-							zyk_spawn_quest_npc(QUEST_NPC_CHIMERA, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
-						}
-						else if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_ANGEL_OF_DEATH) && 
-							ent->client->pers.quest_missions & (1 << MAIN_QUEST_JORMUNGANDR) && 
-							ent->client->pers.quest_missions & (1 << MAIN_QUEST_CHIMERA))
-						{// zyk: starting the final events
-							ent->client->pers.quest_spirits_event_step = 1;
-
-							level.reality_shift_mode = REALITY_SHIFT_NONE;
-						}
 
 						ent->client->pers.quest_progress_timer = level.time + 1000;
 					}
@@ -9777,12 +9686,14 @@ void G_RunFrame( int levelTime ) {
 							{
 								int mage_master_chance = 
 									(ent->client->pers.quest_defeated_enemies - QUEST_MIN_ENEMIES_TO_DEFEAT) + 
-									(ent->client->pers.quest_masters_defeated * 4) + 
+									(ent->client->pers.quest_masters_defeated * 2) + 
 									((ent->client->pers.quest_progress * 20.0) / MAX_QUEST_PROGRESS);
 
 								enemy_type = Q_irand(QUEST_NPC_MAGE_MINISTER, QUEST_NPC_LOW_TRAINED_WARRIOR);
 
-								if (Q_irand(0, 99) < mage_master_chance)
+								if (ent->client->pers.quest_masters_defeated < QUEST_MASTERS_TO_DEFEAT && 
+									!(level.special_quest_npc_in_map & (1 << QUEST_NPC_MAGE_MASTER)) && 
+									Q_irand(0, 99) < mage_master_chance)
 								{
 									enemy_type = QUEST_NPC_MAGE_MASTER;
 								}
@@ -9794,7 +9705,7 @@ void G_RunFrame( int levelTime ) {
 							}
 						}
 
-						if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_THIRD_PART_COMPLETE)) && 
+						if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE)) && 
 							zyk_number_of_allies_in_map(NULL) < (zyk_max_quest_npcs.integer / 2) &&
 							Q_irand(0, 99) < (1 + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 						{ // zyk: spawn an ally
@@ -9898,8 +9809,7 @@ void G_RunFrame( int levelTime ) {
 				// zyk: npcs with magic powers
 				if (ent->client->pers.quest_npc > QUEST_NPC_NONE && ent->client->pers.quest_event_timer < level.time)
 				{
-					if (ent->client->pers.quest_npc == QUEST_NPC_SELLER || 
-						(ent->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && ent->client->pers.quest_npc <= QUEST_NPC_CHIMERA))
+					if (ent->client->pers.quest_npc == QUEST_NPC_SELLER || ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 					{ // zyk: there can only be one of these npcs in the map
 						level.special_quest_npc_in_map |= (1 << ent->client->pers.quest_npc);
 					}
@@ -9944,55 +9854,58 @@ void G_RunFrame( int levelTime ) {
 							}
 						}
 
-						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && Q_irand(0, 3) == 0)
+						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 						{
-							Jedi_Cloak(ent);
+							if (Q_irand(0, 3) == 0)
+							{
+								Jedi_Cloak(ent);
+							}
+
+							if (level.reality_shift_timer < level.time)
+							{
+								if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+								{
+									level.reality_shift_mode = REALITY_SHIFT_NONE;
+
+									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Normal\n\""));
+								}
+								else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+								{
+									level.reality_shift_mode = REALITY_SHIFT_NO_FORCE;
+
+									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Force\n\""));
+								}
+								else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+								{
+									level.reality_shift_mode = REALITY_SHIFT_LOWER_PHYSICAL_DAMAGE;
+
+									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Lower Physical Damage\n\""));
+								}
+								else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+								{
+									level.reality_shift_mode = REALITY_SHIFT_NO_MAGIC;
+
+									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Magic\n\""));
+								}
+								else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+								{
+									level.reality_shift_mode = REALITY_SHIFT_LOW_GRAVITY;
+
+									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Low Gravity\n\""));
+								}
+								else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+								{
+									level.reality_shift_mode = REALITY_SHIFT_HIGH_GRAVITY;
+
+									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - High Gravity\n\""));
+								}
+
+								level.reality_shift_timer = level.time + Q_irand(9000, 15000);
+							}
 						}
 						else if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && Q_irand(0, 99) < 10)
 						{ // zyk: chance to use Melee, so he can use Magic Fist
 							WP_FireMelee(ent, qfalse);
-						}
-						else if (ent->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && ent->client->pers.quest_npc <= QUEST_NPC_CHIMERA &&
-								level.reality_shift_timer < level.time)
-						{
-							if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
-							{
-								level.reality_shift_mode = REALITY_SHIFT_NONE;
-
-								trap->SendServerCommand(-1, va("chat \"^1Elemental Beasts: ^7Reality Shift - Normal\n\""));
-							}
-							else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
-							{
-								level.reality_shift_mode = REALITY_SHIFT_NO_FORCE;
-
-								trap->SendServerCommand(-1, va("chat \"^1Elemental Beasts: ^7Reality Shift - No Force\n\""));
-							}
-							else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
-							{
-								level.reality_shift_mode = REALITY_SHIFT_LOWER_PHYSICAL_DAMAGE;
-
-								trap->SendServerCommand(-1, va("chat \"^1Elemental Beasts: ^7Reality Shift - Lower Physical Damage\n\""));
-							}
-							else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
-							{
-								level.reality_shift_mode = REALITY_SHIFT_NO_MAGIC;
-
-								trap->SendServerCommand(-1, va("chat \"^1Elemental Beasts: ^7Reality Shift - No Magic\n\""));
-							}
-							else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
-							{
-								level.reality_shift_mode = REALITY_SHIFT_LOW_GRAVITY;
-
-								trap->SendServerCommand(-1, va("chat \"^1Elemental Beasts: ^7Reality Shift - Low Gravity\n\""));
-							}
-							else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
-							{
-								level.reality_shift_mode = REALITY_SHIFT_HIGH_GRAVITY;
-
-								trap->SendServerCommand(-1, va("chat \"^1Elemental Beasts: ^7Reality Shift - High Gravity\n\""));
-							}
-
-							level.reality_shift_timer = level.time + Q_irand(5000, 12000);
 						}
 
 						// zyk: has an enemy. Reset the idle timer

@@ -2685,7 +2685,7 @@ void ClientThink_real( gentity_t *ent ) {
 					client->ps.gravity = g_gravity.value;
 
 					// zyk: Reality Shift
-					if (!(client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && client->pers.quest_npc <= QUEST_NPC_CHIMERA))
+					if (!(client->pers.quest_npc == QUEST_NPC_MAGE_MASTER))
 					{
 						if (level.reality_shift_mode == REALITY_SHIFT_LOW_GRAVITY)
 						{
@@ -3131,7 +3131,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// zyk: Reality Shift statuses
 	if (level.reality_shift_mode > REALITY_SHIFT_NONE && 
-		!(ent->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && ent->client->pers.quest_npc <= QUEST_NPC_CHIMERA))
+		!(ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER))
 	{
 		if (level.reality_shift_mode == REALITY_SHIFT_NO_FORCE)
 		{

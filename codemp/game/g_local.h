@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.87"
+#define	GAMEVERSION	"New Zyk Mod v1.1.88"
 
 #define SECURITY_LOG "security.log"
 
@@ -751,9 +751,6 @@ typedef enum {
 
 typedef enum {
 	QUEST_NPC_NONE,
-	QUEST_NPC_ANGEL_OF_DEATH,
-	QUEST_NPC_JORMUNGANDR,
-	QUEST_NPC_CHIMERA,
 	QUEST_NPC_MAGE_MASTER,
 	QUEST_NPC_MAGE_MINISTER,
 	QUEST_NPC_MAGE_SCHOLAR,
@@ -788,10 +785,6 @@ typedef enum {
 	MAIN_QUEST_START,
 	MAIN_QUEST_FIRST_PART_COMPLETE,
 	MAIN_QUEST_SECOND_PART_COMPLETE,
-	MAIN_QUEST_ANGEL_OF_DEATH,
-	MAIN_QUEST_JORMUNGANDR,
-	MAIN_QUEST_CHIMERA,
-	MAIN_QUEST_THIRD_PART_COMPLETE,
 	NUM_QUEST_MISSIONS
 } zyk_quest_mission_t;
 
@@ -909,7 +902,7 @@ typedef enum {
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_NPC_SPAWN_TIME 27000
 #define QUEST_WORM_MP_TO_RESTORE 5
-#define REALITY_SHIFT_MODE_CHANCE 10
+#define REALITY_SHIFT_MODE_CHANCE 20
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 43000

@@ -214,14 +214,6 @@ void Wampa_Slash( int boltIndex, qboolean backhand )
 	{
 		damage *= 2;
 	}
-	else if (NPCS.NPC->client && NPCS.NPC->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-	{
-		damage *= 5;
-	}
-	else if (NPCS.NPC->client && NPCS.NPC->client->pers.quest_npc == QUEST_NPC_CHIMERA)
-	{
-		damage *= 5;
-	}
 
 	numEnts = NPC_GetEntsNearBolt( radiusEntNums, radius, boltIndex, boltOrg );
 

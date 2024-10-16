@@ -2956,7 +2956,6 @@ void fx_runner_think( gentity_t *ent )
 			{ // zyk: the owner of this Spirit Tree
 				if (player_ent->client->sess.amrpgmode < 2 || 
 					player_ent->client->sess.sessionTeam == TEAM_SPECTATOR || 
-					player_ent->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE) ||
 					zyk_is_main_quest_complete(player_ent) == qtrue)
 				{ // zyk: in these cases, clear the Spirit Tree
 					zyk_clear_quest_effect(ent);

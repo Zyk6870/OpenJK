@@ -2170,8 +2170,7 @@ void zyk_decrease_quest_tries(gentity_t *ent)
 	{
 		zyk_set_default_quest_fields(ent);
 
-		// zyk: kill all mage masters
-		zyk_NPC_Kill_f(zyk_get_enemy_type(QUEST_NPC_MAGE_MASTER));
+		zyk_NPC_Kill_f("all");
 
 		trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You have no tries left. Quests reset\n\"");
 	}
@@ -2677,25 +2676,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
 		}
 
-		if (self->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH)
-		{
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
-		}
-		else if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-		{
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
-		}
-		else if (self->client->pers.quest_npc == QUEST_NPC_CHIMERA)
-		{
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
-		}
-		else if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
+		if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
 		{
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
@@ -2727,7 +2708,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2 &&
 				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
-				self->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && self->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
+				self->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && self->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
 			{
 				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 				{
@@ -2737,27 +2718,8 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 					{
 						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
 					}
-				}
-				else if (self->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && self->client->pers.quest_npc <= QUEST_NPC_CHIMERA)
-				{
-					if (quest_player->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE) &&
-						!(quest_player->client->pers.quest_missions & (1 << MAIN_QUEST_THIRD_PART_COMPLETE)))
-					{
-						if (self->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH)
-						{
-							quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_ANGEL_OF_DEATH);
-						}
-						else if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
-						{
-							quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_JORMUNGANDR);
-						}
-						else if (self->client->pers.quest_npc == QUEST_NPC_CHIMERA)
-						{
-							quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_CHIMERA);
-						}
 
-						quest_player->client->pers.quest_progress_timer = level.time + 3000;
-					}
+					level.reality_shift_mode = REALITY_SHIFT_NONE;
 				}
 
 				quest_player->client->pers.quest_defeated_enemies += 1;
@@ -2830,15 +2792,12 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_KEEP_QUEST_TRIES)) // zyk: dont reset in this case, for example, when player logs into his account
 		)
 	{ // zyk: player died in quest. Decrease number of tries
-		if (!(self->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE)))
-		{
-			// zyk: also decrease regen progress
-			self->client->pers.quest_progress -= (MAX_QUEST_PROGRESS / 100);
+		// zyk: also decrease regen progress
+		self->client->pers.quest_progress -= (MAX_QUEST_PROGRESS / 100);
 
-			if (self->client->pers.quest_progress < 0)
-			{
-				self->client->pers.quest_progress = 0;
-			}
+		if (self->client->pers.quest_progress < 0)
+		{
+			self->client->pers.quest_progress = 0;
 		}
 
 		zyk_decrease_quest_tries(self);
@@ -5059,7 +5018,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	}
 
 	if (targ && targ->client && targ->NPC && 
-		targ->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && targ->client->pers.quest_npc <= QUEST_NPC_CHIMERA &&
+		targ->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && 
 		mod == MOD_TRIGGER_HURT)
 	{ // zyk: this npc cannot die by map stuff
 		return;
@@ -6290,38 +6249,20 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					attacker->client->pers.magic_power += mp_to_restore;
 				}
 			}
-			else if (attacker->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH && mod == MOD_BRYAR_PISTOL && targ->client->sess.amrpgmode == 2)
+			else if (attacker->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
 			{
-				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] > 0)
+				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] > 0 && Q_irand(0, 4) == 0)
 				{
 					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_MISC_GREEN_CRYSTAL, 1);
-
-					attacker->health += 10;
-					attacker->client->pers.magic_power += 10;
-
-					G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble.wav"));
-				}
-			}
-			else if (attacker->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
-			{
-				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0)
-				{
-					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_MISC_BLUE_CRYSTAL, 1);
-
 					attacker->health += 50;
-					attacker->client->pers.magic_power += 50;
 
 					G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble.wav"));
 				}
-			}
-			else if (attacker->client->pers.quest_npc == QUEST_NPC_CHIMERA && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
-			{
-				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
+					
+				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && Q_irand(0, 4) == 0)
 				{
 					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_MISC_RED_CRYSTAL, 1);
-
-					attacker->health += 30;
-					attacker->client->pers.magic_power += 30;
+					attacker->client->pers.magic_power += 50;
 
 					G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble.wav"));
 				}
