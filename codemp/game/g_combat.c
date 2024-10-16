@@ -2715,11 +2715,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 				{
 					quest_player->client->pers.quest_masters_defeated += 1;
-
-					if (quest_player->client->pers.quest_masters_defeated >= QUEST_MASTERS_TO_DEFEAT)
-					{
-						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
-					}
 				}
 
 				quest_player->client->pers.quest_defeated_enemies += 1;
@@ -2729,6 +2724,11 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				if ((quest_player->client->pers.quest_defeated_enemies % QUEST_NPC_BONUS_INCREASE) == 0)
 				{
 					quest_player->client->pers.quest_event_timer += QUEST_NPC_SPAWN_TIME;
+				}
+
+				if (quest_player->client->pers.quest_masters_defeated >= QUEST_MASTERS_TO_DEFEAT)
+				{
+					quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
 				}
 
 				if (quest_player->client->pers.quest_defeated_enemies >= QUEST_MIN_ENEMIES_TO_DEFEAT)
