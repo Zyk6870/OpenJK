@@ -6783,10 +6783,10 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 					// zyk: Explosive Upgrade mode 2
 					// zyk: target catches fire
-					if (ent->client && ent->health > 0 && magic_power_user && magic_power_user->client && 
+					if (ent->client && ent->health > 0 && magic_power_user && magic_power_user->client &&
 						Q_stricmp(attacker->targetname, "zyk_explosive_fire") == 0)
 					{
-						ent->client->pers.fire_bolt_hits_counter += (int)points;
+						ent->client->pers.fire_bolt_hits_counter += 2;
 						ent->client->pers.fire_bolt_user_id = magic_power_user->s.number;
 
 						ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_IN_FLAMES);

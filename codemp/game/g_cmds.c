@@ -5166,6 +5166,7 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 void zyk_set_default_quest_fields(gentity_t* ent)
 {
 	ent->client->pers.quest_tries = MIN_QUEST_TRIES;
+	ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = 0;
 	ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] = 0;
 
 	ent->client->pers.quest_defeated_enemies = 0;
@@ -5174,6 +5175,7 @@ void zyk_set_default_quest_fields(gentity_t* ent)
 	ent->client->pers.quest_spirit_tree_id = -1;
 
 	ent->client->pers.quest_missions = 0;
+	ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 }
 
 // zyk: adds a new RPG char with default values
@@ -10232,7 +10234,7 @@ void Cmd_Saber_f( gentity_t *ent ) {
 qboolean zyk_can_deflect_shots(gentity_t *ent)
 {
 	// zyk: Deflective Armor
-	if (ent && ent->client && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0 && Q_irand(0, 1) == 0)
+	if (ent && ent->client && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0 && Q_irand(0, 3) == 0)
 	{
 		return qtrue;
 	}

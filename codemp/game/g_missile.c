@@ -360,7 +360,7 @@ G_MissileImpact
 void WP_SaberBlockNonRandom( gentity_t *self, vec3_t hitloc, qboolean missileBlock );
 void WP_flechette_alt_blow( gentity_t *ent );
 extern int zyk_max_skill_level(int skill_index);
-extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
+extern void zyk_create_fire_area(gentity_t* ent, gentity_t* owner);
 void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	gentity_t		*other;
 	qboolean		hitClient = qfalse;
@@ -843,7 +843,7 @@ killProj:
 
 	// splash damage (doesn't apply to person directly hit)
 	if ( ent->splashDamage ) {
-		// zyk: added the Flechette alt fire condition so it does not damage againm since the call to think(), which does the flechette splash damage, was already done before
+		// zyk: added the Flechette alt fire condition so it does not damage again since the call to think(), which does the flechette splash damage, was already done before
 		if(!(ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING) && ent->methodOfDeath != MOD_MELEE) && 
 			G_RadiusDamage( trace->endpos, ent->parent, ent->splashDamage, ent->splashRadius, other, ent, ent->splashMethodOfDeath ) ) 
 		{
@@ -851,6 +851,11 @@ killProj:
 				&& g_entities[ent->r.ownerNum].client ) {
 				g_entities[ent->r.ownerNum].client->accuracy_hits++;
 			}
+		}
+
+		if (ent->s.weapon == WP_THERMAL)
+		{
+			zyk_create_fire_area(ent, ent->parent);
 		}
 	}
 

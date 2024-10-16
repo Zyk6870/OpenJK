@@ -2286,7 +2286,9 @@ void zyk_create_fire_area(gentity_t* ent, gentity_t *owner)
 	if (owner && owner->client && owner->client->sess.amrpgmode == 2 &&
 		owner->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && owner->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE2))
 	{
-		zyk_quest_effect_spawn(owner, ent, "zyk_explosive_fire", "1", "explosions/explosion1", 0, ent->splashDamage, ent->splashRadius, 2500);
+		zyk_quest_effect_spawn(owner, ent, "zyk_explosive_fire", "4", "env/med_explode", 0, 10, 128, 2000);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
 	}
 }
 
@@ -2336,8 +2338,6 @@ void thermalDetonatorExplode( gentity_t *ent )
 		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ) );
 		ent->freeAfterEvent = qtrue;
 
-		zyk_create_fire_area(ent, ent->parent);
-
 		if (G_RadiusDamage( ent->r.currentOrigin, ent->parent,  ent->splashDamage, ent->splashRadius,
 				ent, ent, ent->splashMethodOfDeath))
 		{
@@ -2345,6 +2345,8 @@ void thermalDetonatorExplode( gentity_t *ent )
 		}
 
 		trap->LinkEntity( (sharedEntity_t *)ent );
+
+		zyk_create_fire_area(ent, ent->parent);
 	}
 }
 
