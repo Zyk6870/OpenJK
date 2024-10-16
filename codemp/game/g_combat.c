@@ -2215,9 +2215,10 @@ extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
-extern void zyk_start_main_quest_final_event(gentity_t* ent);
+extern void zyk_start_main_quest_spirits_event(gentity_t* ent);
 extern void zyk_set_starting_quest_progress(gentity_t* ent);
 extern void zyk_spawn_crystal(float x, float y, float z, int duration, zyk_quest_item_t crystal_type);
+extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
 
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
 	gentity_t* ent;
@@ -2737,6 +2738,27 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
 					}
 				}
+				else if (self->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && self->client->pers.quest_npc <= QUEST_NPC_CHIMERA)
+				{
+					if (quest_player->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE) &&
+						!(quest_player->client->pers.quest_missions & (1 << MAIN_QUEST_THIRD_PART_COMPLETE)))
+					{
+						if (self->client->pers.quest_npc == QUEST_NPC_ANGEL_OF_DEATH)
+						{
+							quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_ANGEL_OF_DEATH);
+						}
+						else if (self->client->pers.quest_npc == QUEST_NPC_JORMUNGANDR)
+						{
+							quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_JORMUNGANDR);
+						}
+						else if (self->client->pers.quest_npc == QUEST_NPC_CHIMERA)
+						{
+							quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_CHIMERA);
+						}
+
+						quest_player->client->pers.quest_progress_timer = level.time + 3000;
+					}
+				}
 
 				quest_player->client->pers.quest_defeated_enemies += 1;
 				quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
@@ -2761,9 +2783,11 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 				// zyk: completed second part of the quest
 				if (quest_player->client->pers.quest_progress == MAX_QUEST_PROGRESS && 
-					quest_player->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
+					quest_player->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT && 
+					!(quest_player->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE)) && 
+					quest_player->client->pers.quest_spirits_event_step == 0)
 				{
-					zyk_start_main_quest_final_event(quest_player);
+					zyk_start_main_quest_spirits_event(quest_player);
 				}
 			}
 		}
@@ -2806,12 +2830,15 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_KEEP_QUEST_TRIES)) // zyk: dont reset in this case, for example, when player logs into his account
 		)
 	{ // zyk: player died in quest. Decrease number of tries
-		// zyk: also decrease regen progress
-		self->client->pers.quest_progress -= (MAX_QUEST_PROGRESS / 100);
-
-		if (self->client->pers.quest_progress < 0)
+		if (!(self->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE)))
 		{
-			self->client->pers.quest_progress = 0;
+			// zyk: also decrease regen progress
+			self->client->pers.quest_progress -= (MAX_QUEST_PROGRESS / 100);
+
+			if (self->client->pers.quest_progress < 0)
+			{
+				self->client->pers.quest_progress = 0;
+			}
 		}
 
 		zyk_decrease_quest_tries(self);
@@ -5031,6 +5058,25 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
+	if (targ && targ->client && targ->NPC && 
+		targ->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && targ->client->pers.quest_npc <= QUEST_NPC_CHIMERA &&
+		mod == MOD_TRIGGER_HURT)
+	{ // zyk: this npc cannot die by map stuff
+		return;
+	}
+
+	if (level.reality_shift_mode == REALITY_SHIFT_LOWER_PHYSICAL_DAMAGE && mod != MOD_FORCE_DARK && 
+		!(inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) > -1) // zyk: not a magic power
+		)
+	{
+		damage /= 2;
+
+		if (damage < 1)
+		{
+			damage = 1;
+		}
+	}
+
 	// zyk: target has chat protection
 	if (targ && targ->client && !targ->NPC && targ->client->pers.player_statuses & (1 << PLAYER_STATUS_CHAT_PROTECTION))
 		return;
@@ -6596,7 +6642,6 @@ G_RadiusDamage
 extern int zyk_max_magic_power(gentity_t* ent);
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
 extern float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t* attacker, gentity_t* target);
-extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, gentity_t *missile, int mod) {
 	float		points, dist;

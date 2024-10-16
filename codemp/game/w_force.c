@@ -735,6 +735,11 @@ qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower )
 		return qfalse;
 	}
 
+	if (level.reality_shift_mode == REALITY_SHIFT_NO_FORCE)
+	{
+		return qfalse;
+	}
+
 	if ( (self->client->ps.fd.forcePowersActive & ( 1 << forcePower )) )
 	{//already using this power
 		if (forcePower != FP_LEVITATION)

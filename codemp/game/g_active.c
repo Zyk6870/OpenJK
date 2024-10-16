@@ -2683,6 +2683,19 @@ void ClientThink_real( gentity_t *ent ) {
 				else
 				{
 					client->ps.gravity = g_gravity.value;
+
+					// zyk: Reality Shift
+					if (!(client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && client->pers.quest_npc <= QUEST_NPC_CHIMERA))
+					{
+						if (level.reality_shift_mode == REALITY_SHIFT_LOW_GRAVITY)
+						{
+							client->ps.gravity /= 5;
+						}
+						else if (level.reality_shift_mode == REALITY_SHIFT_HIGH_GRAVITY)
+						{
+							client->ps.gravity *= 5;
+						}
+					}
 				}
 			}
 		}
@@ -3115,6 +3128,16 @@ void ClientThink_real( gentity_t *ent ) {
 
 	//play/stop any looping sounds tied to controlled movement
 	G_CheckMovingLoopingSounds( ent, ucmd );
+
+	// zyk: Reality Shift statuses
+	if (level.reality_shift_mode > REALITY_SHIFT_NONE && 
+		!(ent->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && ent->client->pers.quest_npc <= QUEST_NPC_CHIMERA))
+	{
+		if (level.reality_shift_mode == REALITY_SHIFT_NO_FORCE)
+		{
+			ent->client->ps.fd.forceDeactivateAll = 1;
+		}
+	}
 
 	pmove.ps = &client->ps;
 	pmove.cmd = *ucmd;

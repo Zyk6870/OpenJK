@@ -4907,8 +4907,8 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			zyk_set_quest_event_timer(ent);
 
-			ent->client->pers.quest_final_event_step = 0;
-			ent->client->pers.quest_final_event_timer = 0;
+			ent->client->pers.quest_spirits_event_step = 0;
+			ent->client->pers.quest_spirits_event_timer = 0;
 			ent->client->pers.quest_spirit_tree_id = -1;
 			ent->client->pers.quest_spirit_tree_call_timer = 0;
 			ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_NONE;
@@ -6380,7 +6380,7 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
 {
-	if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE))
+	if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_THIRD_PART_COMPLETE))
 	{
 		return qtrue;
 	}
@@ -6424,7 +6424,7 @@ int zyk_number_of_enemies_in_map()
 		npc_ent = &g_entities[i];
 
 		if (npc_ent && npc_ent->client && npc_ent->NPC && 
-			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR &&
+			npc_ent->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && npc_ent->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR &&
 			npc_ent->health > 0)
 		{
 			total_enemies++;
@@ -6835,6 +6835,44 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 
 			trap->SendServerCommand(target_ent->s.number, va("print \"%s\n\"", quest_desc));
 		}
+		else if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE))
+		{
+			char quest_desc[MAX_STRING_CHARS];
+
+			strcpy(quest_desc, va("\n^1The Mage War\n\n^7The Elemental Beasts appeared, attracted to your Spirit Tree energy\nBeware, they have special abilities that affect you anywhere\nDefeat them so our victory will be complete.\n^4Blue ^7crystals makes new allies stronger and appear more often.\n^2Green ^7crystals increase Quest Tries.\n^1Red ^7crystals creates a Lightning Dome by holding Use key.\n\n"));
+
+			if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_ANGEL_OF_DEATH))
+			{
+				strcpy(quest_desc, va("%s^3Angel of Death: ^7defeated\n", quest_desc));
+			}
+			else
+			{
+				strcpy(quest_desc, va("%s^3Angel of Death: ^7not defeated\n", quest_desc));
+			}
+
+			if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_JORMUNGANDR))
+			{
+				strcpy(quest_desc, va("%s^3Jormungandr: ^7defeated\n", quest_desc));
+			}
+			else
+			{
+				strcpy(quest_desc, va("%s^3Jormungandr: ^7not defeated\n", quest_desc));
+			}
+
+			if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_CHIMERA))
+			{
+				strcpy(quest_desc, va("%s^3Chimera: ^7defeated\n", quest_desc));
+			}
+			else
+			{
+				strcpy(quest_desc, va("%s^3Chimera: ^7not defeated\n", quest_desc));
+			}
+
+			trap->SendServerCommand(target_ent->s.number,
+				va("print \"%s\n^3Allies: ^7%d\n^3Enemies: ^7%d\n^3Quest Tries: ^7%d\n\n\"",
+					quest_desc,
+					zyk_number_of_allies_in_map(ent), zyk_number_of_enemies_in_map(), ent->client->pers.quest_tries));
+		}
 		else
 		{
 			char quest_desc[MAX_STRING_CHARS];
@@ -7019,7 +7057,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the rare mythic creatures, the Chimera, the Jormungandr and the Angel of Death. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals (all types) to restore their health and mp\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force. Another hint: beware the elemental beasts, the Chimera, the Jormungandr and the Angel of Death. If they appear, you better be ready or run, because they have very powerful magic and their physical attacks can take some of your crystals (all types) to restore their health and mp\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 					}
 					else
@@ -10261,7 +10299,8 @@ int zyk_get_magic_cost(int magic_number)
 qboolean zyk_can_cast_magic(gentity_t* ent)
 {
 	if (ent->client->ps.forceHandExtend != HANDEXTEND_NONE || 
-		ent->client->ps.fd.forceGripBeingGripped > level.time)
+		ent->client->ps.fd.forceGripBeingGripped > level.time || 
+		(level.reality_shift_mode == REALITY_SHIFT_NO_MAGIC && !(ent->client->pers.quest_npc >= QUEST_NPC_ANGEL_OF_DEATH && ent->client->pers.quest_npc <= QUEST_NPC_CHIMERA)))
 	{
 		return qfalse;
 	}

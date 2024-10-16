@@ -2756,10 +2756,10 @@ extern int	BMS_MID;
 extern int	BMS_END;
 
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
+extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 extern void zyk_add_mp(gentity_t* ent, int mp_amount);
 extern void zyk_clear_quest_items(gentity_t* effect_ent);
 extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
-extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 
 void zyk_clear_quest_effect(gentity_t* ent)
 {
@@ -2956,7 +2956,8 @@ void fx_runner_think( gentity_t *ent )
 			{ // zyk: the owner of this Spirit Tree
 				if (player_ent->client->sess.amrpgmode < 2 || 
 					player_ent->client->sess.sessionTeam == TEAM_SPECTATOR || 
-					(zyk_is_main_quest_complete(player_ent) == qtrue && player_ent->client->pers.quest_final_event_step == 0))
+					player_ent->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE) ||
+					zyk_is_main_quest_complete(player_ent) == qtrue)
 				{ // zyk: in these cases, clear the Spirit Tree
 					zyk_clear_quest_effect(ent);
 				}
