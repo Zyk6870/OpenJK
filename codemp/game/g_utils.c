@@ -949,6 +949,12 @@ void G_FreeEntity( gentity_t *ed ) {
 	if (ed->client && ed->NPC && level.special_quest_npc_in_map & (1 << ed->client->pers.quest_npc))
 	{
 		level.special_quest_npc_in_map &= ~(1 << ed->client->pers.quest_npc);
+
+		// zyk: this case may happen if someone uses Entity System to remove all entities from the map
+		if (ed->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && ed->health > 0)
+		{
+			level.reality_shift_mode = REALITY_SHIFT_NONE;
+		}
 	}
 
 	// zyk: if npc is cleaned directly, test if goal entity is still there. If it is, clean the goal entity too

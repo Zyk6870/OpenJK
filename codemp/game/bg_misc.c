@@ -1710,6 +1710,14 @@ qboolean BG_CanUseFPNow(int gametype, playerState_t *ps, int time, forcePowers_t
 		return qfalse;
 	}
 
+#ifdef _GAME
+	// zyk: cannot use force in this case
+	if (level.reality_shift_mode == REALITY_SHIFT_NO_FORCE)
+	{
+		return qfalse;
+	}
+#endif
+
 	/* zyk: not it will be possible
 	if (ps->weapon == WP_EMPLACED_GUN)
 	{ //can't use any of your powers while on an emplaced weapon

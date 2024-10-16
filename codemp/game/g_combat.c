@@ -2681,6 +2681,8 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
+
+			level.reality_shift_mode = REALITY_SHIFT_NONE;
 		}
 		else if (crystal_type > QUEST_ITEM_NONE)
 		{
@@ -2718,8 +2720,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 					{
 						quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
 					}
-
-					level.reality_shift_mode = REALITY_SHIFT_NONE;
 				}
 
 				quest_player->client->pers.quest_defeated_enemies += 1;
@@ -6251,7 +6251,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
 			{
-				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] > 0 && Q_irand(0, 4) == 0)
+				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] > 0 && Q_irand(0, 1) == 0)
 				{
 					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_MISC_GREEN_CRYSTAL, 1);
 					attacker->health += 50;
@@ -6259,7 +6259,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble.wav"));
 				}
 					
-				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && Q_irand(0, 4) == 0)
+				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && Q_irand(0, 1) == 0)
 				{
 					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_MISC_RED_CRYSTAL, 1);
 					attacker->client->pers.magic_power += 50;

@@ -432,7 +432,7 @@ gentity_t* zyk_find_entity_for_quest()
 			Q_stricmp(current_entity->classname, "noclass") != 0 &&
 			Q_stricmp(current_entity->classname, "NPC_goal") != 0 &&
 			current_entity->s.eType != ET_MISSILE &&
-			!strstr(current_entity->classname, "fx_") != 0 &&
+			(!strstr(current_entity->classname, "fx_") != 0 || Q_stricmp(current_entity->targetname, "zyk_spirit_tree") == 0) && 
 			!strstr(current_entity->classname, "func_") &&
 			!strstr(current_entity->classname, "misc_") &&
 			!strstr(current_entity->classname, "trigger_") &&
@@ -7756,6 +7756,7 @@ extern void G_Kill( gentity_t *ent );
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void WP_FireMelee(gentity_t* ent, qboolean alt_fire);
+extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 
 void G_RunFrame( int levelTime ) {
 	int			i;
@@ -9644,9 +9645,9 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					// zyk: Spirit Tree regen and wither
-					if (!(ent->client->pers.quest_progress == MAX_QUEST_PROGRESS &&
-						ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT) &&
+					if (zyk_is_main_quest_complete(ent) == qfalse &&
 						ent->client->pers.quest_defeated_enemies >= QUEST_MIN_ENEMIES_TO_DEFEAT &&
+						ent->client->pers.quest_spirits_event_step == 0 &&
 						ent->client->pers.quest_progress_timer < level.time)
 					{
 						zyk_spirit_tree_events(ent);
@@ -9667,8 +9668,7 @@ void G_RunFrame( int levelTime ) {
 
 						zyk_set_quest_event_timer(ent);
 
-						if (!(ent->client->pers.quest_progress == MAX_QUEST_PROGRESS &&
-							ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT))
+						if (ent->client->pers.quest_spirits_event_step == 0 && zyk_is_main_quest_complete(ent) == qfalse)
 						{
 							int enemy_type = 0;
 							zyk_quest_npc_t stronger_enemy_type = QUEST_NPC_LOW_TRAINED_WARRIOR - (ent->client->pers.quest_defeated_enemies / 5);
@@ -9705,7 +9705,7 @@ void G_RunFrame( int levelTime ) {
 							}
 						}
 
-						if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE)) && 
+						if (ent->client->pers.quest_spirits_event_step == 0 && zyk_is_main_quest_complete(ent) == qfalse &&
 							zyk_number_of_allies_in_map(NULL) < (zyk_max_quest_npcs.integer / 2) &&
 							Q_irand(0, 99) < (1 + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 						{ // zyk: spawn an ally
@@ -9861,46 +9861,38 @@ void G_RunFrame( int levelTime ) {
 								Jedi_Cloak(ent);
 							}
 
-							if (level.reality_shift_timer < level.time)
+							if (level.reality_shift_timer < level.time && Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
 							{
-								if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
-								{
-									level.reality_shift_mode = REALITY_SHIFT_NONE;
+								zyk_reality_shift_t reality_shift_mode = Q_irand(REALITY_SHIFT_NONE, (NUM_REALITY_SHIFT_STATUSES - 1));
 
+								level.reality_shift_mode = reality_shift_mode;
+
+								if (level.reality_shift_mode == REALITY_SHIFT_NONE)
+								{
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Normal\n\""));
 								}
-								else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+								else if (level.reality_shift_mode == REALITY_SHIFT_NO_FORCE)
 								{
-									level.reality_shift_mode = REALITY_SHIFT_NO_FORCE;
-
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Force\n\""));
 								}
-								else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+								else if (level.reality_shift_mode == REALITY_SHIFT_LOWER_PHYSICAL_DAMAGE)
 								{
-									level.reality_shift_mode = REALITY_SHIFT_LOWER_PHYSICAL_DAMAGE;
-
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Lower Physical Damage\n\""));
 								}
-								else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+								else if (level.reality_shift_mode == REALITY_SHIFT_NO_MAGIC)
 								{
-									level.reality_shift_mode = REALITY_SHIFT_NO_MAGIC;
-
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Magic\n\""));
 								}
-								else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+								else if (level.reality_shift_mode == REALITY_SHIFT_LOW_GRAVITY)
 								{
-									level.reality_shift_mode = REALITY_SHIFT_LOW_GRAVITY;
-
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Low Gravity\n\""));
 								}
-								else if (Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+								else if (level.reality_shift_mode == REALITY_SHIFT_HIGH_GRAVITY)
 								{
-									level.reality_shift_mode = REALITY_SHIFT_HIGH_GRAVITY;
-
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - High Gravity\n\""));
 								}
 
-								level.reality_shift_timer = level.time + Q_irand(9000, 15000);
+								level.reality_shift_timer = level.time + Q_irand(5000, 12000);
 							}
 						}
 						else if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && Q_irand(0, 99) < 10)

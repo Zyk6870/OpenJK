@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.88"
+#define	GAMEVERSION	"New Zyk Mod v1.1.89"
 
 #define SECURITY_LOG "security.log"
 
@@ -890,7 +890,7 @@ typedef enum {
 #define ENERGY_MODULATOR_PARTS 3
 #define QUEST_ITEM_DISTANCE 48
 #define QUEST_LOG_PARTS 5
-#define QUEST_MASTERS_TO_DEFEAT 5
+#define QUEST_MASTERS_TO_DEFEAT 10
 #define QUEST_SPIRIT_TREE_DEFAULT_SCALE 1
 #define QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET 4
 #define QUEST_SPIRIT_TREE_RADIUS 50
@@ -902,7 +902,7 @@ typedef enum {
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_NPC_SPAWN_TIME 27000
 #define QUEST_WORM_MP_TO_RESTORE 5
-#define REALITY_SHIFT_MODE_CHANCE 20
+#define REALITY_SHIFT_MODE_CHANCE 50
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 43000
