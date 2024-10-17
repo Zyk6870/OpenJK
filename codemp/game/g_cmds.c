@@ -2088,24 +2088,189 @@ char* zyk_string_with_no_whitespaces(char *old_string)
 	return G_NewString(new_string);
 }
 
+void zyk_load_admin_only_mode_stuff(gentity_t* ent)
+{
+	if (ent->client->sess.amrpgmode == 1)
+	{
+		ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
+
+		// zyk: setting default max hp and shield
+		ent->client->ps.stats[STAT_MAX_HEALTH] = 100;
+
+		if (ent->health > 100)
+			ent->health = 100;
+
+		if (ent->client->ps.stats[STAT_ARMOR] > 100)
+			ent->client->ps.stats[STAT_ARMOR] = 100;
+
+		// zyk: reset the force powers of this player
+		WP_InitForcePowers(ent);
+
+		if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] > FORCE_LEVEL_0 &&
+			level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE
+			)
+			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
+
+		if (level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE)
+			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
+
+		zyk_load_common_settings(ent);
+	}
+}
+
+void legacy_load_account(gentity_t* ent)
+{
+	FILE* account_file;
+	char content[128];
+	int i = 0;
+
+	strcpy(content, "");
+
+	// zyk: loading the char file
+	account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "r");
+	if (account_file != NULL)
+	{
+		// zyk: loading Skillpoints value
+		fscanf(account_file, "%s", content);
+		ent->client->pers.active_inventory_upgrades = atoi(content);
+
+		// zyk: loading skill levels
+		for (i = 0; i < NUMBER_OF_SKILLS; i++)
+		{
+			fscanf(account_file, "%s", content);
+			ent->client->pers.skill_levels[i] = atoi(content);
+		}
+
+		// zyk: loading RPG inventory
+		for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+		{
+			fscanf(account_file, "%s", content);
+			ent->client->pers.rpg_inventory[i] = atoi(content);
+		}
+
+		// zyk: loading credits value
+		fscanf(account_file, "%s", content);
+		ent->client->pers.credits = atoi(content);
+
+		// zyk: validating credits
+		if (ent->client->pers.credits > zyk_max_rpg_credits.integer)
+		{
+			ent->client->pers.credits = zyk_max_rpg_credits.integer;
+		}
+		else if (ent->client->pers.credits < 0)
+		{
+			ent->client->pers.credits = 0;
+		}
+
+		// zyk: quest fields
+		fscanf(account_file, "%s", content);
+		ent->client->pers.quest_tries = atoi(content);
+
+		fscanf(account_file, "%s", content);
+		ent->client->pers.quest_defeated_enemies = atoi(content);
+
+		fscanf(account_file, "%s", content);
+		ent->client->pers.quest_masters_defeated = atoi(content);
+
+		fscanf(account_file, "%s", content);
+		ent->client->pers.quest_progress = atoi(content);
+
+		fscanf(account_file, "%s", content);
+		ent->client->pers.quest_missions = atoi(content);
+
+		// zyk: last health
+		fscanf(account_file, "%s", content);
+		ent->client->pers.last_health = atoi(content);
+
+		// zyk: last shield
+		fscanf(account_file, "%s", content);
+		ent->client->pers.last_shield = atoi(content);
+
+		// zyk: last mp
+		fscanf(account_file, "%s", content);
+		ent->client->pers.last_mp = atoi(content);
+
+		// zyk: last stamina
+		fscanf(account_file, "%s", content);
+		ent->client->pers.last_stamina = atoi(content);
+
+		// zyk: tutorial shown
+		fscanf(account_file, "%s", content);
+		ent->client->pers.tutorial_shown = atoi(content);
+
+		zyk_load_admin_only_mode_stuff(ent);
+
+		fclose(account_file);
+	}
+}
+
+qboolean string_is_an_integer(char *str_with_numbers)
+{
+	int i = 0, j = 0;
+
+	char number_chars[11] = {
+		'0',
+		'1',
+		'2',
+		'3',
+		'4',
+		'5',
+		'6',
+		'7',
+		'8',
+		'9',
+		'\0'
+	};
+
+	for (i = 0; i < strlen(str_with_numbers); i++)
+	{
+		qboolean is_number_digit = qfalse;
+
+		for (j = 0; j < 10; j++)
+		{
+			if (str_with_numbers[i] == number_chars[j])
+			{
+				is_number_digit = qtrue;
+				break;
+			}
+		}
+
+		if (is_number_digit == qfalse)
+		{
+			return qfalse;
+		}
+
+		if (str_with_numbers[i] == '\0')
+		{
+			break;
+		}
+	}
+
+	return qtrue;
+}
+
 // zyk: loads the player account
 void load_account(gentity_t* ent)
 {
 	FILE* account_file;
+	int read_status = 0;
+	char content_type[128];
 	char content[128];
 
+	strcpy(content_type, "");
 	strcpy(content, "");
+
 	account_file = fopen(va("zykmod/accounts/%s.txt", ent->client->sess.filename), "r");
 	if (account_file != NULL)
 	{
 		int i = 0;
 
 		// zyk: loading the account password
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		strcpy(ent->client->pers.password, content);
 
 		// zyk: loading the amrpgmode value
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->sess.amrpgmode = atoi(content);
 
 		if ((zyk_allow_rpg_mode.integer == 0 || (zyk_allow_rpg_in_other_gametypes.integer == 0 && level.gametype != GT_FFA)) && ent->client->sess.amrpgmode == 2)
@@ -2118,19 +2283,19 @@ void load_account(gentity_t* ent)
 		}
 
 		// zyk: loading player_settings value
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.player_settings = atoi(content);
 
 		// zyk: loading the admin command bit value
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.bitvalue = atoi(content);
 
 		// zyk: loading the current char
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		strcpy(ent->client->sess.rpgchar, content);
 
 		// zyk: reading the mod version of the last time this account was saved. Will be used in future versions for account validation
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 
 		fclose(account_file);
 
@@ -2138,100 +2303,129 @@ void load_account(gentity_t* ent)
 		account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "r");
 		if (account_file != NULL)
 		{
-			// zyk: loading Skillpoints value
-			fscanf(account_file, "%s", content);
-			ent->client->pers.active_inventory_upgrades = atoi(content);
+			// zyk: validating if account is using new format
+			read_status = fscanf(account_file, "%s", content_type);
 
-			// zyk: loading skill levels
-			for (i = 0; i < NUMBER_OF_SKILLS; i++)
+			if (string_is_an_integer(content_type) == qtrue)
 			{
-				fscanf(account_file, "%s", content);
-				ent->client->pers.skill_levels[i] = atoi(content);
+				fclose(account_file);
+
+				legacy_load_account(ent);
+
+				return;
 			}
 
-			// zyk: loading RPG inventory
-			for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+			while (read_status != EOF)
 			{
-				fscanf(account_file, "%s", content);
-				ent->client->pers.rpg_inventory[i] = atoi(content);
+				if (Q_stricmp(content_type, "active_inventory_upgrades") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.active_inventory_upgrades = atoi(content);
+				}
+				else if (Q_stricmp(content_type, "credits") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.credits = atoi(content);
+
+					// zyk: validating credits
+					if (ent->client->pers.credits > zyk_max_rpg_credits.integer)
+					{
+						ent->client->pers.credits = zyk_max_rpg_credits.integer;
+					}
+					else if (ent->client->pers.credits < 0)
+					{
+						ent->client->pers.credits = 0;
+					}
+				}
+				else if (Q_stricmp(content_type, "skill_levels") == 0)
+				{
+					for (i = 0; i < NUMBER_OF_SKILLS; i++)
+					{
+						read_status = fscanf(account_file, "%s", content);
+
+						if (string_is_an_integer(content) == qtrue)
+						{
+							ent->client->pers.skill_levels[i] = atoi(content);
+						}
+						else
+						{
+							strcpy(content_type, content);
+							continue;
+						}
+					}
+				}
+				else if (Q_stricmp(content_type, "rpg_inventory") == 0)
+				{
+					for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+					{
+						read_status = fscanf(account_file, "%s", content);
+
+						if (string_is_an_integer(content) == qtrue)
+						{
+							ent->client->pers.rpg_inventory[i] = atoi(content);
+						}
+						else
+						{
+							strcpy(content_type, content);
+							continue;
+						}
+					}
+				}
+				else if (Q_stricmp(content_type, "quest_tries") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.quest_tries = atoi(content);
+				}
+				else if (Q_stricmp(content_type, "quest_defeated_enemies") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.quest_defeated_enemies = atoi(content);
+				}
+				else if (Q_stricmp(content_type, "quest_masters_defeated") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.quest_masters_defeated = atoi(content);
+				}
+				else if (Q_stricmp(content_type, "quest_progress") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.quest_progress = atoi(content);
+				}
+				else if (Q_stricmp(content_type, "quest_missions") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.quest_missions = atoi(content);
+				}
+				else if (Q_stricmp(content_type, "last_health") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.last_health = atoi(content);
+				}
+				else if (Q_stricmp(content_type, "last_shield") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.last_shield = atoi(content);
+				}
+				else if (Q_stricmp(content_type, "last_mp") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.last_mp = atoi(content);
+				}
+				else if (Q_stricmp(content_type, "last_stamina") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.last_stamina = atoi(content);
+				}
+				else if (Q_stricmp(content_type, "tutorial_shown") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.tutorial_shown = atoi(content);
+				}
+
+				read_status = fscanf(account_file, "%s", content_type);
 			}
 
-			// zyk: loading credits value
-			fscanf(account_file, "%s", content);
-			ent->client->pers.credits = atoi(content);
-
-			// zyk: validating credits
-			if (ent->client->pers.credits > zyk_max_rpg_credits.integer)
-			{
-				ent->client->pers.credits = zyk_max_rpg_credits.integer;
-			}
-			else if (ent->client->pers.credits < 0)
-			{
-				ent->client->pers.credits = 0;
-			}
-
-			// zyk: quest fields
-			fscanf(account_file, "%s", content);
-			ent->client->pers.quest_tries = atoi(content);
-
-			fscanf(account_file, "%s", content);
-			ent->client->pers.quest_defeated_enemies = atoi(content);
-
-			fscanf(account_file, "%s", content);
-			ent->client->pers.quest_masters_defeated = atoi(content);
-
-			fscanf(account_file, "%s", content);
-			ent->client->pers.quest_progress = atoi(content);
-
-			fscanf(account_file, "%s", content);
-			ent->client->pers.quest_missions = atoi(content);
-
-			// zyk: last health
-			fscanf(account_file, "%s", content);
-			ent->client->pers.last_health = atoi(content);
-
-			// zyk: last shield
-			fscanf(account_file, "%s", content);
-			ent->client->pers.last_shield = atoi(content);
-
-			// zyk: last mp
-			fscanf(account_file, "%s", content);
-			ent->client->pers.last_mp = atoi(content);
-
-			// zyk: last stamina
-			fscanf(account_file, "%s", content);
-			ent->client->pers.last_stamina = atoi(content);
-
-			// zyk: tutorial shown
-			fscanf(account_file, "%s", content);
-			ent->client->pers.tutorial_shown = atoi(content);
-
-			if (ent->client->sess.amrpgmode == 1)
-			{
-				ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
-
-				// zyk: setting default max hp and shield
-				ent->client->ps.stats[STAT_MAX_HEALTH] = 100;
-
-				if (ent->health > 100)
-					ent->health = 100;
-
-				if (ent->client->ps.stats[STAT_ARMOR] > 100)
-					ent->client->ps.stats[STAT_ARMOR] = 100;
-
-				// zyk: reset the force powers of this player
-				WP_InitForcePowers(ent);
-
-				if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] > FORCE_LEVEL_0 &&
-					level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE
-					)
-					ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
-
-				if (level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE)
-					ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
-
-				zyk_load_common_settings(ent);
-			}
+			zyk_load_admin_only_mode_stuff(ent);
 
 			fclose(account_file);
 		}
@@ -2260,25 +2454,31 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			int i = 0;
 
 			client = ent->client;
-			strcpy(content, "");
 
+			strcpy(content, va("active_inventory_upgrades\n%d\ncredits\n%d", 
+				client->pers.active_inventory_upgrades, client->pers.credits));
+
+			strcpy(content, va("%s\nskill_levels", content));
 			for (i = 0; i < NUMBER_OF_SKILLS; i++)
 			{
-				strcpy(content, va("%s%d\n", content, client->pers.skill_levels[i]));
+				strcpy(content, va("%s\n%d", content, client->pers.skill_levels[i]));
 			}
 
+			strcpy(content, va("%s\nrpg_inventory", content));
 			for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 			{
-				strcpy(content, va("%s%d\n", content, client->pers.rpg_inventory[i]));
+				strcpy(content, va("%s\n%d", content, client->pers.rpg_inventory[i]));
 			}
 
+			strcpy(content, va("%s\nquest_tries\n%d\nquest_defeated_enemies\n%d\nquest_masters_defeated\n%d\nquest_progress\n%d\nquest_missions\n%d", 
+				content, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress, client->pers.quest_missions));
+
+			strcpy(content, va("%s\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d\nlast_stamina\n%d\ntutorial_shown\n%d", 
+				content, client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina, client->pers.tutorial_shown));
+
+			// zyk: saving all content into the file
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
-
-			fprintf(account_file, "%d\n%s%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
-				client->pers.active_inventory_upgrades, content, client->pers.credits, client->pers.quest_tries,
-				client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress, client->pers.quest_missions,
-				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina, client->pers.tutorial_shown);
-
+			fprintf(account_file, "%s\n", content);
 			fclose(account_file);
 		}
 		else
@@ -2287,6 +2487,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			gclient_t* client;
 
 			client = ent->client;
+
 			account_file = fopen(va("zykmod/accounts/%s.txt", ent->client->sess.filename), "w");
 			fprintf(account_file, "%s\n%d\n%d\n%d\n%s\n%s\n",
 				client->pers.password, client->sess.amrpgmode, client->pers.player_settings, client->pers.bitvalue, client->sess.rpgchar, zyk_string_with_no_whitespaces(GAMEVERSION));
