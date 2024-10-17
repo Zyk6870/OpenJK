@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.94"
+#define	GAMEVERSION	"New Zyk Mod v1.1.95"
 
 #define SECURITY_LOG "security.log"
 
@@ -795,8 +795,6 @@ typedef enum {
 	REALITY_SHIFT_NO_FORCE,
 	REALITY_SHIFT_LOWER_PHYSICAL_DAMAGE,
 	REALITY_SHIFT_NO_MAGIC,
-	REALITY_SHIFT_LOW_GRAVITY,
-	REALITY_SHIFT_HIGH_GRAVITY,
 	NUM_REALITY_SHIFT_STATUSES
 } zyk_reality_shift_t;
 

@@ -6939,7 +6939,7 @@ void rpg_lms_prepare()
 void rpg_lms_winner()
 {
 	int i = 0;
-	int credits = 1000;
+	int credits = 300;
 	gentity_t *ent = NULL;
 
 	for (i = 0; i < MAX_CLIENTS; i++)
@@ -9882,14 +9882,6 @@ void G_RunFrame( int levelTime ) {
 								else if (level.reality_shift_mode == REALITY_SHIFT_NO_MAGIC)
 								{
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Magic\n\""));
-								}
-								else if (level.reality_shift_mode == REALITY_SHIFT_LOW_GRAVITY)
-								{
-									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Low Gravity\n\""));
-								}
-								else if (level.reality_shift_mode == REALITY_SHIFT_HIGH_GRAVITY)
-								{
-									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - High Gravity\n\""));
 								}
 
 								level.reality_shift_timer = level.time + Q_irand(5000, 12000);

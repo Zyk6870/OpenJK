@@ -2683,19 +2683,6 @@ void ClientThink_real( gentity_t *ent ) {
 				else
 				{
 					client->ps.gravity = g_gravity.value;
-
-					// zyk: Reality Shift
-					if (!(client->pers.quest_npc == QUEST_NPC_MAGE_MASTER))
-					{
-						if (level.reality_shift_mode == REALITY_SHIFT_LOW_GRAVITY)
-						{
-							client->ps.gravity /= 5;
-						}
-						else if (level.reality_shift_mode == REALITY_SHIFT_HIGH_GRAVITY)
-						{
-							client->ps.gravity *= 5;
-						}
-					}
 				}
 			}
 		}
