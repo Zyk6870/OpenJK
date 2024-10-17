@@ -2681,8 +2681,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
-
-			level.reality_shift_mode = REALITY_SHIFT_NONE;
 		}
 		else if (crystal_type > QUEST_ITEM_NONE)
 		{
@@ -2696,6 +2694,11 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		if (level.special_quest_npc_in_map & (1 << self->client->pers.quest_npc))
 		{
 			level.special_quest_npc_in_map &= ~(1 << self->client->pers.quest_npc);
+		}
+
+		if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+		{
+			level.reality_shift_mode = REALITY_SHIFT_NONE;
 		}
 
 		if (attacker && attacker->client &&
