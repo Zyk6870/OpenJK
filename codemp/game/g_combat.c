@@ -6286,7 +6286,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					attacker->client->ps.stats[STAT_ARMOR] = attacker->client->pers.max_rpg_shield;
 				}
 			}
-			else if (mod == MOD_BLASTER && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 &&
+			else if (mod == MOD_BLASTER && inflictor && inflictor->s.weapon == WP_BLASTER && 
+				attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 &&
 				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_E11_BLASTER2) && targ && targ->health > 0 && targ->client && 
 				Q_irand(0, 1) == 0)
 			{ // zyk: fire
