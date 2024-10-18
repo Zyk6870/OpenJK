@@ -156,7 +156,7 @@ char* zyk_skill_name(int skill_index)
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
-		return G_NewString(skill_names[skill_index]);
+		return skill_names[skill_index];
 	}
 
 	return "";
@@ -392,7 +392,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
-		return G_NewString(inventory_item_names[inventory_index]);
+		return inventory_item_names[inventory_index];
 	}
 
 	return "";
@@ -616,7 +616,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_SEEKER_DRONE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes seeker drone shoot faster and with more damage. It also lasts longer\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes seeker drone shoot faster and with more damage. It lasts longer. Allows picking it up by consuming some powercell ammo, to do it use ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), (RPG_INVENTORY_ITEM_SEEKER_DRONE + 1)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_EWEB)
 	{
@@ -7187,6 +7187,16 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s Mode 1 ^2ON^7\n\n\"", zyk_get_inventory_item_name(item_index)));
 		}
 	}
+	else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0 && ent->client->ps.eFlags & EF_SEEKERDRONE)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
+
+		ent->client->ps.eFlags &= ~EF_SEEKERDRONE;
+
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_ITEM_SEEKER_DRONE, 1);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/weapon_deselect.mp3"));
+	}
 	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MAGIC_SHIELD] > 0)
 	{
 		if (ent->client->pers.magic_shield_duration < level.time)
@@ -7424,13 +7434,18 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							{
 								zyk_use_inventory_item(ent, item_index);
 							}
+							else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE)
+							{
+								zyk_use_inventory_item(ent, item_index);
+							}
 							else if (item_index >= RPG_INVENTORY_MISC_MAGIC_SHIELD && item_index <= RPG_INVENTORY_MISC_FLASHLIGHT)
 							{ // zyk: these items can be used
 								zyk_use_inventory_item(ent, item_index);
 							}
 							else
 							{
-								trap->SendServerCommand(ent->s.number, va("print \"Item number must be between %d and %d or between %d and %d\n\"", 
+								trap->SendServerCommand(ent->s.number, va("print \"Item number must be %d, or between %d and %d, or between %d and %d\n\"", 
+									(RPG_INVENTORY_ITEM_SEEKER_DRONE + 1),
 									(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_EXPLOSIVE + 1),
 									(RPG_INVENTORY_MISC_MAGIC_SHIELD + 1), (RPG_INVENTORY_MISC_FLASHLIGHT + 1)));
 							}
@@ -8234,7 +8249,7 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 
 	if (settings_value >= 0 && settings_value < MAX_PLAYER_SETTINGS)
 	{
-		return G_NewString(settings_descriptions[settings_value]);
+		return settings_descriptions[settings_value];
 	}
 
 	return "";
@@ -9923,7 +9938,7 @@ char* zyk_get_admin_command_description(zyk_settings_t admin_value)
 
 	if (admin_value >= 0 && admin_value < ADM_NUM_CMDS)
 	{
-		return G_NewString(admin_descriptions[admin_value]);
+		return admin_descriptions[admin_value];
 	}
 
 	return "";
