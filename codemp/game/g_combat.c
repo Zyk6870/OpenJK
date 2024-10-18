@@ -6714,9 +6714,9 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					{
 						int max_health = ent->client->ps.stats[STAT_MAX_HEALTH];
 						int max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
-						int heal_amount = 1 * magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
-						int shield_amount = 1 * magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
-						int force_amount = 1 * magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
+						int heal_amount = 1 + (magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA] / 2);
+						int shield_amount = heal_amount;
+						int force_amount = magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 						int stamina_amount = 2 * magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
 						int magic_armor_bonus = 0;
 
@@ -6790,9 +6790,16 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 					if (is_ally == qtrue)
 					{
-						if (this_magic_power == MAGIC_WATER_MAGIC && ent->client && ent->health > 0)
+						if (this_magic_power == MAGIC_WATER_MAGIC && magic_power_user != ent && ent->client && ent->health > 0)
 						{ // zyk: Water magic heals allies
-							zyk_add_health(ent, (int)points);
+							int heal_amount = ((int)points) / 2;
+
+							if (heal_amount < 1)
+							{
+								heal_amount = 1;
+							}
+
+							zyk_add_health(ent, heal_amount);
 
 							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_water", "0", "env/waterfall_splash", 0, 0, 0, 500);
 							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/footsteps/water_wade_01.mp3"));
