@@ -7964,6 +7964,7 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 	settings_descriptions[SETTINGS_MAGIC_CRYSTALS] = "Spawn Quest Stuff in map";
 	settings_descriptions[SETTINGS_PICKUP_MAX_WEIGHT] = "Do not pick-up stuff in map above max weight";
 	settings_descriptions[SETTINGS_SHOW_MP_LEVEL] = "Red bar show Jetpack fuel or MP";
+	settings_descriptions[SETTINGS_SHOW_STAMINA_BAR] = "Show Stamina Blue Bar";
 
 	if (settings_value >= 0 && settings_value < MAX_PLAYER_SETTINGS)
 	{
