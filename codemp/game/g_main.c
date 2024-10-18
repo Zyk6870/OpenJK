@@ -7346,13 +7346,7 @@ void zyk_show_tutorial(gentity_t* ent)
 
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int player_power_level = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] + zyk_total_skillpoints(ent);
-	int interval_time = QUEST_NPC_SPAWN_TIME - (player_power_level * 100);
-
-	if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
-	{
-		interval_time -= (interval_time / 5);
-	}
+	int interval_time = QUEST_NPC_SPAWN_TIME - (level.num_entities * 10);
 
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT))
 	{ //zyk: player is in tutorial for the first time. Do not spawn quest npcs yet

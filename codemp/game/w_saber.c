@@ -8089,6 +8089,12 @@ static void G_GrabSomeMofos(gentity_t *self)
 				correspondingAnim = BOTH_PLAYER_PA_2;
 			}
 
+			// zyk: nofight prevents grab
+			if (zyk_can_hit_target(self, grabbed) == qfalse)
+			{
+				return;
+			}
+
 			if (tortureAnim == -1 || correspondingAnim == -1)
 			{
 				if (self->client->ps.torsoTimer < 300 && !self->client->grappleState)
