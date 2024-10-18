@@ -2261,6 +2261,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_POISONED);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_MAGIC_SHIELD);
+	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_USING_FLASHLIGHT);
 
 	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_EARTH);
 	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_FIRE);

@@ -7111,11 +7111,11 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_WP_SABER] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_WP_BLASTER_PISTOL] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] = 14;
-	rpg_inventory_weights[RPG_INVENTORY_WP_DISRUPTOR] = 15;
-	rpg_inventory_weights[RPG_INVENTORY_WP_BOWCASTER] = 15;
-	rpg_inventory_weights[RPG_INVENTORY_WP_REPEATER] = 16;
-	rpg_inventory_weights[RPG_INVENTORY_WP_DEMP2] = 14;
-	rpg_inventory_weights[RPG_INVENTORY_WP_FLECHETTE] = 16;
+	rpg_inventory_weights[RPG_INVENTORY_WP_DISRUPTOR] = 16;
+	rpg_inventory_weights[RPG_INVENTORY_WP_BOWCASTER] = 16;
+	rpg_inventory_weights[RPG_INVENTORY_WP_REPEATER] = 17;
+	rpg_inventory_weights[RPG_INVENTORY_WP_DEMP2] = 15;
+	rpg_inventory_weights[RPG_INVENTORY_WP_FLECHETTE] = 17;
 	rpg_inventory_weights[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_WP_CONCUSSION] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_WP_BRYAR_PISTOL] = 10;
@@ -7130,25 +7130,25 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_BINOCULARS] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_BACTA_CANISTER] = 7;
-	rpg_inventory_weights[RPG_INVENTORY_ITEM_SENTRY_GUN] = 12;
-	rpg_inventory_weights[RPG_INVENTORY_ITEM_SEEKER_DRONE] = 9;
-	rpg_inventory_weights[RPG_INVENTORY_ITEM_EWEB] = 25;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_SENTRY_GUN] = 16;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_SEEKER_DRONE] = 12;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_EWEB] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_BIG_BACTA] = 14;
-	rpg_inventory_weights[RPG_INVENTORY_ITEM_FORCE_FIELD] = 19;
-	rpg_inventory_weights[RPG_INVENTORY_ITEM_CLOAK] = 20;
-	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 200;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_FORCE_FIELD] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_CLOAK] = 25;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 300;
 
 	rpg_inventory_weights[RPG_INVENTORY_MISC_JETPACK_FUEL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = 1;
 
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 5;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 20;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 8;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 200;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 300;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 300;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 300;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 50;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 250;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 450;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 450;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 450;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 100;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = 30;
@@ -7160,7 +7160,7 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLECHETTE] = 40;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CONCUSSION] = 40;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = 40;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EXPLOSIVE] = 35;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EXPLOSIVE] = 40;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 100;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = 15;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = 25;
@@ -7169,13 +7169,15 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 1;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 100;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 60;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 300;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_MAGIC_SHIELD] = 15;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 150;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 90;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 450;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_MAGIC_SHIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 7;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 15;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 15;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_FLASHLIGHT] = 5;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY] = 1;
 
 	if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -9331,6 +9333,23 @@ void G_RunFrame( int levelTime ) {
 				else if (!(ent->client->pers.cmd.buttons & BUTTON_USE))
 				{ // zyk: not holding Use, reset charge
 					ent->client->pers.special_crystal_counter = 0;
+				}
+
+				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_USING_FLASHLIGHT) && ent->client->pers.flashlight_timer < level.time)
+				{ // zyk: using the flashlight
+					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY, 1);
+
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY] <= 0)
+					{
+						ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_USING_FLASHLIGHT);
+						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/sub_select.mp3"));
+					}
+					else
+					{
+						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+					}
+
+					ent->client->pers.flashlight_timer = level.time + 200;
 				}
 
 				// zyk: updating RPG inventory and calculating current weight

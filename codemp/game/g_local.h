@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.2.2"
+#define	GAMEVERSION	"New Zyk Mod v1.2.3"
 
 #define SECURITY_LOG "security.log"
 
@@ -558,6 +558,7 @@ typedef enum {
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
 	PLAYER_STATUS_KEEP_QUEST_TRIES,
 	PLAYER_STATUS_RESET_TO_MELEE,
+	PLAYER_STATUS_USING_FLASHLIGHT,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -712,6 +713,8 @@ typedef enum {
 	RPG_INVENTORY_MISC_SHIELD_BOOSTER,
 	RPG_INVENTORY_MISC_YSALAMIRI,
 	RPG_INVENTORY_MISC_FORCE_BOON,
+	RPG_INVENTORY_MISC_FLASHLIGHT,
+	RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY,
 	MAX_RPG_INVENTORY_ITEMS
 } zyk_inventory_t;
 
@@ -1065,6 +1068,8 @@ typedef struct clientPersistant_s {
 
 	// zyk: all stuff the player can carry. Used to determine if player is carrying above the max weight
 	int rpg_inventory[MAX_RPG_INVENTORY_ITEMS];
+
+	int flashlight_timer;
 
 	// zyk: has the flags of the Upgrades being used right now
 	int active_inventory_upgrades;

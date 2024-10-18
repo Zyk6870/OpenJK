@@ -387,6 +387,8 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
+	inventory_item_names[RPG_INVENTORY_MISC_FLASHLIGHT] = "Flashlight";
+	inventory_item_names[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY] = "Flashlight Battery";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -398,6 +400,8 @@ char* zyk_get_inventory_item_name(int inventory_index)
 
 void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 {
+	int item_number = item_index + 1;
+
 	if (item_index == RPG_INVENTORY_AMMO_BLASTER_PACK)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for E11 Blaster Rifle, Blaster Pistol and Bryar Pistol weapons\n\n\"", zyk_get_inventory_item_name(item_index)));
@@ -644,19 +648,27 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7prevents being hit my magic powers. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_MAGIC_SHIELD));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7prevents being hit my magic powers. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_SHIELD_BOOSTER));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you immune to force powers for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_YSALAMIRI));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you immune to force powers for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_FORCE_BOON));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_FLASHLIGHT)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a flashlight, use it to light some dark areas in the map. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the battery used by the flashlight\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 }
 
@@ -735,6 +747,8 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "inventoryShieldBooster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "inventoryYsalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "inventoryForceBoon";
+	inventory_item_names[RPG_INVENTORY_MISC_FLASHLIGHT] = "inventoryFlashlightitem";
+	inventory_item_names[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY] = "inventoryFlashlightBattery";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -5283,7 +5297,7 @@ void set_max_force(gentity_t* ent)
 // zyk: sets the Max Weight of stuff the player can carry
 void set_max_weight(gentity_t* ent)
 {
-	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 450);
+	ent->client->pers.max_weight = 700 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 630);
 }
 
 // zyk: set the Max Stamina of this player
@@ -5671,6 +5685,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.energy_modulator_mode = 0;
 			ent->client->pers.quickdraw_timer = 0;
 			ent->client->pers.magic_shield_duration = 0;
+			ent->client->pers.flashlight_timer = 0;
 
 			ent->client->pers.buy_sell_timer = 0;
 			ent->client->pers.inventory_update_timer = level.time + 100;
@@ -6918,6 +6933,12 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][0] = 100;
 	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][1] = 50;
 
+	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT][0] = 5;
+	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT][1] = 2;
+
+	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][0] = 1;
+	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][1] = 0;
+
 	if (buy_item == qtrue)
 	{
 		return seller_items_cost[item_number][0];
@@ -7227,6 +7248,25 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/boon.mp3"));
 	}
+	else if (item_index == RPG_INVENTORY_MISC_FLASHLIGHT && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLASHLIGHT] > 0)
+	{
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY] <= 0)
+		{
+			trap->SendServerCommand(ent->s.number, va("print \"\n^7No battery for the %s^7\n\n\"", zyk_get_inventory_item_name(item_index)));
+			return;
+		}
+
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_USING_FLASHLIGHT))
+		{
+			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_USING_FLASHLIGHT);
+		}
+		else
+		{
+			ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_USING_FLASHLIGHT);
+		}
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/sub_select.mp3"));
+	}
 }
 
 void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
@@ -7383,7 +7423,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							{
 								zyk_use_inventory_item(ent, item_index);
 							}
-							else if (item_index >= RPG_INVENTORY_MISC_MAGIC_SHIELD && item_index <= RPG_INVENTORY_MISC_FORCE_BOON)
+							else if (item_index >= RPG_INVENTORY_MISC_MAGIC_SHIELD && item_index <= RPG_INVENTORY_MISC_FLASHLIGHT)
 							{ // zyk: these items can be used
 								zyk_use_inventory_item(ent, item_index);
 							}
@@ -7391,7 +7431,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							{
 								trap->SendServerCommand(ent->s.number, va("print \"Item number must be between %d and %d or between %d and %d\n\"", 
 									(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_EXPLOSIVE + 1),
-									(RPG_INVENTORY_MISC_MAGIC_SHIELD + 1), (RPG_INVENTORY_MISC_FORCE_BOON + 1)));
+									(RPG_INVENTORY_MISC_MAGIC_SHIELD + 1), (RPG_INVENTORY_MISC_FLASHLIGHT + 1)));
 							}
 						}
 					}
