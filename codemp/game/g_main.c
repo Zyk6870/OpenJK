@@ -7457,13 +7457,16 @@ void zyk_update_inventory(gentity_t* ent)
 	// zyk: jetpack fuel
 	ent->client->pers.jetpack_fuel = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL];
 
-	if (ent->client->pers.jetpack_fuel < 100)
+	if (!(ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL)))
 	{
-		ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
-	}
-	else
-	{
-		ent->client->ps.jetpackFuel = 100;
+		if (ent->client->pers.jetpack_fuel < 100)
+		{
+			ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
+		}
+		else
+		{
+			ent->client->ps.jetpackFuel = 100;
+		}
 	}
 
 	if (!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_BINOCULARS)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC)) &&
@@ -9009,13 +9012,16 @@ void G_RunFrame( int levelTime ) {
 				{
 					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL] = ent->client->pers.jetpack_fuel;
 
-					if (ent->client->pers.jetpack_fuel < 100)
+					if (!(ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL)))
 					{
-						ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
-					}
-					else
-					{
-						ent->client->ps.jetpackFuel = 100;
+						if (ent->client->pers.jetpack_fuel < 100)
+						{
+							ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
+						}
+						else
+						{
+							ent->client->ps.jetpackFuel = 100;
+						}
 					}
 				}
 
@@ -9205,6 +9211,12 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.last_stamina = ent->client->pers.current_stamina;
 				}
 
+				// zyk: show MP level in this case
+				if (ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL))
+				{
+					ent->client->ps.jetpackFuel = (ent->client->pers.magic_power * 100.0) / zyk_max_magic_power(ent);
+				}
+
 				// zyk: tutorial, which teaches the player the RPG Mode features
 				if (ent->client->pers.tutorial_step > TUTORIAL_NONE && ent->client->pers.tutorial_step < MAX_TUTORIAL_STEPS && ent->client->pers.tutorial_timer < level.time)
 				{
@@ -9358,28 +9370,6 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.forceAllowDeactivateTime = level.time + 300;
 
 					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
-				}
-
-				// zyk: show current magic power when player gains or loses a certain amount of mp
-				if ((ent->client->pers.magic_power == 0 && ent->client->pers.magic_power != ent->client->pers.last_magic_power_shown) ||
-					(ent->client->pers.magic_power / MAGIC_CHANGE_AMOUNT) != (ent->client->pers.last_magic_power_shown / MAGIC_CHANGE_AMOUNT))
-				{
-					gentity_t* plum;
-					vec3_t plum_origin;
-
-					ent->client->pers.last_magic_power_shown = ent->client->pers.magic_power;
-
-					// zyk: use score plums to show the current mp
-					VectorSet(plum_origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + DEFAULT_MAXS_2);
-
-					plum = G_TempEntity(plum_origin, EV_SCOREPLUM);
-
-					// only send this temp entity to a single client
-					plum->r.svFlags |= SVF_SINGLECLIENT;
-					plum->r.singleClient = ent->s.number;
-
-					plum->s.otherEntityNum = ent->s.number;
-					plum->s.time = ent->client->pers.magic_power;
 				}
 
 				// zyk: spawn magic crystals and side quest stuff

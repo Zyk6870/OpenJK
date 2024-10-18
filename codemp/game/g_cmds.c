@@ -7962,6 +7962,8 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 	settings_descriptions[SETTINGS_ADMIN_PROTECT] = "Admin Protect";
 	settings_descriptions[SETTINGS_DIFFICULTY] = "Quest Difficulty";
 	settings_descriptions[SETTINGS_MAGIC_CRYSTALS] = "Spawn Quest Stuff in map";
+	settings_descriptions[SETTINGS_PICKUP_MAX_WEIGHT] = "Do not pick-up stuff in map above max weight";
+	settings_descriptions[SETTINGS_SHOW_MP_LEVEL] = "Red bar show Jetpack fuel or MP";
 
 	if (settings_value >= 0 && settings_value < MAX_PLAYER_SETTINGS)
 	{
@@ -7993,6 +7995,17 @@ char* zyk_get_settings(gentity_t* ent, zyk_settings_t settings_value)
 		else
 		{
 			strcpy(message, va("^3%s - %s ^2Normal", settings_value_string, zyk_get_settings_description(SETTINGS_DIFFICULTY)));
+		}
+	}
+	else if (settings_value == SETTINGS_SHOW_MP_LEVEL)
+	{
+		if (ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL))
+		{
+			strcpy(message, va("^3%s - %s ^1MP", settings_value_string, zyk_get_settings_description(SETTINGS_SHOW_MP_LEVEL)));
+		}
+		else
+		{
+			strcpy(message, va("^3%s - %s ^2Jetpack", settings_value_string, zyk_get_settings_description(SETTINGS_SHOW_MP_LEVEL)));
 		}
 	}
 	else

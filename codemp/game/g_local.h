@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.1.98"
+#define	GAMEVERSION	"New Zyk Mod v1.1.99"
 
 #define SECURITY_LOG "security.log"
 
@@ -531,6 +531,8 @@ typedef enum {
 	SETTINGS_ADMIN_PROTECT,
 	SETTINGS_DIFFICULTY,
 	SETTINGS_MAGIC_CRYSTALS,
+	SETTINGS_PICKUP_MAX_WEIGHT,
+	SETTINGS_SHOW_MP_LEVEL,
 	MAX_PLAYER_SETTINGS
 } zyk_settings_t;
 
@@ -841,9 +843,6 @@ typedef enum {
 
 // zyk: when casting magic, use anim for this amount of time in miliseconds
 #define MAGIC_ANIM_TIME 1400
-
-// zyk: show score plum when amount of magic power changes by this amount
-#define MAGIC_CHANGE_AMOUNT 50
 
 // zyk: magic power stats
 #define MAGIC_MIN_DMG 1

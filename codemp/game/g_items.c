@@ -2768,7 +2768,8 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 
 			if ((ent->item->giType == IT_WEAPON && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_WEAPONS)) ||
 				(ent->item->giType == IT_AMMO && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_AMMO)) ||
-				(ent->item->giType == IT_HOLDABLE && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_ITEMS)))
+				(ent->item->giType == IT_HOLDABLE && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_ITEMS)) || 
+				(!(other->client->pers.player_settings & (1 << SETTINGS_PICKUP_MAX_WEIGHT)) && other->client->pers.current_weight >= other->client->pers.max_weight))
 			{
 				return;
 			}
