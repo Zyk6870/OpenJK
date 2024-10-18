@@ -9240,7 +9240,7 @@ void G_RunFrame( int levelTime ) {
 					save_account(ent, qtrue);
 
 					// zyk: timer to save account to prevent too much file IO
-					ent->client->pers.save_stat_changes_timer = level.time + 500;
+					ent->client->pers.save_stat_changes_timer = level.time + SAVE_ACCOUNT_TIMER;
 				}
 
 				// zyk: Weapon Upgrades. Do not change weaponTime if player has no stamina

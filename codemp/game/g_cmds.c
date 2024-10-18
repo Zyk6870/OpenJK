@@ -306,7 +306,7 @@ char* zyk_skill_key(int skill_index)
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
-		return G_NewString(skill_names[skill_index]);
+		return skill_names[skill_index];
 	}
 
 	return "";
@@ -752,7 +752,7 @@ char* zyk_inventory_key(int inventory_index)
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
-		return G_NewString(inventory_item_names[inventory_index]);
+		return inventory_item_names[inventory_index];
 	}
 
 	return "";
@@ -2721,6 +2721,8 @@ void legacy_load_account(gentity_t* ent)
 		zyk_load_admin_only_mode_stuff(ent);
 
 		fclose(account_file);
+
+		ent->client->pers.save_stat_changes_timer = level.time + SAVE_ACCOUNT_TIMER;
 	}
 }
 
@@ -3000,6 +3002,8 @@ void load_account(gentity_t* ent)
 			zyk_load_admin_only_mode_stuff(ent);
 
 			fclose(account_file);
+
+			ent->client->pers.save_stat_changes_timer = level.time + SAVE_ACCOUNT_TIMER;
 		}
 		else
 		{ // zyk: char file could not be loaded
@@ -3027,7 +3031,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			client = ent->client;
 
-			strcpy(content, va("active_inventory_upgrades\n%d\ncredits\n%d", 
+			strcpy(content, va("active_inventory_upgrades\n%d\ncredits\n%d",
 				client->pers.active_inventory_upgrades, client->pers.credits));
 
 			strcpy(content, va("%s\nskill_levels", content));
@@ -3042,11 +3046,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 				strcpy(content, va("%s\n%s\n%d", content, zyk_inventory_key(i), client->pers.rpg_inventory[i]));
 			}
 
-			strcpy(content, va("%s\nquest_tries\n%d\nquest_defeated_enemies\n%d\nquest_masters_defeated\n%d\nquest_progress\n%d\nquest_missions\n%d", 
-				content, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress, client->pers.quest_missions));
-
-			strcpy(content, va("%s\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d\nlast_stamina\n%d\ntutorial_shown\n%d", 
-				content, client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina, client->pers.tutorial_shown));
+			strcpy(content, va("%s\nquest_tries\n%d\nquest_defeated_enemies\n%d\nquest_masters_defeated\n%d\nquest_progress\n%d\nquest_missions\n%d\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d\nlast_stamina\n%d\ntutorial_shown\n%d",
+				content, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress, client->pers.quest_missions, client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina, client->pers.tutorial_shown));
 
 			// zyk: saving all content into the file
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
@@ -6937,7 +6938,7 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT][1] = 2;
 
 	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][0] = 1;
-	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][1] = 0;
+	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][1] = 1;
 
 	if (buy_item == qtrue)
 	{
@@ -8256,22 +8257,22 @@ char* zyk_get_settings(gentity_t* ent, zyk_settings_t settings_value)
 	{
 		if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 		{
-			strcpy(message, va("^3%s - %s ^1Hard", settings_value_string, zyk_get_settings_description(SETTINGS_DIFFICULTY)));
+			strcpy(message, va("^3%s - %s - ^1Hard", settings_value_string, zyk_get_settings_description(SETTINGS_DIFFICULTY)));
 		}
 		else
 		{
-			strcpy(message, va("^3%s - %s ^2Normal", settings_value_string, zyk_get_settings_description(SETTINGS_DIFFICULTY)));
+			strcpy(message, va("^3%s - %s - ^2Normal", settings_value_string, zyk_get_settings_description(SETTINGS_DIFFICULTY)));
 		}
 	}
 	else if (settings_value == SETTINGS_SHOW_MP_LEVEL)
 	{
 		if (ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL))
 		{
-			strcpy(message, va("^3%s - %s ^1MP", settings_value_string, zyk_get_settings_description(SETTINGS_SHOW_MP_LEVEL)));
+			strcpy(message, va("^3%s - %s - ^1MP", settings_value_string, zyk_get_settings_description(SETTINGS_SHOW_MP_LEVEL)));
 		}
 		else
 		{
-			strcpy(message, va("^3%s - %s ^2Jetpack", settings_value_string, zyk_get_settings_description(SETTINGS_SHOW_MP_LEVEL)));
+			strcpy(message, va("^3%s - %s - ^2Jetpack", settings_value_string, zyk_get_settings_description(SETTINGS_SHOW_MP_LEVEL)));
 		}
 	}
 	else
