@@ -1496,8 +1496,14 @@ void G_Kill( gentity_t *ent ) {
 		}
 	}
 
+	// zyk: pointers must be valid
+	if (!ent || !(ent->client))
+	{
+		return;
+	}
+
 	// zyk: target has been paralyzed by an admin
-	if (ent && ent->client && !ent->NPC && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_PARALYZED))
+	if (!ent->NPC && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_PARALYZED))
 		return;
 
 	ent->flags &= ~FL_GODMODE;
@@ -2611,6 +2617,7 @@ void legacy_load_account(gentity_t* ent)
 {
 	FILE* account_file;
 	char content[128];
+	int read_status = 0;
 	int i = 0;
 
 	strcpy(content, "");
@@ -2620,25 +2627,35 @@ void legacy_load_account(gentity_t* ent)
 	if (account_file != NULL)
 	{
 		// zyk: loading Skillpoints value
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.active_inventory_upgrades = atoi(content);
 
 		// zyk: loading skill levels
 		for (i = 0; i < NUMBER_OF_SKILLS; i++)
 		{
-			fscanf(account_file, "%s", content);
+			read_status = fscanf(account_file, "%s", content);
 			ent->client->pers.skill_levels[i] = atoi(content);
+
+			if (i == 41)
+			{ // zyk: this method of loading accounts still didnt have new skills
+				break;
+			}
 		}
 
 		// zyk: loading RPG inventory
 		for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 		{
-			fscanf(account_file, "%s", content);
+			read_status = fscanf(account_file, "%s", content);
 			ent->client->pers.rpg_inventory[i] = atoi(content);
+
+			if (i == 64)
+			{ // zyk: this method of loading accounts still didnt have new inventory items
+				break;
+			}
 		}
 
 		// zyk: loading credits value
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.credits = atoi(content);
 
 		// zyk: validating credits
@@ -2652,39 +2669,39 @@ void legacy_load_account(gentity_t* ent)
 		}
 
 		// zyk: quest fields
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.quest_tries = atoi(content);
 
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.quest_defeated_enemies = atoi(content);
 
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.quest_masters_defeated = atoi(content);
 
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.quest_progress = atoi(content);
 
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.quest_missions = atoi(content);
 
 		// zyk: last health
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.last_health = atoi(content);
 
 		// zyk: last shield
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.last_shield = atoi(content);
 
 		// zyk: last mp
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.last_mp = atoi(content);
 
 		// zyk: last stamina
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.last_stamina = atoi(content);
 
 		// zyk: tutorial shown
-		fscanf(account_file, "%s", content);
+		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.tutorial_shown = atoi(content);
 
 		zyk_load_admin_only_mode_stuff(ent);
@@ -2804,6 +2821,18 @@ void load_account(gentity_t* ent)
 				return;
 			}
 
+			// zyk: initializing skills and inventory items
+			for (i = 0; i < NUMBER_OF_SKILLS; i++)
+			{
+				ent->client->pers.skill_levels[i] = 0;
+			}
+
+			for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+			{
+				ent->client->pers.rpg_inventory[i] = 0;
+			}
+
+			// zyk: reading the rest of the account file
 			while (read_status != EOF)
 			{
 				qboolean read_content_type = qtrue;
@@ -6070,6 +6099,7 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 		char arg2[MAX_STRING_CHARS];
 		char password[32];
 		int i = 0;
+		int read_status = 0;
 		FILE *account_file;
 		gentity_t *player_ent = NULL;
 
@@ -6122,7 +6152,7 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 		}
 
 		// zyk: validating password
-		fscanf(account_file,"%s",password);
+		read_status = fscanf(account_file,"%s",password);
 		fclose(account_file);
 
 		password_encrypt(arg2, 0xFACE);
@@ -6360,8 +6390,9 @@ void Cmd_ZykMod_f( gentity_t *ent ) {
 char *zyk_get_rpg_chars(gentity_t *ent, char *separator)
 {
 	FILE *chars_file;
-	char content[64];
+	char content[128];
 	char chars[MAX_STRING_CHARS];
+	int read_status = 0;
 	int i = 0;
 
 	strcpy(content, "");
@@ -8994,6 +9025,7 @@ void Cmd_RemapLoad_f( gentity_t *ent ) {
 	char new_shader[128];
 	char time_offset[128];
 	FILE *remap_file = NULL;
+	int read_status = 0;
 
 	if (!(ent->client->pers.bitvalue & (1 << ADM_ENTITYSYSTEM)))
 	{ // zyk: admin command
@@ -9031,8 +9063,8 @@ void Cmd_RemapLoad_f( gentity_t *ent ) {
 	{
 		while(fscanf(remap_file,"%s",old_shader) != EOF)
 		{
-			fscanf(remap_file,"%s",new_shader);
-			fscanf(remap_file,"%s",time_offset);
+			read_status = fscanf(remap_file,"%s",new_shader);
+			read_status = fscanf(remap_file,"%s",time_offset);
 
 			AddRemap(G_NewString(old_shader), G_NewString(new_shader), atof(time_offset));
 		}

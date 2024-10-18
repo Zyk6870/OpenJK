@@ -894,12 +894,13 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	vmCvar_t	mapname;
 	vmCvar_t	ckSum;
 	char serverinfo[MAX_INFO_STRING] = {0};
-	// zyk: variable used in the SP buged maps fix
+	// zyk: variable used in the SP bugged maps fix
 	char zyk_mapname[128] = {0};
 	FILE *zyk_entities_file = NULL;
 	FILE *zyk_remap_file = NULL;
 	FILE *zyk_duel_arena_file = NULL;
 	FILE *zyk_melee_arena_file = NULL;
+	int read_status = 0;
 
 	//Init RMG to 0, it will be autoset to 1 if there is terrain on the level.
 	trap->Cvar_Set("RMG", "0");
@@ -2216,8 +2217,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 		while(fscanf(zyk_remap_file,"%s",old_shader) != EOF)
 		{
-			fscanf(zyk_remap_file,"%s",new_shader);
-			fscanf(zyk_remap_file,"%s",time_offset);
+			read_status = fscanf(zyk_remap_file,"%s",new_shader);
+			read_status = fscanf(zyk_remap_file,"%s",time_offset);
 
 			AddRemap(G_NewString(old_shader), G_NewString(new_shader), atof(time_offset));
 		}
@@ -2235,13 +2236,13 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 		strcpy(duel_arena_content, "");
 
-		fscanf(zyk_duel_arena_file, "%s", duel_arena_content);
+		read_status = fscanf(zyk_duel_arena_file, "%s", duel_arena_content);
 		level.duel_tournament_origin[0] = atoi(duel_arena_content);
 
-		fscanf(zyk_duel_arena_file, "%s", duel_arena_content);
+		read_status = fscanf(zyk_duel_arena_file, "%s", duel_arena_content);
 		level.duel_tournament_origin[1] = atoi(duel_arena_content);
 
-		fscanf(zyk_duel_arena_file, "%s", duel_arena_content);
+		read_status = fscanf(zyk_duel_arena_file, "%s", duel_arena_content);
 		level.duel_tournament_origin[2] = atoi(duel_arena_content);
 
 		fclose(zyk_duel_arena_file);
@@ -2257,13 +2258,13 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 		strcpy(melee_arena_content, "");
 
-		fscanf(zyk_melee_arena_file, "%s", melee_arena_content);
+		read_status = fscanf(zyk_melee_arena_file, "%s", melee_arena_content);
 		level.melee_mode_origin[0] = atoi(melee_arena_content);
 
-		fscanf(zyk_melee_arena_file, "%s", melee_arena_content);
+		read_status = fscanf(zyk_melee_arena_file, "%s", melee_arena_content);
 		level.melee_mode_origin[1] = atoi(melee_arena_content);
 
-		fscanf(zyk_melee_arena_file, "%s", melee_arena_content);
+		read_status = fscanf(zyk_melee_arena_file, "%s", melee_arena_content);
 		level.melee_mode_origin[2] = atoi(melee_arena_content);
 
 		fclose(zyk_melee_arena_file);
@@ -6711,7 +6712,7 @@ qboolean duel_tournament_validate_duelists()
 	second_valid_ally = duel_tournament_valid_duelist(second_duelist_ally);
 
 	// zyk: if the main team members (the ones saved in level.duel_matches) of each team are no longer valid, make the ally a main member
-	if (first_valid == qfalse && first_valid_ally == qtrue)
+	if (first_valid == qfalse && first_valid_ally == qtrue && level.duelist_1_ally_id >= 0 && level.duelist_1_ally_id < MAX_CLIENTS)
 	{
 		level.duel_matches[level.duel_matches_done][0] = level.duelist_1_ally_id;
 
@@ -6725,7 +6726,7 @@ qboolean duel_tournament_validate_duelists()
 		first_duelist_ally = NULL;
 	}
 
-	if (second_valid == qfalse && second_valid_ally == qtrue)
+	if (second_valid == qfalse && second_valid_ally == qtrue && level.duelist_2_ally_id >= 0 && level.duelist_2_ally_id < MAX_CLIENTS)
 	{
 		level.duel_matches[level.duel_matches_done][1] = level.duelist_2_ally_id;
 

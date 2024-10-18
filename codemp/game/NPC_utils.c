@@ -1222,8 +1222,8 @@ qboolean NPC_ValidEnemy( gentity_t *ent )
 		}
 	}
 	//Can't be on the same team
-	if ( ent->client->playerTeam == NPCS.NPC->client->playerTeam )
-	{
+	if (NPCS.NPC->client && ent->client->playerTeam == NPCS.NPC->client->playerTeam )
+	{ // zyk: added the first condition, must be a valid client pointer
 		// zyk: npc received order to guard or cover, attack anyone besides the player or his allies
 		if (NPCS.NPC->client->pers.player_statuses & (1 << PLAYER_STATUS_NPC_ORDER_GUARD) || NPCS.NPC->client->pers.player_statuses & (1 << PLAYER_STATUS_NPC_ORDER_COVER))
 		{
@@ -1238,11 +1238,15 @@ qboolean NPC_ValidEnemy( gentity_t *ent )
 	//if ( NPCInfo->enemyLastSeenTime != 0 && level.time - NPCInfo->enemyLastSeenTime > 7000 )//FIXME: make a stat?
 		//return qfalse;
 
-	if ( entTeam == NPCS.NPC->client->enemyTeam //simplest case: they're on my enemy team
-		|| (NPCS.NPC->client->enemyTeam == NPCTEAM_FREE && ent->client->NPC_class != NPCS.NPC->client->NPC_class )//I get mad at anyone and this guy isn't the same class as me
+	if ( (NPCS.NPC->client && entTeam == NPCS.NPC->client->enemyTeam) //simplest case: they're on my enemy team
+		|| (NPCS.NPC->client && NPCS.NPC->client->enemyTeam == NPCTEAM_FREE && ent->client->NPC_class != NPCS.NPC->client->NPC_class )//I get mad at anyone and this guy isn't the same class as me
 		|| (ent->client->NPC_class == CLASS_WAMPA && ent->enemy )//a rampaging wampa
 		|| (ent->client->NPC_class == CLASS_RANCOR && ent->enemy )//a rampaging rancor
-		|| (entTeam == NPCTEAM_FREE && ent->client->enemyTeam == NPCTEAM_FREE && ent->enemy && ent->enemy->client && (ent->enemy->client->playerTeam == NPCS.NPC->client->playerTeam||(ent->enemy->client->playerTeam != NPCTEAM_ENEMY&&NPCS.NPC->client->playerTeam==NPCTEAM_PLAYER))) //enemy is a rampaging non-aligned creature who is attacking someone on our team or a non-enemy (this last condition is used only if we're a good guy - in effect, we protect the innocent)
+		|| (entTeam == NPCTEAM_FREE && ent->client->enemyTeam == NPCTEAM_FREE && ent->enemy && ent->enemy->client && 
+			((NPCS.NPC->client && ent->enemy->client->playerTeam == NPCS.NPC->client->playerTeam) || // zyk: added conditions to test if NPCS.NPC->client pointer is valid
+			 (ent->enemy->client->playerTeam != NPCTEAM_ENEMY && NPCS.NPC->client && NPCS.NPC->client->playerTeam==NPCTEAM_PLAYER)
+			)
+		   ) //enemy is a rampaging non-aligned creature who is attacking someone on our team or a non-enemy (this last condition is used only if we're a good guy - in effect, we protect the innocent)
 		)
 	{
 		return qtrue;
@@ -1714,7 +1718,9 @@ qboolean NPC_CheckLookTarget( gentity_t *self )
 	{
 		if ( self->client->renderInfo.lookTarget >= 0 && self->client->renderInfo.lookTarget < ENTITYNUM_WORLD )
 		{//within valid range
-			if ( (&g_entities[self->client->renderInfo.lookTarget] == NULL) || !g_entities[self->client->renderInfo.lookTarget].inuse )
+			gentity_t* this_target = &g_entities[self->client->renderInfo.lookTarget]; // zyk: added this to rewrite some code below
+
+			if ( (this_target == NULL) || !this_target->inuse )
 			{//lookTarget not inuse or not valid anymore
 				NPC_ClearLookTarget( self );
 			}
@@ -1722,7 +1728,7 @@ qboolean NPC_CheckLookTarget( gentity_t *self )
 			{//Time to clear lookTarget
 				NPC_ClearLookTarget( self );
 			}
-			else if ( g_entities[self->client->renderInfo.lookTarget].client && self->enemy && (&g_entities[self->client->renderInfo.lookTarget] != self->enemy) )
+			else if (this_target->client && self->enemy && (this_target != self->enemy) )
 			{//should always look at current enemy if engaged in battle... FIXME: this could override certain scripted lookTargets...???
 				NPC_ClearLookTarget( self );
 			}

@@ -711,8 +711,7 @@ void TossClientItems( gentity_t *self ) {
 					continue;
 				}
 
-				// zyk: RPG players cannot drop force enlightments because they are now used as the effect when using Special Powers
-				// and cannot drop neutral flag and quad because they are used by Unique Skill
+				// zyk: RPG players cannot drop force enlightments
 				if (item->giType == IT_POWERUP && 
 					(item->giTag == PW_FORCE_ENLIGHTENED_LIGHT || item->giTag == PW_FORCE_ENLIGHTENED_DARK) && 
 					self->client->sess.amrpgmode == 2)
@@ -2083,12 +2082,17 @@ void G_CheckVictoryScript(gentity_t *self)
 {
 	if ( !G_ActivateBehavior( self, BSET_VICTORY ) )
 	{
+		if (!self)
+		{ // zyk: must not be NULL
+			return;
+		}
+
 		if ( self->NPC && self->s.weapon == WP_SABER )
 		{//Jedi taunt from within their AI
 			self->NPC->blockedSpeechDebounceTime = 0;//get them ready to taunt
 			return;
 		}
-		if ( self->client && self->client->NPC_class == CLASS_GALAKMECH )
+		if ( self->client && self->NPC && self->client->NPC_class == CLASS_GALAKMECH )
 		{
 			self->wait = 1;
 			TIMER_Set( self, "gloatTime", Q_irand( 5000, 8000 ) );
@@ -2228,6 +2232,11 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	qboolean	wasJediMaster = qfalse;
 	int			sPMType = 0;
 	char		buf[512] = { 0 };
+
+	if (!self || !(self->client))
+	{
+		return;
+	}
 
 	if (self->client->ps.pm_type == PM_DEAD) {
 		return;
@@ -3767,6 +3776,11 @@ void G_Dismember( gentity_t *ent, gentity_t *enemy, vec3_t point, int limbType, 
 	char	stubName[MAX_QPATH];
 	char	stubCapName[MAX_QPATH];
 
+	if (!ent)
+	{ // zyk: must be a valid pointer
+		return;
+	}
+
 	if (limbType == G2_MODELPART_HEAD)
 	{
 		Q_strncpyz( limbName , "head", sizeof( limbName  ) );
@@ -3937,7 +3951,8 @@ void G_Dismember( gentity_t *ent, gentity_t *enemy, vec3_t point, int limbType, 
 		trap->G2API_SetSurfaceOnOff(ent->ghoul2, stubCapName, 0);
 	}
 
-	if ( level.gametype >= GT_TEAM && ent->s.eType != ET_NPC )
+	// zyk: must have a valid client pointer
+	if (level.gametype >= GT_TEAM && ent->s.eType != ET_NPC && ent->client)
 	{//Team game
 		switch ( ent->client->sess.sessionTeam )
 		{
