@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.2.0"
+#define	GAMEVERSION	"New Zyk Mod v1.2.1"
 
 #define SECURITY_LOG "security.log"
 
@@ -858,6 +858,9 @@ typedef enum {
 
 // zyk: max characters an account or rpg char can have
 #define MAX_ACC_NAME_SIZE 30
+
+// zyk: account buffer used to save info into the player account file
+#define SAVE_ACCOUNT_BUFFER 4096
 
 // zyk: max jetpack fuel the player can have
 #define MAX_JETPACK_FUEL 500

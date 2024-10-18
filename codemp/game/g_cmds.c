@@ -255,6 +255,495 @@ char* zyk_skill_description(int skill_index)
 	return "";
 }
 
+char* zyk_skill_key(int skill_index)
+{
+	char* skill_names[NUMBER_OF_SKILLS];
+
+	skill_names[SKILL_JUMP] = "skilljump";
+	skill_names[SKILL_PUSH] = "skillpush";
+	skill_names[SKILL_PULL] = "skillpull";
+	skill_names[SKILL_SPEED] = "skillspeed";
+	skill_names[SKILL_SENSE] = "skillsense";
+	skill_names[SKILL_SABER_ATTACK] = "skillsaberattack";
+	skill_names[SKILL_SABER_DEFENSE] = "skillsaberdefense";
+	skill_names[SKILL_SABER_THROW] = "skillsaberthrow";
+	skill_names[SKILL_ABSORB] = "skillabsorb";
+	skill_names[SKILL_HEAL] = "skillheal";
+	skill_names[SKILL_PROTECT] = "skillprotect";
+	skill_names[SKILL_MIND_TRICK] = "skillmindtrick";
+	skill_names[SKILL_TEAM_HEAL] = "skillteamheal";
+	skill_names[SKILL_LIGHTNING] = "skilllightning";
+	skill_names[SKILL_GRIP] = "skillgrip";
+	skill_names[SKILL_DRAIN] = "skilldrain";
+	skill_names[SKILL_RAGE] = "skillrage";
+	skill_names[SKILL_TEAM_ENERGIZE] = "skillteamenergize";
+	skill_names[SKILL_SENSE_HEALTH] = "skillsensehealth";
+	skill_names[SKILL_SHIELD_HEALING] = "skillshieldhealing";
+	skill_names[SKILL_FASTER_FORCE_REGEN] = "skillfasterforceregen";
+	skill_names[SKILL_FORCE_POWER] = "skillforcepower";
+
+	skill_names[SKILL_MAX_HEALTH] = "skillmaxhealth";
+	skill_names[SKILL_HEALTH_STRENGTH] = "skillhealthstrength";
+	skill_names[SKILL_MELEE] = "skillmelee";
+	skill_names[SKILL_MELEE_SPEED] = "skillmeleepunchspeed";
+	skill_names[SKILL_SABER] = "skillsaberdamage";
+	skill_names[SKILL_WEAPON_DAMAGE] = "skillweapondamage";
+	skill_names[SKILL_MAX_WEIGHT] = "skillmaxweight";
+	skill_names[SKILL_MAX_STAMINA] = "skillmaxstamina";
+	skill_names[SKILL_UNDERWATER] = "skillunderwater";
+	skill_names[SKILL_RUN_SPEED] = "skillrunspeed";
+
+	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
+	skill_names[SKILL_MAX_MP] = "skillmaxmagicpoints";
+	skill_names[SKILL_MAGIC_HEALING_AREA] = "skillhealingarea";
+	skill_names[SKILL_MAGIC_MAGIC_DOME] = "skillmagicdome";
+	skill_names[SKILL_MAGIC_WATER_MAGIC] = "skillwatermagic";
+	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "skillearthmagic";
+	skill_names[SKILL_MAGIC_FIRE_MAGIC] = "skillfiremagic";
+	skill_names[SKILL_MAGIC_AIR_MAGIC] = "skillairmagic";
+	skill_names[SKILL_MAGIC_DARK_MAGIC] = "skilldarkmagic";
+	skill_names[SKILL_MAGIC_LIGHT_MAGIC] = "skilllightmagic";
+
+	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
+	{
+		return G_NewString(skill_names[skill_index]);
+	}
+
+	return "";
+}
+
+char* zyk_get_inventory_item_name(int inventory_index)
+{
+	char* inventory_item_names[MAX_RPG_INVENTORY_ITEMS];
+
+	inventory_item_names[RPG_INVENTORY_WP_STUN_BATON] = "Stun Baton";
+	inventory_item_names[RPG_INVENTORY_WP_SABER] = "Saber";
+	inventory_item_names[RPG_INVENTORY_WP_BLASTER_PISTOL] = "Blaster Pistol";
+	inventory_item_names[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] = "E11 Blaster Rifle";
+	inventory_item_names[RPG_INVENTORY_WP_DISRUPTOR] = "Disruptor";
+	inventory_item_names[RPG_INVENTORY_WP_BOWCASTER] = "Bowcaster";
+	inventory_item_names[RPG_INVENTORY_WP_REPEATER] = "Repeater";
+	inventory_item_names[RPG_INVENTORY_WP_DEMP2] = "DEMP2";
+	inventory_item_names[RPG_INVENTORY_WP_FLECHETTE] = "Flechette";
+	inventory_item_names[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = "Rocket Launcher";
+	inventory_item_names[RPG_INVENTORY_WP_CONCUSSION] = "Concussion";
+	inventory_item_names[RPG_INVENTORY_WP_BRYAR_PISTOL] = "Bryar Pistol";
+
+	inventory_item_names[RPG_INVENTORY_AMMO_BLASTER_PACK] = "Blaster Pack Ammo";
+	inventory_item_names[RPG_INVENTORY_AMMO_POWERCELL] = "Powercell Ammo";
+	inventory_item_names[RPG_INVENTORY_AMMO_METAL_BOLTS] = "Metal Bolts Ammo";
+	inventory_item_names[RPG_INVENTORY_AMMO_ROCKETS] = "Rockets Ammo";
+	inventory_item_names[RPG_INVENTORY_AMMO_THERMALS] = "Thermals";
+	inventory_item_names[RPG_INVENTORY_AMMO_TRIPMINES] = "Trip Mines";
+	inventory_item_names[RPG_INVENTORY_AMMO_DETPACKS] = "Detpacks";
+
+	inventory_item_names[RPG_INVENTORY_ITEM_BINOCULARS] = "Binoculars";
+	inventory_item_names[RPG_INVENTORY_ITEM_BACTA_CANISTER] = "Bacta Canister";
+	inventory_item_names[RPG_INVENTORY_ITEM_SENTRY_GUN] = "Sentry Gun";
+	inventory_item_names[RPG_INVENTORY_ITEM_SEEKER_DRONE] = "Seeker Drone";
+	inventory_item_names[RPG_INVENTORY_ITEM_EWEB] = "E-Web";
+	inventory_item_names[RPG_INVENTORY_ITEM_BIG_BACTA] = "Big Bacta";
+	inventory_item_names[RPG_INVENTORY_ITEM_FORCE_FIELD] = "Force Field";
+	inventory_item_names[RPG_INVENTORY_ITEM_CLOAK] = "Cloak Item";
+	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "Jetpack";
+
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BACTA] = "Bacta Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "Force Field Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "Shield Generator";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = "Impact Reducer Armor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = "Deflective Armor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = "Saber Armor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "Flame Thrower";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "Stun Baton Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = "Blaster Pistol Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = "Bryar Pistol Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] = "E11 Blaster Rifle Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_DISRUPTOR] = "Disruptor Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BOWCASTER] = "Bowcaster Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_DEMP2] = "DEMP2 Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_REPEATER] = "Repeater Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_FLECHETTE] = "Flechette Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_CONCUSSION] = "Concussion Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = "Rocket Launcher Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_EXPLOSIVE] = "Explosive Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "Jetpack Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = "Thermal Vision";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "Sentry Gun Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
+
+	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "Blue Crystal";
+	inventory_item_names[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = "Green Crystal";
+	inventory_item_names[RPG_INVENTORY_MISC_RED_CRYSTAL] = "Red Crystal";
+
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = "Magic Armor";
+
+	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "Jetpack Fuel";
+	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "Flame Thrower Fuel";
+	inventory_item_names[RPG_INVENTORY_MISC_MAGIC_SHIELD] = "Magic Shield";
+	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
+	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
+	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
+
+	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
+	{
+		return G_NewString(inventory_item_names[inventory_index]);
+	}
+
+	return "";
+}
+
+void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
+{
+	if (item_index == RPG_INVENTORY_AMMO_BLASTER_PACK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for E11 Blaster Rifle, Blaster Pistol and Bryar Pistol weapons\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_POWERCELL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Disruptor, Bowcaster and DEMP2 weapons\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_METAL_BOLTS)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Repeater, Flechette and Concussion Rifle weapons\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_ROCKETS)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Rocket Launcher weapon\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_THERMALS)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7thermal detonators\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_TRIPMINES)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7trip mines\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_AMMO_DETPACKS)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7det packs\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_FLAME_THROWER_FUEL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7fuel for the flame thrower\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_SENTRY_GUN)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable gun which is placed in the ground and shoots nearby enemies\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable remote drone that shoots enemies at sight\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_BACTA_CANISTER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_FORCE_FIELD)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7creates a force field wall in front of the player that can hold almost any attack, except the concussion rifle alternate fire, which can get through\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_BIG_BACTA)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina. Recovers double the amount of a Bacta Canister\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_EWEB)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable emplaced gun\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_BINOCULARS)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to see far things better with the zoom feature\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_JETPACK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to fly. Jump and press Use Key to use it\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_CLOAK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to cloak himself. Npcs cannot detect you unless close enough\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_BLASTER_PISTOL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7pistol that can shoot a charged shot with alt fire. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_BRYAR_PISTOL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7similar to blaster pistol, but has a faster fire rate with normal fire. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_E11_BLASTER_RIFLE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Rifle that is used by the stormtroopers. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_DISRUPTOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Sniper rifle which can desintegrate the enemy. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_BOWCASTER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots green bolts, normal fire can be charged, and alt fire shoots a bouncing bolt. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_DEMP2)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7fires an electro magnetic pulse that causes bonus damage against droids. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_REPEATER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7imperial weapon that shoots orbs and a plasma bomb with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_FLECHETTE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7it is the shotgun of the game, and can shoot 2 bombs with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_CONCUSSION)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7powerful weapon, alt fire can shoot a beam that gets through force fields. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_ROCKET_LAUNCHER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots rockets and a homing missile with alternate fire. Uses rockets ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_SABER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the weapon of a Jedi/Sith. With single, each Saber Attack skill level gives new saber stances. With duals/staff the Saber Attack skill level gives more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_WP_STUN_BATON)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that fires a small electric charge\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_JETPACK_FUEL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7jetpack fuel\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister and Big Bacta recovers more HP, more MP and more Stamina\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_FORCE_FIELD)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Force Field resists more damage. Allows getting them back pressing Use Key on them. Doing so requires some powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_CLOAK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Cloak Item will be able to cloak vehicles. Press Saber Stance key when riding a vehicle to cloak it. Also, when you are cloaked, npcs will only be able to detect you at a closer distance\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to restore his shield\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source by 10 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 20 per cent weapon/melee damage to your health (only 5 per cent from saber) and has a chance to deflect some weapon shots\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_SABER_ARMOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 5 per cent weapon/melee damage to your health (20 per cent from saber)\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7gives you the flame thrower. To use it, get stun baton and use alternate fire\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Increases Blaster Pistol firerate. Upgrade ^32^7: quickdraw. If shooting with pistol right after changing weapon to it, shoots a full charged shot\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Increases Bryar Pistol firerate. Upgrade ^32^7: Altfire can charge more for more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: E11 Blaster Rifle altfire has less spread and faster firerate. Upgrade ^32^7: has a chance to make target burn\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases Disruptor firerate. Upgrade ^32^7: altfire full charged shot has a lot more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times. Upgrade ^32^7: shots have a chance to poison targets\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases firerate of DEMP2 main fire. Upgrade ^32^7: primary and altfire shots can stun targets for a longer time\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases accuracy of primary fire and firerate of Repeater altfire. Upgrade ^32^7: altfire has chance to knockdown targets based on distance to the impact\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases number of bolts shot by Flechette primary and alt fires. Upgrade ^32^7: primary fire shots cause bleeding damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Concussion rifle has better splash radius, can break saber-only damage objects and can move pushable/pullable objects. Upgrade ^32^7: altfire stronger knockdown and for a longer time\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: increases firerate of primary fire\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_EXPLOSIVE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: makes thermals, trip mines and detpacks have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: thermals, trip mines and detpacks create a fire area when explosive, making targets catch fire\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases jetpack fuel consumption a bit and makes the jetpack more stable and faster\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_THERMAL_VISION)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes binoculars detect enemies through a thermal vision system\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_SENTRY_GUN)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes Sentry Gun have more health and damage and detect enemies at a greater distance. Allows getting sentry guns back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_SEEKER_DRONE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes seeker drone shoot faster and with more damage. It also lasts longer\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_EWEB)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes E-Web have more health and damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, magic crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. You must find all 3 parts to use it. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a magic crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. If you find him, he can give it to you. Has very useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any non-magic source by 5 per cent. If the source is Magic Fist or a magic power, decreases damage by 20 per cent and absorb it to regen magic points. Reduces all magic powers mp cost. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. Used to upgrade skills. The ones you keep in your inventory increase the chance for main quest events and for side quest events to happen. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. Give extra tries for the main quest. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Damage is based on the amount of Green Crystals. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7prevents being hit my magic powers. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_MAGIC_SHIELD));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_SHIELD_BOOSTER));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you immune to force powers for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_YSALAMIRI));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_FORCE_BOON));
+	}
+}
+
+char* zyk_inventory_key(int inventory_index)
+{
+	char* inventory_item_names[MAX_RPG_INVENTORY_ITEMS];
+
+	inventory_item_names[RPG_INVENTORY_WP_STUN_BATON] = "inventoryStunBaton";
+	inventory_item_names[RPG_INVENTORY_WP_SABER] = "inventorySaber";
+	inventory_item_names[RPG_INVENTORY_WP_BLASTER_PISTOL] = "inventoryBlasterPistol";
+	inventory_item_names[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] = "inventoryE11BlasterRifle";
+	inventory_item_names[RPG_INVENTORY_WP_DISRUPTOR] = "inventoryDisruptor";
+	inventory_item_names[RPG_INVENTORY_WP_BOWCASTER] = "inventoryBowcaster";
+	inventory_item_names[RPG_INVENTORY_WP_REPEATER] = "inventoryRepeater";
+	inventory_item_names[RPG_INVENTORY_WP_DEMP2] = "inventoryDEMP2";
+	inventory_item_names[RPG_INVENTORY_WP_FLECHETTE] = "inventoryFlechette";
+	inventory_item_names[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = "inventoryRocketLauncher";
+	inventory_item_names[RPG_INVENTORY_WP_CONCUSSION] = "inventoryConcussion";
+	inventory_item_names[RPG_INVENTORY_WP_BRYAR_PISTOL] = "inventoryBryarPistol";
+
+	inventory_item_names[RPG_INVENTORY_AMMO_BLASTER_PACK] = "inventoryBlasterPackAmmo";
+	inventory_item_names[RPG_INVENTORY_AMMO_POWERCELL] = "inventoryPowercellAmmo";
+	inventory_item_names[RPG_INVENTORY_AMMO_METAL_BOLTS] = "inventoryMetalBoltsAmmo";
+	inventory_item_names[RPG_INVENTORY_AMMO_ROCKETS] = "inventoryRocketsAmmo";
+	inventory_item_names[RPG_INVENTORY_AMMO_THERMALS] = "inventoryThermals";
+	inventory_item_names[RPG_INVENTORY_AMMO_TRIPMINES] = "inventoryTripMines";
+	inventory_item_names[RPG_INVENTORY_AMMO_DETPACKS] = "inventoryDetpacks";
+
+	inventory_item_names[RPG_INVENTORY_ITEM_BINOCULARS] = "inventoryBinoculars";
+	inventory_item_names[RPG_INVENTORY_ITEM_BACTA_CANISTER] = "inventoryBactaCanister";
+	inventory_item_names[RPG_INVENTORY_ITEM_SENTRY_GUN] = "inventorySentryGun";
+	inventory_item_names[RPG_INVENTORY_ITEM_SEEKER_DRONE] = "inventorySeekerDrone";
+	inventory_item_names[RPG_INVENTORY_ITEM_EWEB] = "inventoryEWeb";
+	inventory_item_names[RPG_INVENTORY_ITEM_BIG_BACTA] = "inventoryBigBacta";
+	inventory_item_names[RPG_INVENTORY_ITEM_FORCE_FIELD] = "inventoryForceField";
+	inventory_item_names[RPG_INVENTORY_ITEM_CLOAK] = "inventoryCloakItem";
+	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "inventoryJetpack";
+
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BACTA] = "inventoryBactaUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "inventoryForceFieldUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "inventoryCloakItemUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "inventoryShieldGenerator";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = "inventoryImpactReducerArmor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = "inventoryDeflectiveArmor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = "inventorySaberArmor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "inventoryFlameThrower";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "inventoryStunBatonUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = "inventoryBlasterPistolUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = "inventoryBryarPistolUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] = "inventoryE11BlasterRifleUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_DISRUPTOR] = "inventoryDisruptorUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_BOWCASTER] = "inventoryBowcasterUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_DEMP2] = "inventoryDEMP2Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_REPEATER] = "inventoryRepeaterUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_FLECHETTE] = "inventoryFlechetteUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_CONCUSSION] = "inventoryConcussionUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = "inventoryRocketLauncherUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_EXPLOSIVE] = "inventoryExplosiveUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "inventoryJetpackUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = "inventoryThermalVision";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "inventorySentryGunUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "inventorySeekerDroneUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "inventoryEWebUpgrade";
+
+	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "inventoryBlueCrystal";
+	inventory_item_names[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = "inventoryGreenCrystal";
+	inventory_item_names[RPG_INVENTORY_MISC_RED_CRYSTAL] = "inventoryRedCrystal";
+
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "inventoryQuestLog";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = "inventoryMagicArmor";
+
+	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "inventoryJetpackFuel";
+	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "inventoryFlameThrowerFuel";
+	inventory_item_names[RPG_INVENTORY_MISC_MAGIC_SHIELD] = "inventoryMagicShield";
+	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "inventoryShieldBooster";
+	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "inventoryYsalamiri";
+	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "inventoryForceBoon";
+
+	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
+	{
+		return G_NewString(inventory_item_names[inventory_index]);
+	}
+
+	return "";
+}
+
 /*
 ==================
 DeathmatchScoreboardMessage
@@ -2317,6 +2806,8 @@ void load_account(gentity_t* ent)
 
 			while (read_status != EOF)
 			{
+				qboolean read_content_type = qtrue;
+
 				if (Q_stricmp(content_type, "active_inventory_upgrades") == 0)
 				{
 					read_status = fscanf(account_file, "%s", content);
@@ -2339,37 +2830,72 @@ void load_account(gentity_t* ent)
 				}
 				else if (Q_stricmp(content_type, "skill_levels") == 0)
 				{
-					for (i = 0; i < NUMBER_OF_SKILLS; i++)
-					{
-						read_status = fscanf(account_file, "%s", content);
+					read_status = fscanf(account_file, "%s", content_type);
 
-						if (string_is_an_integer(content) == qtrue)
+					if (string_is_an_integer(content_type) == qtrue)
+					{ // zyk: old way of reading skill levels
+						for (i = 0; i < NUMBER_OF_SKILLS; i++)
 						{
-							ent->client->pers.skill_levels[i] = atoi(content);
-						}
-						else
-						{
-							strcpy(content_type, content);
-							continue;
+							ent->client->pers.skill_levels[i] = atoi(content_type);
+
+							read_status = fscanf(account_file, "%s", content_type);
 						}
 					}
+					else
+					{
+						while (strstr(content_type, "skill"))
+						{
+							read_status = fscanf(account_file, "%s", content);
+
+							// zyk: search the correct index to set this value
+							for (i = 0; i < NUMBER_OF_SKILLS; i++)
+							{
+								if (Q_stricmp(content_type, zyk_skill_key(i)) == 0)
+								{ // zyk: found the key name
+									ent->client->pers.skill_levels[i] = atoi(content);
+									break;
+								}
+							}
+
+							read_status = fscanf(account_file, "%s", content_type);
+						}
+					}
+
+					read_content_type = qfalse;
 				}
 				else if (Q_stricmp(content_type, "rpg_inventory") == 0)
 				{
-					for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
-					{
-						read_status = fscanf(account_file, "%s", content);
+					read_status = fscanf(account_file, "%s", content_type);
 
-						if (string_is_an_integer(content) == qtrue)
+					if (string_is_an_integer(content_type) == qtrue)
+					{ // zyk: old way of reading inventory
+						for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 						{
-							ent->client->pers.rpg_inventory[i] = atoi(content);
-						}
-						else
-						{
-							strcpy(content_type, content);
-							continue;
+							ent->client->pers.rpg_inventory[i] = atoi(content_type);
+
+							read_status = fscanf(account_file, "%s", content_type);
 						}
 					}
+					else
+					{
+						while (strstr(content_type, "inventory"))
+						{
+							read_status = fscanf(account_file, "%s", content);
+
+							for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+							{
+								if (Q_stricmp(content_type, zyk_inventory_key(i)) == 0)
+								{
+									ent->client->pers.rpg_inventory[i] = atoi(content);
+									break;
+								}
+							}
+
+							read_status = fscanf(account_file, "%s", content_type);
+						}
+					}
+
+					read_content_type = qfalse;
 				}
 				else if (Q_stricmp(content_type, "quest_tries") == 0)
 				{
@@ -2422,7 +2948,10 @@ void load_account(gentity_t* ent)
 					ent->client->pers.tutorial_shown = atoi(content);
 				}
 
-				read_status = fscanf(account_file, "%s", content_type);
+				if (read_content_type == qtrue)
+				{
+					read_status = fscanf(account_file, "%s", content_type);
+				}
 			}
 
 			zyk_load_admin_only_mode_stuff(ent);
@@ -2450,7 +2979,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 		{  // zyk: save the RPG char
 			FILE* account_file;
 			gclient_t* client;
-			char content[MAX_STRING_CHARS];
+			char content[SAVE_ACCOUNT_BUFFER];
 			int i = 0;
 
 			client = ent->client;
@@ -2461,13 +2990,13 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			strcpy(content, va("%s\nskill_levels", content));
 			for (i = 0; i < NUMBER_OF_SKILLS; i++)
 			{
-				strcpy(content, va("%s\n%d", content, client->pers.skill_levels[i]));
+				strcpy(content, va("%s\n%s\n%d", content, zyk_skill_key(i), client->pers.skill_levels[i]));
 			}
 
 			strcpy(content, va("%s\nrpg_inventory", content));
 			for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 			{
-				strcpy(content, va("%s\n%d", content, client->pers.rpg_inventory[i]));
+				strcpy(content, va("%s\n%s\n%d", content, zyk_inventory_key(i), client->pers.rpg_inventory[i]));
 			}
 
 			strcpy(content, va("%s\nquest_tries\n%d\nquest_defeated_enemies\n%d\nquest_masters_defeated\n%d\nquest_progress\n%d\nquest_missions\n%d", 
@@ -4909,12 +5438,25 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 	{
 		int i = 0;
 
-		// zyk: validating max skill levels. If for some reason a skill is above max, set it to the max
+		// zyk: validating max skill levels. If for some reason a skill is above max or lower than zero, fix the value
 		for (i = 0; i < NUMBER_OF_SKILLS; i++)
 		{
 			if (ent->client->pers.skill_levels[i] > zyk_max_skill_level(i))
 			{
 				ent->client->pers.skill_levels[i]--;
+			}
+			else if (ent->client->pers.skill_levels[i] < 0)
+			{
+				ent->client->pers.skill_levels[i] = 0;
+			}
+		}
+
+		// zyk: validating inventory. If for some reason a value is lower than zero, set it to zero
+		for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+		{
+			if (ent->client->pers.rpg_inventory[i] < 0)
+			{
+				ent->client->pers.rpg_inventory[i] = 0;
 			}
 		}
 
@@ -6145,90 +6687,6 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 		message, ent->client->pers.credits));
 }
 
-char* zyk_get_inventory_item_name(int inventory_index)
-{
-	char* inventory_item_names[MAX_RPG_INVENTORY_ITEMS];
-
-	inventory_item_names[RPG_INVENTORY_WP_STUN_BATON] = "Stun Baton";
-	inventory_item_names[RPG_INVENTORY_WP_SABER] = "Saber";
-	inventory_item_names[RPG_INVENTORY_WP_BLASTER_PISTOL] = "Blaster Pistol";
-	inventory_item_names[RPG_INVENTORY_WP_E11_BLASTER_RIFLE] = "E11 Blaster Rifle";
-	inventory_item_names[RPG_INVENTORY_WP_DISRUPTOR] = "Disruptor";
-	inventory_item_names[RPG_INVENTORY_WP_BOWCASTER] = "Bowcaster";
-	inventory_item_names[RPG_INVENTORY_WP_REPEATER] = "Repeater";
-	inventory_item_names[RPG_INVENTORY_WP_DEMP2] = "DEMP2";
-	inventory_item_names[RPG_INVENTORY_WP_FLECHETTE] = "Flechette";
-	inventory_item_names[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = "Rocket Launcher";
-	inventory_item_names[RPG_INVENTORY_WP_CONCUSSION] = "Concussion";
-	inventory_item_names[RPG_INVENTORY_WP_BRYAR_PISTOL] = "Bryar Pistol";
-
-	inventory_item_names[RPG_INVENTORY_AMMO_BLASTER_PACK] = "Blaster Pack Ammo";
-	inventory_item_names[RPG_INVENTORY_AMMO_POWERCELL] = "Powercell Ammo";
-	inventory_item_names[RPG_INVENTORY_AMMO_METAL_BOLTS] = "Metal Bolts Ammo";
-	inventory_item_names[RPG_INVENTORY_AMMO_ROCKETS] = "Rockets Ammo";
-	inventory_item_names[RPG_INVENTORY_AMMO_THERMALS] = "Thermals";
-	inventory_item_names[RPG_INVENTORY_AMMO_TRIPMINES] = "Trip Mines";
-	inventory_item_names[RPG_INVENTORY_AMMO_DETPACKS] = "Detpacks";
-
-	inventory_item_names[RPG_INVENTORY_ITEM_BINOCULARS] = "Binoculars";
-	inventory_item_names[RPG_INVENTORY_ITEM_BACTA_CANISTER] = "Bacta Canister";
-	inventory_item_names[RPG_INVENTORY_ITEM_SENTRY_GUN] = "Sentry Gun";
-	inventory_item_names[RPG_INVENTORY_ITEM_SEEKER_DRONE] = "Seeker Drone";
-	inventory_item_names[RPG_INVENTORY_ITEM_EWEB] = "E-Web";
-	inventory_item_names[RPG_INVENTORY_ITEM_BIG_BACTA] = "Big Bacta";
-	inventory_item_names[RPG_INVENTORY_ITEM_FORCE_FIELD] = "Force Field";
-	inventory_item_names[RPG_INVENTORY_ITEM_CLOAK] = "Cloak Item";
-	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "Jetpack";
-
-	inventory_item_names[RPG_INVENTORY_UPGRADE_BACTA] = "Bacta Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "Force Field Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "Shield Generator";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = "Impact Reducer Armor";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = "Deflective Armor";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = "Saber Armor";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "Flame Thrower";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "Stun Baton Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = "Blaster Pistol Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = "Bryar Pistol Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] = "E11 Blaster Rifle Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_DISRUPTOR] = "Disruptor Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_BOWCASTER] = "Bowcaster Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_DEMP2] = "DEMP2 Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_REPEATER] = "Repeater Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_FLECHETTE] = "Flechette Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_CONCUSSION] = "Concussion Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = "Rocket Launcher Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_EXPLOSIVE] = "Explosive Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "Jetpack Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = "Thermal Vision";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "Sentry Gun Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
-
-	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "Blue Crystal";
-	inventory_item_names[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = "Green Crystal";
-	inventory_item_names[RPG_INVENTORY_MISC_RED_CRYSTAL] = "Red Crystal";
-
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = "Magic Armor";
-
-	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "Jetpack Fuel";
-	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "Flame Thrower Fuel";
-	inventory_item_names[RPG_INVENTORY_MISC_MAGIC_SHIELD] = "Magic Shield";
-	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
-	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
-	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
-
-	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
-	{
-		return G_NewString(inventory_item_names[inventory_index]);
-	}
-
-	return "";
-}
-
 int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 {
 	// zyk: costs to buy or sell for each seller item
@@ -6638,270 +7096,6 @@ int zyk_number_of_enemies_in_map()
 	}
 
 	return total_enemies;
-}
-
-void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
-{
-	if (item_index == RPG_INVENTORY_AMMO_BLASTER_PACK)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for E11 Blaster Rifle, Blaster Pistol and Bryar Pistol weapons\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_AMMO_POWERCELL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Disruptor, Bowcaster and DEMP2 weapons\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_AMMO_METAL_BOLTS)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Repeater, Flechette and Concussion Rifle weapons\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_AMMO_ROCKETS)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Rocket Launcher weapon\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_AMMO_THERMALS)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7thermal detonators\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_AMMO_TRIPMINES)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7trip mines\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_AMMO_DETPACKS)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7det packs\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_FLAME_THROWER_FUEL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7fuel for the flame thrower\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_ITEM_SENTRY_GUN)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable gun which is placed in the ground and shoots nearby enemies\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable remote drone that shoots enemies at sight\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_ITEM_BACTA_CANISTER)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_ITEM_FORCE_FIELD)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7creates a force field wall in front of the player that can hold almost any attack, except the concussion rifle alternate fire, which can get through\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_ITEM_BIG_BACTA)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina. Recovers double the amount of a Bacta Canister\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_ITEM_EWEB)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable emplaced gun\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_ITEM_BINOCULARS)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to see far things better with the zoom feature\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_ITEM_JETPACK)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to fly. Jump and press Use Key to use it\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_ITEM_CLOAK)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to cloak himself. Npcs cannot detect you unless close enough\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_BLASTER_PISTOL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7pistol that can shoot a charged shot with alt fire. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_BRYAR_PISTOL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7similar to blaster pistol, but has a faster fire rate with normal fire. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_E11_BLASTER_RIFLE)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Rifle that is used by the stormtroopers. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_DISRUPTOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Sniper rifle which can desintegrate the enemy. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_BOWCASTER)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots green bolts, normal fire can be charged, and alt fire shoots a bouncing bolt. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_DEMP2)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7fires an electro magnetic pulse that causes bonus damage against droids. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_REPEATER)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7imperial weapon that shoots orbs and a plasma bomb with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_FLECHETTE)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7it is the shotgun of the game, and can shoot 2 bombs with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_CONCUSSION)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7powerful weapon, alt fire can shoot a beam that gets through force fields. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_ROCKET_LAUNCHER)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots rockets and a homing missile with alternate fire. Uses rockets ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_SABER)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the weapon of a Jedi/Sith. With single, each Saber Attack skill level gives new saber stances. With duals/staff the Saber Attack skill level gives more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_WP_STUN_BATON)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that fires a small electric charge\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_JETPACK_FUEL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7jetpack fuel\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister and Big Bacta recovers more HP, more MP and more Stamina\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_FORCE_FIELD)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Force Field resists more damage. Allows getting them back pressing Use Key on them. Doing so requires some powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_CLOAK)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Cloak Item will be able to cloak vehicles. Press Saber Stance key when riding a vehicle to cloak it. Also, when you are cloaked, npcs will only be able to detect you at a closer distance\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to restore his shield\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source by 10 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 20 per cent weapon/melee damage to your health (only 5 per cent from saber) and has a chance to deflect some weapon shots\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_SABER_ARMOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 5 per cent weapon/melee damage to your health (20 per cent from saber)\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7gives you the flame thrower. To use it, get stun baton and use alternate fire\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Increases Blaster Pistol firerate. Upgrade ^32^7: quickdraw. If shooting with pistol right after changing weapon to it, shoots a full charged shot\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Increases Bryar Pistol firerate. Upgrade ^32^7: Altfire can charge more for more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: E11 Blaster Rifle altfire has less spread and faster firerate. Upgrade ^32^7: has a chance to make target burn\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases Disruptor firerate. Upgrade ^32^7: altfire full charged shot has a lot more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times. Upgrade ^32^7: shots have a chance to poison targets\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases firerate of DEMP2 main fire. Upgrade ^32^7: primary and altfire shots can stun targets for a longer time\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases accuracy of primary fire and firerate of Repeater altfire. Upgrade ^32^7: altfire has chance to knockdown targets based on distance to the impact\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases number of bolts shot by Flechette primary and alt fires. Upgrade ^32^7: primary fire shots cause bleeding damage\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Concussion rifle has better splash radius, can break saber-only damage objects and can move pushable/pullable objects. Upgrade ^32^7: altfire stronger knockdown and for a longer time\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: increases firerate of primary fire\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_EXPLOSIVE)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: makes thermals, trip mines and detpacks have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: thermals, trip mines and detpacks create a fire area when explosive, making targets catch fire\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases jetpack fuel consumption a bit and makes the jetpack more stable and faster\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_THERMAL_VISION)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes binoculars detect enemies through a thermal vision system\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_SENTRY_GUN)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes Sentry Gun have more health and damage and detect enemies at a greater distance. Allows getting sentry guns back by pressing Use Key near them. Doing this requires some power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_SEEKER_DRONE)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes seeker drone shoot faster and with more damage. It also lasts longer\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_EWEB)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes E-Web have more health and damage\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, magic crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. You must find all 3 parts to use it. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a magic crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
-	}
-	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. If you find him, he can give it to you. Has very useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
-	}
-	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any non-magic source by 5 per cent. If the source is Magic Fist or a magic power, decreases damage by 20 per cent and absorb it to regen magic points. Reduces all magic powers mp cost. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. Used to upgrade skills. The ones you keep in your inventory increase the chance for main quest events and for side quest events to happen. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. Give extra tries for the main quest. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Damage is based on the amount of Green Crystals. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7prevents being hit my magic powers. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_MAGIC_SHIELD));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_SHIELD_BOOSTER));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you immune to force powers for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_YSALAMIRI));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), RPG_INVENTORY_MISC_FORCE_BOON));
-	}
 }
 
 void zyk_use_inventory_item(gentity_t* ent, int item_index)
