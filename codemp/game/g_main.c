@@ -1244,6 +1244,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.server_empty_change_map_timer = 0;
 	level.num_fully_connected_clients = 0;
 
+	level.treasure_chest_timer = 0;
 	level.energy_modulator_timer = 0;
 	level.magic_armor_timer = 0;
 
@@ -5548,7 +5549,12 @@ int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int mod
 {
 	int quest_item_effect_id = -1;
 
-	if (quest_item_type == QUEST_ITEM_ENERGY_MODULATOR)
+	if (quest_item_type == QUEST_ITEM_TREASURE_CHEST)
+	{
+		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_treasure_chest", quest_item_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/korriban/coffin_slab.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
+	}
+	else if (quest_item_type == QUEST_ITEM_ENERGY_MODULATOR)
 	{
 		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_energy_modulator_puzzle", quest_item_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/danger/ship_item04.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
@@ -9408,21 +9414,44 @@ void G_RunFrame( int levelTime ) {
 						(ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] * (side_quest_item_chance_modifier / ENERGY_MODULATOR_PARTS)) -
 						(ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] * side_quest_item_chance_modifier) -
 						(ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] * (side_quest_item_chance_modifier / QUEST_LOG_PARTS)) +
-						(main_quest_progress / 5);
+						(main_quest_progress / 4) - ((MAX_GENTITIES - level.num_entities) / 100);
 
 					int side_quest_item_duration = side_quest_item_chance * SIDE_QUEST_STUFF_TIMER;
 
-					if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
-					{ // zyk: Hard Mode
-						side_quest_item_chance /= 2;
-						side_quest_item_duration /= 2;
-					}
+					int crystal_chance = (level.num_entities / 20);
 					
-					if (Q_irand(0, 99) < 9)
+					if (Q_irand(0, 99) < crystal_chance)
 					{ // zyk: crystals
 						zyk_quest_item_t crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
 
 						zyk_spawn_magic_crystal(60000, crystal_type);
+					}
+
+					if (Q_irand(0, 99) < side_quest_item_chance && level.treasure_chest_timer < level.time)
+					{ // zyk: Treasure Chest
+						float treasure_chest_x, treasure_chest_y, treasure_chest_z;
+						gentity_t* chosen_entity = NULL;
+
+						chosen_entity = zyk_find_entity_for_quest();
+
+						if (chosen_entity)
+						{
+							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
+							{
+								treasure_chest_x = chosen_entity->r.currentOrigin[0];
+								treasure_chest_y = chosen_entity->r.currentOrigin[1];
+								treasure_chest_z = chosen_entity->r.currentOrigin[2];
+							}
+							else
+							{
+								treasure_chest_x = chosen_entity->s.origin[0];
+								treasure_chest_y = chosen_entity->s.origin[1];
+								treasure_chest_z = chosen_entity->s.origin[2];
+							}
+
+							zyk_spawn_quest_item(QUEST_ITEM_TREASURE_CHEST, side_quest_item_duration, 20, treasure_chest_x, treasure_chest_y, treasure_chest_z);
+							level.treasure_chest_timer = level.time + side_quest_item_duration;
+						}
 					}
 					
 					if (Q_irand(0, 99) < side_quest_item_chance && level.energy_modulator_timer < level.time)

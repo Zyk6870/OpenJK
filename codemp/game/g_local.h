@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.2.3"
+#define	GAMEVERSION	"New Zyk Mod v1.2.4"
 
 #define SECURITY_LOG "security.log"
 
@@ -751,6 +751,7 @@ typedef enum {
 	QUEST_ITEM_SKILL_CRYSTAL,
 	QUEST_ITEM_EXTRA_TRIES_CRYSTAL,
 	QUEST_ITEM_SPECIAL_CRYSTAL,
+	QUEST_ITEM_TREASURE_CHEST,
 	QUEST_ITEM_ENERGY_MODULATOR,
 	QUEST_ITEM_MAGIC_ARMOR,
 	QUEST_ITEM_SPIRIT_TREE,
@@ -1810,6 +1811,7 @@ typedef struct level_locals_s {
 	int reality_shift_timer;
 
 	// zyk: time to spawn the same side quest secret item again
+	int treasure_chest_timer;
 	int energy_modulator_timer;
 	int magic_armor_timer;
 
