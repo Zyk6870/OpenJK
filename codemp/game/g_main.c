@@ -9418,7 +9418,7 @@ void G_RunFrame( int levelTime ) {
 
 					int side_quest_item_duration = side_quest_item_chance * SIDE_QUEST_STUFF_TIMER;
 
-					int crystal_chance = (level.num_entities / 20);
+					int crystal_chance = (level.num_entities / 15);
 					
 					if (Q_irand(0, 99) < crystal_chance)
 					{ // zyk: crystals
