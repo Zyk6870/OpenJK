@@ -5963,7 +5963,6 @@ void zyk_set_default_quest_fields(gentity_t* ent)
 	ent->client->pers.quest_spirit_tree_id = -1;
 
 	ent->client->pers.quest_missions = 0;
-	ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 }
 
 // zyk: adds a new RPG char with default values
@@ -11892,6 +11891,8 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 			{
 				zyk_set_default_quest_fields(ent);
 				zyk_set_quest_event_timer(ent);
+
+				ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 
 				save_account(ent, qtrue);
 
