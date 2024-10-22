@@ -735,7 +735,7 @@ qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower )
 		return qfalse;
 	}
 
-	if (level.reality_shift_mode == REALITY_SHIFT_NO_FORCE)
+	if (self->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_FORCE))
 	{
 		return qfalse;
 	}

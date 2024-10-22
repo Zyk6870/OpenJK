@@ -3119,14 +3119,9 @@ void ClientThink_real( gentity_t *ent ) {
 	//play/stop any looping sounds tied to controlled movement
 	G_CheckMovingLoopingSounds( ent, ucmd );
 
-	// zyk: Reality Shift statuses
-	if (level.reality_shift_mode > REALITY_SHIFT_NONE && 
-		!(ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER))
+	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_FORCE))
 	{
-		if (level.reality_shift_mode == REALITY_SHIFT_NO_FORCE)
-		{
-			ent->client->ps.fd.forceDeactivateAll = 1;
-		}
+		ent->client->ps.fd.forceDeactivateAll = 1;
 	}
 
 	pmove.ps = &client->ps;

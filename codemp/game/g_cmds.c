@@ -10763,7 +10763,7 @@ qboolean zyk_can_cast_magic(gentity_t* ent)
 {
 	if (ent->client->ps.forceHandExtend != HANDEXTEND_NONE || 
 		ent->client->ps.fd.forceGripBeingGripped > level.time || 
-		(level.reality_shift_mode == REALITY_SHIFT_NO_MAGIC && !(ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)))
+		ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_MAGIC))
 	{
 		return qfalse;
 	}

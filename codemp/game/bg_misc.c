@@ -1700,6 +1700,10 @@ qboolean BG_HasYsalamiri(int gametype, playerState_t *ps)
 
 qboolean BG_CanUseFPNow(int gametype, playerState_t *ps, int time, forcePowers_t power)
 {
+#ifdef _GAME
+	gentity_t* player_ent = &g_entities[ps->clientNum];
+#endif
+
 	if (BG_HasYsalamiri(gametype, ps))
 	{
 		return qfalse;
@@ -1712,7 +1716,7 @@ qboolean BG_CanUseFPNow(int gametype, playerState_t *ps, int time, forcePowers_t
 
 #ifdef _GAME
 	// zyk: cannot use force in this case
-	if (level.reality_shift_mode == REALITY_SHIFT_NO_FORCE)
+	if (player_ent && player_ent->client && player_ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_FORCE))
 	{
 		return qfalse;
 	}

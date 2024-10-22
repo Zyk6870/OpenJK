@@ -1249,8 +1249,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.magic_armor_timer = 0;
 
 	level.special_quest_npc_in_map = 0;
-	level.reality_shift_mode = REALITY_SHIFT_NONE;
-	level.reality_shift_timer = 0;
 
 	// zyk: initializing Duel Tournament variables
 	level.duel_tournament_mode = 0;
@@ -5849,6 +5847,21 @@ void zyk_status_effects(gentity_t* ent)
 				ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_MAGIC_SHIELD);
 			}
 		}
+
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_FORCE) && ent->client->pers.no_force_timer < level.time)
+		{
+			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CANNOT_USE_FORCE);
+		}
+
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_MAGIC) && ent->client->pers.no_magic_timer < level.time)
+		{
+			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CANNOT_USE_MAGIC);
+		}
+
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_LOWER_DAMAGE) && ent->client->pers.lower_damage_timer < level.time)
+		{
+			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_LOWER_DAMAGE);
+		}
 	}
 }
 
@@ -5886,7 +5899,7 @@ void magic_power_events(gentity_t *ent)
 				magic_bonus = 1;
 			}
 
-			if (level.reality_shift_mode == REALITY_SHIFT_NO_MAGIC)
+			if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_MAGIC))
 			{
 				zyk_stop_all_magic_powers(ent);
 			}
@@ -7514,8 +7527,6 @@ void zyk_start_main_quest_spirits_event(gentity_t* ent)
 
 	ent->client->pers.quest_spirits_event_step = 1;
 	ent->client->pers.quest_spirits_event_timer = level.time + 2000;
-
-	level.reality_shift_mode = REALITY_SHIFT_NONE;
 
 	if (ent->client->pers.quest_spirit_tree_id > -1)
 	{
@@ -9894,30 +9905,33 @@ void G_RunFrame( int levelTime ) {
 								Jedi_Cloak(ent);
 							}
 
-							if (level.reality_shift_timer < level.time && Q_irand(0, 99) < REALITY_SHIFT_MODE_CHANCE)
+							if (Q_irand(0, 99) < MAGE_MASTER_STATUS_CHANCE)
 							{
-								zyk_reality_shift_t reality_shift_mode = Q_irand(REALITY_SHIFT_NONE, (NUM_REALITY_SHIFT_STATUSES - 1));
+								zyk_player_status_t status_chosen = Q_irand(PLAYER_STATUS_CANNOT_USE_FORCE, PLAYER_STATUS_LOWER_DAMAGE);
 
-								level.reality_shift_mode = reality_shift_mode;
-
-								if (level.reality_shift_mode == REALITY_SHIFT_NONE)
+								if (ent->enemy->client)
 								{
-									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Normal\n\""));
+									ent->enemy->client->pers.player_statuses |= (1 << status_chosen);
 								}
-								else if (level.reality_shift_mode == REALITY_SHIFT_NO_FORCE)
+
+								if (status_chosen == PLAYER_STATUS_CANNOT_USE_FORCE)
 								{
+									ent->enemy->client->pers.no_force_timer = level.time + MAGE_MASTER_STATUS_DURATION;
+
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Force\n\""));
 								}
-								else if (level.reality_shift_mode == REALITY_SHIFT_LOWER_PHYSICAL_DAMAGE)
+								else if (status_chosen == PLAYER_STATUS_CANNOT_USE_MAGIC)
 								{
-									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Lower Physical Damage\n\""));
-								}
-								else if (level.reality_shift_mode == REALITY_SHIFT_NO_MAGIC)
-								{
+									ent->enemy->client->pers.no_magic_timer = level.time + MAGE_MASTER_STATUS_DURATION;
+
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Magic\n\""));
 								}
+								else if (status_chosen == PLAYER_STATUS_LOWER_DAMAGE)
+								{
+									ent->enemy->client->pers.lower_damage_timer = level.time + MAGE_MASTER_STATUS_DURATION;
 
-								level.reality_shift_timer = level.time + Q_irand(5000, 12000);
+									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Lower Physical Damage\n\""));
+								}
 							}
 						}
 						else if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && Q_irand(0, 99) < 10)

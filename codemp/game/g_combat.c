@@ -2706,11 +2706,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			level.special_quest_npc_in_map &= ~(1 << self->client->pers.quest_npc);
 		}
 
-		if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
-		{
-			level.reality_shift_mode = REALITY_SHIFT_NONE;
-		}
-
 		if (attacker && attacker->client &&
 			(attacker->client->sess.amrpgmode == 2 || zyk_is_quest_ally(attacker) == qtrue))
 		{
@@ -5044,7 +5039,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
-	if (level.reality_shift_mode == REALITY_SHIFT_LOWER_PHYSICAL_DAMAGE && mod != MOD_FORCE_DARK && 
+	if (targ && targ->client && targ->client->pers.player_statuses & (1 << PLAYER_STATUS_LOWER_DAMAGE) && 
+		mod != MOD_FORCE_DARK &&
 		!(inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) > -1) // zyk: not a magic power
 		)
 	{

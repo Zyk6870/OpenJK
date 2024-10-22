@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.2.9"
+#define	GAMEVERSION	"New Zyk Mod v1.2.10"
 
 #define SECURITY_LOG "security.log"
 
@@ -559,6 +559,9 @@ typedef enum {
 	PLAYER_STATUS_KEEP_QUEST_TRIES,
 	PLAYER_STATUS_RESET_TO_MELEE,
 	PLAYER_STATUS_USING_FLASHLIGHT,
+	PLAYER_STATUS_CANNOT_USE_FORCE,
+	PLAYER_STATUS_CANNOT_USE_MAGIC,
+	PLAYER_STATUS_LOWER_DAMAGE,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -798,14 +801,6 @@ typedef enum {
 } zyk_quest_mission_t;
 
 typedef enum {
-	REALITY_SHIFT_NONE,
-	REALITY_SHIFT_NO_FORCE,
-	REALITY_SHIFT_LOWER_PHYSICAL_DAMAGE,
-	REALITY_SHIFT_NO_MAGIC,
-	NUM_REALITY_SHIFT_STATUSES
-} zyk_reality_shift_t;
-
-typedef enum {
 	TUTORIAL_NONE,
 	TUTORIAL_NEW_CHAR,
 	TUTORIAL_STAMINA,
@@ -910,7 +905,8 @@ typedef enum {
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_NPC_SPAWN_TIME 27000
 #define QUEST_WORM_MP_TO_RESTORE 5
-#define REALITY_SHIFT_MODE_CHANCE 50
+#define MAGE_MASTER_STATUS_CHANCE 5
+#define MAGE_MASTER_STATUS_DURATION 10000
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 43000
@@ -950,6 +946,11 @@ typedef struct clientPersistant_s {
 
 	// zyk: player status flags
 	int player_statuses;
+
+	// zyk: some statuses may have a timer
+	int no_force_timer;
+	int no_magic_timer;
+	int lower_damage_timer;
 
 	// zyk: Mind trick works on npcs. Sets the player ids if this npc is mind-tricked
 	int number_of_npcs_tricked_by_player;
@@ -1808,8 +1809,6 @@ typedef struct level_locals_s {
 
 	// zyk: bitvalue. Has npcs where only one of them can be in the map
 	int special_quest_npc_in_map;
-	zyk_reality_shift_t reality_shift_mode;
-	int reality_shift_timer;
 
 	// zyk: time to spawn the same side quest secret item again
 	int treasure_chest_timer;
