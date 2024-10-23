@@ -2877,33 +2877,21 @@ void load_account(gentity_t* ent)
 				{
 					read_status = fscanf(account_file, "%s", content_type);
 
-					if (string_is_an_integer(content_type) == qtrue)
-					{ // zyk: old way of reading skill levels
+					while (strstr(content_type, "skill") && read_status != EOF)
+					{
+						read_status = fscanf(account_file, "%s", content);
+
+						// zyk: search the correct index to set this value
 						for (i = 0; i < NUMBER_OF_SKILLS; i++)
 						{
-							ent->client->pers.skill_levels[i] = atoi(content_type);
-
-							read_status = fscanf(account_file, "%s", content_type);
-						}
-					}
-					else
-					{
-						while (strstr(content_type, "skill"))
-						{
-							read_status = fscanf(account_file, "%s", content);
-
-							// zyk: search the correct index to set this value
-							for (i = 0; i < NUMBER_OF_SKILLS; i++)
-							{
-								if (Q_stricmp(content_type, zyk_skill_key(i)) == 0)
-								{ // zyk: found the key name
-									ent->client->pers.skill_levels[i] = atoi(content);
-									break;
-								}
+							if (Q_stricmp(content_type, zyk_skill_key(i)) == 0)
+							{ // zyk: found the key name
+								ent->client->pers.skill_levels[i] = atoi(content);
+								break;
 							}
-
-							read_status = fscanf(account_file, "%s", content_type);
 						}
+
+						read_status = fscanf(account_file, "%s", content_type);
 					}
 
 					read_content_type = qfalse;
@@ -2912,32 +2900,20 @@ void load_account(gentity_t* ent)
 				{
 					read_status = fscanf(account_file, "%s", content_type);
 
-					if (string_is_an_integer(content_type) == qtrue)
-					{ // zyk: old way of reading inventory
+					while (strstr(content_type, "inventory") && read_status != EOF)
+					{
+						read_status = fscanf(account_file, "%s", content);
+
 						for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 						{
-							ent->client->pers.rpg_inventory[i] = atoi(content_type);
-
-							read_status = fscanf(account_file, "%s", content_type);
-						}
-					}
-					else
-					{
-						while (strstr(content_type, "inventory"))
-						{
-							read_status = fscanf(account_file, "%s", content);
-
-							for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+							if (Q_stricmp(content_type, zyk_inventory_key(i)) == 0)
 							{
-								if (Q_stricmp(content_type, zyk_inventory_key(i)) == 0)
-								{
-									ent->client->pers.rpg_inventory[i] = atoi(content);
-									break;
-								}
+								ent->client->pers.rpg_inventory[i] = atoi(content);
+								break;
 							}
-
-							read_status = fscanf(account_file, "%s", content_type);
 						}
+
+						read_status = fscanf(account_file, "%s", content_type);
 					}
 
 					read_content_type = qfalse;
