@@ -4947,9 +4947,9 @@ void zyk_energy_modulator_resource_usage(gentity_t* ent)
 	{
 		ent->client->pers.magic_power -= 1;
 	}
-	else if (ent->client->pers.magic_power <= 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0)
+	else if (ent->client->pers.magic_power <= 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
 	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]--;
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
 		zyk_add_mp(ent, 100);
 	}
 	else

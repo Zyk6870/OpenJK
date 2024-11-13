@@ -624,7 +624,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, magic crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. You must find all 3 parts to use it. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a magic crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, red crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. You must find all 3 parts to use it. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a red crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
 	{
