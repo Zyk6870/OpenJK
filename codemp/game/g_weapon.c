@@ -1559,7 +1559,6 @@ static void WP_FireDEMP2( gentity_t *ent, qboolean altFire )
 }
 
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
-extern float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t* attacker, gentity_t* target);
 void zyk_lightning_dome_radius_damage( gentity_t *ent )
 {
 	float		frac = ( level.time - ent->genericValue5 ) / 800.0f; // / 1600.0f; // synchronize with demp2 effect
@@ -1670,13 +1669,6 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 			{ // zyk: dont hit players or npcs on the same team
 				continue;
 			}
-
-			// zyk: Elemental bonus. Each power gives a higher damage to target of opposite element and less damage to target of same element
-			final_damage = (int)ceil(final_damage * zyk_get_elemental_bonus_factor(MAGIC_LIGHT_MAGIC, myOwner, gent));
-
-			// zyk: must do at least 1 damage
-			if (final_damage < 1)
-				final_damage = 1;
 
 			G_Damage( gent, ent, myOwner, dir, ent->r.currentOrigin, final_damage, DAMAGE_DEATH_KNOCKBACK, ent->splashMethodOfDeath );
 
