@@ -87,7 +87,7 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 5;
 	max_skill_levels[SKILL_MAX_MP] = 10;
-	max_skill_levels[SKILL_MAGIC_HEALING_AREA] = 8;
+	max_skill_levels[SKILL_MAGIC_AFFINITY] = 8;
 	max_skill_levels[SKILL_MAGIC_MAGIC_DOME] = 8;
 	max_skill_levels[SKILL_MAGIC_WATER_MAGIC] = 8;
 	max_skill_levels[SKILL_MAGIC_EARTH_MAGIC] = 8;
@@ -145,7 +145,7 @@ char* zyk_skill_name(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAX_MP] = "Max Magic Points";
-	skill_names[SKILL_MAGIC_HEALING_AREA] = "Healing Area";
+	skill_names[SKILL_MAGIC_AFFINITY] = "Magic Affinity";
 	skill_names[SKILL_MAGIC_MAGIC_DOME] = "Magic Dome";
 	skill_names[SKILL_MAGIC_WATER_MAGIC] = "Water Magic";
 	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "Earth Magic";
@@ -235,8 +235,8 @@ char* zyk_skill_description(int skill_index)
 		return va("allows you to attack with magic bolts when using melee punches. At max level, can damage saber-only damage objects and move pushable/pullable objects. Damage per bolt is %d + ((%d / 2) * (this skill level))", zyk_magic_fist_damage.integer, zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have. Each level increases it by 100. This is used to cast magic powers";
-	if (skill_index == SKILL_MAGIC_HEALING_AREA)
-		return "creates an energy area that makes you and your allies recover health, stamina, force and shield. It also deals a little non-elemental damage to enemies";
+	if (skill_index == SKILL_MAGIC_AFFINITY)
+		return "decreases mp cost of magic powers";
 	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
 		return "an energy dome appears around you, damaging enemies inside it. It also increases your resistance to damage to your health a little. This power deals non-elemental damage";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
@@ -295,7 +295,7 @@ char* zyk_skill_key(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
 	skill_names[SKILL_MAX_MP] = "skillmaxmagicpoints";
-	skill_names[SKILL_MAGIC_HEALING_AREA] = "skillhealingarea";
+	skill_names[SKILL_MAGIC_AFFINITY] = "skillmagicaffinity";
 	skill_names[SKILL_MAGIC_MAGIC_DOME] = "skillmagicdome";
 	skill_names[SKILL_MAGIC_WATER_MAGIC] = "skillwatermagic";
 	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "skillearthmagic";
@@ -632,7 +632,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any non-magic source by 5 per cent. If the source is Magic Fist or a magic power, decreases damage by 20 per cent and absorb it to regen magic points. Reduces all magic powers mp cost. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any non-magic source by 5 per cent. If the source is Magic Fist or a magic power, decreases damage by 20 per cent and absorb it to regen magic points. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
@@ -4928,7 +4928,7 @@ int zyk_max_magic_power(gentity_t *ent)
 // zyk: tests if this skill is one of the magic powers
 qboolean zyk_is_magic_power_skill(int skill_index)
 {
-	if (skill_index >= SKILL_MAGIC_HEALING_AREA && skill_index <= SKILL_MAGIC_LIGHT_MAGIC)
+	if (skill_index >= SKILL_MAGIC_MAGIC_DOME && skill_index <= SKILL_MAGIC_LIGHT_MAGIC)
 	{
 		return qtrue;
 	}
@@ -4941,7 +4941,7 @@ int zyk_get_magic_index(int skill_index)
 {
 	if (zyk_is_magic_power_skill(skill_index) == qtrue)
 	{
-		return (skill_index - SKILL_MAGIC_HEALING_AREA);
+		return (skill_index - SKILL_MAGIC_MAGIC_DOME);
 	}
 
 	return -1;
@@ -10568,7 +10568,6 @@ Cmd_Magic_f
 int zyk_get_magic_cost(int magic_number)
 {
 	int magic_costs[MAX_MAGIC_POWERS] = {
-		40, // Healing Area
 		40, // Dome of Damage
 		40, // Water Magic
 		40, // Earth Magic
@@ -10594,7 +10593,6 @@ qboolean zyk_can_cast_magic(gentity_t* ent)
 }
 
 extern void zyk_spawn_magic_element_effect(gentity_t* ent, vec3_t effect_origin, int magic_number, int duration);
-extern void healing_area(gentity_t* ent);
 extern void dome_of_damage(gentity_t* ent);
 extern void water_magic(gentity_t* ent);
 extern void earth_magic(gentity_t* ent);
@@ -10644,9 +10642,9 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 			int magic_cost = zyk_get_magic_cost(magic_number);
 
 			// zyk: Magic Armor reduces mp cost
-			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
+			if (ent->client->pers.skill_levels[SKILL_MAGIC_AFFINITY] > 0)
 			{
-				magic_cost /= 2;
+				magic_cost -= ent->client->pers.skill_levels[SKILL_MAGIC_AFFINITY];
 			}
 
 			if (ent->client->pers.magic_power >= magic_cost)
@@ -10660,11 +10658,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				ent->client->ps.legsTimer = MAGIC_ANIM_TIME;
 				ent->client->ps.weaponTime = MAGIC_ANIM_TIME;
 
-				if (magic_number == MAGIC_HEALING_AREA)
-				{
-					healing_area(ent);
-				}
-				else if (magic_number == MAGIC_MAGIC_DOME)
+				if (magic_number == MAGIC_MAGIC_DOME)
 				{
 					dome_of_damage(ent);
 				}

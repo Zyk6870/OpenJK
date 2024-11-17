@@ -4902,7 +4902,6 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 	int i = 0;
 
 	char* magic_powers_effects[MAX_MAGIC_POWERS] = {
-		"zyk_magic_healing_area",
 		"zyk_magic_dome",
 		"zyk_magic_water",
 		"zyk_magic_earth",
@@ -4914,7 +4913,6 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 
 	zyk_magic_t magic_powers[MAX_MAGIC_POWERS] =
 	{
-		MAGIC_HEALING_AREA,
 		MAGIC_MAGIC_DOME,
 		MAGIC_WATER_MAGIC,
 		MAGIC_EARTH_MAGIC,
@@ -6697,68 +6695,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 				G_Damage (ent, NULL, (gentity_t *)attacker->m_pVehicle->m_pPilot, dir, origin, (int)points, DAMAGE_RADIUS, mod);
 			}
 			else
-			{
-				if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 && 
-					Q_stricmp(attacker->targetname, "zyk_magic_healing_area") == 0)
-				{ // zyk: Healing Area. Heals the user and his allies
-					gentity_t * magic_power_user = &g_entities[level.special_power_effects[attacker->s.number]];
-
-					// zyk: if the power user and the target are allies (player or npc), or the target is the quest power user himself, heal him
-					if (magic_power_user && magic_power_user->client && magic_power_user->health > 0 && ent && ent->client && ent->health > 0 &&
-						(level.special_power_effects[attacker->s.number] == ent->s.number || OnSameTeam(magic_power_user, ent) == qtrue ||
-						npcs_on_same_team(magic_power_user, ent) == qtrue || zyk_is_ally(magic_power_user,ent) == qtrue))
-					{
-						int max_health = ent->client->ps.stats[STAT_MAX_HEALTH];
-						int max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
-						int heal_amount = 1 + (magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA] / 2);
-						int shield_amount = heal_amount;
-						int force_amount = magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
-						int stamina_amount = 2 * magic_power_user->client->pers.skill_levels[SKILL_MAGIC_HEALING_AREA];
-						int magic_armor_bonus = 0;
-
-						if (ent->client->sess.amrpgmode == 2)
-						{
-							max_health = ent->client->pers.max_rpg_health;
-						}
-
-						// zyk: Magic Armor
-						if (magic_power_user->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
-						{
-							magic_armor_bonus = 1;
-						}
-
-						zyk_add_health(ent, (heal_amount + magic_armor_bonus));
-
-						zyk_set_stamina(ent, (stamina_amount + magic_armor_bonus), qtrue);
-
-						if ((ent->client->ps.fd.forcePower + (force_amount + magic_armor_bonus)) < ent->client->ps.fd.forcePowerMax)
-						{
-							ent->client->ps.fd.forcePower += (force_amount + magic_armor_bonus);
-						}
-						else
-						{
-							ent->client->ps.fd.forcePower = ent->client->ps.fd.forcePowerMax;
-						}
-
-						if (ent->client->sess.amrpgmode == 2)
-						{
-							max_shield = ent->client->pers.max_rpg_shield;
-						}
-
-						if (!ent->NPC && ent->health >= max_health)
-						{
-							if ((ent->client->ps.stats[STAT_ARMOR] + (shield_amount + magic_armor_bonus)) < max_shield)
-							{
-								ent->client->ps.stats[STAT_ARMOR] += (shield_amount + magic_armor_bonus);
-							}
-							else
-							{
-								ent->client->ps.stats[STAT_ARMOR] = max_shield;
-							}
-						}
-					}
-				}
-				
+			{				
 				if (attacker && ent && level.special_power_effects[attacker->s.number] != -1 && level.special_power_effects[attacker->s.number] != ent->s.number)
 				{ // zyk: if it is an effect used by special power, then attacker must be the owner of the effect. Also, do not hit the owner
 					gentity_t *magic_power_user = &g_entities[level.special_power_effects[attacker->s.number]];

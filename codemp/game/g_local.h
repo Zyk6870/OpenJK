@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.2.14"
+#define	GAMEVERSION	"New Zyk Mod v1.2.15"
 
 #define SECURITY_LOG "security.log"
 
@@ -585,7 +585,6 @@ typedef enum {
 
 // zyk: magic powers values
 typedef enum {
-	MAGIC_HEALING_AREA,
 	MAGIC_MAGIC_DOME,
 	MAGIC_WATER_MAGIC,
 	MAGIC_EARTH_MAGIC,
@@ -639,7 +638,7 @@ typedef enum {
 	SKILL_RUN_SPEED,
 	SKILL_MAGIC_FIST,
 	SKILL_MAX_MP,
-	SKILL_MAGIC_HEALING_AREA,
+	SKILL_MAGIC_AFFINITY,
 	SKILL_MAGIC_MAGIC_DOME,
 	SKILL_MAGIC_WATER_MAGIC,
 	SKILL_MAGIC_EARTH_MAGIC,
