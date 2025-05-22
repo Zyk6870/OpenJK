@@ -77,11 +77,11 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MELEE] = 3;
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
 	max_skill_levels[SKILL_TRADER] = 10;
-	max_skill_levels[SKILL_WEAPON_DAMAGE] = 20;
-	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
+	max_skill_levels[SKILL_WEAPON_DAMAGE] = 15;
+	max_skill_levels[SKILL_MAX_WEIGHT] = 20;
 	max_skill_levels[SKILL_MAX_STAMINA] = 5;
 	max_skill_levels[SKILL_UNDERWATER] = 2;
-	max_skill_levels[SKILL_RUN_SPEED] = 3;
+	max_skill_levels[SKILL_RUN_SPEED] = 2;
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 5;
 	max_skill_levels[SKILL_MAX_MP] = 10;
@@ -5097,6 +5097,38 @@ void Cmd_AddBot_f( gentity_t *ent ) {
 
 // zyk: new functions
 
+// zyk: returns the amount of skills upgraded in a specific category (1 is force, 2 is misc, 3 is magic)
+int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
+{
+	int i = 0;
+	int first_skill_index = 0;
+	int last_skill_index = 0;
+	int skill_affinity = 0;
+
+	if (skill_category == SKILL_CATEGORY_FORCE)
+	{
+		first_skill_index = SKILL_JUMP;
+		last_skill_index = SKILL_FORCE_POWER;
+	}
+	else if (skill_category == SKILL_CATEGORY_MISC)
+	{
+		first_skill_index = SKILL_MAX_HEALTH;
+		last_skill_index = SKILL_RUN_SPEED;
+	}
+	else if (skill_category == SKILL_CATEGORY_MAGIC)
+	{
+		first_skill_index = SKILL_MAGIC_FIST;
+		last_skill_index = SKILL_MAGIC_LIGHT_MAGIC;
+	}
+
+	for (i = first_skill_index; i <= last_skill_index; i++)
+	{
+		skill_affinity += ent->client->pers.skill_levels[i];
+	}
+
+	return skill_affinity;
+}
+
 // zyk: sets the Max HP a player can have in RPG Mode
 void set_max_health(gentity_t *ent)
 {
@@ -5125,7 +5157,7 @@ void set_max_force(gentity_t* ent)
 // zyk: sets the Max Weight of stuff the player can carry
 void set_max_weight(gentity_t* ent)
 {
-	ent->client->pers.max_weight = 700 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 630);
+	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 275) + (50 * zyk_skill_affinity(ent, SKILL_CATEGORY_MISC));
 }
 
 // zyk: set the Max Stamina of this player
@@ -6506,38 +6538,6 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	{
 		zyk_list_category_skills(ent, target_ent, SKILL_MAGIC_FIST, SKILL_MAGIC_LIGHT_MAGIC);
 	}
-}
-
-// zyk: returns the amount of skills upgraded in a specific category (1 is force, 2 is misc, 3 is magic)
-int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
-{
-	int i = 0;
-	int first_skill_index = 0;
-	int last_skill_index = 0;
-	int skill_affinity = 0;
-
-	if (skill_category == SKILL_CATEGORY_FORCE)
-	{
-		first_skill_index = SKILL_JUMP;
-		last_skill_index = SKILL_FORCE_POWER;
-	}
-	else if (skill_category == SKILL_CATEGORY_MISC)
-	{
-		first_skill_index = SKILL_MAX_HEALTH;
-		last_skill_index = SKILL_RUN_SPEED;
-	}
-	else if (skill_category == SKILL_CATEGORY_MAGIC)
-	{
-		first_skill_index = SKILL_MAGIC_FIST;
-		last_skill_index = SKILL_MAGIC_LIGHT_MAGIC;
-	}
-
-	for (i = first_skill_index; i <= last_skill_index; i++)
-	{
-		skill_affinity += ent->client->pers.skill_levels[i];
-	}
-
-	return skill_affinity;
 }
 
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)

@@ -143,6 +143,7 @@ P_WorldEffects
 Check for lava / slime contents and drowning
 =============
 */
+extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 void P_WorldEffects( gentity_t *ent ) {
 #ifdef BASE_COMPAT
 	qboolean	envirosuit = qfalse;
@@ -2613,6 +2614,9 @@ void ClientThink_real( gentity_t *ent ) {
 			{ // zyk: full Quest Log increases Run Speed
 				zyk_player_speed += RPG_RUN_SPEED_SKILL_INCREASE;
 			}
+
+			// zyk: Misc Affinity increases run speed
+			zyk_player_speed += zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
 		}
 
 		if (client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))
