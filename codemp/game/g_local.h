@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.2.23"
+#define	GAMEVERSION	"New Zyk Mod v1.2.24"
 
 #define SECURITY_LOG "security.log"
 
@@ -629,7 +629,7 @@ typedef enum {
 	SKILL_MELEE,
 	SKILL_MELEE_SPEED,
 	SKILL_TRADER,
-	SKILL_WEAPON_DAMAGE,
+	SKILL_STATUS_PROTECTION,
 	SKILL_MAX_WEIGHT,
 	SKILL_MAX_STAMINA,
 	SKILL_UNDERWATER,
@@ -691,6 +691,7 @@ typedef enum {
 	RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR,
 	RPG_INVENTORY_UPGRADE_SABER_ARMOR,
 	RPG_INVENTORY_UPGRADE_FLAME_THROWER,
+	RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE,
 	RPG_INVENTORY_UPGRADE_STUN_BATON,
 	RPG_INVENTORY_UPGRADE_BLASTER_PISTOL,
 	RPG_INVENTORY_UPGRADE_BRYAR_PISTOL,
@@ -855,7 +856,7 @@ typedef enum {
 #define MAGIC_FLIGHT_MP_USAGE 10
 
 // zyk: damage bonus of weapons
-#define RPG_WEAPON_DMG_BONUS 0.025
+#define RPG_WEAPON_DMG_BONUS 0.01
 
 // zyk: max RPG chars an account can have
 #define MAX_RPG_CHARS 15

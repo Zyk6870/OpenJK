@@ -5767,6 +5767,12 @@ void zyk_status_effects(gentity_t* ent)
 				G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
 
 				zyk_set_stamina(ent, 50, qfalse);
+
+				// zyk: Status Protection skill
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0)
+				{
+					ent->client->pers.poison_duration -= (10 * ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION]);
+				}
 			}
 			else if (ent->client->pers.poison_duration <= level.time)
 			{
@@ -5786,6 +5792,13 @@ void zyk_status_effects(gentity_t* ent)
 			ent->client->pers.fire_bolt_hits_counter--;
 			ent->client->pers.fire_bolt_timer = level.time + 200;
 
+			// zyk: Status Protection skill
+			if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0 && 
+				Q_irand(0, 99) < (ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] * 10))
+			{
+				ent->client->pers.fire_bolt_hits_counter--;
+			}
+
 			// zyk: no more do fire bolt damage if counter is 0
 			if (ent->client->pers.fire_bolt_hits_counter <= 0)
 			{
@@ -5800,6 +5813,12 @@ void zyk_status_effects(gentity_t* ent)
 				ent->client->pers.bleeding_debounce_timer = level.time + 100;
 
 				G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
+
+				// zyk: Status Protection skill
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0)
+				{
+					ent->client->pers.bleeding_duration -= (10 * ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION]);
+				}
 			}
 			else if (ent->client->pers.bleeding_duration <= level.time)
 			{

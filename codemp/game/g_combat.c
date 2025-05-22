@@ -4860,19 +4860,13 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 }
 
 // zyk: calculates weapon damage based on the weapon damage skill level and extra amount of this weapon in inventory
-int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int skill_index, int inventory_index)
+int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int inventory_index)
 {
 	int final_dmg = base_dmg;
 
-	if (ent->client->pers.skill_levels[skill_index] > 0 && ent->client->pers.rpg_inventory[inventory_index] > 1)
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] > 0 && ent->client->pers.rpg_inventory[inventory_index] > 0)
 	{
-		int extra_inventory_weapons = ent->client->pers.rpg_inventory[inventory_index] - 1;
-		float bonus_damage_factor = (RPG_WEAPON_DMG_BONUS * extra_inventory_weapons);
-
-		if (extra_inventory_weapons > ent->client->pers.skill_levels[skill_index])
-		{
-			bonus_damage_factor = (RPG_WEAPON_DMG_BONUS * ent->client->pers.skill_levels[skill_index]);
-		}
+		float bonus_damage_factor = (RPG_WEAPON_DMG_BONUS * ent->client->pers.rpg_inventory[inventory_index]);
 
 		final_dmg = (int)ceil(final_dmg * (1.00 + bonus_damage_factor));
 	}

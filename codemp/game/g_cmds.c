@@ -77,7 +77,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MELEE] = 3;
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
 	max_skill_levels[SKILL_TRADER] = 10;
-	max_skill_levels[SKILL_WEAPON_DAMAGE] = 5;
+	max_skill_levels[SKILL_STATUS_PROTECTION] = 5;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 25;
 	max_skill_levels[SKILL_MAX_STAMINA] = 10;
 	max_skill_levels[SKILL_UNDERWATER] = 2;
@@ -133,7 +133,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MELEE] = "Melee";
 	skill_names[SKILL_MELEE_SPEED] = "Melee Punch Speed";
 	skill_names[SKILL_TRADER] = "Trader";
-	skill_names[SKILL_WEAPON_DAMAGE] = "Weapon Damage";
+	skill_names[SKILL_STATUS_PROTECTION] = "Status Protection";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
 	skill_names[SKILL_MAX_STAMINA] = "Max Stamina";
 	skill_names[SKILL_UNDERWATER] = "Underwater";
@@ -212,8 +212,8 @@ char* zyk_skill_description(int skill_index)
 		return "Each level increases how fast you can punch with Melee";
 	if (skill_index == SKILL_TRADER)
 		return "makes you able to get better prices when buying stuff from the seller";
-	if (skill_index == SKILL_WEAPON_DAMAGE)
-		return "Multiplies damage per amount of this weapon in your inventory by 2.5 per cent. The max amount of extra weapons used for the bonus will be the current skill level";
+	if (skill_index == SKILL_STATUS_PROTECTION)
+		return "Decreases duration of negative status effects, like Poison, Bleeding and Fire";
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio. Carrying stuff over the max weight will decrease your run speed and also decrease Stamina";
 	if (skill_index == SKILL_MAX_STAMINA)
@@ -277,7 +277,7 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_MELEE] = "skillmelee";
 	skill_names[SKILL_MELEE_SPEED] = "skillmeleepunchspeed";
 	skill_names[SKILL_TRADER] = "skilltrader";
-	skill_names[SKILL_WEAPON_DAMAGE] = "skillweapondamage";
+	skill_names[SKILL_STATUS_PROTECTION] = "skillstatusprotection";
 	skill_names[SKILL_MAX_WEIGHT] = "skillmaxweight";
 	skill_names[SKILL_MAX_STAMINA] = "skillmaxstamina";
 	skill_names[SKILL_UNDERWATER] = "skillunderwater";
@@ -345,6 +345,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = "Deflective Armor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = "Saber Armor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "Flame Thrower";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = "Weapon Damage Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "Stun Baton Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = "Blaster Pistol Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = "Bryar Pistol Upgrade";
@@ -544,6 +545,10 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7gives you the flame thrower. To use it, get stun baton and use alternate fire\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage to your current weapon based on the amount of them in your inventory. For example, if you are using a Disruptor and have a total of 20 Disruptors in your inventory, the damage will be multiplied by 1 per cent times 20, a total of 20 per cent bonus damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"", zyk_get_inventory_item_name(item_index)));
@@ -705,6 +710,7 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = "inventoryDeflectiveArmor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = "inventorySaberArmor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "inventoryFlameThrower";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = "inventoryWeaponDamage";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "inventoryStunBatonUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = "inventoryBlasterPistolUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = "inventoryBryarPistolUpgrade";
@@ -6707,7 +6713,10 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SABER_ARMOR][1] = 1000;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][0] = 1000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][1] = 700;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][1] = 600;
+
+	seller_items_cost[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE][0] = 1800;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE][1] = 900;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_STUN_BATON][0] = 1500;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_STUN_BATON][1] = 900;
