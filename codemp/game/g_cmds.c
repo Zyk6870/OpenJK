@@ -9795,7 +9795,7 @@ void Cmd_Silence_f( gentity_t *ent ) {
 	}
 }
 
-char* zyk_get_admin_command_description(zyk_settings_t admin_value)
+char* zyk_get_admin_command_description(zyk_admin_t admin_value)
 {
 	char* admin_descriptions[ADM_NUM_CMDS];
 
