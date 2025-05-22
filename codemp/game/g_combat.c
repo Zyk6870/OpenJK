@@ -6188,7 +6188,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			// zyk: Health Strength skill decreases damage taken
 			bonus_health_resistance += (0.02 * targ->client->pers.skill_levels[SKILL_HEALTH_STRENGTH]);
-
+			
 			// zyk: reduces damage based on the health resistance bonuses
 			take = (int)ceil(take * (1.00 - bonus_health_resistance));
 

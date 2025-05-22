@@ -487,6 +487,7 @@ qboolean zyk_there_is_player_or_npc_in_spot(float x, float y, float z)
 extern void Jedi_Cloak(gentity_t* self);
 extern int zyk_max_skill_level(int skill_index);
 extern int zyk_max_magic_power(gentity_t* ent);
+extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 char* zyk_get_enemy_type(int enemy_type)
 {
 	char* enemy_names[NUM_QUEST_NPCS];
@@ -5870,8 +5871,11 @@ void magic_power_events(gentity_t *ent)
 			// zyk: Magic Armor improves all magic powers
 			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
 			{
-				magic_bonus = 1;
+				magic_bonus += 1;
 			}
+
+			// zyk: Magic Affinity increases magic damage
+			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 8);
 
 			if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_MAGIC))
 			{
@@ -8955,42 +8959,58 @@ void G_RunFrame( int levelTime ) {
 			//      then we scale and set it to the jetpackFuel attribute to display the fuel bar correctly to the player
 			if (ent->client->jetPackOn && ent->client->jetPackDebReduce < level.time)
 			{
-				int jetpack_debounce_amount = JETPACK_FUEL_USAGE;
-
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
-				{ // zyk: Jetpack Upgrade decreases fuel debounce
-					jetpack_debounce_amount /= 2;
-				}
-
-				if (ent->client->pers.cmd.upmove > 0)
-				{ // zyk: jetpack thrusting
-					jetpack_debounce_amount *= 2;
-				}
-
-				ent->client->pers.jetpack_fuel -= jetpack_debounce_amount;
-
-				if (ent->client->pers.jetpack_fuel <= 0)
-				{ // zyk: out of fuel. Turn jetpack off
-					ent->client->pers.jetpack_fuel = 0;
-					Jetpack_Off(ent);
-				}
-
-				ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel / JETPACK_SCALE;
-
-				if (ent->client->sess.amrpgmode == 2)
+				if (ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK))
 				{
-					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL] = ent->client->pers.jetpack_fuel;
+					int jetpack_debounce_amount = JETPACK_FUEL_USAGE;
 
-					if (!(ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL)))
+					if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
+					{ // zyk: Jetpack Upgrade decreases fuel debounce
+						jetpack_debounce_amount /= 2;
+					}
+
+					if (ent->client->pers.cmd.upmove > 0)
+					{ // zyk: jetpack thrusting
+						jetpack_debounce_amount *= 2;
+					}
+
+					ent->client->pers.jetpack_fuel -= jetpack_debounce_amount;
+
+					if (ent->client->pers.jetpack_fuel <= 0)
+					{ // zyk: out of fuel. Turn jetpack off
+						ent->client->pers.jetpack_fuel = 0;
+						Jetpack_Off(ent);
+					}
+
+					ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel / JETPACK_SCALE;
+
+					if (ent->client->sess.amrpgmode == 2)
 					{
-						if (ent->client->pers.jetpack_fuel < 100)
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL] = ent->client->pers.jetpack_fuel;
+
+						if (!(ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL)))
 						{
-							ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
+							if (ent->client->pers.jetpack_fuel < 100)
+							{
+								ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
+							}
+							else
+							{
+								ent->client->ps.jetpackFuel = 100;
+							}
 						}
-						else
-						{
-							ent->client->ps.jetpackFuel = 100;
-						}
+					}
+				}
+				else if (ent->client->pers.in_magic_flight == qtrue)
+				{
+					int magic_flight_mp_usage = MAGIC_FLIGHT_MP_USAGE - ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT];
+
+					if (ent->client->pers.magic_power >= magic_flight_mp_usage)
+					{
+						ent->client->pers.magic_power -= magic_flight_mp_usage;
+					}
+					else
+					{
+						Jetpack_Off(ent);
 					}
 				}
 

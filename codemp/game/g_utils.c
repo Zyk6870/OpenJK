@@ -2128,6 +2128,23 @@ tryJetPack:
 		}
 	}
 
+	// zyk: Magic Flight
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)))
+	{
+		if (ent->client->pers.in_magic_flight == qtrue)
+		{
+			ent->client->pers.in_magic_flight = qfalse;
+			Jetpack_Off(ent);
+		}
+		else
+		{
+			ent->client->pers.in_magic_flight = qtrue;
+			Jetpack_On(ent);
+		}
+
+		return;
+	}
+
 	if ( (ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_AMMODISP)) /*&&
 		G_ItemUsable(&ent->client->ps, HI_AMMODISP)*/ )
 	{ //if you used nothing, then try spewing out some ammo

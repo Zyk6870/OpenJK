@@ -134,6 +134,7 @@ extern qboolean G_HeavyMelee( gentity_t *attacker );
 extern void Jedi_Decloak( gentity_t *self );
 
 extern int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int skill_index, int inventory_index);
+extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 
 static void WP_FireEmplaced( gentity_t *ent, qboolean altFire );
 
@@ -3991,7 +3992,11 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 		{ // zyk: Magic fist attacks. Shoots an electric bolt
 			gentity_t	*missile;
 			vec3_t origin, dir, zyk_forward;
-			int fist_damage = zyk_magic_fist_damage.integer + (ent->client->pers.skill_levels[SKILL_MAGIC_FIST] * (zyk_magic_fist_damage.integer * 0.30));
+			float fist_damage_increase_factor = 1.0;
+			int fist_damage = zyk_magic_fist_damage.integer;
+
+			fist_damage_increase_factor += ((ent->client->pers.skill_levels[SKILL_MAGIC_FIST] * 0.05) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01));
+			fist_damage *= fist_damage_increase_factor;
 
 			if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 				VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 12);
@@ -4021,7 +4026,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			// we don't want it to ever bounce
 			missile->bounceCount = 0;
 
-			rpg_skill_counter(ent, 10);
+			rpg_skill_counter(ent, (fist_damage / 10));
 			ent->client->pers.magic_power -= zyk_magic_fist_mp_cost.integer;
 
 			G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/demp2/fire.mp3"));

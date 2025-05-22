@@ -83,9 +83,9 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_UNDERWATER] = 2;
 	max_skill_levels[SKILL_RUN_SPEED] = 2;
 
-	max_skill_levels[SKILL_MAGIC_FIST] = 5;
-	max_skill_levels[SKILL_MAX_MP] = 10;
-	max_skill_levels[SKILL_MAGIC_AFFINITY] = 8;
+	max_skill_levels[SKILL_MAGIC_FIST] = 4;
+	max_skill_levels[SKILL_MAX_MP] = 12;
+	max_skill_levels[SKILL_MAGIC_FLIGHT] = 8;
 	max_skill_levels[SKILL_MAGIC_MAGIC_DOME] = 8;
 	max_skill_levels[SKILL_MAGIC_WATER_MAGIC] = 8;
 	max_skill_levels[SKILL_MAGIC_EARTH_MAGIC] = 8;
@@ -141,7 +141,7 @@ char* zyk_skill_name(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAX_MP] = "Max Magic Points";
-	skill_names[SKILL_MAGIC_AFFINITY] = "Magic Affinity";
+	skill_names[SKILL_MAGIC_FLIGHT] = "Magic Flight";
 	skill_names[SKILL_MAGIC_MAGIC_DOME] = "Magic Dome";
 	skill_names[SKILL_MAGIC_WATER_MAGIC] = "Water Magic";
 	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "Earth Magic";
@@ -227,8 +227,8 @@ char* zyk_skill_description(int skill_index)
 		return va("allows you to attack with magic bolts when using melee punches. At max level, can damage saber-only damage objects and move pushable/pullable objects. Damage per bolt is %d + ((%d / 2) * (this skill level))", zyk_magic_fist_damage.integer, zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have. Each level increases it by 100. This is used to cast magic powers";
-	if (skill_index == SKILL_MAGIC_AFFINITY)
-		return "decreases mp cost of magic powers";
+	if (skill_index == SKILL_MAGIC_FLIGHT)
+		return "allows you to fly using Magic Points. Each level increases flight speed and decreases mp usage";
 	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
 		return "an energy dome appears around you, damaging enemies inside it. It also increases your resistance to damage to your health a little. This power deals non-elemental damage";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
@@ -285,7 +285,7 @@ char* zyk_skill_key(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
 	skill_names[SKILL_MAX_MP] = "skillmaxmagicpoints";
-	skill_names[SKILL_MAGIC_AFFINITY] = "skillmagicaffinity";
+	skill_names[SKILL_MAGIC_FLIGHT] = "skillmagicflight";
 	skill_names[SKILL_MAGIC_MAGIC_DOME] = "skillmagicdome";
 	skill_names[SKILL_MAGIC_WATER_MAGIC] = "skillwatermagic";
 	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "skillearthmagic";
@@ -4922,10 +4922,42 @@ void display_yellow_bar(gentity_t *ent, int duration)
 	te->s.owner = ent->client->ps.clientNum;
 }
 
+// zyk: returns the amount of skills upgraded in a specific category (1 is force, 2 is misc, 3 is magic)
+int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
+{
+	int i = 0;
+	int first_skill_index = 0;
+	int last_skill_index = 0;
+	int skill_affinity = 0;
+
+	if (skill_category == SKILL_CATEGORY_FORCE)
+	{
+		first_skill_index = SKILL_JUMP;
+		last_skill_index = SKILL_FORCE_POWER;
+	}
+	else if (skill_category == SKILL_CATEGORY_MISC)
+	{
+		first_skill_index = SKILL_MAX_HEALTH;
+		last_skill_index = SKILL_RUN_SPEED;
+	}
+	else if (skill_category == SKILL_CATEGORY_MAGIC)
+	{
+		first_skill_index = SKILL_MAGIC_FIST;
+		last_skill_index = SKILL_MAGIC_LIGHT_MAGIC;
+	}
+
+	for (i = first_skill_index; i <= last_skill_index; i++)
+	{
+		skill_affinity += ent->client->pers.skill_levels[i];
+	}
+
+	return skill_affinity;
+}
+
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = ent->client->pers.skill_levels[SKILL_MAX_MP] * 100;
+	int max_mp = (ent->client->pers.skill_levels[SKILL_MAX_MP] * 100) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
 
 	return max_mp;
 }
@@ -5096,38 +5128,6 @@ void Cmd_AddBot_f( gentity_t *ent ) {
 }
 
 // zyk: new functions
-
-// zyk: returns the amount of skills upgraded in a specific category (1 is force, 2 is misc, 3 is magic)
-int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
-{
-	int i = 0;
-	int first_skill_index = 0;
-	int last_skill_index = 0;
-	int skill_affinity = 0;
-
-	if (skill_category == SKILL_CATEGORY_FORCE)
-	{
-		first_skill_index = SKILL_JUMP;
-		last_skill_index = SKILL_FORCE_POWER;
-	}
-	else if (skill_category == SKILL_CATEGORY_MISC)
-	{
-		first_skill_index = SKILL_MAX_HEALTH;
-		last_skill_index = SKILL_RUN_SPEED;
-	}
-	else if (skill_category == SKILL_CATEGORY_MAGIC)
-	{
-		first_skill_index = SKILL_MAGIC_FIST;
-		last_skill_index = SKILL_MAGIC_LIGHT_MAGIC;
-	}
-
-	for (i = first_skill_index; i <= last_skill_index; i++)
-	{
-		skill_affinity += ent->client->pers.skill_levels[i];
-	}
-
-	return skill_affinity;
-}
 
 // zyk: sets the Max HP a player can have in RPG Mode
 void set_max_health(gentity_t *ent)
@@ -10617,13 +10617,13 @@ Cmd_Magic_f
 int zyk_get_magic_cost(int magic_number)
 {
 	int magic_costs[MAX_MAGIC_POWERS] = {
-		40, // Dome of Damage
-		40, // Water Magic
-		40, // Earth Magic
-		40, // Fire Magic
-		40, // Air Magic
-		40, // Dark Magic
-		40 // Light Magic
+		100, // Dome of Damage
+		100, // Water Magic
+		100, // Earth Magic
+		100, // Fire Magic
+		100, // Air Magic
+		100, // Dark Magic
+		100 // Light Magic
 	};
 
 	return magic_costs[magic_number];
@@ -10690,11 +10690,8 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 		{ // zyk: use the magic power
 			int magic_cost = zyk_get_magic_cost(magic_number);
 
-			// zyk: Magic Armor reduces mp cost
-			if (ent->client->pers.skill_levels[SKILL_MAGIC_AFFINITY] > 0)
-			{
-				magic_cost -= ent->client->pers.skill_levels[SKILL_MAGIC_AFFINITY];
-			}
+			// zyk: Magic Affinity reduces mp cost
+			magic_cost -= zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC);
 
 			if (ent->client->pers.magic_power >= magic_cost)
 			{

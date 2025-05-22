@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.2.22"
+#define	GAMEVERSION	"New Zyk Mod v1.2.23"
 
 #define SECURITY_LOG "security.log"
 
@@ -636,7 +636,7 @@ typedef enum {
 	SKILL_RUN_SPEED,
 	SKILL_MAGIC_FIST,
 	SKILL_MAX_MP,
-	SKILL_MAGIC_AFFINITY,
+	SKILL_MAGIC_FLIGHT,
 	SKILL_MAGIC_MAGIC_DOME,
 	SKILL_MAGIC_WATER_MAGIC,
 	SKILL_MAGIC_EARTH_MAGIC,
@@ -849,9 +849,10 @@ typedef enum {
 #define MAGIC_ANIM_TIME 1400
 
 // zyk: magic power stats
-#define MAGIC_MIN_DMG 1
-#define MAGIC_MIN_RANGE 225
-#define MAGIC_RANGE_BONUS 25
+#define MAGIC_MIN_DMG 0
+#define MAGIC_MIN_RANGE 180
+#define MAGIC_RANGE_BONUS 20
+#define MAGIC_FLIGHT_MP_USAGE 10
 
 // zyk: damage bonus of weapons
 #define RPG_WEAPON_DMG_BONUS 0.025
@@ -1113,6 +1114,8 @@ typedef struct clientPersistant_s {
 
 	// zyk: used to print the current MP for the player
 	int last_magic_power_shown;
+
+	qboolean in_magic_flight;
 
 	// zyk: quest control fields
 	int quest_tries;

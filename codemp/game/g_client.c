@@ -3842,6 +3842,7 @@ void ClientSpawn(gentity_t *ent) {
 
 	// zyk: initializing Quest Power attributes
 	ent->client->pers.quest_power_status = 0;
+	ent->client->pers.in_magic_flight = qfalse;
 
 	ent->client->pers.skill_crystal_timer = 0;
 
