@@ -5483,6 +5483,7 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 }
 
 extern qboolean duel_tournament_is_duelist(gentity_t *ent);
+extern int zyk_skill_affinity(gentity_t* ent, int skill_category);
 void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 {
 	int			i, holo, holoregen;
@@ -5980,8 +5981,8 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 						self->client->ps.fd.forcePowerRegenDebounceTime += Q_max(g_forceRegenTime.integer*0.7, 1);
 				}
 				else if (self->client->sess.amrpgmode == 2)
-				{ // zyk: Faster Force Regen skill, sets time in miliseconds based on the skill level
-					self->client->ps.fd.forcePowerRegenDebounceTime += (80 - (10 * self->client->pers.skill_levels[SKILL_FASTER_FORCE_REGEN]));
+				{ // zyk: force regen for RPG players is based on the Force Affinity
+					self->client->ps.fd.forcePowerRegenDebounceTime += (99 - zyk_skill_affinity(self, SKILL_CATEGORY_FORCE));
 				}
 				else
 				{

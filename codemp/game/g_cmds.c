@@ -70,7 +70,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_RAGE] = 4;
 	max_skill_levels[SKILL_TEAM_ENERGIZE] = 4;
 	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
-	max_skill_levels[SKILL_FASTER_FORCE_REGEN] = 5;
 	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
 	max_skill_levels[SKILL_MAX_HEALTH] = 10;
@@ -127,8 +126,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_RAGE] = "Rage";
 	skill_names[SKILL_TEAM_ENERGIZE] = "Team Energize";
 	skill_names[SKILL_SENSE_HEALTH] = "Sense Health";
-	skill_names[SKILL_FASTER_FORCE_REGEN] = "Faster Force Regen";
-	skill_names[SKILL_FORCE_POWER] = "Force Power";
+	skill_names[SKILL_FORCE_POWER] = "Max Force";
 
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
@@ -201,8 +199,6 @@ char* zyk_skill_description(int skill_index)
 		return "restores some force power to players near you. At a level > 3, If force power is full, restores some Stamina and power cell ammo";
 	if (skill_index == SKILL_SENSE_HEALTH)
 		return "allows you to see info about someone, including npcs. Level 1 shows current health. Level 2 shows name, health and shield. Level 3 shows name, health and max health, shield and max shield, force and max force, mp and max mp, Stamina and Max Stamina. To use it, when you are near a player or npc, use ^3Sense ^7force power";
-	if (skill_index == SKILL_FASTER_FORCE_REGEN)
-		return "increases how fast your force is recovered";
 	if (skill_index == SKILL_FORCE_POWER)
 		return "increases the max force power you have. Necessary to allow you to use force powers and force-based skills";
 
@@ -274,7 +270,6 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_RAGE] = "skillrage";
 	skill_names[SKILL_TEAM_ENERGIZE] = "skillteamenergize";
 	skill_names[SKILL_SENSE_HEALTH] = "skillsensehealth";
-	skill_names[SKILL_FASTER_FORCE_REGEN] = "skillfasterforceregen";
 	skill_names[SKILL_FORCE_POWER] = "skillforcepower";
 
 	skill_names[SKILL_MAX_HEALTH] = "skillmaxhealth";
@@ -6513,6 +6508,38 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 }
 
+// zyk: returns the amount of skills upgraded in a specific category (1 is force, 2 is misc, 3 is magic)
+int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
+{
+	int i = 0;
+	int first_skill_index = 0;
+	int last_skill_index = 0;
+	int skill_affinity = 0;
+
+	if (skill_category == SKILL_CATEGORY_FORCE)
+	{
+		first_skill_index = SKILL_JUMP;
+		last_skill_index = SKILL_FORCE_POWER;
+	}
+	else if (skill_category == SKILL_CATEGORY_MISC)
+	{
+		first_skill_index = SKILL_MAX_HEALTH;
+		last_skill_index = SKILL_RUN_SPEED;
+	}
+	else if (skill_category == SKILL_CATEGORY_MAGIC)
+	{
+		first_skill_index = SKILL_MAGIC_FIST;
+		last_skill_index = SKILL_MAGIC_LIGHT_MAGIC;
+	}
+
+	for (i = first_skill_index; i <= last_skill_index; i++)
+	{
+		skill_affinity += ent->client->pers.skill_levels[i];
+	}
+
+	return skill_affinity;
+}
+
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
 	char message[MAX_STRING_CHARS];
@@ -6560,6 +6587,10 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 	{
 		strcpy(message, va("%s^3Stamina: ^2%d/%d\n", message, ent->client->pers.current_stamina, ent->client->pers.max_stamina));
 	}
+
+	strcpy(message, va("%s^3Force Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE)));
+	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MISC)));
+	strcpy(message, va("%s^3Magic Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC)));
 
 	trap->SendServerCommand(target_ent->s.number, va("%s^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
 		message, ent->client->pers.credits));
