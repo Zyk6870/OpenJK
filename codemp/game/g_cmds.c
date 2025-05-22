@@ -753,6 +753,21 @@ char* zyk_inventory_key(int inventory_index)
 	return "";
 }
 
+int zyk_get_max_health(gentity_t* ent)
+{
+	if (!ent || !(ent->client))
+	{
+		return 0;
+	}
+
+	if (ent->client->sess.amrpgmode == 2)
+	{
+		return ent->client->pers.max_rpg_health;
+	}
+
+	return ent->client->ps.stats[STAT_MAX_HEALTH];
+}
+
 /*
 ==================
 DeathmatchScoreboardMessage

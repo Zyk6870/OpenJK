@@ -1147,6 +1147,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 	}
 }
 
+extern int zyk_get_max_health(gentity_t* ent);
 void ForceHeal( gentity_t *self )
 {
 	if ( self->health <= 0 )
@@ -1167,7 +1168,7 @@ void ForceHeal( gentity_t *self )
 	// zyk: Heal will have a cooldown time
 	self->client->ps.fd.forceHealTime = level.time + 1000;
 
-	if ( self->health >= self->client->ps.stats[STAT_MAX_HEALTH])
+	if ( self->health >= zyk_get_max_health(self))
 	{
 		// zyk: Heal at a level > 3. When player has full health, restore some shield
 		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_HEAL] > 3 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
@@ -1192,46 +1193,18 @@ void ForceHeal( gentity_t *self )
 	if (self->client->ps.fd.forcePowerLevel[FP_HEAL] == FORCE_LEVEL_4)
 	{
 		self->health += 30; //This was 50, but that angered the Balance God.
-
-		if (self->health > self->client->ps.stats[STAT_MAX_HEALTH])
-		{
-			self->health = self->client->ps.stats[STAT_MAX_HEALTH];
-		}
-
-		BG_ForcePowerDrain(&self->client->ps, FP_HEAL, 0);
 	}
 	else if (self->client->ps.fd.forcePowerLevel[FP_HEAL] == FORCE_LEVEL_3)
 	{
 		self->health += 25; //This was 50, but that angered the Balance God.
-
-		if (self->health > self->client->ps.stats[STAT_MAX_HEALTH])
-		{
-			self->health = self->client->ps.stats[STAT_MAX_HEALTH];
-		}
-
-		BG_ForcePowerDrain( &self->client->ps, FP_HEAL, 0 );
 	}
 	else if (self->client->ps.fd.forcePowerLevel[FP_HEAL] == FORCE_LEVEL_2)
 	{
 		self->health += 10;
-
-		if (self->health > self->client->ps.stats[STAT_MAX_HEALTH])
-		{
-			self->health = self->client->ps.stats[STAT_MAX_HEALTH];
-		}
-
-		BG_ForcePowerDrain( &self->client->ps, FP_HEAL, 0 );
 	}
 	else
 	{
 		self->health += 5;
-
-		if (self->health > self->client->ps.stats[STAT_MAX_HEALTH])
-		{
-			self->health = self->client->ps.stats[STAT_MAX_HEALTH];
-		}
-		
-		BG_ForcePowerDrain( &self->client->ps, FP_HEAL, 0 );
 	}
 	/*
 	else
@@ -1240,6 +1213,13 @@ void ForceHeal( gentity_t *self )
 	}
 	*/
 	//NOTE: Decided to make all levels instant.
+
+	if (self->health > zyk_get_max_health(self))
+	{
+		self->health = zyk_get_max_health(self);
+	}
+
+	BG_ForcePowerDrain(&self->client->ps, FP_HEAL, 0);
 
 	rpg_skill_counter(self, 100);
 
@@ -1322,9 +1302,9 @@ void ForceTeamHeal( gentity_t *self )
 		if (ent && ent->client && self != ent && 
 			((!ent->NPC && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR) || 
 			 (ent->client->playerTeam != NPCTEAM_ENEMY && ent->s.NPC_class != CLASS_VEHICLE)) && 
-			 (ent->client->ps.stats[STAT_HEALTH] < ent->client->ps.stats[STAT_MAX_HEALTH] || 
+			 (ent->client->ps.stats[STAT_HEALTH] < zyk_get_max_health(ent) ||
 			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_TEAM_HEAL] > 3 && // Team Heal level > 3 in RPG Mode
-			 !ent->NPC && ent->client->ps.stats[STAT_HEALTH] >= ent->client->ps.stats[STAT_MAX_HEALTH] && 
+			 !ent->NPC && ent->client->ps.stats[STAT_HEALTH] >= zyk_get_max_health(ent) &&
 			 ((ent->client->sess.amrpgmode < 2 && ent->client->ps.stats[STAT_ARMOR] < 100) || (ent->client->sess.amrpgmode == 2 && 
 			 ent->client->ps.stats[STAT_ARMOR] < max_shield)))) && ent->client->ps.stats[STAT_HEALTH] > 0 && ForcePowerUsableOn(self, ent, FP_TEAM_HEAL) &&
 		 	trap->InPVS(self->client->ps.origin, ent->client->ps.origin) && 
@@ -1376,7 +1356,7 @@ void ForceTeamHeal( gentity_t *self )
 
 			// zyk: Team Shield Heal skill of RPG Mode
 			if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_TEAM_HEAL] > 3 &&
-				!g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.stats[STAT_HEALTH] >= g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH] && 
+				!g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.stats[STAT_HEALTH] >= zyk_get_max_health(&g_entities[pl[i]]) &&
 				g_entities[pl[i]].client->ps.stats[STAT_ARMOR] < max_shield)
 			{ // zyk: can only be used on players with full health already
 				int shield_heal_amount = 4 * (self->client->pers.skill_levels[SKILL_TEAM_HEAL] - 3);
@@ -1393,9 +1373,9 @@ void ForceTeamHeal( gentity_t *self )
 
 			rpg_skill_counter(self, 20);
 
-			if (g_entities[pl[i]].client->ps.stats[STAT_HEALTH] > g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH])
+			if (g_entities[pl[i]].client->ps.stats[STAT_HEALTH] > zyk_get_max_health(&g_entities[pl[i]]))
 			{
-				g_entities[pl[i]].client->ps.stats[STAT_HEALTH] = g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH];
+				g_entities[pl[i]].client->ps.stats[STAT_HEALTH] = zyk_get_max_health(&g_entities[pl[i]]);
 			}
 
 			g_entities[pl[i]].health = g_entities[pl[i]].client->ps.stats[STAT_HEALTH];
