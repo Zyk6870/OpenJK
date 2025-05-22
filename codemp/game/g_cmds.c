@@ -635,7 +635,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. Give extra tries for the main quest. Keeping some in the inventory increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. The ones you keep in your inventory increase regen rate of the Spirit Tree and increase Magic Armor, Energy Modulator and Seller chance to appear. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
@@ -2775,21 +2775,6 @@ void load_account(gentity_t* ent)
 
 					read_content_type = qfalse;
 				}
-				else if (Q_stricmp(content_type, "quest_tries") == 0)
-				{
-					read_status = fscanf(account_file, "%s", content);
-					ent->client->pers.quest_tries = atoi(content);
-				}
-				else if (Q_stricmp(content_type, "quest_defeated_enemies") == 0)
-				{
-					read_status = fscanf(account_file, "%s", content);
-					ent->client->pers.quest_defeated_enemies = atoi(content);
-				}
-				else if (Q_stricmp(content_type, "quest_masters_defeated") == 0)
-				{
-					read_status = fscanf(account_file, "%s", content);
-					ent->client->pers.quest_masters_defeated = atoi(content);
-				}
 				else if (Q_stricmp(content_type, "quest_progress") == 0)
 				{
 					read_status = fscanf(account_file, "%s", content);
@@ -2879,8 +2864,9 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 				strcpy(content, va("%s\n%s\n%d", content, zyk_inventory_key(i), client->pers.rpg_inventory[i]));
 			}
 
-			strcpy(content, va("%s\nquest_tries\n%d\nquest_defeated_enemies\n%d\nquest_masters_defeated\n%d\nquest_progress\n%d\nquest_missions\n%d\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d\nlast_stamina\n%d\ntutorial_shown\n%d",
-				content, client->pers.quest_tries, client->pers.quest_defeated_enemies, client->pers.quest_masters_defeated, client->pers.quest_progress, client->pers.quest_missions, client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina, client->pers.tutorial_shown));
+			strcpy(content, va("%s\nquest_progress\n%d\nquest_missions\n%d\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d\nlast_stamina\n%d\ntutorial_shown\n%d",
+				content, client->pers.quest_progress, client->pers.quest_missions, 
+				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina, client->pers.tutorial_shown));
 
 			// zyk: saving all content into the file
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
@@ -5818,13 +5804,7 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 
 void zyk_set_default_quest_fields(gentity_t* ent)
 {
-	ent->client->pers.quest_tries = MIN_QUEST_TRIES;
-	ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = 0;
-	ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] = 0;
-
-	ent->client->pers.quest_defeated_enemies = 0;
-	ent->client->pers.quest_masters_defeated = 0;
-	ent->client->pers.quest_progress = 0;
+	ent->client->pers.quest_progress = INITIAL_QUEST_PROGRESS;
 	ent->client->pers.quest_spirit_tree_id = -1;
 
 	ent->client->pers.quest_missions = 0;
@@ -6974,7 +6954,7 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
 {
-	if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE))
+	if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_COMPLETED))
 	{
 		return qtrue;
 	}
@@ -7167,7 +7147,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			trap->SendServerCommand(target_ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
 		}
-		else if (ent->client->pers.quest_defeated_enemies == 0 && !(ent->client->pers.quest_missions & (1 << MAIN_QUEST_START)))
+		else if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_START)))
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
@@ -7198,17 +7178,14 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		else
 		{
 			char quest_desc[MAX_STRING_CHARS];
-			int quest_tries = ent->client->pers.quest_tries + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL];
 
-			strcpy(quest_desc, va("\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nDefeat enough enemies to weaken their army and make the Spirit Tree summoned.\nDefeat the Mage Masters and regenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditating in the tree, the amount of ^4Blue ^7crystals you have and defeating enemies will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^4Blue ^7crystal call your Spirit Tree.\n^4Blue ^7crystals makes new allies stronger and appear more often.\n^2Green ^7crystals increase Quest Tries.\n^1Red ^7crystals creates a Lightning Dome by holding Use key.\n\n", QUESTCHAR_ALL_SPIRITS));
+			strcpy(quest_desc, va("\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nRegenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditate in the tree to regen it. The green crystals you have will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^2Green ^7crystal call your Spirit Tree.\n^4Blue ^7crystals you have make new allies stronger and appear more often.\n^1Red ^7crystals unleashes a Lightning Dome by holding Use key.\n\n", QUESTCHAR_ALL_SPIRITS));
 
 			trap->SendServerCommand(target_ent->s.number,
-				va("print \"%s^3Enemies defeated: ^7%d/%d\n^3Masters defeated: ^7%d/%d\n^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n^3Quest Tries: ^7%d\n\n\"",
+				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
 					quest_desc,
-					ent->client->pers.quest_defeated_enemies, QUEST_MIN_ENEMIES_TO_DEFEAT,
-					ent->client->pers.quest_masters_defeated, QUEST_MASTERS_TO_DEFEAT,
 					ent->client->pers.quest_progress, MAX_QUEST_PROGRESS,
-					zyk_number_of_allies_in_map(ent), zyk_number_of_enemies_in_map(), quest_tries));
+					zyk_number_of_allies_in_map(ent), zyk_number_of_enemies_in_map()));
 		}
 	}
 	else
@@ -8218,7 +8195,7 @@ void Cmd_Settings_f( gentity_t *ent ) {
 			return;
 		}
 
-		if (value == SETTINGS_DIFFICULTY && ent->client->pers.quest_defeated_enemies > 0)
+		if (value == SETTINGS_DIFFICULTY && ent->client->pers.quest_missions & (1 << MAIN_QUEST_START))
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"Cannot change %s after quest started.\n\"", zyk_get_settings_description(SETTINGS_DIFFICULTY)));
 			return;

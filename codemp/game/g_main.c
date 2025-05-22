@@ -7340,7 +7340,7 @@ void zyk_show_tutorial(gentity_t* ent)
 
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
-	int interval_time = QUEST_NPC_SPAWN_TIME - (level.num_entities * 10);
+	int interval_time = QUEST_NPC_SPAWN_TIME - (level.num_entities * 10); // zyk: bigger maps have more entities. A higher spawn frequency increases chance to find quest npcs
 
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT))
 	{ //zyk: player is in tutorial for the first time. Do not spawn quest npcs yet
@@ -7511,16 +7511,7 @@ void zyk_start_main_quest_spirits_event(gentity_t* ent)
 	}
 }
 
-void zyk_set_starting_quest_progress(gentity_t* ent)
-{
-	ent->client->pers.quest_progress = MAX_QUEST_PROGRESS / 20;
-
-	if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
-	{ // zyk: Hard Mode
-		ent->client->pers.quest_progress = MAX_QUEST_PROGRESS / 100;
-	}
-}
-
+extern void zyk_set_default_quest_fields(gentity_t* ent);
 void zyk_show_quest_riddle(gentity_t* ent)
 {
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 0)
@@ -7616,6 +7607,7 @@ void zyk_spirit_tree_events(gentity_t* ent)
 		}
 	}
 
+	// zyk: Spirit Tree events
 	if (tree_ent && Q_stricmp(tree_ent->classname, "fx_runner") == 0 && Q_stricmp(tree_ent->targetname, "zyk_spirit_tree") == 0)
 	{
 		int quest_progress_change = 0;
@@ -7627,31 +7619,23 @@ void zyk_spirit_tree_events(gentity_t* ent)
 		float tree_y = tree_ent->s.origin[1];
 		float tree_z = tree_ent->s.origin[2];
 
-		quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] +
-			(ent->client->pers.quest_defeated_enemies - QUEST_MIN_ENEMIES_TO_DEFEAT));
-
 		if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
 		{
+			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
+				ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+			{ // zyk: meditating inside the tree
+				quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL]);
+
+				if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+				{ // zyk: Hard Mode
+					quest_progress_change /= 2;
+				}
+			}
+
 			trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
 		}
 
-		if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
-			ent->client->ps.forceDodgeAnim == BOTH_MEDITATE &&
-			distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
-		{
-			// zyk: meditating inside the tree makes it regen faster
-			quest_progress_change *= 2;
-		}
-
 		quest_progress_change -= zyk_spirit_tree_wither(tree_x, tree_y, tree_z);
-
-		if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
-		{ // zyk: Hard Mode
-			if (quest_progress_change > 0)
-			{
-				quest_progress_change /= 2;
-			}
-		}
 
 		ent->client->pers.quest_progress += quest_progress_change;
 
@@ -7659,16 +7643,12 @@ void zyk_spirit_tree_events(gentity_t* ent)
 		{
 			ent->client->pers.quest_progress = MAX_QUEST_PROGRESS;
 
-			// zyk: completed the second part of the quest
-			if (ent->client->pers.quest_progress == MAX_QUEST_PROGRESS &&
-				ent->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT)
-			{
-				zyk_start_main_quest_spirits_event(ent);
-			}
+			// zyk: completed the quest
+			zyk_start_main_quest_spirits_event(ent);
 		}
 		else if (ent->client->pers.quest_progress <= 0)
-		{ // zyk: if Spirit Tree is completely withered, player dies and loses a quest try
-			zyk_set_starting_quest_progress(ent);
+		{ // zyk: if Spirit Tree is completely withered, player dies
+			zyk_set_default_quest_fields(ent);
 
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The Spirit Tree is completely withered!\n\"", QUESTCHAR_ALL_SPIRITS));
 
@@ -9401,9 +9381,7 @@ void G_RunFrame( int levelTime ) {
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time && 
 					!(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
 				{
-					int main_quest_progress = (ent->client->pers.quest_defeated_enemies / 2) +
-						(ent->client->pers.quest_masters_defeated * 2) +
-						(((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 10);
+					int main_quest_progress = ((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 100;
 
 					int side_quest_item_chance_modifier = ENERGY_MODULATOR_PARTS * QUEST_LOG_PARTS;
 
@@ -9597,7 +9575,7 @@ void G_RunFrame( int levelTime ) {
 					// zyk: spirits events of the quest
 					if (ent->client->pers.quest_spirits_event_step > 0 && ent->client->pers.quest_spirits_event_timer < level.time)
 					{
-						if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE)))
+						if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_COMPLETED)))
 						{
 							if (ent->client->pers.quest_spirits_event_step == 1)
 							{
@@ -9661,7 +9639,7 @@ void G_RunFrame( int levelTime ) {
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 7)
 								{
-									ent->client->pers.quest_missions |= (1 << MAIN_QUEST_SECOND_PART_COMPLETE);
+									ent->client->pers.quest_missions |= (1 << MAIN_QUEST_COMPLETED);
 								}
 							}
 
@@ -9678,7 +9656,7 @@ void G_RunFrame( int levelTime ) {
 
 					// zyk: Spirit Tree regen and wither
 					if (zyk_is_main_quest_complete(ent) == qfalse &&
-						ent->client->pers.quest_defeated_enemies >= QUEST_MIN_ENEMIES_TO_DEFEAT &&
+						ent->client->pers.quest_missions & (1 << MAIN_QUEST_START) &&
 						ent->client->pers.quest_spirits_event_step == 0 &&
 						ent->client->pers.quest_progress_timer < level.time)
 					{
@@ -9688,9 +9666,9 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					// zyk: quest npcs
-					if (ent->client->pers.quest_event_timer < level.time && 
-						(ent->client->pers.quest_defeated_enemies > 0 || ent->client->pers.quest_missions & (1 << MAIN_QUEST_START)))
+					if (ent->client->pers.quest_event_timer < level.time && ent->client->pers.quest_missions & (1 << MAIN_QUEST_START))
 					{
+						int main_quest_progress = ((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 100;
 						qboolean hard_difficulty = qfalse;
 
 						if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
@@ -9703,37 +9681,28 @@ void G_RunFrame( int levelTime ) {
 						if (ent->client->pers.quest_spirits_event_step == 0 && zyk_is_main_quest_complete(ent) == qfalse)
 						{
 							int enemy_type = 0;
-							zyk_quest_npc_t stronger_enemy_type = QUEST_NPC_LOW_TRAINED_WARRIOR - (ent->client->pers.quest_defeated_enemies / 5);
+							int mage_master_chance = 0;
+							zyk_quest_npc_t stronger_enemy_type = QUEST_NPC_LOW_TRAINED_WARRIOR;
 							
-							if (stronger_enemy_type < QUEST_NPC_MAGE_MINISTER)
+							if (hard_difficulty == qtrue)
 							{
-								stronger_enemy_type = QUEST_NPC_MAGE_MINISTER;
-							}
-
-							if (ent->client->pers.quest_defeated_enemies < QUEST_MIN_ENEMIES_TO_DEFEAT)
-							{
-								enemy_type = Q_irand(stronger_enemy_type, QUEST_NPC_LOW_TRAINED_WARRIOR);
+								stronger_enemy_type -= (main_quest_progress / 4);
 							}
 							else
 							{
-								int mage_master_chance = 
-									(ent->client->pers.quest_defeated_enemies - QUEST_MIN_ENEMIES_TO_DEFEAT) + 
-									(ent->client->pers.quest_masters_defeated * 2) + 
-									((ent->client->pers.quest_progress * 20.0) / MAX_QUEST_PROGRESS);
-
-								enemy_type = Q_irand(QUEST_NPC_MAGE_MINISTER, QUEST_NPC_LOW_TRAINED_WARRIOR);
-
-								if (ent->client->pers.quest_masters_defeated < QUEST_MASTERS_TO_DEFEAT && 
-									!(level.special_quest_npc_in_map & (1 << QUEST_NPC_MAGE_MASTER)) && 
-									Q_irand(0, 99) < mage_master_chance)
-								{
-									enemy_type = QUEST_NPC_MAGE_MASTER;
-								}
+								stronger_enemy_type -= (main_quest_progress / 6);
 							}
+
+							if (stronger_enemy_type < QUEST_NPC_MAGE_MASTER)
+							{
+								stronger_enemy_type = QUEST_NPC_MAGE_MASTER;
+							}
+
+							enemy_type = Q_irand(stronger_enemy_type, QUEST_NPC_LOW_TRAINED_WARRIOR);
 
 							if (zyk_number_of_enemies_in_map() < (zyk_max_quest_npcs.integer / 2))
 							{
-								zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], ent->client->pers.quest_defeated_enemies, hard_difficulty, -1);
+								zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], main_quest_progress, hard_difficulty, -1);
 							}
 						}
 
@@ -9742,7 +9711,7 @@ void G_RunFrame( int levelTime ) {
 							Q_irand(0, 99) < (1 + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 						{ // zyk: spawn an ally
 							int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
-							int ally_bonus = (ent->client->pers.quest_defeated_enemies / 2) + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
+							int ally_bonus = (main_quest_progress / 2) + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
 
 							zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
 						}

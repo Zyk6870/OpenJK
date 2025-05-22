@@ -2159,24 +2159,24 @@ extern char* zyk_get_enemy_type(int enemy_type);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 extern void zyk_set_default_quest_fields(gentity_t* ent);
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
-void zyk_decrease_quest_tries(gentity_t *ent)
+void zyk_decrease_quest_progress(gentity_t *ent)
 {
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] > 0)
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_GREEN_CRYSTAL, 1);
+	if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+	{ // zyk: Hard Mode
+		ent->client->pers.quest_progress -= (QUEST_PROGRESS_DECREASE * 5);
 	}
 	else
-	{
-		ent->client->pers.quest_tries--;
+	{ // zyk: Normal Mode
+		ent->client->pers.quest_progress -= QUEST_PROGRESS_DECREASE;
 	}
 
-	if (ent->client->pers.quest_tries <= 0)
+	if (ent->client->pers.quest_progress <= 0)
 	{
 		zyk_set_default_quest_fields(ent);
 
 		zyk_NPC_Kill_f("all");
 
-		trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You have no tries left. Quests reset\n\"");
+		trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7Spirit Tree withered. Quests reset\n\"");
 	}
 
 	save_account(ent, qtrue);
@@ -2218,8 +2218,6 @@ extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
-extern void zyk_start_main_quest_spirits_event(gentity_t* ent);
-extern void zyk_set_starting_quest_progress(gentity_t* ent);
 extern void zyk_spawn_crystal(float x, float y, float z, int duration, zyk_quest_item_t crystal_type);
 extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
 
@@ -2720,45 +2718,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
 				self->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && self->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
 			{
-				if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
-				{
-					quest_player->client->pers.quest_masters_defeated += 1;
-				}
-
-				quest_player->client->pers.quest_defeated_enemies += 1;
 				quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
-
-				// zyk: add an interval in this case so player has enough time to prepare
-				if ((quest_player->client->pers.quest_defeated_enemies % QUEST_NPC_BONUS_INCREASE) == 0)
-				{
-					quest_player->client->pers.quest_event_timer += QUEST_NPC_SPAWN_TIME;
-				}
-
-				if (quest_player->client->pers.quest_masters_defeated >= QUEST_MASTERS_TO_DEFEAT)
-				{
-					quest_player->client->pers.quest_masters_defeated = QUEST_MASTERS_TO_DEFEAT;
-				}
-
-				if (quest_player->client->pers.quest_defeated_enemies >= QUEST_MIN_ENEMIES_TO_DEFEAT)
-				{
-					quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_FIRST_PART_COMPLETE);
-
-					if (quest_player->client->pers.quest_defeated_enemies == QUEST_MIN_ENEMIES_TO_DEFEAT)
-					{ // zyk: start the second part of the quest, the Spirit Tree regen
-						zyk_set_starting_quest_progress(quest_player);
-
-						quest_player->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
-					}
-				}
-
-				// zyk: completed second part of the quest
-				if (quest_player->client->pers.quest_progress == MAX_QUEST_PROGRESS && 
-					quest_player->client->pers.quest_masters_defeated == QUEST_MASTERS_TO_DEFEAT && 
-					!(quest_player->client->pers.quest_missions & (1 << MAIN_QUEST_SECOND_PART_COMPLETE)) && 
-					quest_player->client->pers.quest_spirits_event_step == 0)
-				{
-					zyk_start_main_quest_spirits_event(quest_player);
-				}
 			}
 		}
 	}
@@ -2799,16 +2759,8 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		!(attacker && attacker->client && attacker != self && attacker->s.number < MAX_CLIENTS) && // zyk: dying to players will not reset quest tries
 		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_KEEP_QUEST_TRIES)) // zyk: dont reset in this case, for example, when player logs into his account
 		)
-	{ // zyk: player died in quest. Decrease number of tries
-		// zyk: also decrease regen progress
-		self->client->pers.quest_progress -= (MAX_QUEST_PROGRESS / 100);
-
-		if (self->client->pers.quest_progress < 0)
-		{
-			self->client->pers.quest_progress = 0;
-		}
-
-		zyk_decrease_quest_tries(self);
+	{ // zyk: player died in quest
+		zyk_decrease_quest_progress(self);
 	}
 
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_KEEP_QUEST_TRIES);

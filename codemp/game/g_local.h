@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.2.25"
+#define	GAMEVERSION	"New Zyk Mod v1.3.0"
 
 #define SECURITY_LOG "security.log"
 
@@ -800,8 +800,7 @@ typedef enum {
 
 typedef enum {
 	MAIN_QUEST_START,
-	MAIN_QUEST_FIRST_PART_COMPLETE,
-	MAIN_QUEST_SECOND_PART_COMPLETE,
+	MAIN_QUEST_COMPLETED,
 	NUM_QUEST_MISSIONS
 } zyk_quest_mission_t;
 
@@ -893,21 +892,21 @@ typedef enum {
 #define QUESTCHAR_SELLER "^3Seller"
 
 // zyk: quest values
+#define INITIAL_QUEST_PROGRESS 1000
+#define QUEST_PROGRESS_DECREASE 1000
 #define MAX_QUEST_PROGRESS 100000
 #define SIDE_QUEST_STUFF_TIMER 1000
 #define SIDE_QUEST_PUZZLE_TIMER 90000
 #define ENERGY_MODULATOR_PARTS 3
 #define QUEST_ITEM_DISTANCE 48
 #define QUEST_LOG_PARTS 5
-#define QUEST_MASTERS_TO_DEFEAT 5
 #define QUEST_SPIRIT_TREE_DEFAULT_SCALE 1
 #define QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET 4
 #define QUEST_SPIRIT_TREE_RADIUS 50
 #define QUEST_SPIRIT_TREE_CALL_COST 1
 #define QUEST_SPIRIT_TREE_WITHER_RATE 20.0
-#define QUEST_SPIRIT_TREE_REGEN_RATE 40
+#define QUEST_SPIRIT_TREE_REGEN_RATE 100
 #define QUEST_SPIRIT_TREE_SPAWN_TIMER 3000
-#define QUEST_MIN_ENEMIES_TO_DEFEAT 60
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_NPC_SPAWN_TIME 27000
 #define QUEST_WORM_MP_TO_RESTORE 5
@@ -919,9 +918,6 @@ typedef enum {
 
 // zyk: timer used in the final Main Quest event
 #define QUEST_FINAL_EVENT_TIMER 25000
-
-// zyk: minimum amount of quest tries
-#define MIN_QUEST_TRIES 1
 
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
@@ -1119,9 +1115,6 @@ typedef struct clientPersistant_s {
 	qboolean in_magic_flight;
 
 	// zyk: quest control fields
-	int quest_tries;
-	int quest_defeated_enemies;
-	int quest_masters_defeated;
 	int quest_progress;
 	int quest_event_timer;
 	int quest_spirits_event_step;
