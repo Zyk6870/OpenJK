@@ -1169,10 +1169,12 @@ void ForceHeal( gentity_t *self )
 
 	if ( self->health >= self->client->ps.stats[STAT_MAX_HEALTH])
 	{
-		// zyk: Shield Heal skill. Done when player has full HP
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_SHIELD_HEALING] > 0 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
+		// zyk: Heal at a level > 3. When player has full health, restore some shield
+		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_HEAL] > 3 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
 		{
-			self->client->ps.stats[STAT_ARMOR] += 4 * self->client->pers.skill_levels[SKILL_SHIELD_HEALING];
+			int shield_heal_amount = 5 * (self->client->pers.skill_levels[SKILL_HEAL] - 3);
+
+			self->client->ps.stats[STAT_ARMOR] += shield_heal_amount;
 
 			if (self->client->ps.stats[STAT_ARMOR] > self->client->pers.max_rpg_shield)
 				self->client->ps.stats[STAT_ARMOR] = self->client->pers.max_rpg_shield;
@@ -1183,11 +1185,12 @@ void ForceHeal( gentity_t *self )
 
 			rpg_skill_counter(self, 100);
 		}
+
 		return;
 	}
 
 	if (self->client->ps.fd.forcePowerLevel[FP_HEAL] == FORCE_LEVEL_4)
-	{ // zyk: Heal 4/4
+	{
 		self->health += 30; //This was 50, but that angered the Balance God.
 
 		if (self->health > self->client->ps.stats[STAT_MAX_HEALTH])
@@ -1271,6 +1274,7 @@ void WP_AddToClientBitflags(gentity_t *ent, int entNum)
 void ForceTeamHeal( gentity_t *self )
 {
 	float radius = 256;
+	float radius_increase_factor = 1.0; // zyk: increase radius based on this value
 	int i = 0;
 	gentity_t *ent;
 	vec3_t a;
@@ -1294,14 +1298,13 @@ void ForceTeamHeal( gentity_t *self )
 		return;
 	}
 
-	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL] == FORCE_LEVEL_2)
+	// zyk: increase the factor based on Team Heal level if it is > 1
+	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL] > FORCE_LEVEL_1)
 	{
-		radius *= 1.5;
+		radius_increase_factor += (0.5 * (self->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL] - 1));
 	}
-	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL] == FORCE_LEVEL_3)
-	{
-		radius *= 2;
-	}
+
+	radius *= radius_increase_factor;
 
 	// while (i < MAX_CLIENTS)  // zyk: now the condition will be the level.num_entities
 	while (i < level.num_entities)
@@ -1320,7 +1323,7 @@ void ForceTeamHeal( gentity_t *self )
 			((!ent->NPC && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR) || 
 			 (ent->client->playerTeam != NPCTEAM_ENEMY && ent->s.NPC_class != CLASS_VEHICLE)) && 
 			 (ent->client->ps.stats[STAT_HEALTH] < ent->client->ps.stats[STAT_MAX_HEALTH] || 
-			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_SHIELD_HEALING] > 0 &&
+			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_TEAM_HEAL] > 3 && // Team Heal level > 3 in RPG Mode
 			 !ent->NPC && ent->client->ps.stats[STAT_HEALTH] >= ent->client->ps.stats[STAT_MAX_HEALTH] && 
 			 ((ent->client->sess.amrpgmode < 2 && ent->client->ps.stats[STAT_ARMOR] < 100) || (ent->client->sess.amrpgmode == 2 && 
 			 ent->client->ps.stats[STAT_ARMOR] < max_shield)))) && ent->client->ps.stats[STAT_HEALTH] > 0 && ForcePowerUsableOn(self, ent, FP_TEAM_HEAL) &&
@@ -1372,11 +1375,13 @@ void ForceTeamHeal( gentity_t *self )
 				max_shield = g_entities[pl[i]].client->pers.max_rpg_shield;
 
 			// zyk: Team Shield Heal skill of RPG Mode
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_SHIELD_HEALING] > 0 &&
+			if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_TEAM_HEAL] > 3 &&
 				!g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.stats[STAT_HEALTH] >= g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH] && 
 				g_entities[pl[i]].client->ps.stats[STAT_ARMOR] < max_shield)
 			{ // zyk: can only be used on players with full health already
-				g_entities[pl[i]].client->ps.stats[STAT_ARMOR] += 3 * self->client->pers.skill_levels[SKILL_SHIELD_HEALING];
+				int shield_heal_amount = 4 * (self->client->pers.skill_levels[SKILL_TEAM_HEAL] - 3);
+
+				g_entities[pl[i]].client->ps.stats[STAT_ARMOR] += shield_heal_amount;
 
 				if (g_entities[pl[i]].client->ps.stats[STAT_ARMOR] > max_shield)
 					g_entities[pl[i]].client->ps.stats[STAT_ARMOR] = max_shield;
@@ -1416,6 +1421,7 @@ extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 void ForceTeamForceReplenish( gentity_t *self )
 {
 	float radius = 256;
+	float radius_increase_factor = 1.0; // zyk: increase radius based on this value
 	int i = 0;
 	gentity_t *ent;
 	vec3_t a;
@@ -1440,14 +1446,12 @@ void ForceTeamForceReplenish( gentity_t *self )
 		return;
 	}
 
-	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] == FORCE_LEVEL_2)
+	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] > FORCE_LEVEL_1)
 	{
-		radius *= 1.5;
+		radius_increase_factor += (0.5 * (self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] - 1));
 	}
-	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] == FORCE_LEVEL_3)
-	{
-		radius *= 2;
-	}
+
+	radius *= radius_increase_factor;
 
 	// while (i < MAX_CLIENTS)  // zyk: now the condition will be the level.num_entities
 	while (i < level.num_entities)
@@ -1459,7 +1463,7 @@ void ForceTeamForceReplenish( gentity_t *self )
 		// zyk: created new condition so we can use Team Energize in FFA. Also restore ammo of the target player
 		if (ent && ent->client && self != ent && 
 			(ent->client->ps.fd.forcePower < ent->client->ps.fd.forcePowerMax || 
-			 (self->client->sess.amrpgmode == 2 && !ent->NPC && 
+			 (self->client->sess.amrpgmode == 2 && self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] > 3 && !ent->NPC && // zyk: at a level > 3, restores some ammo
 			  ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
 			  (ent->client->pers.current_stamina < ent->client->pers.max_stamina || ent->client->ps.ammo[AMMO_POWERCELL] < max_powercell_ammo)
 			 )
@@ -1507,11 +1511,12 @@ void ForceTeamForceReplenish( gentity_t *self )
 
 	while (i < numpl)
 	{
-		// zyk: Team Energize now can recover ammo if the player has full force
-		if (self->client->sess.amrpgmode == 2 && !g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.fd.forcePower == g_entities[pl[i]].client->ps.fd.forcePowerMax)
+		// zyk: Team Energize now can recover ammo and Stamina if the player has full force
+		if (self->client->sess.amrpgmode == 2 && self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] > 3 && 
+			!g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.fd.forcePower == g_entities[pl[i]].client->ps.fd.forcePowerMax)
 		{
 			zyk_set_stamina(&g_entities[pl[i]], poweradd, qtrue);
-			Add_Ammo(&g_entities[pl[i]], AMMO_POWERCELL, 5);
+			Add_Ammo(&g_entities[pl[i]], AMMO_POWERCELL, (poweradd / 5));
 			G_Sound(&g_entities[pl[i]], CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 		}
 		else

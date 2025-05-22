@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.2.15"
+#define	GAMEVERSION	"New Zyk Mod v1.2.16"
 
 #define SECURITY_LOG "security.log"
 
@@ -623,7 +623,6 @@ typedef enum {
 	SKILL_RAGE,
 	SKILL_TEAM_ENERGIZE,
 	SKILL_SENSE_HEALTH,
-	SKILL_SHIELD_HEALING,
 	SKILL_FASTER_FORCE_REGEN,
 	SKILL_FORCE_POWER,
 	SKILL_MAX_HEALTH,

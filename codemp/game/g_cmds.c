@@ -63,14 +63,13 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_HEAL] = 4;
 	max_skill_levels[SKILL_PROTECT] = 4;
 	max_skill_levels[SKILL_MIND_TRICK] = 3;
-	max_skill_levels[SKILL_TEAM_HEAL] = 3;
+	max_skill_levels[SKILL_TEAM_HEAL] = 4;
 	max_skill_levels[SKILL_LIGHTNING] = 4;
 	max_skill_levels[SKILL_GRIP] = 3;
 	max_skill_levels[SKILL_DRAIN] = 4;
 	max_skill_levels[SKILL_RAGE] = 4;
-	max_skill_levels[SKILL_TEAM_ENERGIZE] = 3;
+	max_skill_levels[SKILL_TEAM_ENERGIZE] = 4;
 	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
-	max_skill_levels[SKILL_SHIELD_HEALING] = 3;
 	max_skill_levels[SKILL_FASTER_FORCE_REGEN] = 5;
 	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
@@ -128,7 +127,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_RAGE] = "Rage";
 	skill_names[SKILL_TEAM_ENERGIZE] = "Team Energize";
 	skill_names[SKILL_SENSE_HEALTH] = "Sense Health";
-	skill_names[SKILL_SHIELD_HEALING] = "Shield Healing";
 	skill_names[SKILL_FASTER_FORCE_REGEN] = "Faster Force Regen";
 	skill_names[SKILL_FORCE_POWER] = "Force Power";
 
@@ -184,13 +182,13 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_ABSORB)
 		return "allows you to absorb force power attacks done to you";
 	if (skill_index == SKILL_HEAL)
-		return "recover some Health. Each level increases hp restored";
+		return "recover some Health. Each level increases hp restored. At a level > 3, also restores some shield";
 	if (skill_index == SKILL_PROTECT)
 		return "decreases damage done to you by non-force power attacks. At level 4 decreases force consumption when receiving damage";
 	if (skill_index == SKILL_MIND_TRICK)
 		return "makes yourself invisible to the players affected by this force power. Works on some npcs. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds";
 	if (skill_index == SKILL_TEAM_HEAL)
-		return "restores some health to players near you";
+		return "restores some health to players near you. At a level > 3, also restores some shield";
 	if (skill_index == SKILL_LIGHTNING)
 		return "attacks with a powerful electric attack at players near you. At level 4, does more damage and pushes the enemy back";
 	if (skill_index == SKILL_GRIP)
@@ -200,11 +198,9 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_RAGE)
 		return "makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage";
 	if (skill_index == SKILL_TEAM_ENERGIZE)
-		return "restores some force power to players near you. If force power is full, restores some Stamina and power cell ammo";
+		return "restores some force power to players near you. At a level > 3, If force power is full, restores some Stamina and power cell ammo";
 	if (skill_index == SKILL_SENSE_HEALTH)
 		return "allows you to see info about someone, including npcs. Level 1 shows current health. Level 2 shows name, health and shield. Level 3 shows name, health and max health, shield and max shield, force and max force, mp and max mp, Stamina and Max Stamina. To use it, when you are near a player or npc, use ^3Sense ^7force power";
-	if (skill_index == SKILL_SHIELD_HEALING)
-		return va("Makes ^3Heal ^7restore some shield if your health is full by spending %d force. Makes ^3Team Heal ^7restore some shield to other players if their health is full", zyk_max_force_power.integer / 2);
 	if (skill_index == SKILL_FASTER_FORCE_REGEN)
 		return "increases how fast your force is recovered";
 	if (skill_index == SKILL_FORCE_POWER)
@@ -278,7 +274,6 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_RAGE] = "skillrage";
 	skill_names[SKILL_TEAM_ENERGIZE] = "skillteamenergize";
 	skill_names[SKILL_SENSE_HEALTH] = "skillsensehealth";
-	skill_names[SKILL_SHIELD_HEALING] = "skillshieldhealing";
 	skill_names[SKILL_FASTER_FORCE_REGEN] = "skillfasterforceregen";
 	skill_names[SKILL_FORCE_POWER] = "skillforcepower";
 
@@ -5309,7 +5304,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		{
 			if (ent->client->pers.skill_levels[i] > zyk_max_skill_level(i))
 			{
-				ent->client->pers.skill_levels[i]--;
+				ent->client->pers.skill_levels[i] = zyk_max_skill_level(i);
 			}
 			else if (ent->client->pers.skill_levels[i] < 0)
 			{
