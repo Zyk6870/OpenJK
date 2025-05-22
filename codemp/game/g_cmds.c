@@ -76,7 +76,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 10;
 	max_skill_levels[SKILL_MELEE] = 3;
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
-	max_skill_levels[SKILL_SABER] = 10;
+	max_skill_levels[SKILL_TRADER] = 10;
 	max_skill_levels[SKILL_WEAPON_DAMAGE] = 20;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 10;
 	max_skill_levels[SKILL_MAX_STAMINA] = 5;
@@ -132,7 +132,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
 	skill_names[SKILL_MELEE] = "Melee";
 	skill_names[SKILL_MELEE_SPEED] = "Melee Punch Speed";
-	skill_names[SKILL_SABER] = "Saber Damage";
+	skill_names[SKILL_TRADER] = "Trader";
 	skill_names[SKILL_WEAPON_DAMAGE] = "Weapon Damage";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
 	skill_names[SKILL_MAX_STAMINA] = "Max Stamina";
@@ -210,8 +210,8 @@ char* zyk_skill_description(int skill_index)
 		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 1, Right hand punch does %d normal damage, left hand punch does %d normal damage and kick does %d damage. Each level increases melee damage", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	if (skill_index == SKILL_MELEE_SPEED)
 		return "Each level increases how fast you can punch with Melee";
-	if (skill_index == SKILL_SABER)
-		return "Each level increases Saber damage by 5 per cent";
+	if (skill_index == SKILL_TRADER)
+		return "makes you able to get better prices when buying stuff from the seller";
 	if (skill_index == SKILL_WEAPON_DAMAGE)
 		return "Multiplies damage per amount of this weapon in your inventory by 2.5 per cent. The max amount of extra weapons used for the bonus will be the current skill level";
 	if (skill_index == SKILL_MAX_WEIGHT)
@@ -276,7 +276,7 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_HEALTH_STRENGTH] = "skillhealthstrength";
 	skill_names[SKILL_MELEE] = "skillmelee";
 	skill_names[SKILL_MELEE_SPEED] = "skillmeleepunchspeed";
-	skill_names[SKILL_SABER] = "skillsaberdamage";
+	skill_names[SKILL_TRADER] = "skilltrader";
 	skill_names[SKILL_WEAPON_DAMAGE] = "skillweapondamage";
 	skill_names[SKILL_MAX_WEIGHT] = "skillmaxweight";
 	skill_names[SKILL_MAX_STAMINA] = "skillmaxstamina";
@@ -6596,27 +6596,27 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 		message, ent->client->pers.credits));
 }
 
-int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
+int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboolean buy_item)
 {
 	// zyk: costs to buy or sell for each seller item
 	int seller_items_cost[MAX_RPG_INVENTORY_ITEMS][2];
 
-	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][0] = 2;
+	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][0] = 3;
 	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][0] = 2;
+	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][0] = 3;
 	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][0] = 2;
+	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][0] = 3;
 	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 4;
 	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][0] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][0] = 4;
 	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][0] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][0] = 4;
 	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][1] = 2;
 
 	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][0] = 4;
@@ -6778,10 +6778,10 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][0] = 0;
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 2;
+	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 3;
 	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][0] = 2;
+	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][0] = 3;
 	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][1] = 1;
 
 	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_SHIELD][0] = 100;
@@ -6799,8 +6799,16 @@ int zyk_get_seller_item_cost(zyk_inventory_t item_number, qboolean buy_item)
 	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT][0] = 5;
 	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][0] = 1;
+	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][0] = 2;
 	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][1] = 1;
+
+	// zyk: skill Trader decreases buying cost
+	if (ent->client->pers.skill_levels[SKILL_TRADER] > 0)
+	{
+		float cost_decrease_factor = 1.00 - (0.02 * ent->client->pers.skill_levels[SKILL_TRADER]);
+
+		seller_items_cost[item_number][0] *= cost_decrease_factor;
+	}
 
 	if (buy_item == qtrue)
 	{
@@ -6909,8 +6917,8 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 			char upgrade_mode_str[8];
 			int upgrade_mode_in_use = 0;
 
-			buy_cost = zyk_get_seller_item_cost(inventory_it, qtrue);
-			sell_cost = zyk_get_seller_item_cost(inventory_it, qfalse);
+			buy_cost = zyk_get_seller_item_cost(ent, inventory_it, qtrue);
+			sell_cost = zyk_get_seller_item_cost(ent, inventory_it, qfalse);
 
 			if (buy_cost > 0)
 			{
@@ -7503,7 +7511,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (zyk_get_seller_item_cost(item_index, qtrue) == 0)
+	if (zyk_get_seller_item_cost(ent, item_index, qtrue) == 0)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Cannot buy this item.\n\"");
 		return;
@@ -7541,7 +7549,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 	}
 
-	total_cost = zyk_get_seller_item_cost(item_index, qtrue) * amount;
+	total_cost = zyk_get_seller_item_cost(ent, item_index, qtrue) * amount;
 
 	// zyk: buying the item if player has enough credits
 	if (ent->client->pers.credits >= total_cost)
@@ -7610,7 +7618,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (zyk_get_seller_item_cost(item_index, qfalse) == 0)
+	if (zyk_get_seller_item_cost(ent, item_index, qfalse) == 0)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Cannot sell this item.\n\"");
 		return;
@@ -7642,7 +7650,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	
 	if (sold == qtrue)
 	{
-		add_credits(ent, (zyk_get_seller_item_cost(item_index, qfalse) * amount));
+		add_credits(ent, (zyk_get_seller_item_cost(ent, item_index, qfalse) * amount));
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 

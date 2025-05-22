@@ -4993,6 +4993,7 @@ extern void Boba_FlyStop( gentity_t *self );
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
+extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
 	int			take, asave = 0, knockback;
@@ -5101,10 +5102,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (attacker->client->pers.skill_levels[SKILL_SABER] > 0)
-			{ // zyk: Saber Damage skill
-				bonus_saber_damage_factor += (0.05 * attacker->client->pers.skill_levels[SKILL_SABER]);
-			}
+			// zyk: saber damage for RPG players will have a bonus based on Force Affinity
+			bonus_saber_damage_factor += (0.01 * zyk_skill_affinity(attacker, SKILL_CATEGORY_FORCE));
 
 			damage = (int)ceil(damage * bonus_saber_damage_factor);
 		}
