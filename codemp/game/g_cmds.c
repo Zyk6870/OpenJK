@@ -58,7 +58,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_SENSE] = 3;
 	max_skill_levels[SKILL_SABER_ATTACK] = 5;
 	max_skill_levels[SKILL_SABER_DEFENSE] = 3;
-	max_skill_levels[SKILL_SABER_THROW] = 4;
+	max_skill_levels[SKILL_SABER_THROW] = 5;
 	max_skill_levels[SKILL_ABSORB] = 4;
 	max_skill_levels[SKILL_HEAL] = 4;
 	max_skill_levels[SKILL_PROTECT] = 4;

@@ -7294,8 +7294,8 @@ void saberFirstThrown(gentity_t *saberent)
 
 		VectorNormalize(dir);
 
-		if (saberOwn->client->ps.fd.forcePowerLevel[FP_SABERTHROW] >= FORCE_LEVEL_4) // zyk: level 4 makes it even faster
-			VectorScale(dir, 900, saberent->s.pos.trDelta );
+		if (saberOwn->client->ps.fd.forcePowerLevel[FP_SABERTHROW] >= FORCE_LEVEL_4) // zyk: levels > 3 will make it even faster
+			VectorScale(dir, (500 + (250 * (saberOwn->client->ps.fd.forcePowerLevel[FP_SABERTHROW] - FORCE_LEVEL_3))), saberent->s.pos.trDelta );
 		else
 			VectorScale(dir, 500, saberent->s.pos.trDelta );
 
