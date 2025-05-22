@@ -77,9 +77,9 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MELEE] = 3;
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
 	max_skill_levels[SKILL_TRADER] = 10;
-	max_skill_levels[SKILL_WEAPON_DAMAGE] = 15;
-	max_skill_levels[SKILL_MAX_WEIGHT] = 20;
-	max_skill_levels[SKILL_MAX_STAMINA] = 5;
+	max_skill_levels[SKILL_WEAPON_DAMAGE] = 5;
+	max_skill_levels[SKILL_MAX_WEIGHT] = 25;
+	max_skill_levels[SKILL_MAX_STAMINA] = 10;
 	max_skill_levels[SKILL_UNDERWATER] = 2;
 	max_skill_levels[SKILL_RUN_SPEED] = 2;
 
@@ -5157,13 +5157,13 @@ void set_max_force(gentity_t* ent)
 // zyk: sets the Max Weight of stuff the player can carry
 void set_max_weight(gentity_t* ent)
 {
-	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 275) + (50 * zyk_skill_affinity(ent, SKILL_CATEGORY_MISC));
+	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 200) + (56.25 * zyk_skill_affinity(ent, SKILL_CATEGORY_MISC));
 }
 
 // zyk: set the Max Stamina of this player
 void set_max_stamina(gentity_t* ent)
 {
-	ent->client->pers.max_stamina = RPG_DEFAULT_STAMINA + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * RPG_DEFAULT_STAMINA);
+	ent->client->pers.max_stamina = RPG_DEFAULT_STAMINA + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 2500);
 }
 
 // zyk: increases or decreases RPG player stamina

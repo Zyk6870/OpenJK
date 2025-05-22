@@ -1304,7 +1304,7 @@ void zyk_stamina_out(gentity_t* ent)
 {
 	if (ent->client->pers.current_stamina <= 0 && ent->client->pers.stamina_out_timer <= level.time)
 	{ // zyk: if run out of stamina, knock out the player until stamina recovers a bit
-		int stamina_out_time = 10000 - (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 1000);
+		int stamina_out_time = 12000 - (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 500) - (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) * 50);
 
 		if (ent->client->jetPackOn)
 		{
@@ -1504,11 +1504,11 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 	// zyk: Stamina
 	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.stamina_timer < level.time && ent->health > 0)
 	{
-		int stamina_recovery = 1 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA];
-
 		if (ent->client->pers.stamina_out_timer > level.time)
 		{ // zyk: passed out, recover some stamina
-			zyk_set_stamina(ent, 50 * stamina_recovery, qtrue);
+			int stamina_out_recovery = 70 + (20 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
+
+			zyk_set_stamina(ent, stamina_out_recovery, qtrue);
 		}
 		else
 		{
@@ -1554,7 +1554,9 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 
 			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 			{ // zyk: meditating, recover some stamina
-				zyk_set_stamina(ent, 9 * stamina_recovery, qtrue);
+				int stamina_meditate_recovery = 10 + (3 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
+
+				zyk_set_stamina(ent, stamina_meditate_recovery, qtrue);
 			}
 			else if (zyk_is_player_idle(ent, ucmd) == qfalse)
 			{
