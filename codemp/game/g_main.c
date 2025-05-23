@@ -7567,11 +7567,11 @@ int zyk_spirit_tree_wither(float x, float y, float z)
 			float npc_distance_to_tree = Distance(tree_origin, npc_ent->r.currentOrigin);
 
 			// zyk: quest enemies will make tree wither based on the distance to the tree and their health
-			if (npc_distance_to_tree > 0.0)
+			if (npc_distance_to_tree > 0.0 && npc_distance_to_tree < 1000.0)
 			{
 				total_decrease += (int)ceil((QUEST_SPIRIT_TREE_WITHER_RATE / npc_distance_to_tree) * npc_ent->health);
 			}
-			else
+			else if (npc_distance_to_tree <= 0.0)
 			{
 				total_decrease += (npc_ent->health * QUEST_SPIRIT_TREE_WITHER_RATE);
 			}
@@ -7661,14 +7661,8 @@ void zyk_spirit_tree_events(gentity_t* ent)
 			zyk_start_main_quest_spirits_event(ent);
 		}
 		else if (ent->client->pers.quest_progress <= 0)
-		{ // zyk: if Spirit Tree is completely withered, player dies
+		{ // zyk: if Spirit Tree is completely withered
 			zyk_reset_quest(ent);
-
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The Spirit Tree is completely withered!\n\"", QUESTCHAR_ALL_SPIRITS));
-
-			ent->client->ps.stats[STAT_HEALTH] = ent->health = -999;
-
-			player_die(ent, ent, ent, 100000, MOD_SUICIDE);
 		}
 
 		quest_progress_percentage = (ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS;
@@ -9015,7 +9009,7 @@ void G_RunFrame( int levelTime ) {
 				}
 				else if (ent->client->pers.in_magic_flight == qtrue)
 				{
-					int magic_flight_mp_usage = MAGIC_FLIGHT_MP_USAGE - ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT];
+					int magic_flight_mp_usage = 1 + zyk_max_skill_level(SKILL_MAGIC_FLIGHT) - ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT];
 
 					if (ent->client->pers.magic_power >= magic_flight_mp_usage)
 					{
@@ -9023,6 +9017,7 @@ void G_RunFrame( int levelTime ) {
 					}
 					else
 					{
+						ent->client->pers.in_magic_flight = qfalse;
 						Jetpack_Off(ent);
 					}
 				}

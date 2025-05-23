@@ -2129,18 +2129,21 @@ tryJetPack:
 	}
 
 	// zyk: Magic Flight
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] > 0 && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)))
+	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] > 0 && 
+		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)) && ent->client->jetPackToggleTime < level.time)
 	{
 		if (ent->client->pers.in_magic_flight == qtrue)
 		{
 			ent->client->pers.in_magic_flight = qfalse;
 			Jetpack_Off(ent);
 		}
-		else
+		else if (ent->client->ps.groundEntityNum == ENTITYNUM_NONE)
 		{
 			ent->client->pers.in_magic_flight = qtrue;
 			Jetpack_On(ent);
 		}
+
+		ent->client->jetPackToggleTime = level.time + 500;
 
 		return;
 	}

@@ -2161,6 +2161,11 @@ extern void zyk_reset_quest(gentity_t* ent);
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 void zyk_decrease_quest_progress(gentity_t *ent)
 {
+	if (ent->client->pers.quest_spirits_event_step > 0)
+	{ // zyk: do not decrease this at the final event
+		return;
+	}
+
 	if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 	{ // zyk: Hard Mode
 		ent->client->pers.quest_progress -= (QUEST_PROGRESS_DECREASE * 5);
@@ -2173,13 +2178,7 @@ void zyk_decrease_quest_progress(gentity_t *ent)
 	if (ent->client->pers.quest_progress <= 0)
 	{
 		zyk_reset_quest(ent);
-
-		zyk_NPC_Kill_f("all");
-
-		trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7Spirit Tree withered. Quests reset\n\"");
 	}
-
-	save_account(ent, qtrue);
 }
 
 qboolean zyk_is_quest_ally(gentity_t* ent)

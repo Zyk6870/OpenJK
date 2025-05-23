@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.3.4"
+#define	GAMEVERSION	"New Zyk Mod v1.3.5"
 
 #define SECURITY_LOG "security.log"
 
@@ -852,7 +852,6 @@ typedef enum {
 #define MAGIC_MIN_DMG 0
 #define MAGIC_MIN_RANGE 180
 #define MAGIC_RANGE_BONUS 20
-#define MAGIC_FLIGHT_MP_USAGE 10
 
 // zyk: damage bonus of weapons
 #define RPG_WEAPON_DMG_BONUS 0.01
@@ -900,12 +899,12 @@ typedef enum {
 #define ENERGY_MODULATOR_PARTS 3
 #define QUEST_ITEM_DISTANCE 48
 #define QUEST_LOG_PARTS 5
-#define QUEST_SPIRIT_TREE_DEFAULT_SCALE 1
+#define QUEST_SPIRIT_TREE_DEFAULT_SCALE 2
 #define QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET 4
 #define QUEST_SPIRIT_TREE_RADIUS 50
 #define QUEST_SPIRIT_TREE_CALL_COST 1
-#define QUEST_SPIRIT_TREE_WITHER_RATE 20.0
-#define QUEST_SPIRIT_TREE_REGEN_RATE 100
+#define QUEST_SPIRIT_TREE_WITHER_RATE 10.0
+#define QUEST_SPIRIT_TREE_REGEN_RATE 50
 #define QUEST_SPIRIT_TREE_SPAWN_TIMER 5000
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_NPC_SPAWN_TIME 27000

@@ -228,7 +228,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have. Each level increases it by 100. This is used to cast magic powers";
 	if (skill_index == SKILL_MAGIC_FLIGHT)
-		return "allows you to fly using Magic Points. Each level increases flight speed and decreases mp usage";
+		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level increases flight speed and decreases mp usage";
 	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
 		return "an energy dome appears around you, damaging enemies inside it. It also increases your resistance to damage to your health a little. This power deals non-elemental damage";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
@@ -5815,7 +5815,9 @@ void zyk_reset_quest(gentity_t* ent)
 	ent->client->pers.quest_progress = INITIAL_QUEST_PROGRESS;
 	ent->client->pers.quest_spirit_tree_id = -1;
 
-	ent->client->pers.quest_progress_timer = level.time + 2000000000;
+	ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
+
+	trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7The Spirit Tree is completely withered. Quest reset\n\"");
 }
 
 // zyk: adds a new RPG char with default values
