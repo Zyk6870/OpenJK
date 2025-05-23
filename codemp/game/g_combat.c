@@ -2157,7 +2157,7 @@ void G_AddPowerDuelLoserScore(int team, int score)
 extern void zyk_NPC_Kill_f(char* name);
 extern char* zyk_get_enemy_type(int enemy_type);
 extern void save_account(gentity_t* ent, qboolean save_char_file);
-extern void zyk_set_default_quest_fields(gentity_t* ent);
+extern void zyk_reset_quest(gentity_t* ent);
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 void zyk_decrease_quest_progress(gentity_t *ent)
 {
@@ -2172,7 +2172,7 @@ void zyk_decrease_quest_progress(gentity_t *ent)
 
 	if (ent->client->pers.quest_progress <= 0)
 	{
-		zyk_set_default_quest_fields(ent);
+		zyk_reset_quest(ent);
 
 		zyk_NPC_Kill_f("all");
 

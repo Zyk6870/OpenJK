@@ -7523,7 +7523,7 @@ void zyk_start_main_quest_spirits_event(gentity_t* ent)
 	}
 }
 
-extern void zyk_set_default_quest_fields(gentity_t* ent);
+extern void zyk_reset_quest(gentity_t* ent);
 void zyk_show_quest_riddle(gentity_t* ent)
 {
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 0)
@@ -7636,15 +7636,17 @@ void zyk_spirit_tree_events(gentity_t* ent)
 			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
 				ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 			{ // zyk: meditating inside the tree
-				quest_progress_change += (QUEST_SPIRIT_TREE_REGEN_RATE + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL]);
-
-				if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
-				{ // zyk: Hard Mode
-					quest_progress_change /= 2;
-				}
+				quest_progress_change += QUEST_SPIRIT_TREE_REGEN_RATE;
 			}
 
 			trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
+		}
+
+		quest_progress_change += ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL];
+
+		if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+		{ // zyk: Hard Mode
+			quest_progress_change /= 2;
 		}
 
 		quest_progress_change -= zyk_spirit_tree_wither(tree_x, tree_y, tree_z);
@@ -7660,7 +7662,7 @@ void zyk_spirit_tree_events(gentity_t* ent)
 		}
 		else if (ent->client->pers.quest_progress <= 0)
 		{ // zyk: if Spirit Tree is completely withered, player dies
-			zyk_set_default_quest_fields(ent);
+			zyk_reset_quest(ent);
 
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The Spirit Tree is completely withered!\n\"", QUESTCHAR_ALL_SPIRITS));
 

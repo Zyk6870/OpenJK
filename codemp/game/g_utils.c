@@ -1619,7 +1619,7 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 			ent->client->ps.forceDodgeAnim == BOTH_MEDITATE &&
 			ent->client->pers.quest_spirit_tree_call_timer < level.time)
 		{
-			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] > QUEST_SPIRIT_TREE_CALL_COST)
+			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] >= QUEST_SPIRIT_TREE_CALL_COST)
 			{
 				ent->client->pers.quest_spirit_tree_id = -1;
 				ent->client->pers.quest_spirit_tree_call_timer = level.time + 2000;
