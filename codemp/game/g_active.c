@@ -1298,6 +1298,7 @@ qboolean G_ActionButtonPressed(int buttons)
 }
 
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
+extern void zyk_stop_all_magic_powers(gentity_t* ent);
 
 // zyk: if Stamina runs out, player must rest for some seconds
 void zyk_stamina_out(gentity_t* ent)
@@ -1309,7 +1310,10 @@ void zyk_stamina_out(gentity_t* ent)
 		if (ent->client->jetPackOn)
 		{
 			Jetpack_Off(ent);
+			ent->client->pers.in_magic_flight = qfalse;
 		}
+
+		zyk_stop_all_magic_powers(ent);
 
 		// zyk: reset Stamina. If player took massive damage from  something it may have a too low negative value
 		ent->client->pers.current_stamina = 0;
@@ -1506,7 +1510,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 	{
 		if (ent->client->pers.stamina_out_timer > level.time)
 		{ // zyk: passed out, recover some stamina
-			int stamina_out_recovery = 70 + (20 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
+			int stamina_out_recovery = 50 + (5 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
 
 			zyk_set_stamina(ent, stamina_out_recovery, qtrue);
 		}
@@ -1533,7 +1537,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			{
 				if (ent->client->pers.quest_power_status & (1 << i))
 				{
-					stamina_usage += (2 + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 8));
+					stamina_usage += (12 + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 10));
 				}
 			}
 
@@ -1554,7 +1558,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 
 			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 			{ // zyk: meditating, recover some stamina
-				int stamina_meditate_recovery = 10 + (3 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
+				int stamina_meditate_recovery = 10 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
 
 				zyk_set_stamina(ent, stamina_meditate_recovery, qtrue);
 			}
