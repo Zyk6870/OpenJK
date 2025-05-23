@@ -643,7 +643,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7prevents being hit my magic powers. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7prevents being hit my magic powers, but also prevents using magic powers while it is active. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER)
 	{
@@ -10619,7 +10619,8 @@ qboolean zyk_can_cast_magic(gentity_t* ent)
 {
 	if (ent->client->ps.forceHandExtend != HANDEXTEND_NONE || 
 		ent->client->ps.fd.forceGripBeingGripped > level.time || 
-		ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_MAGIC))
+		ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_MAGIC) || 
+		ent->client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_SHIELD))
 	{
 		return qfalse;
 	}
