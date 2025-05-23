@@ -7304,7 +7304,19 @@ void zyk_show_tutorial(gentity_t* ent)
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 2))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Green crystals give extra tries for quest and Red crystals creates a Lightning Dome by pressing Use key.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Upgrading skills from a category (force, misc, magic) increases that category affinity.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 3))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Force Affinity increases force regen rate and Saber damage.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 4))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Misc Affinity increases Stamina regen rate, Run Speed and Max Weight.\n\"", QUESTCHAR_ALL_SPIRITS));
+		}
+		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 5))
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Affinity increases Magic Powers damage/range, Magic Fist damage, max MP, stamina usage for active magic and lowers Magic Power mp cost.\n\"", QUESTCHAR_ALL_SPIRITS));
 		
 			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 		}

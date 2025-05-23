@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.3.1"
+#define	GAMEVERSION	"New Zyk Mod v1.3.2"
 
 #define SECURITY_LOG "security.log"
 
@@ -818,7 +818,7 @@ typedef enum {
 	TUTORIAL_INVENTORY_START = 30,
 	TUTORIAL_INVENTORY_END = 33,
 	TUTORIAL_QUEST_ITEMS_START = 40,
-	TUTORIAL_QUEST_ITEMS_END = 42,
+	TUTORIAL_QUEST_ITEMS_END = 45,
 	TUTORIAL_MAGIC_START = 50,
 	TUTORIAL_MAGIC_END = 53,
 	MAX_TUTORIAL_STEPS
