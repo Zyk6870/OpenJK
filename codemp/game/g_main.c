@@ -9349,12 +9349,12 @@ void G_RunFrame( int levelTime ) {
 				{
 					int main_quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS);
 					int power_level = zyk_total_skillpoints(ent) + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
-					int level_size = ((MAX_GENTITIES - level.num_entities) / 100);
+					int level_chance = ((MAX_GENTITIES - level.num_entities) / 100);
 
-					int magic_armor_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 4) - level_size;
-					int energy_modulator_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 4) - level_size;
-					int quest_log_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) / 4) - level_size;
-					int treasure_chest_chance = 40 - (main_quest_progress / 5) - level_size;
+					int magic_armor_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 4) - level_chance;
+					int energy_modulator_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 4) - level_chance;
+					int quest_log_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) / 4) - level_chance;
+					int treasure_chest_chance = 40 - (main_quest_progress / 5) - level_chance;
 					int crystal_chance = ((level.num_entities / 10) + RPG_MAX_SKILLPOINTS - power_level) / 4;
 					
 					if (Q_irand(0, 99) < crystal_chance)

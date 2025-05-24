@@ -6096,6 +6096,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					bonus_health_resistance += 0.20;
 
 					zyk_set_mp(targ, (int)ceil(take * 0.20), qtrue);
+
+					zyk_quest_effect_spawn(targ, targ, "zyk_magic_armor_effect", "0", "scepter/invincibility", 0, 0, 0, 700);
 				}
 				else
 				{
