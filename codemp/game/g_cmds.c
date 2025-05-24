@@ -213,7 +213,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_TRADER)
 		return "makes you able to get better prices when buying stuff from the seller";
 	if (skill_index == SKILL_STATUS_PROTECTION)
-		return "Decreases duration of negative status effects. These are: ^1Poison: ^7loses health, lower run speed, Stamina decreases faster. ^1Fire: ^7catches fire. ^1Bleeding: ^7loses a lot of health and attacks deal less non-Force non-Magic damage. ^1Confusion: ^7cannot attack, use Force powers or magic";
+		return "Decreases duration of negative status effects. ^1Poison: ^7loses health, stamina, magic points and lowers run speed. ^1Fire: ^7catches fire, losing a lot of health. ^1Bleeding: ^7loses some health. Melee, Saber, Force powers and Magic attacks do less damage. ^1Confusion: ^7cannot attack or use Force powers or Magic";
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio. Carrying stuff over the max weight will decrease your run speed and also decrease Stamina";
 	if (skill_index == SKILL_MAX_STAMINA)
@@ -7414,15 +7414,29 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 extern gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboolean isVehicle );
 
 // zyk: adds some MP to the RPG player
-void zyk_add_mp(gentity_t* ent, int mp_amount)
+void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add)
 {
-	if ((ent->client->pers.magic_power + mp_amount) < zyk_max_magic_power(ent))
+	if (add == qtrue)
 	{
-		ent->client->pers.magic_power += mp_amount;
+		if ((ent->client->pers.magic_power + mp_amount) < zyk_max_magic_power(ent))
+		{
+			ent->client->pers.magic_power += mp_amount;
+		}
+		else
+		{
+			ent->client->pers.magic_power = zyk_max_magic_power(ent);
+		}
 	}
 	else
 	{
-		ent->client->pers.magic_power = zyk_max_magic_power(ent);
+		if (ent->client->pers.magic_power >= mp_amount)
+		{
+			ent->client->pers.magic_power -= mp_amount;
+		}
+		else
+		{
+			ent->client->pers.magic_power = 0;
+		}
 	}
 }
 
@@ -10710,7 +10724,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				}
 
 				// zyk: magic powers cost mp
-				ent->client->pers.magic_power -= magic_cost;
+				zyk_set_mp(ent, magic_cost, qfalse);
 
 				rpg_skill_counter(ent, 100);
 

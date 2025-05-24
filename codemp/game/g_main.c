@@ -5020,6 +5020,7 @@ qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target)
 }
 
 extern int zyk_get_magic_index(int skill_index);
+extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
 extern void zyk_remap_shaders(const char* oldShader, const char* newShader);
 
 zyk_magic_element_t zyk_get_magic_element(int magic_number)
@@ -5634,14 +5635,7 @@ void zyk_mp_usage(gentity_t* ent, int magic_skill_index)
 		magic_mp_usage = 1;
 	}
 
-	if (ent->client->pers.magic_power >= magic_mp_usage)
-	{
-		ent->client->pers.magic_power -= magic_mp_usage;
-	}
-	else
-	{
-		ent->client->pers.magic_power = 0;
-	}
+	zyk_set_mp(ent, magic_mp_usage, qfalse);
 }
 
 void magic_power_events(gentity_t *ent)
@@ -5924,6 +5918,7 @@ void zyk_status_effects(gentity_t* ent)
 					G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
 
 					zyk_set_stamina(ent, 50, qfalse);
+					zyk_set_mp(ent, 1, qfalse);
 				}
 				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_IN_FLAMES))
 				{
@@ -8980,7 +8975,7 @@ void G_RunFrame( int levelTime ) {
 
 					if (ent->client->pers.magic_power >= magic_flight_mp_usage)
 					{
-						ent->client->pers.magic_power -= magic_flight_mp_usage;
+						zyk_set_mp(ent, magic_flight_mp_usage, qfalse);
 					}
 					else
 					{

@@ -3959,6 +3959,7 @@ int magic_fist_velocity(gentity_t *ent)
 // FireMelee
 //---------------------------------------------------------
 extern void rpg_skill_counter(gentity_t *ent, int amount);
+extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
 void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 {
 	gentity_t	*tr_ent;
@@ -3975,7 +3976,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 	}
 	else
 	{ //left
-		if (ent->client->ps.brokenLimbs & (1 << BROKENLIMB_LARM))
+		if (ent->client && ent->client->ps.brokenLimbs & (1 << BROKENLIMB_LARM))
 		{
 			return;
 		}
@@ -4027,7 +4028,8 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			missile->bounceCount = 0;
 
 			rpg_skill_counter(ent, (fist_damage / 10));
-			ent->client->pers.magic_power -= zyk_magic_fist_mp_cost.integer;
+
+			zyk_set_mp(ent, zyk_magic_fist_mp_cost.integer, qfalse);
 
 			G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/demp2/fire.mp3"));
 		}

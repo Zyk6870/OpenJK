@@ -2758,7 +2758,7 @@ extern int	BMS_END;
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 extern void add_credits(gentity_t* ent, int credits);
-extern void zyk_add_mp(gentity_t* ent, int mp_amount);
+extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
 extern void zyk_clear_quest_items(gentity_t* effect_ent);
 extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
 
@@ -2849,7 +2849,7 @@ void fx_runner_think( gentity_t *ent )
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
-						zyk_add_mp(player_ent, 1);
+						zyk_set_mp(player_ent, 1, qtrue);
 
 						zyk_clear_quest_effect(ent);
 
@@ -2861,7 +2861,7 @@ void fx_runner_think( gentity_t *ent )
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
 
-						zyk_add_mp(player_ent, 1);
+						zyk_set_mp(player_ent, 1, qtrue);
 
 						zyk_clear_quest_effect(ent);
 
@@ -2873,7 +2873,7 @@ void fx_runner_think( gentity_t *ent )
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
 
-						zyk_add_mp(player_ent, 1);
+						zyk_set_mp(player_ent, 1, qtrue);
 
 						zyk_clear_quest_effect(ent);
 
