@@ -740,6 +740,11 @@ qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower )
 		return qfalse;
 	}
 
+	if (self->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
+	{
+		return qfalse;
+	}
+
 	if ( (self->client->ps.fd.forcePowersActive & ( 1 << forcePower )) )
 	{//already using this power
 		if (forcePower != FP_LEVITATION)

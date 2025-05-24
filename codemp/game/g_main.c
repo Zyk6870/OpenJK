@@ -5940,6 +5940,15 @@ void zyk_status_effects(gentity_t* ent)
 				{
 					G_Damage(ent, ent, ent, NULL, NULL, 5, 0, MOD_UNKNOWN);
 				}
+				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
+				{
+					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+					ent->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
+					ent->client->ps.forceHandExtendTime = ent->client->pers.rpg_status_duration[i];
+
+					// zyk: target cant attack while confused
+					ent->client->ps.weaponTime = ent->client->pers.rpg_status_duration[i] - level.time;
+				}
 				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
 				{
 					ent->client->ps.eFlags |= EF_INVULNERABLE;
@@ -9821,7 +9830,7 @@ void G_RunFrame( int levelTime ) {
 
 							if (Q_irand(0, 99) < MAGE_MASTER_STATUS_CHANCE)
 							{
-								zyk_rpg_status_t status_chosen = Q_irand(RPG_STATUS_CANNOT_USE_FORCE, RPG_STATUS_LOWER_DAMAGE);
+								zyk_rpg_status_t status_chosen = Q_irand(RPG_STATUS_CANNOT_USE_FORCE, RPG_STATUS_CANNOT_USE_MAGIC);
 
 								if (ent->enemy->client)
 								{
@@ -9835,10 +9844,6 @@ void G_RunFrame( int levelTime ) {
 								else if (status_chosen == RPG_STATUS_CANNOT_USE_MAGIC)
 								{
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Magic\n\""));
-								}
-								else if (status_chosen == RPG_STATUS_LOWER_DAMAGE)
-								{
-									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Lower Physical Damage\n\""));
 								}
 							}
 						}

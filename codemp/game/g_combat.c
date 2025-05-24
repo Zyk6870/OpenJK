@@ -4983,7 +4983,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
-	if (targ && targ->client && targ->client->pers.rpg_statuses & (1 << RPG_STATUS_LOWER_DAMAGE) &&
+	if (targ && targ->client && targ->client->pers.rpg_statuses & (1 << RPG_STATUS_BLEEDING) &&
 		mod != MOD_FORCE_DARK &&
 		!(inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) > -1) // zyk: not a magic power
 		)
@@ -6259,12 +6259,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0 &&
 				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DEMP22) && targ && targ->health > 0 && targ->client)
 			{
-				targ->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-				targ->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
-				targ->client->ps.forceHandExtendTime = level.time + 1000;
-
-				// zyk: target cant attack
-				targ->client->ps.weaponTime = 1000;
+				zyk_set_rpg_status(targ, RPG_STATUS_CONFUSED, 1000, qtrue);
 			}
 			else if ((mod == MOD_REPEATER_ALT || mod == MOD_REPEATER_ALT_SPLASH) &&
 				inflictor && 
@@ -6859,12 +6854,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								// zyk: confuses the target
 								if (Q_irand(0, 99) < chance_for_confusion)
 								{
-									ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-									ent->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
-									ent->client->ps.forceHandExtendTime = level.time + 1200;
-
-									// zyk: target cant attack while confused
-									ent->client->ps.weaponTime = 1200;
+									zyk_set_rpg_status(ent, RPG_STATUS_CONFUSED, 1200, qtrue);
 								}
 							}
 						}

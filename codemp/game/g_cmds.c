@@ -213,7 +213,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_TRADER)
 		return "makes you able to get better prices when buying stuff from the seller";
 	if (skill_index == SKILL_STATUS_PROTECTION)
-		return "Decreases duration of negative status effects, like Poison, Bleeding and Fire";
+		return "Decreases duration of negative status effects. These are: ^1Poison: ^7loses health, lower run speed, Stamina decreases faster. ^1Fire: ^7catches fire. ^1Bleeding: ^7loses a lot of health and attacks deal less non-Force non-Magic damage. ^1Confusion: ^7cannot attack, use Force powers or magic";
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio. Carrying stuff over the max weight will decrease your run speed and also decrease Stamina";
 	if (skill_index == SKILL_MAX_STAMINA)
@@ -230,7 +230,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level increases flight speed and decreases mp usage";
 	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
-		return "an energy dome appears around you, damaging enemies inside it. It also increases your resistance to damage to your health a little. This power deals non-elemental damage";
+		return "an energy dome appears around you, damaging enemies inside it. Each level increases your resistance to damage to your health a little. This power deals non-elemental damage";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
 		return "hits enemies around you with Water elemental damage. While this magic is active, slowly restore health to you and nearby ally players or ally npcs. Increases your Water element affinity. More powerful against enemies with Fire affinity. Absorbs some Water magic effects";
 	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
@@ -583,7 +583,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases number of bolts shot by Flechette primary and alt fires. Upgrade ^32^7: primary fire shots cause bleeding damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases number of bolts shot by Flechette primary and alt fires. Upgrade ^32^7: primary fire shots cause bleeding\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 	{
@@ -10607,6 +10607,7 @@ qboolean zyk_can_cast_magic(gentity_t* ent)
 {
 	if (ent->client->ps.forceHandExtend != HANDEXTEND_NONE || 
 		ent->client->ps.fd.forceGripBeingGripped > level.time || 
+		ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED) ||
 		ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CANNOT_USE_MAGIC) ||
 		ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
 	{
