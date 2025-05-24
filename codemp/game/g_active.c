@@ -1537,7 +1537,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			{
 				if (ent->client->pers.quest_power_status & (1 << i))
 				{
-					stamina_usage += (12 + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 10));
+					stamina_usage += (12 + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER));
 				}
 			}
 

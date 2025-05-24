@@ -6120,12 +6120,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			if (targ->client->pers.quest_power_status & (1 << MAGIC_MAGIC_DOME))
 			{ // zyk: target using Magic Dome
-				int magic_bonus = 0;
+				int magic_bonus = zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
 
 				// zyk: Magic Armor improves all magic powers
 				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
 				{
-					magic_bonus = 1;
+					magic_bonus += 1;
 				}
 
 				bonus_health_resistance += (0.02 * (targ->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME] + magic_bonus));

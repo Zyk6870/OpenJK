@@ -5655,7 +5655,7 @@ void magic_power_events(gentity_t *ent)
 			}
 
 			// zyk: Magic Affinity increases magic damage
-			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 10);
+			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER);
 
 			if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CANNOT_USE_MAGIC))
 			{
