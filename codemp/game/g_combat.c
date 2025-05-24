@@ -2261,7 +2261,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_USING_FLASHLIGHT);
 
 	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_EARTH);
-	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_FIRE);
 	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_AIR);
 
 	if (self->client->pers.race_position > 0) // zyk: if a player dies during a race, he loses the race
@@ -6164,17 +6163,17 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		// zyk: Dark Magic drains health
 		if (mod == MOD_UNKNOWN && attacker && attacker->client && attacker->health > 0 && 
 			inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) == MAGIC_DARK_MAGIC &&
-			targ->client && Q_irand(0, 99) < (take * 3))
+			targ->client && Q_irand(0, 99) < (take * 2))
 		{
 			zyk_add_health(attacker, take);
 		}
 
 		// zyk: some quest npcs have special abilities
-		if (attacker && attacker->client && attacker->NPC && targ->health > 0 && targ->client && Q_irand(0, 100) < 50)
+		if (attacker && attacker->client && attacker->NPC && targ->health > 0 && targ->client && Q_irand(0, 99) < 50)
 		{
 			if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER && mod == MOD_MELEE)
 			{ // zyk: poison the target
-				zyk_set_rpg_status(targ, RPG_STATUS_POISONED, 20000, qtrue);
+				zyk_set_rpg_status(targ, RPG_STATUS_POISONED, 10000, qtrue);
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM && mod == MOD_MELEE)
 			{ // zyk: absorbs health from target to restore mp to all quest enemies in the map
@@ -6204,7 +6203,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					attacker->client->pers.magic_power += mp_to_restore;
 				}
 
-				zyk_set_rpg_status(targ, RPG_STATUS_BLEEDING, 20000, qtrue);
+				zyk_set_rpg_status(targ, RPG_STATUS_BLEEDING, 10000, qtrue);
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
 			{
@@ -6699,11 +6698,19 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 						if (this_magic_power == MAGIC_WATER_MAGIC)
 						{
+							int chance_for_poison = final_damage;
+
 							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_water", "0", "env/water_impact", 0, 0, 0, 500);
+
+							if (Q_irand(0, 99) < chance_for_poison)
+							{
+								zyk_set_rpg_status(ent, RPG_STATUS_POISONED, final_damage * 500, qtrue);
+							}
 						}
 						else if (this_magic_power == MAGIC_EARTH_MAGIC)
 						{
 							int chance_for_knockdown = final_damage;
+							int chance_for_bleeding = final_damage;
 
 							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_earth", "0", "env/rock_smash", 0, 0, 0, 500);
 
@@ -6729,20 +6736,18 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_EARTH);
 								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_EARTH] = level.time + 5000;
 							}
+
+							if (Q_irand(0, 99) < chance_for_bleeding)
+							{
+								zyk_set_rpg_status(ent, RPG_STATUS_BLEEDING, final_damage * 500, qtrue);
+							}
 						}
 						else if (this_magic_power == MAGIC_FIRE_MAGIC)
 						{
 							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_fire", "0", "env/fire", 0, 0, 0, 500);
 							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
 
-							// zyk: target catches fire
-							if (ent->client && ent->health > 0)
-							{
-								ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_FIRE);
-								ent->client->pers.magic_power_user_id[MAGIC_HIT_BY_FIRE] = magic_power_user->s.number;
-								ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] = final_damage * 1.6;
-								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_FIRE] = level.time + 200;
-							}
+							zyk_set_rpg_status(ent, RPG_STATUS_IN_FLAMES, final_damage * 1000, qtrue);
 						}
 						else if (this_magic_power == MAGIC_AIR_MAGIC)
 						{

@@ -5567,7 +5567,6 @@ void light_magic(gentity_t* ent)
 {
 	ent->client->pers.quest_power_status |= (1 << MAGIC_LIGHT_MAGIC);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 500;
-	ent->client->pers.magic_power_hit_counter[MAGIC_LIGHT_MAGIC] = 1;
 
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
 }
@@ -5768,39 +5767,6 @@ void magic_power_events(gentity_t *ent)
 				}
 			}
 
-			if (ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_FIRE))
-			{
-				if (ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] > 0 && ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_FIRE] < level.time)
-				{
-					gentity_t* fire_magic_user = &g_entities[ent->client->pers.magic_power_user_id[MAGIC_HIT_BY_FIRE]];
-
-					if (fire_magic_user && fire_magic_user->client)
-					{
-						int fire_damage = MAGIC_MIN_DMG + (fire_magic_user->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC] / 2);
-
-						zyk_quest_effect_spawn(fire_magic_user, ent, "zyk_magic_fire", "0", "env/fire", 0, 0, 0, 300);
-
-						fire_damage = (int)ceil(fire_damage * zyk_get_elemental_bonus_factor(MAGIC_FIRE_MAGIC, fire_magic_user, ent));
-
-						// zyk: must do at least 1 damage
-						if (fire_damage < 1)
-							fire_damage = 1;
-
-						G_Damage(ent, fire_magic_user, fire_magic_user, NULL, NULL, fire_damage, 0, MOD_UNKNOWN);
-
-						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fire_lp.wav"));
-					}
-
-					ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE]--;
-
-					ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_FIRE] = level.time + 200;
-				}
-				else if (ent->client->pers.magic_power_hit_counter[MAGIC_HIT_BY_FIRE] == 0 && ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_FIRE] < level.time)
-				{
-					ent->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_FIRE);
-				}
-			}
-
 			if (ent->client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))
 			{
 				int max_distance = MAGIC_MIN_RANGE + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[SKILL_MAGIC_AIR_MAGIC] + magic_bonus));
@@ -5886,6 +5852,11 @@ qboolean zyk_bad_status_effect(zyk_rpg_status_t rpg_status)
 
 void zyk_set_rpg_status(gentity_t* ent, zyk_rpg_status_t rpg_status, int duration, qboolean add_status)
 {
+	if (ent->health < 1 || !(ent->client))
+	{
+		return;
+	}
+
 	if (add_status == qtrue)
 	{
 		// zyk: prevent too many effects spawned at the same time, for example, Fire and Poison
@@ -5935,6 +5906,8 @@ void zyk_status_effects(gentity_t* ent)
 					zyk_quest_effect_spawn(ent, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 300);
 
 					G_Damage(ent, ent, ent, NULL, NULL, 10, 0, MOD_UNKNOWN);
+
+					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fire_lp.wav"));
 				}
 				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_BLEEDING))
 				{
@@ -5958,7 +5931,7 @@ void zyk_status_effects(gentity_t* ent)
 				// zyk: Status Protection skill decreases duration of bad RPG statuses
 				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0 && zyk_bad_status_effect(i) == qtrue)
 				{
-					ent->client->pers.rpg_status_duration[i] -= (10 * ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION]);
+					ent->client->pers.rpg_status_duration[i] -= (20 * ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION]);
 				}
 			}
 			else if (ent->client->pers.rpg_status_duration[i] <= level.time)
@@ -9839,15 +9812,17 @@ void G_RunFrame( int levelTime ) {
 
 								if (status_chosen == RPG_STATUS_CANNOT_USE_FORCE)
 								{
-									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Force\n\""));
+									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7No Force!\n\""));
 								}
 								else if (status_chosen == RPG_STATUS_CANNOT_USE_MAGIC)
 								{
-									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Magic\n\""));
+									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7No Magic!\n\""));
 								}
 							}
 						}
-						else if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && Q_irand(0, 99) < 10)
+						else if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && 
+							Q_irand(0, 99) < 10 && 
+							!(ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED)))
 						{ // zyk: chance to use Melee, so he can use Magic Fist
 							WP_FireMelee(ent, qfalse);
 						}

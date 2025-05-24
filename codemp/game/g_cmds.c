@@ -232,17 +232,17 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
 		return "an energy dome appears around you, damaging enemies inside it. Each level increases your resistance to damage to your health a little. This power deals non-elemental damage";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
-		return "hits enemies around you with Water elemental damage. While this magic is active, slowly restore health to you and nearby ally players or ally npcs. Increases your Water element affinity. More powerful against enemies with Fire affinity. Absorbs some Water magic effects";
+		return "hits enemies around you with Water elemental damage. Slowly restore health to you and nearby ally players or ally npcs. Each level increases chance of causing Poison status to enemies. Increases your Water element affinity. More powerful against enemies with Fire affinity. Absorbs some Water magic effects";
 	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
-		return "creates earthquakes and hits enemies with Earth elemental damage. Increases your Earth element affinity. More powerful against enemies with Air affinity. Absorbs some Earth magic effects";
+		return "hits enemies with Earth elemental damage. Has a chance of knocking down enemies in the ground with an earthquake. Each level increases chance of causing Bleeding status to enemies. Increases your Earth element affinity. More powerful against enemies with Air affinity. Absorbs some Earth magic effects";
 	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
-		return "hits enemies around you with Fire elemental damage. Enemies hit by it will catch fire for some seconds. Increases your Fire element affinity. More powerful against enemies with Water affinity. Absorbs some Fire magic effects";
+		return "hits enemies with Fire elemental damage. Enemies hit by it will catch fire for some seconds, and the duration of this effect increases with each level. Increases your Fire element affinity. More powerful against enemies with Water affinity. Absorbs some Fire magic effects";
 	if (skill_index == SKILL_MAGIC_AIR_MAGIC)
 		return "blows enemies away with a strong wind, and does Air elemental damage to them. Increases your run speed. Has a chance of knocking enemies down if they are midair. Increases your Air element affinity. More powerful against enemies with Earth affinity. Absorbs some Air magic effects";
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
 		return "creates a black hole, sucking enemies nearby and doing Dark elemental damage to them. Drains a small amount of health from enemies. Increases your Dark element affinity. More powerful against enemies with Light affinity. Absorbs some Dark magic effects";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
-		return "creates a shining light that does Light elemental damage to enemies. While near the light, enemies will have their MP drained to restore your MP and have a chance to get confused/stunned. Increases your Light element affinity. More powerful against enemies with Dark affinity. Absorbs some Light magic effects";
+		return "creates a shining light that does Light elemental damage to enemies. While near the light, enemies will have their MP drained to restore your MP and each level increases the chance of causing Confusion status. Increases your Light element affinity. More powerful against enemies with Dark affinity. Absorbs some Light magic effects";
 
 	return "";
 }

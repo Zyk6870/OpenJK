@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.3.10"
+#define	GAMEVERSION	"New Zyk Mod v1.3.11"
 
 #define SECURITY_LOG "security.log"
 
@@ -602,7 +602,6 @@ typedef enum {
 // zyk: flags set when someone is hit by some magic powers
 typedef enum {
 	MAGIC_HIT_BY_EARTH,
-	MAGIC_HIT_BY_FIRE,
 	MAGIC_HIT_BY_AIR,
 	MAX_HIT_BY_MAGIC
 } zyk_hit_by_magic_t;
@@ -1079,9 +1078,6 @@ typedef struct clientPersistant_s {
 	// zyk: cooldown between quest power uses
 	int quest_power_usage_timer;
 
-	// zyk: powers that hits the target player more than once need a hit counter or powers that need a counter to start an effect
-	int magic_power_hit_counter[MAX_MAGIC_POWERS];
-
 	// zyk: timers used by the magic powers hitting this player
 	int magic_power_target_timer[MAX_HIT_BY_MAGIC];
 
@@ -1090,9 +1086,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: debounce timer used to consume mp when magic is active
 	int magic_consumption_timer;
-
-	// zyk: player ids which are hitting the target player with magic
-	int magic_power_user_id[MAX_MAGIC_POWERS];
 
 	// zyk: amount of MP, required to use Magic powers
 	int magic_power;
