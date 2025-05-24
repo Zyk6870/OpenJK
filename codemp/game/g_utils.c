@@ -1610,6 +1610,7 @@ qboolean TryHeal(gentity_t *ent, gentity_t *target)
 }
 
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
+extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 void zyk_use_rpg_stuff(gentity_t* ent)
 {
 	if (ent->client->sess.amrpgmode == 2)
@@ -1898,7 +1899,7 @@ void TryUse( gentity_t *ent )
 	{ // zyk: player touched one of the puzzle crystals
 		if (level.legendary_crystal_chosen[level.legendary_artifact_step - QUEST_SECRET_CHOSEN_CRYSTALS_STEP] == target->count)
 		{ // zyk: one of the crystals chosen in the correct order
-			int crystal_quantity_decrease = QUEST_SECRET_CORRECT_CRYSTALS_STEP - (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] / 20);
+			int crystal_quantity_decrease = QUEST_SECRET_CORRECT_CRYSTALS_STEP - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 8);
 
 			G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/interface/pickup_battery.mp3"));
 
