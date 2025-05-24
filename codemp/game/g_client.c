@@ -2511,6 +2511,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 	// zyk: initializing player_statuses value
 	client->pers.player_statuses = 0;
+	client->pers.rpg_statuses = 0;
 
 	// read or initialize the session data
 	if ( firstTime || level.newSession ) {
@@ -3836,10 +3837,6 @@ void ClientSpawn(gentity_t *ent) {
 	// zyk: initializing flame thrower timer
 	ent->client->pers.flame_thrower_timer = 0;
 
-	// zyk: reset the Fire Bolt hits
-	client->pers.fire_bolt_hits_counter = 0;
-	client->pers.fire_bolt_timer = 0;
-
 	// zyk: initializing Quest Power attributes
 	ent->client->pers.quest_power_status = 0;
 	ent->client->pers.in_magic_flight = qfalse;
@@ -4259,6 +4256,7 @@ void ClientDisconnect( int clientNum ) {
 
 	ent->client->pers.bitvalue = 0;
 	ent->client->pers.player_statuses = 0;
+	ent->client->pers.rpg_statuses = 0;
 
 	if (ent->client->holdingObjectiveItem > 0)
 	{ //carrying a siege objective item - make sure it updates and removes itself from us now in case this is an instant death-respawn situation

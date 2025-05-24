@@ -754,6 +754,8 @@ char* zyk_inventory_key(int inventory_index)
 	return "";
 }
 
+extern void zyk_set_rpg_status(gentity_t* ent, zyk_rpg_status_t rpg_status, int duration, qboolean add_status);
+
 int zyk_get_max_health(gentity_t* ent)
 {
 	if (!ent || !(ent->client))
@@ -5536,7 +5538,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.energy_modulator_mode = 0;
 			ent->client->pers.quickdraw_timer = 0;
-			ent->client->pers.magic_shield_duration = 0;
 			ent->client->pers.flashlight_timer = 0;
 
 			ent->client->pers.buy_sell_timer = 0;
@@ -7068,16 +7069,7 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MAGIC_SHIELD] > 0)
 	{
-		if (ent->client->pers.magic_shield_duration < level.time)
-		{
-			ent->client->pers.magic_shield_duration = level.time + 30000;
-		}
-		else
-		{
-			ent->client->pers.magic_shield_duration += 30000;
-		}
-
-		ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_MAGIC_SHIELD);
+		zyk_set_rpg_status(ent, RPG_STATUS_MAGIC_SHIELD, 30000, qtrue);
 
 		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
 
@@ -7100,14 +7092,7 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_YSALAMIRI] > 0)
 	{
-		if (ent->client->ps.powerups[PW_YSALAMIRI] < level.time)
-		{
-			ent->client->ps.powerups[PW_YSALAMIRI] = level.time + 30000;
-		}
-		else
-		{
-			ent->client->ps.powerups[PW_YSALAMIRI] += 30000;
-		}
+		ent->client->ps.powerups[PW_YSALAMIRI] = level.time + 30000;
 
 		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
 
@@ -7115,14 +7100,7 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FORCE_BOON] > 0)
 	{
-		if (ent->client->ps.powerups[PW_FORCE_BOON] < level.time)
-		{
-			ent->client->ps.powerups[PW_FORCE_BOON] = level.time + 30000;
-		}
-		else
-		{
-			ent->client->ps.powerups[PW_FORCE_BOON] += 30000;
-		}
+		ent->client->ps.powerups[PW_FORCE_BOON] = level.time + 30000;
 
 		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
 
@@ -7356,7 +7334,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 						if (page == 1 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 0)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Can poison targets with its melee attacks. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. Attacks absorb enemy health to restore mp to his allies. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier wearing Impact Reducer Armor. ^2Magic: Air\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Can poison targets with its melee attacks. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Changeling Worm: ^7a changeling in worm form. Melee attacks can cause bleeding and can absorb enemy health to restore mp to his allies. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier wearing Impact Reducer Armor. ^2Magic: Air\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 1)
 						{
@@ -10629,8 +10607,8 @@ qboolean zyk_can_cast_magic(gentity_t* ent)
 {
 	if (ent->client->ps.forceHandExtend != HANDEXTEND_NONE || 
 		ent->client->ps.fd.forceGripBeingGripped > level.time || 
-		ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_MAGIC) || 
-		ent->client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_SHIELD))
+		ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CANNOT_USE_MAGIC) ||
+		ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
 	{
 		return qfalse;
 	}

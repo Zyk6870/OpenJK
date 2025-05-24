@@ -2219,6 +2219,7 @@ extern void zyk_stop_all_magic_powers(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 extern void zyk_spawn_crystal(float x, float y, float z, int duration, zyk_quest_item_t crystal_type);
 extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
+extern void zyk_set_rpg_status(gentity_t* ent, zyk_rpg_status_t rpg_status, int duration, qboolean add_status);
 
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
 	gentity_t* ent;
@@ -2253,11 +2254,10 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	{ // zyk: if player dies, deactivate Energy Modulator
 		self->client->pers.energy_modulator_mode = 0;
 	}
+
+	self->client->pers.rpg_statuses = 0;
 	
-	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
-	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_POISONED);
-	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_MAGIC_SHIELD);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_USING_FLASHLIGHT);
 
 	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_EARTH);
@@ -4983,7 +4983,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
-	if (targ && targ->client && targ->client->pers.player_statuses & (1 << PLAYER_STATUS_LOWER_DAMAGE) && 
+	if (targ && targ->client && targ->client->pers.rpg_statuses & (1 << RPG_STATUS_LOWER_DAMAGE) &&
 		mod != MOD_FORCE_DARK &&
 		!(inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) > -1) // zyk: not a magic power
 		)
@@ -5513,8 +5513,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				targ->client->ps.eFlags &= ~EF_INVULNERABLE;
 			}
-			else if (!((targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_SHIELD)))
-			{ // zyk: Magic Shield
+			else if (!((targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD)))
+			{ // zyk: Magic Shield does not apply god mode
 				return;
 			}
 		}
@@ -6174,10 +6174,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		{
 			if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER && mod == MOD_MELEE)
 			{ // zyk: poison the target
-				targ->client->pers.poison_debounce_timer = 0;
-				targ->client->pers.poison_duration = level.time + 20000;
-
-				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_POISONED);
+				zyk_set_rpg_status(targ, RPG_STATUS_POISONED, 20000, qtrue);
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM && mod == MOD_MELEE)
 			{ // zyk: absorbs health from target to restore mp to all quest enemies in the map
@@ -6206,6 +6203,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				{ // zyk: restore his own mp if there is still some mp to restore
 					attacker->client->pers.magic_power += mp_to_restore;
 				}
+
+				zyk_set_rpg_status(targ, RPG_STATUS_BLEEDING, 20000, qtrue);
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
 			{
@@ -6247,20 +6246,14 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 &&
 				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_E11_BLASTER2) && targ && targ->health > 0 && targ->client && 
 				Q_irand(0, 1) == 0)
-			{ // zyk: fire
-				targ->client->pers.fire_bolt_hits_counter += 5;
-				targ->client->pers.fire_bolt_user_id = attacker->s.number;
-
-				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_IN_FLAMES);
+			{
+				zyk_set_rpg_status(targ, RPG_STATUS_IN_FLAMES, 1000, qtrue);
 			}
 			else if (mod == MOD_BOWCASTER && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0 &&
 				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_BOWCASTER2) && targ && targ->health > 0 && targ->client &&
 				Q_irand(0, 1) == 0)
-			{ // zyk: poison
-				targ->client->pers.poison_debounce_timer = 0;
-				targ->client->pers.poison_duration = level.time + 5000;
-
-				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_POISONED);
+			{
+				zyk_set_rpg_status(targ, RPG_STATUS_POISONED, 5000, qtrue);
 			}
 			else if ((inflictor && inflictor->s.weapon == WP_DEMP2 && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT)) && 
 				attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0 &&
@@ -6291,18 +6284,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 			else if (mod == MOD_FLECHETTE && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 && 
 				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_FLECHETTE2) && targ && targ->health > 0 && targ->client)
-			{ // zyk: bleeding
-				if (targ->client->pers.bleeding_duration < level.time)
-				{
-					targ->client->pers.bleeding_debounce_timer = 0;
-					targ->client->pers.bleeding_duration = level.time + (200 * take);
-				}
-				else
-				{
-					targ->client->pers.bleeding_duration += (200 * take);
-				}
-
-				targ->client->pers.player_statuses |= (1 << PLAYER_STATUS_BLEEDING);
+			{
+				zyk_set_rpg_status(targ, RPG_STATUS_BLEEDING, (200 * take), qtrue);
 			}
 		}
 
@@ -6690,10 +6673,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					if (ent->client && ent->health > 0 && magic_power_user && magic_power_user->client &&
 						Q_stricmp(attacker->targetname, "zyk_explosive_fire") == 0)
 					{
-						ent->client->pers.fire_bolt_hits_counter += 2;
-						ent->client->pers.fire_bolt_user_id = magic_power_user->s.number;
-
-						ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_IN_FLAMES);
+						zyk_set_rpg_status(ent, RPG_STATUS_IN_FLAMES, 2000, qtrue);
 					}
 
 					// zyk: Magic power. Target will not be knocked back by it
@@ -6708,7 +6688,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							continue;
 						}
 
-						if (ent->client && ent->client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_SHIELD))
+						if (ent->client && ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
 						{ // zyk: Magic Shield fully protects against Magic
 							continue;
 						}

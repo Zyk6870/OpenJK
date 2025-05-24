@@ -5179,137 +5179,6 @@ void zyk_spawn_black_hole_model(gentity_t* ent, int duration, int model_scale)
 	zyk_remap_shaders("models/map_objects/mp/spheretwo", "textures/mp/black");
 }
 
-// zyk: fires the Boba Fett flame thrower
-void Player_FireFlameThrower(gentity_t* self, qboolean is_magic)
-{
-	trace_t		tr;
-	gentity_t* traceEnt = NULL;
-
-	int entityList[MAX_GENTITIES];
-	int numListedEntities;
-	int e = 0;
-	int damage = zyk_flame_thrower_damage.integer;
-
-	vec3_t	tfrom, tto, fwd;
-	vec3_t thispush_org, a;
-	vec3_t mins, maxs, fwdangles, forward, right, center;
-	vec3_t		origin, dir;
-
-	int i;
-	float visionArc = 120;
-	float radius = 144;
-
-	self->client->cloakDebReduce = level.time + zyk_flame_thrower_cooldown.integer;
-
-	// zyk: Fire Magic power has more damage
-	if (is_magic == qtrue)
-	{
-		damage += (1 * self->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
-	}
-
-	origin[0] = self->r.currentOrigin[0];
-	origin[1] = self->r.currentOrigin[1];
-	origin[2] = self->r.currentOrigin[2] + 20.0f;
-
-	dir[0] = (-1) * self->client->ps.viewangles[0];
-	dir[2] = self->client->ps.viewangles[2];
-	dir[1] = (-1) * (180 - self->client->ps.viewangles[1]);
-
-	if ((self->client->pers.flame_thrower_timer - level.time) > 500)
-		G_PlayEffectID(G_EffectIndex("boba/fthrw"), origin, dir);
-
-	if ((self->client->pers.flame_thrower_timer - level.time) > 1250)
-		G_Sound(self, CHAN_WEAPON, G_SoundIndex("sound/effects/fire_lp"));
-
-	//Check for a direct usage on NPCs first
-	VectorCopy(self->client->ps.origin, tfrom);
-	tfrom[2] += self->client->ps.viewheight;
-	AngleVectors(self->client->ps.viewangles, fwd, NULL, NULL);
-	tto[0] = tfrom[0] + fwd[0] * radius / 2;
-	tto[1] = tfrom[1] + fwd[1] * radius / 2;
-	tto[2] = tfrom[2] + fwd[2] * radius / 2;
-
-	trap->Trace(&tr, tfrom, NULL, NULL, tto, self->s.number, MASK_PLAYERSOLID, qfalse, 0, 0);
-
-	VectorCopy(self->client->ps.viewangles, fwdangles);
-	AngleVectors(fwdangles, forward, right, NULL);
-	VectorCopy(self->client->ps.origin, center);
-
-	for (i = 0; i < 3; i++)
-	{
-		mins[i] = center[i] - radius;
-		maxs[i] = center[i] + radius;
-	}
-
-	numListedEntities = trap->EntitiesInBox(mins, maxs, entityList, MAX_GENTITIES);
-
-	while (e < numListedEntities)
-	{
-		traceEnt = &g_entities[entityList[e]];
-
-		if (traceEnt)
-		{ //not in the arc, don't consider it
-			if (traceEnt->client)
-			{
-				VectorCopy(traceEnt->client->ps.origin, thispush_org);
-			}
-			else
-			{
-				VectorCopy(traceEnt->s.pos.trBase, thispush_org);
-			}
-
-			VectorCopy(self->client->ps.origin, tto);
-			tto[2] += self->client->ps.viewheight;
-			VectorSubtract(thispush_org, tto, a);
-			vectoangles(a, a);
-
-			if (!InFieldOfVision(self->client->ps.viewangles, visionArc, a))
-			{ //only bother with arc rules if the victim is a client
-				entityList[e] = ENTITYNUM_NONE;
-			}
-		}
-		traceEnt = &g_entities[entityList[e]];
-		if (traceEnt && traceEnt != self)
-		{
-			qboolean is_ally = qfalse;
-
-			if (traceEnt->s.number < level.maxclients && !self->NPC &&
-				zyk_is_ally(self, traceEnt) == qtrue)
-			{ // zyk: allies will not be hit
-				is_ally = qtrue;
-			}
-
-			if (OnSameTeam(self, traceEnt) == qtrue || npcs_on_same_team(self, traceEnt) == qtrue)
-			{ // zyk: if one of them is npc, also check for allies
-				is_ally = qtrue;
-			}
-
-			if (is_ally == qfalse)
-			{
-				G_Damage(traceEnt, self, self, self->client->ps.viewangles, tr.endpos, damage, DAMAGE_NO_KNOCKBACK | DAMAGE_IGNORE_TEAM, MOD_LAVA);
-
-				// zyk: make target catch fire
-				if (traceEnt->client)
-				{
-					if (is_magic == qtrue)
-					{
-						traceEnt->client->pers.fire_bolt_hits_counter = (4 * self->client->pers.skill_levels[SKILL_MAGIC_FIRE_MAGIC]);
-					}
-					else
-					{
-						traceEnt->client->pers.fire_bolt_hits_counter = 10;
-					}
-
-					traceEnt->client->pers.fire_bolt_user_id = self->s.number;
-					traceEnt->client->pers.fire_bolt_timer = level.time + 100;
-					traceEnt->client->pers.player_statuses |= (1 << PLAYER_STATUS_IN_FLAMES);
-				}
-			}
-		}
-		e++;
-	}
-}
-
 extern void save_account(gentity_t* ent, qboolean save_char_file);
 
 void zyk_spawn_puzzle_effect(gentity_t *crystal_model)
@@ -5595,6 +5464,7 @@ void clear_special_power_effect(gentity_t* ent)
 
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
+extern void initialize_rpg_skills(gentity_t* ent, qboolean init_all);
 
 // zyk: Magic Dome
 void dome_of_damage(gentity_t* ent)
@@ -5750,115 +5620,6 @@ void zyk_stop_all_magic_powers(gentity_t* ent)
 	}
 }
 
-// zyk: controls the quest powers stuff
-extern void initialize_rpg_skills(gentity_t *ent, qboolean init_all);
-void zyk_status_effects(gentity_t* ent)
-{
-	if (ent && ent->client && ent->health > 0)
-	{
-		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_POISONED))
-		{
-			if (ent->client->pers.poison_duration > level.time && ent->client->pers.poison_debounce_timer < level.time)
-			{
-				ent->client->pers.poison_debounce_timer = level.time + 250;
-
-				zyk_quest_effect_spawn(ent, ent, "zyk_status_poison", "0", "noghri_stick/gas_cloud", 100, 0, 0, 1200);
-
-				G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
-
-				zyk_set_stamina(ent, 50, qfalse);
-
-				// zyk: Status Protection skill
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0)
-				{
-					ent->client->pers.poison_duration -= (10 * ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION]);
-				}
-			}
-			else if (ent->client->pers.poison_duration <= level.time)
-			{
-				ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_POISONED);
-			}
-		}
-
-		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_IN_FLAMES) && ent->client->pers.fire_bolt_hits_counter > 0 &&
-			ent->client->pers.fire_bolt_timer < level.time)
-		{
-			gentity_t* fire_bolt_user = &g_entities[ent->client->pers.fire_bolt_user_id];
-
-			zyk_quest_effect_spawn(fire_bolt_user, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 300);
-
-			G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 10, 0, MOD_UNKNOWN);
-
-			ent->client->pers.fire_bolt_hits_counter--;
-			ent->client->pers.fire_bolt_timer = level.time + 200;
-
-			// zyk: Status Protection skill
-			if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0 && 
-				Q_irand(0, 99) < (ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] * 10))
-			{
-				ent->client->pers.fire_bolt_hits_counter--;
-			}
-
-			// zyk: no more do fire bolt damage if counter is 0
-			if (ent->client->pers.fire_bolt_hits_counter <= 0)
-			{
-				ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_IN_FLAMES);
-			}
-		}
-
-		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_BLEEDING))
-		{
-			if (ent->client->pers.bleeding_duration > level.time && ent->client->pers.bleeding_debounce_timer < level.time)
-			{
-				ent->client->pers.bleeding_debounce_timer = level.time + 100;
-
-				G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
-
-				// zyk: Status Protection skill
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0)
-				{
-					ent->client->pers.bleeding_duration -= (10 * ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION]);
-				}
-			}
-			else if (ent->client->pers.bleeding_duration <= level.time)
-			{
-				ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_BLEEDING);
-			}
-		}
-
-		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_MAGIC_SHIELD))
-		{
-			if (ent->client->pers.magic_shield_duration > level.time)
-			{
-				ent->client->ps.eFlags |= EF_INVULNERABLE;
-				ent->client->invulnerableTimer = ent->client->pers.magic_shield_duration;
-			}
-			else
-			{
-				ent->client->ps.eFlags &= ~EF_INVULNERABLE;
-				ent->client->invulnerableTimer = 0;
-
-				ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_MAGIC_SHIELD);
-			}
-		}
-
-		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_FORCE) && ent->client->pers.no_force_timer < level.time)
-		{
-			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CANNOT_USE_FORCE);
-		}
-
-		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_MAGIC) && ent->client->pers.no_magic_timer < level.time)
-		{
-			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CANNOT_USE_MAGIC);
-		}
-
-		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_LOWER_DAMAGE) && ent->client->pers.lower_damage_timer < level.time)
-		{
-			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_LOWER_DAMAGE);
-		}
-	}
-}
-
 void zyk_mp_usage(gentity_t* ent, int magic_skill_index)
 {
 	int magic_mp_usage = (ent->client->pers.skill_levels[magic_skill_index] / 2);
@@ -5896,7 +5657,7 @@ void magic_power_events(gentity_t *ent)
 			// zyk: Magic Affinity increases magic damage
 			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 10);
 
-			if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_MAGIC))
+			if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CANNOT_USE_MAGIC))
 			{
 				zyk_stop_all_magic_powers(ent);
 			}
@@ -6110,6 +5871,206 @@ void magic_power_events(gentity_t *ent)
 				ent->client->pers.magic_consumption_timer = level.time + 250;
 			}
 		}
+	}
+}
+
+qboolean zyk_bad_status_effect(zyk_rpg_status_t rpg_status)
+{
+	if (rpg_status == RPG_STATUS_MAGIC_SHIELD)
+	{
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
+void zyk_set_rpg_status(gentity_t* ent, zyk_rpg_status_t rpg_status, int duration, qboolean add_status)
+{
+	if (add_status == qtrue)
+	{
+		// zyk: prevent too many effects spawned at the same time, for example, Fire and Poison
+		if (!(ent->client->pers.rpg_statuses & (1 << rpg_status)))
+		{
+			ent->client->pers.rpg_status_debounce_timer[rpg_status] = 0;
+		}
+
+		ent->client->pers.rpg_statuses |= (1 << rpg_status);
+
+		ent->client->pers.rpg_status_duration[rpg_status] = level.time + duration;
+	}
+	else
+	{
+		ent->client->pers.rpg_statuses &= ~(1 << rpg_status);
+
+		if (rpg_status == RPG_STATUS_MAGIC_SHIELD)
+		{
+			ent->client->ps.eFlags &= ~EF_INVULNERABLE;
+			ent->client->invulnerableTimer = 0;
+		}
+	}
+}
+
+void zyk_status_effects(gentity_t* ent)
+{
+	if (ent && ent->client && ent->health > 0 && ent->client->pers.rpg_statuses > 0)
+	{
+		int i = 0;
+
+		for (i = 0; i < NUM_RPG_STATUSES; i++)
+		{
+			if (ent->client->pers.rpg_status_duration[i] > level.time && ent->client->pers.rpg_status_debounce_timer[i] < level.time)
+			{
+				ent->client->pers.rpg_status_debounce_timer[i] = level.time + 200;
+
+				if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_POISONED))
+				{
+					zyk_quest_effect_spawn(ent, ent, "zyk_status_poison", "0", "noghri_stick/gas_cloud", 100, 0, 0, 1000);
+
+					G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
+
+					zyk_set_stamina(ent, 50, qfalse);
+				}
+				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_IN_FLAMES))
+				{
+					zyk_quest_effect_spawn(ent, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 300);
+
+					G_Damage(ent, ent, ent, NULL, NULL, 10, 0, MOD_UNKNOWN);
+				}
+				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_BLEEDING))
+				{
+					G_Damage(ent, ent, ent, NULL, NULL, 5, 0, MOD_UNKNOWN);
+				}
+				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
+				{
+					ent->client->ps.eFlags |= EF_INVULNERABLE;
+					ent->client->invulnerableTimer = ent->client->pers.rpg_status_duration[i];
+				}
+
+				// zyk: Status Protection skill decreases duration of bad RPG statuses
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0 && zyk_bad_status_effect(i) == qtrue)
+				{
+					ent->client->pers.rpg_status_duration[i] -= (10 * ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION]);
+				}
+			}
+			else if (ent->client->pers.rpg_status_duration[i] <= level.time)
+			{
+				zyk_set_rpg_status(ent, i, 0, qfalse);
+			}
+		}
+	}
+}
+
+// zyk: fires the Boba Fett flame thrower
+void Player_FireFlameThrower(gentity_t* self)
+{
+	trace_t		tr;
+	gentity_t* traceEnt = NULL;
+
+	int entityList[MAX_GENTITIES];
+	int numListedEntities;
+	int e = 0;
+	int damage = zyk_flame_thrower_damage.integer;
+
+	vec3_t	tfrom, tto, fwd;
+	vec3_t thispush_org, a;
+	vec3_t mins, maxs, fwdangles, forward, right, center;
+	vec3_t		origin, dir;
+
+	int i;
+	float visionArc = 120;
+	float radius = 144;
+
+	self->client->cloakDebReduce = level.time + zyk_flame_thrower_cooldown.integer;
+
+	origin[0] = self->r.currentOrigin[0];
+	origin[1] = self->r.currentOrigin[1];
+	origin[2] = self->r.currentOrigin[2] + 20.0f;
+
+	dir[0] = (-1) * self->client->ps.viewangles[0];
+	dir[2] = self->client->ps.viewangles[2];
+	dir[1] = (-1) * (180 - self->client->ps.viewangles[1]);
+
+	if ((self->client->pers.flame_thrower_timer - level.time) > 500)
+		G_PlayEffectID(G_EffectIndex("boba/fthrw"), origin, dir);
+
+	if ((self->client->pers.flame_thrower_timer - level.time) > 1250)
+		G_Sound(self, CHAN_WEAPON, G_SoundIndex("sound/effects/fire_lp"));
+
+	//Check for a direct usage on NPCs first
+	VectorCopy(self->client->ps.origin, tfrom);
+	tfrom[2] += self->client->ps.viewheight;
+	AngleVectors(self->client->ps.viewangles, fwd, NULL, NULL);
+	tto[0] = tfrom[0] + fwd[0] * radius / 2;
+	tto[1] = tfrom[1] + fwd[1] * radius / 2;
+	tto[2] = tfrom[2] + fwd[2] * radius / 2;
+
+	trap->Trace(&tr, tfrom, NULL, NULL, tto, self->s.number, MASK_PLAYERSOLID, qfalse, 0, 0);
+
+	VectorCopy(self->client->ps.viewangles, fwdangles);
+	AngleVectors(fwdangles, forward, right, NULL);
+	VectorCopy(self->client->ps.origin, center);
+
+	for (i = 0; i < 3; i++)
+	{
+		mins[i] = center[i] - radius;
+		maxs[i] = center[i] + radius;
+	}
+
+	numListedEntities = trap->EntitiesInBox(mins, maxs, entityList, MAX_GENTITIES);
+
+	while (e < numListedEntities)
+	{
+		traceEnt = &g_entities[entityList[e]];
+
+		if (traceEnt)
+		{ //not in the arc, don't consider it
+			if (traceEnt->client)
+			{
+				VectorCopy(traceEnt->client->ps.origin, thispush_org);
+			}
+			else
+			{
+				VectorCopy(traceEnt->s.pos.trBase, thispush_org);
+			}
+
+			VectorCopy(self->client->ps.origin, tto);
+			tto[2] += self->client->ps.viewheight;
+			VectorSubtract(thispush_org, tto, a);
+			vectoangles(a, a);
+
+			if (!InFieldOfVision(self->client->ps.viewangles, visionArc, a))
+			{ //only bother with arc rules if the victim is a client
+				entityList[e] = ENTITYNUM_NONE;
+			}
+		}
+		traceEnt = &g_entities[entityList[e]];
+		if (traceEnt && traceEnt != self)
+		{
+			qboolean is_ally = qfalse;
+
+			if (traceEnt->s.number < level.maxclients && !self->NPC &&
+				zyk_is_ally(self, traceEnt) == qtrue)
+			{ // zyk: allies will not be hit
+				is_ally = qtrue;
+			}
+
+			if (OnSameTeam(self, traceEnt) == qtrue || npcs_on_same_team(self, traceEnt) == qtrue)
+			{ // zyk: if one of them is npc, also check for allies
+				is_ally = qtrue;
+			}
+
+			if (is_ally == qfalse)
+			{
+				G_Damage(traceEnt, self, self, self->client->ps.viewangles, tr.endpos, damage, DAMAGE_NO_KNOCKBACK | DAMAGE_IGNORE_TEAM, MOD_LAVA);
+
+				// zyk: make target catch fire
+				if (traceEnt->client)
+				{
+					zyk_set_rpg_status(traceEnt, RPG_STATUS_IN_FLAMES, 2000, qtrue);
+				}
+			}
+		}
+		e++;
 	}
 }
 
@@ -9292,7 +9253,7 @@ void G_RunFrame( int levelTime ) {
 
 					if (ent->client->pers.flame_thrower_timer > level.time && ent->client->cloakDebReduce < level.time)
 					{ // zyk: fires the flame thrower
-						Player_FireFlameThrower(ent, qfalse);
+						Player_FireFlameThrower(ent);
 					}
 				}
 				else if (ent->client->pers.is_getting_up == qfalse && (ent->client->pers.stamina_out_timer - level.time) < 1200)
@@ -9860,29 +9821,23 @@ void G_RunFrame( int levelTime ) {
 
 							if (Q_irand(0, 99) < MAGE_MASTER_STATUS_CHANCE)
 							{
-								zyk_player_status_t status_chosen = Q_irand(PLAYER_STATUS_CANNOT_USE_FORCE, PLAYER_STATUS_LOWER_DAMAGE);
+								zyk_rpg_status_t status_chosen = Q_irand(RPG_STATUS_CANNOT_USE_FORCE, RPG_STATUS_LOWER_DAMAGE);
 
 								if (ent->enemy->client)
 								{
-									ent->enemy->client->pers.player_statuses |= (1 << status_chosen);
+									zyk_set_rpg_status(ent->enemy, status_chosen, MAGE_MASTER_STATUS_DURATION, qtrue);
 								}
 
-								if (status_chosen == PLAYER_STATUS_CANNOT_USE_FORCE)
+								if (status_chosen == RPG_STATUS_CANNOT_USE_FORCE)
 								{
-									ent->enemy->client->pers.no_force_timer = level.time + MAGE_MASTER_STATUS_DURATION;
-
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Force\n\""));
 								}
-								else if (status_chosen == PLAYER_STATUS_CANNOT_USE_MAGIC)
+								else if (status_chosen == RPG_STATUS_CANNOT_USE_MAGIC)
 								{
-									ent->enemy->client->pers.no_magic_timer = level.time + MAGE_MASTER_STATUS_DURATION;
-
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - No Magic\n\""));
 								}
-								else if (status_chosen == PLAYER_STATUS_LOWER_DAMAGE)
+								else if (status_chosen == RPG_STATUS_LOWER_DAMAGE)
 								{
-									ent->enemy->client->pers.lower_damage_timer = level.time + MAGE_MASTER_STATUS_DURATION;
-
 									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7Reality Shift - Lower Physical Damage\n\""));
 								}
 							}

@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.3.7"
+#define	GAMEVERSION	"New Zyk Mod v1.3.8"
 
 #define SECURITY_LOG "security.log"
 
@@ -550,20 +550,24 @@ typedef enum {
 	PLAYER_STATUS_SELF_KILL,
 	PLAYER_STATUS_NO_FIGHT,
 	PLAYER_STATUS_DUEL_TOURNAMENT_LOSS,
-	PLAYER_STATUS_IN_FLAMES,
-	PLAYER_STATUS_POISONED,
-	PLAYER_STATUS_BLEEDING,
-	PLAYER_STATUS_MAGIC_SHIELD,
 	PLAYER_STATUS_CREATED_ACCOUNT,
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
 	PLAYER_STATUS_KEEP_QUEST_TRIES,
 	PLAYER_STATUS_RESET_TO_MELEE,
 	PLAYER_STATUS_USING_FLASHLIGHT,
-	PLAYER_STATUS_CANNOT_USE_FORCE,
-	PLAYER_STATUS_CANNOT_USE_MAGIC,
-	PLAYER_STATUS_LOWER_DAMAGE,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
+
+typedef enum {
+	RPG_STATUS_POISONED,
+	RPG_STATUS_IN_FLAMES,
+	RPG_STATUS_BLEEDING,
+	RPG_STATUS_CANNOT_USE_FORCE,
+	RPG_STATUS_CANNOT_USE_MAGIC,
+	RPG_STATUS_LOWER_DAMAGE,
+	RPG_STATUS_MAGIC_SHIELD,
+	NUM_RPG_STATUSES
+} zyk_rpg_status_t;
 
 typedef enum {
 	MAPMUSIC_NONE,
@@ -948,32 +952,16 @@ typedef struct clientPersistant_s {
 	// zyk: player status flags
 	int player_statuses;
 
-	// zyk: some statuses may have a timer
-	int no_force_timer;
-	int no_magic_timer;
-	int lower_damage_timer;
-
 	// zyk: Mind trick works on npcs. Sets the player ids if this npc is mind-tricked
 	int number_of_npcs_tricked_by_player;
 	int mind_tricker_player_ids1;
 	int mind_tricker_player_ids2;
 	int mind_trick_effect_timer;
 
-	// zyk: poison status
-	int poison_debounce_timer;
-	int poison_duration;
-
-	// zyk: On Fire status
-	int fire_bolt_timer;
-	int fire_bolt_user_id;
-	int fire_bolt_hits_counter;
-
-	// zyk: bleeding status
-	int bleeding_duration;
-	int bleeding_debounce_timer;
-
-	// zyk: Magic Shield status
-	int magic_shield_duration;
+	// zyk: RPG statuses
+	int rpg_statuses;
+	int rpg_status_duration[NUM_RPG_STATUSES];
+	int rpg_status_debounce_timer[NUM_RPG_STATUSES];
 
 	// zyk: last health, shield, mp and stamina are saved into account
 	int last_health;

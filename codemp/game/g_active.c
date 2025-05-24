@@ -2588,7 +2588,7 @@ void ClientThink_real( gentity_t *ent ) {
 			client->ps.speed /= 2;
 		}
 
-		if (client->pers.player_statuses & (1 << PLAYER_STATUS_POISONED))
+		if (client->pers.rpg_statuses & (1 << RPG_STATUS_POISONED))
 		{ // zyk: poisoned
 			client->ps.speed *= 0.75;
 		}
@@ -2640,7 +2640,7 @@ void ClientThink_real( gentity_t *ent ) {
 			zyk_player_speed /= 2;
 		}
 
-		if (client->pers.player_statuses & (1 << PLAYER_STATUS_POISONED))
+		if (client->pers.rpg_statuses & (1 << RPG_STATUS_POISONED))
 		{ // zyk: poisoned
 			zyk_player_speed *= 0.75;
 		}
@@ -3129,7 +3129,7 @@ void ClientThink_real( gentity_t *ent ) {
 	//play/stop any looping sounds tied to controlled movement
 	G_CheckMovingLoopingSounds( ent, ucmd );
 
-	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CANNOT_USE_FORCE))
+	if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CANNOT_USE_FORCE))
 	{
 		ent->client->ps.fd.forceDeactivateAll = 1;
 	}
