@@ -6516,7 +6516,6 @@ void zyk_remove_emotes(gentity_t* ent)
 G_RadiusDamage
 ============
 */
-extern int zyk_max_magic_power(gentity_t* ent);
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
 extern float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t* attacker, gentity_t* target);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
@@ -6826,33 +6825,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							if (ent->client && ent->health > 0)
 							{
 								int chance_for_confusion = final_damage;
-								int mp_to_drain = magic_power_user->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
-								int max_player_mp = zyk_max_magic_power(magic_power_user);
-
-								// zyk: elemental bonus
-								mp_to_drain = final_damage - MAGIC_MIN_DMG;
-
-								if (mp_to_drain < 1)
-								{
-									mp_to_drain = 1;
-								}
-
-								// zyk: drains mp from target
-								if (ent->client->pers.magic_power >= mp_to_drain)
-								{
-									magic_power_user->client->pers.magic_power += mp_to_drain;
-									ent->client->pers.magic_power -= mp_to_drain;
-								}
-								else if (ent->client->pers.magic_power > 0)
-								{
-									magic_power_user->client->pers.magic_power += ent->client->pers.magic_power;
-									ent->client->pers.magic_power = 0;
-								}
-
-								if (magic_power_user->client->pers.magic_power > max_player_mp)
-								{
-									magic_power_user->client->pers.magic_power = max_player_mp;
-								}
 
 								zyk_remove_emotes(ent);
 

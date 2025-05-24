@@ -242,7 +242,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
 		return "creates a black hole, sucking enemies nearby and doing Dark elemental damage to them. Drains a small amount of health from enemies. Increases your Dark element affinity. More powerful against enemies with Light affinity. Absorbs some Dark magic effects";
 	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
-		return "creates a shining light that does Light elemental damage to enemies. While near the light, enemies will have their MP drained to restore your MP and each level increases the chance of causing Confusion status. Increases your Light element affinity. More powerful against enemies with Dark affinity. Absorbs some Light magic effects";
+		return "creates a shining light that does Light elemental damage to enemies. Regens shield and Stamina. Each level increases the chance of causing Confusion status and the amount of shield and Stamina recovered. Increases your Light element affinity. More powerful against enemies with Dark affinity. Absorbs some Light magic effects";
 
 	return "";
 }

@@ -5828,6 +5828,24 @@ void magic_power_events(gentity_t *ent)
 				{
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_light", "4", "howler/sonic", 0, damage, radius, 400);
 
+					if (ent->health > 0)
+					{
+						int shield_amount = 1 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC];
+						int stamina_amount = (1 + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_LIGHT_MAGIC]) * 2;
+
+						if (ent->client->ps.stats[STAT_ARMOR] < ent->client->pers.max_rpg_shield)
+						{
+							ent->client->ps.stats[STAT_ARMOR] += shield_amount;
+						}
+
+						if (ent->client->ps.stats[STAT_ARMOR] > ent->client->pers.max_rpg_shield)
+						{
+							ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
+						}
+
+						zyk_set_stamina(ent, stamina_amount, qtrue);
+					}
+
 					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHT_MAGIC] = level.time + 300;
 				}
 			}
