@@ -632,6 +632,12 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
+		if (bonuses >= 90)
+		{ // zyk: at 90 per cent quest progress, npcs will have shield
+			npc_ent->client->pers.max_rpg_shield = npc_ent->health;
+			npc_ent->client->ps.stats[STAT_ARMOR] = npc_ent->client->pers.max_rpg_shield;
+		}
+
 		// zyk: setting magic abilities
 		if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
 		{
@@ -9627,7 +9633,7 @@ void G_RunFrame( int levelTime ) {
 					// zyk: quest npcs
 					if (ent->client->pers.quest_event_timer < level.time && ent->client->pers.quest_missions & (1 << MAIN_QUEST_START))
 					{
-						int main_quest_progress = ((ent->client->pers.quest_progress * 1.0) / MAX_QUEST_PROGRESS) * 100;
+						int main_quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS);
 						qboolean hard_difficulty = qfalse;
 
 						if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
