@@ -6760,11 +6760,11 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 500;
-	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 300;
+	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 50;
 
-	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 500;
-	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 300;
+	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][1] = 500;

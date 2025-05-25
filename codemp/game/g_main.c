@@ -606,6 +606,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 {
 	if (npc_ent && npc_ent->client)
 	{
+		int quest_progress_for_shield = 90;
 		int ally_bonus = (bonuses / zyk_bonus_increase_for_quest_npc(quest_npc_type));
 
 		// zyk: bonus skill level based on the chance to appear
@@ -624,6 +625,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		{
 			hp_bonus *= 2;
 			skill_level_bonus += 2;
+			quest_progress_for_shield /= 2;
 		}
 
 		// zyk: setting quest npc health
@@ -632,8 +634,8 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
-		if (bonuses >= 90)
-		{ // zyk: at 90 per cent quest progress, npcs will have shield
+		if (bonuses >= quest_progress_for_shield)
+		{ // zyk: at this quest progress, npcs will have shield
 			npc_ent->client->pers.max_rpg_shield = npc_ent->health;
 			npc_ent->client->ps.stats[STAT_ARMOR] = npc_ent->client->pers.max_rpg_shield;
 		}
@@ -7329,6 +7331,8 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CREATED_ACCOUNT);
 	}
 	
+	interval_time -= (ent->client->pers.quest_progress / 10);
+
 	ent->client->pers.quest_event_timer = level.time + interval_time;
 }
 
