@@ -7223,6 +7223,7 @@ void zyk_show_tutorial(gentity_t* ent)
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^2Meditate ^7taunt to regen it. If Stamina runs out, you will faint for some seconds.\n\"", QUESTCHAR_ALL_SPIRITS));
 		
 			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
+			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
 		}
 
 		ent->client->pers.tutorial_step++;
@@ -7248,6 +7249,7 @@ void zyk_show_tutorial(gentity_t* ent)
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or get melee to drop items. Use ^3/jetpack ^7to drop your jetpack.\n\"", QUESTCHAR_ALL_SPIRITS));
 		
 			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
+			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
 		}
 
 		ent->client->pers.tutorial_step++;
@@ -7281,6 +7283,7 @@ void zyk_show_tutorial(gentity_t* ent)
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Affinity increases Magic Powers damage/range, Magic Fist damage, max MP, stamina usage for active magic and lowers Magic Power mp cost.\n\"", QUESTCHAR_ALL_SPIRITS));
 		
 			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
+			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
 		}
 
 		ent->client->pers.tutorial_step++;
@@ -7306,6 +7309,7 @@ void zyk_show_tutorial(gentity_t* ent)
 			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by collecting crystals and using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_ALL_SPIRITS));
 		
 			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
+			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
 		}
 
 		ent->client->pers.tutorial_step++;
@@ -9353,9 +9357,9 @@ void G_RunFrame( int levelTime ) {
 
 					int magic_armor_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 4) - level_chance;
 					int energy_modulator_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 4) - level_chance;
-					int quest_log_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) / 4) - level_chance;
-					int treasure_chest_chance = 40 - (main_quest_progress / 5) - level_chance;
-					int crystal_chance = ((level.num_entities / 10) + RPG_MAX_SKILLPOINTS - power_level) / 4;
+					int spirit_crystal_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) / 4) - level_chance;
+					int treasure_chest_chance = 30 - (main_quest_progress / 5) - level_chance;
+					int crystal_chance = ((level.num_entities / 20) + RPG_MAX_SKILLPOINTS - power_level) / 5;
 					
 					if (Q_irand(0, 99) < crystal_chance)
 					{ // zyk: crystals
@@ -9447,7 +9451,7 @@ void G_RunFrame( int levelTime ) {
 						}
 					}
 
-					if (Q_irand(0, 99) < quest_log_chance && 
+					if (Q_irand(0, 99) < spirit_crystal_chance &&
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < SPIRIT_CRYSTAL_PARTS)
 					{ // zyk: Spirit Crystal side quest
 						float puzzle_x, puzzle_y, puzzle_z;
@@ -9472,11 +9476,11 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < (SPIRIT_CRYSTAL_PARTS - 1))
 							{
-								zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, (quest_log_chance * SIDE_QUEST_STUFF_TIMER), qfalse, -1);
+								zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, (spirit_crystal_chance * SIDE_QUEST_STUFF_TIMER), qfalse, -1);
 							}
 							else
 							{
-								zyk_spawn_quest_item(QUEST_ITEM_SPIRIT_CRYSTAL, (quest_log_chance * SIDE_QUEST_STUFF_TIMER), 45, puzzle_x, puzzle_y, puzzle_z);
+								zyk_spawn_quest_item(QUEST_ITEM_SPIRIT_CRYSTAL, (spirit_crystal_chance * SIDE_QUEST_STUFF_TIMER), 45, puzzle_x, puzzle_y, puzzle_z);
 							}
 						}
 					}

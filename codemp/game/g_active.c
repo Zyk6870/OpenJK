@@ -1510,7 +1510,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 	{
 		if (ent->client->pers.stamina_out_timer > level.time)
 		{ // zyk: passed out, recover some stamina
-			int stamina_out_recovery = 50 + (5 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
+			int stamina_out_recovery = 20 + (5 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
 
 			zyk_set_stamina(ent, stamina_out_recovery, qtrue);
 		}
@@ -1558,7 +1558,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 
 			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 			{ // zyk: meditating, recover some stamina
-				int stamina_meditate_recovery = 10 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
+				int stamina_meditate_recovery = 5 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
 
 				zyk_set_stamina(ent, stamina_meditate_recovery, qtrue);
 			}
