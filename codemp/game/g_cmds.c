@@ -7167,7 +7167,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, va("\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nRegenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditate in the tree to regen it. The green crystals you have will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^2Green ^7crystal call your Spirit Tree.\n^4Blue ^7crystals you have make new allies stronger and appear more often.\n^1Red ^7crystals unleashes a Lightning Dome by holding Use key.\n\n", QUESTCHAR_ALL_SPIRITS));
+			strcpy(quest_desc, va("\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nRegenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditate in the tree to regen it. The red crystals you have will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^1Red ^7crystal call your Spirit Tree.\n^4Blue ^7crystals you have make new allies stronger and appear more often.\n^1Red ^7crystals unleashes a Lightning Dome by holding Use key when not meditating.\n\n", QUESTCHAR_ALL_SPIRITS));
 
 			trap->SendServerCommand(target_ent->s.number,
 				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
@@ -7338,7 +7338,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Force Mage: ^7has no weapons. Fight with Force and Magic powers. ^2Magic: Healing Area, Magic Dome, Dark, Light\n^3Mage Scholar: ^7mage with Magic Fist. He is wearing the Magic Armor. ^2Magic: high-level Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: high-level Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. Wearing all armors. Can do Reality Shift abilities. Magic Fist attacks have a chance of absorbing from you a green crystal to restore health or red crystal to restore mp. Can make the Spirit Tree wither faster. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Force Mage: ^7has no weapons. Fight with Force and Magic powers. ^2Magic: Healing Area, Magic Dome, Dark, Light\n^3Mage Scholar: ^7mage with Magic Fist. Wears the Magic Armor. ^2Magic: high-level Dark\n^3Mage Minister: ^7uses Magic Fist often. Wears the Magic Armor. ^2Magic: high-level Light\n^3Mage Master: ^7the leaders. Wearing all armors. Has ability to stop you from using Force or Magic. Can make the Spirit Tree wither faster when near it. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
 						}
 						else if (page == 3)
 						{

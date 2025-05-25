@@ -6205,16 +6205,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 				zyk_set_rpg_status(targ, RPG_STATUS_BLEEDING, 10000, qtrue);
 			}
-			else if (attacker->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
-			{
-				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && Q_irand(0, 1) == 0)
-				{
-					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_MISC_RED_CRYSTAL, 1);
-					attacker->client->pers.magic_power += 50;
-
-					G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble.wav"));
-				}
-			}
 		}
 
 		if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
