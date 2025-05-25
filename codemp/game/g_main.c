@@ -5353,11 +5353,6 @@ void zyk_spawn_crystal(float x, float y, float z, int duration, zyk_quest_item_t
 		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_skill_crystal", crystal_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
-	else if (crystal_type == QUEST_ITEM_EXTRA_TRIES_CRYSTAL)
-	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_extra_tries_crystal", crystal_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", 45, duration, crystal_effect_id, crystal_type);
-	}
 	else if (crystal_type == QUEST_ITEM_SPECIAL_CRYSTAL)
 	{
 		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_red_crystal", crystal_type);
@@ -5434,6 +5429,11 @@ int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int mod
 	{
 		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_magic_armor_puzzle", quest_item_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/desert/3po_torso.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
+	}
+	else if (quest_item_type == QUEST_ITEM_SPIRIT_CRYSTAL)
+	{
+		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_spirit_crystal", quest_item_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
 	}
 	else if (quest_item_type == QUEST_ITEM_SPIRIT_TREE)
 	{
@@ -7120,11 +7120,11 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_QUEST_LOG] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 150;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 90;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 450;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_MAGIC_SHIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 7;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 20;
@@ -7488,23 +7488,23 @@ void zyk_start_main_quest_spirits_event(gentity_t* ent)
 extern void zyk_reset_quest(gentity_t* ent);
 void zyk_show_quest_riddle(gentity_t* ent)
 {
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 0)
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 0)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Its size is immense, and having its energy is a must... it keeps life on Earth, on its power we can trust...\n\"", QUESTCHAR_SELLER));
 	}
-	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 1)
+	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 1)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: One can feel warm, with the power of its energy... its power can also be evil, burning to ashes all the harmony...\n\"", QUESTCHAR_SELLER));
 	}
-	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 2)
+	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 2)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The harsh feeling of anger, hurting deep into the soul... if one is consumed by it, their life will fall into its bowl...\n\"", QUESTCHAR_SELLER));
 	}
-	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 3)
+	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 3)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: It has a pure essence, it can create life... but it can also be furious, like a sharp cut of a knife...\n\"", QUESTCHAR_SELLER));
 	}
-	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 4)
+	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 4)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The pure feeling of affection, even the evil ones can sustain... if one can feel and share, their life will not be in vain...\n\"", QUESTCHAR_SELLER));
 	}
@@ -7604,7 +7604,7 @@ void zyk_spirit_tree_events(gentity_t* ent)
 			trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
 		}
 
-		quest_progress_change += ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL];
+		quest_progress_change += ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL];
 
 		if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 		{ // zyk: Hard Mode
@@ -9391,7 +9391,8 @@ void G_RunFrame( int levelTime ) {
 						}
 					}
 					
-					if (Q_irand(0, 99) < energy_modulator_chance && level.energy_modulator_timer < level.time)
+					if (Q_irand(0, 99) < energy_modulator_chance && level.energy_modulator_timer < level.time && 
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
 					{ // zyk: Energy Modulator side quest
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
@@ -9413,15 +9414,13 @@ void G_RunFrame( int levelTime ) {
 								puzzle_z = chosen_entity->s.origin[2];
 							}
 
-							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
-							{
-								zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, (energy_modulator_chance * SIDE_QUEST_STUFF_TIMER), 30, puzzle_x, puzzle_y, puzzle_z);
-								level.energy_modulator_timer = level.time + (energy_modulator_chance * SIDE_QUEST_STUFF_TIMER);
-							}
+							zyk_spawn_quest_item(QUEST_ITEM_ENERGY_MODULATOR, (energy_modulator_chance * SIDE_QUEST_STUFF_TIMER), 30, puzzle_x, puzzle_y, puzzle_z);
+							level.energy_modulator_timer = level.time + (energy_modulator_chance * SIDE_QUEST_STUFF_TIMER);
 						}
 					}
 
-					if (Q_irand(0, 99) < magic_armor_chance && level.magic_armor_timer < level.time)
+					if (Q_irand(0, 99) < magic_armor_chance && level.magic_armor_timer < level.time && 
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
 					{ // zyk: Magic Armor side quest
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
@@ -9443,16 +9442,14 @@ void G_RunFrame( int levelTime ) {
 								puzzle_z = chosen_entity->s.origin[2];
 							}
 
-							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
-							{
-								zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, (magic_armor_chance * SIDE_QUEST_STUFF_TIMER), 80, puzzle_x, puzzle_y, puzzle_z);
-								level.magic_armor_timer = level.time + (magic_armor_chance * SIDE_QUEST_STUFF_TIMER);
-							}
+							zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, (magic_armor_chance * SIDE_QUEST_STUFF_TIMER), 80, puzzle_x, puzzle_y, puzzle_z);
+							level.magic_armor_timer = level.time + (magic_armor_chance * SIDE_QUEST_STUFF_TIMER);
 						}
 					}
 
-					if (Q_irand(0, 99) < quest_log_chance)
-					{ // zyk: Quest Log side quest
+					if (Q_irand(0, 99) < quest_log_chance && 
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < SPIRIT_CRYSTAL_PARTS)
+					{ // zyk: Spirit Crystal side quest
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
 
@@ -9473,9 +9470,13 @@ void G_RunFrame( int levelTime ) {
 								puzzle_z = chosen_entity->s.origin[2];
 							}
 
-							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < QUEST_LOG_PARTS)
+							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < (SPIRIT_CRYSTAL_PARTS - 1))
 							{
 								zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, (quest_log_chance * SIDE_QUEST_STUFF_TIMER), qfalse, -1);
+							}
+							else
+							{
+								zyk_spawn_quest_item(QUEST_ITEM_SPIRIT_CRYSTAL, (quest_log_chance * SIDE_QUEST_STUFF_TIMER), 45, puzzle_x, puzzle_y, puzzle_z);
 							}
 						}
 					}
@@ -9486,11 +9487,11 @@ void G_RunFrame( int levelTime ) {
 				// zyk: Seller events
 				if (ent->client->pers.quest_seller_event_step > QUEST_SELLER_STEP_NONE && ent->client->pers.quest_seller_event_timer < level.time)
 				{
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < QUEST_LOG_PARTS)
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < (SPIRIT_CRYSTAL_PARTS - 1))
 					{
 						if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_TALKED)
 						{
-							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hi! I am the seller. Answer my riddle in chat and I will give you a part of my Quest Log!\n\"", QUESTCHAR_SELLER));
+							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hi! I am the seller. Answer my riddle in chat and I will give you a part of my Spirit Crystal!\n\"", QUESTCHAR_SELLER));
 						}
 						else if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_START)
 						{ // zyk: Seller riddles
@@ -9498,17 +9499,24 @@ void G_RunFrame( int levelTime ) {
 						}
 						else if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_END_STEP)
 						{
-							ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] += 1;
+							ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] += 1;
 
-							add_credits(ent, 1000);
+							add_credits(ent, 500);
 							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive this part of the Quest Log and 1000 credits. Use ^3/list questlog^7.\n\"", QUESTCHAR_SELLER));
+							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == (SPIRIT_CRYSTAL_PARTS - 1))
+							{
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive this part of the Spirit Crystal and 500 credits^7.\n\"", QUESTCHAR_SELLER));
+							}
+							else
+							{
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive this part of the Spirit Crystal and 500 credits^7.\n\"", QUESTCHAR_SELLER));
+							}
 						}
 					}
 					else
 					{
-						trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello again! I hope my Quest Log helped you!\n\"", QUESTCHAR_SELLER));
+						trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello again! I hope my Spirit Crystal helped you!\n\"", QUESTCHAR_SELLER));
 
 						ent->client->pers.quest_seller_event_step = NUM_QUEST_SELLER_STEPS;
 					}
@@ -9588,7 +9596,6 @@ void G_RunFrame( int levelTime ) {
 									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
 									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_BLUE_CRYSTAL, 20);
-									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_GREEN_CRYSTAL, 20);
 									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_RED_CRYSTAL, 20);
 
 									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Receive 20 crystals of each type! A reward for your efforts.\n\"", QUESTCHAR_ALL_SPIRITS));

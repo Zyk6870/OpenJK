@@ -1620,12 +1620,12 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 			ent->client->ps.forceDodgeAnim == BOTH_MEDITATE &&
 			ent->client->pers.quest_spirit_tree_call_timer < level.time)
 		{
-			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] >= QUEST_SPIRIT_TREE_CALL_COST)
+			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] >= QUEST_SPIRIT_TREE_CALL_COST)
 			{
 				ent->client->pers.quest_spirit_tree_id = -1;
 				ent->client->pers.quest_spirit_tree_call_timer = level.time + 2000;
 
-				zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_GREEN_CRYSTAL, QUEST_SPIRIT_TREE_CALL_COST);
+				zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_RED_CRYSTAL, QUEST_SPIRIT_TREE_CALL_COST);
 
 				trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
 			}
@@ -1640,6 +1640,7 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 			!(ent->client->isHacking) &&
 			ent->client->pers.special_crystal_timer < level.time && ent->client->pers.special_crystal_counter < RED_CRYSTAL_MAX_CHARGE)
 		{ // zyk: Charging Red Crystal
+			ent->client->ps.electrifyTime = level.time + 500;
 			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/energy_crackle.wav"));
 
 			ent->client->pers.special_crystal_counter++;
@@ -1957,7 +1958,7 @@ void TryUse( gentity_t *ent )
 		if (target->client->pers.quest_npc == QUEST_NPC_SELLER && 
 			ent->client->sess.amrpgmode == 2 && 
 			(ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE || ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_ANSWER) &&
-			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < QUEST_LOG_PARTS &&
+			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < SPIRIT_CRYSTAL_PARTS &&
 			ent->client->pers.quest_seller_event_timer < level.time)
 		{ // zyk: found the seller
 			if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE)

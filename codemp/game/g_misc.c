@@ -2819,7 +2819,7 @@ void fx_runner_think( gentity_t *ent )
 
 	// zyk: one of the crystal types. Tests if there is a RPG player touching it
 	if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_spirit_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_red_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_treasure_chest") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_armor_puzzle") == 0 ||
@@ -2855,15 +2855,18 @@ void fx_runner_think( gentity_t *ent )
 
 						return;
 					}
-					else if (Q_stricmp(ent->targetname, "zyk_extra_tries_crystal") == 0)
+					else if (Q_stricmp(ent->targetname, "zyk_spirit_crystal") == 0 &&
+						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == (SPIRIT_CRYSTAL_PARTS - 1))
 					{
-						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_MISC_GREEN_CRYSTAL, 1);
+						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL, 1);
 
-						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
+						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
 
 						zyk_set_mp(player_ent, 1, qtrue);
 
 						zyk_clear_quest_effect(ent);
+
+						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Found the last part of the Spirit Crystal!\n\"", QUESTCHAR_ALL_SPIRITS));
 
 						return;
 					}
@@ -2871,7 +2874,7 @@ void fx_runner_think( gentity_t *ent )
 					{
 						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_MISC_RED_CRYSTAL, 1);
 
-						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
+						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
 
 						zyk_set_mp(player_ent, 1, qtrue);
 

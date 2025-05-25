@@ -365,12 +365,12 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
 
 	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "Blue Crystal";
-	inventory_item_names[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = "Green Crystal";
 	inventory_item_names[RPG_INVENTORY_MISC_RED_CRYSTAL] = "Red Crystal";
+	inventory_item_names[RPG_INVENTORY_MISC_QUEST_LOG] = "Quest Log";
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = "Magic Armor";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] = "Spirit Crystal";
 
 	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "Jetpack Fuel";
 	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "Flame Thrower Fuel";
@@ -621,25 +621,25 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, red crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. You must find all 3 parts to use it. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a red crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 	}
-	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. If you find him, he can give it to you. Has very useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
-	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any non-magic source by 5 per cent. If the source is Magic Fist or a magic power, decreases damage by 20 per cent and absorb it to regen magic points. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. Upgrading skills uses a blue crystal. The ones you keep in your inventory makes your main quest ally npcs stronger. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
-	else if (item_index == RPG_INVENTORY_MISC_GREEN_CRYSTAL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the green crystals you collect in the map. The ones you keep in your inventory increase regen rate of the Spirit Tree. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Used by the Energy Modulator secret quest item. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. The ones you keep in your inventory increase regen rate of the Spirit Tree. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Used by the Energy Modulator secret quest item. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Has a lot of useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD)
 	{
@@ -730,12 +730,12 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "inventoryEWebUpgrade";
 
 	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "inventoryBlueCrystal";
-	inventory_item_names[RPG_INVENTORY_MISC_GREEN_CRYSTAL] = "inventoryGreenCrystal";
 	inventory_item_names[RPG_INVENTORY_MISC_RED_CRYSTAL] = "inventoryRedCrystal";
+	inventory_item_names[RPG_INVENTORY_MISC_QUEST_LOG] = "inventoryQuestLog";
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "inventoryQuestLog";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = "inventoryMagicArmor";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] = "inventorySpiritCrystal";
 
 	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "inventoryJetpackFuel";
 	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "inventoryFlameThrowerFuel";
@@ -3052,7 +3052,7 @@ char* zyk_parse_riddle_answer(const char* message)
 qboolean zyk_riddle_answer(gentity_t* ent, const char* message)
 {
 	char riddle_answers[6][8] = {"sun", "fire", "hate", "water", "love", ""};
-	int riddle_answer_index = ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG];
+	int riddle_answer_index = ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL];
 	gentity_t* seller_npc = NULL;
 
 	if (ent->client->ps.hasLookTarget)
@@ -5174,7 +5174,7 @@ void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
 	}
 	else if (ent->client->pers.stamina_out_timer <= level.time)
 	{
-		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] >= SPIRIT_CRYSTAL_PARTS)
 		{
 			amount /= 2;
 
@@ -6760,23 +6760,23 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 200;
-	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 50;
+	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 500;
+	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 100;
 
-	seller_items_cost[RPG_INVENTORY_MISC_GREEN_CRYSTAL][0] = 200;
-	seller_items_cost[RPG_INVENTORY_MISC_GREEN_CRYSTAL][1] = 50;
+	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 500;
+	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 100;
 
-	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 200;
-	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 50;
+	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][0] = 1000;
+	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][0] = 0;
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][1] = 500;
-
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][0] = 0;
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][1] = 500;
+
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL][0] = 0;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 3;
 	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 1;
@@ -7312,7 +7312,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				if (zyk_allow_quests.integer == 1)
 				{
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 0)
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_QUEST_LOG] > 0)
 					{
 						int page = 1; // zyk: page the user wants to see
 						char arg2[MAX_STRING_CHARS];
@@ -7332,30 +7332,26 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						if (page <= 0)
 							page = 1;
 
-						if (page == 1 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 0)
+						if (page == 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Can poison targets with its melee attacks. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Changeling Worm: ^7a changeling in worm form. Melee attacks can cause bleeding and can absorb enemy health to restore mp to his allies. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier wearing Impact Reducer Armor. ^2Magic: Air\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Can poison targets with its melee attacks. ^2Magic: Fire\n^3Force Saber Warrior: ^7has force powers and saber. ^2Magic: Water\n^3Heavy Armored Warrior: ^7blue armored gun soldier wearing Deflective Armor, Saber Armor and Impact Reducer Armor. ^2Magic: Healing Area\n^3Changeling Worm: ^7a changeling in worm form. Melee attacks can cause bleeding and can absorb enemy health to restore mp to his allies. ^2Magic: Earth\n^3Flying Warrior: ^7a cloaked flying armored soldier wearing Impact Reducer Armor. ^2Magic: Air\n^3Mid Trained Warrior: ^7uses force, saber and some guns. ^2Magic: Magic Dome^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
 						}
-						else if (page == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 1)
+						else if (page == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Force Mage: ^7has no weapons. Fight with Force and Magic powers. ^2Magic: Healing Area, Magic Dome, Dark, Light\n^3Mage Scholar: ^7mage with Magic Fist. He is wearing the Magic Armor. ^2Magic: high-level Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: high-level Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. Wearing all armors. Can do Reality Shift abilities. Magic Fist attacks have a chance of absorbing from you a green crystal to restore health or red crystal to restore mp. Can make the Spirit Tree wither faster. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Force Mage: ^7has no weapons. Fight with Force and Magic powers. ^2Magic: Healing Area, Magic Dome, Dark, Light\n^3Mage Scholar: ^7mage with Magic Fist. He is wearing the Magic Armor. ^2Magic: high-level Dark\n^3Mage Minister: ^7mage that uses Magic Fist often. He is wearing the Magic Armor. ^2Magic: high-level Light\n^3Mage Master: ^7the leaders of the Brotherhood of Mages. Wearing all armors. Can do Reality Shift abilities. Magic Fist attacks have a chance of absorbing from you a green crystal to restore health or red crystal to restore mp. Can make the Spirit Tree wither faster. Has Magic Fist and extremely high-level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
 						}
-						else if (page == 3 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 2)
+						else if (page == 3)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance ally. Has force/saber. Your blue crystals makes them come as stronger allies. ^2Magic: Water, Earth, Fire, Air\n^3Ally Flying Warrior: ^7a Resistance ally. Flies and has guns. Your blue crystals makes them come as stronger allies. ^2Magic: Healing Area, Air\n^3Ally Elemental Force Mage: ^7has no weapons. Uses force and magic. Defeated enemy gets hp absorbed to allies mp. ^2Magic: random elemental\n^3Ally Mage: ^7a Resistance ally. Can use Magic Fist and all magic. Your blue crystals makes them come as stronger allies\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance ally. Has force/saber. Your blue crystals makes them come as stronger allies. ^2Magic: Water, Earth, Fire, Air\n^3Ally Flying Warrior: ^7a Resistance ally. Flies and has guns. Your blue crystals makes them come as stronger allies. ^2Magic: Healing Area, Air\n^3Ally Elemental Force Mage: ^7has no weapons. Uses force and magic. Defeated enemy gets hp absorbed to allies mp. ^2Magic: random elemental\n^3Ally Mage: ^7a Resistance ally. Can use Magic Fist and all magic. Your blue crystals makes them come as stronger allies\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
 						}
-						else if (page == 4 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 3)
+						else if (page == 4)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor. ^2Magic: Healing Area, Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger. Side quest items are: Treasure Chest (it gives 200 credits), Energy Modulator, Magic Armor.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_SELLER));
-						}
-						else if (page == 5 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
-						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^7Now you have the full Quest Log. Like my other creations, it has special abilities. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor. ^2Magic: Healing Area, Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger. Side quest items are: Treasure Chest (it gives 200 credits), Energy Modulator, Magic Armor and the Spirit Crystal.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG), QUESTCHAR_SELLER));
 						}
 					}
 					else
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\nYou don't have the %s^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+						trap->SendServerCommand(ent->s.number, va("print \"\nYou don't have the %s^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
 					}
 				}
 				else

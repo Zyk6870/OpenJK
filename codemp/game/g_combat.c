@@ -2655,15 +2655,11 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 		if (self->client->pers.quest_npc > QUEST_NPC_NONE && crystal_random_chance < chance_to_spawn_crystal)
 		{
-			if (self->client->pers.quest_npc == QUEST_NPC_HIGH_TRAINED_WARRIOR ||
-				self->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE ||
+			if (self->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE ||
 				self->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR ||
-				self->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER)
-			{
-				crystal_type = QUEST_ITEM_EXTRA_TRIES_CRYSTAL;
-			}
-			else if (self->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER || 
-					self->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM || 
+				self->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER ||
+				self->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER ||
+				self->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM ||
 				self->client->pers.quest_npc == QUEST_NPC_CHANGELING_SENTRY)
 			{
 				crystal_type = QUEST_ITEM_SPECIAL_CRYSTAL;
@@ -2672,7 +2668,8 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				self->client->pers.quest_npc == QUEST_NPC_FORCE_SABER_WARRIOR ||
 				self->client->pers.quest_npc == QUEST_NPC_LOW_TRAINED_WARRIOR ||
 				self->client->pers.quest_npc == QUEST_NPC_FLYING_WARRIOR ||
-				self->client->pers.quest_npc == QUEST_NPC_HEAVY_ARMORED_WARRIOR)
+				self->client->pers.quest_npc == QUEST_NPC_HEAVY_ARMORED_WARRIOR ||
+				self->client->pers.quest_npc == QUEST_NPC_HIGH_TRAINED_WARRIOR)
 			{
 				crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
 			}
@@ -2685,7 +2682,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
 		{
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_EXTRA_TRIES_CRYSTAL);
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
 		}
 		else if (crystal_type > QUEST_ITEM_NONE)
@@ -6105,8 +6101,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
-			{ // zyk: full Quest Log. It works as an armor, absorbing some damage to restore some force
+			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] >= SPIRIT_CRYSTAL_PARTS)
+			{ // zyk: Spirit Crystal. It works as an armor, absorbing some damage to restore some force
 				int force_power_regen_amount = (int)ceil(take * 0.05);
 
 				bonus_health_resistance += 0.05;
@@ -6211,14 +6207,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && mod == MOD_MELEE && targ->client->sess.amrpgmode == 2)
 			{
-				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_GREEN_CRYSTAL] > 0 && Q_irand(0, 1) == 0)
-				{
-					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_MISC_GREEN_CRYSTAL, 1);
-					attacker->health += 50;
-
-					G_Sound(targ, CHAN_AUTO, G_SoundIndex("sound/effects/glass_tumble.wav"));
-				}
-					
 				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && Q_irand(0, 1) == 0)
 				{
 					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_MISC_RED_CRYSTAL, 1);

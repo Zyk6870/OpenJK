@@ -2616,7 +2616,7 @@ void ClientThink_real( gentity_t *ent ) {
 				zyk_player_speed += (client->pers.skill_levels[SKILL_RUN_SPEED] * RPG_RUN_SPEED_SKILL_INCREASE);
 			}
 
-			if (client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] >= QUEST_LOG_PARTS)
+			if (client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] >= SPIRIT_CRYSTAL_PARTS)
 			{ // zyk: full Quest Log increases Run Speed
 				zyk_player_speed += RPG_RUN_SPEED_SKILL_INCREASE;
 			}
