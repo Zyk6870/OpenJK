@@ -9359,9 +9359,9 @@ void G_RunFrame( int levelTime ) {
 					int power_level = zyk_total_skillpoints(ent) + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
 					int level_chance = ((MAX_GENTITIES - level.num_entities) / 100);
 
-					int magic_armor_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 4) - level_chance;
-					int energy_modulator_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 4) - level_chance;
-					int spirit_crystal_chance = (main_quest_progress / 5) + (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) / 4) - level_chance;
+					int magic_armor_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 4) - level_chance;
+					int energy_modulator_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 4) - level_chance;
+					int spirit_crystal_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) / 4) - level_chance;
 					int treasure_chest_chance = 30 - (main_quest_progress / 5) - level_chance;
 					int crystal_chance = ((level.num_entities / 20) + RPG_MAX_SKILLPOINTS - power_level) / 5;
 					
@@ -9514,7 +9514,7 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == (SPIRIT_CRYSTAL_PARTS - 1))
 							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive this part of the Spirit Crystal and 500 credits^7.\n\"", QUESTCHAR_SELLER));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive 500 credits. Now you must find the final part, a green crystal^7.\n\"", QUESTCHAR_SELLER));
 							}
 							else
 							{

@@ -627,7 +627,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. It has 6 parts. Final part is a green crystal. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
