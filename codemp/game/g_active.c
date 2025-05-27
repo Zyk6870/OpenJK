@@ -1328,9 +1328,6 @@ void zyk_stamina_out(gentity_t* ent)
 		// zyk: cannot use magic while passed out
 		ent->client->pers.quest_power_usage_timer = level.time + stamina_out_time;
 
-		// zyk: also lose some health
-		G_Damage(ent, ent, ent, NULL, NULL, 50, 0, MOD_UNKNOWN);
-
 		ent->client->pers.is_getting_up = qfalse;
 
 		trap->SendServerCommand(ent->s.number, va("chat \"^3%s: ^7I am tired...\"", ent->client->pers.netname));
@@ -1513,6 +1510,15 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			int stamina_out_recovery = 20 + (5 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
 
 			zyk_set_stamina(ent, stamina_out_recovery, qtrue);
+
+			// zyk: also lose some health
+			ent->health--;
+			ent->client->ps.stats[STAT_HEALTH] = ent->health;
+
+			if (ent->health < 1)
+			{
+				player_die(ent, ent, ent, 100000, MOD_SUICIDE);
+			}
 		}
 		else
 		{
