@@ -2717,35 +2717,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		}
 	}
 
-	if (attacker && attacker->client && attacker->NPC && attacker->client->pers.quest_npc == QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE)
-	{ // zyk: this quest ally can restore mp to allies when he defeats an enemy
-		int mp_to_restore = self->client->ps.stats[STAT_MAX_HEALTH];
-		int npc_it = 0;
-
-		for (npc_it = (MAX_CLIENTS + BODY_QUEUE_SIZE); npc_it < level.num_entities; npc_it++)
-		{
-			gentity_t* quest_enemy = &g_entities[npc_it];
-
-			if (mp_to_restore < (QUEST_WORM_MP_TO_RESTORE * 2))
-			{
-				break;
-			}
-			else if (quest_enemy && quest_enemy->client && quest_enemy->NPC && quest_enemy->health > 0 &&
-				quest_enemy->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && quest_enemy->client->pers.quest_npc <= QUEST_NPC_ALLY_FORCE_WARRIOR &&
-				quest_enemy != attacker)
-			{ // zyk: one of his allies
-				quest_enemy->client->pers.magic_power += (QUEST_WORM_MP_TO_RESTORE * 2);
-
-				mp_to_restore -= (QUEST_WORM_MP_TO_RESTORE * 2);
-			}
-		}
-
-		if (mp_to_restore > 0)
-		{ // zyk: restore mp to himself
-			attacker->client->pers.magic_power += mp_to_restore;
-		}
-	}
-
 	if (zyk_allow_quests.integer > 0 &&
 		self->client->sess.amrpgmode == 2 &&
 		!(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
@@ -6172,37 +6143,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		if (attacker && attacker->client && attacker->NPC && targ->health > 0 && targ->client && Q_irand(0, 99) < 50)
 		{
 			if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER && mod == MOD_MELEE)
-			{ // zyk: poison the target
+			{
 				zyk_set_rpg_status(targ, RPG_STATUS_POISONED, 10000, qtrue);
 			}
 			else if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM && mod == MOD_MELEE)
-			{ // zyk: absorbs health from target to restore mp to all quest enemies in the map
-				int mp_to_restore = take;
-				int npc_it = 0;
-
-				for (npc_it = (MAX_CLIENTS + BODY_QUEUE_SIZE); npc_it < level.num_entities; npc_it++)
-				{
-					gentity_t* quest_enemy = &g_entities[npc_it];
-
-					if (mp_to_restore < QUEST_WORM_MP_TO_RESTORE)
-					{
-						break;
-					}
-					else if (quest_enemy && quest_enemy->client && quest_enemy->NPC && quest_enemy->health > 0 &&
-						quest_enemy->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && quest_enemy->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR &&
-						quest_enemy != attacker)
-					{ // zyk: one of his allies
-						quest_enemy->client->pers.magic_power += QUEST_WORM_MP_TO_RESTORE;
-
-						mp_to_restore -= QUEST_WORM_MP_TO_RESTORE;
-					}
-				}
-
-				if (mp_to_restore > 0)
-				{ // zyk: restore his own mp if there is still some mp to restore
-					attacker->client->pers.magic_power += mp_to_restore;
-				}
-
+			{
 				zyk_set_rpg_status(targ, RPG_STATUS_BLEEDING, 10000, qtrue);
 			}
 		}

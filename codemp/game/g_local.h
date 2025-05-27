@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.3.21"
+#define	GAMEVERSION	"New Zyk Mod v1.3.22"
 
 #define SECURITY_LOG "security.log"
 
@@ -912,7 +912,6 @@ typedef enum {
 #define QUEST_SPIRIT_TREE_SPAWN_TIMER 5000
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_NPC_SPAWN_TIME 39000
-#define QUEST_WORM_MP_TO_RESTORE 5
 #define MAGE_MASTER_STATUS_CHANCE 5
 #define MAGE_MASTER_STATUS_DURATION 5000
 

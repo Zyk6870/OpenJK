@@ -807,7 +807,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, ally_bonus + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, ally_bonus + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + skill_level_bonus;
 
@@ -7240,7 +7239,7 @@ void zyk_show_tutorial(gentity_t* ent)
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 1))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over the max weight, your run speed will decrease and Stamina will decrease faster.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over max weight, run speed will decrease and Stamina will decrease faster.\n\"", QUESTCHAR_ALL_SPIRITS));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 2))
 		{
@@ -7262,7 +7261,7 @@ void zyk_show_tutorial(gentity_t* ent)
 		{
 			zyk_spawn_magic_spirits(ent, 20000);
 
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Blue Crystals to upgrade skills. We will randomly place some of them in the map. Enemies defeated have a chance to drop them.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Blue Crystals to upgrade skills. We randomly place some in the map. Enemies defeated have a chance to drop them.\n\"", QUESTCHAR_ALL_SPIRITS));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 1))
 		{
