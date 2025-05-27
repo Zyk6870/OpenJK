@@ -2757,7 +2757,6 @@ extern int	BMS_END;
 
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
-extern void add_credits(gentity_t* ent, int credits);
 extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
 extern void zyk_clear_quest_items(gentity_t* effect_ent);
 extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
@@ -2821,7 +2820,6 @@ void fx_runner_think( gentity_t *ent )
 	if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_spirit_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_red_crystal") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_treasure_chest") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_armor_puzzle") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0)
 	{
@@ -2862,8 +2860,6 @@ void fx_runner_think( gentity_t *ent )
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
 
-						zyk_set_mp(player_ent, 1, qtrue);
-
 						zyk_clear_quest_effect(ent);
 
 						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Found the last part of the Spirit Crystal!\n\"", QUESTCHAR_ALL_SPIRITS));
@@ -2876,17 +2872,7 @@ void fx_runner_think( gentity_t *ent )
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
 
-						zyk_set_mp(player_ent, 1, qtrue);
-
-						zyk_clear_quest_effect(ent);
-
-						return;
-					}
-					else if (Q_stricmp(ent->targetname, "zyk_treasure_chest") == 0)
-					{
-						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/transition.mp3"));
-
-						add_credits(player_ent, 200);
+						zyk_set_mp(player_ent, SPECIAL_CRYSTAL_MP_REGEN_AMOUNT, qtrue);
 
 						zyk_clear_quest_effect(ent);
 

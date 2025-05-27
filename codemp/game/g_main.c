@@ -1249,7 +1249,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.server_empty_change_map_timer = 0;
 	level.num_fully_connected_clients = 0;
 
-	level.treasure_chest_timer = 0;
 	level.energy_modulator_timer = 0;
 	level.magic_armor_timer = 0;
 
@@ -5416,12 +5415,7 @@ int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int mod
 {
 	int quest_item_effect_id = -1;
 
-	if (quest_item_type == QUEST_ITEM_TREASURE_CHEST)
-	{
-		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_treasure_chest", quest_item_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/korriban/coffin_slab.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
-	}
-	else if (quest_item_type == QUEST_ITEM_ENERGY_MODULATOR)
+	if (quest_item_type == QUEST_ITEM_ENERGY_MODULATOR)
 	{
 		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_energy_modulator_puzzle", quest_item_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/danger/ship_item04.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
@@ -9361,7 +9355,6 @@ void G_RunFrame( int levelTime ) {
 					int magic_armor_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 4) - level_chance;
 					int energy_modulator_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 4) - level_chance;
 					int spirit_crystal_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) / 4) - level_chance;
-					int treasure_chest_chance = 30 - (main_quest_progress / 5) - level_chance;
 					int crystal_chance = ((level.num_entities / 20) + RPG_MAX_SKILLPOINTS - power_level) / 5;
 					
 					if (Q_irand(0, 99) < crystal_chance)
@@ -9369,33 +9362,6 @@ void G_RunFrame( int levelTime ) {
 						zyk_quest_item_t crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
 
 						zyk_spawn_magic_crystal(60000, crystal_type);
-					}
-
-					if (Q_irand(0, 99) < treasure_chest_chance && level.treasure_chest_timer < level.time)
-					{ // zyk: Treasure Chest
-						float treasure_chest_x, treasure_chest_y, treasure_chest_z;
-						gentity_t* chosen_entity = NULL;
-
-						chosen_entity = zyk_find_entity_for_quest();
-
-						if (chosen_entity)
-						{
-							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
-							{
-								treasure_chest_x = chosen_entity->r.currentOrigin[0];
-								treasure_chest_y = chosen_entity->r.currentOrigin[1];
-								treasure_chest_z = chosen_entity->r.currentOrigin[2];
-							}
-							else
-							{
-								treasure_chest_x = chosen_entity->s.origin[0];
-								treasure_chest_y = chosen_entity->s.origin[1];
-								treasure_chest_z = chosen_entity->s.origin[2];
-							}
-
-							zyk_spawn_quest_item(QUEST_ITEM_TREASURE_CHEST, (treasure_chest_chance * SIDE_QUEST_STUFF_TIMER), 20, treasure_chest_x, treasure_chest_y, treasure_chest_z);
-							level.treasure_chest_timer = level.time + (treasure_chest_chance * SIDE_QUEST_STUFF_TIMER);
-						}
 					}
 					
 					if (Q_irand(0, 99) < energy_modulator_chance && level.energy_modulator_timer < level.time && 
@@ -9498,7 +9464,7 @@ void G_RunFrame( int levelTime ) {
 					{
 						if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_TALKED)
 						{
-							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hi! I am the seller. Answer my riddle in chat and I will give you a part of my Spirit Crystal!\n\"", QUESTCHAR_SELLER));
+							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hi! I am the seller. Answer my riddle in chat and I will give you a part of the Spirit Crystal!\n\"", QUESTCHAR_SELLER));
 						}
 						else if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_START)
 						{ // zyk: Seller riddles

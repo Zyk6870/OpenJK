@@ -619,23 +619,23 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, red crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. You must find all 3 parts to use it. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a red crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, red crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. You must find all of its parts to use it. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a red crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor that decreases damage to your health from any non-magic source by 5 per cent. If the source is Magic Fist or a magic power, decreases damage by 20 per cent and absorb it to regen magic points. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor. Decreases damage to your health from any non-magic source by 5 per cent. Decreases damage from Magic Fist and Magic Powers by 20 per cent and absorb it to regen some magic points. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. It has 6 parts. Final part is a green crystal. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. You must find all of its parts to use it. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. Upgrading skills uses a blue crystal. The ones you keep in your inventory makes your main quest ally npcs stronger. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. When you collect one, it will restore 1 magic point. Upgrading skills uses a blue crystal. The ones you keep in your inventory makes your main quest ally npcs stronger. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. The ones you keep in your inventory increase regen rate of the Spirit Tree. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Used by the Energy Modulator secret quest item. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. When you collect one, it will restore %d magic points. The ones you keep in your inventory increase regen rate of the Spirit Tree. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Used by the Energy Modulator secret quest item. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index), SPECIAL_CRYSTAL_MP_REGEN_AMOUNT));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
@@ -7133,7 +7133,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 	{
 		if (zyk_is_main_quest_complete(ent) == qtrue)
 		{
-			trap->SendServerCommand(target_ent->s.number, va("print \"\n^1The Mage War\n\n^3Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(target_ent->s.number, va("print \"\n\n^3Main Quest Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
 		}
 		else if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_START)))
 		{
@@ -7167,7 +7167,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, va("\n^1The Mage War\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nRegenerate the tree so the %s ^7can defeat all enemies and end the war.\nMeditate in the tree to regen it. The red crystals you have will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^1Red ^7crystal call your Spirit Tree.\n^4Blue ^7crystals you have make new allies stronger and appear more often.\n^1Red ^7crystals unleashes a Lightning Dome by holding Use key when not meditating.\n\n", QUESTCHAR_ALL_SPIRITS));
+			strcpy(quest_desc, va("\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nRegenerate your tree so the %s ^7can defeat all enemies.\nMeditate in the tree to regen it. The red crystals you have will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^1Red ^7crystal call your Spirit Tree.\n^4Blue ^7crystals you have make new allies stronger and appear more often.\n^1Red ^7crystals unleash a Lightning Dome by holding Use key when not meditating.\n\n", QUESTCHAR_ALL_SPIRITS));
 
 			trap->SendServerCommand(target_ent->s.number,
 				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
@@ -7346,7 +7346,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 4)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor and I can use Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger. Side quest items are: Treasure Chest (it gives 200 credits), Energy Modulator, Magic Armor and the Spirit Crystal.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG), QUESTCHAR_SELLER));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor and I can use Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger. The %s ^7created some special items that may help you if you find them: Energy Modulator, Magic Armor and Spirit Crystal.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG), QUESTCHAR_SELLER, QUESTCHAR_ALL_SPIRITS));
 						}
 					}
 					else
