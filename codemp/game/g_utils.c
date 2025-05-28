@@ -1955,12 +1955,12 @@ void TryUse( gentity_t *ent )
 
 	if (target->NPC && target->client && target->health > 0 && target->s.NPC_class != CLASS_VEHICLE && OnSameTeam(ent, target))
 	{
-		if (target->client->pers.quest_npc == QUEST_NPC_SELLER && 
+		if (target->client->pers.quest_npc == QUEST_NPC_TRAVELING_MAGE &&
 			ent->client->sess.amrpgmode == 2 && 
 			(ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE || ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_ANSWER) &&
 			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < SPIRIT_CRYSTAL_PARTS &&
 			ent->client->pers.quest_seller_event_timer < level.time)
-		{ // zyk: found the seller
+		{ // zyk: found the Traveling Mage
 			if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE)
 			{
 				int seller_duration = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] * SIDE_QUEST_STUFF_TIMER;

@@ -2183,7 +2183,7 @@ void zyk_decrease_quest_progress(gentity_t *ent)
 
 qboolean zyk_is_quest_ally(gentity_t* ent)
 {
-	if (ent->NPC && ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && ent->client->pers.quest_npc <= QUEST_NPC_SELLER)
+	if (ent->NPC && ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && ent->client->pers.quest_npc <= QUEST_NPC_TRAVELING_MAGE)
 	{
 		return qtrue;
 	}
@@ -2746,19 +2746,19 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			{ // zyk: attacker was the target, so the attacker receives bonus credits
 				int bonus_credits = 10;
 
-				attacker->client->pers.credits += bonus_credits;
+				attacker->client->pers.craft_energy += bonus_credits;
 				save_account(attacker, qtrue);
-				trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7%s ^7was defeated by the target player, ^3%d ^7bonus credits\n\"", self->client->pers.netname, bonus_credits));
+				trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7%s ^7was defeated by the target player, ^3%d ^7bonus Craft Energy\n\"", self->client->pers.netname, bonus_credits));
 			}
 			else if (level.bounty_quest_target_id == (self - g_entities))
 			{ // zyk: target player was defeated. Gives the reward to the attacker
 				int bonus_credits = 200;
 
-				attacker->client->pers.credits += bonus_credits;
+				attacker->client->pers.craft_energy += bonus_credits;
 				save_account(attacker, qtrue);
 				level.bounty_quest_choose_target = qtrue;
 				level.bounty_quest_target_id++;
-				trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7%s^7 receives ^3%d ^7bonus credits\n\"", attacker->client->pers.netname, bonus_credits));
+				trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7%s^7 receives ^3%d ^7bonus Craft Energy\n\"", attacker->client->pers.netname, bonus_credits));
 			}
 		}
 	}

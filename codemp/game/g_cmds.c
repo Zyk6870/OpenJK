@@ -76,7 +76,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_HEALTH_STRENGTH] = 10;
 	max_skill_levels[SKILL_MELEE] = 3;
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
-	max_skill_levels[SKILL_TRADER] = 10;
+	max_skill_levels[SKILL_ITEM_MAKER] = 10;
 	max_skill_levels[SKILL_STATUS_PROTECTION] = 5;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 25;
 	max_skill_levels[SKILL_MAX_STAMINA] = 10;
@@ -132,7 +132,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
 	skill_names[SKILL_MELEE] = "Melee";
 	skill_names[SKILL_MELEE_SPEED] = "Melee Punch Speed";
-	skill_names[SKILL_TRADER] = "Trader";
+	skill_names[SKILL_ITEM_MAKER] = "Item Maker";
 	skill_names[SKILL_STATUS_PROTECTION] = "Status Protection";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
 	skill_names[SKILL_MAX_STAMINA] = "Max Stamina";
@@ -210,8 +210,8 @@ char* zyk_skill_description(int skill_index)
 		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 1, Right hand punch does %d normal damage, left hand punch does %d normal damage and kick does %d damage. Each level increases melee damage", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	if (skill_index == SKILL_MELEE_SPEED)
 		return "Each level increases how fast you can punch with Melee";
-	if (skill_index == SKILL_TRADER)
-		return va("makes you able to get better prices when buying stuff from the %s", QUESTCHAR_TRAVELING_MAGE);
+	if (skill_index == SKILL_ITEM_MAKER)
+		return "Increases Craft Energy generation rate";
 	if (skill_index == SKILL_STATUS_PROTECTION)
 		return "Decreases duration of negative status effects. ^1Poison: ^7loses health, stamina, magic points and lowers run speed. ^1Fire: ^7catches fire, losing a lot of health. ^1Bleeding: ^7loses some health. Melee, Saber, Force powers and Magic attacks do less damage. ^1Confusion: ^7cannot attack or use Force powers or Magic";
 	if (skill_index == SKILL_MAX_WEIGHT)
@@ -276,7 +276,7 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_HEALTH_STRENGTH] = "skillhealthstrength";
 	skill_names[SKILL_MELEE] = "skillmelee";
 	skill_names[SKILL_MELEE_SPEED] = "skillmeleepunchspeed";
-	skill_names[SKILL_TRADER] = "skilltrader";
+	skill_names[SKILL_ITEM_MAKER] = "skillitemmaker";
 	skill_names[SKILL_STATUS_PROTECTION] = "skillstatusprotection";
 	skill_names[SKILL_MAX_WEIGHT] = "skillmaxweight";
 	skill_names[SKILL_MAX_STAMINA] = "skillmaxstamina";
@@ -635,7 +635,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. When you collect one, it will restore %d magic points. The ones you keep in your inventory increase regen rate of the Spirit Tree. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Used by the Energy Modulator secret quest item. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index), SPECIAL_CRYSTAL_MP_REGEN_AMOUNT));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. When you collect one, it will restore %d magic points. The ones you keep in your inventory increase your Craft Energy and the regen rate of the Spirit Tree. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Used by the Energy Modulator secret quest item. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index), SPECIAL_CRYSTAL_MP_REGEN_AMOUNT));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
@@ -2717,19 +2717,19 @@ void load_account(gentity_t* ent)
 					read_status = fscanf(account_file, "%s", content);
 					ent->client->pers.active_inventory_upgrades = atoi(content);
 				}
-				else if (Q_stricmp(content_type, "credits") == 0)
+				else if (Q_stricmp(content_type, "craftenergy") == 0)
 				{
 					read_status = fscanf(account_file, "%s", content);
-					ent->client->pers.credits = atoi(content);
+					ent->client->pers.craft_energy = atoi(content);
 
-					// zyk: validating credits
-					if (ent->client->pers.credits > zyk_max_rpg_credits.integer)
+					// zyk: validating Craft Energy amount
+					if (ent->client->pers.craft_energy > RPG_MAX_CRAFT_ENERGY)
 					{
-						ent->client->pers.credits = zyk_max_rpg_credits.integer;
+						ent->client->pers.craft_energy = RPG_MAX_CRAFT_ENERGY;
 					}
-					else if (ent->client->pers.credits < 0)
+					else if (ent->client->pers.craft_energy < 0)
 					{
-						ent->client->pers.credits = 0;
+						ent->client->pers.craft_energy = 0;
 					}
 				}
 				else if (Q_stricmp(content_type, "skill_levels") == 0)
@@ -2851,8 +2851,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			client = ent->client;
 
-			strcpy(content, va("active_inventory_upgrades\n%d\ncredits\n%d",
-				client->pers.active_inventory_upgrades, client->pers.credits));
+			strcpy(content, va("active_inventory_upgrades\n%d\ncraftenergy\n%d",
+				client->pers.active_inventory_upgrades, client->pers.craft_energy));
 
 			strcpy(content, va("%s\nskill_levels", content));
 			for (i = 0; i < NUMBER_OF_SKILLS; i++)
@@ -3060,7 +3060,7 @@ qboolean zyk_riddle_answer(gentity_t* ent, const char* message)
 		seller_npc = &g_entities[ent->client->ps.lookTarget];
 	}
 
-	if (seller_npc && seller_npc->NPC && seller_npc->client && seller_npc->client->pers.quest_npc == QUEST_NPC_SELLER &&
+	if (seller_npc && seller_npc->NPC && seller_npc->client && seller_npc->client->pers.quest_npc == QUEST_NPC_TRAVELING_MAGE &&
 		Q_stricmp(zyk_parse_riddle_answer(message), G_NewString(riddle_answers[riddle_answer_index])) == 0)
 	{ // zyk: the parsed message string contains the correct riddle answer
 		seller_npc->client->pers.quest_seller_map_timer = level.time + 500;
@@ -5188,20 +5188,22 @@ void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
 	}
 }
 
-// zyk: gives credits to the player
+// zyk: gives Craft Energy to the player
 void add_credits(gentity_t *ent, int credits)
 {
-	ent->client->pers.credits += credits;
-	if (ent->client->pers.credits > zyk_max_rpg_credits.integer)
-		ent->client->pers.credits = zyk_max_rpg_credits.integer;
+	ent->client->pers.craft_energy += credits;
+
+	if (ent->client->pers.craft_energy > RPG_MAX_CRAFT_ENERGY)
+		ent->client->pers.craft_energy = RPG_MAX_CRAFT_ENERGY;
 }
 
 // zyk: removes credits from the player
 void remove_credits(gentity_t *ent, int credits)
 {
-	ent->client->pers.credits -= credits;
-	if (ent->client->pers.credits < 0)
-		ent->client->pers.credits = 0;
+	ent->client->pers.craft_energy -= credits;
+
+	if (ent->client->pers.craft_energy < 0)
+		ent->client->pers.craft_energy = 0;
 }
 
 // zyk: validates user input to avoid malicious input
@@ -5540,6 +5542,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.quickdraw_timer = 0;
 			ent->client->pers.flashlight_timer = 0;
 
+			ent->client->pers.craft_energy_timer = 0;
 			ent->client->pers.buy_sell_timer = 0;
 			ent->client->pers.inventory_update_timer = level.time + 100;
 
@@ -5777,7 +5780,7 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 
 	ent->client->pers.active_inventory_upgrades = 0;
 	ent->client->pers.magic_power = 0;
-	ent->client->pers.credits = RPG_INITIAL_CREDITS;
+	ent->client->pers.craft_energy = RPG_INITIAL_CRAFT_ENERGY;
 
 	// zyk: in RPG Mode, player must actually buy these
 	ent->client->ps.jetpackFuel = 0;
@@ -6589,13 +6592,20 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MISC)));
 	strcpy(message, va("%s^3Magic Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC)));
 
-	trap->SendServerCommand(target_ent->s.number, va("%s^3Credits: ^7%d\n\n^7Use ^2/list rpg ^7to see console commands\n\n\"", 
-		message, ent->client->pers.credits));
+	if (ent->client->pers.craft_energy < RPG_MAX_CRAFT_ENERGY)
+	{
+		strcpy(message, va("%s^3Craft Energy: ^7%d\n", message, ent->client->pers.craft_energy));
+	}
+	else
+	{
+		strcpy(message, va("%s^3Craft Energy: ^2%d\n", message, ent->client->pers.craft_energy));
+	}
+
+	trap->SendServerCommand(target_ent->s.number, va("%s\n^7Use ^2/list rpg ^7to see console commands\n\n\"", message));
 }
 
 int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboolean buy_item)
 {
-	// zyk: costs to buy or sell for each seller item
 	int seller_items_cost[MAX_RPG_INVENTORY_ITEMS][2];
 
 	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][0] = 3;
@@ -6763,7 +6773,7 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 300;
 	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 50;
 
-	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 300;
+	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 0;
 	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][0] = 1000;
@@ -6801,14 +6811,6 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 
 	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][0] = 2;
 	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][1] = 1;
-
-	// zyk: skill Trader decreases buying cost
-	if (ent->client->pers.skill_levels[SKILL_TRADER] > 0)
-	{
-		float cost_decrease_factor = 1.00 - (0.02 * ent->client->pers.skill_levels[SKILL_TRADER]);
-
-		seller_items_cost[item_number][0] *= cost_decrease_factor;
-	}
 
 	if (buy_item == qtrue)
 	{
@@ -6960,7 +6962,7 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 		}
 	}
 
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                          - ^5Count - ^2Weight - ^3Buy  - Sell\n\n%s\n^7Use ^3/buy <item number> ^7or ^3/sell <item number> ^7to buy or sell items\n\"", message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                          - ^5Count - ^2Weight - ^3Make - Unmake\n\n%s\n^7Use ^3/itemmake <item number> ^7or ^3/itemunmake <item number> ^7to make or unmake items\n\"", message));
 }
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
@@ -6985,7 +6987,7 @@ int zyk_number_of_allies_in_map(gentity_t* ent)
 		npc_ent = &g_entities[i];
 
 		if (npc_ent && npc_ent->client && npc_ent->NPC && 
-			npc_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && npc_ent->client->pers.quest_npc <= QUEST_NPC_SELLER &&
+			npc_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && npc_ent->client->pers.quest_npc <= QUEST_NPC_TRAVELING_MAGE &&
 			npc_ent->health > 0 && 
 			(ent == NULL || npc_ent->client->pers.quest_npc_caller_player_id == ent->s.number))
 		{
@@ -7376,11 +7378,11 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					}
 				}
 
-				trap->SendServerCommand( ent->s.number, va("print \"\n^3Bounty Quest Target: ^7%s^7\n\n^3Bounty Quest\n^7Use ^3/bountyquest ^7so the server chooses a player to be the target. If the target defeats a RPG player, he receives 200 bonus credits. If a bounty hunter kills the target, he receives bonus credits based in the target player level.\n\n\"", target_player) );
+				trap->SendServerCommand( ent->s.number, va("print \"\n^3Bounty Quest Target: ^7%s^7\n\n^3Bounty Quest\n^7Use ^3/bountyquest ^7so the server chooses a player to be the target. If the target defeats a RPG player, he receives 200 bonus Craft Energy. If a bounty hunter kills the target, he receives bonus Craft Energy based on the target player level.\n\n\"", target_player) );
 			}
 			else if (Q_stricmp( arg1, "commands" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/nofight: ^7makes you unable to damage other players and they also cannot damage you.\n^3/creditgive [player id or name] [amount]: ^7gives credits to a player.\n^3/rpgchar: ^7shows your chars (characters) and the char commands.\n^3/allyadd [player id or name]: ^7adds player as ally.\n^3/allyremove [player id or name]: ^7removes an ally player.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command.\n^3/settings: ^7player settings.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
+				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/nofight: ^7makes you unable to damage other players and they also cannot damage you.\n^3/rpgchar: ^7shows your chars (characters) and the char commands.\n^3/allyadd [player id or name]: ^7adds player as ally.\n^3/allyremove [player id or name]: ^7removes an ally player.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command.\n^3/settings: ^7player settings.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
 			}
 			else
 			{ // zyk: the player can also list the specific info of a skill passing the skill number as argument
@@ -7460,10 +7462,10 @@ void zyk_add_health(gentity_t* ent, int heal_amount)
 
 /*
 ==================
-Cmd_Buy_f
+Cmd_ItemMake_f
 ==================
 */
-void Cmd_Buy_f( gentity_t *ent ) {
+void Cmd_ItemMake_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	char arg2[MAX_STRING_CHARS];
 	int value = 0;
@@ -7473,7 +7475,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You must specify an item number and an optional amount. Example: ^3/buy 1 ^7or ^3/buy 1 20^7. Max amount of %d.\n\"", RPG_MAX_BUY_AMOUNT));
+		trap->SendServerCommand(ent->s.number, va("print \"You must specify an item number and an optional amount. Example: ^3/itemmake 1 ^7or ^3/itemmake 1 20^7. Max amount of %d.\n\"", RPG_MAX_BUY_AMOUNT));
 		return;
 	}
 
@@ -7483,7 +7485,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	// zyk: tests the cooldown time to buy or sell
 	if (ent->client->pers.buy_sell_timer > level.time)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"In Buy/Sell cooldown time.\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"In Craft cooldown time.\n\"");
 		return;
 	}
 
@@ -7497,7 +7499,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 
 	if (zyk_get_seller_item_cost(ent, item_index, qtrue) == 0)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"Cannot buy this item.\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"Cannot make this item.\n\"");
 		return;
 	}
 
@@ -7528,7 +7530,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		}
 		else if (amount > 1)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"Can only buy 1 of %s.\n\"", zyk_get_inventory_item_name(item_index)));
+			trap->SendServerCommand(ent->s.number, va("print \"Can only make 1 of %s.\n\"", zyk_get_inventory_item_name(item_index)));
 			return;
 		}
 	}
@@ -7536,7 +7538,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	total_cost = zyk_get_seller_item_cost(ent, item_index, qtrue) * amount;
 
 	// zyk: buying the item if player has enough credits
-	if (ent->client->pers.credits >= total_cost)
+	if (ent->client->pers.craft_energy >= total_cost)
 	{
 		zyk_update_inventory_quantity(ent, qtrue, item_index, amount);
 
@@ -7547,30 +7549,30 @@ void Cmd_Buy_f( gentity_t *ent ) {
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-		ent->client->pers.credits -= total_cost;
+		ent->client->pers.craft_energy -= total_cost;
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
 		// zyk: buying and selling must use Stamina
 		rpg_skill_counter(ent, amount);
 
-		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Thanks %s^7!\n\"", QUESTCHAR_TRAVELING_MAGE, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Item made\n\"");
 
 		Cmd_ZykMod_f(ent);
 	}
 	else
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7%s^7, my products are not free! Give me the money!\n\"", QUESTCHAR_TRAVELING_MAGE, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Not enough Craft Energy\n\"");
 		return;
 	}
 }
 
 /*
 ==================
-Cmd_Sell_f
+Cmd_ItemUnmake_f
 ==================
 */
-void Cmd_Sell_f( gentity_t *ent ) {
+void Cmd_ItemUnmake_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	char arg2[MAX_STRING_CHARS];
 	int value = 0;
@@ -7580,7 +7582,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"You must specify an item number and an optional amount. Example: ^3/sell 1 ^7or ^3/sell 1 20^7.\n\"" );
+		trap->SendServerCommand(ent->s.number, "print \"You must specify an item number and an optional amount. Example: ^3/itemunmake 1 ^7or ^3/itemunmake 1 20^7.\n\"" );
 		return;
 	}
 
@@ -7590,7 +7592,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	// zyk: tests the cooldown time to buy or sell
 	if (ent->client->pers.buy_sell_timer > level.time)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"In Buy/Sell cooldown time.\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"In Craft cooldown time.\n\"");
 		return;
 	}
 
@@ -7604,7 +7606,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 
 	if (zyk_get_seller_item_cost(ent, item_index, qfalse) == 0)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"Cannot sell this item.\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"Cannot unmake this item.\n\"");
 		return;
 	}
 
@@ -7641,11 +7643,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		// zyk: buying and selling must use Stamina
 		rpg_skill_counter(ent, amount);
 
-		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Thanks %s^7!\n\"", QUESTCHAR_TRAVELING_MAGE, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Item unmade\n\"");
 	}
 	else
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7You don't have this amount of this item.\n\"", QUESTCHAR_TRAVELING_MAGE));
+		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7You don't have this amount of this item.\n\"");
 	}
 }
 
@@ -7834,68 +7836,6 @@ void Cmd_Teleport_f( gentity_t *ent )
 
 		zyk_TeleportPlayer(&g_entities[client_id],target_origin,g_entities[client_id].client->ps.viewangles);
 	}
-}
-
-/*
-==================
-Cmd_CreditGive_f
-==================
-*/
-void Cmd_CreditGive_f( gentity_t *ent ) {
-	char arg1[MAX_STRING_CHARS];
-	char arg2[MAX_STRING_CHARS];
-	int client_id = 0, value = 0;
-
-	if (trap->Argc() == 1)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"You must specify a player.\n\"" );
-		return;
-	}
-
-	if (trap->Argc() == 2)
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"You must specify the amount of credits.\n\"" );
-		return;
-	}
-
-	trap->Argv( 1,  arg1, sizeof( arg1 ) );
-	trap->Argv( 2,  arg2, sizeof( arg2 ) );
-
-	client_id = ClientNumberFromString( ent, arg1, qfalse ); 
-	value = atoi(arg2);
-
-	if (client_id == -1)
-	{
-		return;
-	}
-
-	if (value < 1)
-	{
-		trap->SendServerCommand( ent-g_entities, va("print \"Can only use positive values.\n\"") );
-		return;
-	}
-
-	if (g_entities[client_id].client->sess.amrpgmode < 2)
-	{
-		trap->SendServerCommand( ent-g_entities, va("print \"The player is not in RPG Mode\n\"") );
-		return;
-	}
-
-	if ((ent->client->pers.credits - value) < 0)
-	{
-		trap->SendServerCommand( ent-g_entities, va("print \"You don't have this amount of credits\n\"") );
-		return;
-	}
-
-	add_credits(&g_entities[client_id], value);
-	save_account(&g_entities[client_id], qtrue);
-
-	remove_credits(ent, value);
-	save_account(ent, qtrue);
-
-	trap->SendServerCommand( client_id, va("chat \"^3Credit System: ^7You got %d credits from %s\n\"", value, ent->client->pers.netname) );
-
-	trap->SendServerCommand( ent-g_entities, "print \"Done.\n\"" );
 }
 
 /*
@@ -8251,7 +8191,7 @@ void Cmd_BountyQuest_f( gentity_t *ent ) {
 				!(this_ent->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT)))
 			{
 				level.bounty_quest_choose_target = qfalse;
-				trap->SendServerCommand( -1, va("chat \"^3Bounty Quest: ^7A reward of ^3200 ^7credits will be given to who kills %s^7\n\"", this_ent->client->pers.netname) );
+				trap->SendServerCommand( -1, va("chat \"^3Bounty Quest: ^7A reward of ^3200 ^7Craft Energy will be given to who kills %s^7\n\"", this_ent->client->pers.netname) );
 				return;
 			}
 
@@ -11894,12 +11834,10 @@ command_t commands[] = {
 	{ "allylist",			Cmd_AllyList_f,				CMD_NOINTERMISSION },
 	{ "allyremove",			Cmd_AllyRemove_f,			CMD_NOINTERMISSION },
 	{ "bountyquest",		Cmd_BountyQuest_f,			CMD_RPG|CMD_NOINTERMISSION },
-	{ "buy",				Cmd_Buy_f,					CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "callteamvote",		Cmd_CallTeamVote_f,			CMD_NOINTERMISSION },
 	{ "callvote",			Cmd_CallVote_f,				CMD_NOINTERMISSION },
 	{ "changepassword",		Cmd_ChangePassword_f,		CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "clientprint",		Cmd_ClientPrint_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
-	{ "creditgive",			Cmd_CreditGive_f,			CMD_RPG|CMD_NOINTERMISSION },
 	{ "datetime",			Cmd_DateTime_f,				CMD_NOINTERMISSION },
 	{ "debugBMove_Back",	Cmd_BotMoveBack_f,			CMD_CHEAT|CMD_ALIVE },
 	{ "debugBMove_Forward",	Cmd_BotMoveForward_f,		CMD_CHEAT|CMD_ALIVE },
@@ -11935,6 +11873,8 @@ command_t commands[] = {
 	{ "god",				Cmd_God_f,					CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "ignore",				Cmd_Ignore_f,				CMD_NOINTERMISSION },
 	{ "ignorelist",			Cmd_IgnoreList_f,			CMD_NOINTERMISSION },
+	{ "itemmake",			Cmd_ItemMake_f,				CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
+	{ "itemunmake",			Cmd_ItemUnmake_f,			CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "jetpack",			Cmd_Jetpack_f,				CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "kill",				Cmd_Kill_f,					CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "killother",			Cmd_KillOther_f,			CMD_CHEAT|CMD_NOINTERMISSION },
@@ -11971,7 +11911,6 @@ command_t commands[] = {
 	{ "say_team",			Cmd_SayTeam_f,				0 },
 	{ "scale",				Cmd_Scale_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "score",				Cmd_Score_f,				0 },
-	{ "sell",				Cmd_Sell_f,					CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "settings",			Cmd_Settings_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "setviewpos",			Cmd_SetViewpos_f,			CMD_CHEAT|CMD_NOINTERMISSION },
 	{ "siegeclass",			Cmd_SiegeClass_f,			CMD_NOINTERMISSION },

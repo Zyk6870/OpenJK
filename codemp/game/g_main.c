@@ -513,7 +513,7 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = "ally_elemental_force_mage";
 	enemy_names[QUEST_NPC_ALLY_FLYING_WARRIOR] = "ally_flying_warrior";
 	enemy_names[QUEST_NPC_ALLY_FORCE_WARRIOR] = "ally_force_warrior";
-	enemy_names[QUEST_NPC_SELLER] = "quest_seller";
+	enemy_names[QUEST_NPC_TRAVELING_MAGE] = "traveling_mage";
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
@@ -548,7 +548,7 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_ALLY_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
 	bonus_increase[QUEST_NPC_ALLY_FORCE_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
-	bonus_increase[QUEST_NPC_SELLER] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_TRAVELING_MAGE] = QUEST_NPC_BONUS_INCREASE;
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
@@ -583,7 +583,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = 8;
 	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = 7;
 	max_levels[QUEST_NPC_ALLY_FORCE_WARRIOR] = 7;
-	max_levels[QUEST_NPC_SELLER] = 4;
+	max_levels[QUEST_NPC_TRAVELING_MAGE] = 4;
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
@@ -810,7 +810,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + skill_level_bonus;
 		}
-		else if (quest_npc_type == QUEST_NPC_SELLER)
+		else if (quest_npc_type == QUEST_NPC_TRAVELING_MAGE)
 		{
 			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 
@@ -820,7 +820,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = ally_bonus + skill_level_bonus;
 
-			// zyk: seller stays in the map only for this amount of time before going away
+			// zyk: Travelig Mage stays in the map only for this amount of time before going away
 			npc_ent->client->pers.quest_seller_map_timer = level.time + (SIDE_QUEST_STUFF_TIMER * bonuses);
 		}
 
@@ -6920,7 +6920,7 @@ void rpg_lms_winner()
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-		trap->SendServerCommand(-1, va("chat \"^3RPG LMS: ^7%s ^7is the winner! prize: %d credits! Kills: %d\"", ent->client->pers.netname, credits, level.rpg_lms_players[ent->s.number]));
+		trap->SendServerCommand(-1, va("chat \"^3RPG LMS: ^7%s ^7is the winner! prize: %d Craft Energy! Kills: %d\"", ent->client->pers.netname, credits, level.rpg_lms_players[ent->s.number]));
 	}
 	else
 	{
@@ -7127,7 +7127,7 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_QUEST_LOG] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 150;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 450;
@@ -7249,7 +7249,7 @@ void zyk_show_tutorial(gentity_t* ent)
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 2))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: When seeing your inventory, you can also see the commands to buy or sell items.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can craft inventory items. It will require Craft Energy, which is gained by having Red Crystals.\n\"", QUESTCHAR_ALL_SPIRITS));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 3))
 		{
@@ -9064,7 +9064,7 @@ void G_RunFrame( int levelTime ) {
 									add_credits(ent, 2000);
 									save_account(ent, qtrue);
 									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
-									trap->SendServerCommand(-1, va("chat \"^3Race System: ^7Winner: %s^7 - Prize: 2000 Credits!\"", ent->client->pers.netname));
+									trap->SendServerCommand(-1, va("chat \"^3Race System: ^7Winner: %s^7 - Prize: 2000 Craft Energy!\"", ent->client->pers.netname));
 								}
 								else
 								{ // zyk: give him some stuff
@@ -9196,6 +9196,24 @@ void G_RunFrame( int levelTime ) {
 
 					// zyk: interval between messages
 					ent->client->pers.tutorial_timer = level.time + 5000;
+				}
+
+				// zyk: Craft Energy is generated based on the amount of Red Crystals
+				if (ent->client->pers.craft_energy_timer < level.time)
+				{
+					int craft_energy_time = 12000;
+
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
+					{
+						add_credits(ent, ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]);
+					}
+
+					if (ent->client->pers.skill_levels[SKILL_ITEM_MAKER] > 0)
+					{
+						craft_energy_time -= (ent->client->pers.skill_levels[SKILL_ITEM_MAKER] * 200);
+					}
+
+					ent->client->pers.craft_energy_timer = level.time + craft_energy_time;
 				}
 
 				if (ent->client->pers.save_stat_changes_timer < level.time)
@@ -9457,7 +9475,7 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < (SPIRIT_CRYSTAL_PARTS - 1))
 							{
-								zyk_spawn_quest_npc(QUEST_NPC_SELLER, 0, (spirit_crystal_chance * SIDE_QUEST_STUFF_TIMER), qfalse, -1);
+								zyk_spawn_quest_npc(QUEST_NPC_TRAVELING_MAGE, 0, (spirit_crystal_chance * SIDE_QUEST_STUFF_TIMER), qfalse, -1);
 							}
 							else
 							{
@@ -9469,7 +9487,7 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME;
 				}
 
-				// zyk: Seller events
+				// zyk: Traveling Mage events
 				if (ent->client->pers.quest_seller_event_step > QUEST_SELLER_STEP_NONE && ent->client->pers.quest_seller_event_timer < level.time)
 				{
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < (SPIRIT_CRYSTAL_PARTS - 1))
@@ -9486,16 +9504,15 @@ void G_RunFrame( int levelTime ) {
 						{
 							ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] += 1;
 
-							add_credits(ent, 500);
 							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
 							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == (SPIRIT_CRYSTAL_PARTS - 1))
 							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive 500 credits. Now you must find the final part, a green crystal^7.\n\"", QUESTCHAR_TRAVELING_MAGE));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Now you must find the final part, a green crystal^7.\n\"", QUESTCHAR_TRAVELING_MAGE));
 							}
 							else
 							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive this part of the Spirit Crystal and 500 credits^7.\n\"", QUESTCHAR_TRAVELING_MAGE));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive this part of the Spirit Crystal^7.\n\"", QUESTCHAR_TRAVELING_MAGE));
 							}
 						}
 					}
@@ -9762,7 +9779,7 @@ void G_RunFrame( int levelTime ) {
 				// zyk: npcs with magic powers
 				if (ent->client->pers.quest_npc > QUEST_NPC_NONE && ent->client->pers.quest_event_timer < level.time)
 				{
-					if (ent->client->pers.quest_npc == QUEST_NPC_SELLER || ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+					if (ent->client->pers.quest_npc == QUEST_NPC_TRAVELING_MAGE || ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 					{ // zyk: there can only be one of these npcs in the map
 						level.special_quest_npc_in_map |= (1 << ent->client->pers.quest_npc);
 					}
@@ -9896,7 +9913,7 @@ void G_RunFrame( int levelTime ) {
 					}
 				}
 
-				if (ent->client->pers.quest_npc == QUEST_NPC_SELLER && ent->client->pers.quest_seller_map_timer < level.time)
+				if (ent->client->pers.quest_npc == QUEST_NPC_TRAVELING_MAGE && ent->client->pers.quest_seller_map_timer < level.time)
 				{ // zyk: the time for the Seller to stay in the map run out. He will go away
 					gentity_t* player_ent = NULL;
 					int player_it = 0;

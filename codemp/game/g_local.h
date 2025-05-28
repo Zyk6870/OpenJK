@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.3.29"
+#define	GAMEVERSION	"New Zyk Mod v1.3.30"
 
 #define SECURITY_LOG "security.log"
 
@@ -629,7 +629,7 @@ typedef enum {
 	SKILL_HEALTH_STRENGTH,
 	SKILL_MELEE,
 	SKILL_MELEE_SPEED,
-	SKILL_TRADER,
+	SKILL_ITEM_MAKER,
 	SKILL_STATUS_PROTECTION,
 	SKILL_MAX_WEIGHT,
 	SKILL_MAX_STAMINA,
@@ -786,7 +786,7 @@ typedef enum {
 	QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE,
 	QUEST_NPC_ALLY_FLYING_WARRIOR,
 	QUEST_NPC_ALLY_FORCE_WARRIOR,
-	QUEST_NPC_SELLER,
+	QUEST_NPC_TRAVELING_MAGE,
 	NUM_QUEST_NPCS
 } zyk_quest_npc_t;
 
@@ -829,8 +829,9 @@ typedef enum {
 #define RPG_MIN_STAMINA 1000.0
 #define RPG_DEFAULT_STAMINA 5000
 
-// zyk: initial credits in RPG Mode
-#define RPG_INITIAL_CREDITS 0
+// zyk: RPG Mode Craft Energy
+#define RPG_INITIAL_CRAFT_ENERGY 0
+#define RPG_MAX_CRAFT_ENERGY 50000
 #define RPG_MAX_BUY_AMOUNT 100
 
 // zyk: amount of Magic Crystals to upgrade a skill
@@ -1040,7 +1041,9 @@ typedef struct clientPersistant_s {
 
 	int max_force_power; // zyk: max force power the player can have based on Force Power skill level
 
-	int credits; // zyk: the amount of credits (RPG Mode currency) this player has now
+	// zyk: used to craft inventory items
+	int craft_energy;
+	int craft_energy_timer;
 
 	zyk_tutorial_t tutorial_step; // zyk: sets the current tutorial step, to display the correct message to the player
 	int tutorial_timer; // zyk: used by the tutorial to set the interval between messages
