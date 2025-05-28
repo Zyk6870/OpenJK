@@ -2646,7 +2646,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		attacker = &g_entities[self->client->ps.otherKiller];
 	}
 
-	// zyk: enemy npcs have chance to drop crystal
+	// zyk: enemy npcs have chance to drop crystals
 	if (self->NPC && self->client->NPC_class != CLASS_VEHICLE && self->client->playerTeam != NPCTEAM_PLAYER)
 	{
 		int crystal_random_chance = Q_irand(0, 99);
@@ -2673,18 +2673,17 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 			{
 				crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
 			}
+			else if (self->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
+			{ // zyk: other enemy quest npcs
+				crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
+			}
 		}
 		else if (self->client->pers.quest_npc == QUEST_NPC_NONE && crystal_random_chance < chance_to_spawn_crystal)
 		{
 			crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
 		}
 
-		if (self->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && crystal_random_chance < (self->client->ps.stats[STAT_MAX_HEALTH] / 10))
-		{
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] - 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1] + 32, self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SPECIAL_CRYSTAL);
-		}
-		else if (crystal_type > QUEST_ITEM_NONE)
+		if (crystal_type > QUEST_ITEM_NONE)
 		{
 			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, crystal_type);
 		}

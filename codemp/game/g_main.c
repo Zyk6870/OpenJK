@@ -497,6 +497,7 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_MAGE_MASTER] = "mage_master";
 	enemy_names[QUEST_NPC_MAGE_MINISTER] = "mage_minister";
 	enemy_names[QUEST_NPC_MAGE_SCHOLAR] = "mage_scholar";
+	enemy_names[QUEST_NPC_STATUS_MAGE] = "status_mage";
 	enemy_names[QUEST_NPC_FORCE_MAGE] = "force_mage";
 	enemy_names[QUEST_NPC_HIGH_TRAINED_WARRIOR] = "high_trained_warrior";
 	enemy_names[QUEST_NPC_MID_TRAINED_WARRIOR] = "mid_trained_warrior";
@@ -531,6 +532,7 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_MAGE_MASTER] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_MAGE_MINISTER] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_MAGE_SCHOLAR] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_STATUS_MAGE] = QUEST_NPC_BONUS_INCREASE * 1.2;
 	bonus_increase[QUEST_NPC_FORCE_MAGE] = QUEST_NPC_BONUS_INCREASE * 1.2;
 	bonus_increase[QUEST_NPC_HIGH_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 1.2;
 	bonus_increase[QUEST_NPC_MID_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 1.5;
@@ -565,6 +567,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_MAGE_MASTER] = 16;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 10;
 	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 10;
+	max_levels[QUEST_NPC_STATUS_MAGE] = 9;
 	max_levels[QUEST_NPC_FORCE_MAGE] = 8;
 	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = 8;
 	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = 7;
@@ -680,9 +683,14 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 16 + skill_level_bonus;
 		}
-		else if (quest_npc_type == QUEST_NPC_FORCE_MAGE)
+		else if (quest_npc_type == QUEST_NPC_STATUS_MAGE)
 		{
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAX_MP] = npc_skill_level + 12 + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_FORCE_MAGE)
+		{
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DARK_MAGIC, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_LIGHT_MAGIC, npc_skill_level + skill_level_bonus);
 
@@ -780,6 +788,8 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		else if (quest_npc_type == QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE)
 		{
 			int random_magic_power = Q_irand(SKILL_MAGIC_WATER_MAGIC, SKILL_MAGIC_LIGHT_MAGIC);
+
+			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, random_magic_power, ally_bonus + skill_level_bonus);
 
@@ -9797,7 +9807,7 @@ void G_RunFrame( int levelTime ) {
 							}
 						}
 
-						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER || ent->client->pers.quest_npc == QUEST_NPC_STATUS_MAGE)
 						{
 							if (Q_irand(0, 3) == 0)
 							{
@@ -9808,7 +9818,7 @@ void G_RunFrame( int levelTime ) {
 							{
 								zyk_rpg_status_t status_chosen = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
 
-								if (ent->enemy->client && quest_npc_enemy_distance < 500)
+								if (ent->enemy->client && quest_npc_enemy_distance < ent->client->ps.stats[STAT_MAX_HEALTH])
 								{
 									zyk_set_rpg_status(ent->enemy, status_chosen, MAGE_MASTER_STATUS_DURATION, qtrue);
 								}
