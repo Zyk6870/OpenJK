@@ -7503,23 +7503,23 @@ void zyk_show_quest_riddle(gentity_t* ent)
 {
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 0)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Its size is immense, and having its energy is a must... it keeps life on Earth, on its power we can trust...\n\"", QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Its size is immense, and having its energy is a must... it keeps life on Earth, on its power we can trust...\n\"", QUESTCHAR_TRAVELING_MAGE));
 	}
 	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 1)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: One can feel warm, with the power of its energy... its power can also be evil, burning to ashes all the harmony...\n\"", QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: One can feel warm, with the power of its energy... its power can also be evil, burning to ashes all the harmony...\n\"", QUESTCHAR_TRAVELING_MAGE));
 	}
 	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 2)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The harsh feeling of anger, hurting deep into the soul... if one is consumed by it, their life will fall into its bowl...\n\"", QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The harsh feeling of anger, hurting deep into the soul... if one is consumed by it, their life will fall into its bowl...\n\"", QUESTCHAR_TRAVELING_MAGE));
 	}
 	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 3)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: It has a pure essence, it can create life... but it can also be furious, like a sharp cut of a knife...\n\"", QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: It has a pure essence, it can create life... but it can also be furious, like a sharp cut of a knife...\n\"", QUESTCHAR_TRAVELING_MAGE));
 	}
 	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 4)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The pure feeling of affection, even the evil ones can sustain... if one can feel and share, their life will not be in vain...\n\"", QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The pure feeling of affection, even the evil ones can sustain... if one can feel and share, their life will not be in vain...\n\"", QUESTCHAR_TRAVELING_MAGE));
 	}
 }
 
@@ -9476,7 +9476,7 @@ void G_RunFrame( int levelTime ) {
 					{
 						if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_TALKED)
 						{
-							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hi! I am the seller. Answer my riddle in chat and I will give you a part of the Spirit Crystal!\n\"", QUESTCHAR_SELLER));
+							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello! Answer my riddle in chat and I will give you a part of the Spirit Crystal!\n\"", QUESTCHAR_TRAVELING_MAGE));
 						}
 						else if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_START)
 						{ // zyk: Seller riddles
@@ -9491,17 +9491,17 @@ void G_RunFrame( int levelTime ) {
 
 							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == (SPIRIT_CRYSTAL_PARTS - 1))
 							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive 500 credits. Now you must find the final part, a green crystal^7.\n\"", QUESTCHAR_SELLER));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive 500 credits. Now you must find the final part, a green crystal^7.\n\"", QUESTCHAR_TRAVELING_MAGE));
 							}
 							else
 							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive this part of the Spirit Crystal and 500 credits^7.\n\"", QUESTCHAR_SELLER));
+								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive this part of the Spirit Crystal and 500 credits^7.\n\"", QUESTCHAR_TRAVELING_MAGE));
 							}
 						}
 					}
 					else
 					{
-						trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello again! I hope my Spirit Crystal helped you!\n\"", QUESTCHAR_SELLER));
+						trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello again! I hope my Spirit Crystal helped you!\n\"", QUESTCHAR_TRAVELING_MAGE));
 
 						ent->client->pers.quest_seller_event_step = NUM_QUEST_SELLER_STEPS;
 					}
@@ -9910,7 +9910,7 @@ void G_RunFrame( int levelTime ) {
 						{
 							player_ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_NONE;
 
-							trap->SendServerCommand(player_ent->s.number, va("chat \"%s^7: I must go away now. See you later!\n\"", QUESTCHAR_SELLER));
+							trap->SendServerCommand(player_ent->s.number, va("chat \"%s^7: I must go away now. See you later!\n\"", QUESTCHAR_TRAVELING_MAGE));
 						}
 					}
 

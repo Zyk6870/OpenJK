@@ -211,7 +211,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MELEE_SPEED)
 		return "Each level increases how fast you can punch with Melee";
 	if (skill_index == SKILL_TRADER)
-		return "makes you able to get better prices when buying stuff from the seller";
+		return va("makes you able to get better prices when buying stuff from the %s", QUESTCHAR_TRAVELING_MAGE);
 	if (skill_index == SKILL_STATUS_PROTECTION)
 		return "Decreases duration of negative status effects. ^1Poison: ^7loses health, stamina, magic points and lowers run speed. ^1Fire: ^7catches fire, losing a lot of health. ^1Bleeding: ^7loses some health. Melee, Saber, Force powers and Magic attacks do less damage. ^1Confusion: ^7cannot attack or use Force powers or Magic";
 	if (skill_index == SKILL_MAX_WEIGHT)
@@ -619,15 +619,15 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, red crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. You must find all of its parts to use it. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a red crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, red crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. You must find all of its parts to use it. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a red crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_TRAVELING_MAGE));
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor. Decreases damage to your health from any non-magic source by 5 per cent. Decreases damage from Magic Fist and Magic Powers by 20 per cent and absorb it to regen some magic points. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor. Decreases damage to your health from any non-magic source by 5 per cent. Decreases damage from Magic Fist and Magic Powers by 20 per cent and absorb it to regen some magic points. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_TRAVELING_MAGE));
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. You must find all of its parts to use it. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_ALL_SPIRITS));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. You must find all of its parts to use it. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_TRAVELING_MAGE));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
@@ -639,7 +639,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Has a lot of useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Has a lot of useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_TRAVELING_MAGE));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD)
 	{
@@ -7346,7 +7346,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 4)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am a seller who keeps traveling to different places. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing the Magic Armor and I can use Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger. The %s ^7created some special items that may help you if you find them: Energy Modulator, Magic Armor and Spirit Crystal.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG), QUESTCHAR_SELLER, QUESTCHAR_ALL_SPIRITS));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am always traveling. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing a Magic Armor and I can use Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger. I created some special items that may help you if you find them: Energy Modulator, Magic Armor and Spirit Crystal. Beware though, some enemies may also be wearing a Magic Armor\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG), QUESTCHAR_TRAVELING_MAGE));
 						}
 					}
 					else
@@ -7554,13 +7554,13 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		// zyk: buying and selling must use Stamina
 		rpg_skill_counter(ent, amount);
 
-		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Thanks %s^7!\n\"", QUESTCHAR_SELLER, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Thanks %s^7!\n\"", QUESTCHAR_TRAVELING_MAGE, ent->client->pers.netname));
 
 		Cmd_ZykMod_f(ent);
 	}
 	else
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7%s^7, my products are not free! Give me the money!\n\"", QUESTCHAR_SELLER, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7%s^7, my products are not free! Give me the money!\n\"", QUESTCHAR_TRAVELING_MAGE, ent->client->pers.netname));
 		return;
 	}
 }
@@ -7641,11 +7641,11 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		// zyk: buying and selling must use Stamina
 		rpg_skill_counter(ent, amount);
 
-		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Thanks %s^7!\n\"", QUESTCHAR_SELLER, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7Thanks %s^7!\n\"", QUESTCHAR_TRAVELING_MAGE, ent->client->pers.netname));
 	}
 	else
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7You don't have this amount of this item.\n\"", QUESTCHAR_SELLER));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s: ^7You don't have this amount of this item.\n\"", QUESTCHAR_TRAVELING_MAGE));
 	}
 }
 
