@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.3.30"
+#define	GAMEVERSION	"New Zyk Mod v1.3.31"
 
 #define SECURITY_LOG "security.log"
 
@@ -901,7 +901,7 @@ typedef enum {
 #define ENERGY_MODULATOR_PARTS 3
 #define QUEST_ITEM_DISTANCE 48
 #define SPIRIT_CRYSTAL_PARTS 6
-#define SPECIAL_CRYSTAL_MP_REGEN_AMOUNT 10
+#define SPECIAL_CRYSTAL_MP_REGEN_AMOUNT 5
 #define QUEST_SPIRIT_TREE_DEFAULT_SCALE 2
 #define QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET 4
 #define QUEST_SPIRIT_TREE_RADIUS 50

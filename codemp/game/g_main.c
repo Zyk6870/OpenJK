@@ -9201,7 +9201,7 @@ void G_RunFrame( int levelTime ) {
 				// zyk: Craft Energy is generated based on the amount of Red Crystals
 				if (ent->client->pers.craft_energy_timer < level.time)
 				{
-					int craft_energy_time = 12000;
+					int craft_energy_time = 10000 + (zyk_total_skillpoints(ent) * 100);
 
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
 					{
