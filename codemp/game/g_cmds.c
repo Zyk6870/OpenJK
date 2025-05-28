@@ -631,11 +631,11 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. When you collect one, it will restore 1 magic point. Upgrading skills uses a blue crystal. The ones you keep in your inventory makes your main quest ally npcs stronger. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. When you collect one, it will restore 1 magic point. Upgrading skills uses a blue crystal. The ones you keep in your inventory makes your main quest ally npcs stronger. When you die, you lose a blue crystal\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. When you collect one, it will restore %d magic points. The ones you keep in your inventory increase your Craft Energy and the regen rate of the Spirit Tree. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Used by the Energy Modulator secret quest item. Can be sold\n\n\"", zyk_get_inventory_item_name(item_index), SPECIAL_CRYSTAL_MP_REGEN_AMOUNT));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. When you collect one, it will restore %d magic points. The ones you keep in your inventory increase your Craft Energy and the regen rate of the Spirit Tree. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Used by the Energy Modulator secret quest item. When you die, you lose a red crystal\n\n\"", zyk_get_inventory_item_name(item_index), SPECIAL_CRYSTAL_MP_REGEN_AMOUNT));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
@@ -6608,53 +6608,53 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 {
 	int seller_items_cost[MAX_RPG_INVENTORY_ITEMS][2];
 
-	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][0] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][0] = 4;
 	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][0] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][0] = 4;
 	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][0] = 3;
+	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][0] = 4;
 	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 6;
 	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][0] = 7;
 	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][0] = 7;
 	seller_items_cost[RPG_INVENTORY_AMMO_TRIPMINES][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][0] = 7;
 	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][0] = 100;
+	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][0] = 120;
 	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][1] = 50;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_SEEKER_DRONE][0] = 100;
+	seller_items_cost[RPG_INVENTORY_ITEM_SEEKER_DRONE][0] = 120;
 	seller_items_cost[RPG_INVENTORY_ITEM_SEEKER_DRONE][1] = 50;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_BACTA_CANISTER][0] = 80;
-	seller_items_cost[RPG_INVENTORY_ITEM_BACTA_CANISTER][1] = 40;
+	seller_items_cost[RPG_INVENTORY_ITEM_BACTA_CANISTER][0] = 90;
+	seller_items_cost[RPG_INVENTORY_ITEM_BACTA_CANISTER][1] = 30;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_FORCE_FIELD][0] = 150;
-	seller_items_cost[RPG_INVENTORY_ITEM_FORCE_FIELD][1] = 80;
+	seller_items_cost[RPG_INVENTORY_ITEM_FORCE_FIELD][0] = 160;
+	seller_items_cost[RPG_INVENTORY_ITEM_FORCE_FIELD][1] = 70;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][0] = 160;
-	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][1] = 80;
+	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][0] = 180;
+	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][1] = 60;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][0] = 140;
+	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][0] = 150;
 	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][1] = 40;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_BINOCULARS][0] = 10;
+	seller_items_cost[RPG_INVENTORY_ITEM_BINOCULARS][0] = 15;
 	seller_items_cost[RPG_INVENTORY_ITEM_BINOCULARS][1] = 5;
 
 	seller_items_cost[RPG_INVENTORY_ITEM_JETPACK][0] = 500;
 	seller_items_cost[RPG_INVENTORY_ITEM_JETPACK][1] = 200;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_CLOAK][0] = 450;
-	seller_items_cost[RPG_INVENTORY_ITEM_CLOAK][1] = 220;
+	seller_items_cost[RPG_INVENTORY_ITEM_CLOAK][0] = 500;
+	seller_items_cost[RPG_INVENTORY_ITEM_CLOAK][1] = 200;
 
 	seller_items_cost[RPG_INVENTORY_WP_BLASTER_PISTOL][0] = 90;
 	seller_items_cost[RPG_INVENTORY_WP_BLASTER_PISTOL][1] = 45;
@@ -6672,16 +6672,16 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_WP_BOWCASTER][1] = 55;
 
 	seller_items_cost[RPG_INVENTORY_WP_DEMP2][0] = 150;
-	seller_items_cost[RPG_INVENTORY_WP_DEMP2][1] = 80;
+	seller_items_cost[RPG_INVENTORY_WP_DEMP2][1] = 75;
 
 	seller_items_cost[RPG_INVENTORY_WP_REPEATER][0] = 150;
-	seller_items_cost[RPG_INVENTORY_WP_REPEATER][1] = 80;
+	seller_items_cost[RPG_INVENTORY_WP_REPEATER][1] = 75;
 
 	seller_items_cost[RPG_INVENTORY_WP_FLECHETTE][0] = 170;
-	seller_items_cost[RPG_INVENTORY_WP_FLECHETTE][1] = 90;
+	seller_items_cost[RPG_INVENTORY_WP_FLECHETTE][1] = 80;
 
 	seller_items_cost[RPG_INVENTORY_WP_CONCUSSION][0] = 280;
-	seller_items_cost[RPG_INVENTORY_WP_CONCUSSION][1] = 160;
+	seller_items_cost[RPG_INVENTORY_WP_CONCUSSION][1] = 140;
 
 	seller_items_cost[RPG_INVENTORY_WP_ROCKET_LAUNCHER][0] = 250;
 	seller_items_cost[RPG_INVENTORY_WP_ROCKET_LAUNCHER][1] = 120;
@@ -6693,13 +6693,13 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_WP_STUN_BATON][1] = 10;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_BACTA][0] = 1500;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_BACTA][1] = 900;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BACTA][1] = 750;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FORCE_FIELD][0] = 1400;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_FORCE_FIELD][1] = 800;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_FORCE_FIELD][1] = 700;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_CLOAK][0] = 1150;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_CLOAK][1] = 700;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_CLOAK][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR][1] = 500;
@@ -6714,13 +6714,13 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SABER_ARMOR][1] = 1000;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][0] = 1000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][1] = 600;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE][0] = 1800;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE][1] = 900;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_STUN_BATON][0] = 1500;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_STUN_BATON][1] = 900;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_STUN_BATON][1] = 700;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL][0] = 800;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL][1] = 300;
@@ -6729,10 +6729,10 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL][1] = 300;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE][0] = 1200;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE][1] = 700;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE][1] = 600;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_DISRUPTOR][0] = 1500;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_DISRUPTOR][1] = 900;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_DISRUPTOR][1] = 750;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_BOWCASTER][0] = 1400;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_BOWCASTER][1] = 700;
@@ -6744,10 +6744,10 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_REPEATER][1] = 700;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FLECHETTE][0] = 1100;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_FLECHETTE][1] = 600;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_FLECHETTE][1] = 550;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_CONCUSSION][0] = 1200;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_CONCUSSION][1] = 700;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_CONCUSSION][1] = 600;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER][1] = 500;
@@ -6759,13 +6759,13 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][1] = 1500;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_THERMAL_VISION][0] = 1000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_THERMAL_VISION][1] = 600;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_THERMAL_VISION][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SENTRY_GUN][0] = 1800;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_SENTRY_GUN][1] = 1000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SENTRY_GUN][1] = 900;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SEEKER_DRONE][0] = 1600;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_SEEKER_DRONE][1] = 900;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_SEEKER_DRONE][1] = 800;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][1] = 500;
@@ -6780,13 +6780,13 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 500;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 200;
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][0] = 0;
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][1] = 500;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][1] = 200;
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL][0] = 0;
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL][1] = 500;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL][1] = 200;
 
 	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 3;
 	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 1;
@@ -6797,7 +6797,7 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_SHIELD][0] = 100;
 	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_SHIELD][1] = 50;
 
-	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][0] = 40;
+	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][0] = 50;
 	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][1] = 20;
 
 	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][0] = 100;
@@ -6960,6 +6960,28 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 
 			strcpy(message, va("%s%s\n", message, current_column));
 		}
+	}
+
+	if (ent->client->pers.current_weight < ent->client->pers.max_weight)
+	{
+		strcpy(message, va("%s\n^3Weight: ^7%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
+	}
+	else if (ent->client->pers.current_weight == ent->client->pers.max_weight)
+	{
+		strcpy(message, va("%s\n^3Weight: ^2%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
+	}
+	else
+	{
+		strcpy(message, va("%s\n^3Weight: ^1%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
+	}
+
+	if (ent->client->pers.craft_energy < RPG_MAX_CRAFT_ENERGY)
+	{
+		strcpy(message, va("%s^3Craft Energy: ^7%d\n", message, ent->client->pers.craft_energy));
+	}
+	else
+	{
+		strcpy(message, va("%s^3Craft Energy: ^2%d\n", message, ent->client->pers.craft_energy));
 	}
 
 	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                          - ^5Count - ^2Weight - ^3Make - Unmake\n\n%s\n^7Use ^3/itemmake <item number> ^7or ^3/itemunmake <item number> ^7to make or unmake items\n\"", message));

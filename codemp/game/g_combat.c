@@ -2727,6 +2727,16 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		zyk_decrease_quest_progress(self);
 	}
 
+	if (self->client->sess.amrpgmode == 2 && 
+		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_KEEP_QUEST_TRIES)) // zyk: dont lose crystals in this case, for example, when player logs into his account
+		)
+	{
+		self->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]--;
+		self->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
+
+		remove_credits(self, 20);
+	}
+
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
 
 	if (attacker && attacker->client && attacker->client->pers.quest_npc > QUEST_NPC_NONE && attacker->enemy && attacker->enemy == self)
