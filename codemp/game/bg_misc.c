@@ -1716,8 +1716,7 @@ qboolean BG_CanUseFPNow(int gametype, playerState_t *ps, int time, forcePowers_t
 
 #ifdef _GAME
 	// zyk: cannot use force in this case
-	if (player_ent && player_ent->client && 
-		(player_ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CANNOT_USE_FORCE) || player_ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED)))
+	if (player_ent && player_ent->client && player_ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
 	{
 		return qfalse;
 	}

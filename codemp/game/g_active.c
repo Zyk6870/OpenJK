@@ -3135,7 +3135,8 @@ void ClientThink_real( gentity_t *ent ) {
 	//play/stop any looping sounds tied to controlled movement
 	G_CheckMovingLoopingSounds( ent, ucmd );
 
-	if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CANNOT_USE_FORCE) || ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
+	// zyk: cannot use Force with Confusion status
+	if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
 	{
 		ent->client->ps.fd.forceDeactivateAll = 1;
 	}

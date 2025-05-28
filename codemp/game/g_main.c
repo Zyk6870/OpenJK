@@ -5651,7 +5651,7 @@ void magic_power_events(gentity_t *ent)
 			// zyk: Magic Affinity increases magic damage
 			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER);
 
-			if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CANNOT_USE_MAGIC))
+			if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
 			{
 				zyk_stop_all_magic_powers(ent);
 			}
@@ -5853,7 +5853,7 @@ void magic_power_events(gentity_t *ent)
 	}
 }
 
-qboolean zyk_bad_status_effect(zyk_rpg_status_t rpg_status)
+qboolean zyk_is_bad_status_effect(zyk_rpg_status_t rpg_status)
 {
 	if (rpg_status == RPG_STATUS_MAGIC_SHIELD)
 	{
@@ -5945,7 +5945,7 @@ void zyk_status_effects(gentity_t* ent)
 				}
 
 				// zyk: Status Protection skill decreases duration of bad RPG statuses
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0 && zyk_bad_status_effect(i) == qtrue)
+				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0 && zyk_is_bad_status_effect(i) == qtrue)
 				{
 					ent->client->pers.rpg_status_duration[i] -= (20 * ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION]);
 				}
@@ -9762,7 +9762,7 @@ void G_RunFrame( int levelTime ) {
 						int first_magic_skill = SKILL_MAGIC_MAGIC_DOME;
 						int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
 						int magic_skill_index = first_magic_skill + random_magic;
-						int quest_npc_enemy_dist = Distance(ent->client->ps.origin, ent->enemy->r.currentOrigin);
+						int quest_npc_enemy_distance = Distance(ent->client->ps.origin, ent->enemy->r.currentOrigin);
 
 						// zyk: must add a little interval to avoid performance issues
 						ent->client->pers.quest_event_timer = level.time + 200;
@@ -9780,7 +9780,7 @@ void G_RunFrame( int levelTime ) {
 
 							magic_cast_dist = MAGIC_MIN_RANGE + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[magic_skill_index] + magic_bonus));
 
-							if (quest_npc_enemy_dist < Q_irand(0, magic_cast_dist) && !(ent->client->pers.quest_power_status & (1 << random_magic)))
+							if (quest_npc_enemy_distance < Q_irand(0, magic_cast_dist) && !(ent->client->pers.quest_power_status & (1 << random_magic)))
 							{
 								zyk_cast_magic(ent, magic_skill_index);
 
@@ -9806,20 +9806,11 @@ void G_RunFrame( int levelTime ) {
 
 							if (Q_irand(0, 99) < MAGE_MASTER_STATUS_CHANCE)
 							{
-								zyk_rpg_status_t status_chosen = Q_irand(RPG_STATUS_CANNOT_USE_FORCE, RPG_STATUS_CANNOT_USE_MAGIC);
+								zyk_rpg_status_t status_chosen = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
 
-								if (ent->enemy->client)
+								if (ent->enemy->client && quest_npc_enemy_distance < 500)
 								{
 									zyk_set_rpg_status(ent->enemy, status_chosen, MAGE_MASTER_STATUS_DURATION, qtrue);
-								}
-
-								if (status_chosen == RPG_STATUS_CANNOT_USE_FORCE)
-								{
-									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7No Force!\n\""));
-								}
-								else if (status_chosen == RPG_STATUS_CANNOT_USE_MAGIC)
-								{
-									trap->SendServerCommand(-1, va("chat \"^1Mage Master: ^7No Magic!\n\""));
 								}
 							}
 						}

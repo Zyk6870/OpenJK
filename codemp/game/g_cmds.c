@@ -7338,7 +7338,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Sentry: ^7this flying changeling can sometimes shield himself from shots. His shots have a chance to cause Fire status. ^2Magic: Air\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Force Mage: ^7has no weapons. Fight with Force and Magic powers. ^2Magic: Magic Dome, Dark, Light\n^3Mage Scholar: ^7mage with Magic Fist. Wears the Magic Armor. ^2Magic: high-level Dark\n^3Mage Minister: ^7uses Magic Fist often. Wears the Magic Armor. ^2Magic: high-level Light\n^3Mage Master: ^7the leaders. Wearing all armors. Has ability to stop you from using Force or Magic. Can make the Spirit Tree wither faster when near it. Has Magic Fist and extremely high level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Changeling Sentry: ^7this flying changeling can sometimes shield himself from shots. His shots have a chance to cause Fire status. ^2Magic: Air\n^3High Trained Warrior: ^7has force/saber and guns. ^2Magic: Water, Earth, Fire, Air\n^3Force Mage: ^7has no weapons. Fight with Force and Magic powers. ^2Magic: Magic Dome, Dark, Light\n^3Mage Scholar: ^7mage with Magic Fist. Wears the Magic Armor. ^2Magic: high-level Dark\n^3Mage Minister: ^7uses Magic Fist often. Wears the Magic Armor. ^2Magic: high-level Light\n^3Mage Master: ^7the leaders. Wearing all armors. Has ability to give you bad statuses (Poison, Fire, Bleeding, Confusion). Can make the Spirit Tree wither faster when near it. Has Magic Fist and extremely high level of all magic\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
 						}
 						else if (page == 3)
 						{
@@ -10618,7 +10618,6 @@ qboolean zyk_can_cast_magic(gentity_t* ent)
 	if (ent->client->ps.forceHandExtend != HANDEXTEND_NONE || 
 		ent->client->ps.fd.forceGripBeingGripped > level.time || 
 		ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED) ||
-		ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CANNOT_USE_MAGIC) ||
 		ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
 	{
 		return qfalse;
