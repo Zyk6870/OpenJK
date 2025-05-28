@@ -3156,8 +3156,9 @@ void fx_runner_link( gentity_t *ent )
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 100; // wait a small bit, then start working
 		}
-		else if (Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0 || 
-			Q_stricmp(ent->targetname, "zyk_status_poison") == 0 || 
+		else if (Q_stricmp(ent->targetname, "zyk_status_poison") == 0 || 
+			Q_stricmp(ent->targetname, "zyk_status_on_fire") == 0 ||
+			Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0 ||
 			Q_stricmp(ent->targetname, "zyk_magic_armor_effect") == 0)
 		{ // zyk: other RPG effects
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
@@ -3230,8 +3231,9 @@ void SP_fx_runner( gentity_t *ent )
 		Q_stricmp(ent->targetname, "zyk_magic_fire") == 0 || Q_stricmp(ent->targetname, "zyk_magic_air") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_dark") == 0 || Q_stricmp(ent->targetname, "zyk_magic_light") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_element") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_effect_fire_bolt_hit") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_status_poison") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_status_poison") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_status_on_fire") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_armor_effect") == 0)
 	{
 		ent->nextthink = level.time + 100;

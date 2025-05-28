@@ -5917,7 +5917,7 @@ void zyk_status_effects(gentity_t* ent)
 				}
 				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_IN_FLAMES))
 				{
-					zyk_quest_effect_spawn(ent, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 300);
+					zyk_quest_effect_spawn(ent, ent, "zyk_status_on_fire", "0", "env/fire", 0, 0, 0, 300);
 
 					G_Damage(ent, ent, ent, NULL, NULL, 10, 0, MOD_UNKNOWN);
 
@@ -5925,6 +5925,8 @@ void zyk_status_effects(gentity_t* ent)
 				}
 				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_BLEEDING))
 				{
+					zyk_quest_effect_spawn(ent, ent, "zyk_status_bleeding", "0", "sparks/blood_sparks2", 100, 0, 0, 500);
+
 					G_Damage(ent, ent, ent, NULL, NULL, 5, 0, MOD_UNKNOWN);
 				}
 				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
