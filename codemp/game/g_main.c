@@ -5942,7 +5942,7 @@ void zyk_status_effects(gentity_t* ent)
 				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
 				{
 					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-					ent->client->ps.forceDodgeAnim = BOTH_SONICPAIN_END;
+					ent->client->ps.forceDodgeAnim = BOTH_SONICPAIN_HOLD;
 					ent->client->ps.forceHandExtendTime = ent->client->pers.rpg_status_duration[i];
 
 					// zyk: target cant attack while confused
@@ -9677,8 +9677,8 @@ void G_RunFrame( int levelTime ) {
 
 						if (ent->client->pers.quest_spirits_event_step == 0 && zyk_is_main_quest_complete(ent) == qfalse &&
 							zyk_number_of_allies_in_map(NULL) < (zyk_max_quest_npcs.integer / 2) &&
-							Q_irand(0, 99) < (1 + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
-						{ // zyk: spawn an ally
+							Q_irand(0, 99) < ((main_quest_progress / 2) + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
+						{
 							int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 							int ally_bonus = (main_quest_progress / 2) + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
 
@@ -9826,7 +9826,7 @@ void G_RunFrame( int levelTime ) {
 
 						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER || ent->client->pers.quest_npc == QUEST_NPC_STATUS_MAGE)
 						{
-							if (Q_irand(0, 3) == 0)
+							if (Q_irand(0, 4) == 0)
 							{
 								Jedi_Cloak(ent);
 							}
@@ -9914,7 +9914,7 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				if (ent->client->pers.quest_npc == QUEST_NPC_TRAVELING_MAGE && ent->client->pers.quest_seller_map_timer < level.time)
-				{ // zyk: the time for the Seller to stay in the map run out. He will go away
+				{ // zyk: the time for the Traveling Mage to stay in the map run out. He will go away
 					gentity_t* player_ent = NULL;
 					int player_it = 0;
 
