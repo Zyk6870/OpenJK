@@ -6920,7 +6920,7 @@ void rpg_lms_winner()
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-		trap->SendServerCommand(-1, va("chat \"^3RPG LMS: ^7%s ^7is the winner! prize: %d Craft Energy! Kills: %d\"", ent->client->pers.netname, credits, level.rpg_lms_players[ent->s.number]));
+		trap->SendServerCommand(-1, va("chat \"^3RPG LMS: ^7%s ^7is the winner! prize: %d Item-Making Energy! Kills: %d\"", ent->client->pers.netname, credits, level.rpg_lms_players[ent->s.number]));
 	}
 	else
 	{
@@ -7249,7 +7249,7 @@ void zyk_show_tutorial(gentity_t* ent)
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 2))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can craft inventory items. It will require Craft Energy, which is gained by having Red Crystals.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can make inventory items. It will require Item-Making Energy, which is gained by having Red Crystals.\n\"", QUESTCHAR_ALL_SPIRITS));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 3))
 		{
@@ -9064,7 +9064,7 @@ void G_RunFrame( int levelTime ) {
 									add_credits(ent, 2000);
 									save_account(ent, qtrue);
 									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
-									trap->SendServerCommand(-1, va("chat \"^3Race System: ^7Winner: %s^7 - Prize: 2000 Craft Energy!\"", ent->client->pers.netname));
+									trap->SendServerCommand(-1, va("chat \"^3Race System: ^7Winner: %s^7 - Prize: 2000 Item-Making Energy!\"", ent->client->pers.netname));
 								}
 								else
 								{ // zyk: give him some stuff
@@ -9198,10 +9198,10 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.tutorial_timer = level.time + 5000;
 				}
 
-				// zyk: Craft Energy is generated based on the amount of Red Crystals
-				if (ent->health > 0 && ent->client->pers.craft_energy_timer < level.time)
+				// zyk: Item-Making Energy is generated based on the amount of Red Crystals
+				if (ent->health > 0 && ent->client->pers.item_making_energy_timer < level.time)
 				{
-					int craft_energy_time = 10000;
+					int item_making_energy_time = 10000;
 
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
 					{
@@ -9210,10 +9210,10 @@ void G_RunFrame( int levelTime ) {
 
 					if (ent->client->pers.skill_levels[SKILL_ITEM_MAKER] > 0)
 					{
-						craft_energy_time -= (ent->client->pers.skill_levels[SKILL_ITEM_MAKER] * 200);
+						item_making_energy_time -= (ent->client->pers.skill_levels[SKILL_ITEM_MAKER] * 200);
 					}
 
-					ent->client->pers.craft_energy_timer = level.time + craft_energy_time;
+					ent->client->pers.item_making_energy_timer = level.time + item_making_energy_time;
 				}
 
 				if (ent->client->pers.save_stat_changes_timer < level.time)

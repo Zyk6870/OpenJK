@@ -211,7 +211,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MELEE_SPEED)
 		return "Each level increases how fast you can punch with Melee";
 	if (skill_index == SKILL_ITEM_MAKER)
-		return "Increases Craft Energy generation rate";
+		return "Increases Item-Making Energy generation rate";
 	if (skill_index == SKILL_STATUS_PROTECTION)
 		return "Decreases duration of negative status effects. ^1Poison: ^7loses health, stamina, magic points and lowers run speed. ^1Fire: ^7catches fire, losing a lot of health. ^1Bleeding: ^7loses some health. Melee, Saber, Force powers and Magic attacks do less damage. ^1Confusion: ^7cannot attack or use Force powers or Magic";
 	if (skill_index == SKILL_MAX_WEIGHT)
@@ -635,7 +635,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. When you collect one, it will restore %d magic points. The ones you keep in your inventory increase your Craft Energy and the regen rate of the Spirit Tree. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Used by the Energy Modulator secret quest item. When you die, you lose a red crystal\n\n\"", zyk_get_inventory_item_name(item_index), SPECIAL_CRYSTAL_MP_REGEN_AMOUNT));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. When you collect one, it will restore %d magic points. The ones you keep in your inventory increase your Item-Making Energy and the regen rate of the Spirit Tree. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Used by the Energy Modulator secret quest item. When you die, you lose a red crystal\n\n\"", zyk_get_inventory_item_name(item_index), SPECIAL_CRYSTAL_MP_REGEN_AMOUNT));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
@@ -2717,19 +2717,19 @@ void load_account(gentity_t* ent)
 					read_status = fscanf(account_file, "%s", content);
 					ent->client->pers.active_inventory_upgrades = atoi(content);
 				}
-				else if (Q_stricmp(content_type, "craftenergy") == 0)
+				else if (Q_stricmp(content_type, "itemmakingenergy") == 0)
 				{
 					read_status = fscanf(account_file, "%s", content);
-					ent->client->pers.craft_energy = atoi(content);
+					ent->client->pers.item_making_energy = atoi(content);
 
-					// zyk: validating Craft Energy amount
-					if (ent->client->pers.craft_energy > RPG_MAX_CRAFT_ENERGY)
+					// zyk: validating Item-Making Energy amount
+					if (ent->client->pers.item_making_energy > RPG_MAX_ITEMMAKING_ENERGY)
 					{
-						ent->client->pers.craft_energy = RPG_MAX_CRAFT_ENERGY;
+						ent->client->pers.item_making_energy = RPG_MAX_ITEMMAKING_ENERGY;
 					}
-					else if (ent->client->pers.craft_energy < 0)
+					else if (ent->client->pers.item_making_energy < 0)
 					{
-						ent->client->pers.craft_energy = 0;
+						ent->client->pers.item_making_energy = 0;
 					}
 				}
 				else if (Q_stricmp(content_type, "skill_levels") == 0)
@@ -2851,8 +2851,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			client = ent->client;
 
-			strcpy(content, va("active_inventory_upgrades\n%d\ncraftenergy\n%d",
-				client->pers.active_inventory_upgrades, client->pers.craft_energy));
+			strcpy(content, va("active_inventory_upgrades\n%d\nitemmakingenergy\n%d",
+				client->pers.active_inventory_upgrades, client->pers.item_making_energy));
 
 			strcpy(content, va("%s\nskill_levels", content));
 			for (i = 0; i < NUMBER_OF_SKILLS; i++)
@@ -5188,22 +5188,22 @@ void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
 	}
 }
 
-// zyk: gives Craft Energy to the player
+// zyk: gives Item-Making Energy to the player
 void add_credits(gentity_t *ent, int credits)
 {
-	ent->client->pers.craft_energy += credits;
+	ent->client->pers.item_making_energy += credits;
 
-	if (ent->client->pers.craft_energy > RPG_MAX_CRAFT_ENERGY)
-		ent->client->pers.craft_energy = RPG_MAX_CRAFT_ENERGY;
+	if (ent->client->pers.item_making_energy > RPG_MAX_ITEMMAKING_ENERGY)
+		ent->client->pers.item_making_energy = RPG_MAX_ITEMMAKING_ENERGY;
 }
 
 // zyk: removes credits from the player
 void remove_credits(gentity_t *ent, int credits)
 {
-	ent->client->pers.craft_energy -= credits;
+	ent->client->pers.item_making_energy -= credits;
 
-	if (ent->client->pers.craft_energy < 0)
-		ent->client->pers.craft_energy = 0;
+	if (ent->client->pers.item_making_energy < 0)
+		ent->client->pers.item_making_energy = 0;
 }
 
 // zyk: validates user input to avoid malicious input
@@ -5542,7 +5542,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.quickdraw_timer = 0;
 			ent->client->pers.flashlight_timer = 0;
 
-			ent->client->pers.craft_energy_timer = 0;
+			ent->client->pers.item_making_energy_timer = 0;
 			ent->client->pers.buy_sell_timer = 0;
 			ent->client->pers.inventory_update_timer = level.time + 100;
 
@@ -5780,7 +5780,7 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 
 	ent->client->pers.active_inventory_upgrades = 0;
 	ent->client->pers.magic_power = 0;
-	ent->client->pers.craft_energy = RPG_INITIAL_CRAFT_ENERGY;
+	ent->client->pers.item_making_energy = RPG_INITIAL_ITEMMAKING_ENERGY;
 
 	// zyk: in RPG Mode, player must actually buy these
 	ent->client->ps.jetpackFuel = 0;
@@ -6592,13 +6592,13 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MISC)));
 	strcpy(message, va("%s^3Magic Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC)));
 
-	if (ent->client->pers.craft_energy < RPG_MAX_CRAFT_ENERGY)
+	if (ent->client->pers.item_making_energy < RPG_MAX_ITEMMAKING_ENERGY)
 	{
-		strcpy(message, va("%s^3Craft Energy: ^7%d\n", message, ent->client->pers.craft_energy));
+		strcpy(message, va("%s^3Item-Making Energy: ^7%d\n", message, ent->client->pers.item_making_energy));
 	}
 	else
 	{
-		strcpy(message, va("%s^3Craft Energy: ^2%d\n", message, ent->client->pers.craft_energy));
+		strcpy(message, va("%s^3Item-Making Energy: ^2%d\n", message, ent->client->pers.item_making_energy));
 	}
 
 	trap->SendServerCommand(target_ent->s.number, va("%s\n^7Use ^2/list rpg ^7to see console commands\n\n\"", message));
@@ -6975,13 +6975,13 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 		strcpy(message, va("%s\n^3Weight: ^1%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
 	}
 
-	if (ent->client->pers.craft_energy < RPG_MAX_CRAFT_ENERGY)
+	if (ent->client->pers.item_making_energy < RPG_MAX_ITEMMAKING_ENERGY)
 	{
-		strcpy(message, va("%s^3Craft Energy: ^7%d\n", message, ent->client->pers.craft_energy));
+		strcpy(message, va("%s^3Item-Making Energy: ^7%d\n", message, ent->client->pers.item_making_energy));
 	}
 	else
 	{
-		strcpy(message, va("%s^3Craft Energy: ^2%d\n", message, ent->client->pers.craft_energy));
+		strcpy(message, va("%s^3Item-Making Energy: ^2%d\n", message, ent->client->pers.item_making_energy));
 	}
 
 	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                          - ^5Count - ^2Weight - ^3Make - Unmake\n\n%s\n^7Use ^3/itemmake <item number> ^7or ^3/itemunmake <item number> ^7to make or unmake items\n\"", message));
@@ -7400,7 +7400,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					}
 				}
 
-				trap->SendServerCommand( ent->s.number, va("print \"\n^3Bounty Quest Target: ^7%s^7\n\n^3Bounty Quest\n^7Use ^3/bountyquest ^7so the server chooses a player to be the target. If the target defeats a RPG player, he receives 200 bonus Craft Energy. If a bounty hunter kills the target, he receives bonus Craft Energy based on the target player level.\n\n\"", target_player) );
+				trap->SendServerCommand( ent->s.number, va("print \"\n^3Bounty Quest Target: ^7%s^7\n\n^3Bounty Quest\n^7Use ^3/bountyquest ^7so the server chooses a player to be the target. If the target defeats a RPG player, he receives 200 bonus Item-Making Energy. If a bounty hunter kills the target, he receives bonus Item-Making Energy based on the target player level.\n\n\"", target_player) );
 			}
 			else if (Q_stricmp( arg1, "commands" ) == 0)
 			{
@@ -7507,7 +7507,7 @@ void Cmd_ItemMake_f( gentity_t *ent ) {
 	// zyk: tests the cooldown time to buy or sell
 	if (ent->client->pers.buy_sell_timer > level.time)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"In Craft cooldown time.\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"In Item-Making cooldown time.\n\"");
 		return;
 	}
 
@@ -7560,7 +7560,7 @@ void Cmd_ItemMake_f( gentity_t *ent ) {
 	total_cost = zyk_get_seller_item_cost(ent, item_index, qtrue) * amount;
 
 	// zyk: buying the item if player has enough credits
-	if (ent->client->pers.craft_energy >= total_cost)
+	if (ent->client->pers.item_making_energy >= total_cost)
 	{
 		zyk_update_inventory_quantity(ent, qtrue, item_index, amount);
 
@@ -7571,7 +7571,7 @@ void Cmd_ItemMake_f( gentity_t *ent ) {
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-		ent->client->pers.craft_energy -= total_cost;
+		ent->client->pers.item_making_energy -= total_cost;
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
@@ -7584,7 +7584,7 @@ void Cmd_ItemMake_f( gentity_t *ent ) {
 	}
 	else
 	{
-		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Not enough Craft Energy\n\"");
+		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Not enough Item-Making Energy\n\"");
 		return;
 	}
 }
@@ -7614,7 +7614,7 @@ void Cmd_ItemUnmake_f( gentity_t *ent ) {
 	// zyk: tests the cooldown time to buy or sell
 	if (ent->client->pers.buy_sell_timer > level.time)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"In Craft cooldown time.\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"In Item-Making cooldown time.\n\"");
 		return;
 	}
 
@@ -8213,7 +8213,7 @@ void Cmd_BountyQuest_f( gentity_t *ent ) {
 				!(this_ent->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT)))
 			{
 				level.bounty_quest_choose_target = qfalse;
-				trap->SendServerCommand( -1, va("chat \"^3Bounty Quest: ^7A reward of ^3200 ^7Craft Energy will be given to who kills %s^7\n\"", this_ent->client->pers.netname) );
+				trap->SendServerCommand( -1, va("chat \"^3Bounty Quest: ^7A reward of ^3200 ^7Item-Making Energy will be given to who kills %s^7\n\"", this_ent->client->pers.netname) );
 				return;
 			}
 
