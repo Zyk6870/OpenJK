@@ -4958,6 +4958,17 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
+	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2 &&
+		targ && targ->client && targ->NPC &&
+		targ->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && 
+		targ->client->pers.quest_npc <= QUEST_NPC_TRAVELING_MAGE && 
+		targ->client->pers.quest_npc_chat_timer < level.time)
+	{
+		trap->SendServerCommand(attacker->s.number, va("chat \"^3Ally: ^7%s ^7don't attack me, I am an ally!\n\"", attacker->client->pers.netname));
+
+		targ->client->pers.quest_npc_chat_timer = level.time + 3000;
+	}
+
 	if (targ && targ->client && targ->client->pers.rpg_statuses & (1 << RPG_STATUS_BLEEDING) &&
 		(mod == MOD_SABER || 
 		 mod == MOD_MELEE || 

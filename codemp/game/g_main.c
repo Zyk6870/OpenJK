@@ -564,7 +564,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 
 	max_levels[QUEST_NPC_NONE] = 0;
 
-	max_levels[QUEST_NPC_MAGE_MASTER] = 16;
+	max_levels[QUEST_NPC_MAGE_MASTER] = 12;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 10;
 	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 10;
 	max_levels[QUEST_NPC_STATUS_MAGE] = 9;
@@ -622,13 +622,13 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		npc_ent->client->pers.quest_npc_event = 0;
 		npc_ent->client->pers.quest_event_timer = 0;
 		npc_ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
+		npc_ent->client->pers.quest_npc_chat_timer = 0;
 		npc_ent->client->pers.quest_npc_caller_player_id = player_id;
 
 		if (hard_mode == qtrue)
 		{
 			hp_bonus *= 2;
 			skill_level_bonus += 2;
-			quest_progress_for_shield /= 2;
 		}
 
 		// zyk: setting quest npc health
@@ -637,7 +637,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		npc_ent->health = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 		npc_ent->client->pers.maxHealth = npc_ent->client->ps.stats[STAT_MAX_HEALTH];
 
-		if (bonuses >= quest_progress_for_shield)
+		if (bonuses >= quest_progress_for_shield && hard_mode == qtrue)
 		{ // zyk: at this quest progress, npcs will have shield
 			npc_ent->client->pers.max_rpg_shield = npc_ent->health;
 			npc_ent->client->ps.stats[STAT_ARMOR] = npc_ent->client->pers.max_rpg_shield;
@@ -9385,7 +9385,7 @@ void G_RunFrame( int levelTime ) {
 					int magic_armor_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 4) - level_chance;
 					int energy_modulator_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 4) - level_chance;
 					int spirit_crystal_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) / 4) - level_chance;
-					int crystal_chance = ((level.num_entities / 20) + RPG_MAX_SKILLPOINTS - power_level) / 5;
+					int crystal_chance = (level.num_entities / 12);
 					
 					if (Q_irand(0, 99) < crystal_chance)
 					{ // zyk: crystals

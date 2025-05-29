@@ -224,7 +224,7 @@ char* zyk_skill_description(int skill_index)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
 	if (skill_index == SKILL_MAGIC_FIST)
-		return va("allows you to attack with magic bolts when using melee punches. At max level, can damage saber-only damage objects and move pushable/pullable objects. Damage per bolt is %d + ((%d / 2) * (this skill level))", zyk_magic_fist_damage.integer, zyk_magic_fist_damage.integer);
+		return va("allows you to attack with magic bolts when using melee punches. At max level, can damage saber-only damage objects and move pushable/pullable objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAX_MP)
 		return "increases the max amount of Magic Points the player can have. Each level increases it by 100. This is used to cast magic powers";
 	if (skill_index == SKILL_MAGIC_FLIGHT)
