@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.3.33"
+#define	GAMEVERSION	"New Zyk Mod v1.3.34"
 
 #define SECURITY_LOG "security.log"
 
@@ -911,7 +911,7 @@ typedef enum {
 #define QUEST_SPIRIT_TREE_SPAWN_TIMER 5000
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_NPC_SPAWN_TIME 39000
-#define MAGE_MASTER_STATUS_CHANCE 5
+#define MAGE_MASTER_STATUS_CHANCE 4
 #define MAGE_MASTER_STATUS_DURATION 5000
 
 // zyk: maximum time a quest npc can be idle (without enemies)

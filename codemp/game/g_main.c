@@ -9833,9 +9833,10 @@ void G_RunFrame( int levelTime ) {
 
 							if (Q_irand(0, 99) < MAGE_MASTER_STATUS_CHANCE)
 							{
+								int max_distance = ent->client->ps.stats[STAT_MAX_HEALTH] / 2;
 								zyk_rpg_status_t status_chosen = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
 
-								if (ent->enemy->client && quest_npc_enemy_distance < ent->client->ps.stats[STAT_MAX_HEALTH])
+								if (ent->enemy->client && quest_npc_enemy_distance < max_distance)
 								{
 									zyk_set_rpg_status(ent->enemy, status_chosen, MAGE_MASTER_STATUS_DURATION, qtrue);
 								}

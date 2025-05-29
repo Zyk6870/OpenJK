@@ -6771,7 +6771,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								// zyk: confuses the target
 								if (Q_irand(0, 99) < chance_for_confusion)
 								{
-									zyk_set_rpg_status(ent, RPG_STATUS_CONFUSED, 1200, qtrue);
+									zyk_set_rpg_status(ent, RPG_STATUS_CONFUSED, final_damage * 400, qtrue);
 								}
 							}
 						}
