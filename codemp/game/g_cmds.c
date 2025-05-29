@@ -7157,7 +7157,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 	{
 		if (zyk_is_main_quest_complete(ent) == qtrue)
 		{
-			trap->SendServerCommand(target_ent->s.number, va("print \"\n\n^3Main Quest Completed\n\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(target_ent->s.number, "print \"\n^3Main Quest Completed\n\n\"");
 		}
 		else if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_START)))
 		{
@@ -7370,7 +7370,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 4)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am always traveling. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing a Magic Armor and I can use Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger. I created some special items that may help you if you find them: Energy Modulator, Magic Armor and Spirit Crystal. Beware though, some enemies may also be wearing a Magic Armor\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG), QUESTCHAR_TRAVELING_MAGE));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am always traveling. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing a Magic Armor and I can use Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger. I created some special items that may help you if you find them: Spirit Crystal, Energy Modulator, Magic Armor. Beware though, some enemies may also be wearing a Magic Armor. Your quest progress and your Affinity (Force, Misc, Magic) increases the chance to get the secret items\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG), QUESTCHAR_TRAVELING_MAGE));
 						}
 					}
 					else

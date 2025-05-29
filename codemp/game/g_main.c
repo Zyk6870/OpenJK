@@ -9385,7 +9385,7 @@ void G_RunFrame( int levelTime ) {
 					int magic_armor_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 4) - level_chance;
 					int energy_modulator_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 4) - level_chance;
 					int spirit_crystal_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) / 4) - level_chance;
-					int crystal_chance = (level.num_entities / 12);
+					int crystal_chance = (level.num_entities / 10);
 					
 					if (Q_irand(0, 99) < crystal_chance)
 					{ // zyk: crystals
