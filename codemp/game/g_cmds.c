@@ -379,7 +379,6 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
 	inventory_item_names[RPG_INVENTORY_MISC_FLASHLIGHT] = "Flashlight";
-	inventory_item_names[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY] = "Flashlight Battery";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -659,11 +658,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_FLASHLIGHT)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a flashlight, use it to light some dark areas in the map. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the battery used by the flashlight\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a flashlight, use it to light some dark areas in the map. It uses powercell ammo as energy source. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 }
 
@@ -743,8 +738,7 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "inventoryShieldBooster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "inventoryYsalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "inventoryForceBoon";
-	inventory_item_names[RPG_INVENTORY_MISC_FLASHLIGHT] = "inventoryFlashlightitem";
-	inventory_item_names[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY] = "inventoryFlashlightBattery";
+	inventory_item_names[RPG_INVENTORY_MISC_FLASHLIGHT] = "inventoryFlashlight";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -6809,9 +6803,6 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT][0] = 5;
 	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][0] = 2;
-	seller_items_cost[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY][1] = 1;
-
 	if (buy_item == qtrue)
 	{
 		return seller_items_cost[item_number][0];
@@ -7132,9 +7123,9 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_FLASHLIGHT && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLASHLIGHT] > 0)
 	{
-		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY] <= 0)
+		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] <= 0)
 		{
-			trap->SendServerCommand(ent->s.number, va("print \"\n^7No battery for the %s^7\n\n\"", zyk_get_inventory_item_name(item_index)));
+			trap->SendServerCommand(ent->s.number, va("print \"\n^7No powercell for the %s^7\n\n\"", zyk_get_inventory_item_name(item_index)));
 			return;
 		}
 

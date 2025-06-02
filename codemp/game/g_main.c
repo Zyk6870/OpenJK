@@ -7137,7 +7137,6 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FLASHLIGHT] = 5;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY] = 1;
 
 	if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -9319,9 +9318,9 @@ void G_RunFrame( int levelTime ) {
 
 				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_USING_FLASHLIGHT) && ent->client->pers.flashlight_timer < level.time)
 				{ // zyk: using the flashlight
-					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY, 1);
+					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
 
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLASHLIGHT_BATTERY] <= 0)
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] <= 0)
 					{
 						ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_USING_FLASHLIGHT);
 						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/sub_select.mp3"));
