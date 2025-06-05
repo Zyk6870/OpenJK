@@ -6378,7 +6378,7 @@ void duel_tournament_generate_leaderboard(char *filename, char *netname)
 }
 
 // zyk: determines who is the tournament winner
-extern void add_credits(gentity_t *ent, int credits);
+extern void set_item_making_energy(gentity_t* ent, int amount, qboolean add);
 void duel_tournament_winner()
 {
 	gentity_t *ent = NULL;
@@ -6914,7 +6914,7 @@ void rpg_lms_winner()
 
 	if (ent)
 	{
-		add_credits(ent, credits);
+		set_item_making_energy(ent, credits, qtrue);
 
 		save_account(ent, qtrue);
 
@@ -7697,7 +7697,6 @@ qboolean G_PointInBounds( vec3_t point, vec3_t mins, vec3_t maxs );
 int g_siegeRespawnCheck = 0;
 void SetMoverState( gentity_t *ent, moverState_t moverState, int time );
 
-extern void remove_credits(gentity_t *ent, int credits);
 extern void try_finishing_race();
 extern void set_max_health(gentity_t *ent);
 extern void set_max_shield(gentity_t *ent);
@@ -9060,7 +9059,7 @@ void G_RunFrame( int levelTime ) {
 							{ // zyk: this player won the race. Send message to everyone and give his prize
 								if (ent->client->sess.amrpgmode == 2)
 								{ // zyk: give him credits
-									add_credits(ent, 2000);
+									set_item_making_energy(ent, 2000, qtrue);
 									save_account(ent, qtrue);
 									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 									trap->SendServerCommand(-1, va("chat \"^3Race System: ^7Winner: %s^7 - Prize: 2000 Item-Making Energy!\"", ent->client->pers.netname));
@@ -9204,7 +9203,7 @@ void G_RunFrame( int levelTime ) {
 
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
 					{
-						add_credits(ent, ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]);
+						set_item_making_energy(ent, ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL], qtrue);
 					}
 
 					if (ent->client->pers.skill_levels[SKILL_ITEM_MAKER] > 0)

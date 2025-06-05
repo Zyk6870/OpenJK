@@ -2211,7 +2211,7 @@ extern qboolean g_noPDuelCheck;
 extern void saberReactivate(gentity_t *saberent, gentity_t *saberOwner);
 extern void saberBackToOwner(gentity_t *saberent);
 extern void try_finishing_race();
-extern void remove_credits(gentity_t *ent, int credits);
+extern void set_item_making_energy(gentity_t* ent, int amount, qboolean add);
 extern gentity_t *Zyk_NPC_SpawnType(char *npc_type, int x, int y, int z, int yaw);
 extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
@@ -2734,7 +2734,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		self->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]--;
 		self->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
 
-		remove_credits(self, 20);
+		set_item_making_energy(self, 20, qfalse);
 	}
 
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_KEEP_QUEST_TRIES);

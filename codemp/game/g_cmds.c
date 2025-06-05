@@ -5179,25 +5179,35 @@ void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
 		}
 
 		ent->client->pers.current_stamina -= amount;
+
+		if (ent->client->pers.current_stamina < 0)
+		{
+			ent->client->pers.current_stamina = 0;
+		}
 	}
 }
 
 // zyk: gives Item-Making Energy to the player
-void add_credits(gentity_t *ent, int credits)
+void set_item_making_energy(gentity_t *ent, int amount, qboolean add)
 {
-	ent->client->pers.item_making_energy += credits;
+	if (add == qtrue)
+	{
+		ent->client->pers.item_making_energy += amount;
 
-	if (ent->client->pers.item_making_energy > RPG_MAX_ITEMMAKING_ENERGY)
-		ent->client->pers.item_making_energy = RPG_MAX_ITEMMAKING_ENERGY;
-}
+		if (ent->client->pers.item_making_energy > RPG_MAX_ITEMMAKING_ENERGY)
+		{
+			ent->client->pers.item_making_energy = RPG_MAX_ITEMMAKING_ENERGY;
+		}
+	}
+	else
+	{
+		ent->client->pers.item_making_energy -= amount;
 
-// zyk: removes credits from the player
-void remove_credits(gentity_t *ent, int credits)
-{
-	ent->client->pers.item_making_energy -= credits;
-
-	if (ent->client->pers.item_making_energy < 0)
-		ent->client->pers.item_making_energy = 0;
+		if (ent->client->pers.item_making_energy < 0)
+		{
+			ent->client->pers.item_making_energy = 0;
+		}
+	}
 }
 
 // zyk: validates user input to avoid malicious input
@@ -7562,7 +7572,7 @@ void Cmd_ItemMake_f( gentity_t *ent ) {
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-		ent->client->pers.item_making_energy -= total_cost;
+		set_item_making_energy(ent, total_cost, qfalse);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
@@ -7649,11 +7659,11 @@ void Cmd_ItemUnmake_f( gentity_t *ent ) {
 	
 	if (sold == qtrue)
 	{
-		add_credits(ent, (zyk_get_seller_item_cost(ent, item_index, qfalse) * amount));
+		set_item_making_energy(ent, (zyk_get_seller_item_cost(ent, item_index, qfalse) * amount), qtrue);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
-		// zyk: buying and selling must use Stamina
+		// zyk: use some Stamina
 		rpg_skill_counter(ent, amount);
 
 		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Item unmade\n\"");
