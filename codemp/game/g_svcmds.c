@@ -473,7 +473,7 @@ void Svcmd_GiveAdmin_f ( void )
 		return;
 	}
 
-	if (g_entities[client_id].client->sess.amrpgmode > 0)
+	if (g_entities[client_id].client->sess.account_mode > ACC_MODE_LOGGED_OUT)
 	{
 		g_entities[client_id].client->pers.bitvalue |= (1 << ADM_GIVEADM);
 		save_account(&g_entities[client_id], qfalse);

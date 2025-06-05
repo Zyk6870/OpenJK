@@ -2282,14 +2282,14 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	}
 	else
 	{
-		if (ent->client->sess.amrpgmode == 2)
+		if (ent->client->sess.account_mode == ACC_MODE_RPG)
 			health = ent->client->pers.max_rpg_health;
 		else
 			health = Com_Clampi( 1, 100, atoi( Info_ValueForKey( userinfo, "handicap" ) ) );
 	}
 
 	client->pers.maxHealth = health;
-	if (ent->client->sess.amrpgmode < 2 && (client->pers.maxHealth < 1 || client->pers.maxHealth > maxHealth) )
+	if (ent->client->sess.account_mode < ACC_MODE_RPG && (client->pers.maxHealth < 1 || client->pers.maxHealth > maxHealth) )
 		client->pers.maxHealth = 100;
 	client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
 
@@ -2722,7 +2722,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	client->pers.last_mp = 0;
 	client->pers.last_stamina = 0;
 
-	if (ent->client->sess.amrpgmode > 0)
+	if (ent->client->sess.account_mode > ACC_MODE_LOGGED_OUT)
 	{
 		// zyk: if the target goes to spec or something, then the server must choose another target
 		if (level.bounty_quest_choose_target == qfalse && level.bounty_quest_target_id == (ent-g_entities))
@@ -3424,11 +3424,11 @@ void ClientSpawn(gentity_t *ent) {
 		maxHealth = Com_Clampi( 1, 100, atoi( Info_ValueForKey( userinfo, "handicap" ) ) );
 	}
 	client->pers.maxHealth = maxHealth;//atoi( Info_ValueForKey( userinfo, "handicap" ) );
-	if (ent->client->sess.amrpgmode < 2 && (client->pers.maxHealth < 1 || client->pers.maxHealth > maxHealth) ) {
+	if (ent->client->sess.account_mode < ACC_MODE_RPG && (client->pers.maxHealth < 1 || client->pers.maxHealth > maxHealth) ) {
 		client->pers.maxHealth = 100;
 	}
 	// clear entity values
-	if (ent->client->sess.amrpgmode < 2) // zyk: clearmax health if player is not in RPG
+	if (ent->client->sess.account_mode < ACC_MODE_RPG) // zyk: clearmax health if player is not in RPG
 		client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
 	else
 	{
@@ -3471,7 +3471,7 @@ void ClientSpawn(gentity_t *ent) {
 	}
 
 	// zyk: in RPG Mode, it will not reset the fuel
-	if (client->sess.amrpgmode < 2)
+	if (client->sess.account_mode < ACC_MODE_RPG)
 	{
 		//spawn with 100
 		client->ps.jetpackFuel = 100;
@@ -3844,7 +3844,7 @@ void ClientSpawn(gentity_t *ent) {
 	ent->client->pers.skill_crystal_timer = 0;
 
 	// zyk: if player is logged at spawn, load his skills
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		initialize_rpg_skills(ent, qtrue);
 
@@ -3869,7 +3869,7 @@ void ClientSpawn(gentity_t *ent) {
 		zyk_add_guns(ent);
 	}
 
-	if (ent->client->sess.amrpgmode == 1)
+	if (ent->client->sess.account_mode == ACC_MODE_ADMIN)
 	{ // zyk: loading Admin-Only settings
 		zyk_load_common_settings(ent);
 	}
@@ -3939,7 +3939,7 @@ void ClientSpawn(gentity_t *ent) {
 			// zyk: show screen message if the player did not see it yet
 			if (level.read_screen_message[ent->s.number] == qfalse && Q_stricmp(zyk_screen_message.string, "") != 0)
 			{
-				if (ent->client->sess.amrpgmode == 0 || !(ent->client->pers.player_settings & (1 << SETTINGS_SCREEN_MESSAGE)))
+				if (ent->client->sess.account_mode == ACC_MODE_LOGGED_OUT || !(ent->client->pers.player_settings & (1 << SETTINGS_SCREEN_MESSAGE)))
 				{ // zyk: logged players can disable the screen message if they want to
 					level.read_screen_message[ent->s.number] = qtrue;
 					level.screen_message_timer[ent->s.number] = level.time + zyk_screen_message_timer.integer;
@@ -4237,7 +4237,7 @@ void ClientDisconnect( int clientNum ) {
 	zyk_stop_all_magic_powers(ent);
 
 	// zyk: logout player from account
-	ent->client->sess.amrpgmode = 0;
+	ent->client->sess.account_mode = ACC_MODE_LOGGED_OUT;
 
 	trap->UnlinkEntity ((sharedEntity_t *)ent);
 	ent->s.modelindex = 0;

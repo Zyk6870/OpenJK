@@ -203,7 +203,7 @@ void P_WorldEffects( gentity_t *ent ) {
 		ent->damage = 2;
 
 		// zyk: Underwater skill
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_UNDERWATER] > 0)
+		if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.skill_levels[SKILL_UNDERWATER] > 0)
 		{
 			ent->client->airOutTime = level.time + (12000 * (ent->client->pers.skill_levels[SKILL_UNDERWATER] * 10));
 		}
@@ -1503,7 +1503,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 	}
 
 	// zyk: Stamina
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.stamina_timer < level.time && ent->health > 0)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.stamina_timer < level.time && ent->health > 0)
 	{
 		if (ent->client->pers.stamina_out_timer > level.time)
 		{ // zyk: passed out, recover some stamina
@@ -2615,7 +2615,7 @@ void ClientThink_real( gentity_t *ent ) {
 			zyk_player_speed *= bgSiegeClasses[client->siegeClass].speed;
 		}
 
-		if (client->sess.amrpgmode == 2)
+		if (client->sess.account_mode == ACC_MODE_RPG)
 		{ // zyk: Run Speed
 			if (client->pers.skill_levels[SKILL_RUN_SPEED] > 0)
 			{
@@ -2651,7 +2651,7 @@ void ClientThink_real( gentity_t *ent ) {
 			zyk_player_speed *= 0.75;
 		}
 
-		if (client->sess.amrpgmode == 2 && client->pers.current_weight > client->pers.max_weight)
+		if (client->sess.account_mode == ACC_MODE_RPG && client->pers.current_weight > client->pers.max_weight)
 		{ // zyk: too much weight decreases player speed
 			zyk_player_speed -= (client->pers.current_weight - client->pers.max_weight);
 
@@ -2661,7 +2661,7 @@ void ClientThink_real( gentity_t *ent ) {
 			}
 		}
 
-		if (client->sess.amrpgmode == 2 && client->pers.current_stamina > 0 && client->pers.current_stamina < RPG_MIN_STAMINA)
+		if (client->sess.account_mode == ACC_MODE_RPG && client->pers.current_stamina > 0 && client->pers.current_stamina < RPG_MIN_STAMINA)
 		{ // zyk: low Stamina decreases player speed
 			zyk_player_speed = zyk_player_speed * (client->pers.current_stamina / RPG_MIN_STAMINA);
 
@@ -3457,7 +3457,7 @@ void ClientThink_real( gentity_t *ent ) {
 		if (pmove.cmd.generic_cmd != GENCMD_FORCE_THROW &&
 			pmove.cmd.generic_cmd != GENCMD_FORCE_PULL)
 		{ //these are the only two where you wouldn't care about a delay between
-			if (ent->client->sess.amrpgmode == 2)
+			if (ent->client->sess.account_mode == ACC_MODE_RPG)
 			{
 				if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0 && 
 					ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_CLOAK] > 0 &&

@@ -1811,7 +1811,7 @@ void shield_power_converter_use( gentity_t *self, gentity_t *other, gentity_t *a
 		else
 		{
 			// zyk: RPG Mode max shield
-			if (activator->client->sess.amrpgmode == 2)
+			if (activator->client->sess.account_mode == ACC_MODE_RPG)
 				maxArmor = activator->client->pers.max_rpg_shield;
 			else
 				maxArmor = activator->client->ps.stats[STAT_MAX_HEALTH];
@@ -2829,7 +2829,7 @@ void fx_runner_think( gentity_t *ent )
 		{
 			gentity_t* player_ent = &g_entities[i];
 
-			if (player_ent && player_ent->client && player_ent->health > 0 && player_ent->client->sess.amrpgmode == 2)
+			if (player_ent && player_ent->client && player_ent->health > 0 && player_ent->client->sess.account_mode == ACC_MODE_RPG)
 			{ // zyk: a logged RPG player
 				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < QUEST_ITEM_DISTANCE)
 				{
@@ -2955,7 +2955,7 @@ void fx_runner_think( gentity_t *ent )
 			if (player_ent && player_ent->client &&
 				player_ent->client->pers.quest_spirit_tree_id == ent->s.number)
 			{ // zyk: the owner of this Spirit Tree
-				if (player_ent->client->sess.amrpgmode < 2 || 
+				if (player_ent->client->sess.account_mode < ACC_MODE_RPG ||
 					player_ent->client->sess.sessionTeam == TEAM_SPECTATOR || 
 					zyk_is_main_quest_complete(player_ent) == qtrue)
 				{ // zyk: in these cases, clear the Spirit Tree
@@ -3457,7 +3457,7 @@ void zyk_regen_unit_think(gentity_t *ent)
 			if (ent->spawnflags & 2)
 			{
 				int max_shield = this_ent->client->ps.stats[STAT_MAX_HEALTH];
-				if (this_ent->client->sess.amrpgmode == 2)
+				if (this_ent->client->sess.account_mode == ACC_MODE_RPG)
 					max_shield = this_ent->client->pers.max_rpg_shield;
 
 				if ((this_ent->client->ps.stats[STAT_ARMOR] + ent->count) < max_shield)
@@ -3474,7 +3474,7 @@ void zyk_regen_unit_think(gentity_t *ent)
 					this_ent->client->ps.fd.forcePower = this_ent->client->ps.fd.forcePowerMax;
 			}
 
-			if (ent->spawnflags & 8 && this_ent->client->sess.amrpgmode == 2)
+			if (ent->spawnflags & 8 && this_ent->client->sess.account_mode == ACC_MODE_RPG)
 			{
 				int max_magic_power = zyk_max_magic_power(this_ent);
 
@@ -3488,7 +3488,7 @@ void zyk_regen_unit_think(gentity_t *ent)
 				}
 			}
 
-			if (ent->spawnflags & 16 && this_ent->client->sess.amrpgmode == 2)
+			if (ent->spawnflags & 16 && this_ent->client->sess.account_mode == ACC_MODE_RPG)
 			{
 				if ((this_ent->client->pers.current_stamina + ent->count) < this_ent->client->pers.max_stamina)
 				{

@@ -545,7 +545,7 @@ void TossClientWeapon(gentity_t *self, vec3_t direction, float speed)
 		self->client->ps.ammo[weaponData[weapon].ammoIndex] = 0;
 	}
 
-	if (self->client->sess.amrpgmode == 2)
+	if (self->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		zyk_change_weapon_in_inventory(self, weapon, qfalse);
 		zyk_remove_ammo_from_inventory(self, weaponData[weapon].ammoIndex, launched->count);
@@ -559,7 +559,7 @@ void TossClientWeapon(gentity_t *self, vec3_t direction, float speed)
 
 		self->client->ps.stats[STAT_WEAPONS] &= ~(1 << weapon);
 
-		if (self->client->sess.amrpgmode < 2)
+		if (self->client->sess.account_mode < ACC_MODE_RPG)
 		{
 			while (i < WP_NUM_WEAPONS)
 			{
@@ -666,7 +666,7 @@ void TossClientItems( gentity_t *self ) {
 			else
 				launched->count = -1; // zyk: in this case, player has no ammo, so weapon should add no ammo to the player who picks up this weapon
 
-			if (self->client->sess.amrpgmode == 2)
+			if (self->client->sess.account_mode == ACC_MODE_RPG)
 			{
 				zyk_change_weapon_in_inventory(self, weapon, qfalse);
 				zyk_remove_ammo_from_inventory(self, weaponData[weapon].ammoIndex, current_ammo);
@@ -680,7 +680,7 @@ void TossClientItems( gentity_t *self ) {
 			else
 				launched->count = -1; // zyk: in this case, player has no ammo, so weapon should add no ammo to the player who picks up this weapon
 
-			if (self->client->sess.amrpgmode == 2)
+			if (self->client->sess.account_mode == ACC_MODE_RPG)
 			{
 				zyk_change_weapon_in_inventory(self, weapon, qfalse);
 				zyk_remove_ammo_from_inventory(self, weaponData[weapon].ammoIndex, ammo_count);
@@ -692,7 +692,7 @@ void TossClientItems( gentity_t *self ) {
 		{
 			self->client->ps.stats[STAT_WEAPONS] &= ~(1 << weapon);
 
-			if (self->client->sess.amrpgmode < 2)
+			if (self->client->sess.account_mode < ACC_MODE_RPG)
 			{
 				self->s.weapon = WP_MELEE;
 				self->client->ps.weapon = WP_MELEE;
@@ -714,7 +714,7 @@ void TossClientItems( gentity_t *self ) {
 				// zyk: RPG players cannot drop force enlightments
 				if (item->giType == IT_POWERUP && 
 					(item->giTag == PW_FORCE_ENLIGHTENED_LIGHT || item->giTag == PW_FORCE_ENLIGHTENED_DARK) && 
-					self->client->sess.amrpgmode == 2)
+					self->client->sess.account_mode == ACC_MODE_RPG)
 				{
 					continue;
 				}
@@ -2250,7 +2250,7 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	// zyk: stop all magic powers
 	zyk_stop_all_magic_powers(self);
 
-	if (self->client->sess.amrpgmode == 2 && self->client->pers.energy_modulator_mode > 0)
+	if (self->client->sess.account_mode == ACC_MODE_RPG && self->client->pers.energy_modulator_mode > 0)
 	{ // zyk: if player dies, deactivate Energy Modulator
 		self->client->pers.energy_modulator_mode = 0;
 	}
@@ -2698,7 +2698,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		}
 
 		if (attacker && attacker->client &&
-			(attacker->client->sess.amrpgmode == 2 || zyk_is_quest_ally(attacker) == qtrue))
+			(attacker->client->sess.account_mode == ACC_MODE_RPG || zyk_is_quest_ally(attacker) == qtrue))
 		{
 			gentity_t* quest_player = attacker;
 
@@ -2707,7 +2707,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 				quest_player = &g_entities[attacker->client->pers.quest_npc_caller_player_id];
 			}
 
-			if (quest_player && quest_player->client && quest_player->client->sess.amrpgmode == 2 &&
+			if (quest_player && quest_player->client && quest_player->client->sess.account_mode == ACC_MODE_RPG &&
 				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
 				self->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && self->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
 			{
@@ -2717,7 +2717,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	}
 
 	if (zyk_allow_quests.integer > 0 &&
-		self->client->sess.amrpgmode == 2 &&
+		self->client->sess.account_mode == ACC_MODE_RPG &&
 		!(self->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
 		zyk_is_main_quest_complete(self) == qfalse &&
 		!(attacker && attacker->client && attacker != self && attacker->s.number < MAX_CLIENTS) && // zyk: dying to players will not reset quest tries
@@ -2727,7 +2727,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		zyk_decrease_quest_progress(self);
 	}
 
-	if (self->client->sess.amrpgmode == 2 && 
+	if (self->client->sess.account_mode == ACC_MODE_RPG &&
 		!(self->client->pers.player_statuses & (1 << PLAYER_STATUS_KEEP_QUEST_TRIES)) // zyk: dont lose crystals in this case, for example, when player logs into his account
 		)
 	{
@@ -2746,11 +2746,10 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		zyk_stop_all_magic_powers(attacker);
 	}
 
-	// zyk: setting the credits_modifier and the bonus score for the RPG player
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
+	if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		// zyk: Bounty Quest manager
-		if (level.bounty_quest_choose_target == qfalse && attacker != self && self->client->sess.amrpgmode == 2)
+		if (level.bounty_quest_choose_target == qfalse && attacker != self && self->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			if (level.bounty_quest_target_id == (attacker - g_entities))
 			{ // zyk: attacker was the target, so the attacker receives bonus credits
@@ -3095,7 +3094,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	// remove powerups
 	memset(self->client->ps.powerups, 0, sizeof(self->client->ps.powerups));
 
-	if (self->client->sess.amrpgmode < 2)
+	if (self->client->sess.account_mode < ACC_MODE_RPG)
 	{ // zyk: RPG players must keep their inventory at respawn
 		self->client->ps.stats[STAT_HOLDABLE_ITEMS] = 0;
 		self->client->ps.stats[STAT_HOLDABLE_ITEM] = 0;
@@ -4753,7 +4752,7 @@ void G_Knockdown( gentity_t *victim )
 extern int zyk_max_skill_level(int skill_index);
 qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *inflictor, int mod)
 {
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
+	if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		if ((mod == MOD_ROCKET || mod == MOD_ROCKET_HOMING || mod == MOD_ROCKET_SPLASH || mod == MOD_ROCKET_HOMING_SPLASH) && 
 			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0 && 
@@ -4958,7 +4957,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2 &&
+	if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG &&
 		targ && targ->client && targ->NPC &&
 		targ->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && 
 		targ->client->pers.quest_npc <= QUEST_NPC_TRAVELING_MAGE && 
@@ -5009,7 +5008,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
+	if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG)
 	{ // zyk: bonus damage for RPG players
 		if (mod == MOD_SABER)
 		{ 
@@ -5057,7 +5056,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			damage = (int)ceil(damage * 1.09);
 	}
 
-	if (attacker && attacker->client && (attacker->client->sess.amrpgmode == 2 || (attacker->NPC && attacker->client->pers.quest_npc > QUEST_NPC_NONE)))
+	if (attacker && attacker->client && (attacker->client->sess.account_mode == ACC_MODE_RPG || (attacker->NPC && attacker->client->pers.quest_npc > QUEST_NPC_NONE)))
 	{ // zyk: bonus damage
 		// zyk: Magic bolts can damage heavy things
 		if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2)
@@ -5258,7 +5257,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	// zyk: lowered knockback. Default: knockback = damage
 	knockback = damage/2;
 	// zyk: Lightning level 4 in RPG Mode causes knockback
-	if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2 && attacker->client->pers.skill_levels[SKILL_LIGHTNING] > 3 &&
+	if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG &&
+		attacker->client->pers.skill_levels[SKILL_LIGHTNING] > 3 &&
 		attacker->client->ps.fd.forcePowersActive & (1 << FP_LIGHTNING) && mod == MOD_FORCE_DARK)
 	{
 		knockback *= 6;
@@ -5275,7 +5275,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	}
 
 	// zyk: if player is in RPG Mode, reduce knockback based on the Impact Reducer Armor of the player
-	if (targ && targ->client && targ->client->sess.amrpgmode == 2)
+	if (targ && targ->client && targ->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		int new_knockback = knockback;
 
@@ -5501,7 +5501,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				targ->client->ps.eFlags &= ~EF_INVULNERABLE;
 			}
-			else if (!((targ->client->sess.amrpgmode == 2 || targ->NPC) && targ->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD)))
+			else if (!((targ->client->sess.account_mode == ACC_MODE_RPG || targ->NPC) && targ->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD)))
 			{ // zyk: Magic Shield does not apply god mode
 				return;
 			}
@@ -5596,7 +5596,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		int scaled_damage = take;
 		float bonus_resistance = 0.00;
 
-		if (targ->client->sess.amrpgmode == 2)
+		if (targ->client->sess.account_mode == ACC_MODE_RPG)
 		{ // zyk: RPG resistance bonuses
 			if (targ->client->pers.energy_modulator_mode == 2)
 			{ // zyk: Energy Modulator mode 2
@@ -5980,7 +5980,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				float force_decrease_change = 1.0; // zyk: Protect 4/4 will make player lose less force
 
-				if (targ->client->sess.amrpgmode == 2 && targ->client->pers.skill_levels[SKILL_PROTECT] == 4)
+				if (targ->client->sess.account_mode == ACC_MODE_RPG && targ->client->pers.skill_levels[SKILL_PROTECT] == 4)
 					force_decrease_change = 0.5;
 
 				if (targ->client->forcePowerSoundDebounce < level.time)
@@ -6039,7 +6039,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				take = (int)ceil(take*0.55);
 		}
 
-		if (targ->client && (targ->client->sess.amrpgmode == 2 || targ->NPC))
+		if (targ->client && (targ->client->sess.account_mode == ACC_MODE_RPG || targ->NPC))
 		{ // zyk: bonus resistance
 			float bonus_health_resistance = 0.00;
 			int stamina_loss = 0;
@@ -6135,7 +6135,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			// zyk: damage to health also makes RPG player lose Stamina
 			stamina_loss = take;
 
-			if (targ->client->sess.amrpgmode == 2)
+			if (targ->client->sess.account_mode == ACC_MODE_RPG)
 			{
 				if (targ->client->pers.skill_levels[SKILL_MAX_STAMINA] > 0)
 				{
@@ -6176,7 +6176,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 		}
 
-		if (attacker && attacker->client && attacker->client->sess.amrpgmode == 2)
+		if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			if (mod == MOD_STUN_BATON && attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 && 
 				attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON1) && targ && targ->health > 0 && targ->client)

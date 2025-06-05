@@ -1613,7 +1613,7 @@ extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk
 extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 void zyk_use_rpg_stuff(gentity_t* ent)
 {
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_COMPLETED)) && ent->client->pers.quest_spirit_tree_id > -1 &&
 			ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
@@ -1741,7 +1741,7 @@ void TryUse( gentity_t *ent )
 
 	VectorMA( src, USE_DISTANCE, vf, dest );
 
-	if (ent->client->sess.amrpgmode == 2 && 
+	if (ent->client->sess.account_mode == ACC_MODE_RPG &&
 		ent->client->pers.player_statuses & (1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL) &&
 		ent->client->pers.cmd.buttons & BUTTON_USE &&
 		level.legendary_artifact_step == QUEST_SECRET_TOUCHED_PUZZLE_ITEM)
@@ -1818,7 +1818,8 @@ void TryUse( gentity_t *ent )
 		}
 	}
 
-	if (level.duel_tournament_mode == 1 && ent->client->sess.amrpgmode < 2 && target && target->client && target->client->sess.amrpgmode < 2 && target->s.number < MAX_CLIENTS && 
+	if (level.duel_tournament_mode == 1 && ent->client->sess.account_mode < ACC_MODE_RPG && 
+		target && target->client && target->client->sess.account_mode < ACC_MODE_RPG && target->s.number < MAX_CLIENTS &&
 		level.duel_players[ent->s.number] != -1 && level.duel_players[target->s.number] != -1 && zyk_duel_tournament_allow_teams.integer > 0)
 	{ // zyk: adding this plater as ally in Duel Tournament
 		if (level.duel_allies[ent->s.number] != target->s.number)
@@ -1856,7 +1857,7 @@ void TryUse( gentity_t *ent )
 		}
 	}
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0 &&
+	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0 &&
 		target && Q_stricmp(target->classname, "sentryGun") == 0 && target->parent && target->parent == ent && 
 		ent->client->ps.ammo[AMMO_POWERCELL] >= 2)
 	{ // zyk: Sentry Gun Upgrade allows recovering sentry guns. Uses some power cell ammo
@@ -1875,7 +1876,7 @@ void TryUse( gentity_t *ent )
 
 		return;
 	}
-	else if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0 &&
+	else if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0 &&
 			target && target->s.eType == ET_SPECIAL && target->s.modelindex == HI_SHIELD && target->parent && target->parent == ent &&
 			ent->client->ps.ammo[AMMO_POWERCELL] >= 4)
 	{ // zyk: Force Field Upgrade allows recovering force fields. Uses some power cell ammo
@@ -1892,7 +1893,7 @@ void TryUse( gentity_t *ent )
 
 		return;
 	}
-	else if (ent->client->sess.amrpgmode == 2 &&
+	else if (ent->client->sess.account_mode == ACC_MODE_RPG &&
 			level.legendary_artifact_step >= QUEST_SECRET_CHOSEN_CRYSTALS_STEP && 
 			level.legendary_artifact_step < QUEST_SECRET_CORRECT_CRYSTALS_STEP && 
 			target && target->count > 0 && 
@@ -1925,7 +1926,7 @@ void TryUse( gentity_t *ent )
 
 		return;
 	}
-	else if (ent->client->sess.amrpgmode == 2 &&
+	else if (ent->client->sess.account_mode == ACC_MODE_RPG &&
 			level.legendary_artifact_step == QUEST_SECRET_SECRET_ITEM_SPAWNED_STEP &&
 			target && target->count == 7 && 
 			Q_stricmp(target->targetname, "zyk_magic_armor_model") == 0
@@ -1956,7 +1957,7 @@ void TryUse( gentity_t *ent )
 	if (target->NPC && target->client && target->health > 0 && target->s.NPC_class != CLASS_VEHICLE && OnSameTeam(ent, target))
 	{
 		if (target->client->pers.quest_npc == QUEST_NPC_TRAVELING_MAGE &&
-			ent->client->sess.amrpgmode == 2 && 
+			ent->client->sess.account_mode == ACC_MODE_RPG &&
 			(ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE || ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_ANSWER) &&
 			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < SPIRIT_CRYSTAL_PARTS &&
 			ent->client->pers.quest_seller_event_timer < level.time)
@@ -2131,7 +2132,7 @@ tryJetPack:
 	}
 
 	// zyk: Magic Flight
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] > 0 && 
+	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] > 0 &&
 		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)) && ent->client->jetPackToggleTime < level.time)
 	{
 		if (ent->client->pers.in_magic_flight == qtrue)

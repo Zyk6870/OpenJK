@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.4.2"
+#define	GAMEVERSION	"New Zyk Mod v1.4.3"
 
 #define SECURITY_LOG "security.log"
 
@@ -451,6 +451,13 @@ typedef struct playerTeamState_s {
 #define	FOLLOW_ACTIVE1	-1
 #define	FOLLOW_ACTIVE2	-2
 
+typedef enum {
+	ACC_MODE_LOGGED_OUT,
+	ACC_MODE_ADMIN,
+	ACC_MODE_RPG,
+	NUM_ACC_MODES
+} zyk_account_mode_t;
+
 // client data that stays across multiple levels or tournament restarts
 // this is achieved by writing all the data to cvar strings at game shutdown
 // time and reading them back at connection time.  Anything added here
@@ -476,7 +483,7 @@ typedef struct clientSession_s {
 	// 0 - Player is not logged in: in this mode, player didnt login his account yet
 	// 1 - Admin-Only mode: in this mode, player can use admin commands if he has them
 	// 2 - RPG mode: in this mode, player can use admin commands and play the level system
-	int	amrpgmode; // zyk: saved in session so the player account can be loaded again in map changes
+	zyk_account_mode_t	account_mode; // zyk: player account mode
 	char filename[32]; // zyk: player account filename
 
 	char rpgchar[32]; // zyk: file name of the RPG char

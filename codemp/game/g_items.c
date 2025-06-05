@@ -359,7 +359,8 @@ void CreateShield(gentity_t *ent)
 	if ( level.gametype == GT_SIEGE || level.gametype == GT_CTF)
 	{ // zyk: added CTF condition
 		// zyk: Force Field gets double health
-		if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
+		if (ent->parent && ent->parent->client && ent->parent->client->sess.account_mode == ACC_MODE_RPG && 
+			ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
 		{
 			ent->health = SHIELD_SIEGE_HEALTH * 2;
 		}
@@ -370,7 +371,8 @@ void CreateShield(gentity_t *ent)
 	}
 	else
 	{ // zyk: Force Field gets double health
-		if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
+		if (ent->parent && ent->parent->client && ent->parent->client->sess.account_mode == ACC_MODE_RPG && 
+			ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
 		{
 			ent->health = SHIELD_HEALTH * 2;
 		}
@@ -478,7 +480,7 @@ qboolean PlaceShield(gentity_t *playerent)
 			// Set team number.
 			shield->s.otherEntityNum2 = playerent->client->sess.sessionTeam;
 
-			if (level.gametype < GT_TEAM && playerent->client && playerent->client->sess.amrpgmode == 2 && 
+			if (level.gametype < GT_TEAM && playerent->client && playerent->client->sess.account_mode == ACC_MODE_RPG &&
 				playerent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FORCE_FIELD] > 0)
 			{
 				// zyk: setting shield red color if it has the upgrade
@@ -548,7 +550,7 @@ void ItemUse_Binoculars(gentity_t *ent)
 	*/
 
 	// zyk: with Thermal Vision, sets the cooldown between activating and deactivating Binoculars to avoid problem in which it gets instantly on and off
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0 &&
+	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0 &&
 		ent->client->pers.thermal_vision_cooldown_time > level.time)
 	{
 		return;
@@ -569,7 +571,7 @@ void ItemUse_Binoculars(gentity_t *ent)
 
 void ItemUse_Shield(gentity_t *ent)
 {
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_FORCE_FIELD, 1);
 	}
@@ -615,7 +617,7 @@ void pas_fire( gentity_t *ent )
 
 	// zyk: changed sentry gun shotspeed from 2300 to 2800
 	// zyk: Sentry Gun Upgrade makes sentry gun have more damage
-	if (ent->parent && ent->parent->client && ent->parent->client->sess.amrpgmode == 2 && 
+	if (ent->parent && ent->parent->client && ent->parent->client->sess.account_mode == ACC_MODE_RPG &&
 		ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
 		WP_FireTurretMissile(&g_entities[ent->genericValue3], myOrg, fwd, qfalse, 12, 2800, MOD_SENTRY, ent );
 	else
@@ -653,7 +655,7 @@ static qboolean pas_find_enemies( gentity_t *self )
 	VectorCopy(self->s.pos.trBase, org2);
 
 	// zyk: Sentry Gun Upgrade allows it to find enemies in a greater distance
-	if (self->parent && self->parent->client && self->parent->client->sess.amrpgmode == 2 && 
+	if (self->parent && self->parent->client && self->parent->client->sess.account_mode == ACC_MODE_RPG &&
 		self->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SENTRY_GUN] > 0)
 	{
 		distance_to_find_enemies *= 2;
@@ -1234,7 +1236,7 @@ void ItemUse_Sentry( gentity_t *ent )
 	SP_PAS( sentry );
 
 	// zyk: sentry gun has more HP and with the Sentry Gun upgrade, player can place more sentry guns
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		sentry->health = 150;
 
@@ -1275,13 +1277,13 @@ void ItemUse_Seeker(gentity_t *ent)
 	{
 		ent->client->ps.eFlags |= EF_SEEKERDRONE;
 		// zyk: Gunner Items Upgrade increases seeker drone lifetime
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
+		if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
 			ent->client->ps.droneExistTime = level.time + 80000;
 		else
 			ent->client->ps.droneExistTime = level.time + 60000; // zyk: the seeker drone lifetime, changed from 30000 to 60000
 		ent->client->ps.droneFireTime = level.time + 500;   // zyk: fire time of seeker drone changed from 1500 to 500
 
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+		if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_SEEKER_DRONE, 1);
 		}
@@ -1320,7 +1322,7 @@ extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
 void ItemUse_MedPack_Big(gentity_t *ent)
 {
 	// zyk: RPG Mode Big Bacta. Recover 150 HP
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 		{
@@ -1352,7 +1354,7 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 void ItemUse_MedPack(gentity_t *ent)
 {
 	// zyk: RPG Mode Bacta Canister. Recovers some mp
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 		{
@@ -1463,7 +1465,7 @@ void ItemUse_Jetpack( gentity_t *ent )
 	rpg_skill_counter(ent, 10);
 
 	// zyk: Jetpack Upgrade decreases jetpack toggle time
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 		ent->client->jetPackToggleTime = level.time + (JETPACK_TOGGLE_TIME/2);
 	else
 		ent->client->jetPackToggleTime = level.time + JETPACK_TOGGLE_TIME;
@@ -1706,7 +1708,7 @@ void EWebDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int dam
 			owner->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1<<HI_EWEB);
 
 			// zyk: updating the RPG inventory
-			if (owner->client->sess.amrpgmode == 2)
+			if (owner->client->sess.account_mode == ACC_MODE_RPG)
 			{
 				zyk_change_item_in_inventory(owner, HI_EWEB, qfalse);
 			}
@@ -1885,7 +1887,7 @@ void EWebFire(gentity_t *owner, gentity_t *eweb)
 	missile->s.weapon = WP_TURRET;
 
 	// zyk: E-Web Upgrade makes E-Web have more damage
-	if (owner && owner->client && owner->client->sess.amrpgmode == 2 && owner->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
+	if (owner && owner->client && owner->client->sess.account_mode == ACC_MODE_RPG && owner->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
 		missile->damage = EWEB_MISSILE_DAMAGE + 5;
 	else
 		missile->damage = EWEB_MISSILE_DAMAGE;
@@ -2165,7 +2167,7 @@ gentity_t *EWeb_Create(gentity_t *spawner)
 	ent->takedamage = qtrue;
 
 	// zyk: E-Web Upgrade gives E-Web more health
-	if (spawner->client->sess.amrpgmode == 2 && spawner->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
+	if (spawner->client->sess.account_mode == ACC_MODE_RPG && spawner->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EWEB] > 0)
 	{
 		eweb_health = eweb_health * 2;
 	}
@@ -2360,7 +2362,7 @@ int Pickup_Holdable( gentity_t *ent, gentity_t *other ) {
 	other->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << ent->item->giTag);
 
 	// zyk: updating the RPG inventory
-	if (other->client->sess.amrpgmode == 2)
+	if (other->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		zyk_change_item_in_inventory(other, ent->item->giTag, qtrue);
 	}
@@ -2383,7 +2385,7 @@ void Add_Ammo (gentity_t *ent, int weapon, int count)
 	int max_tripmine_ammo = zyk_max_tripmine_ammo.integer;
 	int max_detpack_ammo = zyk_max_detpack_ammo.integer;
 
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{ // zyk: players in RPG Mode have no max ammo
 		max_blasterpack_ammo = 200000000;
 		max_powercell_ammo = 200000000;
@@ -2543,7 +2545,7 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 	other->client->ps.stats[STAT_WEAPONS] |= ( 1 << ent->item->giTag );
 
 	// zyk: updating the RPG inventory
-	if (other->client->sess.amrpgmode == 2)
+	if (other->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		zyk_change_weapon_in_inventory(other, ent->item->giTag, qtrue);
 	}
@@ -2610,7 +2612,7 @@ int Pickup_Armor( gentity_t *ent, gentity_t *other )
 	return adjustRespawnTime(RESPAWN_ARMOR, ent->item->giType, ent->item->giTag);
 	*/
 
-	if (other->client->sess.amrpgmode == 2 && other->client->ps.stats[STAT_ARMOR] < other->client->pers.max_rpg_shield)
+	if (other->client->sess.account_mode == ACC_MODE_RPG && other->client->ps.stats[STAT_ARMOR] < other->client->pers.max_rpg_shield)
 	{ // zyk: RPG Mode has the Max Shield skill that doesnt allow someone to heal shields above this value
 		other->client->ps.stats[STAT_ARMOR] += ent->item->quantity;
 
@@ -2621,7 +2623,7 @@ int Pickup_Armor( gentity_t *ent, gentity_t *other )
 
 		return adjustRespawnTime(zyk_shield_respawn_time.integer, ent->item->giType, ent->item->giTag);
 	}
-	else if (other->client->sess.amrpgmode < 2 && other->client->ps.stats[STAT_ARMOR] < (other->client->ps.stats[STAT_MAX_HEALTH] * ent->item->giTag))
+	else if (other->client->sess.account_mode < ACC_MODE_RPG && other->client->ps.stats[STAT_ARMOR] < (other->client->ps.stats[STAT_MAX_HEALTH] * ent->item->giTag))
 	{ // zyk: player who is not in RPG Mode
 		other->client->ps.stats[STAT_ARMOR] += ent->item->quantity;
 		if ( other->client->ps.stats[STAT_ARMOR] > other->client->ps.stats[STAT_MAX_HEALTH] * ent->item->giTag ) 
@@ -2760,10 +2762,10 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	if (other->health < 1)
 		return;		// dead people can't pickup
 
-	if (other->client->sess.amrpgmode == 2)
+	if (other->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		if (ent->item->giType == IT_WEAPON || ent->item->giType == IT_AMMO || ent->item->giType == IT_HOLDABLE)
-		{ // zyk: RPG players always can pickup weapons, ammo and holdable items
+		{
 			validate_pickup_item = qfalse;
 
 			if ((ent->item->giType == IT_WEAPON && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_WEAPONS)) ||

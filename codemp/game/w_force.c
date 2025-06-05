@@ -448,7 +448,7 @@ void WP_SpawnInitForcePowers( gentity_t *ent )
 	ent->client->ps.fd.forceDeactivateAll = 0;
 
 	// zyk: set max force power for non-rpg mode users
-	if (ent->client->sess.amrpgmode < 2)
+	if (ent->client->sess.account_mode < ACC_MODE_RPG)
 		ent->client->ps.fd.forcePower = ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
 
 	ent->client->ps.fd.forcePowerRegenDebounceTime = level.time;
@@ -566,7 +566,8 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 	}
 
 	if (forcePower != FP_TEAM_HEAL && forcePower != FP_TEAM_FORCE && attacker && attacker->client && other && other->client && 
-		attacker->client->sess.amrpgmode > 0 && other->client->sess.amrpgmode > 0 && other->client->pers.player_settings & (1 << SETTINGS_FORCE_FROM_ALLIES) &&
+		attacker->client->sess.account_mode > ACC_MODE_LOGGED_OUT && other->client->sess.account_mode > ACC_MODE_LOGGED_OUT && 
+		other->client->pers.player_settings & (1 << SETTINGS_FORCE_FROM_ALLIES) &&
 		zyk_is_ally(attacker,other) == qtrue)
 	{ // zyk: allies wont be affected by force powers if they do not allow it
 		return 0;
@@ -878,16 +879,16 @@ int WP_AbsorbConversion(gentity_t *attacked, int atdAbsLevel, gentity_t *attacke
 		addTot = 1;
 	}
 
-	if (attacked->client->sess.amrpgmode == 2 && attacked->client->pers.skill_levels[SKILL_ABSORB] == 4)
+	if (attacked->client->sess.account_mode == ACC_MODE_RPG && attacked->client->pers.skill_levels[SKILL_ABSORB] == 4)
 	{ // zyk: Absorb 4/4 in RPG Mode absorbs more force
 		addTot = addTot + (zyk_max_force_power.integer/10);
 	}
 
 	attacked->client->ps.fd.forcePower += addTot;
 
-	if (attacked->client->sess.amrpgmode == 2 && attacked->client->ps.fd.forcePower > attacked->client->pers.max_force_power)
+	if (attacked->client->sess.account_mode == ACC_MODE_RPG && attacked->client->ps.fd.forcePower > attacked->client->pers.max_force_power)
 		attacked->client->ps.fd.forcePower = attacked->client->pers.max_force_power;
-	else if (attacked->client->sess.amrpgmode < 2 && attacked->client->ps.fd.forcePower > zyk_max_force_power.integer)
+	else if (attacked->client->sess.account_mode < ACC_MODE_RPG && attacked->client->ps.fd.forcePower > zyk_max_force_power.integer)
 		attacked->client->ps.fd.forcePower = zyk_max_force_power.integer;
 
 	//play sound indicating that attack was absorbed
@@ -1171,7 +1172,9 @@ void ForceHeal( gentity_t *self )
 	if ( self->health >= zyk_get_max_health(self))
 	{
 		// zyk: Heal at a level > 3. When player has full health, restore some shield
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_HEAL] > 3 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
+		if (self->client->sess.account_mode == ACC_MODE_RPG && 
+			self->client->pers.skill_levels[SKILL_HEAL] > 3 && 
+			self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
 		{
 			int shield_heal_amount = 5 * (self->client->pers.skill_levels[SKILL_HEAL] - 3);
 
@@ -1296,19 +1299,19 @@ void ForceTeamHeal( gentity_t *self )
 		if (ent && ent->client)
 			max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
 
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+		if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 			max_shield = ent->client->pers.max_rpg_shield;
 
 		if (ent && ent->client && self != ent && 
 			((!ent->NPC && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR) || 
 			 (ent->client->playerTeam != NPCTEAM_ENEMY && ent->s.NPC_class != CLASS_VEHICLE)) && 
 			 (ent->client->ps.stats[STAT_HEALTH] < zyk_get_max_health(ent) ||
-			 (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_TEAM_HEAL] > 3 && // Team Heal level > 3 in RPG Mode
+			 (self->client->sess.account_mode == ACC_MODE_RPG && self->client->pers.skill_levels[SKILL_TEAM_HEAL] > 3 && // Team Heal level > 3 in RPG Mode
 			 !ent->NPC && ent->client->ps.stats[STAT_HEALTH] >= zyk_get_max_health(ent) &&
-			 ((ent->client->sess.amrpgmode < 2 && ent->client->ps.stats[STAT_ARMOR] < 100) || (ent->client->sess.amrpgmode == 2 && 
+			 ((ent->client->sess.account_mode < ACC_MODE_RPG && ent->client->ps.stats[STAT_ARMOR] < 100) || (ent->client->sess.account_mode == ACC_MODE_RPG &&
 			 ent->client->ps.stats[STAT_ARMOR] < max_shield)))) && ent->client->ps.stats[STAT_HEALTH] > 0 && ForcePowerUsableOn(self, ent, FP_TEAM_HEAL) &&
 		 	trap->InPVS(self->client->ps.origin, ent->client->ps.origin) && 
-			(((self->client->sess.amrpgmode == 0 || self->client->pers.player_settings & (1 << SETTINGS_HEAL_ALLY) || zyk_is_ally(self, ent) == qtrue) &&
+			(((self->client->sess.account_mode == ACC_MODE_LOGGED_OUT || self->client->pers.player_settings & (1 << SETTINGS_HEAL_ALLY) || zyk_is_ally(self, ent) == qtrue) &&
 			 g_gametype.integer == GT_FFA) || OnSameTeam(self, ent)))
 		{ // zyk: Team Heal now can be used in FFA and in npcs. It will not heal enemy npcs
 			VectorSubtract(self->client->ps.origin, ent->client->ps.origin, a);
@@ -1351,11 +1354,12 @@ void ForceTeamHeal( gentity_t *self )
 			g_entities[pl[i]].health > 0)
 		{
 			int max_shield = g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH];
-			if (g_entities[pl[i]].client->sess.amrpgmode == 2)
+			if (g_entities[pl[i]].client->sess.account_mode == ACC_MODE_RPG)
 				max_shield = g_entities[pl[i]].client->pers.max_rpg_shield;
 
 			// zyk: Team Shield Heal skill of RPG Mode
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_TEAM_HEAL] > 3 &&
+			if (self->client->sess.account_mode == ACC_MODE_RPG && 
+				self->client->pers.skill_levels[SKILL_TEAM_HEAL] > 3 &&
 				!g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.stats[STAT_HEALTH] >= zyk_get_max_health(&g_entities[pl[i]]) &&
 				g_entities[pl[i]].client->ps.stats[STAT_ARMOR] < max_shield)
 			{ // zyk: can only be used on players with full health already
@@ -1443,14 +1447,14 @@ void ForceTeamForceReplenish( gentity_t *self )
 		// zyk: created new condition so we can use Team Energize in FFA. Also restore ammo of the target player
 		if (ent && ent->client && self != ent && 
 			(ent->client->ps.fd.forcePower < ent->client->ps.fd.forcePowerMax || 
-			 (self->client->sess.amrpgmode == 2 && self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] > 3 && !ent->NPC && // zyk: at a level > 3, restores some ammo
+			 (self->client->sess.account_mode == ACC_MODE_RPG && self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] > 3 && !ent->NPC && // zyk: at a level > 3, restores some ammo
 			  ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
 			  (ent->client->pers.current_stamina < ent->client->pers.max_stamina || ent->client->ps.ammo[AMMO_POWERCELL] < max_powercell_ammo)
 			 )
 			) && 
 			ForcePowerUsableOn(self, ent, FP_TEAM_FORCE) &&
 			trap->InPVS(self->client->ps.origin, ent->client->ps.origin) && 
-			(((self->client->sess.amrpgmode == 0 || self->client->pers.player_settings & (1 << SETTINGS_HEAL_ALLY) || zyk_is_ally(self, ent) == qtrue) &&
+			(((self->client->sess.account_mode == ACC_MODE_LOGGED_OUT || self->client->pers.player_settings & (1 << SETTINGS_HEAL_ALLY) || zyk_is_ally(self, ent) == qtrue) &&
 			g_gametype.integer == GT_FFA) || OnSameTeam(self, ent)))
 		{
 			VectorSubtract(self->client->ps.origin, ent->client->ps.origin, a);
@@ -1492,7 +1496,8 @@ void ForceTeamForceReplenish( gentity_t *self )
 	while (i < numpl)
 	{
 		// zyk: Team Energize now can recover ammo and Stamina if the player has full force
-		if (self->client->sess.amrpgmode == 2 && self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] > 3 && 
+		if (self->client->sess.account_mode == ACC_MODE_RPG && 
+			self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] > 3 &&
 			!g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.fd.forcePower == g_entities[pl[i]].client->ps.fd.forcePowerMax)
 		{
 			zyk_set_stamina(&g_entities[pl[i]], poweradd, qtrue);
@@ -1503,9 +1508,9 @@ void ForceTeamForceReplenish( gentity_t *self )
 		{
 			g_entities[pl[i]].client->ps.fd.forcePower += poweradd;
 
-			if (g_entities[pl[i]].client->sess.amrpgmode == 2 && g_entities[pl[i]].client->ps.fd.forcePower > g_entities[pl[i]].client->pers.max_force_power)
+			if (g_entities[pl[i]].client->sess.account_mode == ACC_MODE_RPG && g_entities[pl[i]].client->ps.fd.forcePower > g_entities[pl[i]].client->pers.max_force_power)
 				g_entities[pl[i]].client->ps.fd.forcePower = g_entities[pl[i]].client->pers.max_force_power;
-			else if (g_entities[pl[i]].client->sess.amrpgmode < 2 && g_entities[pl[i]].client->ps.fd.forcePower > zyk_max_force_power.integer) // zyk: now it must be the cvar, because this cvar is the max force
+			else if (g_entities[pl[i]].client->sess.account_mode < ACC_MODE_RPG && g_entities[pl[i]].client->ps.fd.forcePower > zyk_max_force_power.integer) // zyk: now it must be the cvar, because this cvar is the max force
 				g_entities[pl[i]].client->ps.fd.forcePower = zyk_max_force_power.integer;
 
 			rpg_skill_counter(self, 20);
@@ -1845,9 +1850,9 @@ void ForceLightningDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec
 			{ //give them power and don't hurt them.
 				traceEnt->client->ps.fd.forcePower++;
 				// zyk: changed the code below so we can use the cvar zyk_FORCE_POWER_MAX instead of hardcoded 100 force power max
-				if (traceEnt->client->sess.amrpgmode == 2 && traceEnt->client->ps.fd.forcePower > traceEnt->client->pers.max_force_power)
+				if (traceEnt->client->sess.account_mode == ACC_MODE_RPG && traceEnt->client->ps.fd.forcePower > traceEnt->client->pers.max_force_power)
 					traceEnt->client->ps.fd.forcePower = traceEnt->client->pers.max_force_power;
-				else if (traceEnt->client->sess.amrpgmode < 2 && traceEnt->client->ps.fd.forcePower > zyk_max_force_power.integer)
+				else if (traceEnt->client->sess.account_mode < ACC_MODE_RPG && traceEnt->client->ps.fd.forcePower > zyk_max_force_power.integer)
 					traceEnt->client->ps.fd.forcePower = zyk_max_force_power.integer;
 
 				return;
@@ -1891,7 +1896,7 @@ void ForceLightningDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec
 				}
 				*/
 				// zyk: Lightning level 4 in RPG Mode causes double damage
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_LIGHTNING] > 3)
+				if (self->client->sess.account_mode == ACC_MODE_RPG && self->client->pers.skill_levels[SKILL_LIGHTNING] > 3)
 				{
 					dmg *= 2;
 				}
@@ -1957,7 +1962,7 @@ void ForceShootLightning( gentity_t *self )
 		VectorCopy( self->client->ps.origin, center );
 
 		// zyk: Lightning 4/4 has more range
-		if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_LIGHTNING] > 3)
+		if (self->client->sess.account_mode == ACC_MODE_RPG && self->client->pers.skill_levels[SKILL_LIGHTNING] > 3)
 		{
 			radius = FORCE_LIGHTNING_RADIUS * 1.8;
 		}
@@ -2157,7 +2162,7 @@ void ForceDrainDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec3_t 
 
 				if (dmg)
 				{
-					if (self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_DRAIN] > 3 && traceEnt->client->ps.fd.forcePower <= 0)
+					if (self->client->sess.account_mode == ACC_MODE_RPG && self->client->pers.skill_levels[SKILL_DRAIN] > 3 && traceEnt->client->ps.fd.forcePower <= 0)
 					{ // zyk: Drain skill at level > 3. Enemy has no force. Damages him
 						G_Damage( traceEnt, self, self, NULL, impactPoint, (dmg/2), 0, MOD_FORCE_DARK );
 
@@ -2196,7 +2201,9 @@ void ForceDrainDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec3_t 
 					}
 					self->client->ps.stats[STAT_HEALTH] = self->health;
 				}
-				else if (dmg > 0 && self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_DRAIN] > 3 && self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
+				else if (dmg > 0 && self->client->sess.account_mode == ACC_MODE_RPG && 
+						self->client->pers.skill_levels[SKILL_DRAIN] > 3 && 
+						self->client->ps.stats[STAT_ARMOR] < self->client->pers.max_rpg_shield)
 				{ // zyk: Drain skill at level > 3 and hp is full, recover shield
 					self->client->ps.stats[STAT_ARMOR] += 1;
 				}
@@ -4116,7 +4123,8 @@ void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower )
 		{
 			G_MuteSound(self->client->ps.fd.killSoundEntIndex[TRACK_CHANNEL_5-50], CHAN_VOICE);
 
-			if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0 &&
+			if (self->client->sess.account_mode == ACC_MODE_RPG && 
+				self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_THERMAL_VISION] > 0 &&
 				self->client->ps.zoomMode == 2)
 			{ // zyk: stops Thermal Vision. In this case, stop binoculars
 				self->client->ps.zoomMode = 0;
@@ -4504,7 +4512,7 @@ static void WP_UpdateMindtrickEnts(gentity_t *self)
 		{ // zyk: added the NPC condition
 			if ( !ent || !ent->client || !ent->inuse || ent->health < 1 ||
 				(ent->client->ps.fd.forcePowersActive & (1 << FP_SEE) && 
-				(ent->client->sess.amrpgmode < 2 || ent->client->pers.thermal_vision == qfalse)) )
+				(ent->client->sess.account_mode < ACC_MODE_RPG || ent->client->pers.thermal_vision == qfalse)) )
 			{ // zyk: do not cancel Mind Trick if enemy is using Thermal Vision
 				if (ent && !ent->NPC) // zyk: remove tricked entity only for players
 				{
@@ -4660,7 +4668,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 			int addTime = 400;
 
 			// zyk: added this condition because of Rage 4/4 in RPG Mode, which dont damage the player
-			if (self->client->sess.amrpgmode < 2 || self->client->pers.skill_levels[SKILL_RAGE] < 4)
+			if (self->client->sess.account_mode < ACC_MODE_RPG || self->client->pers.skill_levels[SKILL_RAGE] < 4)
 				self->health -= 2;
 
 			if (self->client->ps.fd.forcePowerLevel[FP_RAGE] == FORCE_LEVEL_1)
@@ -4764,7 +4772,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 	case FP_SABERTHROW:
 		break;
 	case FP_PROTECT:
-		if (self->client->sess.amrpgmode < 2 || self->client->pers.skill_levels[SKILL_PROTECT] < 4)
+		if (self->client->sess.account_mode < ACC_MODE_RPG || self->client->pers.skill_levels[SKILL_PROTECT] < 4)
 		{ // zyk: Protect 4/4 does not have force debounce
 			if (self->client->ps.fd.forcePowerDebounce[forcePower] < level.time)
 			{
@@ -4779,7 +4787,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 		}
 		break;
 	case FP_ABSORB:
-		if (self->client->sess.amrpgmode < 2 || self->client->pers.skill_levels[SKILL_ABSORB] < 4)
+		if (self->client->sess.account_mode < ACC_MODE_RPG || self->client->pers.skill_levels[SKILL_ABSORB] < 4)
 		{ // zyk: Absorb 4/4 does not have force debounce
 			if (self->client->ps.fd.forcePowerDebounce[forcePower] < level.time)
 			{
@@ -5158,7 +5166,7 @@ void SeekerDroneUpdate(gentity_t *self)
 
 				// zyk: changed shot speed from 2000 to 4000
 				// zyk: Seeker Drone Upgrade increases seeker drone damage
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
+				if (self->client->sess.account_mode == ACC_MODE_RPG && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
 					WP_FireGenericBlasterMissile(self, org, endir, qfalse, 20, 4000, MOD_BLASTER);
 				else
 					WP_FireGenericBlasterMissile(self, org, endir, qfalse, 15, 4000, MOD_BLASTER);
@@ -5166,7 +5174,7 @@ void SeekerDroneUpdate(gentity_t *self)
 				G_SoundAtLoc( org, CHAN_WEAPON, G_SoundIndex("sound/weapons/bryar/fire.wav") );
 
 				// zyk: Seeker Drone Upgrade makes a fast-shooting seeker drone
-				if (self->client->sess.amrpgmode == 2 && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
+				if (self->client->sess.account_mode == ACC_MODE_RPG && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0)
 					self->client->ps.droneFireTime = level.time + Q_irand(200, 300);
 				else
 					self->client->ps.droneFireTime = level.time + Q_irand(400, 700);
@@ -5442,7 +5450,7 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 	}
 	else
 	{
-		if (target->client->sess.amrpgmode == 2)
+		if (target->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			client_max_health = target->client->pers.max_rpg_health;
 			stamina = target->client->pers.current_stamina;
@@ -5467,7 +5475,7 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 			magic_power = target->client->pers.magic_power;
 			max_magic_power = zyk_max_magic_power(target);
 		}
-		else if (target->client->sess.amrpgmode == 2)
+		else if (target->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			// zyk: calculating the max armor of this player
 			client_max_armor = target->client->pers.max_rpg_shield;
@@ -5699,7 +5707,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 	i = 0;
 
 	// zyk: added the rpg mode condition, because RPG Mode players cant get power ups
-	if (self->client->sess.amrpgmode < 2 && duel_tournament_is_duelist(self) == qfalse && 
+	if (self->client->sess.account_mode < ACC_MODE_RPG && duel_tournament_is_duelist(self) == qfalse &&
 		(self->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] || self->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK]))
 	{ //enlightenment
 		if (!self->client->ps.fd.forceUsingAdded)
@@ -5913,8 +5921,12 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 				self->client->ps.fd.forcePowerDuration[i] = 0;
 			}
 			// zyk: using Sense Health skill of RPG Mode
-			else if (i == FP_SEE && self->client->sess.amrpgmode == 2 && self->client->pers.skill_levels[SKILL_SENSE_HEALTH] > 0 &&
-					 self->client->ps.fd.forcePowersActive & ( 1 << FP_SEE ) && self->client->pers.sense_health_timer < level.time && self->client->ps.hasLookTarget)
+			else if (i == FP_SEE && 
+					self->client->sess.account_mode == ACC_MODE_RPG && 
+					self->client->pers.skill_levels[SKILL_SENSE_HEALTH] > 0 &&
+					self->client->ps.fd.forcePowersActive & (1 << FP_SEE) && 
+					self->client->pers.sense_health_timer < level.time && 
+					self->client->ps.hasLookTarget)
 			{
 				// zyk: if you are looking at someone (player or npc), this will be the client id
 				sense_health_info(self, &g_entities[self->client->ps.lookTarget]);
@@ -5980,7 +5992,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 					else
 						self->client->ps.fd.forcePowerRegenDebounceTime += Q_max(g_forceRegenTime.integer*0.7, 1);
 				}
-				else if (self->client->sess.amrpgmode == 2)
+				else if (self->client->sess.account_mode == ACC_MODE_RPG)
 				{ // zyk: force regen for RPG players is based on the Force Affinity
 					self->client->ps.fd.forcePowerRegenDebounceTime += (100 - zyk_skill_affinity(self, SKILL_CATEGORY_FORCE));
 				}
@@ -6075,7 +6087,7 @@ qboolean Jedi_DodgeEvasion( gentity_t *self, gentity_t *shooter, trace_t *tr, in
 	}
 
 	// zyk: Thermal Vision, cannot dodge
-	if (self->client->sess.amrpgmode == 2 && self->client->pers.thermal_vision == qtrue)
+	if (self->client->sess.account_mode == ACC_MODE_RPG && self->client->pers.thermal_vision == qtrue)
 	{
 		return qfalse;
 	}

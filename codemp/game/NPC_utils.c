@@ -1141,7 +1141,7 @@ qboolean NPC_ValidEnemy( gentity_t *ent )
 		int enemy_distance = Distance(NPCS.NPC->r.currentOrigin, ent->r.currentOrigin);
 		int cloak_detect_distance = NPC_CLOAK_DETECTION_DISTANCE;
 
-		if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
+		if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CLOAK] > 0)
 		{
 			cloak_detect_distance /= 2;
 		}

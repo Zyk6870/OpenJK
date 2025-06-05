@@ -226,13 +226,13 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire, int weapon )
 
 		count = ( level.time - ent->client->ps.weaponChargeTime ) / BRYAR_CHARGE_UNIT;
 
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 &&
+		if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG &&
 			weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
 			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BLASTER_PISTOL2) && ent->client->pers.quickdraw_timer > level.time)
 		{
 			count = 5;
 		}
-		else if (ent && ent->client && ent->client->sess.amrpgmode == 2 &&
+		else if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG &&
 				weapon == WP_BRYAR_OLD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0 && 
 			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BRYAR_PISTOL2) && count > 5)
 		{
@@ -264,7 +264,7 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire, int weapon )
 		VectorSet( missile->r.mins, -boxSize, -boxSize, -boxSize );
 	}
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{ // zyk: bonus damage of the pistols
 		if (weapon == WP_BRYAR_PISTOL)
 		{
@@ -421,7 +421,7 @@ void WP_FireBlasterMissile( gentity_t *ent, vec3_t start, vec3_t dir, qboolean a
 	missile->classname = "blaster_proj";
 	missile->s.weapon = WP_BLASTER;
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_E11_BLASTER_RIFLE);
 	}
@@ -511,7 +511,7 @@ static void WP_FireBlaster( gentity_t *ent, qboolean altFire )
 	if ( altFire )
 	{
 		// add some slop to the alt-fire direction
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 && 
+		if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 &&
 			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_E11_BLASTER1))
 		{ // zyk: Blaster Pack Upgrade improves accuracy
 			angs[PITCH] += Q_flrand(-1.0f, 1.0f) * (BLASTER_SPREAD/2.0);
@@ -657,7 +657,7 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 				ent->client->accuracy_hits++;
 			}
 
-			if (ent->client && ent->client->sess.amrpgmode == 2)
+			if (ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 			{ // zyk: Disruptor at higher levels causes more damage
 				damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_DISRUPTOR);
 			}
@@ -886,7 +886,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 				 {
 					if ( traceEnt->takedamage )
 					{
-						if (ent->client && ent->client->sess.amrpgmode == 2)
+						if (ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 						{
 							damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_DISRUPTOR);
 
@@ -932,7 +932,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 					VectorCopy(traceEnt->client->ps.viewangles, preAng);
 				}
 
-				if (ent->client && ent->client->sess.amrpgmode == 2)
+				if (ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 				{
 					damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_DISRUPTOR);
 
@@ -1028,7 +1028,7 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 	VectorSet( missile->r.maxs, BOWCASTER_SIZE, BOWCASTER_SIZE, BOWCASTER_SIZE );
 	VectorScale( missile->r.maxs, -1, missile->r.mins );
 
-	if (ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_BOWCASTER);
 	}
@@ -1041,11 +1041,16 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 	missile->flags |= FL_BOUNCE;
 
 	// zyk: this is the bounce count used to count how many times the shot bounces, default: 3. In RPG Mode bounces more times with Upgrade
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0 && 
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG &&
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0 &&
 		ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_BOWCASTER1))
-		missile->bounceCount = 18;  
+	{
+		missile->bounceCount = 18;
+	}
 	else
-		missile->bounceCount = 3;  
+	{
+		missile->bounceCount = 3;
+	}
 }
 
 //---------------------------------------------------------
@@ -1075,7 +1080,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 	else if ( count > 5 )
 	{
 		// zyk: Bowcaster with Power Cell Weapons Upgrade in RPG Mode can shoot more missiles
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0 && 
+		if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0 &&
 			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_BOWCASTER1))
 		{
 			if (count > 7)
@@ -1093,7 +1098,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 		count--;
 	}
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0 && 
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BOWCASTER] > 0 &&
 		ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_BOWCASTER1))
 	{ // zyk: decrease spread
 		bowcaster_spread = BOWCASTER_ALT_SPREAD * 0.7;
@@ -1122,7 +1127,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 		VectorSet( missile->r.maxs, BOWCASTER_SIZE, BOWCASTER_SIZE, BOWCASTER_SIZE );
 		VectorScale( missile->r.maxs, -1, missile->r.mins );
 
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+		if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_BOWCASTER);
 		}
@@ -1173,7 +1178,7 @@ static void WP_RepeaterMainFire( gentity_t *ent, vec3_t dir )
 	missile->classname = "repeater_proj";
 	missile->s.weapon = WP_REPEATER;
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_REPEATER);
 	}
@@ -1204,7 +1209,7 @@ static void WP_RepeaterAltFire( gentity_t *ent )
 	missile->s.pos.trType = TR_GRAVITY;
 	missile->s.pos.trDelta[2] += 40.0f; //give a slight boost in the upward direction
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_REPEATER);
 		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, RPG_INVENTORY_WP_REPEATER);
@@ -1244,7 +1249,7 @@ static void WP_FireRepeater( gentity_t *ent, qboolean altFire )
 	else
 	{
 		// add some slop to the alt-fire direction
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0 && 
+		if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0 &&
 			ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_REPEATER1))
 		{ // zyk: with Repeater Upgrade, repeater will be more accurate
 			angs[PITCH] += Q_flrand(-1.0f, 1.0f) * (REPEATER_SPREAD/2);
@@ -1283,7 +1288,7 @@ static void WP_DEMP2_MainFire( gentity_t *ent )
 	VectorSet( missile->r.maxs, DEMP2_SIZE, DEMP2_SIZE, DEMP2_SIZE );
 	VectorScale( missile->r.maxs, -1, missile->r.mins );
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_DEMP2);
 	}
@@ -1527,7 +1532,7 @@ static void WP_DEMP2_AltFire( gentity_t *ent )
 	missile->think = DEMP2_AltDetonate;
 	missile->nextthink = level.time;
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_DEMP2);
 	}
@@ -1756,7 +1761,7 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 	int i;
 	int zyk_number_of_shots = FLECHETTE_SHOTS;
 
-	if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 && 
+	if (ent->client && ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 &&
 		ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_FLECHETTE1))
 	{ // zyk: Flechette Upgrade makes flechette have more shots
 		zyk_number_of_shots += 2;
@@ -1784,7 +1789,7 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 		VectorSet( missile->r.maxs, FLECHETTE_SIZE, FLECHETTE_SIZE, FLECHETTE_SIZE );
 		VectorScale( missile->r.maxs, -1, missile->r.mins );
 
-		if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+		if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_FLECHETTE);
 		}
@@ -1923,7 +1928,7 @@ static void WP_CreateFlechetteBouncyThing( vec3_t start, vec3_t fwd, gentity_t *
 
 	missile->bounceCount = 50;
 
-	if (self && self->client && self->client->sess.amrpgmode == 2)
+	if (self && self->client && self->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		damage = zyk_calculate_rpg_weapon_damage(self, damage, RPG_INVENTORY_WP_FLECHETTE);
 		splash_damage = zyk_calculate_rpg_weapon_damage(self, splash_damage, RPG_INVENTORY_WP_FLECHETTE);
@@ -1955,7 +1960,7 @@ static void WP_FlechetteAltFire( gentity_t *self )
 
 	WP_TraceSetStart( self, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
-	if (self->client && self->client->sess.amrpgmode == 2 && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 &&
+	if (self->client && self->client->sess.account_mode == ACC_MODE_RPG && self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLECHETTE] > 0 &&
 		self->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_FLECHETTE1))
 	{ // zyk: Flechette Upgrade makes flechette have more shots
 		flechette_bombs += 1;
@@ -2233,7 +2238,7 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 	VectorSet( missile->r.maxs, ROCKET_SIZE, ROCKET_SIZE, ROCKET_SIZE );
 	VectorScale( missile->r.maxs, -1, missile->r.mins );
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
 		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, RPG_INVENTORY_WP_ROCKET_LAUNCHER);
@@ -2276,7 +2281,7 @@ static void WP_FireRocket( gentity_t *ent, qboolean altFire )
 extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
 void zyk_create_fire_area(gentity_t* ent, gentity_t *owner)
 {
-	if (owner && owner->client && owner->client->sess.amrpgmode == 2 &&
+	if (owner && owner->client && owner->client->sess.account_mode == ACC_MODE_RPG &&
 		owner->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && owner->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE2))
 	{
 		zyk_quest_effect_spawn(owner, ent, "zyk_explosive_fire", "4", "env/med_explode", 0, 10, 128, 2000);
@@ -2423,8 +2428,9 @@ gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean altFire )
 	bolt->s.loopSound = G_SoundIndex( "sound/weapons/thermal/thermloop.wav" );
 	bolt->s.loopIsSoundset = qfalse;
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2 &&
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1))
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG &&
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && 
+		ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1))
 	{
 		damage *= 1.5;
 		splash_damage *= 1.5;
@@ -2923,7 +2929,7 @@ void CreateLaserTrap( gentity_t *laserTrap, vec3_t start, gentity_t *owner )
 	laserTrap->flags |= FL_BOUNCE_HALF;
 	laserTrap->s.eFlags |= EF_MISSILE_STICK;
 
-	if (owner && owner->client && owner->client->sess.amrpgmode == 2 &&
+	if (owner && owner->client && owner->client->sess.account_mode == ACC_MODE_RPG &&
 		owner->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && owner->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1))
 	{
 		damage *= 1.5;
@@ -3266,8 +3272,9 @@ void drop_charge (gentity_t *self, vec3_t start, vec3_t dir)
 	bolt->parent = self;
 	bolt->r.ownerNum = self->s.number;
 
-	if (self && self->client && self->client->sess.amrpgmode == 2 && 
-		self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && self->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1))
+	if (self && self->client && self->client->sess.account_mode == ACC_MODE_RPG &&
+		self->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && 
+		self->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1))
 	{
 		damage *= 1.5;
 		splash_damage *= 1.5;
@@ -3592,7 +3599,7 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 						ent->client->accuracy_hits++;
 					}
 
-					if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+					if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 					{
 						damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_CONCUSSION);
 					}
@@ -3662,7 +3669,8 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 									traceEnt->client->ps.forceHandExtendTime = level.time + 1100;
 									traceEnt->client->ps.forceDodgeAnim = 0; //this toggles between 1 and 0, when it's 1 we should play the get up anim
 
-									if (ent->client && ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0 &&
+									if (ent->client && ent->client->sess.account_mode == ACC_MODE_RPG && 
+										ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0 &&
 										ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_CONCUSSION2))
 									{ // zyk: increases knockdown strength and time
 										traceEnt->client->ps.forceHandExtendTime += 1100;
@@ -3787,7 +3795,7 @@ static void WP_FireConcussion( gentity_t *ent )
 	VectorSet( missile->r.maxs, ROCKET_SIZE, ROCKET_SIZE, ROCKET_SIZE );
 	VectorScale( missile->r.maxs, -1, missile->r.mins );
 
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		damage = zyk_calculate_rpg_weapon_damage(ent, damage, RPG_INVENTORY_WP_CONCUSSION);
 		splash_damage = zyk_calculate_rpg_weapon_damage(ent, splash_damage, RPG_INVENTORY_WP_CONCUSSION);
@@ -3848,7 +3856,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	trap->Trace ( &tr, muzzleStun, mins, maxs, end, ent->s.number, MASK_SHOT, qfalse, 0, 0 );
 
 	// zyk: starts flame thrower
-	if (ent->client && ent->client->sess.amrpgmode == 2 && alt_fire == qtrue && 
+	if (ent->client && ent->client->sess.account_mode == ACC_MODE_RPG && 
+		alt_fire == qtrue &&
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0 && 
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] >= flame_thrower_fuel_usage &&
 		ent->waterlevel < 3)
@@ -3868,7 +3877,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	tr_ent = &g_entities[tr.entityNum];
 
 	// zyk: Stun Baton with Stun Baton Upgrade in RPG Mode allows the player to open any door
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 && 
+	if (ent->client->sess.account_mode == ACC_MODE_RPG &&
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 && 
 		ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON1) && zyk_allow_stun_baton_upgrade.integer == 1 && Q_stricmp(tr_ent->classname, "func_door") == 0)
 	{
 		GlobalUse(tr_ent, ent, ent);
@@ -3897,7 +3907,7 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 		G_Sound( tr_ent, CHAN_WEAPON, G_SoundIndex( va("sound/weapons/melee/punch%d", Q_irand(1, 4)) ) );
 
 		// zyk: stun baton in RPG mode does more damage
-		if (ent->client->sess.amrpgmode == 2)
+		if (ent->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			G_Damage( tr_ent, ent, ent, forward, tr.endpos, zyk_calculate_rpg_weapon_damage(ent, zyk_stun_baton_damage.integer, RPG_INVENTORY_WP_STUN_BATON), (DAMAGE_NO_KNOCKBACK | DAMAGE_HALF_ABSORB), MOD_STUN_BATON);
 		}
@@ -3922,7 +3932,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 				tr_ent->client->ps.electrifyTime = level.time + 700;
 
 				// zyk: if the player has stun baton upgrade in RPG mode, enemy has its speed decreased
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 && 
+				if (ent->client->sess.account_mode == ACC_MODE_RPG && 
+					ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 &&
 					ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON2))
 				{
 					// zyk: allies cant be hit by it
@@ -3989,7 +4000,9 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 	}
 	else
 	{
-		if ((ent->client->sess.amrpgmode == 2 || ent->NPC) && ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0 && ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
+		if ((ent->client->sess.account_mode == ACC_MODE_RPG || ent->NPC) && 
+			ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0 && 
+			ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
 		{ // zyk: Magic fist attacks. Shoots an electric bolt
 			gentity_t	*missile;
 			vec3_t origin, dir, zyk_forward;

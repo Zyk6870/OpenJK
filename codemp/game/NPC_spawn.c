@@ -1759,7 +1759,7 @@ finish:
 	{
 		int zyk_it = 0;
 
-		newent->client->sess.amrpgmode = 0;
+		newent->client->sess.account_mode = ACC_MODE_LOGGED_OUT;
 		newent->client->pers.player_statuses = 0;
 		newent->client->pers.rpg_statuses = 0;
 		newent->client->pers.race_position = 0;

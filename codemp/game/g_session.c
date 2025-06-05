@@ -88,7 +88,7 @@ void G_WriteClientSessionData( gclient_t *client )
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.selectedFP ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.duelTeam ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.siegeDesiredTeam ) );
-	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.amrpgmode ) );
+	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.account_mode ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.ally1 ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.ally2 ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.vote_timer ) );
@@ -144,7 +144,7 @@ void G_ReadSessionData( gclient_t *client )
 		&client->sess.selectedFP,
 		&client->sess.duelTeam,
 		&client->sess.siegeDesiredTeam,
-		&client->sess.amrpgmode,
+		&client->sess.account_mode,
 		&client->sess.ally1,
 		&client->sess.ally2,
 		&client->sess.vote_timer,
@@ -297,7 +297,7 @@ void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
 	sess->siegeClass[0] = 0;
 
 	// zyk: setting initial value of RPG mode session attributes
-	sess->amrpgmode = 0;
+	sess->account_mode = ACC_MODE_LOGGED_OUT;
 	strcpy(sess->filename,"");
 	strcpy(sess->rpgchar, "");
 

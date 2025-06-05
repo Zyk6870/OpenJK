@@ -1870,7 +1870,7 @@ static qboolean PM_CheckJump( void )
 		{
 #if defined (_GAME)
 			gentity_t *player_ent = &g_entities[pm->ps->clientNum];
-			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+			if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG)
 			{
 				rpg_skill_counter(player_ent, 5);
 			}
@@ -2813,7 +2813,7 @@ static qboolean PM_CheckJump( void )
 	if (1)
 	{
 		gentity_t *player_ent = &g_entities[pm->ps->clientNum];
-		if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+		if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			rpg_skill_counter(player_ent, 5);
 		}
@@ -3289,7 +3289,7 @@ static void PM_AirMove( void ) {
 		{ // zyk: added the Jetpack Upgrade test, in this case, player can have more control
 #if defined (_GAME)
 			gentity_t *player_ent = &g_entities[pm->ps->clientNum];
-			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
+			if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG && player_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 				VectorScale(wishvel, 1.1f, wishvel);
 			else
 				VectorScale(wishvel, 0.8f, wishvel);
@@ -3301,7 +3301,7 @@ static void PM_AirMove( void ) {
 		{ //if we are jetting then we have more control than usual
 #if defined (_GAME) // zyk: added the Jetpack Upgrade test, in this case, player can have more control
 			gentity_t *player_ent = &g_entities[pm->ps->clientNum];
-			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
+			if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG && player_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 				VectorScale(wishvel, 2.5f, wishvel);
 			else
 				VectorScale(wishvel, 2.0f, wishvel);
@@ -3743,7 +3743,7 @@ static int PM_TryRoll( void )
 #if defined( _GAME )
 			gentity_t *player_ent = &g_entities[pm->ps->clientNum];
 
-			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+			if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG)
 			{ // zyk: rolling increases skill counter
 				rpg_skill_counter(player_ent, 20);
 			}
@@ -5977,7 +5977,7 @@ void PM_FinishWeaponChange( void ) {
 
 #ifdef _GAME
 	// zyk: player in RPG Mode has the inventory
-	if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && weapon == WP_BRYAR_PISTOL && 
+	if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG && weapon == WP_BRYAR_PISTOL &&
 		player_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
 		player_ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BLASTER_PISTOL2))
 	{
@@ -6328,7 +6328,7 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 
 #ifdef _GAME
 					// zyk: player in RPG Mode has the inventory
-					if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+					if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG)
 					{
 						zyk_remove_ammo_from_inventory(player_ent, weaponData[pm->ps->weapon].ammoIndex, weaponData[pm->ps->weapon].altChargeSub);
 					}
@@ -6378,7 +6378,7 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 
 #ifdef _GAME
 					// zyk: player in RPG Mode has the inventory
-					if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+					if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG)
 					{
 						zyk_remove_ammo_from_inventory(player_ent, weaponData[pm->ps->weapon].ammoIndex, weaponData[pm->ps->weapon].chargeSub);
 					}
@@ -6467,7 +6467,7 @@ int PM_ItemUsable(playerState_t *ps, int forcedUse)
 	{
 	case HI_MEDPAC:
 #if defined( _GAME )
-		if (item_user && item_user->client && item_user->client->sess.amrpgmode == 2)
+		if (item_user && item_user->client && item_user->client->sess.account_mode == ACC_MODE_RPG)
 		{ // zyk: bacta canister. Must allow even with max health to regen MP and stamina
 			if (ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] && 
 				item_user->client->pers.magic_power == zyk_max_magic_power(item_user) &&
@@ -6499,7 +6499,7 @@ int PM_ItemUsable(playerState_t *ps, int forcedUse)
 #endif
 	case HI_MEDPAC_BIG:
 #if defined( _GAME )
-		if (item_user && item_user->client && item_user->client->sess.amrpgmode == 2)
+		if (item_user && item_user->client && item_user->client->sess.account_mode == ACC_MODE_RPG)
 		{ // zyk: Big Bacta. Must allow even with max health to regen stamina
 			if (ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] && 
 				item_user->client->pers.magic_power == zyk_max_magic_power(item_user) &&
@@ -8097,7 +8097,7 @@ static void PM_Weapon( void )
 
 #ifdef _GAME
 			// zyk: player in RPG Mode has the inventory
-			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2)
+			if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG)
 			{
 				zyk_remove_ammo_from_inventory(player_ent, weaponData[pm->ps->weapon].ammoIndex, amount);
 			}
@@ -10981,7 +10981,7 @@ void PmoveSingle (pmove_t *pmove) {
 	*/
 
 #if defined( _GAME )
-	if (player_ent && player_ent->s.number < MAX_CLIENTS && player_ent->client && player_ent->client->sess.amrpgmode == 2 &&
+	if (player_ent && player_ent->s.number < MAX_CLIENTS && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG &&
 		player_ent->client->pers.stamina_out_timer > level.time)
 	{ // zyk: no Stamina, cannot move
 		stiffenedUp = qtrue;
@@ -11271,7 +11271,7 @@ void PmoveSingle (pmove_t *pmove) {
 		gentity_t *player_ent = &g_entities[pm->ps->clientNum];
 
 		// zyk: if player has the Jetpack Upgrade, increase max velocity
-		if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && player_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
+		if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG && player_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 			zyk_jetpack_max_vel = 672;
 #endif
 

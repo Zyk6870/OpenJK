@@ -4837,8 +4837,11 @@ int zyk_number_of_allies(gentity_t *ent, qboolean in_rpg_mode)
 	{
 		gentity_t *allied_player = &g_entities[i];
 
-		if (zyk_is_ally(ent,allied_player) == qtrue && (in_rpg_mode == qfalse || (allied_player->client->sess.amrpgmode == 2 && allied_player->client->sess.sessionTeam != TEAM_SPECTATOR)))
+		if (zyk_is_ally(ent, allied_player) == qtrue && 
+			(in_rpg_mode == qfalse || (allied_player->client->sess.account_mode == ACC_MODE_RPG && allied_player->client->sess.sessionTeam != TEAM_SPECTATOR)))
+		{
 			number_of_allies++;
+		}
 	}
 
 	return number_of_allies;
@@ -5955,7 +5958,7 @@ void zyk_status_effects(gentity_t* ent)
 				}
 
 				// zyk: Status Protection skill decreases duration of bad RPG statuses
-				if (ent->client->sess.amrpgmode == 2 && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0 && zyk_is_bad_status_effect(i) == qtrue)
+				if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION] > 0 && zyk_is_bad_status_effect(i) == qtrue)
 				{
 					ent->client->pers.rpg_status_duration[i] -= (20 * ent->client->pers.skill_levels[SKILL_STATUS_PROTECTION]);
 				}
@@ -6414,7 +6417,7 @@ void duel_tournament_winner()
 		duel_tournament_prize(ent);
 
 		// zyk: calculating the new leaderboard if this winner is logged in his account
-		if (ent->client->sess.amrpgmode > 0)
+		if (ent->client->sess.account_mode > ACC_MODE_LOGGED_OUT)
 		{
 			duel_tournament_generate_leaderboard(G_NewString(ent->client->sess.filename), G_NewString(ent->client->pers.netname));
 		}
@@ -6423,9 +6426,9 @@ void duel_tournament_winner()
 		{
 			duel_tournament_prize(ally);
 
-			if (ally->client->sess.amrpgmode > 0)
+			if (ally->client->sess.account_mode > ACC_MODE_LOGGED_OUT)
 			{
-				if (ent->client->sess.amrpgmode > 0)
+				if (ent->client->sess.account_mode > ACC_MODE_LOGGED_OUT)
 				{
 					level.duel_leaderboard_add_ally = qtrue;
 					strcpy(level.duel_leaderboard_ally_acc, ally->client->sess.filename);
@@ -8943,7 +8946,7 @@ void G_RunFrame( int levelTime ) {
 				{
 					int jetpack_debounce_amount = JETPACK_FUEL_USAGE;
 
-					if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
+					if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_JETPACK] > 0)
 					{ // zyk: Jetpack Upgrade decreases fuel debounce
 						jetpack_debounce_amount /= 2;
 					}
@@ -8956,14 +8959,14 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.jetpack_fuel -= jetpack_debounce_amount;
 
 					if (ent->client->pers.jetpack_fuel <= 0)
-					{ // zyk: out of fuel. Turn jetpack off
+					{
 						ent->client->pers.jetpack_fuel = 0;
 						Jetpack_Off(ent);
 					}
 
 					ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel / JETPACK_SCALE;
 
-					if (ent->client->sess.amrpgmode == 2)
+					if (ent->client->sess.account_mode == ACC_MODE_RPG)
 					{
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL] = ent->client->pers.jetpack_fuel;
 
@@ -9057,7 +9060,7 @@ void G_RunFrame( int levelTime ) {
 
 							if (level.race_last_player_position == 1)
 							{ // zyk: this player won the race. Send message to everyone and give his prize
-								if (ent->client->sess.amrpgmode == 2)
+								if (ent->client->sess.account_mode == ACC_MODE_RPG)
 								{ // zyk: give him credits
 									set_item_making_energy(ent, 2000, qtrue);
 									save_account(ent, qtrue);
@@ -9149,7 +9152,7 @@ void G_RunFrame( int levelTime ) {
 				}
 			}
 
-			if (ent->client->sess.amrpgmode == 2 && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+			if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
 				
 				/* zyk: Max Health used by jka code must be set by the max amount possible, so player can restore shield to the max possible shield as soon as
@@ -9921,7 +9924,7 @@ void G_RunFrame( int levelTime ) {
 					{
 						player_ent = &g_entities[player_it];
 
-						if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode == 2 && 
+						if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG &&
 							player_ent->client->pers.quest_seller_event_step > QUEST_SELLER_STEP_NONE && player_ent->client->pers.quest_seller_event_step < QUEST_SELLER_END_STEP)
 						{
 							player_ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_NONE;

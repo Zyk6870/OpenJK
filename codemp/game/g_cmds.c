@@ -757,7 +757,7 @@ int zyk_get_max_health(gentity_t* ent)
 		return 0;
 	}
 
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		return ent->client->pers.max_rpg_health;
 	}
@@ -1221,7 +1221,7 @@ void Cmd_Give_f( gentity_t *ent )
 		return;
 	}
 
-	if (g_entities[client_id].client->sess.amrpgmode == 2)
+	if (g_entities[client_id].client->sess.account_mode == ACC_MODE_RPG)
 	{
 		trap->SendServerCommand( ent-g_entities, "print \"Cannot give stuff to RPG players.\n\"" );
 		return;
@@ -1239,7 +1239,9 @@ void Cmd_Give_f( gentity_t *ent )
 		return;
 	}
 
-	if (ent != &g_entities[client_id] && g_entities[client_id].client->sess.amrpgmode > 0 && g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
+	if (ent != &g_entities[client_id] && g_entities[client_id].client->sess.account_mode > ACC_MODE_LOGGED_OUT && 
+		g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && 
+		!(g_entities[client_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 	{
 		trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
 		return;
@@ -1350,7 +1352,7 @@ void Cmd_Scale_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (ent != &g_entities[client_id] && g_entities[client_id].client->sess.amrpgmode > 0 && 
+	if (ent != &g_entities[client_id] && g_entities[client_id].client->sess.account_mode > ACC_MODE_LOGGED_OUT && 
 		g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 	{
 		trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
@@ -1894,7 +1896,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 	client->pers.teamState.state = TEAM_BEGIN;
 	if ( oldTeam != TEAM_SPECTATOR ) {
 		// zyk: set flag so it will not reset quests of this player
-		if (ent->client->sess.amrpgmode == 2)
+		if (ent->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
 		}
@@ -2549,14 +2551,14 @@ void Cmd_FollowPrev_f( gentity_t *ent ) {
 void zyk_jetpack(gentity_t* ent)
 {
 	// zyk: player starts with jetpack if it is enabled in player settings, is not in Siege Mode, and does not have all force powers through /give command
-	if ((ent->client->sess.amrpgmode == 1 && 
+	if ((ent->client->sess.account_mode == ACC_MODE_ADMIN && 
 		!(ent->client->pers.player_settings & (1 << SETTINGS_JETPACK))) && zyk_allow_jetpack_command.integer &&
 		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && 
 		level.gametype != GT_JEDIMASTER && !(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_ADM_GIVE_FORCE)))
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 	}
-	else if (ent->client->sess.amrpgmode < 2)
+	else if (ent->client->sess.account_mode < ACC_MODE_RPG)
 	{
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_JETPACK);
 		if (ent->client->jetPackOn)
@@ -2606,7 +2608,7 @@ char* zyk_string_with_no_whitespaces(char *old_string)
 
 void zyk_load_admin_only_mode_stuff(gentity_t* ent)
 {
-	if (ent->client->sess.amrpgmode == 1)
+	if (ent->client->sess.account_mode == ACC_MODE_ADMIN)
 	{
 		ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
 
@@ -2650,32 +2652,27 @@ void load_account(gentity_t* ent)
 	{
 		int i = 0;
 
-		// zyk: loading the account password
 		read_status = fscanf(account_file, "%s", content);
 		strcpy(ent->client->pers.password, content);
 
-		// zyk: loading the amrpgmode value
 		read_status = fscanf(account_file, "%s", content);
-		ent->client->sess.amrpgmode = atoi(content);
+		ent->client->sess.account_mode = atoi(content);
 
-		if ((zyk_allow_rpg_mode.integer == 0 || (zyk_allow_rpg_in_other_gametypes.integer == 0 && level.gametype != GT_FFA)) && ent->client->sess.amrpgmode == 2)
+		if ((zyk_allow_rpg_mode.integer == 0 || (zyk_allow_rpg_in_other_gametypes.integer == 0 && level.gametype != GT_FFA)) && ent->client->sess.account_mode == ACC_MODE_RPG)
 		{ // zyk: RPG Mode not allowed. Change his account to Admin-Only Mode
-			ent->client->sess.amrpgmode = 1;
+			ent->client->sess.account_mode = ACC_MODE_ADMIN;
 		}
 		else if (level.gametype == GT_SIEGE || level.gametype == GT_JEDIMASTER)
 		{ // zyk: Siege and Jedi Master will never allow RPG Mode
-			ent->client->sess.amrpgmode = 1;
+			ent->client->sess.account_mode = ACC_MODE_ADMIN;
 		}
 
-		// zyk: loading player_settings value
 		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.player_settings = atoi(content);
 
-		// zyk: loading the admin command bit value
 		read_status = fscanf(account_file, "%s", content);
 		ent->client->pers.bitvalue = atoi(content);
 
-		// zyk: loading the current char
 		read_status = fscanf(account_file, "%s", content);
 		strcpy(ent->client->sess.rpgchar, content);
 
@@ -2830,14 +2827,14 @@ void load_account(gentity_t* ent)
 	}
 }
 
-// zyk: saves info into the player account file. If save_char_file is qtrue, this function must save the char file
+// zyk: saves info in the player main account file or in the char file
 void save_account(gentity_t* ent, qboolean save_char_file)
 {
 	// zyk: used to prevent account save in map change time or before loading account after changing map
-	if (level.voteExecuteTime < level.time && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.amrpgmode > 0)
-	{ // zyk: players can only save things if server is not at RP Mode or if it is allowed in config
+	if (level.voteExecuteTime < level.time && ent->client->pers.connected == CON_CONNECTED && ent->client->sess.account_mode > ACC_MODE_LOGGED_OUT)
+	{
 		if (save_char_file == qtrue)
-		{  // zyk: save the RPG char
+		{
 			FILE* account_file;
 			gclient_t* client;
 			char content[SAVE_ACCOUNT_BUFFER];
@@ -2870,7 +2867,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			fclose(account_file);
 		}
 		else
-		{ // zyk: save the main account file
+		{
 			FILE* account_file;
 			gclient_t* client;
 
@@ -2878,7 +2875,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			account_file = fopen(va("zykmod/accounts/%s.txt", ent->client->sess.filename), "w");
 			fprintf(account_file, "%s\n%d\n%d\n%d\n%s\n%s\n",
-				client->pers.password, client->sess.amrpgmode, client->pers.player_settings, client->pers.bitvalue, client->sess.rpgchar, zyk_string_with_no_whitespaces(GAMEVERSION));
+				client->pers.password, client->sess.account_mode, client->pers.player_settings, client->pers.bitvalue, client->sess.rpgchar, 
+				zyk_string_with_no_whitespaces(GAMEVERSION));
 			fclose(account_file);
 		}
 	}
@@ -3148,7 +3146,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	}
 
 	if (zyk_riddle_answer_chat_mode == qtrue && 
-		ent->client->sess.amrpgmode == 2 && ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_ANSWER &&
+		ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_ANSWER &&
 		zyk_riddle_answer(ent, text) == qtrue)
 	{ // zyk: a riddle answer
 		ent->client->pers.quest_seller_event_step = QUEST_SELLER_END_STEP;
@@ -4649,7 +4647,7 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 	trace_t tr;
 	vec3_t forward, fwdOrg;
 
-	if (ent->client->sess.amrpgmode == 2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] >= ENERGY_MODULATOR_PARTS)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] >= ENERGY_MODULATOR_PARTS)
 	{ // zyk: Energy Modulator Upgrade
 		zyk_energy_modulator(ent);
 	}
@@ -4699,7 +4697,7 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 		return;
 	}
 
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{ // zyk: cannot accept duel in RPG Mode
 		return;
 	}
@@ -5337,7 +5335,7 @@ int zyk_total_skillpoints(gentity_t* ent)
 extern void zyk_set_quest_event_timer(gentity_t* ent);
 void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 {
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		int i = 0;
 
@@ -5636,7 +5634,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 // zyk: using skills (weapons, force, etc) calls this. Used to set Stamina
 void rpg_skill_counter(gentity_t *ent, int amount)
 {
-	if (ent && ent->client && ent->client->sess.amrpgmode == 2)
+	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		// zyk: when player does things, it will decrease Stamina
 		zyk_set_stamina(ent, amount, qfalse);
@@ -5645,7 +5643,7 @@ void rpg_skill_counter(gentity_t *ent, int amount)
 
 void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount)
 {
-	if (!(ent && ent->client && ent->client->sess.amrpgmode == 2))
+	if (!(ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG))
 	{
 		return;
 	}
@@ -5690,7 +5688,7 @@ void zyk_change_weapon_in_inventory(gentity_t* ent, weapon_t weapon, qboolean ad
 		-1
 	};
 
-	if (!(ent && ent->client && ent->client->sess.amrpgmode == 2))
+	if (!(ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG))
 	{
 		return;
 	}
@@ -5716,7 +5714,7 @@ void zyk_remove_ammo_from_inventory(gentity_t* ent, ammo_t ammo_type, int amount
 					RPG_INVENTORY_AMMO_DETPACKS
 	};
 
-	if (!(ent && ent->client && ent->client->sess.amrpgmode == 2))
+	if (!(ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG))
 	{
 		return;
 	}
@@ -5744,7 +5742,7 @@ void zyk_change_item_in_inventory(gentity_t* ent, holdable_t item_type, qboolean
 		RPG_INVENTORY_ITEM_CLOAK
 	};
 
-	if (!(ent && ent->client && ent->client->sess.amrpgmode == 2))
+	if (!(ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG))
 	{
 		return;
 	}
@@ -5877,7 +5875,7 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	trap->Argv(2, arg2, sizeof( arg2 ));
 
 	// zyk: creates the account if player is not logged in
-	if (ent->client->sess.amrpgmode != 0)
+	if (ent->client->sess.account_mode != ACC_MODE_LOGGED_OUT)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"You are already logged in.\n\"" );
 		return;
@@ -5937,11 +5935,11 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	// zyk: setting the values to be saved in the account file
 	if (zyk_allow_rpg_mode.integer == 0)
 	{
-		ent->client->sess.amrpgmode = 1;
+		ent->client->sess.account_mode = ACC_MODE_ADMIN;
 	}
 	else
 	{
-		ent->client->sess.amrpgmode = 2;
+		ent->client->sess.account_mode = ACC_MODE_RPG;
 	}
 
 	ent->client->pers.player_settings = 0;
@@ -5955,7 +5953,7 @@ void Cmd_NewAccount_f( gentity_t *ent ) {
 	save_account(ent, qfalse);
 	save_account(ent, qtrue);
 
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		initialize_rpg_skills(ent, qtrue);
 	}
@@ -5971,7 +5969,7 @@ Cmd_LoginAccount_f
 ==================
 */
 void Cmd_LoginAccount_f( gentity_t *ent ) {
-	if (ent->client->sess.amrpgmode == 0)
+	if (ent->client->sess.account_mode == ACC_MODE_LOGGED_OUT)
 	{
 		char arg1[MAX_STRING_CHARS];
 		char arg2[MAX_STRING_CHARS];
@@ -6001,7 +5999,7 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 		for (i = 0; i < level.maxclients; i++)
 		{
 			player_ent = &g_entities[i];
-			if (player_ent && player_ent->client && player_ent->client->sess.amrpgmode > 0 && Q_stricmp(player_ent->client->sess.filename,arg1) == 0)
+			if (player_ent && player_ent->client && player_ent->client->sess.account_mode > ACC_MODE_LOGGED_OUT && Q_stricmp(player_ent->client->sess.filename,arg1) == 0)
 			{
 				trap->SendServerCommand( ent->s.number, "print \"There is already someone logged in this account.\n\"" );
 				return;
@@ -6047,11 +6045,11 @@ void Cmd_LoginAccount_f( gentity_t *ent ) {
 
 		load_account(ent);
 
-		if (ent->client->sess.amrpgmode == 1)
+		if (ent->client->sess.account_mode == ACC_MODE_ADMIN)
 		{
 			trap->SendServerCommand(ent->s.number, "print \"^7Account loaded succesfully in ^2Admin-Only Mode^7. Use command ^3/list^7.\n\"");
 		}
-		else if (ent->client->sess.amrpgmode == 2)
+		else if (ent->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			initialize_rpg_skills(ent, qtrue);
 			trap->SendServerCommand( ent->s.number, "print \"^7Account loaded succesfully in ^2RPG Mode^7. Use command ^3/list^7.\n\"" );
@@ -6139,7 +6137,7 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 	zyk_stop_all_magic_powers(ent);
 
 	// zyk: saving the not logged player mode in session
-	ent->client->sess.amrpgmode = 0;
+	ent->client->sess.account_mode = ACC_MODE_LOGGED_OUT;
 
 	ent->client->pers.bitvalue = 0;
 
@@ -6215,54 +6213,7 @@ Cmd_ZykMod_f
 */
 // zyk: sends info to the client-side menu if player has the client-side plugin. No longer used in the new mod
 void Cmd_ZykMod_f( gentity_t *ent ) {
-	/*
-	if (Q_stricmp(ent->client->pers.guid, "NOGUID") == 0)
-	{
-		return;
-	}
-
-	if (ent->client->sess.amrpgmode == 2)
-	{
-		int i = 0;
-		char content[1024];
-
-		strcpy(content,"");
-
-		for (i = 0; i < NUMBER_OF_SKILLS; i++)
-		{
-			strcpy(content, va("%s%d/%d-", content, ent->client->pers.skill_levels[i], zyk_max_skill_level(i)));
-		}
-
-		strcpy(content, va("%s%s", content, zyk_get_settings_values(ent)));
-
-		strcpy(content, va("%s%d-%d-%d-", 
-			content, 0, ent->client->pers.quest_defeated_enemies, 22));
-
-		trap->SendServerCommand(ent->s.number, va("zykmod \"%d-%d/%d-%d-NOCLASS-%s\"",ent->client->pers.magic_crystals,ent->client->pers.magic_power,zyk_max_magic_power(ent),ent->client->pers.credits,content));
-	}
-	else if (ent->client->sess.amrpgmode == 1)
-	{ // zyk: just sends the player settings
-		int i = 0;
-		char content[1024];
-
-		strcpy(content,"");
-
-		for (i = 0; i < 103; i++)
-		{
-			if (i == 97)
-			{
-				strcpy(content, va("%s%s", content, zyk_get_settings_values(ent)));
-			}
-			else
-			{
-				strcpy(content, va("%s0-", content));
-			}
-				
-		}
-
-		trap->SendServerCommand(ent->s.number, va("zykmod \"%s\"", content));
-	}
-	*/
+	
 }
 
 char *zyk_get_rpg_chars(gentity_t *ent, char *separator)
@@ -7213,7 +7164,7 @@ Cmd_ListAccount_f
 ==================
 */
 void Cmd_ListAccount_f( gentity_t *ent ) {
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		if (trap->Argc() == 1)
 		{ // zyk: if player didnt pass arguments, lists general info
@@ -7395,7 +7346,8 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				{
 					gentity_t* player = &g_entities[j];
 
-					if (player && player->client && player->client->sess.amrpgmode == 2 && level.bounty_quest_choose_target == qfalse && player->s.number == level.bounty_quest_target_id)
+					if (player && player->client && player->client->sess.account_mode == ACC_MODE_RPG &&
+						level.bounty_quest_choose_target == qfalse && player->s.number == level.bounty_quest_target_id)
 					{
 						strcpy(target_player, va("%s", player->client->pers.netname));
 					}
@@ -7422,7 +7374,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			}
 		}
 	}
-	else if (ent->client->sess.amrpgmode == 1)
+	else if (ent->client->sess.account_mode == ACC_MODE_ADMIN)
 	{
 		trap->SendServerCommand( ent->s.number, "print \"\n^2Admin-Only Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account of the player.\n^3/playermode: ^7switches between the ^2Admin-Only Mode ^7and the ^2RPG Mode^7.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [admin command number]: ^7gives the player a new admin command.\n^3/admindown [player id or name] [admin command number]: ^7removes an admin command from the player.\n^3/settings: ^7turn on or off player settings.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows all info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
 	}
@@ -7467,7 +7419,7 @@ void zyk_add_health(gentity_t* ent, int heal_amount)
 	{
 		int max_health = ent->client->ps.stats[STAT_MAX_HEALTH];
 
-		if (ent->client->sess.amrpgmode == 2)
+		if (ent->client->sess.account_mode == ACC_MODE_RPG)
 		{ // zyk: a RPG player, not a npc
 			max_health = ent->client->pers.max_rpg_health;
 		}
@@ -7764,7 +7716,9 @@ void Cmd_Teleport_f( gentity_t *ent )
 				return;
 			}
 
-			if (g_entities[client_id].client->sess.amrpgmode > 0 && g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
+			if (g_entities[client_id].client->sess.account_mode > ACC_MODE_LOGGED_OUT && 
+				g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && 
+				!(g_entities[client_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 			{
 				trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
 				return;
@@ -7795,7 +7749,9 @@ void Cmd_Teleport_f( gentity_t *ent )
 			return;
 		}
 
-		if (g_entities[client1_id].client->sess.amrpgmode > 0 && g_entities[client1_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client1_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
+		if (g_entities[client1_id].client->sess.account_mode > ACC_MODE_LOGGED_OUT && 
+			g_entities[client1_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && 
+			!(g_entities[client1_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
 			return;
@@ -7806,7 +7762,9 @@ void Cmd_Teleport_f( gentity_t *ent )
 			return;
 		}
 
-		if (g_entities[client2_id].client->sess.amrpgmode > 0 && g_entities[client2_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client2_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
+		if (g_entities[client2_id].client->sess.account_mode > ACC_MODE_LOGGED_OUT && 
+			g_entities[client2_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && 
+			!(g_entities[client2_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
 			return;
@@ -7845,7 +7803,9 @@ void Cmd_Teleport_f( gentity_t *ent )
 			return;
 		}
 
-		if (g_entities[client_id].client->sess.amrpgmode > 0 && g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && !(g_entities[client_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
+		if (g_entities[client_id].client->sess.account_mode > ACC_MODE_LOGGED_OUT && 
+			g_entities[client_id].client->pers.bitvalue & (1 << ADM_ADMPROTECT) && 
+			!(g_entities[client_id].client->pers.player_settings & (1 << SETTINGS_ADMIN_PROTECT)))
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Target player is adminprotected\n\"") );
 			return;
@@ -8175,7 +8135,7 @@ void Cmd_Settings_f( gentity_t *ent ) {
 
 		trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", zyk_get_settings(ent, value)));
 
-		if (value == SETTINGS_RPG_QUESTS && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)
+		if (value == SETTINGS_RPG_QUESTS && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.account_mode == ACC_MODE_RPG)
 		{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
 			ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
 
@@ -8210,23 +8170,25 @@ void Cmd_BountyQuest_f( gentity_t *ent ) {
 		{
 			this_ent = &g_entities[level.bounty_quest_target_id];
 
-			if (this_ent && this_ent->client && this_ent->client->sess.amrpgmode == 2 && this_ent->health > 0 && this_ent->client->sess.sessionTeam != TEAM_SPECTATOR && 
+			if (this_ent && this_ent->client && this_ent->client->sess.account_mode == ACC_MODE_RPG &&
+				this_ent->health > 0 && 
+				this_ent->client->sess.sessionTeam != TEAM_SPECTATOR && 
 				!(this_ent->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT)))
 			{
 				level.bounty_quest_choose_target = qfalse;
-				trap->SendServerCommand( -1, va("chat \"^3Bounty Quest: ^7A reward of ^3200 ^7Item-Making Energy will be given to who kills %s^7\n\"", this_ent->client->pers.netname) );
+				trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7A reward of ^3200 ^7Item-Making Energy will be given to who kills %s^7\n\"", this_ent->client->pers.netname));
 				return;
 			}
 
 			level.bounty_quest_target_id++;
 		}
-		trap->SendServerCommand( -1, va("chat \"^3Bounty Quest: ^7No one was chosen as the target\n\"") );
+		trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7No one was chosen as the target\n\""));
 	}
 	else
 	{ // zyk: there is already a target player
 		this_ent = &g_entities[level.bounty_quest_target_id];
 		if (this_ent && this_ent->client)
-			trap->SendServerCommand( -1, va("chat \"^3Bounty Quest: ^7%s ^7is already the target\n\"", this_ent->client->pers.netname) );
+			trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7%s ^7is already the target\n\"", this_ent->client->pers.netname));
 	}
 }
 
@@ -8261,13 +8223,13 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 		return;
 	}
 
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
-		ent->client->sess.amrpgmode = 1;
+		ent->client->sess.account_mode = ACC_MODE_ADMIN;
 	}
 	else if (zyk_allow_rpg_mode.integer > 0)
 	{
-		ent->client->sess.amrpgmode = 2;
+		ent->client->sess.account_mode = ACC_MODE_RPG;
 
 		// zyk: removing the /give stuff, which is not allowed to RPG players
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_ADM_GIVE_FORCE);
@@ -8276,7 +8238,7 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 
 	save_account(ent, qfalse);
 
-	if (ent->client->sess.amrpgmode == 1)
+	if (ent->client->sess.account_mode == ACC_MODE_ADMIN)
 	{
 		ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
 
@@ -8315,7 +8277,7 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 		trap->SendServerCommand( ent-g_entities, "print \"^7You are now in ^2RPG mode^7.\n\"" );
 	}
 
-	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
 		if (ent && ent->client)
 		{
@@ -8585,7 +8547,7 @@ void Cmd_Drop_f( gentity_t *ent ) {
 			else
 				launched->count = -1; // zyk: in this case, player has no ammo, so weapon should add no ammo to the player who picks up this weapon
 
-			if (ent->client->sess.amrpgmode == 2)
+			if (ent->client->sess.account_mode == ACC_MODE_RPG)
 			{
 				zyk_change_weapon_in_inventory(ent, weapon, qfalse);
 				zyk_remove_ammo_from_inventory(ent, weaponData[weapon].ammoIndex, current_ammo);
@@ -8599,7 +8561,7 @@ void Cmd_Drop_f( gentity_t *ent ) {
 			else
 				launched->count = -1; // zyk: in this case, player has no ammo, so weapon should add no ammo to the player who picks up this weapon
 
-			if (ent->client->sess.amrpgmode == 2)
+			if (ent->client->sess.account_mode == ACC_MODE_RPG)
 			{
 				zyk_change_weapon_in_inventory(ent, weapon, qfalse);
 				zyk_remove_ammo_from_inventory(ent, weaponData[weapon].ammoIndex, ammo_count);
@@ -8611,7 +8573,7 @@ void Cmd_Drop_f( gentity_t *ent ) {
 		{
 			ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << weapon);
 
-			if (ent->client->sess.amrpgmode < 2)
+			if (ent->client->sess.account_mode < ACC_MODE_RPG)
 			{
 				ent->s.weapon = WP_MELEE;
 				ent->client->ps.weapon = WP_MELEE;
@@ -8632,7 +8594,7 @@ void Cmd_Jetpack_f( gentity_t *ent ) {
 	}
 
 	if (!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)) && zyk_allow_jetpack_command.integer && 
-		 ent->client->sess.amrpgmode < 2 &&
+		 ent->client->sess.account_mode < ACC_MODE_RPG &&
 		(level.gametype != GT_SIEGE || zyk_allow_jetpack_in_siege.integer) && level.gametype != GT_JEDIMASTER && 
 		!(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_ADM_GIVE_FORCE)))
 	{ // zyk: gets jetpack if player does not have it. RPG players need jetpack skill to get it
@@ -8645,7 +8607,7 @@ void Cmd_Jetpack_f( gentity_t *ent ) {
 			Jetpack_Off(ent);
 
 		// zyk: player in RPG Mode drops his jetpack
-		if (ent->client->sess.amrpgmode == 2 && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK))
+		if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK))
 		{
 			vec3_t vel;
 			gitem_t* item = NULL;
@@ -9901,7 +9863,7 @@ void Cmd_AdminList_f( gentity_t *ent ) {
 
 			player_ent = &g_entities[client_id];
 
-			if (player_ent->client->sess.amrpgmode == 0)
+			if (player_ent->client->sess.account_mode == ACC_MODE_LOGGED_OUT)
 			{
 				trap->SendServerCommand( ent-g_entities, va("print \"Player %s ^7is not logged in.\n\"", player_ent->client->pers.netname) );
 				return;
@@ -9945,7 +9907,7 @@ void Cmd_AdminUp_f( gentity_t *ent ) {
 			return;
 		}
 
-		if (g_entities[client_id].client->sess.amrpgmode == 0)
+		if (g_entities[client_id].client->sess.account_mode == ACC_MODE_LOGGED_OUT)
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Player is not logged in\n\"") );
 			return;
@@ -10003,7 +9965,7 @@ void Cmd_AdminDown_f( gentity_t *ent ) {
 			return;
 		}
 
-		if (g_entities[client_id].client->sess.amrpgmode == 0)
+		if (g_entities[client_id].client->sess.account_mode == ACC_MODE_LOGGED_OUT)
 		{
 			trap->SendServerCommand( ent-g_entities, va("print \"Player is not logged in\n\"") );
 			return;
@@ -10239,7 +10201,7 @@ void Cmd_Players_f( gentity_t *ent ) {
 			{
 				strcpy(content, va("%s%d - %s ^7- %s - ",content,player->s.number,player->client->pers.netname,player->client->sess.IP));
 
-				if (player->client->sess.amrpgmode > 0)
+				if (player->client->sess.account_mode > ACC_MODE_LOGGED_OUT)
 				{
 					if (player->client->pers.bitvalue > 0)
 						strcpy(content, va("%s^3(admin)",content));
@@ -10247,7 +10209,7 @@ void Cmd_Players_f( gentity_t *ent ) {
 						strcpy(content, va("%s^3(logged)",content));
 				}
 
-				if (player->client->sess.amrpgmode == 2)
+				if (player->client->sess.account_mode == ACC_MODE_RPG)
 				{
 					strcpy(content, va("%s ^3(rpg)",content));
 				}
@@ -10273,7 +10235,7 @@ void Cmd_Players_f( gentity_t *ent ) {
 
 		player_ent = &g_entities[client_id];
 
-		if (player_ent->client->sess.amrpgmode != 2)
+		if (player_ent->client->sess.account_mode != ACC_MODE_RPG)
 		{
 			trap->SendServerCommand(ent->s.number, va("print \"Player %s ^7is not in RPG Mode.\n\"", player_ent->client->pers.netname) );
 			return;
@@ -10764,7 +10726,7 @@ void Cmd_DuelMode_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"This tournament is for non-rpg players\n\"");
 		return;
@@ -11116,7 +11078,7 @@ void Cmd_SniperMode_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"You cannot be in RPG Mode to play the Sniper Battle.\n\"");
 		return;
@@ -11205,7 +11167,7 @@ void Cmd_MeleeMode_f(gentity_t *ent) {
 		return;
 	}
 
-	if (ent->client->sess.amrpgmode == 2)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"You cannot be in RPG Mode to play the Melee Battle.\n\"");
 		return;
@@ -11581,7 +11543,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 			trap->SendServerCommand(ent->s.number, va("print \"Char %s ^7created!\n\"", ent->client->sess.rpgchar));
 
-			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)
+			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.account_mode == ACC_MODE_RPG)
 			{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
 				G_Kill(ent);
 			}
@@ -11658,7 +11620,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 			trap->SendServerCommand(ent->s.number, va("print \"Char %s ^7loaded!\n\"", ent->client->sess.rpgchar));
 
-			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.amrpgmode == 2)
+			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.account_mode == ACC_MODE_RPG)
 			{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
 				G_Kill(ent);
 			}
@@ -12012,14 +11974,14 @@ void ClientCommand( int clientNum ) {
 	}
 
 	else if ( (command->flags & CMD_LOGGEDIN)
-		&& ent->client->sess.amrpgmode == 0 )
+		&& ent->client->sess.account_mode == ACC_MODE_LOGGED_OUT )
 	{ // zyk: new condition
 		trap->SendServerCommand( clientNum, "print \"You must be logged in\n\"" );
 		return;
 	}
 
 	else if ( (command->flags & CMD_RPG)
-		&& ent->client->sess.amrpgmode < 2 )
+		&& ent->client->sess.account_mode < ACC_MODE_RPG)
 	{ // zyk: new condition
 		trap->SendServerCommand( clientNum, "print \"You must be in RPG Mode\n\"" );
 		return;
