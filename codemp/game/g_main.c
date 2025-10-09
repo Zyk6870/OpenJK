@@ -497,7 +497,6 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_MAGE_MASTER] = "mage_master";
 	enemy_names[QUEST_NPC_MAGE_MINISTER] = "mage_minister";
 	enemy_names[QUEST_NPC_MAGE_SCHOLAR] = "mage_scholar";
-	enemy_names[QUEST_NPC_STATUS_MAGE] = "status_mage";
 	enemy_names[QUEST_NPC_FORCE_MAGE] = "force_mage";
 	enemy_names[QUEST_NPC_HIGH_TRAINED_WARRIOR] = "high_trained_warrior";
 	enemy_names[QUEST_NPC_MID_TRAINED_WARRIOR] = "mid_trained_warrior";
@@ -513,7 +512,6 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = "ally_elemental_force_mage";
 	enemy_names[QUEST_NPC_ALLY_FLYING_WARRIOR] = "ally_flying_warrior";
 	enemy_names[QUEST_NPC_ALLY_FORCE_WARRIOR] = "ally_force_warrior";
-	enemy_names[QUEST_NPC_TRAVELING_MAGE] = "traveling_mage";
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
@@ -532,7 +530,6 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_MAGE_MASTER] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_MAGE_MINISTER] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_MAGE_SCHOLAR] = QUEST_NPC_BONUS_INCREASE;
-	bonus_increase[QUEST_NPC_STATUS_MAGE] = QUEST_NPC_BONUS_INCREASE * 1.2;
 	bonus_increase[QUEST_NPC_FORCE_MAGE] = QUEST_NPC_BONUS_INCREASE * 1.2;
 	bonus_increase[QUEST_NPC_HIGH_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 1.2;
 	bonus_increase[QUEST_NPC_MID_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 1.5;
@@ -548,7 +545,6 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_ALLY_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
 	bonus_increase[QUEST_NPC_ALLY_FORCE_WARRIOR] = QUEST_NPC_BONUS_INCREASE * 2;
-	bonus_increase[QUEST_NPC_TRAVELING_MAGE] = QUEST_NPC_BONUS_INCREASE;
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
@@ -567,7 +563,6 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_MAGE_MASTER] = 12;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 10;
 	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 10;
-	max_levels[QUEST_NPC_STATUS_MAGE] = 9;
 	max_levels[QUEST_NPC_FORCE_MAGE] = 8;
 	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = 8;
 	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = 7;
@@ -583,7 +578,6 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = 8;
 	max_levels[QUEST_NPC_ALLY_FLYING_WARRIOR] = 7;
 	max_levels[QUEST_NPC_ALLY_FORCE_WARRIOR] = 7;
-	max_levels[QUEST_NPC_TRAVELING_MAGE] = 4;
 
 	if (enemy_type > QUEST_NPC_NONE && enemy_type < NUM_QUEST_NPCS)
 	{
@@ -669,10 +663,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level - 2 + skill_level_bonus;
 		}
-		else if (quest_npc_type == QUEST_NPC_STATUS_MAGE)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
-		}
 		else if (quest_npc_type == QUEST_NPC_FORCE_MAGE)
 		{
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
@@ -748,12 +738,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, random_magic_power, ally_bonus + skill_level_bonus);
-		}
-		else if (quest_npc_type == QUEST_NPC_TRAVELING_MAGE)
-		{
-			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
-
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, ally_bonus + skill_level_bonus);
 		}
 
 		// zyk: setting the initial amount of magic points here because it is based on the Max MP skill
@@ -9279,7 +9263,7 @@ void G_RunFrame( int levelTime ) {
 				// zyk: npcs with magic powers
 				if (ent->client->pers.quest_npc > QUEST_NPC_NONE && ent->client->pers.quest_event_timer < level.time)
 				{
-					if (ent->client->pers.quest_npc == QUEST_NPC_TRAVELING_MAGE || ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+					if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 					{ // zyk: there can only be one of these npcs in the map
 						level.special_quest_npc_in_map |= (1 << ent->client->pers.quest_npc);
 					}
@@ -9317,22 +9301,11 @@ void G_RunFrame( int levelTime ) {
 							}
 						}
 
-						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER || ent->client->pers.quest_npc == QUEST_NPC_STATUS_MAGE)
+						if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 						{
 							if (Q_irand(0, 4) == 0)
 							{
 								Jedi_Cloak(ent);
-							}
-
-							if (Q_irand(0, 99) < MAGE_MASTER_STATUS_CHANCE)
-							{
-								int max_distance = ent->client->ps.stats[STAT_MAX_HEALTH] / 2;
-								zyk_rpg_status_t status_chosen = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
-
-								if (ent->enemy->client && quest_npc_enemy_distance < max_distance)
-								{
-									zyk_set_rpg_status(ent->enemy, status_chosen, MAGE_MASTER_STATUS_DURATION, qtrue);
-								}
 							}
 						}
 						else if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR && 

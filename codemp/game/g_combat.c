@@ -2183,7 +2183,7 @@ void zyk_decrease_quest_progress(gentity_t *ent)
 
 qboolean zyk_is_quest_ally(gentity_t* ent)
 {
-	if (ent->NPC && ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && ent->client->pers.quest_npc <= QUEST_NPC_TRAVELING_MAGE)
+	if (ent->NPC && ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && ent->client->pers.quest_npc < NUM_QUEST_NPCS)
 	{
 		return qtrue;
 	}
@@ -4897,7 +4897,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG &&
 		targ && targ->client && targ->NPC &&
 		targ->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && 
-		targ->client->pers.quest_npc <= QUEST_NPC_TRAVELING_MAGE && 
+		targ->client->pers.quest_npc < NUM_QUEST_NPCS &&
 		targ->client->pers.quest_npc_chat_timer < level.time)
 	{
 		trap->SendServerCommand(attacker->s.number, va("chat \"^3Ally: ^7%s ^7don't attack me, I am an ally!\n\"", attacker->client->pers.netname));

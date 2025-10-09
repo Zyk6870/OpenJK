@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.5.5"
+#define	GAMEVERSION	"New Zyk Mod v1.5.6"
 
 #define SECURITY_LOG "security.log"
 
@@ -746,7 +746,6 @@ typedef enum {
 	QUEST_NPC_MAGE_MASTER,
 	QUEST_NPC_MAGE_MINISTER,
 	QUEST_NPC_MAGE_SCHOLAR,
-	QUEST_NPC_STATUS_MAGE,
 	QUEST_NPC_FORCE_MAGE,
 	QUEST_NPC_HIGH_TRAINED_WARRIOR,
 	QUEST_NPC_MID_TRAINED_WARRIOR,
@@ -761,7 +760,6 @@ typedef enum {
 	QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE,
 	QUEST_NPC_ALLY_FLYING_WARRIOR,
 	QUEST_NPC_ALLY_FORCE_WARRIOR,
-	QUEST_NPC_TRAVELING_MAGE,
 	NUM_QUEST_NPCS
 } zyk_quest_npc_t;
 
@@ -876,8 +874,6 @@ typedef enum {
 #define QUEST_SPIRIT_TREE_SPAWN_TIMER 5000
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_NPC_SPAWN_TIME 39000
-#define MAGE_MASTER_STATUS_CHANCE 4
-#define MAGE_MASTER_STATUS_DURATION 5000
 
 // zyk: maximum time a quest npc can be idle (without enemies)
 #define QUEST_NPC_IDLE_TIME 43000

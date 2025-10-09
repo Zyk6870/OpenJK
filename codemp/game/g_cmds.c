@@ -579,7 +579,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. When you collect one, it will restore 1 magic point. Upgrading skills uses a blue crystal. The ones you keep in your inventory increase your Item-Making Energy, makes your main quest ally npcs stronger and increase regen rate of the Spirit Tree. Used by the Energy Modulator secret quest item. When you die, you lose a blue crystal\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. When you collect one, it will restore 1 magic point. Upgrading skills uses a blue crystal. The ones you keep in your inventory increase your Item-Making Energy, makes your main quest ally npcs stronger and increase regen rate of the Spirit Tree. When you die, you lose a blue crystal\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
@@ -6766,7 +6766,7 @@ int zyk_number_of_allies_in_map(gentity_t* ent)
 		npc_ent = &g_entities[i];
 
 		if (npc_ent && npc_ent->client && npc_ent->NPC && 
-			npc_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && npc_ent->client->pers.quest_npc <= QUEST_NPC_TRAVELING_MAGE &&
+			npc_ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && npc_ent->client->pers.quest_npc < NUM_QUEST_NPCS &&
 			npc_ent->health > 0 && 
 			(ent == NULL || npc_ent->client->pers.quest_npc_caller_player_id == ent->s.number))
 		{
@@ -6948,7 +6948,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, va("\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nRegenerate your tree so the %s ^7can defeat all enemies.\nMeditate in the tree to regen it. The red crystals you have will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a ^1Red ^7crystal call your Spirit Tree.\n^4Blue ^7crystals you have make new allies stronger and appear more often.\n^1Red ^7crystals unleash a Lightning Dome by holding Use key when not meditating.\n\n", QUESTCHAR_ALL_SPIRITS));
+			strcpy(quest_desc, va("\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nRegenerate your tree so it can defeat all enemies.\nMeditate in the tree to regen it. The blue crystals you have will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a blue crystal to call your Spirit Tree.\nBlue crystals you have make new allies stronger and appear more often.\n\n", QUESTCHAR_ALL_SPIRITS));
 
 			trap->SendServerCommand(target_ent->s.number,
 				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
