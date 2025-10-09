@@ -1889,13 +1889,13 @@ void TryUse( gentity_t *ent )
 	{ // zyk: player touched one of the puzzle crystals
 		if (level.legendary_crystal_chosen[level.legendary_artifact_step - QUEST_SECRET_CHOSEN_CRYSTALS_STEP] == target->count)
 		{ // zyk: one of the crystals chosen in the correct order
-			int crystal_quantity_decrease = QUEST_SECRET_CORRECT_CRYSTALS_STEP - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 8);
+			int crystal_quantity = QUEST_SECRET_CORRECT_CRYSTALS_STEP;
 
 			G_Sound(target, CHAN_AUTO, G_SoundIndex("sound/interface/pickup_battery.mp3"));
 
 			level.legendary_artifact_step++;
 
-			if (level.legendary_artifact_step > crystal_quantity_decrease)
+			if (level.legendary_artifact_step > crystal_quantity)
 			{
 				level.legendary_artifact_step = QUEST_SECRET_CORRECT_CRYSTALS_STEP;
 			}
@@ -1917,7 +1917,7 @@ void TryUse( gentity_t *ent )
 	else if (ent->client->sess.account_mode == ACC_MODE_RPG &&
 			level.legendary_artifact_step == QUEST_SECRET_SECRET_ITEM_SPAWNED_STEP &&
 			target && target->count == 7 && 
-			Q_stricmp(target->targetname, "zyk_magic_armor_model") == 0
+			Q_stricmp(target->targetname, "zyk_energy_modulator_model") == 0
 		)
 	{ // zyk: player touched the artifact after solving the puzzle
 		target->think = G_FreeEntity;
@@ -1925,11 +1925,11 @@ void TryUse( gentity_t *ent )
 
 		level.legendary_artifact_step = QUEST_SECRET_CLEAR_STEP;
 
-		if (Q_stricmp(target->targetname, "zyk_magic_armor_model") == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
+		if (Q_stricmp(target->targetname, "zyk_energy_modulator_model") == 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0)
 		{
-			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR, 1);
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR, 1);
 
-			trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You got the legendary ^5Magic Armor^7\n\"");
+			trap->SendServerCommand(ent->s.number, "chat \"^3Quest System: ^7You got the ^3Energy Modulator^7\n\"");
 
 			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/cairn_beam_start.mp3"));
 		}
@@ -1944,67 +1944,29 @@ void TryUse( gentity_t *ent )
 
 	if (target->NPC && target->client && target->health > 0 && target->s.NPC_class != CLASS_VEHICLE && OnSameTeam(ent, target))
 	{
-		if (target->client->pers.quest_npc == QUEST_NPC_TRAVELING_MAGE &&
-			ent->client->sess.account_mode == ACC_MODE_RPG &&
-			(ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE || ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_ANSWER) &&
-			ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < SPIRIT_CRYSTAL_PARTS &&
-			ent->client->pers.quest_seller_event_timer < level.time)
-		{ // zyk: found the Traveling Mage
-			if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_NONE)
-			{
-				int seller_duration = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] * SIDE_QUEST_STUFF_TIMER;
-
-				if (seller_duration < (SIDE_QUEST_STUFF_TIMER + 5000))
-				{
-					seller_duration = SIDE_QUEST_STUFF_TIMER + 5000;
-				}
-
-				ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_TALKED;
-
-				// zyk: reset seller time so the player has enough time to answer the riddle
-				target->client->pers.quest_seller_map_timer = level.time + seller_duration;
-
-				// zyk: a player is answering the riddle, do not try to teleport to another spot
-				target->client->pers.quest_npc_idle_timer = level.time + seller_duration + 2000;
-			}
-			else
-			{
-				zyk_show_quest_riddle(ent);
-
-				ent->client->pers.quest_seller_event_timer = level.time + 5000;
-			}
+		if (!target->client->leader)
+		{ // zyk: setting the npc leader so he follows the player
+			target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_GUARD);
+			target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
+			target->client->leader = ent;
+			target->NPC->tempBehavior = BS_FOLLOW_LEADER;
 
 			// zyk: setting use anim
 			ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 			ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
 			ent->client->ps.forceHandExtendTime = level.time + 500;
 		}
-		else
-		{
-			if (!target->client->leader)
-			{ // zyk: setting the npc leader so he follows the player
-				target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_GUARD);
-				target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
-				target->client->leader = ent;
-				target->NPC->tempBehavior = BS_FOLLOW_LEADER;
+		else if (target->client->leader == ent)
+		{ // zyk: npc will stop follow the player, which is the leader
+			target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_GUARD);
+			target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
+			target->client->leader = NULL;
+			target->NPC->tempBehavior = BS_STAND_GUARD;
 
-				// zyk: setting use anim
-				ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-				ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
-				ent->client->ps.forceHandExtendTime = level.time + 500;
-			}
-			else if (target->client->leader == ent)
-			{ // zyk: npc will stop follow the player, which is the leader
-				target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_GUARD);
-				target->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_NPC_ORDER_COVER);
-				target->client->leader = NULL;
-				target->NPC->tempBehavior = BS_STAND_GUARD;
-
-				// zyk: setting use anim
-				ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-				ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
-				ent->client->ps.forceHandExtendTime = level.time + 500;
-			}
+			// zyk: setting use anim
+			ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+			ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
+			ent->client->ps.forceHandExtendTime = level.time + 500;
 		}
 	}
 

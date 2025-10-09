@@ -6032,50 +6032,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
-			{ // zyk: Magic Armor
-				if ((mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2) || // zyk: Magic Fist
-					(mod == MOD_UNKNOWN && attacker && attacker->client && 
-					 inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) > -1) // zyk: Magic power
-					)
-				{ // zyk: Absorbs Magic Fist damage and Magic power damage
-					bonus_health_resistance += 0.20;
-
-					zyk_set_mp(targ, (int)ceil(take * 0.20), qtrue);
-
-					zyk_quest_effect_spawn(targ, targ, "zyk_magic_armor_effect", "0", "scepter/invincibility", 0, 0, 0, 700);
-				}
-				else
-				{
-					bonus_health_resistance += 0.05;
-				}
-			}
-
-			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] >= SPIRIT_CRYSTAL_PARTS)
-			{ // zyk: Spirit Crystal. It works as an armor, absorbing some damage to restore some force
-				int force_power_regen_amount = (int)ceil(take * 0.05);
-
-				bonus_health_resistance += 0.05;
-
-				if ((targ->client->ps.fd.forcePower + force_power_regen_amount) < targ->client->ps.fd.forcePowerMax)
-				{
-					targ->client->ps.fd.forcePower += force_power_regen_amount;
-				}
-				else
-				{
-					targ->client->ps.fd.forcePower = targ->client->ps.fd.forcePowerMax;
-				}
-			}
-
 			if (targ->client->pers.active_magic & (1 << MAGIC_MAGIC_DOME))
 			{ // zyk: target using Defensive Dome
 				int magic_bonus = zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
-
-				// zyk: Magic Armor improves all magic powers
-				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
-				{
-					magic_bonus += 1;
-				}
 
 				bonus_health_resistance += (0.02f * (targ->client->pers.skill_levels[SKILL_MAGIC_DOME] + magic_bonus + (zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER)));
 			}

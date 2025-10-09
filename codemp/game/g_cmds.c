@@ -328,8 +328,6 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_MISC_QUEST_LOG] = "Quest Log";
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = "Magic Armor";
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] = "Spirit Crystal";
 
 	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "Jetpack Fuel";
 	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "Flame Thrower Fuel";
@@ -579,14 +577,6 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts some energy sources (magic points, red crystals or powercell ammo) into attack power or extra shield protection. It has two modes. First Mode increases damage of all attacks by 25 per cent. Second Mode increases resistance to damage to your shield from any source by 25 per cent. You must find all of its parts to use it. Activate it by pressing Duel key. It uses mp, and it if runs out, consumes a red crystal to restore some mp, and if it runs out too, uses powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_TRAVELING_MAGE));
 	}
-	else if (item_index == RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A very powerful armor. Decreases damage to your health from any non-magic source by 5 per cent. Decreases damage from Magic Fist and Magic Powers by 20 per cent and absorb it to regen some magic points. Increases all magic powers strength a little\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_TRAVELING_MAGE));
-	}
-	else if (item_index == RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. You must find all of its parts to use it. It increases your run speed a little, reduces Stamina usage, and also absorbs 5 per cent damage from any source to restore some Force\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_TRAVELING_MAGE));
-	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. When you collect one, it will restore 1 magic point. Upgrading skills uses a blue crystal. The ones you keep in your inventory increase your Item-Making Energy, makes your main quest ally npcs stronger and increase regen rate of the Spirit Tree. Used by the Energy Modulator secret quest item. When you die, you lose a blue crystal\n\n\"", zyk_get_inventory_item_name(item_index)));
@@ -683,8 +673,6 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_MISC_QUEST_LOG] = "inventoryQuestLog";
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = "inventoryMagicArmor";
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] = "inventorySpiritCrystal";
 
 	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "inventoryJetpackFuel";
 	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "inventoryFlameThrowerFuel";
@@ -2902,121 +2890,6 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
 	}
 }
 
-// zyk: returns only numbers and letters for the possible riddle answer
-char* zyk_parse_riddle_answer(const char* message)
-{
-	int i = 0;
-	int j = 0;
-	int k = 0;
-	char new_answer_string[MAX_STRING_CHARS];
-
-	char allowed_chars[53] = {
-		'A',
-		'B',
-		'C',
-		'D',
-		'E',
-		'F',
-		'G',
-		'H',
-		'I',
-		'J',
-		'K',
-		'L',
-		'M',
-		'N',
-		'O',
-		'P',
-		'Q',
-		'R',
-		'S',
-		'T',
-		'U',
-		'V',
-		'W',
-		'X',
-		'Y',
-		'Z',
-		'a',
-		'b',
-		'c',
-		'd',
-		'e',
-		'f',
-		'g',
-		'h',
-		'i',
-		'j',
-		'k',
-		'l',
-		'm',
-		'n',
-		'o',
-		'p',
-		'q',
-		'r',
-		's',
-		't',
-		'u',
-		'v',
-		'w',
-		'x',
-		'y',
-		'z',
-		'\0'
-	};
-
-	strcpy(new_answer_string, "");
-
-	while (message[i] != '\0')
-	{
-		qboolean valid_char = qfalse;
-
-		for (j = 0; j < 53; j++)
-		{
-			if (message[i] == allowed_chars[j])
-			{
-				valid_char = qtrue;
-				break;
-			}
-		}
-
-		if (valid_char == qtrue)
-		{
-			new_answer_string[k] = message[i];
-			k++;
-		}
-
-		i++;
-	}
-
-	new_answer_string[k] = '\0';
-
-	return G_NewString(new_answer_string);
-}
-
-qboolean zyk_riddle_answer(gentity_t* ent, const char* message)
-{
-	char riddle_answers[6][8] = {"sun", "fire", "hate", "water", "love", ""};
-	int riddle_answer_index = ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL];
-	gentity_t* seller_npc = NULL;
-
-	if (ent->client->ps.hasLookTarget)
-	{
-		seller_npc = &g_entities[ent->client->ps.lookTarget];
-	}
-
-	if (seller_npc && seller_npc->NPC && seller_npc->client && seller_npc->client->pers.quest_npc == QUEST_NPC_TRAVELING_MAGE &&
-		Q_stricmp(zyk_parse_riddle_answer(message), G_NewString(riddle_answers[riddle_answer_index])) == 0)
-	{ // zyk: the parsed message string contains the correct riddle answer
-		seller_npc->client->pers.quest_seller_map_timer = level.time + 500;
-
-		return qtrue;
-	}
-
-	return qfalse;
-}
-
 void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) {
 	int			j;
 	gentity_t	*other;
@@ -3026,7 +2899,6 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	char		text[MAX_SAY_TEXT];
 	char		location[64];
 	char		*locMsg = NULL;
-	qboolean zyk_riddle_answer_chat_mode = qfalse;
 
 	if ( level.gametype < GT_TEAM && mode == SAY_TEAM ) {
 		mode = SAY_ALL;
@@ -3042,8 +2914,6 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		// zyk: if player is silenced by an admin, he cannot say anything
 		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SILENCED))
 			return;
-
-		zyk_riddle_answer_chat_mode = qtrue;
 
 		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, text );
 		Com_sprintf (name, sizeof(name), "%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
@@ -3066,8 +2936,6 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 			Com_sprintf (name, sizeof(name), EC"(%s%c%c"EC")"EC": ",
 				ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		}
-
-		zyk_riddle_answer_chat_mode = qtrue;
 
 		color = COLOR_CYAN;
 		break;
@@ -3093,20 +2961,8 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		G_LogPrintf( "sayally: %s: %s\n", ent->client->pers.netname, text );
 		Com_sprintf (name, sizeof(name), EC"{%s%c%c"EC"}"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 
-		zyk_riddle_answer_chat_mode = qtrue;
-
 		color = COLOR_WHITE;
 		break;
-	}
-
-	if (zyk_riddle_answer_chat_mode == qtrue && 
-		ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_ANSWER &&
-		zyk_riddle_answer(ent, text) == qtrue)
-	{ // zyk: a riddle answer
-		ent->client->pers.quest_seller_event_step = QUEST_SELLER_END_STEP;
-		ent->client->pers.quest_seller_event_timer = level.time + 500;
-
-		return;
 	}
 
 	if ( target ) {
@@ -4601,8 +4457,8 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 	trace_t tr;
 	vec3_t forward, fwdOrg;
 
-	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] >= ENERGY_MODULATOR_PARTS)
-	{ // zyk: Energy Modulator Upgrade
+	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] > 0)
+	{ // zyk: Energy Modulator
 		zyk_energy_modulator(ent);
 	}
 
@@ -5127,16 +4983,6 @@ void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
 	}
 	else if (ent->client->pers.stamina_out_timer <= level.time)
 	{
-		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] >= SPIRIT_CRYSTAL_PARTS)
-		{
-			amount /= 2;
-
-			if (amount < 1)
-			{
-				amount = 1;
-			}
-		}
-
 		ent->client->pers.current_stamina -= amount;
 
 		if (ent->client->pers.current_stamina < 0)
@@ -5520,8 +5366,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.quest_spirits_event_timer = 0;
 			ent->client->pers.quest_spirit_tree_id = -1;
 			ent->client->pers.quest_spirit_tree_call_timer = 0;
-			ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_NONE;
-			ent->client->pers.quest_seller_event_timer = 0;
 
 			ent->client->pers.stamina_timer = 0;
 			ent->client->pers.stamina_out_timer = 0;
@@ -6695,12 +6539,6 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 200;
-
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][0] = 0;
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR][1] = 200;
-
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL][0] = 0;
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL][1] = 200;
 
 	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 3;
 	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 1;

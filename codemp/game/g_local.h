@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.5.2"
+#define	GAMEVERSION	"New Zyk Mod v1.5.3"
 
 #define SECURITY_LOG "security.log"
 
@@ -690,8 +690,6 @@ typedef enum {
 	RPG_INVENTORY_MISC_BLUE_CRYSTAL,
 	RPG_INVENTORY_MISC_QUEST_LOG,
 	RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR,
-	RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR,
-	RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL,
 	RPG_INVENTORY_MISC_JETPACK_FUEL,
 	RPG_INVENTORY_MISC_FLAME_THROWER_FUEL,
 	RPG_INVENTORY_MISC_MAGIC_SHIELD,
@@ -734,8 +732,6 @@ typedef enum {
 	QUEST_ITEM_NONE,
 	QUEST_ITEM_SKILL_CRYSTAL,
 	QUEST_ITEM_ENERGY_MODULATOR,
-	QUEST_ITEM_MAGIC_ARMOR,
-	QUEST_ITEM_SPIRIT_CRYSTAL,
 	QUEST_ITEM_SPIRIT_TREE,
 	NUM_QUEST_ITEMS
 } zyk_quest_item_t;
@@ -763,15 +759,6 @@ typedef enum {
 	QUEST_NPC_TRAVELING_MAGE,
 	NUM_QUEST_NPCS
 } zyk_quest_npc_t;
-
-typedef enum {
-	QUEST_SELLER_STEP_NONE,
-	QUEST_SELLER_STEP_TALKED,
-	QUEST_SELLER_RIDDLE_START,
-	QUEST_SELLER_RIDDLE_ANSWER,
-	QUEST_SELLER_END_STEP,
-	NUM_QUEST_SELLER_STEPS
-} zyk_quest_seller_step_t;
 
 typedef enum {
 	MAIN_QUEST_START,
@@ -825,7 +812,7 @@ typedef enum {
 
 // zyk: magic power stats
 #define MAGIC_MIN_DMG 0
-#define MAGIC_MIN_RANGE 180
+#define MAGIC_MIN_RANGE 256
 #define MAGIC_RANGE_BONUS 20
 #define MAGIC_AFFINITY_MODIFIER 10
 
@@ -871,9 +858,7 @@ typedef enum {
 #define MAX_QUEST_PROGRESS 100000
 #define SIDE_QUEST_STUFF_TIMER 1000
 #define SIDE_QUEST_PUZZLE_TIMER 90000
-#define ENERGY_MODULATOR_PARTS 3
 #define QUEST_ITEM_DISTANCE 48
-#define SPIRIT_CRYSTAL_PARTS 6
 #define QUEST_SPIRIT_TREE_DEFAULT_SCALE 2
 #define QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET 4
 #define QUEST_SPIRIT_TREE_RADIUS 50
@@ -1068,9 +1053,6 @@ typedef struct clientPersistant_s {
 	int quest_spirit_tree_id;
 	int quest_spirit_tree_call_timer;
 	int quest_progress_timer;
-	zyk_quest_seller_step_t quest_seller_event_step;
-	int quest_seller_event_timer;
-	int quest_seller_map_timer;
 
 	// zyk: bitvalue. Has side quest missions completed
 	int quest_missions;
@@ -1760,7 +1742,6 @@ typedef struct level_locals_s {
 
 	// zyk: time to spawn the same side quest secret item again
 	int energy_modulator_timer;
-	int magic_armor_timer;
 
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];

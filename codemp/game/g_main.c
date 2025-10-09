@@ -649,7 +649,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 1;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 1;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_LIGHTNING_DOME, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
@@ -660,16 +659,12 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_MINISTER)
 		{
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
-
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_LIGHTNING_DOME, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level - 2 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_SCHOLAR)
 		{
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
-
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level - 2 + skill_level_bonus;
@@ -758,12 +753,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		{
 			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
-
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, ally_bonus + skill_level_bonus);
-
-			// zyk: Travelig Mage stays in the map only for this amount of time before going away
-			npc_ent->client->pers.quest_seller_map_timer = level.time + (SIDE_QUEST_STUFF_TIMER * bonuses);
 		}
 
 		// zyk: setting the initial amount of magic points here because it is based on the Max MP skill
@@ -1204,7 +1194,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.num_fully_connected_clients = 0;
 
 	level.energy_modulator_timer = 0;
-	level.magic_armor_timer = 0;
 
 	level.special_quest_npc_in_map = 0;
 
@@ -5128,11 +5117,6 @@ void zyk_spawn_legendary_artifact_model(float x, float y, float z, int model_sca
 		zyk_set_entity_field(new_ent, "model", "models/map_objects/danger/ship_item04.md3");
 		zyk_set_entity_field(new_ent, "targetname", "zyk_energy_modulator_model");
 	}
-	else
-	{
-		zyk_set_entity_field(new_ent, "model", "models/map_objects/desert/3po_torso.md3");
-		zyk_set_entity_field(new_ent, "targetname", "zyk_magic_armor_model");
-	}
 
 	zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
 
@@ -5199,11 +5183,6 @@ void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int
 		zyk_set_entity_field(new_ent, "origin", va("%f %f %f", x, y, z));
 
 		zyk_set_entity_field(new_ent, "model", G_NewString(model_path));
-
-		if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
-		{
-			zyk_set_entity_field(new_ent, "angles", "90 0 0");
-		}
 
 		zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
 
@@ -5291,16 +5270,6 @@ int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int mod
 	{
 		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_energy_modulator_puzzle", quest_item_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/danger/ship_item04.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
-	}
-	else if (quest_item_type == QUEST_ITEM_MAGIC_ARMOR)
-	{
-		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_magic_armor_puzzle", quest_item_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/desert/3po_torso.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
-	}
-	else if (quest_item_type == QUEST_ITEM_SPIRIT_CRYSTAL)
-	{
-		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_spirit_crystal", quest_item_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_green.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
 	}
 	else if (quest_item_type == QUEST_ITEM_SPIRIT_TREE)
 	{
@@ -5568,12 +5537,6 @@ void magic_power_events(gentity_t *ent)
 		{
 			int i = 0;
 			int magic_bonus = 0;
-
-			// zyk: Magic Armor improves all magic powers
-			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
-			{
-				magic_bonus += 1;
-			}
 
 			// zyk: Magic Affinity increases magic damage
 			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER);
@@ -6855,9 +6818,7 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_QUEST_LOG] = 50;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 150;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 450;
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] = 50;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 200;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_MAGIC_SHIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 7;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 20;
@@ -7203,29 +7164,6 @@ void zyk_start_main_quest_spirits_event(gentity_t* ent)
 }
 
 extern void zyk_reset_quest(gentity_t* ent);
-void zyk_show_quest_riddle(gentity_t* ent)
-{
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 0)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Its size is immense, and having its energy is a must... it keeps life on Earth, on its power we can trust...\n\"", QUESTCHAR_TRAVELING_MAGE));
-	}
-	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 1)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: One can feel warm, with the power of its energy... its power can also be evil, burning to ashes all the harmony...\n\"", QUESTCHAR_TRAVELING_MAGE));
-	}
-	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 2)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The harsh feeling of anger, hurting deep into the soul... if one is consumed by it, their life will fall into its bowl...\n\"", QUESTCHAR_TRAVELING_MAGE));
-	}
-	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 3)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: It has a pure essence, it can create life... but it can also be furious, like a sharp cut of a knife...\n\"", QUESTCHAR_TRAVELING_MAGE));
-	}
-	else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == 4)
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: The pure feeling of affection, even the evil ones can sustain... if one can feel and share, their life will not be in vain...\n\"", QUESTCHAR_TRAVELING_MAGE));
-	}
-}
 
 int zyk_spirit_tree_wither(float x, float y, float z)
 {
@@ -8410,11 +8348,6 @@ void G_RunFrame( int levelTime ) {
 			int model_y = level.legendary_artifact_origin[1];
 			int model_z = level.legendary_artifact_origin[2];
 
-			if (level.legendary_artifact_type == QUEST_ITEM_MAGIC_ARMOR)
-			{
-				legendary_artifact_scale = 80;
-			}
-
 			zyk_spawn_legendary_artifact_model(model_x, model_y, model_z, legendary_artifact_scale);
 
 			level.legendary_artifact_step = QUEST_SECRET_SECRET_ITEM_SPAWNED_STEP;
@@ -9063,9 +8996,7 @@ void G_RunFrame( int levelTime ) {
 					int power_level = zyk_total_skillpoints(ent) + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
 					int level_chance = ((MAX_GENTITIES - level.num_entities) / 100);
 
-					int magic_armor_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / 4) - level_chance;
-					int energy_modulator_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 4) - level_chance;
-					int spirit_crystal_chance = (main_quest_progress / 10) + (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) / 4) - level_chance;
+					int energy_modulator_chance = (main_quest_progress / 10) + (power_level / 4) - level_chance;
 					int crystal_chance = (level.num_entities / 10);
 					
 					if (Q_irand(0, 99) < crystal_chance)
@@ -9074,7 +9005,7 @@ void G_RunFrame( int levelTime ) {
 					}
 					
 					if (Q_irand(0, 99) < energy_modulator_chance && level.energy_modulator_timer < level.time && 
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < ENERGY_MODULATOR_PARTS)
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < 1)
 					{ // zyk: Energy Modulator side quest
 						float puzzle_x, puzzle_y, puzzle_z;
 						gentity_t* chosen_entity = NULL;
@@ -9101,117 +9032,7 @@ void G_RunFrame( int levelTime ) {
 						}
 					}
 
-					if (Q_irand(0, 99) < magic_armor_chance && level.magic_armor_timer < level.time && 
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] == 0)
-					{ // zyk: Magic Armor side quest
-						float puzzle_x, puzzle_y, puzzle_z;
-						gentity_t* chosen_entity = NULL;
-
-						chosen_entity = zyk_find_entity_for_quest();
-
-						if (chosen_entity)
-						{
-							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
-							{
-								puzzle_x = chosen_entity->r.currentOrigin[0];
-								puzzle_y = chosen_entity->r.currentOrigin[1];
-								puzzle_z = chosen_entity->r.currentOrigin[2];
-							}
-							else
-							{
-								puzzle_x = chosen_entity->s.origin[0];
-								puzzle_y = chosen_entity->s.origin[1];
-								puzzle_z = chosen_entity->s.origin[2];
-							}
-
-							zyk_spawn_quest_item(QUEST_ITEM_MAGIC_ARMOR, (magic_armor_chance * SIDE_QUEST_STUFF_TIMER), 80, puzzle_x, puzzle_y, puzzle_z);
-							level.magic_armor_timer = level.time + (magic_armor_chance * SIDE_QUEST_STUFF_TIMER);
-						}
-					}
-
-					if (Q_irand(0, 99) < spirit_crystal_chance &&
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < SPIRIT_CRYSTAL_PARTS)
-					{ // zyk: Spirit Crystal side quest
-						float puzzle_x, puzzle_y, puzzle_z;
-						gentity_t* chosen_entity = NULL;
-
-						chosen_entity = zyk_find_entity_for_quest();
-
-						if (chosen_entity)
-						{
-							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
-							{
-								puzzle_x = chosen_entity->r.currentOrigin[0];
-								puzzle_y = chosen_entity->r.currentOrigin[1];
-								puzzle_z = chosen_entity->r.currentOrigin[2];
-							}
-							else
-							{
-								puzzle_x = chosen_entity->s.origin[0];
-								puzzle_y = chosen_entity->s.origin[1];
-								puzzle_z = chosen_entity->s.origin[2];
-							}
-
-							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < (SPIRIT_CRYSTAL_PARTS - 1))
-							{
-								zyk_spawn_quest_npc(QUEST_NPC_TRAVELING_MAGE, 0, (spirit_crystal_chance * SIDE_QUEST_STUFF_TIMER), qfalse, -1);
-							}
-							else
-							{
-								zyk_spawn_quest_item(QUEST_ITEM_SPIRIT_CRYSTAL, (spirit_crystal_chance * SIDE_QUEST_STUFF_TIMER), 45, puzzle_x, puzzle_y, puzzle_z);
-							}
-						}
-					}
-
 					ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME;
-				}
-
-				// zyk: Traveling Mage events
-				if (ent->client->pers.quest_seller_event_step > QUEST_SELLER_STEP_NONE && ent->client->pers.quest_seller_event_timer < level.time)
-				{
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] < (SPIRIT_CRYSTAL_PARTS - 1))
-					{
-						if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_STEP_TALKED)
-						{
-							trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello! Answer my riddle in chat and I will give you a part of the Spirit Crystal!\n\"", QUESTCHAR_TRAVELING_MAGE));
-						}
-						else if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_RIDDLE_START)
-						{ // zyk: Seller riddles
-							zyk_show_quest_riddle(ent);
-						}
-						else if (ent->client->pers.quest_seller_event_step == QUEST_SELLER_END_STEP)
-						{
-							ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] += 1;
-
-							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
-
-							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_SPIRIT_CRYSTAL] == (SPIRIT_CRYSTAL_PARTS - 1))
-							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Now you must find the final part, a green crystal^7.\n\"", QUESTCHAR_TRAVELING_MAGE));
-							}
-							else
-							{
-								trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Correct answer! Receive this part of the Spirit Crystal^7.\n\"", QUESTCHAR_TRAVELING_MAGE));
-							}
-						}
-					}
-					else
-					{
-						trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello again! I hope my Spirit Crystal helped you!\n\"", QUESTCHAR_TRAVELING_MAGE));
-
-						ent->client->pers.quest_seller_event_step = NUM_QUEST_SELLER_STEPS;
-					}
-
-					if (ent->client->pers.quest_seller_event_step != QUEST_SELLER_RIDDLE_ANSWER)
-					{
-						ent->client->pers.quest_seller_event_step++;
-						ent->client->pers.quest_seller_event_timer = level.time + 5000;
-					}
-
-					if (ent->client->pers.quest_seller_event_step >= NUM_QUEST_SELLER_STEPS)
-					{
-						ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_NONE;
-					}
 				}
 
 				// zyk: control the quest events
@@ -9475,15 +9296,8 @@ void G_RunFrame( int levelTime ) {
 						if (ent->client->pers.skill_levels[magic_skill_index] > 0)
 						{
 							int magic_cast_dist = 0;
-							int magic_bonus = 0;
 
-							// zyk: Magic Armor improves all magic powers
-							if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
-							{
-								magic_bonus = 1;
-							}
-
-							magic_cast_dist = MAGIC_MIN_RANGE + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[magic_skill_index] + magic_bonus));
+							magic_cast_dist = MAGIC_MIN_RANGE;
 
 							if (quest_npc_enemy_distance < Q_irand(0, magic_cast_dist) && !(ent->client->pers.active_magic & (1 << random_magic)))
 							{
@@ -9590,33 +9404,6 @@ void G_RunFrame( int levelTime ) {
 							zyk_stop_all_magic_powers(ent);
 						}
 					}
-				}
-
-				if (ent->client->pers.quest_npc == QUEST_NPC_TRAVELING_MAGE && ent->client->pers.quest_seller_map_timer < level.time)
-				{ // zyk: the time for the Traveling Mage to stay in the map run out. He will go away
-					gentity_t* player_ent = NULL;
-					int player_it = 0;
-
-					for (player_it = 0; player_it < level.maxclients; player_it++)
-					{
-						player_ent = &g_entities[player_it];
-
-						if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG &&
-							player_ent->client->pers.quest_seller_event_step > QUEST_SELLER_STEP_NONE && player_ent->client->pers.quest_seller_event_step < QUEST_SELLER_END_STEP)
-						{
-							player_ent->client->pers.quest_seller_event_step = QUEST_SELLER_STEP_NONE;
-
-							trap->SendServerCommand(player_ent->s.number, va("chat \"%s^7: I must go away now. See you later!\n\"", QUESTCHAR_TRAVELING_MAGE));
-						}
-					}
-
-					if (ent->client->pers.active_magic > 0)
-					{ // zyk: stop using all magic
-						zyk_stop_all_magic_powers(ent);
-					}
-
-					ent->think = G_FreeEntity;
-					ent->nextthink = level.time;
 				}
 
 				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy)
