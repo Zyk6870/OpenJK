@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.4.5"
+#define	GAMEVERSION	"New Zyk Mod v1.4.6"
 
 #define SECURITY_LOG "security.log"
 
@@ -639,7 +639,6 @@ typedef enum {
 	SKILL_MAX_STAMINA,
 	SKILL_RUN_SPEED,
 	SKILL_MAGIC_FIST,
-	SKILL_MAX_MP,
 	SKILL_MAGIC_FLIGHT,
 	SKILL_MAGIC_MAGIC_DOME,
 	SKILL_MAGIC_WATER_MAGIC,

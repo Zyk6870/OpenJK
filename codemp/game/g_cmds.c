@@ -80,7 +80,6 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_RUN_SPEED] = 4;
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 4;
-	max_skill_levels[SKILL_MAX_MP] = 12;
 	max_skill_levels[SKILL_MAGIC_FLIGHT] = 8;
 	max_skill_levels[SKILL_MAGIC_MAGIC_DOME] = 8;
 	max_skill_levels[SKILL_MAGIC_WATER_MAGIC] = 8;
@@ -132,7 +131,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
-	skill_names[SKILL_MAX_MP] = "Max Magic Points";
 	skill_names[SKILL_MAGIC_FLIGHT] = "Magic Flight";
 	skill_names[SKILL_MAGIC_MAGIC_DOME] = "Magic Dome";
 	skill_names[SKILL_MAGIC_WATER_MAGIC] = "Water Magic";
@@ -209,8 +207,6 @@ char* zyk_skill_description(int skill_index)
 	
 	if (skill_index == SKILL_MAGIC_FIST)
 		return va("allows you to attack with magic bolts when using melee punches. At max level, can damage saber-only damage objects and move pushable/pullable objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
-	if (skill_index == SKILL_MAX_MP)
-		return "increases the max amount of Magic Points the player can have. Each level increases it by 100. This is used to cast magic powers";
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level increases flight speed and decreases mp usage";
 	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
@@ -264,7 +260,6 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_RUN_SPEED] = "skillrunspeed";
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
-	skill_names[SKILL_MAX_MP] = "skillmaxmagicpoints";
 	skill_names[SKILL_MAGIC_FLIGHT] = "skillmagicflight";
 	skill_names[SKILL_MAGIC_MAGIC_DOME] = "skillmagicdome";
 	skill_names[SKILL_MAGIC_WATER_MAGIC] = "skillwatermagic";
@@ -4923,7 +4918,7 @@ int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = (ent->client->pers.skill_levels[SKILL_MAX_MP] * 100) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+	int max_mp = (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 40);
 
 	return max_mp;
 }
