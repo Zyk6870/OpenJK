@@ -3148,10 +3148,9 @@ void fx_runner_link( gentity_t *ent )
 		ent->think = fx_runner_think;
 
 		if (Q_stricmp(ent->targetname, "zyk_magic_dome") == 0 ||
-			Q_stricmp(ent->targetname, "zyk_magic_water") == 0 || Q_stricmp(ent->targetname, "zyk_magic_earth") == 0 ||
-			Q_stricmp(ent->targetname, "zyk_magic_fire") == 0 || Q_stricmp(ent->targetname, "zyk_magic_air") == 0 ||
-			Q_stricmp(ent->targetname, "zyk_magic_dark") == 0 || Q_stricmp(ent->targetname, "zyk_magic_light") == 0 ||
-			Q_stricmp(ent->targetname, "zyk_magic_element") == 0)
+			Q_stricmp(ent->targetname, "zyk_magic_water") == 0 || 
+			Q_stricmp(ent->targetname, "zyk_magic_fire") == 0 ||
+			Q_stricmp(ent->targetname, "zyk_magic_light") == 0)
 		{ // zyk: effects from magic powers start right now
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 100; // wait a small bit, then start working
@@ -3227,10 +3226,9 @@ void SP_fx_runner( gentity_t *ent )
 
 	// zyk: no need to wait 400 ms with these effects
 	if (Q_stricmp(ent->targetname, "zyk_magic_dome") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_magic_water") == 0 || Q_stricmp(ent->targetname, "zyk_magic_earth") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_magic_fire") == 0 || Q_stricmp(ent->targetname, "zyk_magic_air") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_magic_dark") == 0 || Q_stricmp(ent->targetname, "zyk_magic_light") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_magic_element") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_magic_water") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_magic_fire") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_magic_light") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_status_poison") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_status_on_fire") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0 ||

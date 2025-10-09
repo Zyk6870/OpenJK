@@ -81,13 +81,10 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 4;
 	max_skill_levels[SKILL_MAGIC_FLIGHT] = 8;
-	max_skill_levels[SKILL_MAGIC_DOME] = 8;
-	max_skill_levels[SKILL_HEALING_WATER] = 8;
-	max_skill_levels[SKILL_MAGIC_EARTH_MAGIC] = 8;
-	max_skill_levels[SKILL_MAGIC_FIRE_MAGIC] = 8;
-	max_skill_levels[SKILL_MAGIC_AIR_MAGIC] = 8;
-	max_skill_levels[SKILL_MAGIC_DARK_MAGIC] = 8;
-	max_skill_levels[SKILL_MAGIC_LIGHT_MAGIC] = 8;
+	max_skill_levels[SKILL_MAGIC_DOME] = 10;
+	max_skill_levels[SKILL_HEALING_WATER] = 10;
+	max_skill_levels[SKILL_FIRE_STRENGTH] = 10;
+	max_skill_levels[SKILL_LIGHTNING_DOME] = 10;
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
@@ -132,13 +129,10 @@ char* zyk_skill_name(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "Magic Flight";
-	skill_names[SKILL_MAGIC_DOME] = "Magic Dome";
+	skill_names[SKILL_MAGIC_DOME] = "Defensive Dome";
 	skill_names[SKILL_HEALING_WATER] = "Healing Water";
-	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "Earth Magic";
-	skill_names[SKILL_MAGIC_FIRE_MAGIC] = "Fire Magic";
-	skill_names[SKILL_MAGIC_AIR_MAGIC] = "Air Magic";
-	skill_names[SKILL_MAGIC_DARK_MAGIC] = "Dark Magic";
-	skill_names[SKILL_MAGIC_LIGHT_MAGIC] = "Light Magic";
+	skill_names[SKILL_FIRE_STRENGTH] = "Fire Strength";
+	skill_names[SKILL_LIGHTNING_DOME] = "Lightning Dome";
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
@@ -212,17 +206,11 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_DOME)
 		return "an energy dome appears around you. Each level increases your resistance to damage to your health and the damage done to enemies inside it";
 	if (skill_index == SKILL_HEALING_WATER)
-		return "Restores health to you and nearby ally players or npcs";
-	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
-		return "hits enemies with Earth elemental damage. Has a chance of knocking down enemies in the ground with an earthquake. Each level increases chance of causing Bleeding status to enemies. Increases your Earth element affinity. More powerful against enemies with Air affinity. Absorbs some Earth magic effects";
-	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
-		return "hits enemies with Fire elemental damage. Enemies hit by it will catch fire for some seconds, and the duration of this effect increases with each level. Increases your Fire element affinity. More powerful against enemies with Water affinity. Absorbs some Fire magic effects";
-	if (skill_index == SKILL_MAGIC_AIR_MAGIC)
-		return "blows enemies away with a strong wind, and does Air elemental damage to them. Increases your run speed. Has a chance of knocking enemies down if they are midair. Increases your Air element affinity. More powerful against enemies with Earth affinity. Absorbs some Air magic effects";
-	if (skill_index == SKILL_MAGIC_DARK_MAGIC)
-		return "creates a black hole, sucking enemies nearby and doing Dark elemental damage to them. Drains a small amount of health from enemies. Increases your Dark element affinity. More powerful against enemies with Light affinity. Absorbs some Dark magic effects";
-	if (skill_index == SKILL_MAGIC_LIGHT_MAGIC)
-		return "creates a shining light that does Light elemental damage to enemies. Regens shield and Stamina. Each level increases the chance of causing Confusion status and the amount of shield and Stamina recovered. Increases your Light element affinity. More powerful against enemies with Dark affinity. Absorbs some Light magic effects";
+		return "Restores health to you and nearby ally players or npcs. Causes bad status effects to enemies, like Poison, Fire, Bleeding and Confusion";
+	if (skill_index == SKILL_FIRE_STRENGTH)
+		return "increases your run speed and damage of all your attacks";
+	if (skill_index == SKILL_LIGHTNING_DOME)
+		return "keeps creating Lightning Domes after some seconds, damaging enemies at a good distance";
 
 	return "";
 }
@@ -263,11 +251,8 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_MAGIC_FLIGHT] = "skillmagicflight";
 	skill_names[SKILL_MAGIC_DOME] = "skillmagicdome";
 	skill_names[SKILL_HEALING_WATER] = "skillhealingwater";
-	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "skillearthmagic";
-	skill_names[SKILL_MAGIC_FIRE_MAGIC] = "skillfiremagic";
-	skill_names[SKILL_MAGIC_AIR_MAGIC] = "skillairmagic";
-	skill_names[SKILL_MAGIC_DARK_MAGIC] = "skilldarkmagic";
-	skill_names[SKILL_MAGIC_LIGHT_MAGIC] = "skilllightmagic";
+	skill_names[SKILL_FIRE_STRENGTH] = "skillfirestrength";
+	skill_names[SKILL_LIGHTNING_DOME] = "skilllightningdome";
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
 	{
@@ -4904,7 +4889,7 @@ int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
 	else if (skill_category == SKILL_CATEGORY_MAGIC)
 	{
 		first_skill_index = SKILL_MAGIC_FIST;
-		last_skill_index = SKILL_MAGIC_LIGHT_MAGIC;
+		last_skill_index = SKILL_LIGHTNING_DOME;
 	}
 
 	for (i = first_skill_index; i <= last_skill_index; i++)
@@ -4926,7 +4911,7 @@ int zyk_max_magic_power(gentity_t *ent)
 // zyk: tests if this skill is one of the magic powers
 qboolean zyk_is_magic_power_skill(int skill_index)
 {
-	if (skill_index >= SKILL_MAGIC_DOME && skill_index <= SKILL_MAGIC_LIGHT_MAGIC)
+	if (skill_index >= SKILL_MAGIC_DOME && skill_index <= SKILL_LIGHTNING_DOME)
 	{
 		return qtrue;
 	}
@@ -5520,8 +5505,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.thermal_vision = qfalse;
 			ent->client->pers.thermal_vision_cooldown_time = 0;
 
-			ent->client->pers.quest_power_status = 0;
-			ent->client->pers.hit_by_magic = 0;
+			ent->client->pers.active_magic = 0;
 
 			// zyk: used to add a cooldown between each flame
 			ent->client->cloakDebReduce = 0;
@@ -6478,7 +6462,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 	else if (Q_stricmp(arg1, "magic") == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, SKILL_MAGIC_FIST, SKILL_MAGIC_LIGHT_MAGIC);
+		zyk_list_category_skills(ent, target_ent, SKILL_MAGIC_FIST, SKILL_LIGHTNING_DOME);
 	}
 }
 
@@ -10513,13 +10497,10 @@ Cmd_Magic_f
 int zyk_get_magic_cost(int magic_number)
 {
 	int magic_costs[MAX_MAGIC_POWERS] = {
-		100, // Dome of Damage
-		100, // Water Magic
-		100, // Earth Magic
-		100, // Fire Magic
-		100, // Air Magic
-		100, // Dark Magic
-		100 // Light Magic
+		20, // Dome of Damage
+		20, // Water Magic
+		20, // Fire Strength
+		20  // Lightning Dome
 	};
 
 	return magic_costs[magic_number];
@@ -10538,14 +10519,10 @@ qboolean zyk_can_cast_magic(gentity_t* ent)
 	return qtrue;
 }
 
-extern void zyk_spawn_magic_element_effect(gentity_t* ent, vec3_t effect_origin, int magic_number, int duration);
 extern void dome_of_damage(gentity_t* ent);
 extern void water_magic(gentity_t* ent);
-extern void earth_magic(gentity_t* ent);
-extern void fire_magic(gentity_t* ent);
-extern void air_magic(gentity_t* ent);
-extern void dark_magic(gentity_t* ent);
-extern void light_magic(gentity_t* ent);
+extern void fire_strength(gentity_t* ent);
+extern void magic_lightning_dome(gentity_t* ent);
 void zyk_cast_magic(gentity_t* ent, int skill_index)
 {
 	int magic_number = zyk_get_magic_index(skill_index);
@@ -10566,12 +10543,12 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 		return;
 	}
 
-	if (ent->client->pers.quest_power_usage_timer < level.time)
+	if (ent->client->pers.magic_power_usage_timer < level.time)
 	{
 		// zyk: cooldown to toggle magic powers
-		ent->client->pers.quest_power_usage_timer = level.time + MAGIC_ANIM_TIME;
+		ent->client->pers.magic_power_usage_timer = level.time + MAGIC_ANIM_TIME;
 
-		if (ent->client->pers.quest_power_status & (1 << magic_number))
+		if (ent->client->pers.active_magic & (1 << magic_number))
 		{ // zyk: stop using the magic power
 			rpg_skill_counter(ent, 50);
 
@@ -10587,14 +10564,8 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 		{ // zyk: use the magic power
 			int magic_cost = zyk_get_magic_cost(magic_number);
 
-			// zyk: Magic Affinity reduces mp cost
-			magic_cost -= zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC);
-
 			if (ent->client->pers.magic_power >= magic_cost)
 			{
-				// zyk: magic usage effect
-				zyk_spawn_magic_element_effect(ent, ent->r.currentOrigin, magic_number, 1500);
-
 				// zyk: magic usage anim
 				G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCE_RAGE, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
 				ent->client->ps.torsoTimer = MAGIC_ANIM_TIME;
@@ -10609,25 +10580,13 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				{
 					water_magic(ent);
 				}
-				else if (magic_number == MAGIC_EARTH_MAGIC)
+				else if (magic_number == MAGIC_FIRE_STRENGTH)
 				{
-					earth_magic(ent);
+					fire_strength(ent);
 				}
-				else if (magic_number == MAGIC_FIRE_MAGIC)
+				else if (magic_number == MAGIC_LIGHTNING_DOME)
 				{
-					fire_magic(ent);
-				}
-				else if (magic_number == MAGIC_AIR_MAGIC)
-				{
-					air_magic(ent);
-				}
-				else if (magic_number == MAGIC_DARK_MAGIC)
-				{
-					dark_magic(ent);
-				}
-				else if (magic_number == MAGIC_LIGHT_MAGIC)
-				{
-					light_magic(ent);
+					magic_lightning_dome(ent);
 				}
 
 				// zyk: magic powers cost mp
@@ -10637,7 +10596,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 
 				if (ent->s.number < MAX_CLIENTS)
 				{
-					display_yellow_bar(ent, (ent->client->pers.quest_power_usage_timer - level.time));
+					display_yellow_bar(ent, (ent->client->pers.magic_power_usage_timer - level.time));
 				}
 			}
 			else
@@ -10650,7 +10609,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 	else
 	{
 		if (ent->s.number < MAX_CLIENTS)
-			trap->SendServerCommand(ent->s.number, va("chat \"^3Magic Power: ^7%d seconds left!\"", ((ent->client->pers.quest_power_usage_timer - level.time) / 1000)));
+			trap->SendServerCommand(ent->s.number, va("chat \"^3Magic Power: ^7%d seconds left!\"", ((ent->client->pers.magic_power_usage_timer - level.time) / 1000)));
 	}
 }
 

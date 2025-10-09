@@ -2260,9 +2260,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_USING_FLASHLIGHT);
 
-	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_EARTH);
-	self->client->pers.hit_by_magic &= ~(1 << MAGIC_HIT_BY_AIR);
-
 	if (self->client->pers.race_position > 0) // zyk: if a player dies during a race, he loses the race
 	{
 		self->client->pers.race_position = 0;
@@ -4823,10 +4820,7 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 	char* magic_powers_effects[MAX_MAGIC_POWERS] = {
 		"zyk_magic_dome",
 		"zyk_magic_water",
-		"zyk_magic_earth",
 		"zyk_magic_fire",
-		"zyk_magic_air",
-		"zyk_magic_dark",
 		"zyk_magic_light"
 	};
 
@@ -4834,11 +4828,8 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 	{
 		MAGIC_MAGIC_DOME,
 		MAGIC_HEALING_WATER,
-		MAGIC_EARTH_MAGIC,
-		MAGIC_FIRE_MAGIC,
-		MAGIC_AIR_MAGIC,
-		MAGIC_DARK_MAGIC,
-		MAGIC_LIGHT_MAGIC
+		MAGIC_FIRE_STRENGTH,
+		MAGIC_LIGHTNING_DOME
 	};
 
 	for (i = 0; i < MAX_MAGIC_POWERS; i++)
@@ -5058,6 +5049,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 	if (attacker && attacker->client && (attacker->client->sess.account_mode == ACC_MODE_RPG || (attacker->NPC && attacker->client->pers.quest_npc > QUEST_NPC_NONE)))
 	{ // zyk: bonus damage
+		int magic_bonus = 0;
+
 		// zyk: Magic bolts can damage heavy things
 		if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2)
 		{
@@ -5069,6 +5062,19 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			damage = (int)ceil(damage * 1.25);
 
 			zyk_energy_modulator_resource_usage(attacker);
+		}
+
+		// zyk: Magic Armor improves all magic powers
+		if (attacker->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
+		{
+			magic_bonus += 1;
+		}
+
+		if (attacker->client->pers.active_magic & (1 << MAGIC_FIRE_STRENGTH))
+		{
+			float fire_strength_bonus = 1.0f + (0.02f * (attacker->client->pers.skill_levels[SKILL_FIRE_STRENGTH] + magic_bonus + (zyk_skill_affinity(attacker, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER)));
+
+			damage = (int)ceil(damage * fire_strength_bonus);
 		}
 	}
 
@@ -6108,8 +6114,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (targ->client->pers.quest_power_status & (1 << MAGIC_MAGIC_DOME))
-			{ // zyk: target using Magic Dome
+			if (targ->client->pers.active_magic & (1 << MAGIC_MAGIC_DOME))
+			{ // zyk: target using Defensive Dome
 				int magic_bonus = zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
 
 				// zyk: Magic Armor improves all magic powers
@@ -6118,7 +6124,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					magic_bonus += 1;
 				}
 
-				bonus_health_resistance += (0.025f * (targ->client->pers.skill_levels[SKILL_MAGIC_DOME] + magic_bonus));
+				bonus_health_resistance += (0.02f * (targ->client->pers.skill_levels[SKILL_MAGIC_DOME] + magic_bonus + (zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER)));
 			}
 			
 			// zyk: reduces damage based on the health resistance bonuses
@@ -6146,14 +6152,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 				zyk_set_stamina(targ, stamina_loss, qfalse);
 			}
-		}
-
-		// zyk: Dark Magic drains health
-		if (mod == MOD_UNKNOWN && attacker && attacker->client && attacker->health > 0 && 
-			inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) == MAGIC_DARK_MAGIC &&
-			targ->client && Q_irand(0, 99) < (take * 2))
-		{
-			zyk_add_health(attacker, take);
 		}
 
 		// zyk: some quest npcs have special abilities
@@ -6621,7 +6619,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					if (magic_power_user && magic_power_user->client && magic_power_user != ent && 
 						this_magic_power > -1)
 					{
-						float elemental_bonus_factor = 1;
 						int final_damage = (int)points;
 
 						if (zyk_can_hit_target(magic_power_user, ent) == qfalse)
@@ -6634,147 +6631,25 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							continue;
 						}
 
-						elemental_bonus_factor = zyk_get_elemental_bonus_factor(this_magic_power, magic_power_user, ent);
-
-						// zyk: Elemental bonus. Each power gives a higher damage to target of opposite element and less damage to target of same element
-						final_damage = (int)ceil(final_damage * elemental_bonus_factor);
-
 						// zyk: must do at least 1 damage
 						if (final_damage < 1)
 							final_damage = 1;
 
 						if (this_magic_power == MAGIC_HEALING_WATER)
 						{
+							int chance_for_bad_status = final_damage;
+
+							zyk_remove_emotes(ent);
+
+							if (Q_irand(0, 99) < chance_for_bad_status)
+							{
+								zyk_rpg_status_t random_bad_status = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
+
+								zyk_set_rpg_status(ent, random_bad_status, chance_for_bad_status * 1000, qtrue);
+							}
+
+							// zyk: this magic deals no damage
 							final_damage = 0;
-						}
-						else if (this_magic_power == MAGIC_EARTH_MAGIC)
-						{
-							int chance_for_knockdown = final_damage;
-							int chance_for_bleeding = final_damage / 2;
-
-							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_earth", "0", "env/rock_smash", 0, 0, 0, 500);
-
-							if (ent->client && ent->health > 0 && 
-								Q_irand(0, 99) < chance_for_knockdown && ent->client->ps.groundEntityNum != ENTITYNUM_NONE && 
-								!(ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_EARTH)))
-							{// zyk: target can only be hit on the floor
-								zyk_remove_emotes(ent);
-
-								ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-								ent->client->ps.forceHandExtendTime = level.time + 800;
-								ent->client->ps.velocity[2] += 300;
-								ent->client->ps.forceDodgeAnim = 0;
-								ent->client->ps.quickerGetup = qtrue;
-
-								if (ent->s.number < level.maxclients)
-								{
-									G_ScreenShake(ent->client->ps.origin, ent, 10.0f, 2000, qtrue);
-								}
-
-								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/stone_break1.mp3"));
-
-								ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_EARTH);
-								ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_EARTH] = level.time + 5000;
-							}
-
-							if (Q_irand(0, 99) < chance_for_bleeding)
-							{
-								zyk_set_rpg_status(ent, RPG_STATUS_BLEEDING, final_damage * 500, qtrue);
-							}
-						}
-						else if (this_magic_power == MAGIC_FIRE_MAGIC)
-						{
-							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_fire", "0", "env/fire", 0, 0, 0, 500);
-							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
-
-							zyk_set_rpg_status(ent, RPG_STATUS_IN_FLAMES, final_damage * 1000, qtrue);
-						}
-						else if (this_magic_power == MAGIC_AIR_MAGIC)
-						{
-							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_air", "0", "env/water_steam3", 0, 0, 0, 500);
-							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/woosh1.mp3"));
-
-							static vec3_t air_magic_forward;
-							vec3_t air_magic_dir;
-
-							if (ent->client && ent->health > 0)
-							{ // zyk: blows the target away
-								int chance_for_knockdown = final_damage;
-								float air_strength = 1.0 + (final_damage / 2);
-
-								VectorSubtract(ent->client->ps.origin, magic_power_user->client->ps.origin, air_magic_forward);
-								VectorNormalize(air_magic_forward);
-
-								if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-								{
-									air_strength *= 75.0;
-								}
-								else
-								{
-									air_strength *= 15.0;
-								}
-
-								VectorScale(air_magic_forward, air_strength, air_magic_dir);
-								VectorAdd(ent->client->ps.velocity, air_magic_dir, ent->client->ps.velocity);
-
-								zyk_remove_emotes(ent);
-
-								// zyk: hit by Air Magic. Has a chance to knock down the target while midair
-								if (Q_irand(0, 99) < chance_for_knockdown && ent->client->ps.groundEntityNum == ENTITYNUM_NONE && 
-									!(ent->client->pers.hit_by_magic & (1 << MAGIC_HIT_BY_AIR)))
-								{
-									ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-									ent->client->ps.forceHandExtendTime = level.time + 800;
-									ent->client->ps.velocity[2] += 100;
-									ent->client->ps.forceDodgeAnim = 0;
-									ent->client->ps.quickerGetup = qtrue;
-
-									ent->client->pers.hit_by_magic |= (1 << MAGIC_HIT_BY_AIR);
-									ent->client->pers.magic_power_target_timer[MAGIC_HIT_BY_AIR] = level.time + 5000;
-								}
-							}
-						}
-						else if (this_magic_power == MAGIC_DARK_MAGIC)
-						{
-							if (ent->client && ent->health > 0)
-							{
-								vec3_t dark_magic_dir, dark_magic_forward;
-								float target_distance = Distance(magic_power_user->client->ps.origin, ent->client->ps.origin);
-								float black_hole_suck_strength = 1.0 + (final_damage / 2);
-
-								VectorSubtract(magic_power_user->client->ps.origin, ent->client->ps.origin, dark_magic_forward);
-								VectorNormalize(dark_magic_forward);
-
-								// zyk: tests if the target is on the ground or in the air
-								if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-								{
-									black_hole_suck_strength *= 75.0;
-								}
-								else
-								{
-									black_hole_suck_strength *= 15.0;
-								}
-
-								VectorScale(dark_magic_forward, black_hole_suck_strength, dark_magic_dir);
-								VectorAdd(ent->client->ps.velocity, dark_magic_dir, ent->client->ps.velocity);
-
-								zyk_remove_emotes(ent);
-							}
-						}
-						else if (this_magic_power == MAGIC_LIGHT_MAGIC)
-						{
-							if (ent->client && ent->health > 0)
-							{
-								int chance_for_confusion = final_damage / 2;
-
-								zyk_remove_emotes(ent);
-
-								// zyk: confuses the target
-								if (Q_irand(0, 99) < chance_for_confusion)
-								{
-									zyk_set_rpg_status(ent, RPG_STATUS_CONFUSED, final_damage * 400, qtrue);
-								}
-							}
 						}
 
 						if (ent->client && !(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)))
@@ -6788,11 +6663,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						if (final_damage > 0)
 						{
 							G_Damage(ent, attacker, magic_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
-						}
-
-						if (this_magic_power == MAGIC_DARK_MAGIC && ent && ent->client && ent->health < 1)
-						{ // zyk: Black Hole disintegrates enemies who got killed by it
-							ent->client->ps.eFlags |= EF_DISINTEGRATION;
 						}
 					}
 					else

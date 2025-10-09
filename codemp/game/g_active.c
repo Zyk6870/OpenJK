@@ -1326,7 +1326,7 @@ void zyk_stamina_out(gentity_t* ent)
 		ent->client->pers.stamina_out_timer = level.time + stamina_out_time;
 
 		// zyk: cannot use magic while passed out
-		ent->client->pers.quest_power_usage_timer = level.time + stamina_out_time;
+		ent->client->pers.magic_power_usage_timer = level.time + stamina_out_time;
 
 		ent->client->pers.is_getting_up = qfalse;
 
@@ -1542,7 +1542,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			// zyk: active magic uses stamina
 			for (i = 0; i < MAX_MAGIC_POWERS; i++)
 			{
-				if (ent->client->pers.quest_power_status & (1 << i))
+				if (ent->client->pers.active_magic & (1 << i))
 				{
 					stamina_usage += (12 + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER));
 				}
@@ -1570,7 +1570,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 				zyk_set_stamina(ent, stamina_meditate_recovery, qtrue);
 
 				// zyk: not using magic and meditating. Regen some mp
-				if (ent->client->pers.quest_power_status == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
+				if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 				{
 					zyk_set_mp(ent, 1, qtrue);
 
@@ -2593,8 +2593,8 @@ void ClientThink_real( gentity_t *ent ) {
 			//ent->client->ps.speed = ent->client->ps.basespeed = NPC_GetRunSpeed( ent );
 		}
 
-		if (client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))
-		{ // zyk: using Air Magic. Increase speed
+		if (client->pers.active_magic & (1 << MAGIC_FIRE_STRENGTH))
+		{ // zyk: using Fire Strength. Increase speed
 			client->ps.speed *= 2;
 		}
 
@@ -2640,8 +2640,8 @@ void ClientThink_real( gentity_t *ent ) {
 			zyk_player_speed += zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
 		}
 
-		if (client->pers.quest_power_status & (1 << MAGIC_AIR_MAGIC))
-		{ // zyk: using Air Magic. Increase speed
+		if (client->pers.active_magic & (1 << MAGIC_FIRE_STRENGTH))
+		{ // zyk: using Fire Strength. Increase speed
 			zyk_player_speed *= 2;
 		}
 

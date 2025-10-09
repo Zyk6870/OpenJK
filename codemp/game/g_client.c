@@ -2680,7 +2680,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 
 	// zyk: initializing attributes used in RPG mode
 	// zyk: cooldown time between magic powers
-	client->pers.quest_power_usage_timer = 0;
+	client->pers.magic_power_usage_timer = 0;
 
 	// zyk: duelist went to spec. Reset him from duels
 	if (level.duel_players[ent->s.number] > -1)
@@ -3838,7 +3838,7 @@ void ClientSpawn(gentity_t *ent) {
 	ent->client->pers.flame_thrower_timer = 0;
 
 	// zyk: initializing Quest Power attributes
-	ent->client->pers.quest_power_status = 0;
+	ent->client->pers.active_magic = 0;
 	ent->client->pers.in_magic_flight = qfalse;
 
 	ent->client->pers.skill_crystal_timer = 0;

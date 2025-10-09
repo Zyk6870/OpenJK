@@ -1776,8 +1776,8 @@ finish:
 		newent->client->pers.quest_npc_caller_player_id = -1;
 
 		// zyk: initializing Magic Power attributes
-		newent->client->pers.quest_power_status = 0;
-		newent->client->pers.quest_power_usage_timer = 0;
+		newent->client->pers.active_magic = 0;
+		newent->client->pers.magic_power_usage_timer = 0;
 		newent->client->pers.magic_power = 0;
 
 		for (zyk_it = 0; zyk_it < NUMBER_OF_SKILLS; zyk_it++)

@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.4.7"
+#define	GAMEVERSION	"New Zyk Mod v1.4.8"
 
 #define SECURITY_LOG "security.log"
 
@@ -580,36 +580,14 @@ typedef enum {
 	NUM_MAP_MUSIC
 } zyk_map_music_t;
 
-// zyk: Elements of each Magic power
-typedef enum {
-	MAGICELEMENT_NONE,
-	MAGICELEMENT_WATER,
-	MAGICELEMENT_EARTH,
-	MAGICELEMENT_FIRE,
-	MAGICELEMENT_AIR,
-	MAGICELEMENT_DARK,
-	MAGICELEMENT_LIGHT,
-	NUM_MAGIC_ELEMENTS
-} zyk_magic_element_t;
-
 // zyk: magic powers values
 typedef enum {
 	MAGIC_MAGIC_DOME,
 	MAGIC_HEALING_WATER,
-	MAGIC_EARTH_MAGIC,
-	MAGIC_FIRE_MAGIC,
-	MAGIC_AIR_MAGIC,
-	MAGIC_DARK_MAGIC,
-	MAGIC_LIGHT_MAGIC,
+	MAGIC_FIRE_STRENGTH,
+	MAGIC_LIGHTNING_DOME,
 	MAX_MAGIC_POWERS
 } zyk_magic_t;
-
-// zyk: flags set when someone is hit by some magic powers
-typedef enum {
-	MAGIC_HIT_BY_EARTH,
-	MAGIC_HIT_BY_AIR,
-	MAX_HIT_BY_MAGIC
-} zyk_hit_by_magic_t;
 
 typedef enum {
 	SKILL_JUMP,
@@ -642,11 +620,8 @@ typedef enum {
 	SKILL_MAGIC_FLIGHT,
 	SKILL_MAGIC_DOME,
 	SKILL_HEALING_WATER,
-	SKILL_MAGIC_EARTH_MAGIC,
-	SKILL_MAGIC_FIRE_MAGIC,
-	SKILL_MAGIC_AIR_MAGIC,
-	SKILL_MAGIC_DARK_MAGIC,
-	SKILL_MAGIC_LIGHT_MAGIC,
+	SKILL_FIRE_STRENGTH,
+	SKILL_LIGHTNING_DOME,
 	NUMBER_OF_SKILLS
 } zyk_rpg_skill_t;
 
@@ -1071,16 +1046,10 @@ typedef struct clientPersistant_s {
 	int quickdraw_timer;
 
 	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
-	int quest_power_status;
-
-	// zyk: bitvalue. If this player is hit by some enemy magic, set a flag
-	int hit_by_magic;
+	int active_magic;
 
 	// zyk: cooldown between quest power uses
-	int quest_power_usage_timer;
-
-	// zyk: timers used by the magic powers hitting this player
-	int magic_power_target_timer[MAX_HIT_BY_MAGIC];
+	int magic_power_usage_timer;
 
 	// zyk: magic powers debounce timer
 	int magic_power_debounce_timer[MAX_MAGIC_POWERS];
