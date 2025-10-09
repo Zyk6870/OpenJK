@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.5.6"
+#define	GAMEVERSION	"New Zyk Mod v1.5.7"
 
 #define SECURITY_LOG "security.log"
 
@@ -749,12 +749,12 @@ typedef enum {
 	QUEST_NPC_FORCE_MAGE,
 	QUEST_NPC_HIGH_TRAINED_WARRIOR,
 	QUEST_NPC_MID_TRAINED_WARRIOR,
-	QUEST_NPC_HEAVY_ARMORED_WARRIOR,
-	QUEST_NPC_CHANGELING_SENTRY,
-	QUEST_NPC_FLYING_WARRIOR,
-	QUEST_NPC_CHANGELING_WORM,
 	QUEST_NPC_FORCE_SABER_WARRIOR,
+	QUEST_NPC_CHANGELING_SENTRY,
+	QUEST_NPC_CHANGELING_WORM,
 	QUEST_NPC_CHANGELING_HOWLER,
+	QUEST_NPC_FLYING_WARRIOR,
+	QUEST_NPC_HEAVY_ARMORED_WARRIOR,
 	QUEST_NPC_LOW_TRAINED_WARRIOR,
 	QUEST_NPC_ALLY_MAGE,
 	QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE,
@@ -855,8 +855,7 @@ typedef enum {
 #define RPG_RUN_SPEED_SKILL_INCREASE 10.0f
 
 // zyk: main characters names
-#define QUESTCHAR_ALL_SPIRITS "^6Magic Spirits"
-#define QUESTCHAR_TRAVELING_MAGE "^3Traveling Mage"
+#define QUESTCHAR_MAIN "^6Spirit Tree"
 
 // zyk: quest values
 #define INITIAL_QUEST_PROGRESS 1000

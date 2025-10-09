@@ -566,13 +566,13 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_FORCE_MAGE] = 8;
 	max_levels[QUEST_NPC_HIGH_TRAINED_WARRIOR] = 8;
 	max_levels[QUEST_NPC_MID_TRAINED_WARRIOR] = 7;
-	max_levels[QUEST_NPC_CHANGELING_SENTRY] = 7;
-	max_levels[QUEST_NPC_FLYING_WARRIOR] = 7;
-	max_levels[QUEST_NPC_CHANGELING_WORM] = 7;
-	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 5;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR] = 7;
-	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 7;
-	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR] = 4;
+	max_levels[QUEST_NPC_CHANGELING_SENTRY] = 5;
+	max_levels[QUEST_NPC_CHANGELING_WORM] = 5;
+	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 5;
+	max_levels[QUEST_NPC_FLYING_WARRIOR] = 0;
+	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 0;
+	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR] = 0;
 	
 	max_levels[QUEST_NPC_ALLY_MAGE] = 10;
 	max_levels[QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE] = 8;
@@ -6826,34 +6826,29 @@ void zyk_calculate_current_weight(gentity_t* ent)
 	ent->client->pers.current_weight = current_weight;
 }
 
-void zyk_spawn_magic_spirits(gentity_t* ent, int duration)
-{
-
-}
-
 void zyk_show_tutorial(gentity_t* ent)
 {
 	if (ent->client->pers.tutorial_step >= TUTORIAL_NEW_CHAR_START && ent->client->pers.tutorial_step <= TUTORIAL_NEW_CHAR_END)
 	{
 		if (ent->client->pers.tutorial_step == TUTORIAL_NEW_CHAR_START)
 		{
-			zyk_spawn_magic_spirits(ent, TUTORIAL_DURATION);
+			
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 1))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. We are the Magical Spirits. We will explain everything you need to know.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. I will explain everything you need to know.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 2))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info. From there you can find all other commands.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info. From there you can find all other commands.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 3))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We are here because we need your help! Use ^3/list quests^7 too see all info you need to help us.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: I am here because I need your help! Use ^3/list quests^7 too see all info you need to help me.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 4))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Use ^3/tutorial ^7if you need all this information again.\n\"", QUESTCHAR_ALL_SPIRITS, ent->client->pers.netname));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Use ^3/tutorial ^7if you need all this information again.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname));
 		}
 
 		ent->client->pers.tutorial_step++;
@@ -6862,13 +6857,11 @@ void zyk_show_tutorial(gentity_t* ent)
 	{
 		if (ent->client->pers.tutorial_step == TUTORIAL_STAMINA_START)
 		{
-			zyk_spawn_magic_spirits(ent, 10000);
-
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Doing actions decrease stamina. It is the blue bar at the right of your screen.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Doing actions decrease stamina. It is the blue bar at the right of your screen.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_STAMINA_START + 1))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^2Meditate ^7taunt to regen it. If Stamina runs out, you will faint for some seconds.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^2Meditate ^7taunt to regen it. If Stamina runs out, you will faint for some seconds.\n\"", QUESTCHAR_MAIN));
 		
 			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
@@ -6880,21 +6873,19 @@ void zyk_show_tutorial(gentity_t* ent)
 	{
 		if (ent->client->pers.tutorial_step == TUTORIAL_INVENTORY_START)
 		{
-			zyk_spawn_magic_spirits(ent, 20000);
-
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list inventory^7. Everything you pickup up is stored there. Each inventory page shows 10 items.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list inventory^7. Everything you pickup up is stored there. Each inventory page shows 10 items.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 1))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over max weight, run speed will decrease and Stamina will decrease faster.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over max weight, run speed will decrease and Stamina will decrease faster.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 2))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can make inventory items. It will require Item-Making Energy, which is gained by having Red Crystals.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can make inventory items. It will require Item-Making Energy, which is gained by having Blue Crystals.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 3))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or get melee to drop items. Use ^3/jetpack ^7to drop your jetpack.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or get melee to drop items. Use ^3/jetpack ^7to drop your jetpack.\n\"", QUESTCHAR_MAIN));
 		
 			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
@@ -6906,29 +6897,27 @@ void zyk_show_tutorial(gentity_t* ent)
 	{
 		if (ent->client->pers.tutorial_step == TUTORIAL_QUEST_ITEMS_START)
 		{
-			zyk_spawn_magic_spirits(ent, 20000);
-
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Blue Crystals to upgrade skills. We randomly place some in the map. Enemies defeated have a chance to drop them.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Blue Crystals to upgrade skills. I randomly place some in the map. Enemies defeated have a chance to drop them.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 1))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list force^7 or ^3/list misc ^7or ^3/list magic ^7to see skills. It also show commands to upgrade them.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list force^7 or ^3/list misc ^7or ^3/list magic ^7to see skills. It also show commands to upgrade them.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 2))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Upgrading skills from a category (force, misc, magic) increases that category affinity.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Upgrading skills from a category (force, misc, magic) increases that category affinity.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 3))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Force Affinity increases force regen rate and Saber damage.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Force Affinity increases your Max Force points, Force regen rate and Saber damage.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 4))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Misc Affinity increases Stamina regen rate, Run Speed and Max Weight.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Misc Affinity increases Stamina regen rate, Run Speed and Max Weight.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 5))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Affinity increases Magic Powers damage/range, Magic Fist damage, max MP, stamina usage for active magic and lowers Magic Power mp cost.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Affinity increases Magic Powers strength, Magic Fist damage, Max MP, MP regen rate when meditating and stamina usage for active magic.\n\"", QUESTCHAR_MAIN));
 		
 			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
@@ -6940,21 +6929,19 @@ void zyk_show_tutorial(gentity_t* ent)
 	{
 		if (ent->client->pers.tutorial_step == TUTORIAL_MAGIC_START)
 		{
-			zyk_spawn_magic_spirits(ent, 10000);
-
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: That was a Magic Power! You can learn them too.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: That was a Magic Power! You can learn them too.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_MAGIC_START + 1))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <skill number>^7.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <skill number>^7.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_MAGIC_START + 2))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need MP (Magic Points) to cast magic. Upgrade the Max Magic Points skill to be able to have MP.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need MP (Magic Points) to cast magic. When you upgrade Magic skills, your max MP increases.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_MAGIC_START + 3))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by collecting crystals and using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_ALL_SPIRITS));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by meditating or using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
 		
 			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
@@ -9036,8 +9023,6 @@ void G_RunFrame( int levelTime ) {
 							{
 								gentity_t* tree_ent = NULL;
 
-								zyk_spawn_magic_spirits(ent, QUEST_FINAL_EVENT_TIMER + 5000);
-
 								if (ent->client->pers.quest_spirit_tree_id > -1)
 								{
 									tree_ent = &g_entities[ent->client->pers.quest_spirit_tree_id];
@@ -9067,16 +9052,16 @@ void G_RunFrame( int levelTime ) {
 										}
 									}
 
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: We can now defeat the remaining of Brotherhood of Mages.\n\"", QUESTCHAR_ALL_SPIRITS));
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: I can now defeat the remaining of The Conquerors.\n\"", QUESTCHAR_MAIN));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 3)
 								{
 									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: They are defeated. Nature was unbalanced because of their actions, but now...\n\"",
-										QUESTCHAR_ALL_SPIRITS));
+										QUESTCHAR_MAIN));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 4)
 								{
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ...it will become balanced again thanks to you.\n\"", QUESTCHAR_ALL_SPIRITS));
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ...it will become balanced again thanks to you.\n\"", QUESTCHAR_MAIN));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 5)
 								{
@@ -9084,11 +9069,11 @@ void G_RunFrame( int levelTime ) {
 
 									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_BLUE_CRYSTAL, 20);
 
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Receive 20 blue crystals! A reward for your efforts.\n\"", QUESTCHAR_ALL_SPIRITS));
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Receive 20 blue crystals! A reward for your efforts.\n\"", QUESTCHAR_MAIN));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 6)
 								{
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now it is our time to go. See you again sometime.\n\"", QUESTCHAR_ALL_SPIRITS));
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now it is my time to go. See you again sometime.\n\"", QUESTCHAR_MAIN));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 7)
 								{

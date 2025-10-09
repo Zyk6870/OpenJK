@@ -575,7 +575,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Item-Making energy into attack power, extra shield protection and can increase Force Affinity, Misc Affinity and Magic Affnity. You must find it and solve the puzzle to get it. Activate it by pressing Duel key. It uses Item-Making Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_TRAVELING_MAGE));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Item-Making energy into attack power, extra shield protection and can increase Force Affinity, Misc Affinity and Magic Affnity. You must find it and solve the puzzle to get it. Activate it by pressing Duel key. It uses Item-Making Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
@@ -583,7 +583,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Has a lot of useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_TRAVELING_MAGE));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Has a lot of useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD)
 	{
@@ -6948,7 +6948,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, va("\n\n^7The Brotherhood of Mages is attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Trees.\nRegenerate your tree so it can defeat all enemies.\nMeditate in the tree to regen it. The blue crystals you have will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a blue crystal to call your Spirit Tree.\nBlue crystals you have make new allies stronger and appear more often.\n\n", QUESTCHAR_ALL_SPIRITS));
+			strcpy(quest_desc, va("\n\n^7The Conquerors are attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Tree.\nRegenerate your tree so it can defeat all enemies.\nMeditate in the tree to regen it. The blue crystals you have will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a blue crystal to call your Spirit Tree.\nBlue crystals you have make new allies stronger and appear more often.\n\n"));
 
 			trap->SendServerCommand(target_ent->s.number,
 				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
@@ -7127,7 +7127,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 4)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I am always traveling. I was in the Brotherhood of Mages in the past, but left when I realized that they are evil. I still can use some magic, and I will try to help you fight the enemies when I am around. I am wearing a Magic Armor and I can use Magic Dome^7. Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger. I created some special items that may help you if you find them: Spirit Crystal, Energy Modulator, Magic Armor. Beware though, some enemies may also be wearing a Magic Armor. Your quest progress and your Affinity (Force, Misc, Magic) increases the chance to get the secret items\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG), QUESTCHAR_TRAVELING_MAGE));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your blue crystals make your allies have a better chance to appear and makes them stronger. I created a special item that may help you if you find it: Energy Modulator. Your quest progress increases the chance to get it\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG), QUESTCHAR_MAIN));
 						}
 					}
 					else

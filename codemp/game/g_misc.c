@@ -2757,7 +2757,6 @@ extern int	BMS_END;
 
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
-extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
 extern void zyk_clear_quest_items(gentity_t* effect_ent);
 extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
 
@@ -2844,8 +2843,6 @@ void fx_runner_think( gentity_t *ent )
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
-						zyk_set_mp(player_ent, 1, qtrue);
-
 						zyk_clear_quest_effect(ent);
 
 						return;
@@ -2854,7 +2851,7 @@ void fx_runner_think( gentity_t *ent )
 						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0 &&
 						level.legendary_artifact_step == QUEST_SECRET_INIT_STEP)
 					{
-						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Press ^2Use ^7key and solve the puzzle to receive the Energy Modulator!\n\"", QUESTCHAR_ALL_SPIRITS));
+						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Press ^2Use ^7key and solve the puzzle to receive the Energy Modulator!\n\"", QUESTCHAR_MAIN));
 
 						level.legendary_artifact_type = QUEST_ITEM_ENERGY_MODULATOR;
 						level.legendary_artifact_step = QUEST_SECRET_TOUCHED_PUZZLE_ITEM;
