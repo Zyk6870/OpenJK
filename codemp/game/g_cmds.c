@@ -55,7 +55,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_PUSH] = 3;
 	max_skill_levels[SKILL_PULL] = 3;
 	max_skill_levels[SKILL_SPEED] = 3;
-	max_skill_levels[SKILL_SENSE] = 3;
+	max_skill_levels[SKILL_SENSE] = 6;
 	max_skill_levels[SKILL_SABER_ATTACK] = 5;
 	max_skill_levels[SKILL_SABER_DEFENSE] = 3;
 	max_skill_levels[SKILL_SABER_THROW] = 5;
@@ -69,10 +69,8 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_DRAIN] = 4;
 	max_skill_levels[SKILL_RAGE] = 4;
 	max_skill_levels[SKILL_TEAM_ENERGIZE] = 4;
-	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
-	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
-	max_skill_levels[SKILL_MAX_HEALTH] = 20;
+	max_skill_levels[SKILL_MAX_HEALTH] = 10;
 	max_skill_levels[SKILL_MELEE] = 3;
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
 	max_skill_levels[SKILL_ITEM_MAKER] = 10;
@@ -123,8 +121,6 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_DRAIN] = "Drain";
 	skill_names[SKILL_RAGE] = "Rage";
 	skill_names[SKILL_TEAM_ENERGIZE] = "Team Energize";
-	skill_names[SKILL_SENSE_HEALTH] = "Sense Health";
-	skill_names[SKILL_FORCE_POWER] = "Max Force";
 
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_MELEE] = "Melee";
@@ -166,7 +162,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_SPEED)
 		return "increases your speed by 1.7 times at level 1 and +0.4 at other levels";
 	if (skill_index == SKILL_SENSE)
-		return "See people through walls, invisible people or cloaked people. Dodge disruptor shots";
+		return "See people through walls, invisible people or cloaked people. Dodge disruptor shots. At a level higher than 3, allows you to see info about the nearest player or npc";
 	if (skill_index == SKILL_SABER_ATTACK)
 		return va("gives you the saber. If you are using Single Saber, gives you the saber styles. If using duals or staff, increases saber damage, which is increased by 20 per cent for each level. Saber damage scale is %.2f", g_saberDamageScale.value);
 	if (skill_index == SKILL_SABER_DEFENSE)
@@ -193,10 +189,6 @@ char* zyk_skill_description(int skill_index)
 		return "makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage";
 	if (skill_index == SKILL_TEAM_ENERGIZE)
 		return "restores some force power to players near you. At a level > 3, If force power is full, restores some Stamina and power cell ammo";
-	if (skill_index == SKILL_SENSE_HEALTH)
-		return "allows you to see info about someone, including npcs. Level 1 shows current health. Level 2 shows name, health and shield. Level 3 shows name, health and max health, shield and max shield, force and max force, mp and max mp, Stamina and Max Stamina. To use it, when you are near a player or npc, use ^3Sense ^7force power";
-	if (skill_index == SKILL_FORCE_POWER)
-		return "increases the max force power you have. Necessary to allow you to use force powers and force-based skills";
 
 	if (skill_index == SKILL_MAX_HEALTH)
 		return va("Each level increases your max health by %d", RPG_MAX_HEALTH_INCREASE);
@@ -222,7 +214,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level increases flight speed and decreases mp usage";
 	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
-		return "an energy dome appears around you, damaging enemies inside it. Each level increases your resistance to damage to your health a little. This power deals non-elemental damage";
+		return "an energy dome appears around you. Each level increases your resistance to damage to your health and the damage done to enemies inside it";
 	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
 		return "hits enemies around you with Water elemental damage. Slowly restore health to you and nearby ally players or ally npcs. Each level increases chance of causing Poison status to enemies. Increases your Water element affinity. More powerful against enemies with Fire affinity. Absorbs some Water magic effects";
 	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
@@ -261,8 +253,6 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_DRAIN] = "skilldrain";
 	skill_names[SKILL_RAGE] = "skillrage";
 	skill_names[SKILL_TEAM_ENERGIZE] = "skillteamenergize";
-	skill_names[SKILL_SENSE_HEALTH] = "skillsensehealth";
-	skill_names[SKILL_FORCE_POWER] = "skillforcepower";
 
 	skill_names[SKILL_MAX_HEALTH] = "skillmaxhealth";
 	skill_names[SKILL_MELEE] = "skillmelee";
@@ -4909,7 +4899,7 @@ int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
 	if (skill_category == SKILL_CATEGORY_FORCE)
 	{
 		first_skill_index = SKILL_JUMP;
-		last_skill_index = SKILL_FORCE_POWER;
+		last_skill_index = SKILL_TEAM_ENERGIZE;
 	}
 	else if (skill_category == SKILL_CATEGORY_MISC)
 	{
@@ -5126,14 +5116,21 @@ void set_max_shield(gentity_t *ent)
 
 void set_max_force(gentity_t* ent)
 {
-	ent->client->pers.max_force_power = (int)ceil((zyk_max_force_power.value / 4.0) * ent->client->pers.skill_levels[SKILL_FORCE_POWER]);
+	int force_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE);
+	ent->client->pers.max_force_power = 0;
+
+	if (force_affinity > 0)
+	{
+		ent->client->pers.max_force_power = 50 + (force_affinity * 2.0f);
+	}
+
 	ent->client->ps.fd.forcePowerMax = ent->client->pers.max_force_power;
 }
 
 // zyk: sets the Max Weight of stuff the player can carry
 void set_max_weight(gentity_t* ent)
 {
-	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 200) + (56.25 * zyk_skill_affinity(ent, SKILL_CATEGORY_MISC));
+	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 200) + (56.25f * zyk_skill_affinity(ent, SKILL_CATEGORY_MISC));
 }
 
 // zyk: set the Max Stamina of this player
@@ -5384,7 +5381,11 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->ps.fd.forcePowersKnown |= (1 << FP_SEE);
 		if (ent->client->pers.skill_levels[SKILL_SENSE] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_SEE);
-		ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[SKILL_SENSE];
+
+		if (ent->client->pers.skill_levels[SKILL_SENSE] < 4)
+			ent->client->ps.fd.forcePowerLevel[FP_SEE] = ent->client->pers.skill_levels[SKILL_SENSE];
+		else
+			ent->client->ps.fd.forcePowerLevel[FP_SEE] = FORCE_LEVEL_3;
 
 		// zyk: loading Saber Attack value
 		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_SABER_OFFENSE)) && ent->client->pers.skill_levels[SKILL_SABER_ATTACK] > 0)
@@ -6473,7 +6474,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 {
 	if (Q_stricmp( arg1, "force" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, SKILL_JUMP, SKILL_FORCE_POWER);
+		zyk_list_category_skills(ent, target_ent, SKILL_JUMP, SKILL_TEAM_ENERGIZE);
 	}
 	else if (Q_stricmp( arg1, "misc" ) == 0)
 	{

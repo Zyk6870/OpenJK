@@ -110,7 +110,7 @@ int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] =
 		//NUM_FORCE_POWERS
 	},
 	{
-		65,//FP_HEAL,//instant //was 25, but that was way too little
+		50,//FP_HEAL,//instant //was 25, but that was way too little // zyk: default 65
 		10,//FP_LEVITATION,//hold/duration
 		50,//FP_SPEED,//duration
 		20,//FP_PUSH,//hold/duration
@@ -131,7 +131,7 @@ int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] =
 		//NUM_FORCE_POWERS
 	},
 	{
-		60,//FP_HEAL,//instant
+		50,//FP_HEAL,//instant // zyk: default 60
 		10,//FP_LEVITATION,//hold/duration
 		50,//FP_SPEED,//duration
 		20,//FP_PUSH,//hold/duration

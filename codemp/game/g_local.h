@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.4.4"
+#define	GAMEVERSION	"New Zyk Mod v1.4.5"
 
 #define SECURITY_LOG "security.log"
 
@@ -630,8 +630,6 @@ typedef enum {
 	SKILL_DRAIN,
 	SKILL_RAGE,
 	SKILL_TEAM_ENERGIZE,
-	SKILL_SENSE_HEALTH,
-	SKILL_FORCE_POWER,
 	SKILL_MAX_HEALTH,
 	SKILL_MELEE,
 	SKILL_MELEE_SPEED,
@@ -842,14 +840,14 @@ typedef enum {
 #define MAGIC_CRYSTALS_TO_UPGRADE_SKILL 1
 #define RED_CRYSTAL_MAX_CHARGE 5
 
-// zyk: max RPG skillpoints
-#define RPG_MAX_SKILLPOINTS 100
+// zyk: max RPG skill levels upgraded
+#define RPG_MAX_SKILLPOINTS 80
 
 // zyk: minimum amount of time to spawn magic crystals and side quest stuff
 #define RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME 4000
 
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
-#define RPG_MAX_HEALTH_INCREASE 10
+#define RPG_MAX_HEALTH_INCREASE 20
 
 // zyk: when casting magic, use anim for this amount of time in miliseconds
 #define MAGIC_ANIM_TIME 1400

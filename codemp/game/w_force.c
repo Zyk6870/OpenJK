@@ -5460,15 +5460,15 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 		strcpy(client_name, target->client->pers.netname);
 	}
 	
-	if (self->client->pers.skill_levels[SKILL_SENSE_HEALTH] == 1)
+	if (self->client->pers.skill_levels[SKILL_SENSE] == 4)
 	{
 		trap->SendServerCommand(self->s.number, va("cp \"^1%d\n\"", client_health));
 	}
-	else if (self->client->pers.skill_levels[SKILL_SENSE_HEALTH] == 2)
+	else if (self->client->pers.skill_levels[SKILL_SENSE] == 5)
 	{
 		trap->SendServerCommand(self->s.number, va("cp \"%s\n\n^1%d^3/^2%d\n\"", client_name, client_health, client_armor));
 	}
-	else if (self->client->pers.skill_levels[SKILL_SENSE_HEALTH] == 3)
+	else if (self->client->pers.skill_levels[SKILL_SENSE] == 6)
 	{
 		if (target->NPC)
 		{
@@ -5923,7 +5923,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 			// zyk: using Sense Health skill of RPG Mode
 			else if (i == FP_SEE && 
 					self->client->sess.account_mode == ACC_MODE_RPG && 
-					self->client->pers.skill_levels[SKILL_SENSE_HEALTH] > 0 &&
+					self->client->pers.skill_levels[SKILL_SENSE] > 3 &&
 					self->client->ps.fd.forcePowersActive & (1 << FP_SEE) && 
 					self->client->pers.sense_health_timer < level.time && 
 					self->client->ps.hasLookTarget)
@@ -5994,7 +5994,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 				}
 				else if (self->client->sess.account_mode == ACC_MODE_RPG)
 				{ // zyk: force regen for RPG players is based on the Force Affinity
-					self->client->ps.fd.forcePowerRegenDebounceTime += (100 - zyk_skill_affinity(self, SKILL_CATEGORY_FORCE));
+					self->client->ps.fd.forcePowerRegenDebounceTime += (120 - zyk_skill_affinity(self, SKILL_CATEGORY_FORCE));
 				}
 				else
 				{
