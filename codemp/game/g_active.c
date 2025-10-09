@@ -202,10 +202,10 @@ void P_WorldEffects( gentity_t *ent ) {
 		ent->client->airOutTime = level.time + 12000;
 		ent->damage = 2;
 
-		// zyk: Underwater skill
-		if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.skill_levels[SKILL_UNDERWATER] > 0)
+		// zyk: Underwater time will increase based on Max Stamina
+		if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.skill_levels[SKILL_MAX_STAMINA] > 0)
 		{
-			ent->client->airOutTime = level.time + (12000 * (ent->client->pers.skill_levels[SKILL_UNDERWATER] * 10));
+			ent->client->airOutTime = level.time + (12000 * (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 5));
 		}
 	}
 

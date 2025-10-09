@@ -72,16 +72,14 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_SENSE_HEALTH] = 3;
 	max_skill_levels[SKILL_FORCE_POWER] = 10;
 
-	max_skill_levels[SKILL_MAX_HEALTH] = 10;
-	max_skill_levels[SKILL_HEALTH_STRENGTH] = 10;
+	max_skill_levels[SKILL_MAX_HEALTH] = 20;
 	max_skill_levels[SKILL_MELEE] = 3;
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
 	max_skill_levels[SKILL_ITEM_MAKER] = 10;
 	max_skill_levels[SKILL_STATUS_PROTECTION] = 5;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 25;
 	max_skill_levels[SKILL_MAX_STAMINA] = 10;
-	max_skill_levels[SKILL_UNDERWATER] = 2;
-	max_skill_levels[SKILL_RUN_SPEED] = 2;
+	max_skill_levels[SKILL_RUN_SPEED] = 4;
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 4;
 	max_skill_levels[SKILL_MAX_MP] = 12;
@@ -129,14 +127,12 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_FORCE_POWER] = "Max Force";
 
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
-	skill_names[SKILL_HEALTH_STRENGTH] = "Health Strength";
 	skill_names[SKILL_MELEE] = "Melee";
 	skill_names[SKILL_MELEE_SPEED] = "Melee Punch Speed";
 	skill_names[SKILL_ITEM_MAKER] = "Item Maker";
 	skill_names[SKILL_STATUS_PROTECTION] = "Status Protection";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
 	skill_names[SKILL_MAX_STAMINA] = "Max Stamina";
-	skill_names[SKILL_UNDERWATER] = "Underwater";
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
@@ -204,8 +200,6 @@ char* zyk_skill_description(int skill_index)
 
 	if (skill_index == SKILL_MAX_HEALTH)
 		return va("Each level increases your max health by %d", RPG_MAX_HEALTH_INCREASE);
-	if (skill_index == SKILL_HEALTH_STRENGTH)
-		return "Each level increases your health resistance to damage by 2 per cent";
 	if (skill_index == SKILL_MELEE)
 		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 1, Right hand punch does %d normal damage, left hand punch does %d normal damage and kick does %d damage. Each level increases melee damage", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	if (skill_index == SKILL_MELEE_SPEED)
@@ -217,9 +211,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio. Carrying stuff over the max weight will decrease your run speed and also decrease Stamina";
 	if (skill_index == SKILL_MAX_STAMINA)
-		return "Each level increases your max stamina. Stamina is used by any action the player does. Low stamina makes run speed slower. You can also lose some stamina when taking damage. If Stamina runs out you will pass out for some seconds. Each skill level decreases time you need to rest. Meditating recovers stamina faster, and the amount recovered increases with each skill level. Use bacta canister or big bacta items to regen stamina";
-	if (skill_index == SKILL_UNDERWATER)
-		return "Each level increases time you can be underwater before running out of air";
+		return "Each level increases your max stamina. Stamina is used by any action the player does. Low stamina makes run speed slower. You can also lose some stamina when taking damage. If Stamina runs out you will pass out for some seconds. Each skill level decreases time you need to rest and the time you can be underwater before drowning. Meditating recovers stamina faster, and the amount recovered increases with each skill level. Use bacta canister or big bacta items to regen stamina";
 	if (skill_index == SKILL_RUN_SPEED)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
@@ -273,14 +265,12 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_FORCE_POWER] = "skillforcepower";
 
 	skill_names[SKILL_MAX_HEALTH] = "skillmaxhealth";
-	skill_names[SKILL_HEALTH_STRENGTH] = "skillhealthstrength";
 	skill_names[SKILL_MELEE] = "skillmelee";
 	skill_names[SKILL_MELEE_SPEED] = "skillmeleepunchspeed";
 	skill_names[SKILL_ITEM_MAKER] = "skillitemmaker";
 	skill_names[SKILL_STATUS_PROTECTION] = "skillstatusprotection";
 	skill_names[SKILL_MAX_WEIGHT] = "skillmaxweight";
 	skill_names[SKILL_MAX_STAMINA] = "skillmaxstamina";
-	skill_names[SKILL_UNDERWATER] = "skillunderwater";
 	skill_names[SKILL_RUN_SPEED] = "skillrunspeed";
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
