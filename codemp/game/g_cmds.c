@@ -81,8 +81,8 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 4;
 	max_skill_levels[SKILL_MAGIC_FLIGHT] = 8;
-	max_skill_levels[SKILL_MAGIC_MAGIC_DOME] = 8;
-	max_skill_levels[SKILL_MAGIC_WATER_MAGIC] = 8;
+	max_skill_levels[SKILL_MAGIC_DOME] = 8;
+	max_skill_levels[SKILL_HEALING_WATER] = 8;
 	max_skill_levels[SKILL_MAGIC_EARTH_MAGIC] = 8;
 	max_skill_levels[SKILL_MAGIC_FIRE_MAGIC] = 8;
 	max_skill_levels[SKILL_MAGIC_AIR_MAGIC] = 8;
@@ -132,8 +132,8 @@ char* zyk_skill_name(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "Magic Flight";
-	skill_names[SKILL_MAGIC_MAGIC_DOME] = "Magic Dome";
-	skill_names[SKILL_MAGIC_WATER_MAGIC] = "Water Magic";
+	skill_names[SKILL_MAGIC_DOME] = "Magic Dome";
+	skill_names[SKILL_HEALING_WATER] = "Healing Water";
 	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "Earth Magic";
 	skill_names[SKILL_MAGIC_FIRE_MAGIC] = "Fire Magic";
 	skill_names[SKILL_MAGIC_AIR_MAGIC] = "Air Magic";
@@ -209,10 +209,10 @@ char* zyk_skill_description(int skill_index)
 		return va("allows you to attack with magic bolts when using melee punches. At max level, can damage saber-only damage objects and move pushable/pullable objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level increases flight speed and decreases mp usage";
-	if (skill_index == SKILL_MAGIC_MAGIC_DOME)
+	if (skill_index == SKILL_MAGIC_DOME)
 		return "an energy dome appears around you. Each level increases your resistance to damage to your health and the damage done to enemies inside it";
-	if (skill_index == SKILL_MAGIC_WATER_MAGIC)
-		return "hits enemies around you with Water elemental damage. Slowly restore health to you and nearby ally players or ally npcs. Each level increases chance of causing Poison status to enemies. Increases your Water element affinity. More powerful against enemies with Fire affinity. Absorbs some Water magic effects";
+	if (skill_index == SKILL_HEALING_WATER)
+		return "Restores health to you and nearby ally players or npcs";
 	if (skill_index == SKILL_MAGIC_EARTH_MAGIC)
 		return "hits enemies with Earth elemental damage. Has a chance of knocking down enemies in the ground with an earthquake. Each level increases chance of causing Bleeding status to enemies. Increases your Earth element affinity. More powerful against enemies with Air affinity. Absorbs some Earth magic effects";
 	if (skill_index == SKILL_MAGIC_FIRE_MAGIC)
@@ -261,8 +261,8 @@ char* zyk_skill_key(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "skillmagicflight";
-	skill_names[SKILL_MAGIC_MAGIC_DOME] = "skillmagicdome";
-	skill_names[SKILL_MAGIC_WATER_MAGIC] = "skillwatermagic";
+	skill_names[SKILL_MAGIC_DOME] = "skillmagicdome";
+	skill_names[SKILL_HEALING_WATER] = "skillhealingwater";
 	skill_names[SKILL_MAGIC_EARTH_MAGIC] = "skillearthmagic";
 	skill_names[SKILL_MAGIC_FIRE_MAGIC] = "skillfiremagic";
 	skill_names[SKILL_MAGIC_AIR_MAGIC] = "skillairmagic";
@@ -4926,7 +4926,7 @@ int zyk_max_magic_power(gentity_t *ent)
 // zyk: tests if this skill is one of the magic powers
 qboolean zyk_is_magic_power_skill(int skill_index)
 {
-	if (skill_index >= SKILL_MAGIC_MAGIC_DOME && skill_index <= SKILL_MAGIC_LIGHT_MAGIC)
+	if (skill_index >= SKILL_MAGIC_DOME && skill_index <= SKILL_MAGIC_LIGHT_MAGIC)
 	{
 		return qtrue;
 	}
@@ -4939,7 +4939,7 @@ int zyk_get_magic_index(int skill_index)
 {
 	if (zyk_is_magic_power_skill(skill_index) == qtrue)
 	{
-		return (skill_index - SKILL_MAGIC_MAGIC_DOME);
+		return (skill_index - SKILL_MAGIC_DOME);
 	}
 
 	return -1;
@@ -5550,6 +5550,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.is_getting_up = qtrue;
 
 			ent->client->pers.magic_consumption_timer = 0;
+			ent->client->pers.magic_regen_debounce_timer = 0;
 
 			ent->client->pers.special_crystal_timer = 0;
 			ent->client->pers.special_crystal_counter = 0;
@@ -10604,7 +10605,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				{
 					dome_of_damage(ent);
 				}
-				else if (magic_number == MAGIC_WATER_MAGIC)
+				else if (magic_number == MAGIC_HEALING_WATER)
 				{
 					water_magic(ent);
 				}

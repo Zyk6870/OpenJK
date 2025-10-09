@@ -1360,6 +1360,7 @@ qboolean zyk_is_player_idle(gentity_t* ent, usercmd_t* ucmd)
 	return qtrue;
 }
 
+extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
 void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 {
 	vec3_t viewChange;
@@ -1567,6 +1568,14 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 				int stamina_meditate_recovery = 5 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
 
 				zyk_set_stamina(ent, stamina_meditate_recovery, qtrue);
+
+				// zyk: not using magic and meditating. Regen some mp
+				if (ent->client->pers.quest_power_status == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
+				{
+					zyk_set_mp(ent, 1, qtrue);
+
+					ent->client->pers.magic_regen_debounce_timer = level.time + 1000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 5);
+				}
 			}
 			else if (zyk_is_player_idle(ent, ucmd) == qfalse)
 			{

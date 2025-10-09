@@ -656,8 +656,8 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_WATER, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level - 1 + skill_level_bonus;
 		}
@@ -679,7 +679,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_STATUS_MAGE)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_FORCE_MAGE)
 		{
@@ -688,14 +688,14 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_HIGH_TRAINED_WARRIOR)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_WATER, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_MID_TRAINED_WARRIOR)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_SENTRY)
 		{
@@ -709,7 +709,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
 
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_WORM)
 		{
@@ -721,11 +721,11 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 1;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
 
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_FORCE_SABER_WARRIOR)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_WATER, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_HOWLER)
 		{
@@ -741,7 +741,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 				npc_ent->client->ps.weapon = WP_MELEE;
 			}
 
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_MAGE)
 		{
@@ -750,14 +750,14 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, ally_bonus + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, ally_bonus + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_WATER, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, ally_bonus + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus - 1 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE)
 		{
-			int random_magic_power = Q_irand(SKILL_MAGIC_WATER_MAGIC, SKILL_MAGIC_LIGHT_MAGIC);
+			int random_magic_power = Q_irand(SKILL_HEALING_WATER, SKILL_MAGIC_LIGHT_MAGIC);
 
 			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 
@@ -765,12 +765,12 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			}
 		else if (quest_npc_type == QUEST_NPC_ALLY_FLYING_WARRIOR)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_AIR_MAGIC, ally_bonus + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_FORCE_WARRIOR)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_WATER_MAGIC, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_WATER, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_EARTH_MAGIC, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_FIRE_MAGIC, ally_bonus + skill_level_bonus);
 		}
@@ -780,7 +780,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
 
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_MAGIC_DOME, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, ally_bonus + skill_level_bonus);
 
 			// zyk: Travelig Mage stays in the map only for this amount of time before going away
 			npc_ent->client->pers.quest_seller_map_timer = level.time + (SIDE_QUEST_STUFF_TIMER * bonuses);
@@ -5457,8 +5457,8 @@ void dome_of_damage(gentity_t* ent)
 // zyk: Water Magic
 void water_magic(gentity_t* ent)
 {
-	ent->client->pers.quest_power_status |= (1 << MAGIC_WATER_MAGIC);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 500;
+	ent->client->pers.quest_power_status |= (1 << MAGIC_HEALING_WATER);
+	ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_WATER] = level.time + 500;
 
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/bodyfall_water1.mp3"));
 }
@@ -5559,7 +5559,7 @@ float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t *attacke
 		-1,
 		MAGIC_FIRE_MAGIC,
 		MAGIC_AIR_MAGIC,
-		MAGIC_WATER_MAGIC,
+		MAGIC_HEALING_WATER,
 		MAGIC_EARTH_MAGIC,
 		MAGIC_LIGHT_MAGIC,
 		MAGIC_DARK_MAGIC
@@ -5570,9 +5570,9 @@ float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t *attacke
 	{ /* zyk: calculates bonus damage based on the levels of the magic skill of the attacker and both the same elemental magic and the opposite elemental magic of the target, so
 			    it will increase and decrease damage considering both opposite and same elements of target
 	*/
-		int attacker_skill_level = attacker->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME + magic_power];
-		int target_skill_level = target->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME + magic_power];
-		int target_opposite_element_skill_level = target->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME + opposite_elemental_magic[magic_power]];
+		int attacker_skill_level = attacker->client->pers.skill_levels[SKILL_MAGIC_DOME + magic_power];
+		int target_skill_level = target->client->pers.skill_levels[SKILL_MAGIC_DOME + magic_power];
+		int target_opposite_element_skill_level = target->client->pers.skill_levels[SKILL_MAGIC_DOME + opposite_elemental_magic[magic_power]];
 
 		if (attacker_skill_level > 0)
 		{
@@ -5643,7 +5643,7 @@ void magic_power_events(gentity_t *ent)
 			// zyk: stop magic if skill level is not at least at level 1
 			for (i = 0; i < MAX_MAGIC_POWERS; i++)
 			{
-				int skill_index = SKILL_MAGIC_MAGIC_DOME + i;
+				int skill_index = SKILL_MAGIC_DOME + i;
 
 				if (ent->client->pers.skill_levels[skill_index] < 1)
 				{
@@ -5655,12 +5655,12 @@ void magic_power_events(gentity_t *ent)
 			{
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
-					zyk_mp_usage(ent, SKILL_MAGIC_MAGIC_DOME);
+					zyk_mp_usage(ent, SKILL_MAGIC_DOME);
 				}
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] < level.time)
 				{
-					int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME];
+					int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_DOME];
 
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dome", "4", "env/dome", 0, damage, 290, 400);
 
@@ -5668,19 +5668,19 @@ void magic_power_events(gentity_t *ent)
 				}
 			}
 
-			if (ent->client->pers.quest_power_status & (1 << MAGIC_WATER_MAGIC))
+			if (ent->client->pers.quest_power_status & (1 << MAGIC_HEALING_WATER))
 			{
-				int max_distance = MAGIC_MIN_RANGE + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC] + magic_bonus));
-				int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC];
+				int max_distance = MAGIC_MIN_RANGE + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[SKILL_HEALING_WATER] + magic_bonus));
+				int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_HEALING_WATER];
 
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
-					zyk_mp_usage(ent, SKILL_MAGIC_WATER_MAGIC);
+					zyk_mp_usage(ent, SKILL_HEALING_WATER);
 				}
 
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] < level.time)
+				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_WATER] < level.time)
 				{
-					int heal_amount = 1 + magic_bonus + (ent->client->pers.skill_levels[SKILL_MAGIC_WATER_MAGIC] / 2);
+					int heal_amount = magic_bonus + ent->client->pers.skill_levels[SKILL_HEALING_WATER];
 
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_water", "4", "env/water_impact", 0, damage, max_distance, 400);
 
@@ -5689,7 +5689,7 @@ void magic_power_events(gentity_t *ent)
 						zyk_add_health(ent, heal_amount);
 					}
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_WATER_MAGIC] = level.time + 300;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_WATER] = level.time + 300;
 				}
 			}
 
@@ -7138,7 +7138,7 @@ void zyk_spawn_magic_spirits(gentity_t* ent, int duration)
 	zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_MAGIC_DOME, duration);
 
 	VectorSet(effect_origin, ent->r.currentOrigin[0], ent->r.currentOrigin[1] + 100, ent->r.currentOrigin[2]);
-	zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_WATER_MAGIC, duration);
+	zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_HEALING_WATER, duration);
 
 	VectorSet(effect_origin, ent->r.currentOrigin[0] - 100, ent->r.currentOrigin[1] + 80, ent->r.currentOrigin[2]);
 	zyk_spawn_magic_element_effect(ent, effect_origin, MAGIC_EARTH_MAGIC, duration);
@@ -9751,7 +9751,7 @@ void G_RunFrame( int levelTime ) {
 
 					if (ent->enemy)
 					{
-						int first_magic_skill = SKILL_MAGIC_MAGIC_DOME;
+						int first_magic_skill = SKILL_MAGIC_DOME;
 						int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
 						int magic_skill_index = first_magic_skill + random_magic;
 						int quest_npc_enemy_distance = Distance(ent->client->ps.origin, ent->enemy->r.currentOrigin);
@@ -9909,7 +9909,7 @@ void G_RunFrame( int levelTime ) {
 				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy)
 				{
 					int random_magic = Q_irand(0, MAGIC_LIGHT_MAGIC);
-					int first_magic_skill = SKILL_MAGIC_MAGIC_DOME;
+					int first_magic_skill = SKILL_MAGIC_DOME;
 					int current_magic_skill = first_magic_skill;
 
 					// zyk: adding all magic powers to this npc

@@ -4833,7 +4833,7 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 	zyk_magic_t magic_powers[MAX_MAGIC_POWERS] =
 	{
 		MAGIC_MAGIC_DOME,
-		MAGIC_WATER_MAGIC,
+		MAGIC_HEALING_WATER,
 		MAGIC_EARTH_MAGIC,
 		MAGIC_FIRE_MAGIC,
 		MAGIC_AIR_MAGIC,
@@ -6118,7 +6118,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					magic_bonus += 1;
 				}
 
-				bonus_health_resistance += (0.02 * (targ->client->pers.skill_levels[SKILL_MAGIC_MAGIC_DOME] + magic_bonus));
+				bonus_health_resistance += (0.025f * (targ->client->pers.skill_levels[SKILL_MAGIC_DOME] + magic_bonus));
 			}
 			
 			// zyk: reduces damage based on the health resistance bonuses
@@ -6591,9 +6591,9 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 					if (is_ally == qtrue)
 					{
-						if (this_magic_power == MAGIC_WATER_MAGIC && magic_power_user != ent && ent->client && ent->health > 0)
+						if (this_magic_power == MAGIC_HEALING_WATER && magic_power_user != ent && ent->client && ent->health > 0)
 						{ // zyk: Water magic heals allies
-							int heal_amount = ((int)points) / 2;
+							int heal_amount = (int)points;
 
 							if (heal_amount < 1)
 							{
@@ -6643,16 +6643,9 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						if (final_damage < 1)
 							final_damage = 1;
 
-						if (this_magic_power == MAGIC_WATER_MAGIC)
+						if (this_magic_power == MAGIC_HEALING_WATER)
 						{
-							int chance_for_poison = final_damage / 2;
-
-							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_water", "0", "env/water_impact", 0, 0, 0, 500);
-
-							if (Q_irand(0, 99) < chance_for_poison)
-							{
-								zyk_set_rpg_status(ent, RPG_STATUS_POISONED, final_damage * 500, qtrue);
-							}
+							final_damage = 0;
 						}
 						else if (this_magic_power == MAGIC_EARTH_MAGIC)
 						{
@@ -6792,7 +6785,10 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							ent->client->pers.tutorial_timer = level.time + 1000;
 						}
 
-						G_Damage (ent, attacker, magic_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
+						if (final_damage > 0)
+						{
+							G_Damage(ent, attacker, magic_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
+						}
 
 						if (this_magic_power == MAGIC_DARK_MAGIC && ent && ent->client && ent->health < 1)
 						{ // zyk: Black Hole disintegrates enemies who got killed by it
