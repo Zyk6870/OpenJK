@@ -4019,7 +4019,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 			float fist_damage_increase_factor = 1.0;
 			int fist_damage = zyk_magic_fist_damage.integer;
 
-			fist_damage_increase_factor += ((ent->client->pers.skill_levels[SKILL_MAGIC_FIST] * 0.05) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01));
+			fist_damage_increase_factor += ((ent->client->pers.skill_levels[SKILL_MAGIC_FIST] * 0.02) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01));
 			fist_damage *= fist_damage_increase_factor;
 
 			if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched

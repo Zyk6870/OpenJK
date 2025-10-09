@@ -652,8 +652,8 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 1;
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_LIGHTNING_DOME, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_FIRE_STRENGTH, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_WATER, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level - 1 + skill_level_bonus;
@@ -676,12 +676,12 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_STATUS_MAGE)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_WATER, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_FORCE_MAGE)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_FIRE_STRENGTH, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_HEALING_WATER, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_HIGH_TRAINED_WARRIOR)
 		{
@@ -707,7 +707,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_WORM)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_FIRE_STRENGTH, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_HEAVY_ARMORED_WARRIOR)
 		{
@@ -719,11 +719,11 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_FORCE_SABER_WARRIOR)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_WATER, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_HOWLER)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_FIRE_STRENGTH, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR)
 		{
@@ -740,15 +740,15 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		else if (quest_npc_type == QUEST_NPC_ALLY_MAGE)
 		{
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_LIGHTNING_DOME, ally_bonus + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_FIRE_STRENGTH, ally_bonus + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_WATER, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, ally_bonus + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus - 1 + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_ELEMENTAL_FORCE_MAGE)
 		{
-			int random_magic_power = Q_irand(SKILL_HEALING_WATER, MAGIC_HEALING_WATER);
+			int random_magic_power = Q_irand(SKILL_HEALING_CIRCLE, MAGIC_HEALING_CIRCLE);
 
 			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 
@@ -5370,243 +5370,6 @@ extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern void initialize_rpg_skills(gentity_t* ent, qboolean init_all);
 
-// zyk: Magic Dome
-void dome_of_damage(gentity_t* ent)
-{
-	ent->client->pers.active_magic |= (1 << MAGIC_MAGIC_DOME);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] = 100;
-
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/cairn_beam_start.mp3"));
-}
-
-// zyk: Healing Water
-void water_magic(gentity_t* ent)
-{
-	ent->client->pers.active_magic |= (1 << MAGIC_HEALING_WATER);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_WATER] = level.time + 500;
-
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/bodyfall_water1.mp3"));
-}
-
-// zyk: Fire Strength
-void fire_strength(gentity_t* ent) 
-{
-	ent->client->pers.active_magic |= (1 << MAGIC_FIRE_STRENGTH);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_STRENGTH] = level.time + 500;
-
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fireburst.mp3"));
-}
-
-extern void zyk_lightning_dome_detonate(gentity_t* ent);
-void lightning_dome(gentity_t* ent, int damage)
-{
-	gentity_t* missile;
-	vec3_t origin;
-	trace_t	tr;
-
-	VectorSet(origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] - 22);
-
-	trap->Trace(&tr, ent->client->ps.origin, NULL, NULL, origin, ent->s.number, MASK_SHOT, qfalse, 0, 0);
-
-	missile = G_Spawn();
-
-	G_SetOrigin(missile, origin);
-	//In SP the impact actually travels as a missile based on the trace fraction, but we're
-	//just going to be instant. -rww
-
-	VectorCopy(tr.plane.normal, missile->pos1);
-
-	missile->count = 9;
-
-	missile->classname = "demp2_alt_proj";
-	// missile->targetname = "zyk_magic_light";
-	missile->s.weapon = WP_DEMP2;
-
-	missile->think = zyk_lightning_dome_detonate;
-	missile->nextthink = level.time;
-
-	missile->splashDamage = missile->damage = damage;
-	missile->splashMethodOfDeath = missile->methodOfDeath = MOD_UNKNOWN;
-
-	missile->splashRadius = 768;
-
-	missile->r.ownerNum = ent->s.number;
-
-	missile->dflags = DAMAGE_DEATH_KNOCKBACK;
-	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
-
-	// we don't want it to ever bounce
-	missile->bounceCount = 0;
-}
-
-// zyk: Lighting Dome
-void magic_lightning_dome(gentity_t* ent)
-{
-	ent->client->pers.active_magic |= (1 << MAGIC_LIGHTNING_DOME);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 500;
-
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
-}
-
-void zyk_stop_magic_power(gentity_t* ent, zyk_magic_t magic_number)
-{
-	ent->client->pers.active_magic &= ~(1 << magic_number);
-}
-
-void zyk_stop_all_magic_powers(gentity_t* ent)
-{
-	int i = 0;
-
-	for (i = 0; i < MAX_MAGIC_POWERS; i++)
-	{
-		zyk_stop_magic_power(ent, i);
-	}
-}
-
-void zyk_mp_usage(gentity_t* ent, int magic_skill_index)
-{
-	int magic_mp_usage = (ent->client->pers.skill_levels[magic_skill_index] / 2);
-
-	if (magic_mp_usage < 1)
-	{
-		magic_mp_usage = 1;
-	}
-
-	zyk_set_mp(ent, magic_mp_usage, qfalse);
-}
-
-void magic_power_events(gentity_t *ent)
-{
-	if (ent && ent->client)
-	{
-		if (ent->health > 0)
-		{
-			int i = 0;
-			int magic_bonus = 0;
-
-			// zyk: Magic Armor improves all magic powers
-			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
-			{
-				magic_bonus += 1;
-			}
-
-			// zyk: Magic Affinity increases magic damage
-			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER);
-
-			if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
-			{
-				zyk_stop_all_magic_powers(ent);
-			}
-
-			if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power <= 0)
-			{ // zyk: run out of mp, stop all magic
-				ent->client->pers.magic_power = 0;
-
-				zyk_stop_all_magic_powers(ent);
-			}
-
-			// zyk: stop magic if skill level is not at least at level 1
-			for (i = 0; i < MAX_MAGIC_POWERS; i++)
-			{
-				int skill_index = SKILL_MAGIC_DOME + i;
-
-				if (ent->client->pers.skill_levels[skill_index] < 1)
-				{
-					zyk_stop_magic_power(ent, i);
-				}
-			}
-
-			if (ent->client->pers.active_magic & (1 << MAGIC_MAGIC_DOME))
-			{
-				if (ent->client->pers.magic_consumption_timer < level.time)
-				{
-					zyk_mp_usage(ent, SKILL_MAGIC_DOME);
-				}
-
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] < level.time)
-				{
-					int damage = MAGIC_MIN_DMG + (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_MAGIC_DOME] / 2);
-
-					if (damage < 1)
-					{
-						damage = 1;
-					}
-
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dome", "4", "env/dome", 0, damage, 290, 400);
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] = level.time + 300;
-				}
-			}
-
-			if (ent->client->pers.active_magic & (1 << MAGIC_HEALING_WATER))
-			{
-				int max_distance = MAGIC_MIN_RANGE + (MAGIC_RANGE_BONUS * (ent->client->pers.skill_levels[SKILL_HEALING_WATER] + magic_bonus));
-				int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_HEALING_WATER];
-
-				if (ent->client->pers.magic_consumption_timer < level.time)
-				{
-					zyk_mp_usage(ent, SKILL_HEALING_WATER);
-				}
-
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_WATER] < level.time)
-				{
-					int heal_amount = magic_bonus + ent->client->pers.skill_levels[SKILL_HEALING_WATER];
-
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_water", "4", "env/water_impact", 0, damage, max_distance, 400);
-
-					if (ent->health > 0)
-					{
-						zyk_add_health(ent, heal_amount);
-					}
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_WATER] = level.time + 300;
-				}
-			}
-
-			if (ent->client->pers.active_magic & (1 << MAGIC_FIRE_STRENGTH))
-			{
-				if (ent->client->pers.magic_consumption_timer < level.time)
-				{
-					zyk_mp_usage(ent, SKILL_FIRE_STRENGTH);
-				}
-
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_STRENGTH] < level.time)
-				{
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_fire", "0", "env/fire", 0, 0, 0, 400);
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_FIRE_STRENGTH] = level.time + 300;
-				}
-			}
-
-			if (ent->client->pers.active_magic & (1 << MAGIC_LIGHTNING_DOME))
-			{
-				if (ent->client->pers.magic_consumption_timer < level.time)
-				{
-					zyk_mp_usage(ent, SKILL_LIGHTNING_DOME);
-
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_light", "0", "howler/sonic", 0, 0, 0, 400);
-				}
-
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
-				{
-					int damage = MAGIC_MIN_DMG + (magic_bonus * 2) + (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 2);
-
-					lightning_dome(ent, damage);
-
-					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 5000 - (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 200);
-				}
-			}
-
-			if (ent->client->pers.magic_consumption_timer < level.time)
-			{
-				ent->client->pers.magic_consumption_timer = level.time + 250;
-			}
-		}
-	}
-}
-
 qboolean zyk_is_bad_status_effect(zyk_rpg_status_t rpg_status)
 {
 	if (rpg_status == RPG_STATUS_MAGIC_SHIELD)
@@ -5707,6 +5470,256 @@ void zyk_status_effects(gentity_t* ent)
 			else if (ent->client->pers.rpg_status_duration[i] <= level.time)
 			{
 				zyk_set_rpg_status(ent, i, 0, qfalse);
+			}
+		}
+	}
+}
+
+// zyk: Magic Dome
+void dome_of_damage(gentity_t* ent)
+{
+	ent->client->pers.active_magic |= (1 << MAGIC_MAGIC_DOME);
+	ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] = 100;
+
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/cairn_beam_start.mp3"));
+}
+
+// zyk: Healing Circle can decrease duration of bad status effects
+void healing_haven_status_restoration(gentity_t* ent, int amount)
+{
+	int current_status = 0;
+
+	for (current_status = 0; current_status < NUM_RPG_STATUSES; current_status++)
+	{
+		if (ent->client->pers.rpg_statuses & (1 << current_status) && zyk_is_bad_status_effect(current_status) == qtrue)
+		{
+			ent->client->pers.rpg_status_duration[current_status] -= amount;
+		}
+	}
+}
+
+// zyk: Healing Circle
+void healing_circle(gentity_t* ent)
+{
+	ent->client->pers.active_magic |= (1 << MAGIC_HEALING_CIRCLE);
+	ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_CIRCLE] = level.time + 500;
+
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
+}
+
+// zyk: Chaos Field
+void chaos_field(gentity_t* ent)
+{
+	ent->client->pers.active_magic |= (1 << MAGIC_CHAOS_FIELD);
+	ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] = level.time + 500;
+}
+
+extern void zyk_lightning_dome_detonate(gentity_t* ent);
+void lightning_dome(gentity_t* ent, int damage)
+{
+	gentity_t* missile;
+	vec3_t origin;
+	trace_t	tr;
+
+	VectorSet(origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] - 22);
+
+	trap->Trace(&tr, ent->client->ps.origin, NULL, NULL, origin, ent->s.number, MASK_SHOT, qfalse, 0, 0);
+
+	missile = G_Spawn();
+
+	G_SetOrigin(missile, origin);
+	//In SP the impact actually travels as a missile based on the trace fraction, but we're
+	//just going to be instant. -rww
+
+	VectorCopy(tr.plane.normal, missile->pos1);
+
+	missile->count = 9;
+
+	missile->classname = "demp2_alt_proj";
+	// missile->targetname = "zyk_magic_light";
+	missile->s.weapon = WP_DEMP2;
+
+	missile->think = zyk_lightning_dome_detonate;
+	missile->nextthink = level.time;
+
+	missile->splashDamage = missile->damage = damage;
+	missile->splashMethodOfDeath = missile->methodOfDeath = MOD_UNKNOWN;
+
+	missile->splashRadius = 768;
+
+	missile->r.ownerNum = ent->s.number;
+
+	missile->dflags = DAMAGE_DEATH_KNOCKBACK;
+	missile->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
+
+	// we don't want it to ever bounce
+	missile->bounceCount = 0;
+}
+
+// zyk: Lighting Dome
+void magic_lightning_dome(gentity_t* ent)
+{
+	ent->client->pers.active_magic |= (1 << MAGIC_LIGHTNING_DOME);
+	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 500;
+}
+
+void zyk_stop_magic_power(gentity_t* ent, zyk_magic_t magic_number)
+{
+	ent->client->pers.active_magic &= ~(1 << magic_number);
+}
+
+void zyk_stop_all_magic_powers(gentity_t* ent)
+{
+	int i = 0;
+
+	for (i = 0; i < MAX_MAGIC_POWERS; i++)
+	{
+		zyk_stop_magic_power(ent, i);
+	}
+}
+
+void zyk_mp_usage(gentity_t* ent, int magic_skill_index)
+{
+	int magic_mp_usage = (ent->client->pers.skill_levels[magic_skill_index] / 2);
+
+	if (magic_mp_usage < 1)
+	{
+		magic_mp_usage = 1;
+	}
+
+	zyk_set_mp(ent, magic_mp_usage, qfalse);
+}
+
+void magic_power_events(gentity_t *ent)
+{
+	if (ent && ent->client)
+	{
+		if (ent->health > 0)
+		{
+			int i = 0;
+			int magic_bonus = 0;
+
+			// zyk: Magic Armor improves all magic powers
+			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
+			{
+				magic_bonus += 1;
+			}
+
+			// zyk: Magic Affinity increases magic damage
+			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER);
+
+			if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
+			{
+				zyk_stop_all_magic_powers(ent);
+			}
+
+			if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power <= 0)
+			{ // zyk: run out of mp, stop all magic
+				ent->client->pers.magic_power = 0;
+
+				zyk_stop_all_magic_powers(ent);
+			}
+
+			// zyk: stop magic if skill level is not at least at level 1
+			for (i = 0; i < MAX_MAGIC_POWERS; i++)
+			{
+				int skill_index = SKILL_MAGIC_DOME + i;
+
+				if (ent->client->pers.skill_levels[skill_index] < 1)
+				{
+					zyk_stop_magic_power(ent, i);
+				}
+			}
+
+			if (ent->client->pers.active_magic & (1 << MAGIC_MAGIC_DOME))
+			{
+				if (ent->client->pers.magic_consumption_timer < level.time)
+				{
+					zyk_mp_usage(ent, SKILL_MAGIC_DOME);
+				}
+
+				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] < level.time)
+				{
+					int damage = MAGIC_MIN_DMG + (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_MAGIC_DOME] / 2);
+
+					if (damage < 1)
+					{
+						damage = 1;
+					}
+
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dome", "4", "env/dome", 0, damage, 290, 400);
+
+					ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] = level.time + 300;
+				}
+			}
+
+			if (ent->client->pers.active_magic & (1 << MAGIC_HEALING_CIRCLE))
+			{
+				int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_HEALING_CIRCLE];
+
+				if (ent->client->pers.magic_consumption_timer < level.time)
+				{
+					zyk_mp_usage(ent, SKILL_HEALING_CIRCLE);
+				}
+
+				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_CIRCLE] < level.time)
+				{
+					int heal_amount = magic_bonus + ent->client->pers.skill_levels[SKILL_HEALING_CIRCLE];
+
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing", "4", "env/red_cyc", 0, damage, 228, 400);
+
+					if (ent->health > 0)
+					{
+						zyk_add_health(ent, heal_amount);
+					}
+
+					healing_haven_status_restoration(ent, heal_amount * 100);
+
+					ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_CIRCLE] = level.time + 300;
+				}
+			}
+
+			if (ent->client->pers.active_magic & (1 << MAGIC_CHAOS_FIELD))
+			{
+				int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_CHAOS_FIELD];
+
+				if (ent->client->pers.magic_consumption_timer < level.time)
+				{
+					zyk_mp_usage(ent, SKILL_CHAOS_FIELD);
+				}
+
+				if (ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] < level.time)
+				{
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_chaos", "4", "ships/proton_impact", 0, damage, 512, 400);
+
+					ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] = level.time + 300;
+				}
+			}
+
+			if (ent->client->pers.active_magic & (1 << MAGIC_LIGHTNING_DOME))
+			{
+				if (ent->client->pers.magic_consumption_timer < level.time)
+				{
+					zyk_mp_usage(ent, SKILL_LIGHTNING_DOME);
+
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_lightning", "0", "howler/sonic", 0, 0, 0, 400);
+				}
+
+				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
+				{
+					int damage = MAGIC_MIN_DMG + (magic_bonus * 2) + (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 2);
+
+					lightning_dome(ent, damage);
+
+					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
+
+					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 5000 - (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 200);
+				}
+			}
+
+			if (ent->client->pers.magic_consumption_timer < level.time)
+			{
+				ent->client->pers.magic_consumption_timer = level.time + 250;
 			}
 		}
 	}

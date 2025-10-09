@@ -4819,16 +4819,16 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 
 	char* magic_powers_effects[MAX_MAGIC_POWERS] = {
 		"zyk_magic_dome",
-		"zyk_magic_water",
-		"zyk_magic_fire",
-		"zyk_magic_light"
+		"zyk_magic_healing",
+		"zyk_magic_chaos",
+		"zyk_magic_lightning"
 	};
 
 	zyk_magic_t magic_powers[MAX_MAGIC_POWERS] =
 	{
 		MAGIC_MAGIC_DOME,
-		MAGIC_HEALING_WATER,
-		MAGIC_FIRE_STRENGTH,
+		MAGIC_HEALING_CIRCLE,
+		MAGIC_CHAOS_FIELD,
 		MAGIC_LIGHTNING_DOME
 	};
 
@@ -5049,8 +5049,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 	if (attacker && attacker->client && (attacker->client->sess.account_mode == ACC_MODE_RPG || (attacker->NPC && attacker->client->pers.quest_npc > QUEST_NPC_NONE)))
 	{ // zyk: bonus damage
-		int magic_bonus = 0;
-
 		// zyk: Magic bolts can damage heavy things
 		if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2)
 		{
@@ -5062,19 +5060,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			damage = (int)ceil(damage * 1.25);
 
 			zyk_energy_modulator_resource_usage(attacker);
-		}
-
-		// zyk: Magic Armor improves all magic powers
-		if (attacker->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] > 0)
-		{
-			magic_bonus += 1;
-		}
-
-		if (attacker->client->pers.active_magic & (1 << MAGIC_FIRE_STRENGTH))
-		{
-			float fire_strength_bonus = 1.0f + (0.02f * (attacker->client->pers.skill_levels[SKILL_FIRE_STRENGTH] + magic_bonus + (zyk_skill_affinity(attacker, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER)));
-
-			damage = (int)ceil(damage * fire_strength_bonus);
 		}
 	}
 
@@ -6463,7 +6448,7 @@ G_RadiusDamage
 ============
 */
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
-extern float zyk_get_elemental_bonus_factor(zyk_magic_t magic_power, gentity_t* attacker, gentity_t* target);
+extern void healing_haven_status_restoration(gentity_t* ent, int amount);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, gentity_t *missile, int mod) {
 	float		points, dist;
@@ -6589,8 +6574,8 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 					if (is_ally == qtrue)
 					{
-						if (this_magic_power == MAGIC_HEALING_WATER && magic_power_user != ent && ent->client && ent->health > 0)
-						{ // zyk: Water magic heals allies
+						if (this_magic_power == MAGIC_HEALING_CIRCLE && magic_power_user != ent && ent->client && ent->health > 0)
+						{ // zyk: Healing Haven magic heals allies
 							int heal_amount = (int)points;
 
 							if (heal_amount < 1)
@@ -6598,9 +6583,16 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 								heal_amount = 1;
 							}
 
+							if (ent->client && ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
+							{ // zyk: Magic Shield fully protects against Magic, even healing ones
+								continue;
+							}
+
 							zyk_add_health(ent, heal_amount);
 
-							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_water", "0", "env/waterfall_splash", 0, 0, 0, 500);
+							healing_haven_status_restoration(ent, heal_amount * 100);
+
+							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_healing", "0", "env/waterfall_splash", 0, 0, 0, 500);
 							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/footsteps/water_wade_01.mp3"));
 						}
 
@@ -6635,17 +6627,29 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						if (final_damage < 1)
 							final_damage = 1;
 
-						if (this_magic_power == MAGIC_HEALING_WATER)
+						if (this_magic_power == MAGIC_HEALING_CIRCLE)
 						{
-							int chance_for_bad_status = final_damage;
+							// zyk: this magic deals no damage
+							final_damage = 0;
+						}
+						else if (this_magic_power == MAGIC_CHAOS_FIELD)
+						{
+							int chaos_chance = final_damage;
 
 							zyk_remove_emotes(ent);
 
-							if (Q_irand(0, 99) < chance_for_bad_status)
+							if (Q_irand(0, 99) < chaos_chance)
 							{
-								zyk_rpg_status_t random_bad_status = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
+								if (ent->client)
+								{
+									zyk_rpg_status_t random_bad_status = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
 
-								zyk_set_rpg_status(ent, random_bad_status, chance_for_bad_status * 1000, qtrue);
+									zyk_set_rpg_status(ent, random_bad_status, chaos_chance * 1000, qtrue);
+								}
+								else
+								{ // zyk: try to use entities
+									GlobalUse(ent, magic_power_user, magic_power_user);
+								}
 							}
 
 							// zyk: this magic deals no damage

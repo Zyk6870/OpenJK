@@ -2593,11 +2593,6 @@ void ClientThink_real( gentity_t *ent ) {
 			//ent->client->ps.speed = ent->client->ps.basespeed = NPC_GetRunSpeed( ent );
 		}
 
-		if (client->pers.active_magic & (1 << MAGIC_FIRE_STRENGTH))
-		{ // zyk: using Fire Strength. Increase speed
-			client->ps.speed *= 2;
-		}
-
 		if (client->pers.stun_baton_less_speed_timer > level.time)
 		{ // zyk: stun baton 3/3 decreases speed
 			client->ps.speed /= 2;
@@ -2638,11 +2633,6 @@ void ClientThink_real( gentity_t *ent ) {
 
 			// zyk: Misc Affinity increases run speed
 			zyk_player_speed += zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
-		}
-
-		if (client->pers.active_magic & (1 << MAGIC_FIRE_STRENGTH))
-		{ // zyk: using Fire Strength. Increase speed
-			zyk_player_speed *= 2;
 		}
 
 		if (client->bodyGrabIndex != ENTITYNUM_NONE)

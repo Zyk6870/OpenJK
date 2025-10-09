@@ -79,11 +79,11 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAX_STAMINA] = 10;
 	max_skill_levels[SKILL_RUN_SPEED] = 4;
 
-	max_skill_levels[SKILL_MAGIC_FIST] = 4;
-	max_skill_levels[SKILL_MAGIC_FLIGHT] = 8;
+	max_skill_levels[SKILL_MAGIC_FIST] = 15;
+	max_skill_levels[SKILL_MAGIC_FLIGHT] = 15;
 	max_skill_levels[SKILL_MAGIC_DOME] = 10;
-	max_skill_levels[SKILL_HEALING_WATER] = 10;
-	max_skill_levels[SKILL_FIRE_STRENGTH] = 10;
+	max_skill_levels[SKILL_HEALING_CIRCLE] = 10;
+	max_skill_levels[SKILL_CHAOS_FIELD] = 10;
 	max_skill_levels[SKILL_LIGHTNING_DOME] = 10;
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
@@ -130,8 +130,8 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "Magic Flight";
 	skill_names[SKILL_MAGIC_DOME] = "Defensive Dome";
-	skill_names[SKILL_HEALING_WATER] = "Healing Water";
-	skill_names[SKILL_FIRE_STRENGTH] = "Fire Strength";
+	skill_names[SKILL_HEALING_CIRCLE] = "Healing Circle";
+	skill_names[SKILL_CHAOS_FIELD] = "Chaos Field";
 	skill_names[SKILL_LIGHTNING_DOME] = "Lightning Dome";
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
@@ -202,13 +202,13 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FIST)
 		return va("allows you to attack with magic bolts when using melee punches. At max level, can damage saber-only damage objects and move pushable/pullable objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAGIC_FLIGHT)
-		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level increases flight speed and decreases mp usage";
+		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level decreases mp usage";
 	if (skill_index == SKILL_MAGIC_DOME)
 		return "an energy dome appears around you, decreasing damage to your health and damaging enemies inside the dome. Higher levels increase your resistance to damage done to your health and the damage done to enemies inside the dome";
-	if (skill_index == SKILL_HEALING_WATER)
-		return "Restores health to you and nearby ally players or npcs. Causes bad status effects to enemies (Poison, Fire, Bleeding, Confusion). Higher levels increase the amount of health restored and chance to cause bad status effects to enemies";
-	if (skill_index == SKILL_FIRE_STRENGTH)
-		return "increases your run speed and damage of all your attacks. Higher levels increase damage";
+	if (skill_index == SKILL_HEALING_CIRCLE)
+		return "Restores health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and nearby ally players or npcs. Higher levels increase the amount of health restored and bad status effects duration reduction";
+	if (skill_index == SKILL_CHAOS_FIELD)
+		return "Creates a field that causes bad status effects (Poison, Fire, Bleeding, Confusion) to enemies inside it, and also interacts with map stuff, like doors, elevators, etc. Each level increases chance to cause the bad status effects and their duration, and also increases chance to interact with map stuff";
 	if (skill_index == SKILL_LIGHTNING_DOME)
 		return "keeps creating Lightning Domes after some seconds, damaging enemies at a good distance. Has a chance of knocking down enemies. Higher levels create domes more often, deals more damage and increases chance to knockdown enemies";
 
@@ -250,8 +250,8 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "skillmagicflight";
 	skill_names[SKILL_MAGIC_DOME] = "skillmagicdome";
-	skill_names[SKILL_HEALING_WATER] = "skillhealingwater";
-	skill_names[SKILL_FIRE_STRENGTH] = "skillfirestrength";
+	skill_names[SKILL_HEALING_CIRCLE] = "skillhealinghaven";
+	skill_names[SKILL_CHAOS_FIELD] = "skillchaosfield";
 	skill_names[SKILL_LIGHTNING_DOME] = "skilllightningdome";
 
 	if (skill_index >= 0 && skill_index < NUMBER_OF_SKILLS)
@@ -10520,8 +10520,8 @@ qboolean zyk_can_cast_magic(gentity_t* ent)
 }
 
 extern void dome_of_damage(gentity_t* ent);
-extern void water_magic(gentity_t* ent);
-extern void fire_strength(gentity_t* ent);
+extern void healing_circle(gentity_t* ent);
+extern void chaos_field(gentity_t* ent);
 extern void magic_lightning_dome(gentity_t* ent);
 void zyk_cast_magic(gentity_t* ent, int skill_index)
 {
@@ -10576,13 +10576,13 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				{
 					dome_of_damage(ent);
 				}
-				else if (magic_number == MAGIC_HEALING_WATER)
+				else if (magic_number == MAGIC_HEALING_CIRCLE)
 				{
-					water_magic(ent);
+					healing_circle(ent);
 				}
-				else if (magic_number == MAGIC_FIRE_STRENGTH)
+				else if (magic_number == MAGIC_CHAOS_FIELD)
 				{
-					fire_strength(ent);
+					chaos_field(ent);
 				}
 				else if (magic_number == MAGIC_LIGHTNING_DOME)
 				{
