@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.5.3"
+#define	GAMEVERSION	"New Zyk Mod v1.5.4"
 
 #define SECURITY_LOG "security.log"
 
@@ -985,10 +985,9 @@ typedef struct clientPersistant_s {
 
 	int flame_thrower_timer; // zyk: used by stun baton. Its the flame thrower timer
 
-	// zyk: each of the modes of Energy Modulator Upgrade for Gunner:
+	// zyk: each of the modes of Energy Modulator:
 	// 0 - Off
-	// 1 - Damage buff and lower flame thrower fuel usage
-	// 2 - Resistance buff and gun shot deflection
+	// 1 - On
 	int energy_modulator_mode;
 	int energy_modulator_entity_id;
 

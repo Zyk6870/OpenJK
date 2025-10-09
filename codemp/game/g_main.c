@@ -5015,9 +5015,7 @@ void energy_modulator_spawn_model(gentity_t* ent, char *model_path)
 
 qboolean zyk_has_resources_for_energy_modulator(gentity_t* ent)
 {
-	if (ent->client->pers.magic_power < 1 &&
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] < 1 &&
-		ent->client->ps.ammo[AMMO_POWERCELL] < 1)
+	if (ent->client->pers.item_making_energy < 1)
 	{
 		return qfalse;
 	}
@@ -5041,13 +5039,7 @@ void zyk_energy_modulator(gentity_t* ent)
 		energy_modulator_spawn_model(ent, "models/map_objects/danger/ship_item04.md3");
 	}
 	else if (ent->client->pers.energy_modulator_mode == 1)
-	{ // zyk: sets the new mode
-		ent->client->pers.energy_modulator_mode = 2;
-
-		energy_modulator_spawn_model(ent, "models/map_objects/danger/ship_item04_placed.md3");
-	}
-	else
-	{ // zyk: if it is 2, turn it off
+	{ // zyk: turn it off
 		ent->client->pers.energy_modulator_mode = 0;
 	}
 }
@@ -8839,9 +8831,15 @@ void G_RunFrame( int levelTime ) {
 				{
 					int item_making_energy_time = 10000;
 
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0)
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0 && ent->client->pers.energy_modulator_mode == 0)
 					{
 						set_item_making_energy(ent, ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL], qtrue);
+					}
+
+					// zyk: Energy Modulator, while active, consumes Item-Making Energy
+					if (ent->client->pers.energy_modulator_mode == 1)
+					{
+						set_item_making_energy(ent, 100, qfalse);
 					}
 
 					if (ent->client->pers.skill_levels[SKILL_ITEM_MAKER] > 0)

@@ -4812,28 +4812,6 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 }
 
 extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
-extern qboolean zyk_has_resources_for_energy_modulator(gentity_t* ent);
-void zyk_energy_modulator_resource_usage(gentity_t* ent)
-{
-	if (zyk_has_resources_for_energy_modulator(ent) == qfalse)
-	{ // zyk: no more resources to keep it active. Turn it off
-		ent->client->pers.energy_modulator_mode = 0;
-	}
-	else if (ent->client->pers.magic_power >= 1)
-	{
-		zyk_set_mp(ent, 1, qfalse);
-	}
-	else if (ent->client->pers.magic_power <= 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0)
-	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]--;
-		zyk_set_mp(ent, 100, qtrue);
-	}
-	else
-	{
-		ent->client->ps.ammo[AMMO_POWERCELL] -= 1;
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
-	}
-}
 
 /*
 ============
@@ -5024,10 +5002,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 
 		if (attacker->client->pers.energy_modulator_mode == 1)
-		{ // zyk: Energy Modulator mode 1 increases damage
-			damage = (int)ceil(damage * 1.25);
-
-			zyk_energy_modulator_resource_usage(attacker);
+		{ // zyk: Energy Modulator increases damage
+			damage = (int)ceil(damage * 1.20f);
 		}
 	}
 
@@ -5557,13 +5533,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (targ->client->sess.account_mode == ACC_MODE_RPG)
 		{ // zyk: RPG resistance bonuses
-			if (targ->client->pers.energy_modulator_mode == 2)
-			{ // zyk: Energy Modulator mode 2
-				bonus_resistance += 0.25;
+			if (targ->client->pers.energy_modulator_mode == 1)
+			{ // zyk: Energy Modulator increases shield resistance
+				bonus_resistance += 0.20f;
 
 				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
-
-				zyk_energy_modulator_resource_usage(targ);
 			}
 
 			scaled_damage = (int)ceil(take * (1.0 - bonus_resistance));
