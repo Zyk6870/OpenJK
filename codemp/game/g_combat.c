@@ -2250,9 +2250,9 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	// zyk: stop all magic powers
 	zyk_stop_all_magic_powers(self);
 
-	if (self->client->sess.account_mode == ACC_MODE_RPG && self->client->pers.energy_modulator_mode > 0)
+	if (self->client->sess.account_mode == ACC_MODE_RPG && self->client->pers.energy_modulator_mode != ENERGY_MODULATOR_MODE_OFF)
 	{ // zyk: if player dies, deactivate Energy Modulator
-		self->client->pers.energy_modulator_mode = 0;
+		self->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
 	}
 
 	self->client->pers.rpg_statuses = 0;
@@ -5001,7 +5001,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			can_damage_heavy_things = qtrue;
 		}
 
-		if (attacker->client->pers.energy_modulator_mode == 1)
+		if (attacker->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
 		{ // zyk: Energy Modulator increases damage
 			damage = (int)ceil(damage * 1.20f);
 		}
@@ -5533,7 +5533,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 		if (targ->client->sess.account_mode == ACC_MODE_RPG)
 		{ // zyk: RPG resistance bonuses
-			if (targ->client->pers.energy_modulator_mode == 1)
+			if (targ->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
 			{ // zyk: Energy Modulator increases shield resistance
 				bonus_resistance += 0.20f;
 

@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.5.4"
+#define	GAMEVERSION	"New Zyk Mod v1.5.5"
 
 #define SECURITY_LOG "security.log"
 
@@ -737,6 +737,11 @@ typedef enum {
 } zyk_quest_item_t;
 
 typedef enum {
+	ENERGY_MODULATOR_MODE_OFF,
+	ENERGY_MODULATOR_MODE_ON
+} zyk_energy_modulator_mode_t;
+
+typedef enum {
 	QUEST_NPC_NONE,
 	QUEST_NPC_MAGE_MASTER,
 	QUEST_NPC_MAGE_MINISTER,
@@ -797,6 +802,9 @@ typedef enum {
 
 // zyk: amount of Magic Crystals to upgrade a skill
 #define MAGIC_CRYSTALS_TO_UPGRADE_SKILL 1
+
+// zyk: amount of Energy required to keep Energy Modulator On
+#define ENERGY_MODULATOR_ENERGY_USAGE 1
 
 // zyk: max RPG skill levels upgraded
 #define RPG_MAX_SKILLPOINTS 80
@@ -985,11 +993,10 @@ typedef struct clientPersistant_s {
 
 	int flame_thrower_timer; // zyk: used by stun baton. Its the flame thrower timer
 
-	// zyk: each of the modes of Energy Modulator:
-	// 0 - Off
-	// 1 - On
-	int energy_modulator_mode;
+	// zyk: Energy Modulator
+	zyk_energy_modulator_mode_t energy_modulator_mode;
 	int energy_modulator_entity_id;
+	int energy_modulator_energy_usage_timer;
 
 	int max_force_power; // zyk: max force power the player can have based on Force Power skill level
 

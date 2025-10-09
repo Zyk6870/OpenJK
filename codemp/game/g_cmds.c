@@ -4748,9 +4748,9 @@ int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
 	}
 
 	// zyk: Energy Modulator increases Affinity
-	if (ent->client->pers.energy_modulator_mode == 1)
+	if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
 	{
-		skill_affinity += 10;
+		skill_affinity += 30;
 	}
 
 	return skill_affinity;
@@ -5356,7 +5356,9 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			// zyk: used to add a cooldown between each flame
 			ent->client->cloakDebReduce = 0;
 
-			ent->client->pers.energy_modulator_mode = 0;
+			ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
+			ent->client->pers.energy_modulator_energy_usage_timer = 0;
+
 			ent->client->pers.quickdraw_timer = 0;
 			ent->client->pers.flashlight_timer = 0;
 

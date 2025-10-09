@@ -5015,7 +5015,7 @@ void energy_modulator_spawn_model(gentity_t* ent, char *model_path)
 
 qboolean zyk_has_resources_for_energy_modulator(gentity_t* ent)
 {
-	if (ent->client->pers.item_making_energy < 1)
+	if (ent->client->pers.item_making_energy < ENERGY_MODULATOR_ENERGY_USAGE)
 	{
 		return qfalse;
 	}
@@ -5028,19 +5028,19 @@ void zyk_energy_modulator(gentity_t* ent)
 {
 	if (zyk_has_resources_for_energy_modulator(ent) == qfalse)
 	{
-		ent->client->pers.energy_modulator_mode = 0;
+		ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
 		return;
 	}
 
-	if (ent->client->pers.energy_modulator_mode == 0)
+	if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_OFF)
 	{ // zyk: if it is Off, turn it on and spawns the model
-		ent->client->pers.energy_modulator_mode = 1;
+		ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_ON;
 
 		energy_modulator_spawn_model(ent, "models/map_objects/danger/ship_item04.md3");
 	}
-	else if (ent->client->pers.energy_modulator_mode == 1)
+	else if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
 	{ // zyk: turn it off
-		ent->client->pers.energy_modulator_mode = 0;
+		ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
 	}
 }
 
@@ -8831,15 +8831,10 @@ void G_RunFrame( int levelTime ) {
 				{
 					int item_making_energy_time = 10000;
 
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0 && ent->client->pers.energy_modulator_mode == 0)
+					// zyk: Energy Modulator, while active, stops Item-Making Energy regen
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0 && ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_OFF)
 					{
 						set_item_making_energy(ent, ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL], qtrue);
-					}
-
-					// zyk: Energy Modulator, while active, consumes Item-Making Energy
-					if (ent->client->pers.energy_modulator_mode == 1)
-					{
-						set_item_making_energy(ent, 100, qfalse);
 					}
 
 					if (ent->client->pers.skill_levels[SKILL_ITEM_MAKER] > 0)
@@ -8848,6 +8843,14 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					ent->client->pers.item_making_energy_timer = level.time + item_making_energy_time;
+				}
+
+				// zyk: Energy Modulator consumes Item-Making Energy
+				if (ent->health > 0 && ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON && ent->client->pers.energy_modulator_energy_usage_timer < level.time)
+				{
+					set_item_making_energy(ent, ENERGY_MODULATOR_ENERGY_USAGE, qfalse);
+
+					ent->client->pers.energy_modulator_energy_usage_timer = level.time + 200;
 				}
 
 				if (ent->client->pers.save_stat_changes_timer < level.time)
