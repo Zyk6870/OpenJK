@@ -204,13 +204,13 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level increases flight speed and decreases mp usage";
 	if (skill_index == SKILL_MAGIC_DOME)
-		return "an energy dome appears around you. Each level increases your resistance to damage to your health and the damage done to enemies inside it";
+		return "an energy dome appears around you, decreasing damage to your health and damaging enemies inside the dome. Higher levels increase your resistance to damage done to your health and the damage done to enemies inside the dome";
 	if (skill_index == SKILL_HEALING_WATER)
-		return "Restores health to you and nearby ally players or npcs. Causes bad status effects to enemies, like Poison, Fire, Bleeding and Confusion";
+		return "Restores health to you and nearby ally players or npcs. Causes bad status effects to enemies (Poison, Fire, Bleeding, Confusion). Higher levels increase the amount of health restored and chance to cause bad status effects to enemies";
 	if (skill_index == SKILL_FIRE_STRENGTH)
-		return "increases your run speed and damage of all your attacks";
+		return "increases your run speed and damage of all your attacks. Higher levels increase damage";
 	if (skill_index == SKILL_LIGHTNING_DOME)
-		return "keeps creating Lightning Domes after some seconds, damaging enemies at a good distance";
+		return "keeps creating Lightning Domes after some seconds, damaging enemies at a good distance. Has a chance of knocking down enemies. Higher levels create domes more often, deals more damage and increases chance to knockdown enemies";
 
 	return "";
 }

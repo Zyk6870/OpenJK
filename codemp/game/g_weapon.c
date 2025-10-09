@@ -1699,6 +1699,16 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 					Jedi_Decloak( gent );
 					gent->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
 				}
+
+				if (myOwner && myOwner->client && myOwner->client->sess.account_mode == ACC_MODE_RPG &&
+					myOwner->client->pers.active_magic & (1 << MAGIC_LIGHTNING_DOME) && Q_irand(0, 99) < (final_damage * 0.5f))
+				{ // zyk: has a chance of knockdown
+					gent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
+					gent->client->ps.forceHandExtendTime = level.time + 800;
+					gent->client->ps.velocity[2] += 300;
+					gent->client->ps.forceDodgeAnim = 0;
+					gent->client->ps.quickerGetup = qtrue;
+				}
 			}
 		}
 	}

@@ -5525,7 +5525,12 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] < level.time)
 				{
-					int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_DOME];
+					int damage = MAGIC_MIN_DMG + (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_MAGIC_DOME] / 2);
+
+					if (damage < 1)
+					{
+						damage = 1;
+					}
 
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dome", "4", "env/dome", 0, damage, 290, 400);
 
@@ -5584,13 +5589,13 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
 				{
-					int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME];
+					int damage = MAGIC_MIN_DMG + (magic_bonus * 2) + (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 2);
 
 					lightning_dome(ent, damage);
 
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 5000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 30);
+					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 5000 - (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 200);
 				}
 			}
 
