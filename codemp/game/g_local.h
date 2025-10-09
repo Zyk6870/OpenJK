@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.5.1"
+#define	GAMEVERSION	"New Zyk Mod v1.5.2"
 
 #define SECURITY_LOG "security.log"
 
@@ -688,7 +688,6 @@ typedef enum {
 	RPG_INVENTORY_UPGRADE_SEEKER_DRONE,
 	RPG_INVENTORY_UPGRADE_EWEB,
 	RPG_INVENTORY_MISC_BLUE_CRYSTAL,
-	RPG_INVENTORY_MISC_RED_CRYSTAL,
 	RPG_INVENTORY_MISC_QUEST_LOG,
 	RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR,
 	RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR,
@@ -734,7 +733,6 @@ typedef enum {
 typedef enum {
 	QUEST_ITEM_NONE,
 	QUEST_ITEM_SKILL_CRYSTAL,
-	QUEST_ITEM_SPECIAL_CRYSTAL,
 	QUEST_ITEM_ENERGY_MODULATOR,
 	QUEST_ITEM_MAGIC_ARMOR,
 	QUEST_ITEM_SPIRIT_CRYSTAL,
@@ -812,7 +810,6 @@ typedef enum {
 
 // zyk: amount of Magic Crystals to upgrade a skill
 #define MAGIC_CRYSTALS_TO_UPGRADE_SKILL 1
-#define RED_CRYSTAL_MAX_CHARGE 5
 
 // zyk: max RPG skill levels upgraded
 #define RPG_MAX_SKILLPOINTS 80
@@ -877,7 +874,6 @@ typedef enum {
 #define ENERGY_MODULATOR_PARTS 3
 #define QUEST_ITEM_DISTANCE 48
 #define SPIRIT_CRYSTAL_PARTS 6
-#define SPECIAL_CRYSTAL_MP_REGEN_AMOUNT 5
 #define QUEST_SPIRIT_TREE_DEFAULT_SCALE 2
 #define QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET 4
 #define QUEST_SPIRIT_TREE_RADIUS 50
@@ -949,10 +945,6 @@ typedef struct clientPersistant_s {
 	// zyk: used to backup player force powers before some event that does not allow them. They will be restored after event ends
 	int zyk_saved_force_powers;
 	int zyk_saved_force_power_levels[NUM_FORCE_POWERS];
-
-	// zyk: timer when player is using crystals
-	int special_crystal_timer;
-	int special_crystal_counter;
 
 	// zyk: cooldown time to buy or sell
 	int buy_sell_timer;

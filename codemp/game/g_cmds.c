@@ -325,7 +325,6 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
 
 	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "Blue Crystal";
-	inventory_item_names[RPG_INVENTORY_MISC_RED_CRYSTAL] = "Red Crystal";
 	inventory_item_names[RPG_INVENTORY_MISC_QUEST_LOG] = "Quest Log";
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
@@ -590,11 +589,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. When you collect one, it will restore 1 magic point. Upgrading skills uses a blue crystal. The ones you keep in your inventory makes your main quest ally npcs stronger. When you die, you lose a blue crystal\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_RED_CRYSTAL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the red crystals you collect in the map. When you collect one, it will restore %d magic points. The ones you keep in your inventory increase your Item-Making Energy and the regen rate of the Spirit Tree. Pressing and holding Use key will create a Lightning Dome damaging enemies nearby. Used by the Energy Modulator secret quest item. When you die, you lose a red crystal\n\n\"", zyk_get_inventory_item_name(item_index), SPECIAL_CRYSTAL_MP_REGEN_AMOUNT));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. When you collect one, it will restore 1 magic point. Upgrading skills uses a blue crystal. The ones you keep in your inventory increase your Item-Making Energy, makes your main quest ally npcs stronger and increase regen rate of the Spirit Tree. Used by the Energy Modulator secret quest item. When you die, you lose a blue crystal\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
@@ -685,7 +680,6 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "inventoryEWebUpgrade";
 
 	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "inventoryBlueCrystal";
-	inventory_item_names[RPG_INVENTORY_MISC_RED_CRYSTAL] = "inventoryRedCrystal";
 	inventory_item_names[RPG_INVENTORY_MISC_QUEST_LOG] = "inventoryQuestLog";
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
@@ -5536,9 +5530,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.magic_consumption_timer = 0;
 			ent->client->pers.magic_regen_debounce_timer = 0;
 
-			ent->client->pers.special_crystal_timer = 0;
-			ent->client->pers.special_crystal_counter = 0;
-
 			ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME;
 
 			// zyk: loading initial force
@@ -6696,11 +6687,8 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 300;
+	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 0;
 	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 50;
-
-	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][0] = 0;
-	seller_items_cost[RPG_INVENTORY_MISC_RED_CRYSTAL][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][1] = 500;

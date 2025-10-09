@@ -5027,7 +5027,7 @@ void energy_modulator_spawn_model(gentity_t* ent, char *model_path)
 qboolean zyk_has_resources_for_energy_modulator(gentity_t* ent)
 {
 	if (ent->client->pers.magic_power < 1 &&
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] < 1 &&
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] < 1 &&
 		ent->client->ps.ammo[AMMO_POWERCELL] < 1)
 	{
 		return qfalse;
@@ -5061,31 +5061,6 @@ void zyk_energy_modulator(gentity_t* ent)
 	{ // zyk: if it is 2, turn it off
 		ent->client->pers.energy_modulator_mode = 0;
 	}
-}
-
-void zyk_spawn_black_hole_model(gentity_t* ent, int duration, int model_scale)
-{
-	gentity_t* new_ent = G_Spawn();
-
-	zyk_set_entity_field(new_ent, "classname", "misc_model_breakable");
-	zyk_set_entity_field(new_ent, "spawnflags", "65536");
-	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2] - 15));
-
-	zyk_set_entity_field(new_ent, "model", "models/map_objects/mp/sphere_1.md3");
-
-	zyk_set_entity_field(new_ent, "targetname", "zyk_magic_black_hole");
-
-	zyk_set_entity_field(new_ent, "zykmodelscale", va("%d", model_scale));
-
-	zyk_spawn_entity(new_ent);
-
-	if (new_ent && new_ent->inuse)
-	{ // zyk: do not set these if for some reason the entity was not spawned
-		level.special_power_effects[new_ent->s.number] = ent->s.number;
-		level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
-	}
-
-	zyk_remap_shaders("models/map_objects/mp/spheretwo", "textures/mp/black");
 }
 
 extern void save_account(gentity_t* ent, qboolean save_char_file);
@@ -5254,11 +5229,6 @@ void zyk_spawn_crystal(float x, float y, float z, int duration, zyk_quest_item_t
 	{
 		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_skill_crystal", crystal_type);
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", 45, duration, crystal_effect_id, crystal_type);
-	}
-	else if (crystal_type == QUEST_ITEM_SPECIAL_CRYSTAL)
-	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_red_crystal", crystal_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_red.md3", 45, duration, crystal_effect_id, crystal_type);
 	}
 }
 
@@ -6884,7 +6854,6 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_RED_CRYSTAL] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_QUEST_LOG] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 150;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_MAGIC_ARMOR] = 450;
@@ -7352,7 +7321,7 @@ void zyk_spirit_tree_events(gentity_t* ent)
 			trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
 		}
 
-		quest_progress_change += ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL];
+		quest_progress_change += ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
 
 		if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 		{ // zyk: Hard Mode
@@ -8932,14 +8901,14 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.tutorial_timer = level.time + 5000;
 				}
 
-				// zyk: Item-Making Energy is generated based on the amount of Red Crystals
+				// zyk: Item-Making Energy is generated based on the amount of Blue Crystals
 				if (ent->health > 0 && ent->client->pers.item_making_energy_timer < level.time)
 				{
 					int item_making_energy_time = 10000;
 
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0)
 					{
-						set_item_making_energy(ent, ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL], qtrue);
+						set_item_making_energy(ent, ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL], qtrue);
 					}
 
 					if (ent->client->pers.skill_levels[SKILL_ITEM_MAKER] > 0)
@@ -9029,28 +8998,6 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.is_getting_up = qtrue;
 				}
 
-				if (ent->client->pers.special_crystal_timer < level.time && 
-					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 && 
-					ent->client->pers.special_crystal_counter >= RED_CRYSTAL_MAX_CHARGE)
-				{ // zyk: Red crystal is fully charged
-					int red_crystal_dmg = 50;
-
-					// zyk: creates a lightning dome, it is the DEMP2 alt fire but bigger
-					lightning_dome(ent, red_crystal_dmg);
-
-					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
-
-					ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
-
-					ent->client->pers.special_crystal_counter = 0;
-					ent->client->pers.special_crystal_timer = level.time + 200;
-
-				}
-				else if (!(ent->client->pers.cmd.buttons & BUTTON_USE))
-				{ // zyk: not holding Use, reset charge
-					ent->client->pers.special_crystal_counter = 0;
-				}
-
 				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_USING_FLASHLIGHT) && ent->client->pers.flashlight_timer < level.time)
 				{ // zyk: using the flashlight
 					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
@@ -9122,10 +9069,8 @@ void G_RunFrame( int levelTime ) {
 					int crystal_chance = (level.num_entities / 10);
 					
 					if (Q_irand(0, 99) < crystal_chance)
-					{ // zyk: crystals
-						zyk_quest_item_t crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
-
-						zyk_spawn_magic_crystal(60000, crystal_type);
+					{ // zyk: blue crystals
+						zyk_spawn_magic_crystal(60000, QUEST_ITEM_SKILL_CRYSTAL);
 					}
 					
 					if (Q_irand(0, 99) < energy_modulator_chance && level.energy_modulator_timer < level.time && 
@@ -9332,9 +9277,8 @@ void G_RunFrame( int levelTime ) {
 									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
 									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_BLUE_CRYSTAL, 20);
-									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_RED_CRYSTAL, 20);
 
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Receive 20 crystals of each type! A reward for your efforts.\n\"", QUESTCHAR_ALL_SPIRITS));
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Receive 20 blue crystals! A reward for your efforts.\n\"", QUESTCHAR_ALL_SPIRITS));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 6)
 								{

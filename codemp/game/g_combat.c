@@ -2648,41 +2648,10 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	{
 		int crystal_random_chance = Q_irand(0, 99);
 		int chance_to_spawn_crystal = 40 + (self->client->ps.stats[STAT_MAX_HEALTH] / 20);
-		zyk_quest_item_t crystal_type = QUEST_ITEM_NONE;
 
-		if (self->client->pers.quest_npc > QUEST_NPC_NONE && crystal_random_chance < chance_to_spawn_crystal)
+		if (crystal_random_chance < chance_to_spawn_crystal)
 		{
-			if (self->client->pers.quest_npc == QUEST_NPC_FORCE_MAGE ||
-				self->client->pers.quest_npc == QUEST_NPC_MAGE_SCHOLAR ||
-				self->client->pers.quest_npc == QUEST_NPC_MAGE_MINISTER ||
-				self->client->pers.quest_npc == QUEST_NPC_CHANGELING_HOWLER ||
-				self->client->pers.quest_npc == QUEST_NPC_CHANGELING_WORM ||
-				self->client->pers.quest_npc == QUEST_NPC_CHANGELING_SENTRY)
-			{
-				crystal_type = QUEST_ITEM_SPECIAL_CRYSTAL;
-			}
-			else if (self->client->pers.quest_npc == QUEST_NPC_MID_TRAINED_WARRIOR || 
-				self->client->pers.quest_npc == QUEST_NPC_FORCE_SABER_WARRIOR ||
-				self->client->pers.quest_npc == QUEST_NPC_LOW_TRAINED_WARRIOR ||
-				self->client->pers.quest_npc == QUEST_NPC_FLYING_WARRIOR ||
-				self->client->pers.quest_npc == QUEST_NPC_HEAVY_ARMORED_WARRIOR ||
-				self->client->pers.quest_npc == QUEST_NPC_HIGH_TRAINED_WARRIOR)
-			{
-				crystal_type = QUEST_ITEM_SKILL_CRYSTAL;
-			}
-			else if (self->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
-			{ // zyk: other enemy quest npcs
-				crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
-			}
-		}
-		else if (self->client->pers.quest_npc == QUEST_NPC_NONE && crystal_random_chance < chance_to_spawn_crystal)
-		{
-			crystal_type = Q_irand(QUEST_ITEM_SKILL_CRYSTAL, QUEST_ITEM_SPECIAL_CRYSTAL);
-		}
-
-		if (crystal_type > QUEST_ITEM_NONE)
-		{
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, crystal_type);
+			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
 		}
 	}
 
@@ -2729,7 +2698,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		)
 	{
 		self->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]--;
-		self->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
 
 		set_item_making_energy(self, 20, qfalse);
 	}
@@ -4855,9 +4823,9 @@ void zyk_energy_modulator_resource_usage(gentity_t* ent)
 	{
 		zyk_set_mp(ent, 1, qfalse);
 	}
-	else if (ent->client->pers.magic_power <= 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0)
+	else if (ent->client->pers.magic_power <= 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0)
 	{
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL]--;
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL]--;
 		zyk_set_mp(ent, 100, qtrue);
 	}
 	else

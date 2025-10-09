@@ -2819,7 +2819,6 @@ void fx_runner_think( gentity_t *ent )
 	// zyk: one of the crystal types. Tests if there is a RPG player touching it
 	if (Q_stricmp(ent->targetname, "zyk_skill_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_spirit_crystal") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_red_crystal") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_armor_puzzle") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0)
 	{
@@ -2863,18 +2862,6 @@ void fx_runner_think( gentity_t *ent )
 						zyk_clear_quest_effect(ent);
 
 						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Found the last part of the Spirit Crystal!\n\"", QUESTCHAR_ALL_SPIRITS));
-
-						return;
-					}
-					else if (Q_stricmp(ent->targetname, "zyk_red_crystal") == 0)
-					{
-						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_MISC_RED_CRYSTAL, 1);
-
-						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/movers/sec_panel_pass.mp3"));
-
-						zyk_set_mp(player_ent, SPECIAL_CRYSTAL_MP_REGEN_AMOUNT, qtrue);
-
-						zyk_clear_quest_effect(ent);
 
 						return;
 					}

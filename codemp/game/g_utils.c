@@ -1620,31 +1620,19 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 			ent->client->ps.forceDodgeAnim == BOTH_MEDITATE &&
 			ent->client->pers.quest_spirit_tree_call_timer < level.time)
 		{
-			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] >= QUEST_SPIRIT_TREE_CALL_COST)
+			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] >= QUEST_SPIRIT_TREE_CALL_COST)
 			{
 				ent->client->pers.quest_spirit_tree_id = -1;
 				ent->client->pers.quest_spirit_tree_call_timer = level.time + 2000;
 
-				zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_RED_CRYSTAL, QUEST_SPIRIT_TREE_CALL_COST);
+				zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_BLUE_CRYSTAL, QUEST_SPIRIT_TREE_CALL_COST);
 
 				trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
 			}
 			else
 			{
-				trap->SendServerCommand(ent->s.number, "cp \"Not enough Green Crystals to call your Spirit Tree\n\"");
+				trap->SendServerCommand(ent->s.number, "cp \"Not enough Blue Crystals to call your Spirit Tree\n\"");
 			}
-		}
-
-		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_RED_CRYSTAL] > 0 &&
-			!(ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE) && 
-			!(ent->client->isHacking) &&
-			ent->client->pers.special_crystal_timer < level.time && ent->client->pers.special_crystal_counter < RED_CRYSTAL_MAX_CHARGE)
-		{ // zyk: Charging Red Crystal
-			ent->client->ps.electrifyTime = level.time + 500;
-			G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/energy_crackle.wav"));
-
-			ent->client->pers.special_crystal_counter++;
-			ent->client->pers.special_crystal_timer = level.time + 200;
 		}
 	}
 }
