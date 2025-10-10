@@ -6063,10 +6063,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				zyk_set_rpg_status(targ, RPG_STATUS_BLEEDING, 10000, qtrue);
 			}
-			else if (attacker->client->pers.quest_npc == QUEST_NPC_CHANGELING_SENTRY && mod == MOD_BRYAR_PISTOL)
-			{
-				zyk_set_rpg_status(targ, RPG_STATUS_IN_FLAMES, 5000, qtrue);
-			}
 		}
 
 		if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG)

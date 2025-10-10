@@ -498,7 +498,6 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = "force_saber_warrior_both";
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = "force_saber_warrior_dark";
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT] = "force_saber_warrior_light";
-	enemy_names[QUEST_NPC_CHANGELING_SENTRY] = "changeling_sentry";
 	enemy_names[QUEST_NPC_CHANGELING_WORM] = "changeling_worm";
 	enemy_names[QUEST_NPC_CHANGELING_HOWLER] = "changeling_howler";
 	enemy_names[QUEST_NPC_FLYING_WARRIOR] = "flying_warrior";
@@ -527,7 +526,6 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT] = QUEST_NPC_BONUS_INCREASE;
-	bonus_increase[QUEST_NPC_CHANGELING_SENTRY] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_CHANGELING_WORM] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_CHANGELING_HOWLER] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
@@ -556,7 +554,6 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = 5;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = 5;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT] = 5;
-	max_levels[QUEST_NPC_CHANGELING_SENTRY] = 7;
 	max_levels[QUEST_NPC_CHANGELING_WORM] = 7;
 	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 7;
 	max_levels[QUEST_NPC_FLYING_WARRIOR] = 0;
@@ -641,41 +638,21 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 		}
-		else if (quest_npc_type == QUEST_NPC_FORCE_SABER_WARRIOR_BOTH)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
-		}
-		else if (quest_npc_type == QUEST_NPC_FORCE_SABER_WARRIOR_DARK)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
-		}
-		else if (quest_npc_type == QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
-		}
-		else if (quest_npc_type == QUEST_NPC_CHANGELING_SENTRY)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
-		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_WORM)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_LIGHTNING_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_HOWLER)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
 		{
 			Jedi_Cloak(npc_ent);
-
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_HEAVY_ARMORED_WARRIOR)
 		{
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 1;
-
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR)
 		{
@@ -686,8 +663,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 				npc_ent->s.weapon = WP_MELEE;
 				npc_ent->client->ps.weapon = WP_MELEE;
 			}
-
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_MAGE)
 		{
@@ -9081,11 +9056,11 @@ void G_RunFrame( int levelTime ) {
 							
 							if (hard_difficulty == qtrue)
 							{
-								stronger_enemy_type -= (main_quest_progress / 6);
+								stronger_enemy_type -= (main_quest_progress / 3);
 							}
 							else
 							{
-								stronger_enemy_type -= (main_quest_progress / 8);
+								stronger_enemy_type -= (main_quest_progress / 5);
 							}
 
 							if (stronger_enemy_type < QUEST_NPC_MAGE_MASTER)
