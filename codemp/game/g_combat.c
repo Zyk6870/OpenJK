@@ -5979,18 +5979,18 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
 			{ // zyk: Impact Reducer Armor
-				bonus_health_resistance += 0.10;
+				bonus_health_resistance += 0.20f;
 			}
 
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
 			{ // zyk: Deflective Armor
 				if (zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue)
 				{
-					bonus_health_resistance += 0.20;
+					bonus_health_resistance += 0.25f;
 				}
 				else if (mod == MOD_SABER)
 				{
-					bonus_health_resistance += 0.05;
+					bonus_health_resistance += 0.10f;
 				}
 			}
 
@@ -5998,11 +5998,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{ // zyk: Saber Armor
 				if (zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue)
 				{
-					bonus_health_resistance += 0.05;
+					bonus_health_resistance += 0.10f;
 				}
 				else if (mod == MOD_SABER)
 				{
-					bonus_health_resistance += 0.20;
+					bonus_health_resistance += 0.40f;
 				}
 			}
 
@@ -6014,7 +6014,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 			
 			// zyk: reduces damage based on the health resistance bonuses
-			take = (int)ceil(take * (1.00 - bonus_health_resistance));
+			take = (int)ceil(take * (1.00f - bonus_health_resistance));
 
 			if (take < 1)
 			{ // zyk: cannot make player fully absorb all damage

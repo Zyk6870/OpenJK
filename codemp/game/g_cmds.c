@@ -487,15 +487,15 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source by 10 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source by 20 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 20 per cent weapon/melee damage to your health (only 5 per cent from saber) and has a chance to deflect some weapon shots\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 25 per cent weapon/melee damage to your health and 10 per cent from saber. It has a chance to deflect some weapon shots\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_SABER_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 5 per cent weapon/melee damage to your health (20 per cent from saber)\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 10 per cent weapon/melee damage to your health and 40 per cent from saber\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER)
 	{
@@ -575,7 +575,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Item-Making energy into attack power, extra shield protection and can increase Force Affinity, Misc Affinity and Magic Affnity. You must find it and solve the puzzle to get it. Activate it by pressing Duel key. It uses Item-Making Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Item-Making energy into attack power, extra shield protection and can increase Force Affinity, Misc Affinity and Magic Affinity. You must find it and solve the puzzle to get it. Activate it by pressing Duel key. It uses Item-Making Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
@@ -4750,7 +4750,7 @@ int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
 	// zyk: Energy Modulator increases Affinity
 	if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
 	{
-		skill_affinity += 30;
+		skill_affinity += 20;
 	}
 
 	return skill_affinity;
@@ -6994,7 +6994,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				if (trap->Argc() == 2)
 				{
-					trap->SendServerCommand(ent->s.number, "print \"Must pass a page number, ^3desc ^7to see inventory item description, or ^3use ^7to toggle a weapon upgrade. Examples: ^3/list inventory 1, /list inventory desc 1, /list inv 1, /list inv desc 1, /list inv use 42^7\n\"");
+					trap->SendServerCommand(ent->s.number, "print \"Must pass a page number, ^3desc ^7to see inventory item description, or ^3use ^7to either toggle a weapon/armor upgrade mode or use certain items. Examples: ^3/list inventory 1, /list inventory desc 1, /list inv 1, /list inv desc 1, /list inv use 42^7\n\"");
 				}
 				else
 				{
