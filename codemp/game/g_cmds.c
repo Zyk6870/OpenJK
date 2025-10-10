@@ -301,9 +301,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "Force Field Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "Shield Generator";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = "Impact Reducer Armor";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = "Deflective Armor";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = "Saber Armor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = "Adaptive Armor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "Flame Thrower";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = "Weapon Damage Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "Stun Baton Upgrade";
@@ -485,17 +483,9 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to restore his shield\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR)
+	else if (item_index == RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source by 20 per cent and reduces the knockback of some weapons attacks by 80 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 25 per cent weapon/melee damage to your health and 10 per cent from saber. It has a chance to deflect some weapon shots\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_SABER_ARMOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7absorbs 10 per cent weapon/melee damage to your health and 40 per cent from saber\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source by 20 per cent. Uses each ammo type to give extra protection. Uses Blaster Pack to reduce knockback of some attacks by 80 per cent and to absorb an extra 10 per cent damage from weapons or melee and has a chance to use this ammo to deflect some types of weapon shots. Uses Metal Bolts to absorb an extra 30 per cent damage from saber. Uses Powercell to absorb an extra 20 per cent damage from Magic attacks\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER)
 	{
@@ -646,9 +636,7 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "inventoryForceFieldUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "inventoryCloakItemUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "inventoryShieldGenerator";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = "inventoryImpactReducerArmor";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = "inventoryDeflectiveArmor";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = "inventorySaberArmor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = "inventoryAdaptiveArmor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "inventoryFlameThrower";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = "inventoryWeaponDamage";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "inventoryStunBatonUpgrade";
@@ -6473,14 +6461,8 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR][0] = 2000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR][1] = 1000;
-
-	seller_items_cost[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR][0] = 2000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR][1] = 1000;
-
-	seller_items_cost[RPG_INVENTORY_UPGRADE_SABER_ARMOR][0] = 2000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_SABER_ARMOR][1] = 1000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR][0] = 2000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR][1] = 1000;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][1] = 500;
@@ -10314,9 +10296,12 @@ void Cmd_Saber_f( gentity_t *ent ) {
 // zyk: tests if some weapon shots will be deflected when hitting this player
 qboolean zyk_can_deflect_shots(gentity_t *ent)
 {
-	// zyk: Deflective Armor
-	if (ent && ent->client && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0 && Q_irand(0, 3) == 0)
+	// zyk: Adaptive Armor
+	if (ent && ent->client && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] > 0 && 
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] > 1 && Q_irand(0, 3) == 0)
 	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_BLASTER_PACK, 2);
+
 		return qtrue;
 	}
 

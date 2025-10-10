@@ -4764,23 +4764,6 @@ int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int inventory_
 	return final_dmg;
 }
 
-qboolean zyk_source_is_non_saber_weapon(int mod, gentity_t* inflictor)
-{
-	if ((mod >= MOD_STUN_BATON && mod <= MOD_CONC_ALT) || 
-		mod == MOD_SENTRY || 
-		mod == MOD_TARGET_LASER)
-	{
-		if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2)
-		{ // zyk: Magic Fist
-			return qfalse;
-		}
-
-		return qtrue;
-	}
-
-	return qfalse;
-}
-
 zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 {
 	int i = 0;
@@ -4809,6 +4792,43 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 	}
 
 	return -1;
+}
+
+qboolean zyk_is_magic_fist(int mod, gentity_t* inflictor)
+{
+	if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2)
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
+qboolean zyk_is_magic_power(gentity_t* inflictor)
+{
+	if (inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) > -1)
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
+qboolean zyk_source_is_non_saber_weapon(int mod, gentity_t* inflictor)
+{
+	if ((mod >= MOD_STUN_BATON && mod <= MOD_CONC_ALT) || 
+		mod == MOD_SENTRY || 
+		mod == MOD_TARGET_LASER)
+	{
+		if (zyk_is_magic_fist(mod, inflictor) == qtrue)
+		{
+			return qfalse;
+		}
+
+		return qtrue;
+	}
+
+	return qfalse;
 }
 
 extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
@@ -4905,21 +4925,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		targ->client->pers.quest_npc_chat_timer = level.time + 3000;
 	}
 
-	if (targ && targ->client && targ->client->pers.rpg_statuses & (1 << RPG_STATUS_BLEEDING) &&
-		(mod == MOD_SABER || 
-		 mod == MOD_MELEE || 
-		 mod == MOD_FORCE_DARK || // zyk: a Force Power
-		!(inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) > -1) // zyk: a magic power
-		))
-	{
-		damage /= 2;
-
-		if (damage < 1)
-		{
-			damage = 1;
-		}
-	}
-
 	// zyk: target has chat protection
 	if (targ && targ->client && !targ->NPC && targ->client->pers.player_statuses & (1 << PLAYER_STATUS_CHAT_PROTECTION))
 		return;
@@ -4976,7 +4981,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			damage = (int)ceil(damage * bonus_saber_damage_factor);
 		}
-		else if (mod == MOD_MELEE && !(inflictor && inflictor->s.weapon == WP_DEMP2))
+		else if (mod == MOD_MELEE && zyk_is_magic_fist(mod, inflictor) == qfalse)
 		{ // zyk: Melee damage. Will not consider the magic bolt attacks
 			damage = (int)ceil(damage * (1.0 + (0.50 * attacker->client->pers.skill_levels[SKILL_MELEE])));
 		}
@@ -5209,14 +5214,18 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		knockback = 0;
 	}
 
-	// zyk: if player is in RPG Mode, reduce knockback based on the Impact Reducer Armor of the player
-	if (targ && targ->client && targ->client->sess.account_mode == ACC_MODE_RPG)
+	// zyk: if player is in RPG Mode, reduce knockback based on the Adaptive Armor of the player
+	if (targ && targ->client)
 	{
 		int new_knockback = knockback;
 
-		if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
+		if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] > 0 && targ->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] > 0)
 		{
 			new_knockback -= knockback * 0.8;
+
+			zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_AMMO_BLASTER_PACK, 1);
+
+			targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 		}
 
 		knockback = new_knockback;
@@ -5536,8 +5545,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (targ->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
 			{ // zyk: Energy Modulator increases shield resistance
 				bonus_resistance += 0.20f;
-
-				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 			}
 
 			scaled_damage = (int)ceil(take * (1.0 - bonus_resistance));
@@ -5977,32 +5984,37 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			float bonus_health_resistance = 0.00;
 			int stamina_loss = 0;
 
-			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] > 0)
-			{ // zyk: Impact Reducer Armor
+			// zyk: Adaptive Armor
+			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] > 0)
+			{
 				bonus_health_resistance += 0.20f;
-			}
 
-			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] > 0)
-			{ // zyk: Deflective Armor
-				if (zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue)
-				{
-					bonus_health_resistance += 0.25f;
-				}
-				else if (mod == MOD_SABER)
+				if (zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue && targ->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] > 0)
 				{
 					bonus_health_resistance += 0.10f;
-				}
-			}
 
-			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] > 0)
-			{ // zyk: Saber Armor
-				if (zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue)
-				{
-					bonus_health_resistance += 0.10f;
+					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_AMMO_BLASTER_PACK, 1);
+
+					targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 				}
-				else if (mod == MOD_SABER)
+
+				if (mod == MOD_SABER && targ->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS] > 1)
 				{
-					bonus_health_resistance += 0.40f;
+					bonus_health_resistance += 0.30f;
+
+					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_AMMO_METAL_BOLTS, 2);
+
+					targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
+				}
+
+				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] > 1 && 
+					(zyk_is_magic_fist(mod, inflictor) == qtrue || zyk_is_magic_power(inflictor) == qtrue))
+				{
+					bonus_health_resistance += 0.20f;
+
+					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 2);
+
+					targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 				}
 			}
 

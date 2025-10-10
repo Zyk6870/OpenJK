@@ -628,9 +628,11 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		// zyk: setting magic abilities
 		if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
 		{
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 1;
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 1;
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 1;
+
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] = 10000;
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] = 10000;
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS] = 10000;
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_LIGHTNING_DOME, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
@@ -653,8 +655,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_SENTRY)
 		{
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
-
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_WORM)
@@ -669,15 +669,11 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		{
 			Jedi_Cloak(npc_ent);
 
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
-
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_HEAVY_ARMORED_WARRIOR)
 		{
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 1;
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 1;
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 1;
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 1;
 
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 		}
@@ -5414,7 +5410,7 @@ void lightning_dome(gentity_t* ent, int damage)
 	missile->count = 9;
 
 	missile->classname = "demp2_alt_proj";
-	// missile->targetname = "zyk_magic_light";
+	missile->targetname = "zyk_magic_lightning";
 	missile->s.weapon = WP_DEMP2;
 
 	missile->think = zyk_lightning_dome_detonate;
@@ -6733,10 +6729,8 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 10;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 250;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_IMPACT_REDUCER_ARMOR] = 450;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_DEFLECTIVE_ARMOR] = 450;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SABER_ARMOR] = 450;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 300;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 700;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 100;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 30;
