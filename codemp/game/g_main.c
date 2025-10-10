@@ -495,6 +495,9 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_NONE] = "";
 
 	enemy_names[QUEST_NPC_MAGE_MASTER] = "mage_master";
+	enemy_names[QUEST_NPC_MAGE_MINISTER] = "mage_minister";
+	enemy_names[QUEST_NPC_MAGE_SCHOLAR] = "mage_scholar";
+	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR_GUNS] = "force_saber_warrior_guns";
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = "force_saber_warrior_both";
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = "force_saber_warrior_dark";
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT] = "force_saber_warrior_light";
@@ -523,6 +526,9 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_NONE] = QUEST_NPC_BONUS_INCREASE;
 
 	bonus_increase[QUEST_NPC_MAGE_MASTER] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_MAGE_MINISTER] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_MAGE_SCHOLAR] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_GUNS] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT] = QUEST_NPC_BONUS_INCREASE;
@@ -551,11 +557,14 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_NONE] = 0;
 
 	max_levels[QUEST_NPC_MAGE_MASTER] = 20;
-	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = 5;
-	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = 5;
-	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT] = 5;
-	max_levels[QUEST_NPC_CHANGELING_WORM] = 7;
-	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 7;
+	max_levels[QUEST_NPC_MAGE_MINISTER] = 10;
+	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 10;
+	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_GUNS] = 7;
+	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = 0;
+	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = 0;
+	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT] = 0;
+	max_levels[QUEST_NPC_CHANGELING_WORM] = 5;
+	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 5;
 	max_levels[QUEST_NPC_FLYING_WARRIOR] = 0;
 	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 0;
 	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR] = 0;
@@ -635,6 +644,20 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_MAGE_MINISTER)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_LIGHTNING_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
+		}
+		else if (quest_npc_type == QUEST_NPC_MAGE_SCHOLAR)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 		}
@@ -9180,10 +9203,12 @@ void G_RunFrame( int levelTime ) {
 				// zyk: npcs with magic powers
 				if (ent->client->pers.quest_npc > QUEST_NPC_NONE && ent->client->pers.quest_event_timer < level.time)
 				{
+					/*
 					if (ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 					{ // zyk: there can only be one of these npcs in the map
 						level.special_quest_npc_in_map |= (1 << ent->client->pers.quest_npc);
 					}
+					*/
 
 					if (ent->enemy)
 					{
