@@ -559,7 +559,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_MAGE_MASTER] = 20;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 10;
 	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 10;
-	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_GUNS] = 7;
+	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_GUNS] = 0;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = 0;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = 0;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT] = 0;
@@ -646,6 +646,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_MINISTER)
 		{
@@ -653,6 +654,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_SCHOLAR)
 		{
@@ -660,6 +662,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_WORM)
 		{
@@ -671,7 +674,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
 		{
-			Jedi_Cloak(npc_ent);
+			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = (1 << HI_JETPACK);
 		}
 		else if (quest_npc_type == QUEST_NPC_HEAVY_ARMORED_WARRIOR)
 		{
@@ -695,6 +698,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, ally_bonus + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = ally_bonus + skill_level_bonus;
 		}
 
 		// zyk: setting the initial amount of magic points here because it is based on the Max MP skill
@@ -9222,9 +9226,16 @@ void G_RunFrame( int levelTime ) {
 
 						if (ent->client->pers.skill_levels[magic_skill_index] > 0)
 						{
-							int magic_cast_dist = 0;
+							int magic_cast_dist = 50000;
 
-							magic_cast_dist = MAGIC_MIN_RANGE;
+							if (random_magic == MAGIC_CHAOS_FIELD)
+							{
+								magic_cast_dist = 550;
+							}
+							else if (random_magic == MAGIC_LIGHTNING_DOME)
+							{
+								magic_cast_dist = 1000;
+							}
 
 							if (quest_npc_enemy_distance < Q_irand(0, magic_cast_dist) && !(ent->client->pers.active_magic & (1 << random_magic)))
 							{
