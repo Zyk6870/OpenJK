@@ -1544,7 +1544,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			{
 				if (ent->client->pers.active_magic & (1 << i))
 				{
-					stamina_usage += (12 + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER));
+					stamina_usage += (10 + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER));
 				}
 			}
 
@@ -1574,7 +1574,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 				{
 					zyk_set_mp(ent, 1, qtrue);
 
-					ent->client->pers.magic_regen_debounce_timer = level.time + 1000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 5);
+					ent->client->pers.magic_regen_debounce_timer = level.time + 1000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
 				}
 			}
 			else if (zyk_is_player_idle(ent, ucmd) == qfalse)

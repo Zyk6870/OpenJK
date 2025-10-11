@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.5.26"
+#define	GAMEVERSION	"New Zyk Mod v1.5.27"
 
 #define SECURITY_LOG "security.log"
 
@@ -582,7 +582,7 @@ typedef enum {
 
 // zyk: magic powers values
 typedef enum {
-	MAGIC_DEFENSIVE_DOME,
+	MAGIC_DEFENSIVE_SHIELD,
 	MAGIC_HEALING_CIRCLE,
 	MAGIC_CHAOS_FIELD,
 	MAGIC_LIGHTNING_DOME,
@@ -618,7 +618,7 @@ typedef enum {
 	SKILL_RUN_SPEED,
 	SKILL_MAGIC_FIST,
 	SKILL_MAGIC_FLIGHT,
-	SKILL_DEFENSIVE_DOME,
+	SKILL_DEFENSIVE_SHIELD,
 	SKILL_HEALING_CIRCLE,
 	SKILL_CHAOS_FIELD,
 	SKILL_LIGHTNING_DOME,
@@ -786,7 +786,7 @@ typedef enum {
 
 typedef enum {
 	SELECTED_ABILITY_NONE,
-	SELECTED_ABILITY_DEFENSIVE_DOME,
+	SELECTED_ABILITY_DEFENSIVE_SHIELD,
 	SELECTED_ABILITY_HEALING_CIRCLE,
 	SELECTED_ABILITY_CHAOS_FIELD,
 	SELECTED_ABILITY_LIGHTNING_DOME,
@@ -823,7 +823,8 @@ typedef enum {
 
 // zyk: magic power stats
 #define MAGIC_MIN_DMG 0
-#define MAGIC_AFFINITY_MODIFIER 10
+#define MAGIC_AFFINITY_MODIFIER 7
+#define MAGIC_BACTA_MP_REGEN_AMOUNT 25
 
 // zyk: damage bonus of weapons
 #define RPG_WEAPON_DMG_BONUS 0.01

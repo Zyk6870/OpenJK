@@ -1328,7 +1328,7 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 		{
 			MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT * 2);
 
-			zyk_set_mp(ent, 200, qtrue);
+			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT * 4, qtrue);
 
 			// zyk: Big Bacta can regen some stamina
 			zyk_set_stamina(ent, 2000, qtrue);
@@ -1337,7 +1337,7 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 		{
 			MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
 
-			zyk_set_mp(ent, 100, qtrue);
+			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT * 2, qtrue);
 
 			// zyk: Big Bacta can regen some stamina
 			zyk_set_stamina(ent, 1000, qtrue);
@@ -1360,7 +1360,7 @@ void ItemUse_MedPack(gentity_t *ent)
 		{
 			MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT * 2);
 
-			zyk_set_mp(ent, 100, qtrue);
+			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT * 2, qtrue);
 
 			// zyk: Bacta Canister can regen some stamina
 			zyk_set_stamina(ent, 1000, qtrue);
@@ -1369,7 +1369,7 @@ void ItemUse_MedPack(gentity_t *ent)
 		{
 			MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);
 
-			zyk_set_mp(ent, 50, qtrue);
+			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT, qtrue);
 
 			// zyk: Bacta Canister can regen some stamina
 			zyk_set_stamina(ent, 500, qtrue);

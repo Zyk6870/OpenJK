@@ -3072,7 +3072,7 @@ void fx_runner_link( gentity_t *ent )
 		// Let's get to work right now!
 		ent->think = fx_runner_think;
 
-		if (Q_stricmp(ent->targetname, "zyk_magic_dome") == 0 ||
+		if (Q_stricmp(ent->targetname, "zyk_magic_defensive") == 0 ||
 			Q_stricmp(ent->targetname, "zyk_magic_healing") == 0 || 
 			Q_stricmp(ent->targetname, "zyk_magic_chaos") == 0 ||
 			Q_stricmp(ent->targetname, "zyk_magic_lightning") == 0)
@@ -3082,8 +3082,7 @@ void fx_runner_link( gentity_t *ent )
 		}
 		else if (Q_stricmp(ent->targetname, "zyk_status_poison") == 0 || 
 			Q_stricmp(ent->targetname, "zyk_status_on_fire") == 0 ||
-			Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0 ||
-			Q_stricmp(ent->targetname, "zyk_magic_armor_effect") == 0)
+			Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0)
 		{ // zyk: other RPG effects
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 200; // wait a small bit, then start working
@@ -3150,14 +3149,13 @@ void SP_fx_runner( gentity_t *ent )
 	ent->think = fx_runner_link;
 
 	// zyk: no need to wait 400 ms with these effects
-	if (Q_stricmp(ent->targetname, "zyk_magic_dome") == 0 ||
+	if (Q_stricmp(ent->targetname, "zyk_magic_defensive") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_healing") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_chaos") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_lightning") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_status_poison") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_status_on_fire") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_magic_armor_effect") == 0)
+		Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0)
 	{
 		ent->nextthink = level.time + 100;
 	}

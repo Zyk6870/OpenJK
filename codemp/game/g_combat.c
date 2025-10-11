@@ -4769,7 +4769,7 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 	int i = 0;
 
 	char* magic_powers_effects[MAX_MAGIC_POWERS] = {
-		"zyk_magic_dome",
+		"zyk_magic_defensive",
 		"zyk_magic_healing",
 		"zyk_magic_chaos",
 		"zyk_magic_lightning"
@@ -4777,7 +4777,7 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 
 	zyk_magic_t magic_powers[MAX_MAGIC_POWERS] =
 	{
-		MAGIC_DEFENSIVE_DOME,
+		MAGIC_DEFENSIVE_SHIELD,
 		MAGIC_HEALING_CIRCLE,
 		MAGIC_CHAOS_FIELD,
 		MAGIC_LIGHTNING_DOME
@@ -6018,11 +6018,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (targ->client->pers.active_magic & (1 << MAGIC_DEFENSIVE_DOME))
-			{ // zyk: target using Defensive Dome
+			if (targ->client->pers.active_magic & (1 << MAGIC_DEFENSIVE_SHIELD))
+			{ // zyk: target using Defensive Shield
 				int magic_bonus = zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
 
-				bonus_health_resistance += (0.02f * (targ->client->pers.skill_levels[SKILL_DEFENSIVE_DOME] + magic_bonus + (zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER)));
+				bonus_health_resistance += (0.025f * (targ->client->pers.skill_levels[SKILL_DEFENSIVE_SHIELD] + magic_bonus));
 			}
 			
 			// zyk: reduces damage based on the health resistance bonuses
@@ -6397,8 +6397,8 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 	}
 
 	for ( i = 0 ; i < 3 ; i++ ) {
-		if (i == 2 && attacker && Q_stricmp(attacker->targetname, "zyk_magic_dome") == 0)
-		{ // zyk: Dome of Damage quest power calculates the bounding box in a different way
+		if (i == 2 && attacker && Q_stricmp(attacker->targetname, "zyk_magic_chaos") == 0)
+		{ // zyk: this magic effect calculates the bounding box in a different way
 			mins[i] = origin[i] - 20;
 			maxs[i] = origin[i] + radius - 150;
 		}
@@ -6485,15 +6485,15 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					{
 						if (this_magic_power == MAGIC_HEALING_CIRCLE && magic_power_user != ent && ent->client && ent->health > 0)
 						{ // zyk: Healing Circle magic heals allies
-							int heal_amount = magic_power_user->client->pers.skill_levels[SKILL_HEALING_CIRCLE];
+							int heal_amount = 1 + (magic_power_user->client->pers.skill_levels[SKILL_HEALING_CIRCLE] / 2);
+							int magic_bonus = zyk_skill_affinity(magic_power_user, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
 
 							if (ent->client && ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
 							{ // zyk: Magic Shield fully protects against Magic, even healing ones
 								continue;
 							}
 
-							// zyk: Magic Affinity
-							heal_amount += (zyk_skill_affinity(magic_power_user, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER);
+							heal_amount += (magic_bonus / 2);
 
 							zyk_add_health(ent, heal_amount);
 
@@ -6558,9 +6558,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 									GlobalUse(ent, magic_power_user, magic_power_user);
 								}
 							}
-
-							// zyk: this magic deals no damage
-							final_damage = 0;
 						}
 
 						if (ent->client && !(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)))

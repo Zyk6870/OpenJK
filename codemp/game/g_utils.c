@@ -1638,9 +1638,9 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 		}
 		else if (ent->client->pers.selected_ability > SELECTED_ABILITY_NONE)
 		{
-			if (ent->client->pers.selected_ability == SELECTED_ABILITY_DEFENSIVE_DOME)
+			if (ent->client->pers.selected_ability == SELECTED_ABILITY_DEFENSIVE_SHIELD)
 			{
-				zyk_cast_magic(ent, SKILL_DEFENSIVE_DOME);
+				zyk_cast_magic(ent, SKILL_DEFENSIVE_SHIELD);
 			}
 			else if (ent->client->pers.selected_ability == SELECTED_ABILITY_HEALING_CIRCLE)
 			{
