@@ -5158,35 +5158,46 @@ int zyk_total_skillpoints(gentity_t* ent)
 	return total_skillpoints;
 }
 
+// zyk: validations, for example if a skill has a level above max or below 0 or if max skill levels upgraded is above the max allowed, or some inventory item amount is below 0
+void validate_rpg_player(gentity_t* ent)
+{
+	int i = 0;
+	qboolean skillpoints_above_max = qfalse;
+
+	if (zyk_total_skillpoints(ent) > RPG_MAX_SKILLPOINTS)
+	{
+		skillpoints_above_max = qtrue;
+	}
+
+	for (i = 0; i < NUMBER_OF_SKILLS; i++)
+	{
+		if (skillpoints_above_max == qtrue || ent->client->pers.skill_levels[i] < 0)
+		{
+			ent->client->pers.skill_levels[i] = 0;
+		}
+		else if (ent->client->pers.skill_levels[i] > zyk_max_skill_level(i))
+		{
+			ent->client->pers.skill_levels[i] = zyk_max_skill_level(i);
+		}
+	}
+
+	// zyk: validating inventory. If for some reason a value is lower than zero, set it to zero
+	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+	{
+		if (ent->client->pers.rpg_inventory[i] < 0)
+		{
+			ent->client->pers.rpg_inventory[i] = 0;
+		}
+	}
+}
+
 // zyk: initialize RPG skills of this player
 extern void zyk_set_quest_event_timer(gentity_t* ent);
 void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 {
 	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
-		int i = 0;
-
-		// zyk: validating max skill levels. If for some reason a skill is above max or lower than zero, fix the value
-		for (i = 0; i < NUMBER_OF_SKILLS; i++)
-		{
-			if (ent->client->pers.skill_levels[i] > zyk_max_skill_level(i))
-			{
-				ent->client->pers.skill_levels[i] = zyk_max_skill_level(i);
-			}
-			else if (ent->client->pers.skill_levels[i] < 0)
-			{
-				ent->client->pers.skill_levels[i] = 0;
-			}
-		}
-
-		// zyk: validating inventory. If for some reason a value is lower than zero, set it to zero
-		for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
-		{
-			if (ent->client->pers.rpg_inventory[i] < 0)
-			{
-				ent->client->pers.rpg_inventory[i] = 0;
-			}
-		}
+		validate_rpg_player(ent);
 
 		// zyk: loading Jump value
 		if (!(ent->client->ps.fd.forcePowersKnown & (1 << FP_LEVITATION)) && ent->client->pers.skill_levels[SKILL_JUMP] > 0)
