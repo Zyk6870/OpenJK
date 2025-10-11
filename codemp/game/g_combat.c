@@ -6555,7 +6555,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 									zyk_set_rpg_status(ent, random_bad_status, chaos_chance * 1000, qtrue);
 								}
-								else
+								else if (ent->s.eType == ET_MOVER)
 								{ // zyk: try to use entities
 									GlobalUse(ent, magic_power_user, magic_power_user);
 								}
