@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.5.18"
+#define	GAMEVERSION	"New Zyk Mod v1.5.19"
 
 #define SECURITY_LOG "security.log"
 
@@ -784,6 +784,16 @@ typedef enum {
 	MAX_TUTORIAL_STEPS
 } zyk_tutorial_t;
 
+typedef enum {
+	SELECTED_ABILITY_NONE,
+	SELECTED_ABILITY_DEFENSIVE_DOME,
+	SELECTED_ABILITY_HEALING_CIRCLE,
+	SELECTED_ABILITY_CHAOS_FIELD,
+	SELECTED_ABILITY_LIGHTNING_DOME,
+	SELECTED_ABILITY_ENERGY_MODULATOR,
+	MAX_SELECTED_ABILITIES
+} zyk_selected_ability_t;
+
 // zyk: Minimum Stamina before player starts to get tired
 #define RPG_MIN_STAMINA 1000.0
 #define RPG_DEFAULT_STAMINA 5000
@@ -1036,6 +1046,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: used to print the current MP for the player
 	int last_magic_power_shown;
+
+	// zyk: some RPG abilities can be used bya shortcut key, and the current selected one is stored here
+	zyk_selected_ability_t selected_ability;
 
 	qboolean in_magic_flight;
 

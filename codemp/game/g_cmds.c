@@ -204,13 +204,13 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level decreases mp usage";
 	if (skill_index == SKILL_MAGIC_DOME)
-		return "an energy dome appears around you, decreasing damage to your health and damaging enemies inside the dome. Higher levels increase your resistance to damage done to your health and the damage done to enemies inside the dome";
+		return va("an energy dome appears around you, decreasing damage to your health and damaging enemies inside the dome. Higher levels increase your resistance to damage done to your health and the damage done to enemies inside the dome. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_HEALING_CIRCLE)
-		return "Restores health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and nearby ally players or npcs. Higher levels increase the amount of health restored and bad status effects duration reduction";
+		return va("Restores health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and nearby ally players or npcs. Higher levels increase the amount of health restored and bad status effects duration reduction. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_CHAOS_FIELD)
-		return "Creates a field that causes bad status effects (Poison, Fire, Bleeding, Confusion) to enemies inside it, and also interacts with map stuff, like doors, elevators, etc. Each level increases chance to cause the bad status effects and their duration, and also increases chance to interact with map stuff";
+		return va("Creates a field that causes bad status effects (Poison, Fire, Bleeding, Confusion) to enemies inside it, and also interacts with map stuff, like doors, elevators, etc. Each level increases chance to cause the bad status effects and their duration, and also increases chance to interact with map stuff. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_LIGHTNING_DOME)
-		return "keeps creating Lightning Domes after some seconds, damaging enemies at a good distance. Has a chance of knocking down enemies. Higher levels create domes more often, deals more damage and increases chance to knockdown enemies";
+		return va("keeps creating Lightning Domes after some seconds, damaging enemies at a good distance. Has a chance of knocking down enemies. Higher levels create domes more often, deals more damage and increases chance to knockdown enemies. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 
 	return "";
 }
@@ -556,7 +556,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Item-Making energy into attack power, extra shield resistance to damage and can increase Force Affinity, Misc Affinity and Magic Affinity. You must find it and solve the puzzle to get it. Activate it by pressing Duel key. It uses Item-Making Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Item-Making energy into attack power, extra shield resistance to damage and can increase Force Affinity, Misc Affinity and Magic Affinity. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/list inv use %d^7. It uses Item-Making Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
@@ -2702,6 +2702,11 @@ void load_account(gentity_t* ent)
 					read_status = fscanf(account_file, "%s", content);
 					ent->client->pers.quest_missions = atoi(content);
 				}
+				else if (Q_stricmp(content_type, "selected_ability") == 0)
+				{
+					read_status = fscanf(account_file, "%s", content);
+					ent->client->pers.selected_ability = atoi(content);
+				}
 				else if (Q_stricmp(content_type, "last_health") == 0)
 				{
 					read_status = fscanf(account_file, "%s", content);
@@ -2781,8 +2786,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 				strcpy(content, va("%s\n%s\n%d", content, zyk_inventory_key(i), client->pers.rpg_inventory[i]));
 			}
 
-			strcpy(content, va("%s\nquest_progress\n%d\nquest_missions\n%d\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d\nlast_stamina\n%d\ntutorial_shown\n%d",
-				content, client->pers.quest_progress, client->pers.quest_missions, 
+			strcpy(content, va("%s\nquest_progress\n%d\nquest_missions\n%d\nselected_ability\n%d\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d\nlast_stamina\n%d\ntutorial_shown\n%d",
+				content, client->pers.quest_progress, client->pers.quest_missions, client->pers.selected_ability, 
 				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina, client->pers.tutorial_shown));
 
 			// zyk: saving all content into the file
@@ -4434,14 +4439,41 @@ qboolean G_OtherPlayersDueling(void)
 }
 
 extern void zyk_energy_modulator(gentity_t* ent);
+char* zyk_selected_ability_name(zyk_selected_ability_t selected_ability)
+{
+	char* ability_names[MAX_SELECTED_ABILITIES];
+
+	ability_names[SELECTED_ABILITY_NONE] = "None";
+	ability_names[SELECTED_ABILITY_DEFENSIVE_DOME] = "Defensive Dome (Magic)";
+	ability_names[SELECTED_ABILITY_HEALING_CIRCLE] = "Healing Circle (Magic)";
+	ability_names[SELECTED_ABILITY_CHAOS_FIELD] = "Chaos Field (Magic)";
+	ability_names[SELECTED_ABILITY_LIGHTNING_DOME] = "Lightning Dome (Magic)";
+	ability_names[SELECTED_ABILITY_ENERGY_MODULATOR] = "Energy Modulator";
+
+	if (selected_ability >= 0 && selected_ability < MAX_SELECTED_ABILITIES)
+	{
+		return ability_names[selected_ability];
+	}
+
+	return "";
+}
+
 void Cmd_EngageDuel_f(gentity_t *ent)
 {
 	trace_t tr;
 	vec3_t forward, fwdOrg;
 
-	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] > 0)
-	{ // zyk: Energy Modulator
-		zyk_energy_modulator(ent);
+	// zyk: selects an ability to be used by the shortcut key
+	if (ent->client->sess.account_mode == ACC_MODE_RPG)
+	{
+		ent->client->pers.selected_ability++;
+
+		if (ent->client->pers.selected_ability >= MAX_SELECTED_ABILITIES)
+		{
+			ent->client->pers.selected_ability = SELECTED_ABILITY_NONE;
+		}
+
+		trap->SendServerCommand(ent->s.number, va("print \"Selected ability: ^3%s^7\n\"", zyk_selected_ability_name(ent->client->pers.selected_ability)));
 	}
 
 	if (!g_privateDuel.integer)
@@ -6821,6 +6853,10 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/weapon_deselect.mp3"));
 	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
+	{
+		zyk_energy_modulator(ent);
+	}
 	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MAGIC_SHIELD] > 0)
 	{
 		zyk_set_rpg_status(ent, RPG_STATUS_MAGIC_SHIELD, 30000, qtrue);
@@ -7033,6 +7069,10 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 								zyk_use_inventory_item(ent, item_index);
 							}
 							else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE)
+							{
+								zyk_use_inventory_item(ent, item_index);
+							}
+							else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 							{
 								zyk_use_inventory_item(ent, item_index);
 							}

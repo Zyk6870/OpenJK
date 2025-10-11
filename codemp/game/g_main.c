@@ -4968,12 +4968,42 @@ qboolean zyk_has_resources_for_energy_modulator(gentity_t* ent)
 	return qtrue;
 }
 
+void zyk_energy_modulator_sound(gentity_t* ent, zyk_energy_modulator_mode_t energy_modulator_mode)
+{
+	if (energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
+	{
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/esc.mp3"));
+	}
+	else
+	{
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/ammocon_empty.mp3"));
+	}
+}
+
 // zyk: spawns the entity when turning it on or free it when turning it off
 void zyk_energy_modulator(gentity_t* ent)
 {
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < 1)
+	{ // zyk: player must have the Energy Modulator to activate it
+		if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
+		{
+			zyk_energy_modulator_sound(ent, ENERGY_MODULATOR_MODE_OFF);
+		}
+
+		ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
+
+		return;
+	}
+
 	if (zyk_has_resources_for_energy_modulator(ent) == qfalse)
 	{
+		if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
+		{
+			zyk_energy_modulator_sound(ent, ENERGY_MODULATOR_MODE_OFF);
+		}
+
 		ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
+
 		return;
 	}
 
@@ -4982,10 +5012,14 @@ void zyk_energy_modulator(gentity_t* ent)
 		ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_ON;
 
 		energy_modulator_spawn_model(ent, "models/map_objects/danger/ship_item04.md3");
+
+		zyk_energy_modulator_sound(ent, ENERGY_MODULATOR_MODE_ON);
 	}
 	else if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
 	{ // zyk: turn it off
 		ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
+
+		zyk_energy_modulator_sound(ent, ENERGY_MODULATOR_MODE_OFF);
 	}
 }
 
@@ -8778,6 +8812,16 @@ void G_RunFrame( int levelTime ) {
 				if (ent->health > 0 && ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON && ent->client->pers.energy_modulator_energy_usage_timer < level.time)
 				{
 					set_item_making_energy(ent, ENERGY_MODULATOR_ENERGY_USAGE, qfalse);
+
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < 1)
+					{ // zyk: no longer has the Energy Modulator. Turn it off
+						if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
+						{
+							zyk_energy_modulator_sound(ent, ENERGY_MODULATOR_MODE_OFF);
+						}
+
+						ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
+					}
 
 					ent->client->pers.energy_modulator_energy_usage_timer = level.time + 200;
 				}

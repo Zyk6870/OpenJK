@@ -1611,9 +1611,11 @@ qboolean TryHeal(gentity_t *ent, gentity_t *target)
 
 extern void set_item_making_energy(gentity_t* ent, int amount, qboolean add);
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
+extern void zyk_cast_magic(gentity_t* ent, int skill_index);
+extern void zyk_energy_modulator(gentity_t* ent);
 void zyk_use_rpg_stuff(gentity_t* ent)
 {
-	if (ent->client->sess.account_mode == ACC_MODE_RPG)
+	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->health > 1)
 	{
 		if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_COMPLETED)) && ent->client->pers.quest_spirit_tree_id > -1 &&
 			ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
@@ -1634,6 +1636,29 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 				trap->SendServerCommand(ent->s.number, "cp \"Not enough Blue Crystals to call your Spirit Tree\n\"");
 			}
 		}
+		else if (ent->client->pers.selected_ability > SELECTED_ABILITY_NONE)
+		{
+			if (ent->client->pers.selected_ability == SELECTED_ABILITY_DEFENSIVE_DOME)
+			{
+				zyk_cast_magic(ent, SKILL_MAGIC_DOME);
+			}
+			else if (ent->client->pers.selected_ability == SELECTED_ABILITY_HEALING_CIRCLE)
+			{
+				zyk_cast_magic(ent, SKILL_HEALING_CIRCLE);
+			}
+			else if (ent->client->pers.selected_ability == SELECTED_ABILITY_CHAOS_FIELD)
+			{
+				zyk_cast_magic(ent, SKILL_CHAOS_FIELD);
+			}
+			else if (ent->client->pers.selected_ability == SELECTED_ABILITY_LIGHTNING_DOME)
+			{
+				zyk_cast_magic(ent, SKILL_LIGHTNING_DOME);
+			}
+			else if (ent->client->pers.selected_ability == SELECTED_ABILITY_ENERGY_MODULATOR)
+			{
+				zyk_energy_modulator(ent);
+			}
+		}
 	}
 }
 
@@ -1650,7 +1675,6 @@ Try and use an entity in the world, directly ahead of us
 extern void Touch_Button(gentity_t *ent, gentity_t *other, trace_t *trace );
 extern qboolean gSiegeRoundBegun;
 extern void NPC_BSDefault( void );
-extern void zyk_show_quest_riddle(gentity_t* ent);
 static vec3_t	playerMins = {-15, -15, DEFAULT_MINS_2};
 static vec3_t	playerMaxs = {15, 15, DEFAULT_MAXS_2};
 void TryUse( gentity_t *ent )
