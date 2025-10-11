@@ -6725,8 +6725,7 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_CLOAK] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 300;
 
-	rpg_inventory_weights[RPG_INVENTORY_MISC_JETPACK_FUEL] = 1;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_FUEL] = 1;
 
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 20;
@@ -7022,8 +7021,8 @@ void zyk_update_inventory(gentity_t* ent)
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_ITEM_JETPACK] > 0)
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << HI_JETPACK);
 
-	// zyk: jetpack fuel
-	ent->client->pers.jetpack_fuel = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL];
+	// zyk: jetpack/flame thrower fuel
+	ent->client->pers.jetpack_fuel = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FUEL];
 
 	if (!(ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL)))
 	{
@@ -8525,7 +8524,7 @@ void G_RunFrame( int levelTime ) {
 
 					if (ent->client->sess.account_mode == ACC_MODE_RPG)
 					{
-						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_JETPACK_FUEL] = ent->client->pers.jetpack_fuel;
+						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FUEL] = ent->client->pers.jetpack_fuel;
 
 						if (!(ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL)))
 						{

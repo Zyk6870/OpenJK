@@ -3869,14 +3869,14 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	if (ent->client && ent->client->sess.account_mode == ACC_MODE_RPG && 
 		alt_fire == qtrue &&
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0 && 
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] >= flame_thrower_fuel_usage &&
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FUEL] >= flame_thrower_fuel_usage &&
 		ent->waterlevel < 3)
 	{ // zyk: do not use flame thrower when underwater
 		G_Sound( ent, CHAN_WEAPON, G_SoundIndex("sound/effects/fireout.mp3") );
 
 		ent->client->pers.flame_thrower_timer = level.time + 1500;
 
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] -= flame_thrower_fuel_usage;
+		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FUEL] -= flame_thrower_fuel_usage;
 	}
 
 	if ( tr.entityNum >= ENTITYNUM_WORLD )

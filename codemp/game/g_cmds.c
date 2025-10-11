@@ -327,8 +327,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
 
-	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "Jetpack Fuel";
-	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "Flame Thrower Fuel";
+	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "Fuel";
 	inventory_item_names[RPG_INVENTORY_MISC_MAGIC_SHIELD] = "Magic Shield";
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
@@ -374,10 +373,6 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	else if (item_index == RPG_INVENTORY_AMMO_DETPACKS)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7det packs\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_FLAME_THROWER_FUEL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7fuel for the flame thrower\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_SENTRY_GUN)
 	{
@@ -462,10 +457,6 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	else if (item_index == RPG_INVENTORY_WP_STUN_BATON)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that fires a small electric charge\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_JETPACK_FUEL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7jetpack fuel\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA)
 	{
@@ -565,7 +556,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Item-Making energy into attack power, extra shield protection and can increase Force Affinity, Misc Affinity and Magic Affinity. You must find it and solve the puzzle to get it. Activate it by pressing Duel key. It uses Item-Making Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Item-Making energy into attack power, extra shield resistance to damage and can increase Force Affinity, Misc Affinity and Magic Affinity. You must find it and solve the puzzle to get it. Activate it by pressing Duel key. It uses Item-Making Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
 	{
@@ -574,6 +565,10 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Has a lot of useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_FUEL)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Fuel used by the Jetpack and the Flame Thrower\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD)
 	{
@@ -662,8 +657,7 @@ char* zyk_inventory_key(int inventory_index)
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
 
-	inventory_item_names[RPG_INVENTORY_MISC_JETPACK_FUEL] = "inventoryJetpackFuel";
-	inventory_item_names[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL] = "inventoryFlameThrowerFuel";
+	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "inventoryFuel";
 	inventory_item_names[RPG_INVENTORY_MISC_MAGIC_SHIELD] = "inventoryMagicShield";
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "inventoryShieldBooster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "inventoryYsalamiri";
@@ -6530,11 +6524,8 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 200;
 
-	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][0] = 3;
-	seller_items_cost[RPG_INVENTORY_MISC_JETPACK_FUEL][1] = 1;
-
-	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][0] = 3;
-	seller_items_cost[RPG_INVENTORY_MISC_FLAME_THROWER_FUEL][1] = 1;
+	seller_items_cost[RPG_INVENTORY_MISC_FUEL][0] = 3;
+	seller_items_cost[RPG_INVENTORY_MISC_FUEL][1] = 1;
 
 	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_SHIELD][0] = 100;
 	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_SHIELD][1] = 50;
@@ -7808,7 +7799,7 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 	settings_descriptions[SETTINGS_DIFFICULTY] = "Quest Difficulty";
 	settings_descriptions[SETTINGS_MAGIC_CRYSTALS] = "Spawn Quest Stuff in map";
 	settings_descriptions[SETTINGS_PICKUP_MAX_WEIGHT] = "Do not pick-up stuff in map above max weight";
-	settings_descriptions[SETTINGS_SHOW_MP_LEVEL] = "Red bar show Jetpack fuel or MP";
+	settings_descriptions[SETTINGS_SHOW_MP_LEVEL] = "Red bar show Fuel (Jetpack/Flame Thrower) or MP";
 	settings_descriptions[SETTINGS_SHOW_STAMINA_BAR] = "Show Stamina Blue Bar";
 
 	if (settings_value >= 0 && settings_value < MAX_PLAYER_SETTINGS)
@@ -7851,7 +7842,7 @@ char* zyk_get_settings(gentity_t* ent, zyk_settings_t settings_value)
 		}
 		else
 		{
-			strcpy(message, va("^3%s - %s - ^2Jetpack", settings_value_string, zyk_get_settings_description(SETTINGS_SHOW_MP_LEVEL)));
+			strcpy(message, va("^3%s - %s - ^2Fuel", settings_value_string, zyk_get_settings_description(SETTINGS_SHOW_MP_LEVEL)));
 		}
 	}
 	else
