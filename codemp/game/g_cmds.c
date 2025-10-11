@@ -5622,6 +5622,7 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 	ent->client->pers.active_inventory_upgrades = 0;
 	ent->client->pers.magic_power = 0;
 	ent->client->pers.item_making_energy = RPG_INITIAL_ITEMMAKING_ENERGY;
+	ent->client->pers.selected_ability = 0;
 
 	// zyk: in RPG Mode, player must actually buy these
 	ent->client->ps.jetpackFuel = 0;
