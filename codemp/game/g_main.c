@@ -525,9 +525,9 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 
 	bonus_increase[QUEST_NPC_NONE] = QUEST_NPC_BONUS_INCREASE;
 
-	bonus_increase[QUEST_NPC_MAGE_MASTER] = QUEST_NPC_BONUS_INCREASE;
-	bonus_increase[QUEST_NPC_MAGE_MINISTER] = QUEST_NPC_BONUS_INCREASE;
-	bonus_increase[QUEST_NPC_MAGE_SCHOLAR] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_MAGE_MASTER] = QUEST_NPC_BONUS_INCREASE / 2;
+	bonus_increase[QUEST_NPC_MAGE_MINISTER] = QUEST_NPC_BONUS_INCREASE / 2;
+	bonus_increase[QUEST_NPC_MAGE_SCHOLAR] = QUEST_NPC_BONUS_INCREASE / 2;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_GUNS] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = QUEST_NPC_BONUS_INCREASE;
@@ -538,7 +538,7 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_LOW_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
 
-	bonus_increase[QUEST_NPC_ALLY_MAGE] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_ALLY_MAGE] = QUEST_NPC_BONUS_INCREASE / 2;
 	bonus_increase[QUEST_NPC_ALLY_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_ALLY_FORCE_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
 
@@ -8972,7 +8972,7 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR
 					)
 				{
-					// zyk: spirits events of the quest
+					// zyk: final events of the quest
 					if (ent->client->pers.quest_spirits_event_step > 0 && ent->client->pers.quest_spirits_event_timer < level.time)
 					{
 						if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_COMPLETED)))
@@ -9074,22 +9074,27 @@ void G_RunFrame( int levelTime ) {
 
 						zyk_set_quest_event_timer(ent);
 
-						if (ent->client->pers.quest_spirits_event_step == 0 && zyk_is_main_quest_complete(ent) == qfalse)
-						{
+						if (ent->client->pers.quest_spirits_event_step == 0 && zyk_is_main_quest_complete(ent) == qfalse && 
+							(hard_difficulty == qtrue || main_quest_progress > 1))
+						{ // zyk: Quest Progress must be at least 2 per cent in Normal Difficulty for quest npcs to appear
 							int enemy_type = 0;
 							int mage_master_chance = 0;
 							zyk_quest_npc_t stronger_enemy_type = QUEST_NPC_LOW_TRAINED_WARRIOR;
-							
+
 							if (hard_difficulty == qtrue)
 							{
 								stronger_enemy_type -= (main_quest_progress / 3);
 							}
 							else
 							{
-								stronger_enemy_type -= (main_quest_progress / 5);
+								stronger_enemy_type -= (main_quest_progress / 6);
 							}
 
-							if (stronger_enemy_type < QUEST_NPC_MAGE_MASTER)
+							if (stronger_enemy_type > QUEST_NPC_LOW_TRAINED_WARRIOR)
+							{
+								stronger_enemy_type = QUEST_NPC_LOW_TRAINED_WARRIOR;
+							}
+							else if (stronger_enemy_type < QUEST_NPC_MAGE_MASTER)
 							{
 								stronger_enemy_type = QUEST_NPC_MAGE_MASTER;
 							}
@@ -9100,16 +9105,15 @@ void G_RunFrame( int levelTime ) {
 							{
 								zyk_spawn_quest_npc(enemy_type, ent->client->ps.viewangles[YAW], main_quest_progress, hard_difficulty, -1);
 							}
-						}
 
-						if (ent->client->pers.quest_spirits_event_step == 0 && zyk_is_main_quest_complete(ent) == qfalse &&
-							zyk_number_of_allies_in_map(NULL) < (zyk_max_quest_npcs.integer / 2) &&
-							Q_irand(0, 99) < ((main_quest_progress / 2) + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
-						{
-							int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
-							int ally_bonus = (main_quest_progress / 2) + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
+							if (zyk_number_of_allies_in_map(NULL) < (zyk_max_quest_npcs.integer / 2) &&
+								Q_irand(0, 99) < ((main_quest_progress / 2) + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
+							{
+								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
+								int ally_bonus = (main_quest_progress / 2) + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
 
-							zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
+								zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
+							}
 						}
 					}
 				}
