@@ -6485,17 +6485,15 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					{
 						if (this_magic_power == MAGIC_HEALING_CIRCLE && magic_power_user != ent && ent->client && ent->health > 0)
 						{ // zyk: Healing Circle magic heals allies
-							int heal_amount = (int)points;
-
-							if (heal_amount < 1)
-							{
-								heal_amount = 1;
-							}
+							int heal_amount = magic_power_user->client->pers.skill_levels[SKILL_HEALING_CIRCLE];
 
 							if (ent->client && ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
 							{ // zyk: Magic Shield fully protects against Magic, even healing ones
 								continue;
 							}
+
+							// zyk: Magic Affinity
+							heal_amount += (zyk_skill_affinity(magic_power_user, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER);
 
 							zyk_add_health(ent, heal_amount);
 
