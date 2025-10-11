@@ -6820,7 +6820,7 @@ void zyk_show_tutorial(gentity_t* ent)
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_STAMINA_START + 1))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^2Meditate ^7taunt to regen it. If Stamina runs out, you will faint for some seconds.\n\"", QUESTCHAR_MAIN));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^2Meditate ^7to regen Stamina, Force Points and Magic Points. If Stamina runs out, you faint for some seconds.\n\"", QUESTCHAR_MAIN));
 		
 			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
@@ -6856,7 +6856,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	{
 		if (ent->client->pers.tutorial_step == TUTORIAL_QUEST_ITEMS_START)
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need Blue Crystals to upgrade skills. I randomly place some in the map. Enemies defeated have a chance to drop them.\n\"", QUESTCHAR_MAIN));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use Blue Crystals to upgrade skills. I randomly place some in the map. Enemies defeated have a chance to drop them.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 1))
 		{

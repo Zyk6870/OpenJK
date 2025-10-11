@@ -6930,7 +6930,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, va("\n\n^7The Conquerors are attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Tree.\nRegenerate your tree so it can defeat all enemies.\nMeditate in the tree to regen it. The blue crystals you have will make it regen faster.\nEnemies wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use a blue crystal to call your Spirit Tree.\nBlue crystals you have make new allies stronger and appear more often.\n\n"));
+			strcpy(quest_desc, va("\n\n^7The Conquerors are attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Tree.\nFully regenerate your tree so it can defeat all enemies.\nThe blue crystals you have will regen it. Meditating inside the Tree makes it regen faster.\nEnemies in the map wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use some Item-Making Energy to call your Spirit Tree.\nBlue crystals you have make new allies stronger and appear more often.\n\n"));
 
 			trap->SendServerCommand(target_ent->s.number,
 				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
