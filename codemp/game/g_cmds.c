@@ -81,7 +81,7 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 15;
 	max_skill_levels[SKILL_MAGIC_FLIGHT] = 15;
-	max_skill_levels[SKILL_MAGIC_DOME] = 10;
+	max_skill_levels[SKILL_DEFENSIVE_DOME] = 10;
 	max_skill_levels[SKILL_HEALING_CIRCLE] = 10;
 	max_skill_levels[SKILL_CHAOS_FIELD] = 10;
 	max_skill_levels[SKILL_LIGHTNING_DOME] = 10;
@@ -129,7 +129,7 @@ char* zyk_skill_name(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "Magic Flight";
-	skill_names[SKILL_MAGIC_DOME] = "Defensive Dome";
+	skill_names[SKILL_DEFENSIVE_DOME] = "Defensive Dome";
 	skill_names[SKILL_HEALING_CIRCLE] = "Healing Circle";
 	skill_names[SKILL_CHAOS_FIELD] = "Chaos Field";
 	skill_names[SKILL_LIGHTNING_DOME] = "Lightning Dome";
@@ -203,7 +203,7 @@ char* zyk_skill_description(int skill_index)
 		return va("allows you to attack with magic bolts when using melee punches. At max level, can damage saber-only damage objects and move pushable/pullable objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level decreases mp usage";
-	if (skill_index == SKILL_MAGIC_DOME)
+	if (skill_index == SKILL_DEFENSIVE_DOME)
 		return va("an energy dome appears around you, decreasing damage to your health and damaging enemies inside the dome. Higher levels increase your resistance to damage done to your health and the damage done to enemies inside the dome. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_HEALING_CIRCLE)
 		return va("Restores health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and nearby ally players or npcs. Higher levels increase the amount of health restored and bad status effects duration reduction. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
@@ -249,8 +249,8 @@ char* zyk_skill_key(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "skillmagicflight";
-	skill_names[SKILL_MAGIC_DOME] = "skillmagicdome";
-	skill_names[SKILL_HEALING_CIRCLE] = "skillhealinghaven";
+	skill_names[SKILL_DEFENSIVE_DOME] = "skilldefensivedome";
+	skill_names[SKILL_HEALING_CIRCLE] = "skillhealingcircle";
 	skill_names[SKILL_CHAOS_FIELD] = "skillchaosfield";
 	skill_names[SKILL_LIGHTNING_DOME] = "skilllightningdome";
 
@@ -4781,7 +4781,7 @@ int zyk_max_magic_power(gentity_t *ent)
 // zyk: tests if this skill is one of the magic powers
 qboolean zyk_is_magic_power_skill(int skill_index)
 {
-	if (skill_index >= SKILL_MAGIC_DOME && skill_index <= SKILL_LIGHTNING_DOME)
+	if (skill_index >= SKILL_DEFENSIVE_DOME && skill_index <= SKILL_LIGHTNING_DOME)
 	{
 		return qtrue;
 	}
@@ -4794,7 +4794,7 @@ int zyk_get_magic_index(int skill_index)
 {
 	if (zyk_is_magic_power_skill(skill_index) == qtrue)
 	{
-		return (skill_index - SKILL_MAGIC_DOME);
+		return (skill_index - SKILL_DEFENSIVE_DOME);
 	}
 
 	return -1;
@@ -10422,7 +10422,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				ent->client->ps.legsTimer = MAGIC_ANIM_TIME;
 				ent->client->ps.weaponTime = MAGIC_ANIM_TIME;
 
-				if (magic_number == MAGIC_MAGIC_DOME)
+				if (magic_number == MAGIC_DEFENSIVE_DOME)
 				{
 					dome_of_damage(ent);
 				}

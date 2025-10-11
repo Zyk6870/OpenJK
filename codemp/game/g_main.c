@@ -643,7 +643,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_LIGHTNING_DOME, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_DEFENSIVE_DOME, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
@@ -651,7 +651,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		else if (quest_npc_type == QUEST_NPC_MAGE_MINISTER)
 		{
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_LIGHTNING_DOME, npc_skill_level + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_DEFENSIVE_DOME, npc_skill_level + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
@@ -670,7 +670,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_HOWLER)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_DEFENSIVE_DOME, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
 		{
@@ -695,7 +695,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_LIGHTNING_DOME, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, MAGIC_CHAOS_FIELD, ally_bonus + skill_level_bonus);
 			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, ally_bonus + skill_level_bonus);
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_DOME, ally_bonus + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_DEFENSIVE_DOME, ally_bonus + skill_level_bonus);
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = ally_bonus + skill_level_bonus;
@@ -5388,14 +5388,14 @@ void zyk_status_effects(gentity_t* ent)
 // zyk: Magic Dome
 void dome_of_damage(gentity_t* ent)
 {
-	ent->client->pers.active_magic |= (1 << MAGIC_MAGIC_DOME);
-	ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] = 100;
+	ent->client->pers.active_magic |= (1 << MAGIC_DEFENSIVE_DOME);
+	ent->client->pers.magic_power_debounce_timer[MAGIC_DEFENSIVE_DOME] = 100;
 
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/cairn_beam_start.mp3"));
 }
 
 // zyk: Healing Circle can decrease duration of bad status effects
-void healing_haven_status_restoration(gentity_t* ent, int amount)
+void healing_circle_status_restoration(gentity_t* ent, int amount)
 {
 	int current_status = 0;
 
@@ -5512,7 +5512,7 @@ void magic_power_events(gentity_t *ent)
 			// zyk: Magic Affinity increases magic damage
 			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER);
 
-			if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
+			if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED) || ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
 			{
 				zyk_stop_all_magic_powers(ent);
 			}
@@ -5527,7 +5527,7 @@ void magic_power_events(gentity_t *ent)
 			// zyk: stop magic if skill level is not at least at level 1
 			for (i = 0; i < MAX_MAGIC_POWERS; i++)
 			{
-				int skill_index = SKILL_MAGIC_DOME + i;
+				int skill_index = SKILL_DEFENSIVE_DOME + i;
 
 				if (ent->client->pers.skill_levels[skill_index] < 1)
 				{
@@ -5535,16 +5535,16 @@ void magic_power_events(gentity_t *ent)
 				}
 			}
 
-			if (ent->client->pers.active_magic & (1 << MAGIC_MAGIC_DOME))
+			if (ent->client->pers.active_magic & (1 << MAGIC_DEFENSIVE_DOME))
 			{
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
-					zyk_mp_usage(ent, SKILL_MAGIC_DOME);
+					zyk_mp_usage(ent, SKILL_DEFENSIVE_DOME);
 				}
 
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] < level.time)
+				if (ent->client->pers.magic_power_debounce_timer[MAGIC_DEFENSIVE_DOME] < level.time)
 				{
-					int damage = MAGIC_MIN_DMG + (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_MAGIC_DOME] / 2);
+					int damage = MAGIC_MIN_DMG + (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_DEFENSIVE_DOME] / 2);
 
 					if (damage < 1)
 					{
@@ -5553,7 +5553,7 @@ void magic_power_events(gentity_t *ent)
 
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_dome", "4", "env/dome", 0, damage, 290, 400);
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_DOME] = level.time + 300;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_DEFENSIVE_DOME] = level.time + 300;
 				}
 			}
 
@@ -5577,7 +5577,7 @@ void magic_power_events(gentity_t *ent)
 						zyk_add_health(ent, heal_amount);
 					}
 
-					healing_haven_status_restoration(ent, heal_amount * 100);
+					healing_circle_status_restoration(ent, heal_amount * 100);
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_CIRCLE] = level.time + 300;
 				}
@@ -9263,7 +9263,7 @@ void G_RunFrame( int levelTime ) {
 
 					if (ent->enemy)
 					{
-						int first_magic_skill = SKILL_MAGIC_DOME;
+						int first_magic_skill = SKILL_DEFENSIVE_DOME;
 						int random_magic = Q_irand(0, MAGIC_LIGHTNING_DOME);
 						int magic_skill_index = first_magic_skill + random_magic;
 						int quest_npc_enemy_distance = Distance(ent->client->ps.origin, ent->enemy->r.currentOrigin);
@@ -9377,7 +9377,7 @@ void G_RunFrame( int levelTime ) {
 				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy)
 				{
 					int random_magic = Q_irand(0, MAGIC_LIGHTNING_DOME);
-					int first_magic_skill = SKILL_MAGIC_DOME;
+					int first_magic_skill = SKILL_DEFENSIVE_DOME;
 					int current_magic_skill = first_magic_skill;
 
 					ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = zyk_max_skill_level(SKILL_MAGIC_FIST);

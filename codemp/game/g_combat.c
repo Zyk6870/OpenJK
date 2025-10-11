@@ -4777,7 +4777,7 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 
 	zyk_magic_t magic_powers[MAX_MAGIC_POWERS] =
 	{
-		MAGIC_MAGIC_DOME,
+		MAGIC_DEFENSIVE_DOME,
 		MAGIC_HEALING_CIRCLE,
 		MAGIC_CHAOS_FIELD,
 		MAGIC_LIGHTNING_DOME
@@ -6018,11 +6018,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (targ->client->pers.active_magic & (1 << MAGIC_MAGIC_DOME))
+			if (targ->client->pers.active_magic & (1 << MAGIC_DEFENSIVE_DOME))
 			{ // zyk: target using Defensive Dome
 				int magic_bonus = zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
 
-				bonus_health_resistance += (0.02f * (targ->client->pers.skill_levels[SKILL_MAGIC_DOME] + magic_bonus + (zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER)));
+				bonus_health_resistance += (0.02f * (targ->client->pers.skill_levels[SKILL_DEFENSIVE_DOME] + magic_bonus + (zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER)));
 			}
 			
 			// zyk: reduces damage based on the health resistance bonuses
@@ -6357,7 +6357,7 @@ G_RadiusDamage
 ============
 */
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
-extern void healing_haven_status_restoration(gentity_t* ent, int amount);
+extern void healing_circle_status_restoration(gentity_t* ent, int amount);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, gentity_t *missile, int mod) {
 	float		points, dist;
@@ -6484,7 +6484,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					if (is_ally == qtrue)
 					{
 						if (this_magic_power == MAGIC_HEALING_CIRCLE && magic_power_user != ent && ent->client && ent->health > 0)
-						{ // zyk: Healing Haven magic heals allies
+						{ // zyk: Healing Circle magic heals allies
 							int heal_amount = (int)points;
 
 							if (heal_amount < 1)
@@ -6499,7 +6499,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 							zyk_add_health(ent, heal_amount);
 
-							healing_haven_status_restoration(ent, heal_amount * 100);
+							healing_circle_status_restoration(ent, heal_amount * 100);
 
 							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_healing", "0", "env/waterfall_splash", 0, 0, 0, 500);
 							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/footsteps/water_wade_01.mp3"));
