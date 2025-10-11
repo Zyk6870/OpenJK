@@ -701,10 +701,10 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = ally_bonus + skill_level_bonus;
 		}
 
-		// zyk: setting the initial amount of magic points here because it is based on the Max MP skill
+		// zyk: setting the initial amount of magic points
 		npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
 
-		npc_ent->client->pers.magic_power *= 10;
+		npc_ent->client->pers.magic_power *= 2;
 	}
 }
 
