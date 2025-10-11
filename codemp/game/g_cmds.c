@@ -6335,11 +6335,24 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 }
 
+float zyk_get_rpg_player_speed(gentity_t* ent)
+{
+	float rpg_player_speed = g_speed.value + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
+
+	if (ent->client->pers.skill_levels[SKILL_RUN_SPEED] > 0)
+	{
+		rpg_player_speed += (ent->client->pers.skill_levels[SKILL_RUN_SPEED] * RPG_RUN_SPEED_SKILL_INCREASE);
+	}
+
+	return rpg_player_speed;
+}
+
 void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 { // zyk: lists general RPG info of this player
 	char message[MAX_STRING_CHARS];
 	int total_skill_points = zyk_total_skillpoints(ent);
 	int max_magic_power = zyk_max_magic_power(ent);
+	float rpg_player_speed = zyk_get_rpg_player_speed(ent);
 
 	strcpy(message, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n", ent->client->sess.filename, ent->client->sess.rpgchar));
 
@@ -6383,6 +6396,7 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 		strcpy(message, va("%s^3Stamina: ^2%d/%d\n", message, ent->client->pers.current_stamina, ent->client->pers.max_stamina));
 	}
 
+	strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, rpg_player_speed));
 	strcpy(message, va("%s^3Force Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE)));
 	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MISC)));
 	strcpy(message, va("%s^3Magic Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC)));
@@ -7144,7 +7158,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Force Saber Warrior (Both): ^7uses brown clothes and has both Light-Side and Dark-Side force powers and saber\n^3Force Saber Warrior (Guns): ^7uses brown clothes and has both Light-Side and Dark-Side force powers and guns\n^3Mage Scholar: ^7mage with Magic Fist and Magic Flight skills. Can use Healing Circle and Chaos Field magic powers\n^3Mage Minister: ^7mage with Magic Fist and Magic Flight skills. Can use Defensive Dome and Lightning Dome magic powers\n^3Mage Master: ^7the leaders of The Conquerors. Wearing the Adaptive Armor and able to use its special bonuses. Can cloak himself. Can make the Spirit Tree wither faster when near it. Has Magic Fist, Magic Flight and extremely high level of all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Force Saber Warrior (Both): ^7uses brown clothes and has both Light-Side and Dark-Side force powers and saber\n^3Force Saber Warrior (Guns): ^7uses green clothes and has both Light-Side and Dark-Side force powers and guns\n^3Mage Scholar: ^7mage with Magic Fist and Magic Flight skills. Can use Healing Circle and Chaos Field magic powers\n^3Mage Minister: ^7mage with Magic Fist and Magic Flight skills. Can use Defensive Dome and Lightning Dome magic powers\n^3Mage Master: ^7the leaders of The Conquerors. Wearing the Adaptive Armor and able to use its special bonuses. Can cloak himself. Can make the Spirit Tree wither faster when near it. Has Magic Fist, Magic Flight and extremely high level of all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
 						}
 						else if (page == 3)
 						{

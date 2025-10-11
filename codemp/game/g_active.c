@@ -2103,6 +2103,7 @@ extern void Boba_FlyStop( gentity_t *self );
 extern void TossClientWeapon(gentity_t *self, vec3_t direction, float speed);
 extern qboolean saberKnockOutOfHand(gentity_t *saberent, gentity_t *saberOwner, vec3_t velocity);
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
+extern float zyk_get_rpg_player_speed(gentity_t* ent);
 void ClientThink_real( gentity_t *ent ) {
 	gclient_t	*client;
 	pmove_t		pmove;
@@ -2612,22 +2613,16 @@ void ClientThink_real( gentity_t *ent ) {
 
 		// set speed
 
+		if (client->sess.account_mode == ACC_MODE_RPG)
+		{ // zyk: Run Speed
+			zyk_player_speed = zyk_get_rpg_player_speed(ent);
+		}
+
 		//Check for a siege class speed multiplier
 		if (level.gametype == GT_SIEGE &&
 			client->siegeClass != -1)
 		{
 			zyk_player_speed *= bgSiegeClasses[client->siegeClass].speed;
-		}
-
-		if (client->sess.account_mode == ACC_MODE_RPG)
-		{ // zyk: Run Speed
-			if (client->pers.skill_levels[SKILL_RUN_SPEED] > 0)
-			{
-				zyk_player_speed += (client->pers.skill_levels[SKILL_RUN_SPEED] * RPG_RUN_SPEED_SKILL_INCREASE);
-			}
-
-			// zyk: Misc Affinity increases run speed
-			zyk_player_speed += zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
 		}
 
 		if (client->bodyGrabIndex != ENTITYNUM_NONE)
