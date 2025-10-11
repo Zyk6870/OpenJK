@@ -5445,8 +5445,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				targ->client->ps.eFlags &= ~EF_INVULNERABLE;
 			}
-			else if (!((targ->client->sess.account_mode == ACC_MODE_RPG || targ->NPC) && targ->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD)))
-			{ // zyk: Magic Shield does not apply god mode
+			else // if (!((targ->client->sess.account_mode == ACC_MODE_RPG || targ->NPC) && targ->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD)))
+			{
 				return;
 			}
 		}
@@ -6488,11 +6488,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							int heal_amount = 1 + (magic_power_user->client->pers.skill_levels[SKILL_HEALING_CIRCLE] / 2);
 							int magic_bonus = zyk_skill_affinity(magic_power_user, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
 
-							if (ent->client && ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
-							{ // zyk: Magic Shield fully protects against Magic, even healing ones
-								continue;
-							}
-
 							heal_amount += (magic_bonus / 2);
 
 							zyk_add_health(ent, heal_amount);
@@ -6522,11 +6517,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 						if (zyk_can_hit_target(magic_power_user, ent) == qfalse)
 						{
-							continue;
-						}
-
-						if (ent->client && ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
-						{ // zyk: Magic Shield fully protects against Magic
 							continue;
 						}
 

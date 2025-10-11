@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.5.28"
+#define	GAMEVERSION	"New Zyk Mod v1.5.29"
 
 #define SECURITY_LOG "security.log"
 
@@ -570,7 +570,6 @@ typedef enum {
 	RPG_STATUS_IN_FLAMES,
 	RPG_STATUS_BLEEDING,
 	RPG_STATUS_CONFUSED,
-	RPG_STATUS_MAGIC_SHIELD,
 	NUM_RPG_STATUSES
 } zyk_rpg_status_t;
 
@@ -689,7 +688,6 @@ typedef enum {
 	RPG_INVENTORY_MISC_QUEST_LOG,
 	RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR,
 	RPG_INVENTORY_MISC_FUEL,
-	RPG_INVENTORY_MISC_MAGIC_SHIELD,
 	RPG_INVENTORY_MISC_SHIELD_BOOSTER,
 	RPG_INVENTORY_MISC_YSALAMIRI,
 	RPG_INVENTORY_MISC_FORCE_BOON,

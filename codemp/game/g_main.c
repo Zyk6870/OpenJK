@@ -5282,11 +5282,6 @@ extern void initialize_rpg_skills(gentity_t* ent, qboolean init_all);
 
 qboolean zyk_is_bad_status_effect(zyk_rpg_status_t rpg_status)
 {
-	if (rpg_status == RPG_STATUS_MAGIC_SHIELD)
-	{
-		return qfalse;
-	}
-
 	return qtrue;
 }
 
@@ -5312,12 +5307,6 @@ void zyk_set_rpg_status(gentity_t* ent, zyk_rpg_status_t rpg_status, int duratio
 	else
 	{
 		ent->client->pers.rpg_statuses &= ~(1 << rpg_status);
-
-		if (rpg_status == RPG_STATUS_MAGIC_SHIELD)
-		{
-			ent->client->ps.eFlags &= ~EF_INVULNERABLE;
-			ent->client->invulnerableTimer = 0;
-		}
 	}
 }
 
@@ -5364,11 +5353,6 @@ void zyk_status_effects(gentity_t* ent)
 
 					// zyk: target cant attack while confused
 					ent->client->ps.weaponTime = ent->client->pers.rpg_status_duration[i] - level.time;
-				}
-				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
-				{
-					ent->client->ps.eFlags |= EF_INVULNERABLE;
-					ent->client->invulnerableTimer = ent->client->pers.rpg_status_duration[i];
 				}
 
 				// zyk: Status Protection skill decreases duration of bad RPG statuses
@@ -5514,7 +5498,7 @@ void magic_power_events(gentity_t *ent)
 			// zyk: Magic Affinity increases magic damage
 			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER);
 
-			if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED) || ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
+			if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
 			{
 				zyk_stop_all_magic_powers(ent);
 			}
@@ -6782,7 +6766,6 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_QUEST_LOG] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 200;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_MAGIC_SHIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 7;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 20;

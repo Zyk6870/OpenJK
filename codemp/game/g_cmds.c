@@ -328,7 +328,6 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
 
 	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "Fuel";
-	inventory_item_names[RPG_INVENTORY_MISC_MAGIC_SHIELD] = "Magic Shield";
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
@@ -570,10 +569,6 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Fuel used by the Jetpack and the Flame Thrower\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
-	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7prevents being hit my magic powers, but also prevents using magic powers while it is active. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
-	}
 	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
@@ -658,7 +653,6 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
 
 	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "inventoryFuel";
-	inventory_item_names[RPG_INVENTORY_MISC_MAGIC_SHIELD] = "inventoryMagicShield";
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "inventoryShieldBooster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "inventoryYsalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "inventoryForceBoon";
@@ -671,8 +665,6 @@ char* zyk_inventory_key(int inventory_index)
 
 	return "";
 }
-
-extern void zyk_set_rpg_status(gentity_t* ent, zyk_rpg_status_t rpg_status, int duration, qboolean add_status);
 
 int zyk_get_max_health(gentity_t* ent)
 {
@@ -6417,16 +6409,16 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 {
 	int seller_items_cost[MAX_RPG_INVENTORY_ITEMS][2];
 
-	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][0] = 3;
 	seller_items_cost[RPG_INVENTORY_AMMO_BLASTER_PACK][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][0] = 3;
 	seller_items_cost[RPG_INVENTORY_AMMO_POWERCELL][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][0] = 4;
+	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][0] = 3;
 	seller_items_cost[RPG_INVENTORY_AMMO_METAL_BOLTS][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 6;
+	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][0] = 5;
 	seller_items_cost[RPG_INVENTORY_AMMO_ROCKETS][1] = 2;
 
 	seller_items_cost[RPG_INVENTORY_AMMO_THERMALS][0] = 7;
@@ -6584,9 +6576,6 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 
 	seller_items_cost[RPG_INVENTORY_MISC_FUEL][0] = 3;
 	seller_items_cost[RPG_INVENTORY_MISC_FUEL][1] = 1;
-
-	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_SHIELD][0] = 100;
-	seller_items_cost[RPG_INVENTORY_MISC_MAGIC_SHIELD][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][0] = 50;
 	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][1] = 20;
@@ -6883,14 +6872,6 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	{
 		zyk_energy_modulator(ent);
 	}
-	else if (item_index == RPG_INVENTORY_MISC_MAGIC_SHIELD && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MAGIC_SHIELD] > 0)
-	{
-		zyk_set_rpg_status(ent, RPG_STATUS_MAGIC_SHIELD, 30000, qtrue);
-
-		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
-
-		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close2.mp3"));
-	}
 	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_SHIELD_BOOSTER] > 0)
 	{
 		if ((ent->client->ps.stats[STAT_ARMOR] + 25) < ent->client->pers.max_rpg_shield)
@@ -7102,7 +7083,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							{
 								zyk_use_inventory_item(ent, item_index);
 							}
-							else if (item_index >= RPG_INVENTORY_MISC_MAGIC_SHIELD && item_index <= RPG_INVENTORY_MISC_FLASHLIGHT)
+							else if (item_index >= RPG_INVENTORY_MISC_SHIELD_BOOSTER && item_index <= RPG_INVENTORY_MISC_FLASHLIGHT)
 							{ // zyk: these items can be used
 								zyk_use_inventory_item(ent, item_index);
 							}
@@ -7111,7 +7092,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 								trap->SendServerCommand(ent->s.number, va("print \"Item number must be %d, or between %d and %d, or between %d and %d\n\"", 
 									(RPG_INVENTORY_ITEM_SEEKER_DRONE + 1),
 									(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_EXPLOSIVE + 1),
-									(RPG_INVENTORY_MISC_MAGIC_SHIELD + 1), (RPG_INVENTORY_MISC_FLASHLIGHT + 1)));
+									(RPG_INVENTORY_MISC_SHIELD_BOOSTER + 1), (RPG_INVENTORY_MISC_FLASHLIGHT + 1)));
 							}
 						}
 					}
@@ -10386,8 +10367,7 @@ qboolean zyk_can_cast_magic(gentity_t* ent)
 {
 	if (ent->client->ps.forceHandExtend != HANDEXTEND_NONE || 
 		ent->client->ps.fd.forceGripBeingGripped > level.time || 
-		ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED) ||
-		ent->client->pers.rpg_statuses & (1 << RPG_STATUS_MAGIC_SHIELD))
+		ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
 	{
 		return qfalse;
 	}
