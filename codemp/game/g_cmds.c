@@ -249,7 +249,7 @@ char* zyk_skill_key(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "skillmagicflight";
-	skill_names[SKILL_DEFENSIVE_SHIELD] = "skilldefensivedome";
+	skill_names[SKILL_DEFENSIVE_SHIELD] = "skilldefensiveshield";
 	skill_names[SKILL_HEALING_CIRCLE] = "skillhealingcircle";
 	skill_names[SKILL_CHAOS_FIELD] = "skillchaosfield";
 	skill_names[SKILL_LIGHTNING_DOME] = "skilllightningdome";
@@ -6438,23 +6438,23 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][0] = 7;
 	seller_items_cost[RPG_INVENTORY_AMMO_DETPACKS][1] = 2;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][0] = 120;
+	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][0] = 100;
 	seller_items_cost[RPG_INVENTORY_ITEM_SENTRY_GUN][1] = 50;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_SEEKER_DRONE][0] = 120;
+	seller_items_cost[RPG_INVENTORY_ITEM_SEEKER_DRONE][0] = 100;
 	seller_items_cost[RPG_INVENTORY_ITEM_SEEKER_DRONE][1] = 50;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_BACTA_CANISTER][0] = 90;
-	seller_items_cost[RPG_INVENTORY_ITEM_BACTA_CANISTER][1] = 30;
+	seller_items_cost[RPG_INVENTORY_ITEM_BACTA_CANISTER][0] = 70;
+	seller_items_cost[RPG_INVENTORY_ITEM_BACTA_CANISTER][1] = 35;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_FORCE_FIELD][0] = 160;
-	seller_items_cost[RPG_INVENTORY_ITEM_FORCE_FIELD][1] = 70;
+	seller_items_cost[RPG_INVENTORY_ITEM_FORCE_FIELD][0] = 150;
+	seller_items_cost[RPG_INVENTORY_ITEM_FORCE_FIELD][1] = 75;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][0] = 180;
-	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][1] = 60;
+	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][0] = 140;
+	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][1] = 70;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][0] = 150;
-	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][1] = 40;
+	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][0] = 140;
+	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_ITEM_BINOCULARS][0] = 15;
 	seller_items_cost[RPG_INVENTORY_ITEM_BINOCULARS][1] = 5;
