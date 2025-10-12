@@ -200,17 +200,17 @@ char* zyk_skill_description(int skill_index)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
 	if (skill_index == SKILL_MAGIC_FIST)
-		return va("allows you to attack with magic bolts when using melee punches. At max level, can damage saber-only damage objects and move pushable/pullable objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
+		return va("allows you to attack with magic bolts when using melee punches. Each level increases damage. Magic Affinity increases damage. At max level, can damage any objects that normally would only be able to be damaged by Saber or Heavy Weapons, and can also interact with some objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level decreases mp usage";
 	if (skill_index == SKILL_DEFENSIVE_SHIELD)
-		return va("a magic shield appears around you, decreasing damage to your health from any source. Higher levels increase resistance to damage to your health. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("a magic shield appears around you, decreasing damage to your health from any source. Higher levels and Magic Affinity increase resistance to damage to your health. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_HEALING_CIRCLE)
-		return va("Restores health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and nearby ally players or npcs. Higher levels increase the amount of health restored and bad status effects duration reduction. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("Restores health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and nearby ally players or npcs. Higher levels and Magic Affinity increase the amount of health restored and decrease bad status effects duration faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_CHAOS_FIELD)
-		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to enemies inside it, and also interacts with map stuff, like doors, elevators, etc. Each level increases chance to cause the bad status effects and their duration, and also increases chance to interact with map stuff. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to enemies inside it. Meditating charges up the field to increase damage done by it (you will see an electrify effect around you each time it charges up). Higher levels and Magic Affinity increase chance to cause the bad status effects and their duration and also increase damage and charge damage bonus faster. Damage bonus resets when this magic power stops. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_LIGHTNING_DOME)
-		return va("keeps creating Lightning Domes after some seconds, damaging enemies at a good distance. Has a chance of knocking down enemies. Higher levels create domes more often, deals more damage and increases chance to knockdown enemies. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("keeps creating Lightning Domes after some seconds, damaging enemies at a good distance. Has a chance of knocking down enemies. Higher levels and Magic Affinity create domes more often, deals more damage and increases chance to knockdown enemies. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 
 	return "";
 }
@@ -5369,6 +5369,9 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.thermal_vision_cooldown_time = 0;
 
 			ent->client->pers.active_magic = 0;
+
+			ent->client->pers.magic_chaos_field_bonus = 0;
+			ent->client->pers.magic_chaos_field_charge_timer = 0;
 
 			// zyk: used to add a cooldown between each flame
 			ent->client->cloakDebReduce = 0;

@@ -4713,57 +4713,7 @@ void G_Knockdown( gentity_t *victim )
 	}
 }
 
-// zyk: tests if this rpg player can damage saber-only damage things
 extern int zyk_max_skill_level(int skill_index);
-qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *inflictor, int mod)
-{
-	if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG)
-	{
-		if ((mod == MOD_ROCKET || mod == MOD_ROCKET_HOMING || mod == MOD_ROCKET_SPLASH || mod == MOD_ROCKET_HOMING_SPLASH) && 
-			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0 && 
-			attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_ROCKET1))
-		{
-			return qtrue;
-		}
-	
-		if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && 
-			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0 && 
-			attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_CONCUSSION1))
-		{
-			return qtrue;
-		}
-
-		if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2 && 
-			attacker->client->pers.skill_levels[SKILL_MAGIC_FIST] == zyk_max_skill_level(SKILL_MAGIC_FIST))
-		{ // zyk: Magic Fist
-			return qtrue;
-		}
-
-		if ((mod == MOD_THERMAL || mod == MOD_THERMAL_SPLASH || mod == MOD_TRIP_MINE_SPLASH || mod == MOD_TIMED_MINE_SPLASH || mod == MOD_DET_PACK_SPLASH) &&
-			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1))
-		{ // zyk: explosive upgrade
-			return qtrue;
-		}
-	}
-
-	return qfalse;
-}
-
-// zyk: calculates weapon damage based on the weapon damage skill level and extra amount of this weapon in inventory
-int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int inventory_index)
-{
-	int final_dmg = base_dmg;
-
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] > 0 && ent->client->pers.rpg_inventory[inventory_index] > 0)
-	{
-		float bonus_damage_factor = (RPG_WEAPON_DMG_BONUS * ent->client->pers.rpg_inventory[inventory_index]);
-
-		final_dmg = (int)ceil(final_dmg * (1.00 + bonus_damage_factor));
-	}
-
-	return final_dmg;
-}
-
 zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 {
 	int i = 0;
@@ -4812,6 +4762,63 @@ qboolean zyk_is_magic_power(gentity_t* inflictor)
 	}
 
 	return qfalse;
+}
+
+// zyk: tests if this ability can damage anything
+qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *inflictor, int mod)
+{
+	if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG)
+	{
+		if ((mod == MOD_ROCKET || mod == MOD_ROCKET_HOMING || mod == MOD_ROCKET_SPLASH || mod == MOD_ROCKET_HOMING_SPLASH) && 
+			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0 && 
+			attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_ROCKET1))
+		{
+			return qtrue;
+		}
+	
+		if ((mod == MOD_CONC || mod == MOD_CONC_ALT) && 
+			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_CONCUSSION] > 0 && 
+			attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_CONCUSSION1))
+		{
+			return qtrue;
+		}
+
+		// zyk: Magic Fist at max level
+		if (zyk_is_magic_fist(mod, inflictor) == qtrue &&
+			attacker->client->pers.skill_levels[SKILL_MAGIC_FIST] == zyk_max_skill_level(SKILL_MAGIC_FIST))
+		{
+			return qtrue;
+		}
+
+		// zyk: Magic powers can hit anything
+		if (zyk_is_magic_power(inflictor) == qtrue)
+		{
+			return qtrue;
+		}
+
+		if ((mod == MOD_THERMAL || mod == MOD_THERMAL_SPLASH || mod == MOD_TRIP_MINE_SPLASH || mod == MOD_TIMED_MINE_SPLASH || mod == MOD_DET_PACK_SPLASH) &&
+			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_EXPLOSIVE] > 0 && attacker->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_EXPLOSIVE1))
+		{ // zyk: explosive upgrade
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
+// zyk: calculates weapon damage based on the weapon damage skill level and extra amount of this weapon in inventory
+int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int inventory_index)
+{
+	int final_dmg = base_dmg;
+
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] > 0 && ent->client->pers.rpg_inventory[inventory_index] > 0)
+	{
+		float bonus_damage_factor = (RPG_WEAPON_DMG_BONUS * ent->client->pers.rpg_inventory[inventory_index]);
+
+		final_dmg = (int)ceil(final_dmg * (1.00 + bonus_damage_factor));
+	}
+
+	return final_dmg;
 }
 
 qboolean zyk_source_is_non_saber_weapon(int mod, gentity_t* inflictor)
@@ -4875,7 +4882,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	int			take, asave = 0, knockback;
 	float		shieldAbsorbed = 0;
 	int			check_shield = 1; // zyk: tests if damage can be absorbed by shields
-	qboolean	can_damage_heavy_things = qfalse; // zyk: will be qtrue if attacker is a RPG Mode Monk using melee or a Magic Master using Magic Fist
+	qboolean	can_damage_heavy_things = qfalse; // zyk: some attacks can destroy anything
 
 	if (!targ)
 		return;
@@ -4904,13 +4911,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	if (attacker && attacker->client && !attacker->NPC && attacker->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT) && targ && Q_stricmp(targ->classname, "sentryGun") == 0 &&
 		(!targ->parent || targ->parent != attacker))
 	{
-		return;
-	}
-
-	if (targ && targ->client && targ->NPC && 
-		targ->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER && 
-		mod == MOD_TRIGGER_HURT)
-	{ // zyk: this npc cannot die by map stuff
 		return;
 	}
 
@@ -4987,7 +4987,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
-	// zyk: force Rage increases damage of attacks
+	// zyk: Force Rage increases damage of attacks
 	if (attacker && attacker->client && attacker->client->ps.fd.forcePowersActive & (1 << FP_RAGE))
 	{ // zyk: new Force Rage code
 		if (attacker->client->ps.fd.forcePowerLevel[FP_RAGE] == 1)
@@ -4998,10 +4998,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			damage = (int)ceil(damage * 1.09);
 	}
 
-	if (attacker && attacker->client && (attacker->client->sess.account_mode == ACC_MODE_RPG || (attacker->NPC && attacker->client->pers.quest_npc > QUEST_NPC_NONE)))
+	if (attacker && attacker->client && (attacker->client->sess.account_mode == ACC_MODE_RPG || attacker->NPC))
 	{ // zyk: bonus damage
-		// zyk: Magic bolts can damage heavy things
-		if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2)
+		if (zyk_can_damage_saber_only_entities(attacker, inflictor, mod) == qtrue)
 		{
 			can_damage_heavy_things = qtrue;
 		}
@@ -5052,13 +5051,13 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 	if ( (targ->flags&FL_SHIELDED) && mod != MOD_SABER  && !targ->client)
 	{//magnetically protected, this thing can only be damaged by lightsabers
-		if (zyk_can_damage_saber_only_entities(attacker, inflictor, mod) == qfalse)
+		if (can_damage_heavy_things == qfalse)
 			return;
 	}
 
 	if ((targ->flags & FL_DMG_BY_SABER_ONLY) && mod != MOD_SABER)
 	{ //saber-only damage
-		if (zyk_can_damage_saber_only_entities(attacker, inflictor, mod) == qfalse)
+		if (can_damage_heavy_things == qfalse)
 			return;
 	}
 
@@ -5082,7 +5081,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
-	if ((targ->flags & FL_DMG_BY_HEAVY_WEAP_ONLY))
+	if ((targ->flags & FL_DMG_BY_HEAVY_WEAP_ONLY) && can_damage_heavy_things == qfalse)
 	{ //only take damage from explosives and such
 		if (mod != MOD_REPEATER_ALT &&
 			mod != MOD_ROCKET &&
@@ -5104,14 +5103,14 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			mod != MOD_TELEFRAG &&
 			mod != MOD_TRIGGER_HURT)
 		{
-			if ( mod != MOD_MELEE || (can_damage_heavy_things == qfalse && !G_HeavyMelee( attacker ) ))
+			if ( (mod != MOD_MELEE) || (!G_HeavyMelee( attacker ) ))
 			{ //let classes with heavy melee ability damage heavy wpn dmg doors with fists
 				return;
 			}
 		}
 	}
 
-	if (targ->flags & FL_BBRUSH)
+	if (targ->flags & FL_BBRUSH && can_damage_heavy_things == qfalse)
 	{
 		if (mod == MOD_DEMP2 ||
 			mod == MOD_DEMP2_ALT ||
@@ -5119,7 +5118,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			mod == MOD_BRYAR_PISTOL_ALT ||
 			mod == MOD_MELEE)
 		{ //these don't damage bbrushes.. ever
-			if ( mod != MOD_MELEE || (can_damage_heavy_things == qfalse && !G_HeavyMelee( attacker )) )
+			if ( mod != MOD_MELEE || (!G_HeavyMelee( attacker )) )
 			{ //let classes with heavy melee ability damage breakable brushes with fists
 				return;
 			}
@@ -6535,18 +6534,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 							zyk_remove_emotes(ent);
 
-							if (Q_irand(0, 99) < chaos_chance)
+							if (Q_irand(0, 99) < chaos_chance && ent->client)
 							{
-								if (ent->client)
-								{
-									zyk_rpg_status_t random_bad_status = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
+								zyk_rpg_status_t random_bad_status = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
 
-									zyk_set_rpg_status(ent, random_bad_status, chaos_chance * 1000, qtrue);
-								}
-								else if (ent->s.eType == ET_MOVER)
-								{ // zyk: try to use entities
-									GlobalUse(ent, magic_power_user, magic_power_user);
-								}
+								zyk_set_rpg_status(ent, random_bad_status, chaos_chance * 1000, qtrue);
 							}
 						}
 

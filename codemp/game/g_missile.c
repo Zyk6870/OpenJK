@@ -432,7 +432,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		}
 	}
 
-	// zyk: rockets and concussion, both with upgrade, and Magic Fist, can use force pushable/pullable entities, like the rock at start of t3_rift map
+	// zyk: rockets and concussion, both with upgrade, and Magic Fist at max level, can use force pushable/pullable entities, like the rock at start of t3_rift map
 	if (Q_stricmp(other->classname, "func_static") == 0 && (other->spawnflags & 1 || other->spawnflags & 2) && 
 		ent->parent && ent->parent->client && ent->parent->client->sess.account_mode == ACC_MODE_RPG &&
 		((ent->s.weapon == WP_ROCKET_LAUNCHER && ent->parent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0 && 
@@ -468,8 +468,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			int cannot_deflect = 0;
 
 			// zyk: Magic Fist can hit anything!
-			if (ent->methodOfDeath == MOD_MELEE && (ent->s.weapon == WP_BOWCASTER || ent->s.weapon == WP_DEMP2 || 
-				(ent->s.weapon == WP_FLECHETTE && Q_stricmp(ent->classname, "flech_alt") == 0) || ent->s.weapon == WP_CONCUSSION))
+			if (ent->methodOfDeath == MOD_MELEE && ent->s.weapon == WP_DEMP2)
 			{
 				cannot_deflect = 1;
 			}
@@ -509,27 +508,10 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		!(ent->dflags&DAMAGE_HEAVY_WEAP_CLASS) )
 	{
 		vec3_t fwd;
-		gentity_t *this_npc = NULL;
 		int cannot_deflect = 0;
 
-		if (ent->r.ownerNum >= MAX_CLIENTS)
-			this_npc = &g_entities[ent->r.ownerNum];
-
-		// zyk: Guardian of Wind can hit anyone with his blaster shots
-		if (this_npc && this_npc->client && Q_stricmp(this_npc->NPC_type, "guardian_boss_7") == 0)
-		{
-			cannot_deflect = 1;
-		}
-
-		// zyk: Guardian of Ice can hit anyone with his bowcaster shots
-		if (this_npc && this_npc->client && Q_stricmp(this_npc->NPC_type, "guardian_boss_10") == 0)
-		{
-			cannot_deflect = 1;
-		}
-
 		// zyk: Magic Fist can hit anything!
-		if (ent->methodOfDeath == MOD_MELEE && (ent->s.weapon == WP_BOWCASTER || ent->s.weapon == WP_DEMP2 || 
-			(ent->s.weapon == WP_FLECHETTE && Q_stricmp(ent->classname, "flech_alt") == 0) || ent->s.weapon == WP_CONCUSSION))
+		if (ent->methodOfDeath == MOD_MELEE && ent->s.weapon == WP_DEMP2)
 		{
 			cannot_deflect = 1;
 		}
@@ -557,7 +539,6 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		ent->s.weapon != WP_TRIP_MINE &&
 		ent->s.weapon != WP_DET_PACK &&
 		ent->s.weapon != WP_DEMP2 &&
-		!(ent->s.weapon == WP_CONCUSSION && ent->methodOfDeath == MOD_MELEE) && // zyk: cannot be Ultra Bolt
 		ent->methodOfDeath != MOD_REPEATER_ALT &&
 		ent->methodOfDeath != MOD_FLECHETTE_ALT_SPLASH &&
 		ent->methodOfDeath != MOD_CONC &&
@@ -698,6 +679,16 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			}
 			return;
 		}
+	}
+
+	// zyk: Magic Fist at max level can interact with movers, like doors, elevators, etc
+	if (!other->takedamage && ent->parent && 
+		(ent->s.weapon == WP_DEMP2 && ent->methodOfDeath == MOD_MELEE && 
+		 ent->parent->client->pers.skill_levels[SKILL_MAGIC_FIST] == zyk_max_skill_level(SKILL_MAGIC_FIST)) &&
+		other->s.eType == ET_MOVER)
+	{
+		GlobalUse(other, ent->parent, ent->parent);
+		goto killProj;
 	}
 
 	// check for sticking

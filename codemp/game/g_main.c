@@ -5404,6 +5404,9 @@ void healing_circle(gentity_t* ent)
 // zyk: Chaos Field
 void chaos_field(gentity_t* ent)
 {
+	ent->client->pers.magic_chaos_field_bonus = 0;
+	ent->client->pers.magic_chaos_field_charge_timer = level.time + 1000;
+
 	ent->client->pers.active_magic |= (1 << MAGIC_CHAOS_FIELD);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] = level.time + 500;
 
@@ -5573,7 +5576,23 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] < level.time)
 				{
+					damage += ent->client->pers.magic_chaos_field_bonus;
+
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_chaos", "4", "env/dome", 0, damage, 290, 400);
+
+					// zyk: meditating while this magic is active gives damage bonus to it
+					if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
+						ent->client->ps.forceDodgeAnim == BOTH_MEDITATE && 
+						ent->client->pers.magic_chaos_field_charge_timer < level.time)
+					{
+						int charge_timer_decrease = 50 * (magic_bonus + ent->client->pers.skill_levels[SKILL_CHAOS_FIELD]);
+
+						ent->client->pers.magic_chaos_field_bonus += 1;
+
+						ent->client->pers.magic_chaos_field_charge_timer = level.time + 2600 - charge_timer_decrease;
+
+						ent->client->ps.electrifyTime = level.time + 700;
+					}
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] = level.time + 300;
 				}
