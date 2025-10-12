@@ -5612,7 +5612,7 @@ void magic_power_events(gentity_t *ent)
 
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 5000 - (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 200);
+					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 5000 - (magic_bonus * 50) - (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 90);
 				}
 			}
 
