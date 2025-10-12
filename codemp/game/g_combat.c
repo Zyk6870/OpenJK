@@ -4727,7 +4727,7 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 
 	zyk_magic_t magic_powers[MAX_MAGIC_POWERS] =
 	{
-		MAGIC_DEFENSIVE_SHIELD,
+		MAGIC_MAGIC_SHIELD,
 		MAGIC_HEALING_CIRCLE,
 		MAGIC_CHAOS_FIELD,
 		MAGIC_LIGHTNING_DOME
@@ -5982,6 +5982,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		{ // zyk: bonus resistance
 			float bonus_health_resistance = 0.00;
 			int stamina_loss = 0;
+			int magic_bonus = zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
 
 			// zyk: Adaptive Armor
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] > 0)
@@ -6017,11 +6018,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				}
 			}
 
-			if (targ->client->pers.active_magic & (1 << MAGIC_DEFENSIVE_SHIELD))
-			{ // zyk: target using Defensive Shield
-				int magic_bonus = zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
-
-				bonus_health_resistance += (0.025f * (targ->client->pers.skill_levels[SKILL_DEFENSIVE_SHIELD] + magic_bonus));
+			if (targ->client->pers.active_magic & (1 << MAGIC_MAGIC_SHIELD))
+			{ // zyk: target using Magic Shield
+				bonus_health_resistance += (0.025f * (targ->client->pers.skill_levels[SKILL_MAGIC_SHIELD] + magic_bonus));
 			}
 			
 			// zyk: reduces damage based on the health resistance bonuses
@@ -6030,6 +6029,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (take < 1)
 			{ // zyk: cannot make player fully absorb all damage
 				take = 1;
+			}
+
+			if (targ->client->pers.active_magic & (1 << MAGIC_MAGIC_SHIELD))
+			{ // zyk: Magic Shield absorbs damage taken
+				targ->client->pers.magic_magic_shield_bonus += ((int)ceil(take * (magic_bonus + targ->client->pers.skill_levels[SKILL_MAGIC_SHIELD]) * 0.05f));
 			}
 
 			// zyk: damage to health also makes RPG player lose Stamina

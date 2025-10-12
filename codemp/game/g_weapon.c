@@ -3973,6 +3973,16 @@ int magic_fist_velocity(gentity_t *ent)
 {
 	int magic_bolt_speed = zyk_magic_fist_velocity.integer;
 
+	if (ent->client->pers.active_magic & (1 << MAGIC_MAGIC_SHIELD))
+	{
+		if (ent->client->pers.magic_magic_shield_bonus > (magic_bolt_speed / 2))
+		{
+			ent->client->pers.magic_magic_shield_bonus = magic_bolt_speed / 2;
+		}
+
+		magic_bolt_speed += ent->client->pers.magic_magic_shield_bonus;
+	}
+
 	return magic_bolt_speed;
 }
 

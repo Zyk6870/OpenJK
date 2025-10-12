@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.5.32"
+#define	GAMEVERSION	"New Zyk Mod v1.5.33"
 
 #define SECURITY_LOG "security.log"
 
@@ -581,7 +581,7 @@ typedef enum {
 
 // zyk: magic powers values
 typedef enum {
-	MAGIC_DEFENSIVE_SHIELD,
+	MAGIC_MAGIC_SHIELD,
 	MAGIC_HEALING_CIRCLE,
 	MAGIC_CHAOS_FIELD,
 	MAGIC_LIGHTNING_DOME,
@@ -617,7 +617,7 @@ typedef enum {
 	SKILL_RUN_SPEED,
 	SKILL_MAGIC_FIST,
 	SKILL_MAGIC_FLIGHT,
-	SKILL_DEFENSIVE_SHIELD,
+	SKILL_MAGIC_SHIELD,
 	SKILL_HEALING_CIRCLE,
 	SKILL_CHAOS_FIELD,
 	SKILL_LIGHTNING_DOME,
@@ -784,7 +784,7 @@ typedef enum {
 
 typedef enum {
 	SELECTED_ABILITY_NONE,
-	SELECTED_ABILITY_DEFENSIVE_SHIELD,
+	SELECTED_ABILITY_MAGIC_SHIELD,
 	SELECTED_ABILITY_HEALING_CIRCLE,
 	SELECTED_ABILITY_CHAOS_FIELD,
 	SELECTED_ABILITY_LIGHTNING_DOME,
@@ -1040,6 +1040,7 @@ typedef struct clientPersistant_s {
 	// zyk: debounce timer used to regen mp when player is meditating
 	int magic_regen_debounce_timer;
 
+	int magic_magic_shield_bonus;
 	int magic_chaos_field_bonus;
 	int magic_chaos_field_charge_timer;
 

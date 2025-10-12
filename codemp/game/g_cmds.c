@@ -81,7 +81,7 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 15;
 	max_skill_levels[SKILL_MAGIC_FLIGHT] = 15;
-	max_skill_levels[SKILL_DEFENSIVE_SHIELD] = 10;
+	max_skill_levels[SKILL_MAGIC_SHIELD] = 10;
 	max_skill_levels[SKILL_HEALING_CIRCLE] = 10;
 	max_skill_levels[SKILL_CHAOS_FIELD] = 10;
 	max_skill_levels[SKILL_LIGHTNING_DOME] = 10;
@@ -129,7 +129,7 @@ char* zyk_skill_name(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "Magic Flight";
-	skill_names[SKILL_DEFENSIVE_SHIELD] = "Defensive Shield";
+	skill_names[SKILL_MAGIC_SHIELD] = "Magic Shield";
 	skill_names[SKILL_HEALING_CIRCLE] = "Healing Circle";
 	skill_names[SKILL_CHAOS_FIELD] = "Chaos Field";
 	skill_names[SKILL_LIGHTNING_DOME] = "Lightning Dome";
@@ -200,17 +200,17 @@ char* zyk_skill_description(int skill_index)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
 	if (skill_index == SKILL_MAGIC_FIST)
-		return va("allows you to attack with magic bolts when using melee punches. Each level increases damage. Magic Affinity increases damage. At max level, can damage any objects that normally would only be able to be damaged by Saber or Heavy Weapons, and can also interact with some objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
+		return va("Allows you to attack with magic bolts when using melee punches. Each level increases damage. Magic Affinity increases damage. At max level, can damage any objects that normally would only be able to be damaged by Saber or Heavy Weapons, and can also interact with some objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAGIC_FLIGHT)
-		return "allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level decreases mp usage";
-	if (skill_index == SKILL_DEFENSIVE_SHIELD)
-		return va("a magic shield appears around you, decreasing damage to your health from any source. Higher levels and Magic Affinity increase resistance to damage to your health. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return "Allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level decreases mp usage";
+	if (skill_index == SKILL_MAGIC_SHIELD)
+		return va("A magic shield appears around you, decreasing damage to your health from any source. Some of the damage absorbed is stored to increase Magic Fist shot speed, to a max bonus value of 50 per cent of the normal shot speed. Higher levels and Magic Affinity increase resistance to damage to your health and Magic Fist shot speed bonus. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_HEALING_CIRCLE)
 		return va("Restores health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and nearby ally players or npcs. Higher levels and Magic Affinity increase the amount of health restored and decrease bad status effects duration faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_CHAOS_FIELD)
-		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to them. Field keeps charging up to increase damage done by it (you will see an effect each time it charges up). Higher levels and Magic Affinity increase chance to cause the bad status effects and their duration and also charges up faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to them. Field keeps charging up to increase damage done by it (you will see an effect each time it charges up). Higher levels and Magic Affinity increase the field damage, makes it charge up faster, increase chance to cause the bad status effects and their duration. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_LIGHTNING_DOME)
-		return va("keeps creating Lightning Domes after some seconds, damaging enemies at a good distance. Has a chance of knocking down enemies. Higher levels and Magic Affinity create domes more often, deals more damage and increases chance to knockdown enemies. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("Keeps creating Lightning Domes after some seconds, damaging enemies at a good distance. Has a chance of knocking down enemies. Higher levels and Magic Affinity create domes more often, deals more damage and increases chance to knockdown enemies. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 
 	return "";
 }
@@ -249,7 +249,7 @@ char* zyk_skill_key(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "skillmagicflight";
-	skill_names[SKILL_DEFENSIVE_SHIELD] = "skilldefensiveshield";
+	skill_names[SKILL_MAGIC_SHIELD] = "skillmagicshield";
 	skill_names[SKILL_HEALING_CIRCLE] = "skillhealingcircle";
 	skill_names[SKILL_CHAOS_FIELD] = "skillchaosfield";
 	skill_names[SKILL_LIGHTNING_DOME] = "skilllightningdome";
@@ -4436,11 +4436,11 @@ char* zyk_selected_ability_name(zyk_selected_ability_t selected_ability)
 	char* ability_names[MAX_SELECTED_ABILITIES];
 
 	ability_names[SELECTED_ABILITY_NONE] = "None";
-	ability_names[SELECTED_ABILITY_DEFENSIVE_SHIELD] = "Defensive Shield (Magic)";
-	ability_names[SELECTED_ABILITY_HEALING_CIRCLE] = "Healing Circle (Magic)";
-	ability_names[SELECTED_ABILITY_CHAOS_FIELD] = "Chaos Field (Magic)";
-	ability_names[SELECTED_ABILITY_LIGHTNING_DOME] = "Lightning Dome (Magic)";
-	ability_names[SELECTED_ABILITY_ENERGY_MODULATOR] = "Energy Modulator";
+	ability_names[SELECTED_ABILITY_MAGIC_SHIELD] = "Magic Shield (Magic power)";
+	ability_names[SELECTED_ABILITY_HEALING_CIRCLE] = "Healing Circle (Magic power)";
+	ability_names[SELECTED_ABILITY_CHAOS_FIELD] = "Chaos Field (Magic power)";
+	ability_names[SELECTED_ABILITY_LIGHTNING_DOME] = "Lightning Dome (Magic power)";
+	ability_names[SELECTED_ABILITY_ENERGY_MODULATOR] = "Energy Modulator (Item)";
 
 	if (selected_ability >= 0 && selected_ability < MAX_SELECTED_ABILITIES)
 	{
@@ -4773,7 +4773,7 @@ int zyk_max_magic_power(gentity_t *ent)
 // zyk: tests if this skill is one of the magic powers
 qboolean zyk_is_magic_power_skill(int skill_index)
 {
-	if (skill_index >= SKILL_DEFENSIVE_SHIELD && skill_index <= SKILL_LIGHTNING_DOME)
+	if (skill_index >= SKILL_MAGIC_SHIELD && skill_index <= SKILL_LIGHTNING_DOME)
 	{
 		return qtrue;
 	}
@@ -4786,7 +4786,7 @@ int zyk_get_magic_index(int skill_index)
 {
 	if (zyk_is_magic_power_skill(skill_index) == qtrue)
 	{
-		return (skill_index - SKILL_DEFENSIVE_SHIELD);
+		return (skill_index - SKILL_MAGIC_SHIELD);
 	}
 
 	return -1;
@@ -5370,6 +5370,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.active_magic = 0;
 
+			ent->client->pers.magic_magic_shield_bonus = 0;
 			ent->client->pers.magic_chaos_field_bonus = 0;
 			ent->client->pers.magic_chaos_field_charge_timer = 0;
 
@@ -7138,11 +7139,11 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 						if (page == 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7the most common enemy. After a while he will be able to use E11 Blaster Rifle\n^3Heavy Armored Warrior: ^7armored soldier with guns and wearing Adaptive Armor but not able to use its special bonuses\n^3Flying Warrior: ^7a flying armored soldier\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Melee attacks can cause Poison status. Has Defensive Shield magic\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. Melee attacks can cause Bleeding status. Has Healing Circle magic\n^3Force Saber Warrior (Light): ^7uses blue clothes and has Light-Side force powers and saber\n^3Force Saber Warrior (Dark): ^7uses red clothes and has Dark-Side force powers and saber^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7the most common enemy. After a while he will be able to use E11 Blaster Rifle\n^3Heavy Armored Warrior: ^7armored soldier with guns and wearing Adaptive Armor but not able to use its special bonuses\n^3Flying Warrior: ^7a flying armored soldier\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Melee attacks can cause Poison status. Has Magic Shield magic\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. Melee attacks can cause Bleeding status. Has Healing Circle magic\n^3Force Saber Warrior (Light): ^7uses blue clothes and has Light-Side force powers and saber\n^3Force Saber Warrior (Dark): ^7uses red clothes and has Dark-Side force powers and saber^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
 						}
 						else if (page == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Force Saber Warrior (Both): ^7uses brown clothes and has both Light-Side and Dark-Side force powers and saber\n^3Force Saber Warrior (Guns): ^7uses green clothes and has both Light-Side and Dark-Side force powers and guns\n^3Mage Scholar: ^7mage with Magic Fist and Magic Flight skills. Can use Healing Circle and Chaos Field magic powers\n^3Mage Minister: ^7mage with Magic Fist and Magic Flight skills. Can use Defensive Shield and Lightning Dome magic powers\n^3Mage Master: ^7the leaders of The Conquerors. Wearing the Adaptive Armor and able to use its special bonuses. Can cloak himself. Can make the Spirit Tree wither faster when near it. Has Magic Fist, Magic Flight and extremely high level of all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Force Saber Warrior (Both): ^7uses brown clothes and has both Light-Side and Dark-Side force powers and saber\n^3Force Saber Warrior (Guns): ^7uses green clothes and has both Light-Side and Dark-Side force powers and guns\n^3Mage Scholar: ^7mage with Magic Fist and Magic Flight skills. Can use Healing Circle and Chaos Field magic powers\n^3Mage Minister: ^7mage with Magic Fist and Magic Flight skills. Can use Magic Shield and Lightning Dome magic powers\n^3Mage Master: ^7the leaders of The Conquerors. Wearing the Adaptive Armor and able to use its special bonuses. Can cloak himself. Can make the Spirit Tree wither faster when near it. Has Magic Fist, Magic Flight and extremely high level of all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
 						}
 						else if (page == 3)
 						{
@@ -10378,7 +10379,7 @@ qboolean zyk_can_cast_magic(gentity_t* ent)
 	return qtrue;
 }
 
-extern void defensive_shield(gentity_t* ent);
+extern void magic_shield(gentity_t* ent);
 extern void healing_circle(gentity_t* ent);
 extern void chaos_field(gentity_t* ent);
 extern void magic_lightning_dome(gentity_t* ent);
@@ -10431,9 +10432,9 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				ent->client->ps.legsTimer = MAGIC_ANIM_TIME;
 				ent->client->ps.weaponTime = MAGIC_ANIM_TIME;
 
-				if (magic_number == MAGIC_DEFENSIVE_SHIELD)
+				if (magic_number == MAGIC_MAGIC_SHIELD)
 				{
-					defensive_shield(ent);
+					magic_shield(ent);
 				}
 				else if (magic_number == MAGIC_HEALING_CIRCLE)
 				{
