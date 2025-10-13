@@ -8969,18 +8969,10 @@ void G_RunFrame( int levelTime ) {
 					int level_chance = ((MAX_GENTITIES - level.num_entities) / 100);
 
 					int energy_modulator_chance = (main_quest_progress / 10) + (power_level / 4) - level_chance;
-					int crystal_chance = (level.num_entities / 10);
-					int crystal_duration = 30000;
+					int crystal_duration = (RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME * 3) - (power_level * 50);
 
-					if (Q_irand(0, 99) < crystal_chance)
-					{ // zyk: blue crystals
-						crystal_duration -= (power_level * 100);
-
-						if (crystal_duration < RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME)
-						{
-							crystal_duration = RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME;
-						}
-
+					if (crystal_duration >= 2000)
+					{
 						zyk_spawn_magic_crystal(crystal_duration, QUEST_ITEM_SKILL_CRYSTAL);
 					}
 					
