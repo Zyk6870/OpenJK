@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.4"
+#define	GAMEVERSION	"New Zyk Mod v1.6.5"
 
 #define SECURITY_LOG "security.log"
 
@@ -856,7 +856,7 @@ typedef enum {
 // zyk: npc cloak detection distance
 #define NPC_CLOAK_DETECTION_DISTANCE 1000
 
-#define RPG_RUN_SPEED_SKILL_INCREASE 5.0f
+#define RPG_RUN_SPEED_SKILL_INCREASE 7.5f
 
 // zyk: main characters names
 #define QUESTCHAR_MAIN "^6Spirit Tree"
