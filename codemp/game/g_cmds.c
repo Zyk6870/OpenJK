@@ -9617,11 +9617,7 @@ void Cmd_WordFilter_f(gentity_t* ent)
 
 		fclose(temp_word_file);
 
-		if (word_file != NULL)
-		{
-			remove(word_file_name);
-		}
-
+		remove(word_file_name);
 		rename(temp_word_file_name, word_file_name);
 
 		if (found_the_word == qfalse)
@@ -9649,6 +9645,8 @@ char* zyk_get_admin_command_description(zyk_admin_t admin_value)
 	admin_descriptions[ADM_WORDFILTER] = "Word Filter";
 	admin_descriptions[ADM_CLIENTPRINT] = "ClientPrint";
 	admin_descriptions[ADM_KICK] = "Kick";
+	admin_descriptions[ADM_BAN] = "Ban";
+	admin_descriptions[ADM_UNBAN] = "Unban";
 	admin_descriptions[ADM_PARALYZE] = "Paralyze";
 	admin_descriptions[ADM_GIVE] = "Give";
 	admin_descriptions[ADM_SCALE] = "Scale";
@@ -9754,6 +9752,14 @@ void Cmd_AdminList_f( gentity_t *ent ) {
 		else if (command_number == ADM_KICK)
 		{
 			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/admkick <player name or ID> ^7to kick a player from the server\n\n\"" );
+		}
+		else if (command_number == ADM_BAN)
+		{
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/admban <player name or ID or IP address> ^7to ban a player from the server\n\n\"");
+		}
+		else if (command_number == ADM_UNBAN)
+		{
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/admunban <IP address> ^7to unban a player IP from the server\n\n\"");
 		}
 		else if (command_number == ADM_PARALYZE)
 		{
@@ -9987,6 +9993,158 @@ void Cmd_AdmKick_f( gentity_t *ent ) {
 	}
 
 	trap->SendConsoleCommand( EXEC_APPEND, va( "kick %d\n", client_id) );
+}
+
+char* zyk_get_player_ip(gentity_t* ent)
+{
+	int i = 0;
+	char player_ip[NET_ADDRSTRMAXLEN];
+
+	while (ent->client->sess.IP[i] != '\0' && ent->client->sess.IP[i] != ':')
+	{
+		player_ip[i] = ent->client->sess.IP[i];
+
+		i++;
+	}
+
+	player_ip[i] = '\0';
+
+	return G_NewString(player_ip);
+}
+
+/*
+==================
+Cmd_AdmBan_f
+==================
+*/
+void Cmd_AdmBan_f(gentity_t* ent) {
+	char arg1[MAX_STRING_CHARS];
+	char player_ip[NET_ADDRSTRMAXLEN];
+	gentity_t* player = NULL;
+	int i = 0;
+	int client_id = -1;
+	FILE* ban_file = NULL;
+
+	if (!(ent->client->pers.bitvalue & (1 << ADM_BAN)))
+	{ // zyk: admin command
+		trap->SendServerCommand(ent->s.number, "print \"You don't have this admin command.\n\"");
+		return;
+	}
+
+	if (trap->Argc() != 2)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"You must specify the player name or ID or IP address.\n\"");
+		return;
+	}
+
+	trap->Argv(1, arg1, sizeof(arg1));
+
+	// zyk: tries to find the player based on IP
+	for (i = 0; i < level.maxclients; i++)
+	{
+		player = &g_entities[i];
+
+		strcpy(player_ip, zyk_get_player_ip(player));
+
+		if (Q_stricmp(arg1, player_ip) == 0)
+		{
+			client_id = player->s.number;
+			break;
+		}
+	}
+
+	// zyk: tries to find the player by ID or name
+	if (client_id == -1)
+	{
+		client_id = ClientNumberFromString(ent, arg1, qtrue);
+
+		if (client_id == -1)
+		{
+			return;
+		}
+	}
+
+	// zyk: found the player
+	player = &g_entities[client_id];
+	strcpy(player_ip, zyk_get_player_ip(player));
+
+	ban_file = fopen("zykmod/banlist.txt", "a");
+
+	if (ban_file != NULL)
+	{
+		fprintf(ban_file, "%s\n", player_ip);
+		fclose(ban_file);
+	}
+
+	trap->SendConsoleCommand(EXEC_APPEND, va("kick %d\n", client_id));
+}
+
+/*
+==================
+Cmd_AdmUnBan_f
+==================
+*/
+void Cmd_AdmUnBan_f(gentity_t* ent) {
+	char arg1[MAX_STRING_CHARS];
+	char content[MAX_STRING_CHARS];
+
+	const char *ban_file_name = "zykmod/banlist.txt";
+	const char *temp_ban_file_name = "zykmod/tempbanlist.txt";
+
+	FILE* ban_file = NULL;
+	FILE* temp_ban_file = NULL;
+	qboolean found_ip_address = qfalse;
+
+	if (!(ent->client->pers.bitvalue & (1 << ADM_UNBAN)))
+	{ // zyk: admin command
+		trap->SendServerCommand(ent->s.number, "print \"You don't have this admin command.\n\"");
+		return;
+	}
+
+	if (trap->Argc() != 2)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"You must specify the player IP address.\n\"");
+		return;
+	}
+
+	trap->Argv(1, arg1, sizeof(arg1));
+
+	ban_file = fopen(ban_file_name, "r");
+	temp_ban_file = fopen(temp_ban_file_name, "w");
+
+	if (ban_file != NULL && temp_ban_file != NULL)
+	{
+		while (fscanf(ban_file, "%s", content) != EOF)
+		{
+			if (Q_stricmp(content, arg1) != 0)
+			{
+				fprintf(temp_ban_file, "%s\n", content);
+			}
+			else
+			{
+				found_ip_address = qtrue;
+			}
+		}
+
+		fclose(ban_file);
+	}
+
+	if (temp_ban_file != NULL)
+	{
+		fclose(temp_ban_file);
+
+		remove(ban_file_name);
+		rename(temp_ban_file_name, ban_file_name);
+
+		if (found_ip_address == qtrue)
+		{
+			trap->SendServerCommand(ent->s.number, "print \"IP address removed from banlist.\n\"");
+		}
+		else
+		{
+			trap->SendServerCommand(ent->s.number, "print \"IP address not found on banlist.\n\"");
+		}
+	}
 }
 
 /*
@@ -11732,10 +11890,12 @@ int cmdcmp( const void *a, const void *b ) {
 /* This array MUST be sorted correctly by alphabetical name field */
 command_t commands[] = {
 	{ "addbot",				Cmd_AddBot_f,				0 },
+	{ "admban",				Cmd_AdmBan_f,				CMD_LOGGEDIN | CMD_NOINTERMISSION },
 	{ "admindown",			Cmd_AdminDown_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "adminlist",			Cmd_AdminList_f,			CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "adminup",			Cmd_AdminUp_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "admkick",			Cmd_AdmKick_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
+	{ "admunban",			Cmd_AdmUnBan_f,				CMD_LOGGEDIN | CMD_NOINTERMISSION },
 	{ "allyadd",			Cmd_AllyAdd_f,				CMD_NOINTERMISSION },
 	{ "allychat",			Cmd_AllyChat_f,				CMD_NOINTERMISSION },
 	{ "allylist",			Cmd_AllyList_f,				CMD_NOINTERMISSION },

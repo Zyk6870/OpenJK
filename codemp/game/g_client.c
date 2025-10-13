@@ -2415,10 +2415,32 @@ static qboolean CompareIPs( const char *ip1, const char *ip2 )
 	return qtrue;
 }
 
+char* zyk_parse_ip(char *player_ip)
+{
+	char new_ip[NET_ADDRSTRMAXLEN];
+	int i = 0;
+
+	strcpy(new_ip, "");
+
+	while (player_ip != NULL && player_ip[i] != '\0' && player_ip[i] != ':')
+	{
+		new_ip[i] = player_ip[i];
+
+		i++;
+	}
+
+	new_ip[i] = '\0';
+
+	return G_NewString(new_ip);
+}
+
 char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	char		*value = NULL;
 	gentity_t	*ent = NULL, *te = NULL;
 	gclient_t	*client;
+	FILE* ban_file = NULL;
+	int file_read_status = 0;
+	char content[NET_ADDRSTRMAXLEN];
 	char		userinfo[MAX_INFO_STRING] = {0},
 				tmpIP[NET_ADDRSTRMAXLEN] = {0},
 				guid[33] = {0};
@@ -2443,6 +2465,28 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	Q_strncpyz( tmpIP, isBot ? "Bot" : value, sizeof( tmpIP ) );
 	if ( G_FilterPacket( value ) ) {
 		return "Banned.";
+	}
+
+	// zyk: testing if this player was banned by admban command
+	ban_file = fopen("zykmod/banlist.txt", "r");
+
+	if (ban_file != NULL)
+	{
+		file_read_status = fscanf(ban_file, "%s", content);
+
+		while (file_read_status != EOF)
+		{
+			if (Q_stricmp(zyk_parse_ip(tmpIP), content) == 0)
+			{
+				fclose(ban_file);
+
+				return "Banned.";
+			}
+
+			file_read_status = fscanf(ban_file, "%s", content);
+		}
+
+		fclose(ban_file);
 	}
 
 	if ( !isBot && g_needpass.integer ) {
