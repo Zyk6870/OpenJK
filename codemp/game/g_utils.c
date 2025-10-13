@@ -1633,7 +1633,7 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 			}
 			else
 			{
-				trap->SendServerCommand(ent->s.number, "cp \"Not enough Blue Crystals to call your Spirit Tree\n\"");
+				trap->SendServerCommand(ent->s.number, "cp \"Not enough Item-Making Energy to call your Spirit Tree\n\"");
 			}
 		}
 		else if (ent->client->pers.selected_ability > SELECTED_ABILITY_NONE)
