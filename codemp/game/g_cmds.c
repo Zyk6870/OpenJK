@@ -2811,6 +2811,9 @@ G_Say
 
 static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message, char *locMsg )
 {
+	FILE* word_file = NULL;
+	char content[MAX_STRING_CHARS];
+
 	if (!other) {
 		return;
 	}
@@ -2853,6 +2856,29 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
 		(ent->s.number >= 31 && level.ignored_players[other->s.number][1] & (1 << (ent->s.number - 31))))
 	{
 		return;
+	}
+
+	strcpy(content, "");
+
+	word_file = fopen("zykmod/wordlist.txt", "r");
+	if (word_file != NULL)
+	{
+		while (fgets(content, sizeof(content), word_file) != NULL)
+		{
+			if (content[strlen(content) - 1] == '\n')
+				content[strlen(content) - 1] = '\0';
+
+			// zyk: player message contains a word or sentence that is not allowed
+			if (strstr(message, G_NewString(content)))
+			{
+				fclose(word_file);
+
+				trap->SendServerCommand(ent->s.number, "print \"Your message contains a word or sentence that is not allowed in this server.\n\"");
+				return;
+			}
+		}
+
+		fclose(word_file);
 	}
 
 	if (locMsg)
@@ -9524,6 +9550,91 @@ void Cmd_Silence_f( gentity_t *ent ) {
 	}
 }
 
+/*
+==================
+Cmd_WordFilter_f
+==================
+*/
+void Cmd_WordFilter_f(gentity_t* ent)
+{
+	char arg[MAX_STRING_CHARS];
+	char content[MAX_STRING_CHARS];
+	qboolean found_the_word = qfalse;
+
+	const char* word_file_name = "zykmod/wordlist.txt"; 
+	const char* temp_word_file_name = "zykmod/tempwordlist.txt";
+
+	FILE* word_file = NULL;
+	FILE* temp_word_file = NULL;
+
+	if (!(ent->client->pers.bitvalue & (1 << ADM_WORDFILTER)))
+	{ // zyk: admin command
+		trap->SendServerCommand(ent->s.number, "print \"You don't have this admin command.\n\"");
+		return;
+	}
+
+	if (trap->Argc() < 2)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"You must specify a word or sentence.\n\""));
+		return;
+	}
+
+	trap->Argv(1, arg, sizeof(arg));
+
+	strcpy(content, "");
+
+	word_file = fopen(word_file_name, "r");
+	temp_word_file = fopen(temp_word_file_name, "w");
+
+	if (word_file != NULL && temp_word_file != NULL)
+	{
+		while (fgets(content, sizeof(content), word_file) != NULL)
+		{
+			if (content[strlen(content) - 1] == '\n')
+				content[strlen(content) - 1] = '\0';
+
+			// zyk: write everything into the temp file except the word we want to remove
+			if (Q_stricmp(arg, content) != 0)
+			{
+				fprintf(temp_word_file, "%s\n", content);
+			}
+			else
+			{
+				found_the_word = qtrue;
+			}
+		}
+
+		fclose(word_file);
+	}
+
+	if (temp_word_file != NULL)
+	{
+		// zyk: did not find the word. It means we must add it to the file
+		if (found_the_word == qfalse)
+		{
+			fprintf(temp_word_file, "%s\n", arg);
+		}
+
+		fclose(temp_word_file);
+
+		if (word_file != NULL)
+		{
+			remove(word_file_name);
+		}
+
+		rename(temp_word_file_name, word_file_name);
+
+		if (found_the_word == qfalse)
+		{
+			trap->SendServerCommand(ent->s.number, "print \"Added it to list.\n\"");
+		}
+		else
+		{
+			trap->SendServerCommand(ent->s.number, "print \"Removed it from list.\n\"");
+		}
+	}
+}
+
 char* zyk_get_admin_command_description(zyk_admin_t admin_value)
 {
 	char* admin_descriptions[ADM_NUM_CMDS];
@@ -9535,6 +9646,7 @@ char* zyk_get_admin_command_description(zyk_admin_t admin_value)
 	admin_descriptions[ADM_ADMPROTECT] = "Admin Protect";
 	admin_descriptions[ADM_ENTITYSYSTEM] = "Entity System";
 	admin_descriptions[ADM_SILENCE] = "Silence";
+	admin_descriptions[ADM_WORDFILTER] = "Word Filter";
 	admin_descriptions[ADM_CLIENTPRINT] = "ClientPrint";
 	admin_descriptions[ADM_KICK] = "Kick";
 	admin_descriptions[ADM_PARALYZE] = "Paralyze";
@@ -9605,63 +9717,67 @@ void Cmd_AdminList_f( gentity_t *ent ) {
 
 		if (command_number == ADM_NPC)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/npc spawn <name> ^7to spawn a npc. Use ^3/npc spawn vehicle <name> to spawn a vehicle. Use ^3/npc kill all ^7to kill all npcs\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/npc spawn <name> ^7to spawn a npc. Use ^3/npc spawn vehicle <name> to spawn a vehicle. Use ^3/npc kill all ^7to kill all npcs\n\n\"" );
 		}
 		else if (command_number == ADM_NOCLIP)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/noclip ^7to toggle noclip\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/noclip ^7to toggle noclip\n\n\"" );
 		}
 		else if (command_number == ADM_GIVEADM)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nThis flag allows admins to give or remove admin commands from a player with ^3/adminup <name> <command number> ^7and ^3/admindown <name> <command number>^7. Use ^3/adminlist show <player name or ID> ^7to see admin commands of a player\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nThis flag allows admins to give or remove admin commands from a player with ^3/adminup <name> <command number> ^7and ^3/admindown <name> <command number>^7. Use ^3/adminlist show <player name or ID> ^7to see admin commands of a player\n\n\"" );
 		}
 		else if (command_number == ADM_TELE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nThis command can be ^3/teleport^7 or ^3/tele^7. Use ^3/teleport point ^7to mark a spot in map, then use ^3/teleport ^7to go there. Use ^3/teleport <player name or ID> ^7to teleport to a player. Use ^3/teleport <player name or ID> <player name or ID> ^7to teleport a player to another. Use ^3/teleport <x> <y> <z> ^7to teleport to coordinates. Use ^3/teleport <player name or ID> <x> <y> <z> ^7to teleport a player to coordinates\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nThis command can be ^3/teleport^7 or ^3/tele^7. Use ^3/teleport point ^7to mark a spot in map, then use ^3/teleport ^7to go there. Use ^3/teleport <player name or ID> ^7to teleport to a player. Use ^3/teleport <player name or ID> <player name or ID> ^7to teleport a player to another. Use ^3/teleport <x> <y> <z> ^7to teleport to coordinates. Use ^3/teleport <player name or ID> <x> <y> <z> ^7to teleport a player to coordinates\n\n\"" );
 		}
 		else if (command_number == ADM_ADMPROTECT)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nWith this flag, a player can use Admin Protect option in /settings to protect himself from admin commands\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nWith this flag, a player can use Admin Protect option in /settings to protect himself from admin commands\n\n\"" );
 		}
 		else if (command_number == ADM_ENTITYSYSTEM)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/entitysystem ^7to see the Entity System commands\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/entitysystem ^7to see the Entity System commands\n\n\"" );
 		}
 		else if (command_number == ADM_SILENCE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/silence <player name or ID> ^7to silence that player\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/silence <player name or ID> ^7to silence that player\n\n\"" );
+		}
+		else if (command_number == ADM_WORDFILTER)
+		{
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/wordfilter <word or sentence> ^7to add or remove a word or a sentence from the word filter list. Words in list cannot be said in chat\n\n\"");
 		}
 		else if (command_number == ADM_CLIENTPRINT)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/clientprint <player name or ID, or -1 to show to all players> <message> ^7to print a message in the screen\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/clientprint <player name or ID, or -1 to show to all players> <message> ^7to print a message in the screen\n\n\"" );
 		}
 		else if (command_number == ADM_KICK)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/admkick <player name or ID> ^7to kick a player from the server\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/admkick <player name or ID> ^7to kick a player from the server\n\n\"" );
 		}
 		else if (command_number == ADM_PARALYZE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/paralyze <player name or ID> ^7to paralyze a player. Use it again so the target player will no longer be paralyzed\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/paralyze <player name or ID> ^7to paralyze a player. Use it again so the target player will no longer be paralyzed\n\n\"" );
 		}
 		else if (command_number == ADM_GIVE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/give <player name or ID> <option> ^7to give stuff to a player. Option may be ^3guns ^7or ^3force ^7\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/give <player name or ID> <option> ^7to give stuff to a player. Option may be ^3guns ^7or ^3force ^7\n\n\"" );
 		}
 		else if (command_number == ADM_SCALE)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/scale <player name or ID> <size between 20 and 500> ^7to change the player model size\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/scale <player name or ID> <size between 20 and 500> ^7to change the player model size\n\n\"" );
 		}
 		else if (command_number == ADM_PLAYERS)
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"\nUse ^3/players ^7to see info about the players. Use ^3/players <player name or ID> ^7to see RPG info of a player. Use ^3/players <player name or ID> ^7and a third argument (^3force, misc, magic^7) to see skill levels of the player\n\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/players ^7to see info about the players. Use ^3/players <player name or ID> ^7to see RPG info of a player. Use ^3/players <player name or ID> ^7and a third argument (^3force, misc, magic^7) to see skill levels of the player\n\n\"" );
 		}
 		else if (command_number == ADM_DUELARENA)
 		{
-			trap->SendServerCommand(ent - g_entities, "print \"\nUse ^3/duelarena ^7to set or unset the Duel Tournament arena in this map. The arena is saved automatically. Also, use ^3/duelpause ^7to pause the tournament and use it again to resume it\n\n\"");
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/duelarena ^7to set or unset the Duel Tournament arena in this map. The arena is saved automatically. Also, use ^3/duelpause ^7to pause the tournament and use it again to resume it\n\n\"");
 		}
 		else if (command_number == ADM_CUSTOMQUEST)
 		{
-			trap->SendServerCommand(ent - g_entities, "print \"\nUse ^3/customquest ^7to see commands to manage Custom Quests\n\n\"");
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/customquest ^7to see commands to manage Custom Quests\n\n\"");
 		}
 	}
 	else
@@ -9678,7 +9794,7 @@ void Cmd_AdminList_f( gentity_t *ent ) {
 
 			if (!(ent->client->pers.bitvalue & (1 << ADM_GIVEADM)))
 			{ // zyk: admin command
-				trap->SendServerCommand( ent-g_entities, "print \"You must have GiveAdmin to use this admin command.\n\"" );
+				trap->SendServerCommand(ent->s.number, "print \"You must have GiveAdmin to use this admin command.\n\"" );
 				return;
 			}
 
@@ -9694,7 +9810,7 @@ void Cmd_AdminList_f( gentity_t *ent ) {
 
 			if (player_ent->client->sess.account_mode == ACC_MODE_LOGGED_OUT)
 			{
-				trap->SendServerCommand( ent-g_entities, va("print \"Player %s ^7is not logged in.\n\"", player_ent->client->pers.netname) );
+				trap->SendServerCommand(ent->s.number, va("print \"Player %s ^7is not logged in.\n\"", player_ent->client->pers.netname) );
 				return;
 			}
 
@@ -9703,7 +9819,7 @@ void Cmd_AdminList_f( gentity_t *ent ) {
 		}
 		else
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"Invalid option.\n\"" );
+			trap->SendServerCommand(ent->s.number, "print \"Invalid option.\n\"" );
 		}
 	}
 }
@@ -11721,6 +11837,7 @@ command_t commands[] = {
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			CMD_NOINTERMISSION },
 	{ "vote",				Cmd_Vote_f,					CMD_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				CMD_NOINTERMISSION },
+	{ "wordfilter",			Cmd_WordFilter_f,			CMD_LOGGEDIN | CMD_NOINTERMISSION },
 	{ "zykchars",			Cmd_ZykChars_f,				CMD_LOGGEDIN | CMD_NOINTERMISSION },
 	{ "zyklist",			Cmd_ListAccount_f,			CMD_NOINTERMISSION },
 	{ "zyklogin",			Cmd_LoginAccount_f,			CMD_NOINTERMISSION },
