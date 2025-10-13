@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.3"
+#define	GAMEVERSION	"New Zyk Mod v1.6.4"
 
 #define SECURITY_LOG "security.log"
 
@@ -517,7 +517,6 @@ typedef enum {
 	ADM_CLIENTPRINT,
 	ADM_KICK,
 	ADM_BAN,
-	ADM_UNBAN,
 	ADM_PARALYZE,
 	ADM_GIVE,
 	ADM_SCALE,

@@ -9667,7 +9667,6 @@ char* zyk_get_admin_command_description(zyk_admin_t admin_value)
 	admin_descriptions[ADM_CLIENTPRINT] = "ClientPrint";
 	admin_descriptions[ADM_KICK] = "Kick";
 	admin_descriptions[ADM_BAN] = "Ban";
-	admin_descriptions[ADM_UNBAN] = "Unban";
 	admin_descriptions[ADM_PARALYZE] = "Paralyze";
 	admin_descriptions[ADM_GIVE] = "Give";
 	admin_descriptions[ADM_SCALE] = "Scale";
@@ -9776,11 +9775,7 @@ void Cmd_AdminList_f( gentity_t *ent ) {
 		}
 		else if (command_number == ADM_BAN)
 		{
-			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/admban <player name or ID or IP address> ^7to ban a player from the server\n\n\"");
-		}
-		else if (command_number == ADM_UNBAN)
-		{
-			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/admunban <IP address> ^7to unban a player IP from the server\n\n\"");
+			trap->SendServerCommand(ent->s.number, "print \"\nUse ^3/admban <player name or ID or IP address> ^7to ban a player from the server. Use ^3/admunban <IP address> ^7to unban a player IP from the server. Use ^3/banlist <page number> ^7to see banned IPs\n\n\"");
 		}
 		else if (command_number == ADM_PARALYZE)
 		{
@@ -10116,7 +10111,7 @@ void Cmd_AdmUnBan_f(gentity_t* ent) {
 	FILE* temp_ban_file = NULL;
 	qboolean found_ip_address = qfalse;
 
-	if (!(ent->client->pers.bitvalue & (1 << ADM_UNBAN)))
+	if (!(ent->client->pers.bitvalue & (1 << ADM_BAN)))
 	{ // zyk: admin command
 		trap->SendServerCommand(ent->s.number, "print \"You don't have this admin command.\n\"");
 		return;
@@ -10165,6 +10160,70 @@ void Cmd_AdmUnBan_f(gentity_t* ent) {
 		{
 			trap->SendServerCommand(ent->s.number, "print \"IP address not found on banlist.\n\"");
 		}
+	}
+}
+
+/*
+==================
+Cmd_Banlist_f
+==================
+*/
+void Cmd_Banlist_f(gentity_t* ent) {
+	char arg1[MAX_STRING_CHARS];
+	char content[MAX_STRING_CHARS];
+	char file_content[MAX_STRING_CHARS];
+	FILE* ban_file = NULL;
+	int results_per_page = zyk_list_cmds_results_per_page.integer; // zyk: number of results per page
+	int page = 0;
+	int i = 0;
+
+	if (!(ent->client->pers.bitvalue & (1 << ADM_BAN)))
+	{ // zyk: admin command
+		trap->SendServerCommand(ent->s.number, "print \"You don't have this admin command.\n\"");
+		return;
+	}
+
+	if (trap->Argc() != 2)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"You must specify a page number. Example: ^3/banlist 1\n\"");
+		return;
+	}
+
+	trap->Argv(1, arg1, sizeof(arg1));
+
+	page = atoi(arg1);
+
+	if (page == 0)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Invalid page number\n\"");
+		return;
+	}
+
+	ban_file = fopen("zykmod/banlist.txt", "r");
+	if (ban_file != NULL)
+	{
+		strcpy(content, "");
+		strcpy(file_content, "");
+
+		while (i < (results_per_page * (page - 1)) && fgets(content, sizeof(content), ban_file) != NULL)
+		{ // zyk: reads the file until it reaches the position corresponding to the page number
+			i++;
+		}
+
+		while (i < (results_per_page * page) && fgets(content, sizeof(content), ban_file) != NULL)
+		{ // zyk: fgets returns NULL at EOF
+			strcpy(file_content, va("%s%s", file_content, content));
+			i++;
+		}
+
+		fclose(ban_file);
+
+		trap->SendServerCommand(ent->s.number, va("print \"\n%s\n\"", file_content));
+	}
+	else
+	{
+		trap->SendServerCommand(ent->s.number, "print \"The banlist file does not exist\n\"");
+		return;
 	}
 }
 
@@ -11921,6 +11980,7 @@ command_t commands[] = {
 	{ "allychat",			Cmd_AllyChat_f,				CMD_NOINTERMISSION },
 	{ "allylist",			Cmd_AllyList_f,				CMD_NOINTERMISSION },
 	{ "allyremove",			Cmd_AllyRemove_f,			CMD_NOINTERMISSION },
+	{ "banlist",			Cmd_Banlist_f,				CMD_LOGGEDIN | CMD_NOINTERMISSION },
 	{ "bountyquest",		Cmd_BountyQuest_f,			CMD_RPG|CMD_NOINTERMISSION },
 	{ "callteamvote",		Cmd_CallTeamVote_f,			CMD_NOINTERMISSION },
 	{ "callvote",			Cmd_CallVote_f,				CMD_NOINTERMISSION },
