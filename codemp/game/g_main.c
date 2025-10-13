@@ -6756,8 +6756,6 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_CLOAK] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 300;
 
-	rpg_inventory_weights[RPG_INVENTORY_MISC_FUEL] = 1;
-
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 10;
@@ -6781,9 +6779,14 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
+
 	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_QUEST_LOG] = 50;
+
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 200;
+
+	rpg_inventory_weights[RPG_INVENTORY_MISC_FUEL] = 1;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 7;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 20;

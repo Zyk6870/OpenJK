@@ -328,6 +328,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
 
 	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "Fuel";
+	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "Medpack";
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
@@ -568,17 +569,21 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Fuel used by the Jetpack and the Flame Thrower\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
+	else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 health. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+	}
 	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you immune to force powers for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you immune to force powers for a short time. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time. Use with ^3/list inv use %d\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 }
 
@@ -648,6 +653,7 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
 
 	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "inventoryFuel";
+	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "inventoryMedpack";
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "inventoryShieldBooster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "inventoryYsalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "inventoryForceBoon";
@@ -6601,6 +6607,9 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_MISC_FUEL][0] = 3;
 	seller_items_cost[RPG_INVENTORY_MISC_FUEL][1] = 1;
 
+	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][0] = 40;
+	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][1] = 20;
+
 	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][0] = 50;
 	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][1] = 20;
 
@@ -6843,6 +6852,28 @@ int zyk_number_of_enemies_in_map()
 	return total_enemies;
 }
 
+void zyk_add_health(gentity_t* ent, int heal_amount)
+{
+	if (ent && ent->client)
+	{
+		int max_health = ent->client->ps.stats[STAT_MAX_HEALTH];
+
+		if (ent->client->sess.account_mode == ACC_MODE_RPG)
+		{ // zyk: a RPG player, not a npc
+			max_health = ent->client->pers.max_rpg_health;
+		}
+
+		if ((ent->health + heal_amount) < max_health)
+		{
+			ent->health += heal_amount;
+		}
+		else
+		{
+			ent->health = max_health;
+		}
+	}
+}
+
 void zyk_set_light_source(gentity_t* ent, qboolean activate_light_source)
 {
 	if (activate_light_source == qtrue)
@@ -6925,6 +6956,14 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	{
 		zyk_energy_modulator(ent);
 	}
+	else if (item_index == RPG_INVENTORY_MISC_MEDPACK && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MEDPACK] > 0)
+	{
+		zyk_add_health(ent, 25);
+
+		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickuphealth.mp3"));
+	}
 	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_SHIELD_BOOSTER] > 0)
 	{
 		if ((ent->client->ps.stats[STAT_ARMOR] + 25) < ent->client->pers.max_rpg_shield)
@@ -6938,7 +6977,7 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 
 		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
 
-		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupshield.mp3"));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_YSALAMIRI] > 0)
 	{
@@ -7117,7 +7156,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							{
 								zyk_use_inventory_item(ent, item_index);
 							}
-							else if (item_index >= RPG_INVENTORY_MISC_SHIELD_BOOSTER && item_index <= RPG_INVENTORY_MISC_FORCE_BOON)
+							else if (item_index >= RPG_INVENTORY_MISC_MEDPACK && item_index <= RPG_INVENTORY_MISC_FORCE_BOON)
 							{ // zyk: these items can be used
 								zyk_use_inventory_item(ent, item_index);
 							}
@@ -7126,7 +7165,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 								trap->SendServerCommand(ent->s.number, va("print \"Item number must be %d, or between %d and %d, or between %d and %d\n\"", 
 									(RPG_INVENTORY_ITEM_SEEKER_DRONE + 1),
 									(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_EXPLOSIVE + 1),
-									(RPG_INVENTORY_MISC_SHIELD_BOOSTER + 1), (RPG_INVENTORY_MISC_FORCE_BOON + 1)));
+									(RPG_INVENTORY_MISC_MEDPACK + 1), (RPG_INVENTORY_MISC_FORCE_BOON + 1)));
 							}
 						}
 					}
@@ -7268,28 +7307,6 @@ void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add)
 		else
 		{
 			ent->client->pers.magic_power = 0;
-		}
-	}
-}
-
-void zyk_add_health(gentity_t* ent, int heal_amount)
-{
-	if (ent && ent->client)
-	{
-		int max_health = ent->client->ps.stats[STAT_MAX_HEALTH];
-
-		if (ent->client->sess.account_mode == ACC_MODE_RPG)
-		{ // zyk: a RPG player, not a npc
-			max_health = ent->client->pers.max_rpg_health;
-		}
-
-		if ((ent->health + heal_amount) < max_health)
-		{
-			ent->health += heal_amount;
-		}
-		else
-		{
-			ent->health = max_health;
 		}
 	}
 }
