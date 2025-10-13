@@ -6787,7 +6787,6 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 7;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 20;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_FLASHLIGHT] = 5;
 
 	if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -7298,6 +7297,7 @@ extern void duel_show_table(gentity_t *ent);
 extern void WP_DisruptorAltFire(gentity_t *ent);
 extern void G_Kill( gentity_t *ent );
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
+extern void zyk_set_light_source(gentity_t* ent, qboolean activate_light_source);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void WP_FireMelee(gentity_t* ent, qboolean alt_fire);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
@@ -8902,13 +8902,12 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_USING_FLASHLIGHT) && ent->client->pers.flashlight_timer < level.time)
-				{ // zyk: using the flashlight
+				{ // zyk: using the Stun Baton light source
 					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
 
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] <= 0)
 					{
-						ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_USING_FLASHLIGHT);
-						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/sub_select.mp3"));
+						zyk_set_light_source(ent, qfalse);
 					}
 					else
 					{
