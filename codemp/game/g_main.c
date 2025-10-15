@@ -5608,7 +5608,7 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
 				{
-					int damage = MAGIC_MIN_DMG + (magic_bonus * 2) + (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 2);
+					int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME];
 
 					lightning_dome(ent, damage);
 
