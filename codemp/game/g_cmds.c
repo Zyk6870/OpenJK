@@ -10712,10 +10712,10 @@ Cmd_Magic_f
 int zyk_get_magic_cost(int magic_number)
 {
 	int magic_costs[MAX_MAGIC_POWERS] = {
-		20, // Dome of Damage
-		20, // Water Magic
-		20, // Fire Strength
-		20  // Lightning Dome
+		20,
+		20,
+		20,
+		20
 	};
 
 	return magic_costs[magic_number];

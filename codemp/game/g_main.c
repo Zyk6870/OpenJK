@@ -5603,7 +5603,7 @@ void magic_power_events(gentity_t *ent)
 				{
 					zyk_mp_usage(ent, SKILL_LIGHTNING_DOME);
 
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_lightning", "0", "howler/sonic", 0, 0, 0, 400);
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_lightning", "0", "howler/sonic", 0, 0, 0, 300);
 				}
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
@@ -5614,7 +5614,7 @@ void magic_power_events(gentity_t *ent)
 
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 5000 - (magic_bonus * 50) - (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 90);
+					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 5000 - (magic_bonus * 50) - (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 50);
 				}
 			}
 
