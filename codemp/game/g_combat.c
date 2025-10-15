@@ -4767,7 +4767,7 @@ qboolean zyk_is_magic_power(gentity_t* inflictor)
 // zyk: tests if this ability can damage anything
 qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *inflictor, int mod)
 {
-	if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG)
+	if (attacker && attacker->client && (attacker->client->sess.account_mode == ACC_MODE_RPG || attacker->NPC))
 	{
 		if ((mod == MOD_ROCKET || mod == MOD_ROCKET_HOMING || mod == MOD_ROCKET_SPLASH || mod == MOD_ROCKET_HOMING_SPLASH) && 
 			attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0 && 
@@ -4785,7 +4785,7 @@ qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *infl
 
 		// zyk: Magic Fist at max level
 		if (zyk_is_magic_fist(mod, inflictor) == qtrue &&
-			attacker->client->pers.skill_levels[SKILL_MAGIC_FIST] == zyk_max_skill_level(SKILL_MAGIC_FIST))
+			attacker->client->pers.skill_levels[SKILL_MAGIC_FIST] >= zyk_max_skill_level(SKILL_MAGIC_FIST))
 		{
 			return qtrue;
 		}
@@ -5757,7 +5757,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	}
 
 	// zyk: Magic Fist can disable jetpacks
-	if (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2 && client)
+	if (zyk_is_magic_fist(mod, inflictor) == qtrue && client)
 	{
 		if (client->jetPackOn)
 		{ //disable jetpack temporarily
@@ -6496,9 +6496,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							zyk_add_health(ent, heal_amount);
 
 							healing_circle_status_restoration(ent, heal_amount * 100);
-
-							zyk_quest_effect_spawn(magic_power_user, ent, "zyk_magic_healing", "0", "env/waterfall_splash", 0, 0, 0, 500);
-							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/footsteps/water_wade_01.mp3"));
 						}
 
 						continue;

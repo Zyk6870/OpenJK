@@ -556,7 +556,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 
 	max_levels[QUEST_NPC_NONE] = 0;
 
-	max_levels[QUEST_NPC_MAGE_MASTER] = 20;
+	max_levels[QUEST_NPC_MAGE_MASTER] = 15;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 10;
 	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 10;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_GUNS] = 0;
