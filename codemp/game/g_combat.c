@@ -4718,11 +4718,12 @@ zyk_magic_t zyk_get_magic_for_effect(char* effect_name)
 {
 	int i = 0;
 
-	char* magic_powers_effects[MAX_MAGIC_POWERS] = {
+	char* magic_powers_effects[MAX_MAGIC_POWERS + 1] = {
 		"zyk_magic_defensive",
 		"zyk_magic_healing",
 		"zyk_magic_chaos",
-		"zyk_magic_lightning"
+		"zyk_magic_lightning",
+		""
 	};
 
 	zyk_magic_t magic_powers[MAX_MAGIC_POWERS] =
@@ -4756,7 +4757,7 @@ qboolean zyk_is_magic_fist(int mod, gentity_t* inflictor)
 
 qboolean zyk_is_magic_power(gentity_t* inflictor)
 {
-	if (inflictor && !inflictor->client && zyk_get_magic_for_effect(inflictor->targetname) > -1)
+	if (inflictor && !inflictor->client && inflictor->targetname != NULL && zyk_get_magic_for_effect(inflictor->targetname) > -1)
 	{
 		return qtrue;
 	}
@@ -5022,8 +5023,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
-	if ((mod == MOD_DEMP2 || (mod == MOD_MELEE && inflictor && inflictor->s.weapon == WP_DEMP2)) && targ && targ->inuse && targ->client)
-	{ // zyk: added the MOD_MELEE condition because of Magic Master Electric Bolts
+	if ((mod == MOD_DEMP2 || zyk_is_magic_fist(mod, inflictor) == qtrue) && targ && targ->inuse && targ->client)
+	{ // zyk: added the Magic Fist condition
 		if ( targ->client->ps.electrifyTime < level.time )
 		{//electrocution effect
 			if (targ->s.eType == ET_NPC && targ->s.NPC_class == CLASS_VEHICLE &&
@@ -6341,16 +6342,19 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 void zyk_remove_emotes(gentity_t* ent)
 {
 	// zyk: removing emotes to prevent exploits
-	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_EMOTE))
+	if (ent && ent->client)
 	{
-		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_EMOTE);
-		ent->client->ps.forceHandExtendTime = level.time;
-	}
+		if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_EMOTE))
+		{
+			ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_EMOTE);
+			ent->client->ps.forceHandExtendTime = level.time;
+		}
 
-	// zyk: if using Meditate taunt, remove it
-	if (ent->client->ps.legsAnim == BOTH_MEDITATE && ent->client->ps.torsoAnim == BOTH_MEDITATE)
-	{
-		ent->client->ps.legsAnim = ent->client->ps.torsoAnim = BOTH_MEDITATE_END;
+		// zyk: if using Meditate taunt, remove it
+		if (ent->client->ps.legsAnim == BOTH_MEDITATE && ent->client->ps.torsoAnim == BOTH_MEDITATE)
+		{
+			ent->client->ps.legsAnim = ent->client->ps.torsoAnim = BOTH_MEDITATE_END;
+		}
 	}
 }
 
@@ -6533,11 +6537,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						{
 							int chaos_chance = final_damage;
 
-							zyk_remove_emotes(ent);
-
 							if (Q_irand(0, 99) < chaos_chance && ent->client)
 							{
 								zyk_rpg_status_t random_bad_status = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
+
+								zyk_remove_emotes(ent);
 
 								zyk_set_rpg_status(ent, random_bad_status, chaos_chance * 1000, qtrue);
 							}

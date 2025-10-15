@@ -5603,7 +5603,7 @@ void magic_power_events(gentity_t *ent)
 				{
 					zyk_mp_usage(ent, SKILL_LIGHTNING_DOME);
 
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_lightning", "0", "howler/sonic", 0, 0, 0, 300);
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_lightning", "0", "howler/sonic", 0, 0, 0, 350);
 				}
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
