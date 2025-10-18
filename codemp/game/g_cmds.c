@@ -11512,7 +11512,24 @@ Cmd_Tutorial_f
 ==================
 */
 void Cmd_Tutorial_f(gentity_t *ent) {
-	ent->client->pers.tutorial_step = 1;
+	char arg1[MAX_STRING_CHARS];
+
+	strcpy(arg1, "");
+
+	if (trap->Argc() > 1)
+	{
+		trap->Argv(1, arg1, sizeof(arg1));
+	}
+
+	if (Q_stricmp(arg1, "stop") == 0)
+	{
+		ent->client->pers.tutorial_step = 24;
+	}
+	else
+	{
+		ent->client->pers.tutorial_step = 1;
+	}
+	
 	ent->client->pers.tutorial_timer = level.time + 1000;
 }
 

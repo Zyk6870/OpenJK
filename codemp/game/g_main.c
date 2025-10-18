@@ -6899,7 +6899,7 @@ void zyk_show_tutorial(gentity_t* ent)
 {
 	if (ent->client->pers.tutorial_step == 1)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. I am the %s. I will explain everything you need to know.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname, QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. I am the %s. I will explain everything you need to know. Use ^3/tutorial stop ^7to stop the tutorial.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname, QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 2)
 	{
