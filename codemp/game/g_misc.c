@@ -2827,14 +2827,6 @@ void fx_runner_think( gentity_t *ent )
 			{ // zyk: a logged RPG player
 				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < QUEST_ITEM_DISTANCE)
 				{
-					if (!(player_ent->client->pers.tutorial_shown & (1 << TUTORIAL_QUEST_ITEMS)))
-					{
-						player_ent->client->pers.tutorial_shown |= (1 << TUTORIAL_QUEST_ITEMS);
-
-						player_ent->client->pers.tutorial_step = TUTORIAL_QUEST_ITEMS_START;
-						player_ent->client->pers.tutorial_timer = level.time + 1000;
-					}
-
 					if (Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0 &&
 						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0 &&
 						level.legendary_artifact_step == QUEST_SECRET_INIT_STEP)

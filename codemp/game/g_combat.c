@@ -6548,14 +6548,6 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							}
 						}
 
-						if (ent->client && !(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)))
-						{
-							ent->client->pers.tutorial_shown |= (1 << TUTORIAL_MAGIC);
-
-							ent->client->pers.tutorial_step = TUTORIAL_MAGIC_START;
-							ent->client->pers.tutorial_timer = level.time + 1000;
-						}
-
 						if (final_damage > 0)
 						{
 							G_Damage(ent, attacker, magic_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);

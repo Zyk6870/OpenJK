@@ -6897,126 +6897,103 @@ void zyk_calculate_current_weight(gentity_t* ent)
 
 void zyk_show_tutorial(gentity_t* ent)
 {
-	if (ent->client->pers.tutorial_step >= TUTORIAL_NEW_CHAR_START && ent->client->pers.tutorial_step <= TUTORIAL_NEW_CHAR_END)
+	if (ent->client->pers.tutorial_step == 1)
 	{
-		if (ent->client->pers.tutorial_step == TUTORIAL_NEW_CHAR_START)
-		{
-			
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 1))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. I will explain everything you need to know.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 2))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info. From there you can find all other commands.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 3))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: I am here because I need your help! Use ^3/list quests^7 too see all info you need to help me.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_NEW_CHAR_START + 4))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Use ^3/tutorial ^7if you need all this information again.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname));
-		}
-
-		ent->client->pers.tutorial_step++;
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. I am the %s. I will explain everything you need to know.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname, QUESTCHAR_MAIN));
 	}
-	else if (ent->client->pers.tutorial_step >= TUTORIAL_STAMINA_START && ent->client->pers.tutorial_step <= TUTORIAL_STAMINA_END)
+	else if (ent->client->pers.tutorial_step == 2)
 	{
-		if (ent->client->pers.tutorial_step == TUTORIAL_STAMINA_START)
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Doing actions decrease stamina. It is the blue bar at the right of your screen.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_STAMINA_START + 1))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^2Meditate ^7to regen Stamina, Force Points and Magic Points. If Stamina runs out, you faint for some seconds.\n\"", QUESTCHAR_MAIN));
-		
-			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
-			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
-		}
-
-		ent->client->pers.tutorial_step++;
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info. From there you can find all other commands.\n\"", QUESTCHAR_MAIN));
 	}
-	else if (ent->client->pers.tutorial_step >= TUTORIAL_INVENTORY_START && ent->client->pers.tutorial_step <= TUTORIAL_INVENTORY_END)
+	else if (ent->client->pers.tutorial_step == 3)
 	{
-		if (ent->client->pers.tutorial_step == TUTORIAL_INVENTORY_START)
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list inventory^7. Everything you pickup up is stored there. Each inventory page shows 10 items.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 1))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over max weight, run speed will decrease and Stamina will decrease faster.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 2))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can make inventory items. It will require Nature Energy, which is gained by having Blue Crystals.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 3))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or get melee to drop items. Use ^3/jetpack ^7to drop your jetpack.\n\"", QUESTCHAR_MAIN));
-		
-			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
-			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
-		}
-
-		ent->client->pers.tutorial_step++;
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can upgrade skills listed in 3 categories: ^3/list force^7, ^3/list misc^7, ^3/list magic^7.\n\"", QUESTCHAR_MAIN));
 	}
-	else if (ent->client->pers.tutorial_step >= TUTORIAL_QUEST_ITEMS_START && ent->client->pers.tutorial_step <= TUTORIAL_QUEST_ITEMS_END)
+	else if (ent->client->pers.tutorial_step == 4)
 	{
-		if (ent->client->pers.tutorial_step == TUTORIAL_QUEST_ITEMS_START)
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use Blue Crystals to upgrade skills. I randomly place some in the map. Enemies defeated have a chance to drop them.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 1))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list force^7 or ^3/list misc ^7or ^3/list magic ^7to see skills. It also show commands to upgrade them.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 2))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Upgrading skills from a category (force, misc, magic) increases that category affinity.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 3))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Force Affinity increases your Max Force points, Force regen rate and Saber damage.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 4))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Misc Affinity increases Stamina regen rate, Run Speed and Max Weight.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_QUEST_ITEMS_START + 5))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Affinity increases Magic Powers strength, Magic Fist damage, Max MP, MP regen rate when meditating and stamina usage for active magic.\n\"", QUESTCHAR_MAIN));
-		
-			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
-			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
-		}
-
-		ent->client->pers.tutorial_step++;
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/up <number> ^7to upgrade a skill. It requires Nature Energy. Skills increase affinity to that skill category.\n\"", QUESTCHAR_MAIN));
 	}
-	else if (ent->client->pers.tutorial_step >= TUTORIAL_MAGIC_START && ent->client->pers.tutorial_step <= TUTORIAL_MAGIC_END)
+	else if (ent->client->pers.tutorial_step == 6)
 	{
-		if (ent->client->pers.tutorial_step == TUTORIAL_MAGIC_START)
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: That was a Magic Power! You can learn them too.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_MAGIC_START + 1))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <skill number>^7.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_MAGIC_START + 2))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need MP (Magic Points) to cast magic. When you upgrade Magic skills, your max MP increases.\n\"", QUESTCHAR_MAIN));
-		}
-		else if (ent->client->pers.tutorial_step == (TUTORIAL_MAGIC_START + 3))
-		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by meditating or using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
-		
-			ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
-			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
-		}
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Force Affinity increases your Max Force points, Force regen rate and Saber damage.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 7)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Misc Affinity increases Stamina regen rate, Run Speed and Max Weight.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 8)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Affinity increases Magic Powers strength, Magic Fist damage, Max MP, MP regen rate when meditating and stamina usage for active magic.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 9)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Nature Energy is required to upgrade skills and create items in your inventory.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 10)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Everything you collect in map is stored in your inventory. Use ^3/list inv ^7to see it.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 11)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Everything you collect in map is stored in your inventory. Use ^3/list inv ^7to see it.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 12)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To make or unmake inventory items, use ^3/itemmake <number> ^7or ^3/itemunmake <number>^7.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 13)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To make or unmake inventory items, use ^3/itemmake <number> ^7or ^3/itemunmake <number>^7.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 14)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over max weight, run speed will decrease and Stamina will decrease faster.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 15)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can either ^3/drop ^7weapons or get melee to drop items. Use ^3/jetpack ^7to drop your jetpack.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 16)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Doing actions decrease stamina. It is the blue bar at the right of your screen.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 17)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^2Meditate ^7to regen Stamina, Force Points and Magic Points. If Stamina runs out, you faint for some seconds.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 18)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <number>^7.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 19)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can also cast magic by pressing Duel key to select a magic power. Press Use key to cast it.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 20)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need MP (Magic Points) to cast magic. When you upgrade Magic skills, your max MP increases.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 21)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by meditating or using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 22)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: I am here because I need your help! Use ^3/list quests^7 too see all info you need to help me.\n\"", QUESTCHAR_MAIN));
+	}
+	else if (ent->client->pers.tutorial_step == 23)
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Use ^3/tutorial ^7if you need all this information again.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname));
+	}
 
-		ent->client->pers.tutorial_step++;
+	ent->client->pers.tutorial_step++;
+
+	if (ent->client->pers.tutorial_step > 23)
+	{
+		ent->client->pers.tutorial_step = 0;
+
+		ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
+		ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
 	}
 }
 
@@ -8813,7 +8790,7 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				// zyk: tutorial, which teaches the player the RPG Mode features
-				if (ent->client->pers.tutorial_step > TUTORIAL_NONE && ent->client->pers.tutorial_step < MAX_TUTORIAL_STEPS && ent->client->pers.tutorial_timer < level.time)
+				if (ent->client->pers.tutorial_step > 0 && ent->client->pers.tutorial_timer < level.time)
 				{
 					zyk_show_tutorial(ent);
 

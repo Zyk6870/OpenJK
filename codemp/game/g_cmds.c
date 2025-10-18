@@ -2718,11 +2718,6 @@ void load_account(gentity_t* ent)
 					read_status = fscanf(account_file, "%s", content);
 					ent->client->pers.last_stamina = atoi(content);
 				}
-				else if (Q_stricmp(content_type, "tutorial_shown") == 0)
-				{
-					read_status = fscanf(account_file, "%s", content);
-					ent->client->pers.tutorial_shown = atoi(content);
-				}
 
 				if (read_content_type == qtrue)
 				{
@@ -2777,9 +2772,9 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 				strcpy(content, va("%s\n%s\n%d", content, zyk_inventory_key(i), client->pers.rpg_inventory[i]));
 			}
 
-			strcpy(content, va("%s\nquest_progress\n%d\nquest_missions\n%d\nselected_ability\n%d\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d\nlast_stamina\n%d\ntutorial_shown\n%d",
+			strcpy(content, va("%s\nquest_progress\n%d\nquest_missions\n%d\nselected_ability\n%d\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d\nlast_stamina\n%d",
 				content, client->pers.quest_progress, client->pers.quest_missions, client->pers.selected_ability, 
-				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina, client->pers.tutorial_shown));
+				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina));
 
 			// zyk: saving all content into the file
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
@@ -5696,8 +5691,7 @@ void add_new_char(gentity_t *ent)
 	ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_CREATED_ACCOUNT);
 
 	// zyk: starting the tutorial, to help players use the mod features
-	ent->client->pers.tutorial_shown = 0;
-	ent->client->pers.tutorial_step = TUTORIAL_NEW_CHAR_START;
+	ent->client->pers.tutorial_step = 1;
 	ent->client->pers.tutorial_timer = level.time + 1000;
 }
 
@@ -7006,27 +7000,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, "^1Tutorial Quest\n\n^7Main Quest will start after at least one the following tutorials.\nThey will appear when you need them.\n\n");
-
-			if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_STAMINA)))
-			{
-				strcpy(quest_desc, va("%s^3Stamina Tutorial\n", quest_desc));
-			}
-
-			if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_INVENTORY)))
-			{
-				strcpy(quest_desc, va("%s^3Inventory Weight Tutorial\n", quest_desc));
-			}
-
-			if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_MAGIC)))
-			{
-				strcpy(quest_desc, va("%s^3Magic Tutorial\n", quest_desc));
-			}
-
-			if (!(ent->client->pers.tutorial_shown & (1 << TUTORIAL_QUEST_ITEMS)))
-			{
-				strcpy(quest_desc, va("%s^3Quest Items Tutorial\n", quest_desc));
-			}
+			strcpy(quest_desc, "\n\n^7Main Quest will start after the Tutorial.\n");
 
 			trap->SendServerCommand(target_ent->s.number, va("print \"%s\n\"", quest_desc));
 		}
@@ -11538,9 +11512,7 @@ Cmd_Tutorial_f
 ==================
 */
 void Cmd_Tutorial_f(gentity_t *ent) {
-	ent->client->pers.tutorial_shown = 0;
-	ent->client->pers.tutorial_shown |= (1 << TUTORIAL_NEW_CHAR);
-	ent->client->pers.tutorial_step = TUTORIAL_NEW_CHAR_START;
+	ent->client->pers.tutorial_step = 1;
 	ent->client->pers.tutorial_timer = level.time + 1000;
 }
 

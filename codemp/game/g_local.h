@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.20"
+#define	GAMEVERSION	"New Zyk Mod v1.6.21"
 
 #define SECURITY_LOG "security.log"
 
@@ -763,26 +763,6 @@ typedef enum {
 } zyk_quest_mission_t;
 
 typedef enum {
-	TUTORIAL_NONE,
-	TUTORIAL_NEW_CHAR,
-	TUTORIAL_STAMINA,
-	TUTORIAL_INVENTORY,
-	TUTORIAL_QUEST_ITEMS,
-	TUTORIAL_MAGIC,
-	TUTORIAL_NEW_CHAR_START = 10,
-	TUTORIAL_NEW_CHAR_END = 14,
-	TUTORIAL_STAMINA_START = 20,
-	TUTORIAL_STAMINA_END = 21,
-	TUTORIAL_INVENTORY_START = 30,
-	TUTORIAL_INVENTORY_END = 33,
-	TUTORIAL_QUEST_ITEMS_START = 40,
-	TUTORIAL_QUEST_ITEMS_END = 45,
-	TUTORIAL_MAGIC_START = 50,
-	TUTORIAL_MAGIC_END = 53,
-	MAX_TUTORIAL_STEPS
-} zyk_tutorial_t;
-
-typedef enum {
 	SELECTED_ABILITY_NONE,
 	SELECTED_ABILITY_MAGIC_SHIELD,
 	SELECTED_ABILITY_HEALING_CIRCLE,
@@ -849,7 +829,7 @@ typedef enum {
 #define DUEL_TOURNAMENT_PROTECTION_TIME 2000
 
 // zyk: tutorial duration time
-#define TUTORIAL_DURATION 25000
+#define TUTORIAL_DURATION 120000
 
 // zyk: npc cloak detection distance
 #define NPC_CLOAK_DETECTION_DISTANCE 1000
@@ -999,9 +979,8 @@ typedef struct clientPersistant_s {
 	int nature_energy;
 	int nature_energy_timer;
 
-	zyk_tutorial_t tutorial_step; // zyk: sets the current tutorial step, to display the correct message to the player
+	int tutorial_step; // zyk: sets the current tutorial step, to display the correct message to the player
 	int tutorial_timer; // zyk: used by the tutorial to set the interval between messages
-	int tutorial_shown; // zyk: bitvalue, has all tutorials shown to the player
 
 	// zyk: Race Mode. Sets the initial position of this racer which is calculated in racemode command. Default 0. If greater than 0, player joined a race
 	int race_position;
