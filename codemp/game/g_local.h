@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.19"
+#define	GAMEVERSION	"New Zyk Mod v1.6.20"
 
 #define SECURITY_LOG "security.log"
 
@@ -796,9 +796,9 @@ typedef enum {
 #define RPG_MIN_STAMINA 1000.0
 #define RPG_DEFAULT_STAMINA 5000
 
-// zyk: RPG Mode Item-Making Energy
-#define RPG_INITIAL_ITEMMAKING_ENERGY 0
-#define RPG_MAX_ITEMMAKING_ENERGY 50000
+// zyk: RPG Nature Energy
+#define RPG_INITIAL_NATURE_ENERGY 0
+#define RPG_MAX_NATURE_ENERGY 20000
 #define RPG_MAX_BUY_AMOUNT 100
 
 // zyk: cost in Energy to upgrade a skill
@@ -870,8 +870,6 @@ typedef enum {
 #define QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET 4
 #define QUEST_SPIRIT_TREE_RADIUS 50
 #define QUEST_SPIRIT_TREE_CALL_COST 50
-#define QUEST_SPIRIT_TREE_WITHER_RATE 10.0
-#define QUEST_SPIRIT_TREE_REGEN_RATE 50
 #define QUEST_SPIRIT_TREE_SPAWN_TIMER 5000
 #define QUEST_NPC_BONUS_INCREASE 10
 #define QUEST_NPC_SPAWN_TIME 39000

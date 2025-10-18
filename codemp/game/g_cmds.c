@@ -2629,9 +2629,9 @@ void load_account(gentity_t* ent)
 					read_status = fscanf(account_file, "%s", content);
 					ent->client->pers.nature_energy = atoi(content);
 
-					if (ent->client->pers.nature_energy > RPG_MAX_ITEMMAKING_ENERGY)
+					if (ent->client->pers.nature_energy > RPG_MAX_NATURE_ENERGY)
 					{
-						ent->client->pers.nature_energy = RPG_MAX_ITEMMAKING_ENERGY;
+						ent->client->pers.nature_energy = RPG_MAX_NATURE_ENERGY;
 					}
 					else if (ent->client->pers.nature_energy < 0)
 					{
@@ -5036,9 +5036,9 @@ void set_nature_energy(gentity_t *ent, int amount, qboolean add)
 	{
 		ent->client->pers.nature_energy += amount;
 
-		if (ent->client->pers.nature_energy > RPG_MAX_ITEMMAKING_ENERGY)
+		if (ent->client->pers.nature_energy > RPG_MAX_NATURE_ENERGY)
 		{
-			ent->client->pers.nature_energy = RPG_MAX_ITEMMAKING_ENERGY;
+			ent->client->pers.nature_energy = RPG_MAX_NATURE_ENERGY;
 		}
 	}
 	else
@@ -5640,7 +5640,7 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 
 	ent->client->pers.active_inventory_upgrades = 0;
 	ent->client->pers.magic_power = 0;
-	ent->client->pers.nature_energy = RPG_INITIAL_ITEMMAKING_ENERGY;
+	ent->client->pers.nature_energy = RPG_INITIAL_NATURE_ENERGY;
 	ent->client->pers.selected_ability = 0;
 
 	// zyk: in RPG Mode, player must actually buy these
@@ -6415,19 +6415,19 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 		strcpy(message, va("%s^3Stamina: ^2%d/%d\n", message, ent->client->pers.current_stamina, ent->client->pers.max_stamina));
 	}
 
+	if (ent->client->pers.nature_energy < RPG_MAX_NATURE_ENERGY)
+	{
+		strcpy(message, va("%s^3Nature Energy: ^7%d/%d\n", message, ent->client->pers.nature_energy, RPG_MAX_NATURE_ENERGY));
+	}
+	else
+	{
+		strcpy(message, va("%s^3Nature Energy: ^2%d/%d\n", message, ent->client->pers.nature_energy, RPG_MAX_NATURE_ENERGY));
+	}
+
 	strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, rpg_player_speed));
 	strcpy(message, va("%s^3Force Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE)));
 	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MISC)));
 	strcpy(message, va("%s^3Magic Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC)));
-
-	if (ent->client->pers.nature_energy < RPG_MAX_ITEMMAKING_ENERGY)
-	{
-		strcpy(message, va("%s^3Nature Energy: ^7%d\n", message, ent->client->pers.nature_energy));
-	}
-	else
-	{
-		strcpy(message, va("%s^3Nature Energy: ^2%d\n", message, ent->client->pers.nature_energy));
-	}
 
 	trap->SendServerCommand(target_ent->s.number, va("%s\n^7Use ^2/list rpg ^7to see console commands\n\n\"", message));
 }
@@ -6779,7 +6779,7 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 		strcpy(message, va("%s\n^3Weight: ^1%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
 	}
 
-	if (ent->client->pers.nature_energy < RPG_MAX_ITEMMAKING_ENERGY)
+	if (ent->client->pers.nature_energy < RPG_MAX_NATURE_ENERGY)
 	{
 		strcpy(message, va("%s^3Nature Energy: ^7%d\n", message, ent->client->pers.nature_energy));
 	}
@@ -7034,7 +7034,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, va("\n\n^7The Conquerors are attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Tree.\nFully regenerate your tree so it can defeat all enemies.\nThe blue crystals you have will regen it. Meditating inside the Tree makes it regen faster.\nEnemies in the map wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use some Nature Energy to call your Spirit Tree.\nBlue crystals you have make new allies stronger and appear more often.\n\n"));
+			strcpy(quest_desc, va("\n\n^7The Conquerors are attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Tree.\nYou must fully regenerate it to defeat all of them.\nThe Tree regeneration rate is based on the amount of Nature Energy you have.\nMeditate inside the tree to regen it faster.\nEnemies in the map wither the tree based on their numbers.\nMeditate and hold ^2Use ^7key to use some Nature Energy to call your Spirit Tree.\nSometimes allies will come to help.\n\n"));
 
 			trap->SendServerCommand(target_ent->s.number,
 				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",

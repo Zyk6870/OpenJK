@@ -7196,50 +7196,10 @@ void zyk_start_main_quest_spirits_event(gentity_t* ent)
 }
 
 extern void zyk_reset_quest(gentity_t* ent);
-
-int zyk_spirit_tree_wither(float x, float y, float z)
-{
-	int i = 0;
-	int total_decrease = 0;
-	vec3_t tree_origin;
-	gentity_t* npc_ent = NULL;
-
-	VectorSet(tree_origin, x, y, z);
-
-	for (i = (MAX_CLIENTS + BODY_QUEUE_SIZE); i < level.num_entities; i++)
-	{
-		npc_ent = &g_entities[i];
-
-		if (npc_ent && npc_ent->client && npc_ent->NPC && npc_ent->health > 0 &&
-			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
-		{
-			float npc_distance_to_tree = Distance(tree_origin, npc_ent->r.currentOrigin);
-
-			// zyk: quest enemies will make tree wither based on the distance to the tree and their health
-			if (npc_distance_to_tree > 0.0 && npc_distance_to_tree < 1000.0)
-			{
-				total_decrease += (int)ceil((QUEST_SPIRIT_TREE_WITHER_RATE / npc_distance_to_tree) * npc_ent->health);
-			}
-			else if (npc_distance_to_tree <= 0.0)
-			{
-				total_decrease += (npc_ent->health * QUEST_SPIRIT_TREE_WITHER_RATE);
-			}
-
-			// zyk: Mage Masters wither the Tree more
-			if (npc_ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
-			{
-				total_decrease *= 2;
-			}
-		}
-	}
-
-	return total_decrease;
-}
-
 void zyk_spirit_tree_events(gentity_t* ent)
 {
 	gentity_t* tree_ent = NULL;
-	int tree_duration = 2000000000 - level.time; // zyk: a very long duration so the tree will not disappear
+	int tree_duration = 2147480000 - level.time; // zyk: a very long duration so the tree will not disappear
 
 	// zyk: get the Spirit Tree entity or spawn one
 	if (ent->client->pers.quest_spirit_tree_id > -1)
@@ -7248,15 +7208,15 @@ void zyk_spirit_tree_events(gentity_t* ent)
 	}
 	else
 	{
-		int quest_progress_percentage = 0;
+		int quest_progress_percent = 0;
 		int quest_spirit_tree_scale = 0;
 
 		float tree_x = ent->client->ps.origin[0];
 		float tree_y = ent->client->ps.origin[1];
 		float tree_z = ent->client->ps.origin[2];
 
-		quest_progress_percentage = (ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS;
-		quest_spirit_tree_scale = (QUEST_SPIRIT_TREE_DEFAULT_SCALE + quest_progress_percentage) / 2;
+		quest_progress_percent = (ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS;
+		quest_spirit_tree_scale = (QUEST_SPIRIT_TREE_DEFAULT_SCALE + quest_progress_percent) / 2;
 
 		ent->client->pers.quest_spirit_tree_id = zyk_spawn_quest_item(QUEST_ITEM_SPIRIT_TREE, tree_duration, quest_spirit_tree_scale, tree_x, tree_y, tree_z);
 
@@ -7276,29 +7236,23 @@ void zyk_spirit_tree_events(gentity_t* ent)
 		int quest_spirit_tree_scale = 0;
 		int distance_to_tree = Distance(ent->client->ps.origin, tree_ent->s.origin);
 
-		float tree_x = tree_ent->s.origin[0];
-		float tree_y = tree_ent->s.origin[1];
-		float tree_z = tree_ent->s.origin[2];
-
 		if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
 		{
-			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
-				ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
-			{ // zyk: meditating inside the tree
-				quest_progress_change += QUEST_SPIRIT_TREE_REGEN_RATE;
-			}
+			quest_progress_change += (ent->client->pers.nature_energy / 20);
 
 			trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
 		}
-
-		quest_progress_change += 10;
+		else
+		{
+			quest_progress_change += (ent->client->pers.nature_energy / 40);
+		}
 
 		if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 		{ // zyk: Hard Mode
 			quest_progress_change /= 2;
 		}
 
-		quest_progress_change -= zyk_spirit_tree_wither(tree_x, tree_y, tree_z);
+		quest_progress_change -= zyk_number_of_enemies_in_map();
 
 		ent->client->pers.quest_progress += quest_progress_change;
 
@@ -9145,26 +9099,22 @@ void G_RunFrame( int levelTime ) {
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 3)
 								{
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: They are defeated. Nature was unbalanced because of their actions, but now...\n\"",
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: They are defeated. Nature will become balanced again thanks to you.\n\"",
 										QUESTCHAR_MAIN));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 4)
 								{
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: ...it will become balanced again thanks to you.\n\"", QUESTCHAR_MAIN));
+									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+
+									ent->client->pers.nature_energy += 2000;
+
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Receive 2000 Nature Energy! A reward for your efforts.\n\"", QUESTCHAR_MAIN));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 5)
 								{
-									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
-
-									ent->client->pers.nature_energy += 1000;
-
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Receive 1000 Nature Energy! A reward for your efforts.\n\"", QUESTCHAR_MAIN));
-								}
-								else if (ent->client->pers.quest_spirits_event_step == 6)
-								{
 									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now it is my time to go. See you again sometime.\n\"", QUESTCHAR_MAIN));
 								}
-								else if (ent->client->pers.quest_spirits_event_step == 7)
+								else if (ent->client->pers.quest_spirits_event_step == 6)
 								{
 									ent->client->pers.quest_missions |= (1 << MAIN_QUEST_COMPLETED);
 								}
@@ -9172,7 +9122,7 @@ void G_RunFrame( int levelTime ) {
 
 							ent->client->pers.quest_spirits_event_step++;
 
-							if (ent->client->pers.quest_spirits_event_step >= 8)
+							if (ent->client->pers.quest_spirits_event_step >= 7)
 							{
 								ent->client->pers.quest_spirits_event_step = 0;
 							}
