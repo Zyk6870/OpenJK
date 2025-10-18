@@ -3970,28 +3970,11 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	}
 }
 
-int magic_fist_velocity(gentity_t *ent)
-{
-	int magic_bolt_speed = zyk_magic_fist_velocity.integer;
-
-	if (ent->client->pers.active_magic & (1 << MAGIC_MAGIC_SHIELD))
-	{
-		if (ent->client->pers.magic_magic_shield_bonus > (magic_bolt_speed / 2))
-		{
-			ent->client->pers.magic_magic_shield_bonus = magic_bolt_speed / 2;
-		}
-
-		magic_bolt_speed += ent->client->pers.magic_magic_shield_bonus;
-	}
-
-	return magic_bolt_speed;
-}
-
 //---------------------------------------------------------
 // FireMelee
 //---------------------------------------------------------
 extern void rpg_skill_counter(gentity_t *ent, int amount);
-extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
+extern void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target);
 void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 {
 	gentity_t	*tr_ent;
@@ -4021,52 +4004,7 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 	}
 	else
 	{
-		if ((ent->client->sess.account_mode == ACC_MODE_RPG || ent->NPC) && 
-			ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0 && 
-			ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
-		{ // zyk: Magic fist attacks. Shoots an electric bolt
-			gentity_t	*missile;
-			vec3_t origin, dir, zyk_forward;
-			float fist_damage_increase_factor = 1.0;
-			int fist_damage = zyk_magic_fist_damage.integer;
-
-			fist_damage_increase_factor += ((ent->client->pers.skill_levels[SKILL_MAGIC_FIST] * 0.02) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01));
-			fist_damage *= fist_damage_increase_factor;
-
-			if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
-				VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 12);
-			else
-				VectorSet(origin,ent->client->ps.origin[0],ent->client->ps.origin[1],ent->client->ps.origin[2] + 36);
-			
-			VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
-
-			AngleVectors(dir, zyk_forward, NULL, NULL);
-
-			VectorNormalize(zyk_forward);
-
-			missile = CreateMissile(origin, zyk_forward, magic_fist_velocity(ent), 10000, ent, qfalse);
-
-			missile->classname = "demp2_proj";
-			missile->s.weapon = WP_DEMP2;
-
-			VectorSet(missile->r.maxs, 2, 2, 2);
-			VectorScale(missile->r.maxs, -1, missile->r.mins);
-
-			missile->damage = fist_damage;
-
-			missile->dflags = DAMAGE_DEATH_KNOCKBACK;
-			missile->methodOfDeath = MOD_MELEE;
-			missile->clipmask = MASK_SHOT;
-
-			// we don't want it to ever bounce
-			missile->bounceCount = 0;
-
-			rpg_skill_counter(ent, (fist_damage / 10));
-
-			zyk_set_mp(ent, zyk_magic_fist_mp_cost.integer, qfalse);
-
-			G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/demp2/fire.mp3"));
-		}
+		zyk_magic_fist_bolt(ent, qfalse);
 
 		VectorCopy(ent->client->ps.origin, muzzlePunch);
 		muzzlePunch[2] += ent->client->ps.viewheight-6;

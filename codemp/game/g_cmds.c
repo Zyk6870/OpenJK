@@ -204,7 +204,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "Allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level decreases mp usage";
 	if (skill_index == SKILL_MAGIC_SHIELD)
-		return va("A magic shield appears around you, decreasing damage to your health from any source. Some of the damage absorbed is stored to increase Magic Fist shot speed, to a max bonus value of 50 per cent of the normal shot speed. Higher levels and Magic Affinity increase resistance to damage to your health and Magic Fist shot speed bonus. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("A magic shield appears around you, decreasing damage to your health from any source. If you have Magic Fist skill, has a chance to automatically shoot at the nearest target. Higher levels and Magic Affinity increase resistance to damage to your health and also increases chance to shoot Magic Fist more often. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_HEALING_CIRCLE)
 		return va("Restores health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and nearby ally players or npcs. Higher levels and Magic Affinity increase the amount of health restored and decrease bad status effects duration faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_CHAOS_FIELD)
@@ -475,7 +475,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source by 20 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source (except Magic attacks) by 20 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR)
 	{
@@ -5395,7 +5395,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.active_magic = 0;
 
-			ent->client->pers.magic_magic_shield_bonus = 0;
 			ent->client->pers.magic_chaos_field_bonus = 0;
 			ent->client->pers.magic_chaos_field_charge_timer = 0;
 

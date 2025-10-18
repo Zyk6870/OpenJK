@@ -4829,7 +4829,7 @@ qboolean zyk_source_is_non_saber_weapon(int mod, gentity_t* inflictor)
 		mod == MOD_SENTRY || 
 		mod == MOD_TARGET_LASER)
 	{
-		if (zyk_is_magic_fist(mod, inflictor) == qtrue)
+		if (zyk_is_magic_fist(mod, inflictor) == qtrue || zyk_is_magic_power(inflictor) == qtrue)
 		{
 			return qfalse;
 		}
@@ -5986,7 +5986,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			int stamina_loss = 0;
 			int magic_bonus = zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
 
-			// zyk: Protective Vest
+			// zyk: Protective Armor
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] > 0 && 
 				(mod == MOD_SABER || zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue))
 			{
@@ -6026,7 +6026,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 
 			if (targ->client->pers.active_magic & (1 << MAGIC_MAGIC_SHIELD))
-			{ // zyk: target using Magic Shield
+			{
 				bonus_health_resistance += (0.025f * (targ->client->pers.skill_levels[SKILL_MAGIC_SHIELD] + magic_bonus));
 			}
 			
@@ -6036,11 +6036,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (take < 1)
 			{ // zyk: cannot make player fully absorb all damage
 				take = 1;
-			}
-
-			if (targ->client->pers.active_magic & (1 << MAGIC_MAGIC_SHIELD))
-			{ // zyk: Magic Shield absorbs damage taken
-				targ->client->pers.magic_magic_shield_bonus += ((int)ceil(take * (magic_bonus + targ->client->pers.skill_levels[SKILL_MAGIC_SHIELD]) * 0.05f));
 			}
 
 			// zyk: damage to health also makes RPG player lose Stamina

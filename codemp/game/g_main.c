@@ -5281,6 +5281,7 @@ void clear_special_power_effect(gentity_t* ent)
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern void initialize_rpg_skills(gentity_t* ent, qboolean init_all);
+extern void rpg_skill_counter(gentity_t* ent, int amount);
 
 qboolean zyk_is_bad_status_effect(zyk_rpg_status_t rpg_status)
 {
@@ -5374,8 +5375,6 @@ void zyk_status_effects(gentity_t* ent)
 // zyk: Magic Shield
 void magic_shield(gentity_t* ent)
 {
-	ent->client->pers.magic_magic_shield_bonus = 0;
-
 	ent->client->pers.active_magic |= (1 << MAGIC_MAGIC_SHIELD);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SHIELD] = 100;
 
@@ -5466,6 +5465,75 @@ void magic_lightning_dome(gentity_t* ent)
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 500;
 }
 
+int magic_fist_velocity(gentity_t* ent)
+{
+	int magic_bolt_speed = zyk_magic_fist_velocity.integer;
+
+	return magic_bolt_speed;
+}
+
+// zyk: Magic Fist. RPG players with Magic Fist skill can shoot electric bolts. If shoot_nearest_target is qtrue, try to shoot at lookTarget entity instead of shooting forward
+void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target)
+{
+	if (ent && ent->client && (ent->client->sess.account_mode == ACC_MODE_RPG || ent->NPC) &&
+		ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0 &&
+		ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
+	{
+		gentity_t* missile;
+		vec3_t origin, dir, zyk_forward;
+		float fist_damage_increase_factor = 1.0;
+		int fist_damage = zyk_magic_fist_damage.integer;
+
+		fist_damage_increase_factor += ((ent->client->pers.skill_levels[SKILL_MAGIC_FIST] * 0.02) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01));
+		fist_damage *= fist_damage_increase_factor;
+
+		if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
+			VectorSet(origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 12);
+		else
+			VectorSet(origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 36);
+
+		if (shoot_at_nearest_target == qtrue && ent->client->ps.hasLookTarget == qtrue)
+		{ // zyk: shoot at nearest target
+			gentity_t* target_ent = &g_entities[ent->client->ps.lookTarget];
+
+			if (target_ent && target_ent->client)
+			{
+				VectorSubtract(target_ent->client->ps.origin, origin, zyk_forward);
+			}
+		}
+		else
+		{ // zyk: shoot forward
+			VectorSet(dir, ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0);
+			AngleVectors(dir, zyk_forward, NULL, NULL);
+		}
+
+		VectorNormalize(zyk_forward);
+
+		missile = CreateMissile(origin, zyk_forward, magic_fist_velocity(ent), 10000, ent, qfalse);
+
+		missile->classname = "demp2_proj";
+		missile->s.weapon = WP_DEMP2;
+
+		VectorSet(missile->r.maxs, 2, 2, 2);
+		VectorScale(missile->r.maxs, -1, missile->r.mins);
+
+		missile->damage = fist_damage;
+
+		missile->dflags = DAMAGE_DEATH_KNOCKBACK;
+		missile->methodOfDeath = MOD_MELEE;
+		missile->clipmask = MASK_SHOT;
+
+		// we don't want it to ever bounce
+		missile->bounceCount = 0;
+
+		rpg_skill_counter(ent, (fist_damage / 10));
+
+		zyk_set_mp(ent, zyk_magic_fist_mp_cost.integer, qfalse);
+
+		G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/demp2/fire.mp3"));
+	}
+}
+
 void zyk_stop_magic_power(gentity_t* ent, zyk_magic_t magic_number)
 {
 	ent->client->pers.active_magic &= ~(1 << magic_number);
@@ -5537,6 +5605,13 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SHIELD] < level.time)
 				{
+					int chance_for_magic_fist = magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_SHIELD];
+
+					if (Q_irand(0, 99) < chance_for_magic_fist && ent->client->ps.hasLookTarget == qtrue)
+					{
+						zyk_magic_fist_bolt(ent, qtrue);
+					}
+
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_defensive", "0", "misc/genrings", 0, 0, 0, 400);
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SHIELD] = level.time + 300;
