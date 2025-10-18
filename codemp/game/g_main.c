@@ -8831,6 +8831,16 @@ void G_RunFrame( int levelTime ) {
 						ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
 					}
 
+					if (zyk_has_resources_for_energy_modulator(ent) == qfalse)
+					{
+						if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
+						{
+							zyk_energy_modulator_sound(ent, ENERGY_MODULATOR_MODE_OFF);
+						}
+
+						ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
+					}
+
 					ent->client->pers.energy_modulator_energy_usage_timer = level.time + 200;
 				}
 
