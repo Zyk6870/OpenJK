@@ -208,9 +208,9 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_HEALING_CIRCLE)
 		return va("Restores health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and nearby ally players or npcs. Higher levels and Magic Affinity increase the amount of health restored and decrease bad status effects duration faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_CHAOS_FIELD)
-		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to them. Field keeps charging up to increase damage done by it (you will see an effect each time it charges up). Higher levels and Magic Affinity increase the field damage, makes it charge up faster, increase chance to cause the bad status effects and their duration. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to them. Higher levels and Magic Affinity increase the field damage and the chance to cause the bad status effects and their duration. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_LIGHTNING_DOME)
-		return va("Keeps creating Lightning Domes after some seconds, damaging enemies at a good distance. Has a chance of knocking down enemies. Higher levels and Magic Affinity create domes more often, deals more damage and increases chance to knockdown enemies. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("Keeps creating Lightning Domes after some seconds, damaging enemies at a great distance and disabling their Cloak and/or Jetpack. Keeps charging up damage for each dome up to max of %d times the normal damage. Can hit targets through walls. Meditating will make domes be created more often. Higher levels and Magic Affinity make domes do more damage. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", MAGIC_LIGHTNING_DOME_MAX_BONUS, skill_index);
 
 	return "";
 }
@@ -5395,8 +5395,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.active_magic = 0;
 
-			ent->client->pers.magic_chaos_field_bonus = 0;
-			ent->client->pers.magic_chaos_field_charge_timer = 0;
+			ent->client->pers.magic_lightning_dome_bonus = 0;
 
 			// zyk: used to add a cooldown between each flame
 			ent->client->cloakDebReduce = 0;

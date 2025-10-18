@@ -1681,7 +1681,7 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 			if ( gent->takedamage
 				&& gent->client )
 			{
-				if ( gent->client->ps.electrifyTime < level.time )
+				if (gent->client->ps.electrifyTime < level.time )
 				{//electrocution effect
 					if (gent->s.eType == ET_NPC && gent->s.NPC_class == CLASS_VEHICLE &&
 						gent->m_pVehicle && (gent->m_pVehicle->m_pVehicleInfo->type == VH_SPEEDER || gent->m_pVehicle->m_pVehicleInfo->type == VH_WALKER))
@@ -1694,21 +1694,17 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 						gent->client->ps.electrifyTime = level.time + Q_irand( 500, 1200 );
 					}
 				}
-				if ( gent->client->ps.powerups[PW_CLOAKED] )
+
+				if (gent->client->ps.powerups[PW_CLOAKED] )
 				{//disable cloak temporarily
 					Jedi_Decloak( gent );
 					gent->client->cloakToggleTime = level.time + Q_irand( 3000, 10000 );
 				}
 
-				if (myOwner && myOwner->client && (myOwner->client->sess.account_mode == ACC_MODE_RPG || myOwner->NPC) &&
-					myOwner->client->pers.active_magic & (1 << MAGIC_LIGHTNING_DOME) && gent->health > 0 && 
-					gent->client->ps.forceHandExtend != HANDEXTEND_KNOCKDOWN && Q_irand(0, 99) < (final_damage * 0.5f))
-				{ // zyk: has a chance of knockdown
-					gent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-					gent->client->ps.forceHandExtendTime = level.time + 800;
-					gent->client->ps.velocity[2] += 300;
-					gent->client->ps.forceDodgeAnim = 0;
-					gent->client->ps.quickerGetup = qtrue;
+				if (gent->client->jetPackOn)
+				{ //disable jetpack temporarily
+					Jetpack_Off(gent);
+					gent->client->jetPackToggleTime = level.time + Q_irand(3000, 10000);
 				}
 			}
 		}

@@ -5325,7 +5325,7 @@ void zyk_status_effects(gentity_t* ent)
 			{
 				ent->client->pers.rpg_status_debounce_timer[i] = level.time + 200;
 
-				if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_POISONED))
+				if (i == RPG_STATUS_POISONED)
 				{
 					zyk_quest_effect_spawn(ent, ent, "zyk_status_poison", "0", "noghri_stick/gas_cloud", 100, 0, 0, 1000);
 
@@ -5334,7 +5334,7 @@ void zyk_status_effects(gentity_t* ent)
 					zyk_set_stamina(ent, 50, qfalse);
 					zyk_set_mp(ent, 1, qfalse);
 				}
-				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_IN_FLAMES))
+				else if (i == RPG_STATUS_IN_FLAMES)
 				{
 					zyk_quest_effect_spawn(ent, ent, "zyk_status_on_fire", "0", "env/fire", 0, 0, 0, 300);
 
@@ -5342,13 +5342,13 @@ void zyk_status_effects(gentity_t* ent)
 
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/fire_lp.wav"));
 				}
-				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_BLEEDING))
+				else if (i == RPG_STATUS_BLEEDING)
 				{
 					zyk_quest_effect_spawn(ent, ent, "zyk_status_bleeding", "0", "sparks/blood_sparks2", 100, 0, 0, 500);
 
 					G_Damage(ent, ent, ent, NULL, NULL, 5, 0, MOD_UNKNOWN);
 				}
-				else if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
+				else if (i == RPG_STATUS_CONFUSED)
 				{
 					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 					ent->client->ps.forceDodgeAnim = BOTH_SONICPAIN_HOLD;
@@ -5407,9 +5407,6 @@ void healing_circle(gentity_t* ent)
 // zyk: Chaos Field
 void chaos_field(gentity_t* ent)
 {
-	ent->client->pers.magic_chaos_field_bonus = 0;
-	ent->client->pers.magic_chaos_field_charge_timer = level.time + 1000;
-
 	ent->client->pers.active_magic |= (1 << MAGIC_CHAOS_FIELD);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] = level.time + 500;
 
@@ -5461,6 +5458,8 @@ void lightning_dome(gentity_t* ent, int damage)
 // zyk: Lighting Dome
 void magic_lightning_dome(gentity_t* ent)
 {
+	ent->client->pers.magic_lightning_dome_bonus = 0;
+
 	ent->client->pers.active_magic |= (1 << MAGIC_LIGHTNING_DOME);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 500;
 }
@@ -5620,7 +5619,7 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.active_magic & (1 << MAGIC_HEALING_CIRCLE))
 			{
-				int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_HEALING_CIRCLE];
+				int damage = magic_bonus + ent->client->pers.skill_levels[SKILL_HEALING_CIRCLE];
 
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
@@ -5646,8 +5645,6 @@ void magic_power_events(gentity_t *ent)
 
 			if (ent->client->pers.active_magic & (1 << MAGIC_CHAOS_FIELD))
 			{
-				int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_CHAOS_FIELD];
-
 				if (ent->client->pers.magic_consumption_timer < level.time)
 				{
 					zyk_mp_usage(ent, SKILL_CHAOS_FIELD);
@@ -5655,20 +5652,9 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] < level.time)
 				{
-					damage += ent->client->pers.magic_chaos_field_bonus;
+					int damage = 1 + (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_CHAOS_FIELD] / 2);
 
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_chaos", "4", "env/dome", 0, damage, 290, 400);
-
-					if (ent->client->pers.magic_chaos_field_charge_timer < level.time)
-					{
-						int charge_timer_decrease = 50 * (magic_bonus + ent->client->pers.skill_levels[SKILL_CHAOS_FIELD]);
-
-						ent->client->pers.magic_chaos_field_bonus += 1;
-
-						ent->client->pers.magic_chaos_field_charge_timer = level.time + 3100 - charge_timer_decrease;
-
-						zyk_quest_effect_spawn(ent, ent, "zyk_magic_chaos", "0", "env/small_electricity2", 0, 0, 0, 400);
-					}
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] = level.time + 300;
 				}
@@ -5685,13 +5671,29 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
 				{
-					int damage = MAGIC_MIN_DMG + magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME];
+					int damage = 1 + (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] / 2);
+					int max_bonus_damage = damage * MAGIC_LIGHTNING_DOME_MAX_BONUS;
+					int debounce_time = 4000;
+
+					if (ent->client->pers.magic_lightning_dome_bonus > max_bonus_damage)
+					{
+						ent->client->pers.magic_lightning_dome_bonus = max_bonus_damage;
+					}
+
+					damage += ent->client->pers.magic_lightning_dome_bonus;
 
 					lightning_dome(ent, damage);
-
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 5000 - (magic_bonus * 50) - (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 50);
+					ent->client->pers.magic_lightning_dome_bonus++;
+
+					if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
+						ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+					{
+						debounce_time = 3000;
+					}
+
+					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + debounce_time;
 				}
 			}
 
