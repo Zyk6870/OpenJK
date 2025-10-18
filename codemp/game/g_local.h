@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.14"
+#define	GAMEVERSION	"New Zyk Mod v1.6.15"
 
 #define SECURITY_LOG "security.log"
 
@@ -612,7 +612,7 @@ typedef enum {
 	SKILL_MAX_HEALTH,
 	SKILL_MELEE,
 	SKILL_MELEE_SPEED,
-	SKILL_ITEM_MAKER,
+	SKILL_NATURE_AFFINITY,
 	SKILL_STATUS_PROTECTION,
 	SKILL_MAX_WEIGHT,
 	SKILL_MAX_STAMINA,
@@ -666,6 +666,7 @@ typedef enum {
 	RPG_INVENTORY_UPGRADE_FORCE_FIELD,
 	RPG_INVENTORY_UPGRADE_CLOAK,
 	RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR,
+	RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR,
 	RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR,
 	RPG_INVENTORY_UPGRADE_FLAME_THROWER,
 	RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE,
@@ -686,7 +687,6 @@ typedef enum {
 	RPG_INVENTORY_UPGRADE_SENTRY_GUN,
 	RPG_INVENTORY_UPGRADE_SEEKER_DRONE,
 	RPG_INVENTORY_UPGRADE_EWEB,
-	RPG_INVENTORY_MISC_BLUE_CRYSTAL,
 	RPG_INVENTORY_MISC_QUEST_LOG,
 	RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR,
 	RPG_INVENTORY_MISC_FUEL,
@@ -727,7 +727,6 @@ typedef enum {
 
 typedef enum {
 	QUEST_ITEM_NONE,
-	QUEST_ITEM_SKILL_CRYSTAL,
 	QUEST_ITEM_ENERGY_MODULATOR,
 	QUEST_ITEM_SPIRIT_TREE,
 	NUM_QUEST_ITEMS
@@ -803,8 +802,8 @@ typedef enum {
 #define RPG_MAX_ITEMMAKING_ENERGY 50000
 #define RPG_MAX_BUY_AMOUNT 100
 
-// zyk: amount of Magic Crystals to upgrade a skill
-#define MAGIC_CRYSTALS_TO_UPGRADE_SKILL 1
+// zyk: cost in Energy to upgrade a skill
+#define COST_TO_UPGRADE_SKILL 100
 
 // zyk: amount of Energy required to keep Energy Modulator On
 #define ENERGY_MODULATOR_ENERGY_USAGE 1
@@ -1000,8 +999,8 @@ typedef struct clientPersistant_s {
 	int max_force_power; // zyk: max force power the player can have based on Force Power skill level
 
 	// zyk: used to craft inventory items
-	int item_making_energy;
-	int item_making_energy_timer;
+	int nature_energy;
+	int nature_energy_timer;
 
 	zyk_tutorial_t tutorial_step; // zyk: sets the current tutorial step, to display the correct message to the player
 	int tutorial_timer; // zyk: used by the tutorial to set the interval between messages

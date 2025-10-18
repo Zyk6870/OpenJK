@@ -1574,7 +1574,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 				{
 					zyk_set_mp(ent, 1, qtrue);
 
-					ent->client->pers.magic_regen_debounce_timer = level.time + 1000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+					ent->client->pers.magic_regen_debounce_timer = level.time + 1000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 50);
 				}
 			}
 			else if (zyk_is_player_idle(ent, ucmd) == qfalse)

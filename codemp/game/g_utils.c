@@ -1609,7 +1609,7 @@ qboolean TryHeal(gentity_t *ent, gentity_t *target)
 	return qfalse;
 }
 
-extern void set_item_making_energy(gentity_t* ent, int amount, qboolean add);
+extern void set_nature_energy(gentity_t* ent, int amount, qboolean add);
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void zyk_energy_modulator(gentity_t* ent);
@@ -1622,18 +1622,18 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 			ent->client->ps.forceDodgeAnim == BOTH_MEDITATE &&
 			ent->client->pers.quest_spirit_tree_call_timer < level.time)
 		{
-			if (ent->client->pers.item_making_energy >= QUEST_SPIRIT_TREE_CALL_COST)
+			if (ent->client->pers.nature_energy >= QUEST_SPIRIT_TREE_CALL_COST)
 			{
 				ent->client->pers.quest_spirit_tree_id = -1;
 				ent->client->pers.quest_spirit_tree_call_timer = level.time + 2000;
 
-				set_item_making_energy(ent, QUEST_SPIRIT_TREE_CALL_COST, qfalse);
+				set_nature_energy(ent, QUEST_SPIRIT_TREE_CALL_COST, qfalse);
 
 				trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
 			}
 			else
 			{
-				trap->SendServerCommand(ent->s.number, "cp \"Not enough Item-Making Energy to call your Spirit Tree\n\"");
+				trap->SendServerCommand(ent->s.number, "cp \"Not enough Nature Energy to call your Spirit Tree\n\"");
 			}
 		}
 		else if (ent->client->pers.selected_ability > SELECTED_ABILITY_NONE)

@@ -73,7 +73,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAX_HEALTH] = 10;
 	max_skill_levels[SKILL_MELEE] = 3;
 	max_skill_levels[SKILL_MELEE_SPEED] = 3;
-	max_skill_levels[SKILL_ITEM_MAKER] = 10;
+	max_skill_levels[SKILL_NATURE_AFFINITY] = 10;
 	max_skill_levels[SKILL_STATUS_PROTECTION] = 5;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 25;
 	max_skill_levels[SKILL_MAX_STAMINA] = 10;
@@ -121,7 +121,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_MELEE] = "Melee";
 	skill_names[SKILL_MELEE_SPEED] = "Melee Punch Speed";
-	skill_names[SKILL_ITEM_MAKER] = "Item Maker";
+	skill_names[SKILL_NATURE_AFFINITY] = "Nature Affinity";
 	skill_names[SKILL_STATUS_PROTECTION] = "Status Protection";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
 	skill_names[SKILL_MAX_STAMINA] = "Max Stamina";
@@ -188,8 +188,8 @@ char* zyk_skill_description(int skill_index)
 		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 1, Right hand punch does %d normal damage, left hand punch does %d normal damage and kick does %d damage. Each level increases melee damage", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	if (skill_index == SKILL_MELEE_SPEED)
 		return "Each level increases how fast you can punch with Melee";
-	if (skill_index == SKILL_ITEM_MAKER)
-		return "Increases Item-Making Energy generation rate";
+	if (skill_index == SKILL_NATURE_AFFINITY)
+		return "Increases Nature Energy generation rate";
 	if (skill_index == SKILL_STATUS_PROTECTION)
 		return "Decreases duration of negative status effects. ^1Poison: ^7loses health, stamina, magic points and lowers run speed. ^1Fire: ^7catches fire, losing a lot of health. ^1Bleeding: ^7loses some health. Melee, Saber, Force powers and Magic attacks do less damage. ^1Confusion: ^7cannot attack or use Force powers or Magic";
 	if (skill_index == SKILL_MAX_WEIGHT)
@@ -241,7 +241,7 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_MAX_HEALTH] = "skillmaxhealth";
 	skill_names[SKILL_MELEE] = "skillmelee";
 	skill_names[SKILL_MELEE_SPEED] = "skillmeleepunchspeed";
-	skill_names[SKILL_ITEM_MAKER] = "skillitemmaker";
+	skill_names[SKILL_NATURE_AFFINITY] = "skillnatureaffinity";
 	skill_names[SKILL_STATUS_PROTECTION] = "skillstatusprotection";
 	skill_names[SKILL_MAX_WEIGHT] = "skillmaxweight";
 	skill_names[SKILL_MAX_STAMINA] = "skillmaxstamina";
@@ -301,6 +301,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "Force Field Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "Shield Generator";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = "Protective Armor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = "Adaptive Armor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "Flame Thrower";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = "Weapon Damage Upgrade";
@@ -322,7 +323,6 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
 
-	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "Blue Crystal";
 	inventory_item_names[RPG_INVENTORY_MISC_QUEST_LOG] = "Quest Log";
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
@@ -473,9 +473,13 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to restore his shield\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
+	else if (item_index == RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source by 20 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source by 20 per cent. Uses each ammo type to give extra protection. Uses Blaster Pack to reduce knockback of some attacks by 80 per cent and to absorb an extra 10 per cent damage from weapons or melee and has a chance to use this ammo to deflect some types of weapon shots. Uses Metal Bolts to absorb an extra 30 per cent damage from saber. Uses Powercell to absorb an extra 20 per cent damage from Magic attacks\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Uses each ammo type to give extra damage resistance to each attack type. Uses Blaster Pack to reduce knockback of some attacks by 80 per cent and to absorb 10 per cent damage from weapons or melee and has a chance to use this ammo to deflect some types of weapon shots. Uses Metal Bolts to absorb 30 per cent damage from saber. Uses Powercell to absorb 40 per cent damage from Magic attacks\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER)
 	{
@@ -555,11 +559,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Item-Making energy into attack power, extra shield resistance to damage and can increase Force Affinity, Misc Affinity and Magic Affinity. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/list inv use %d^7. It uses Item-Making Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_BLUE_CRYSTAL)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the blue crystals you collect in the map. When you collect one, it will restore 1 magic point. Upgrading skills uses a blue crystal. The ones you keep in your inventory increase your Item-Making Energy, makes your main quest ally npcs stronger and increase regen rate of the Spirit Tree. When you die, you lose a blue crystal\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Nature Energy into attack power, extra shield resistance to damage and can increase Force Affinity, Misc Affinity and Magic Affinity. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/list inv use %d^7. It uses Nature Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
@@ -626,6 +626,7 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "inventoryForceFieldUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "inventoryCloakItemUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "inventoryShieldGenerator";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = "inventoryProtectiveArmor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = "inventoryAdaptiveArmor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "inventoryFlameThrower";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = "inventoryWeaponDamage";
@@ -647,7 +648,6 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "inventorySeekerDroneUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "inventoryEWebUpgrade";
 
-	inventory_item_names[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = "inventoryBlueCrystal";
 	inventory_item_names[RPG_INVENTORY_MISC_QUEST_LOG] = "inventoryQuestLog";
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
@@ -2624,19 +2624,18 @@ void load_account(gentity_t* ent)
 					read_status = fscanf(account_file, "%s", content);
 					ent->client->pers.active_inventory_upgrades = atoi(content);
 				}
-				else if (Q_stricmp(content_type, "itemmakingenergy") == 0)
+				else if (Q_stricmp(content_type, "natureenergy") == 0)
 				{
 					read_status = fscanf(account_file, "%s", content);
-					ent->client->pers.item_making_energy = atoi(content);
+					ent->client->pers.nature_energy = atoi(content);
 
-					// zyk: validating Item-Making Energy amount
-					if (ent->client->pers.item_making_energy > RPG_MAX_ITEMMAKING_ENERGY)
+					if (ent->client->pers.nature_energy > RPG_MAX_ITEMMAKING_ENERGY)
 					{
-						ent->client->pers.item_making_energy = RPG_MAX_ITEMMAKING_ENERGY;
+						ent->client->pers.nature_energy = RPG_MAX_ITEMMAKING_ENERGY;
 					}
-					else if (ent->client->pers.item_making_energy < 0)
+					else if (ent->client->pers.nature_energy < 0)
 					{
-						ent->client->pers.item_making_energy = 0;
+						ent->client->pers.nature_energy = 0;
 					}
 				}
 				else if (Q_stricmp(content_type, "skill_levels") == 0)
@@ -2763,8 +2762,8 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 
 			client = ent->client;
 
-			strcpy(content, va("active_inventory_upgrades\n%d\nitemmakingenergy\n%d",
-				client->pers.active_inventory_upgrades, client->pers.item_making_energy));
+			strcpy(content, va("active_inventory_upgrades\n%d\nnatureenergy\n%d",
+				client->pers.active_inventory_upgrades, client->pers.nature_energy));
 
 			strcpy(content, va("%s\nskill_levels", content));
 			for (i = 0; i < NUMBER_OF_SKILLS; i++)
@@ -5030,25 +5029,25 @@ void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
 	}
 }
 
-// zyk: gives Item-Making Energy to the player
-void set_item_making_energy(gentity_t *ent, int amount, qboolean add)
+// zyk: gives Nature Energy to the player
+void set_nature_energy(gentity_t *ent, int amount, qboolean add)
 {
 	if (add == qtrue)
 	{
-		ent->client->pers.item_making_energy += amount;
+		ent->client->pers.nature_energy += amount;
 
-		if (ent->client->pers.item_making_energy > RPG_MAX_ITEMMAKING_ENERGY)
+		if (ent->client->pers.nature_energy > RPG_MAX_ITEMMAKING_ENERGY)
 		{
-			ent->client->pers.item_making_energy = RPG_MAX_ITEMMAKING_ENERGY;
+			ent->client->pers.nature_energy = RPG_MAX_ITEMMAKING_ENERGY;
 		}
 	}
 	else
 	{
-		ent->client->pers.item_making_energy -= amount;
+		ent->client->pers.nature_energy -= amount;
 
-		if (ent->client->pers.item_making_energy < 0)
+		if (ent->client->pers.nature_energy < 0)
 		{
-			ent->client->pers.item_making_energy = 0;
+			ent->client->pers.nature_energy = 0;
 		}
 	}
 }
@@ -5409,7 +5408,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.quickdraw_timer = 0;
 			ent->client->pers.flashlight_timer = 0;
 
-			ent->client->pers.item_making_energy_timer = 0;
+			ent->client->pers.nature_energy_timer = 0;
 			ent->client->pers.buy_sell_timer = 0;
 			ent->client->pers.inventory_update_timer = level.time + 100;
 
@@ -5643,7 +5642,7 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 
 	ent->client->pers.active_inventory_upgrades = 0;
 	ent->client->pers.magic_power = 0;
-	ent->client->pers.item_making_energy = RPG_INITIAL_ITEMMAKING_ENERGY;
+	ent->client->pers.nature_energy = RPG_INITIAL_ITEMMAKING_ENERGY;
 	ent->client->pers.selected_ability = 0;
 
 	// zyk: in RPG Mode, player must actually buy these
@@ -6034,7 +6033,7 @@ qboolean rpg_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont_show
 	if (ent->client->pers.skill_levels[upgrade_value - 1] < zyk_max_skill_level(upgrade_value - 1))
 	{
 		ent->client->pers.skill_levels[upgrade_value - 1]++;
-		ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] -= MAGIC_CRYSTALS_TO_UPGRADE_SKILL;
+		ent->client->pers.nature_energy -= COST_TO_UPGRADE_SKILL;
 	}
 	else
 	{
@@ -6155,11 +6154,11 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 		return qfalse;
 	}
 
-	// zyk: the user must have skillpoints to get a new skill level
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] < MAGIC_CRYSTALS_TO_UPGRADE_SKILL)
+	// zyk: testing if player can pay cost to upgrade skill
+	if (ent->client->pers.nature_energy < COST_TO_UPGRADE_SKILL)
 	{
 		if (dont_show_message == qfalse)
-			trap->SendServerCommand( ent->s.number, "print \"Not enough magic crystals.\n\"" );
+			trap->SendServerCommand( ent->s.number, "print \"Not enough Nature Energy.\n\"" );
 		return qfalse;
 	}
 
@@ -6423,13 +6422,13 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MISC)));
 	strcpy(message, va("%s^3Magic Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC)));
 
-	if (ent->client->pers.item_making_energy < RPG_MAX_ITEMMAKING_ENERGY)
+	if (ent->client->pers.nature_energy < RPG_MAX_ITEMMAKING_ENERGY)
 	{
-		strcpy(message, va("%s^3Item-Making Energy: ^7%d\n", message, ent->client->pers.item_making_energy));
+		strcpy(message, va("%s^3Nature Energy: ^7%d\n", message, ent->client->pers.nature_energy));
 	}
 	else
 	{
-		strcpy(message, va("%s^3Item-Making Energy: ^2%d\n", message, ent->client->pers.item_making_energy));
+		strcpy(message, va("%s^3Nature Energy: ^2%d\n", message, ent->client->pers.nature_energy));
 	}
 
 	trap->SendServerCommand(target_ent->s.number, va("%s\n^7Use ^2/list rpg ^7to see console commands\n\n\"", message));
@@ -6535,6 +6534,9 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR][1] = 500;
 
+	seller_items_cost[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR][0] = 1000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR][1] = 1000;
+
 	seller_items_cost[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR][0] = 2000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR][1] = 1000;
 
@@ -6594,9 +6596,6 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][1] = 500;
-
-	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][0] = 500;
-	seller_items_cost[RPG_INVENTORY_MISC_BLUE_CRYSTAL][1] = 200;
 
 	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][1] = 500;
@@ -6782,13 +6781,13 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 		strcpy(message, va("%s\n^3Weight: ^1%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
 	}
 
-	if (ent->client->pers.item_making_energy < RPG_MAX_ITEMMAKING_ENERGY)
+	if (ent->client->pers.nature_energy < RPG_MAX_ITEMMAKING_ENERGY)
 	{
-		strcpy(message, va("%s^3Item-Making Energy: ^7%d\n", message, ent->client->pers.item_making_energy));
+		strcpy(message, va("%s^3Nature Energy: ^7%d\n", message, ent->client->pers.nature_energy));
 	}
 	else
 	{
-		strcpy(message, va("%s^3Item-Making Energy: ^2%d\n", message, ent->client->pers.item_making_energy));
+		strcpy(message, va("%s^3Nature Energy: ^2%d\n", message, ent->client->pers.nature_energy));
 	}
 
 	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                          - ^5Count - ^2Weight - ^3Make - Unmake\n\n%s\n^7Use ^3/itemmake <item number> ^7or ^3/itemunmake <item number> ^7to make or unmake items\n\"", message));
@@ -7037,7 +7036,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, va("\n\n^7The Conquerors are attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Tree.\nFully regenerate your tree so it can defeat all enemies.\nThe blue crystals you have will regen it. Meditating inside the Tree makes it regen faster.\nEnemies in the map wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use some Item-Making Energy to call your Spirit Tree.\nBlue crystals you have make new allies stronger and appear more often.\n\n"));
+			strcpy(quest_desc, va("\n\n^7The Conquerors are attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Tree.\nFully regenerate your tree so it can defeat all enemies.\nThe blue crystals you have will regen it. Meditating inside the Tree makes it regen faster.\nEnemies in the map wither the tree based on their distance to it.\nMeditate and hold ^2Use ^7key to use some Nature Energy to call your Spirit Tree.\nBlue crystals you have make new allies stronger and appear more often.\n\n"));
 
 			trap->SendServerCommand(target_ent->s.number,
 				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
@@ -7251,7 +7250,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 					}
 				}
 
-				trap->SendServerCommand( ent->s.number, va("print \"\n^3Bounty Quest Target: ^7%s^7\n\n^3Bounty Quest\n^7Use ^3/bountyquest ^7so the server chooses a player to be the target. If the target defeats a RPG player, he receives 200 bonus Item-Making Energy. If a bounty hunter kills the target, he receives bonus Item-Making Energy based on the target player level.\n\n\"", target_player) );
+				trap->SendServerCommand( ent->s.number, va("print \"\n^3Bounty Quest Target: ^7%s^7\n\n^3Bounty Quest\n^7Use ^3/bountyquest ^7so the server chooses a player to be the target. If the target defeats a RPG player, he receives 200 bonus Nature Energy. If a bounty hunter kills the target, he receives bonus Nature Energy based on the target player level.\n\n\"", target_player) );
 			}
 			else if (Q_stricmp( arg1, "commands" ) == 0)
 			{
@@ -7389,7 +7388,7 @@ void Cmd_ItemMake_f( gentity_t *ent ) {
 	total_cost = zyk_get_seller_item_cost(ent, item_index, qtrue) * amount;
 
 	// zyk: buying the item if player has enough credits
-	if (ent->client->pers.item_making_energy >= total_cost)
+	if (ent->client->pers.nature_energy >= total_cost)
 	{
 		zyk_update_inventory_quantity(ent, qtrue, item_index, amount);
 
@@ -7400,7 +7399,7 @@ void Cmd_ItemMake_f( gentity_t *ent ) {
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-		set_item_making_energy(ent, total_cost, qfalse);
+		set_nature_energy(ent, total_cost, qfalse);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
@@ -7413,7 +7412,7 @@ void Cmd_ItemMake_f( gentity_t *ent ) {
 	}
 	else
 	{
-		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Not enough Item-Making Energy\n\"");
+		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Not enough Nature Energy\n\"");
 		return;
 	}
 }
@@ -7487,7 +7486,7 @@ void Cmd_ItemUnmake_f( gentity_t *ent ) {
 	
 	if (sold == qtrue)
 	{
-		set_item_making_energy(ent, (zyk_get_seller_item_cost(ent, item_index, qfalse) * amount), qtrue);
+		set_nature_energy(ent, (zyk_get_seller_item_cost(ent, item_index, qfalse) * amount), qtrue);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
@@ -8052,7 +8051,7 @@ void Cmd_BountyQuest_f( gentity_t *ent ) {
 				!(this_ent->client->pers.player_statuses & (1 << PLAYER_STATUS_NO_FIGHT)))
 			{
 				level.bounty_quest_choose_target = qfalse;
-				trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7A reward of ^3200 ^7Item-Making Energy will be given to who kills %s^7\n\"", this_ent->client->pers.netname));
+				trap->SendServerCommand(-1, va("chat \"^3Bounty Quest: ^7A reward of ^3200 ^7Nature Energy will be given to who kills %s^7\n\"", this_ent->client->pers.netname));
 				return;
 			}
 

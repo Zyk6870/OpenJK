@@ -4960,7 +4960,7 @@ void energy_modulator_spawn_model(gentity_t* ent, char *model_path)
 
 qboolean zyk_has_resources_for_energy_modulator(gentity_t* ent)
 {
-	if (ent->client->pers.item_making_energy < ENERGY_MODULATOR_ENERGY_USAGE)
+	if (ent->client->pers.nature_energy < ENERGY_MODULATOR_ENERGY_USAGE)
 	{
 		return qfalse;
 	}
@@ -5171,6 +5171,7 @@ void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int
 	}
 }
 
+/*
 void zyk_spawn_crystal(float x, float y, float z, int duration, zyk_quest_item_t crystal_type)
 {
 	int crystal_effect_id = 0;
@@ -5231,6 +5232,7 @@ void zyk_spawn_magic_crystal(int duration, zyk_quest_item_t crystal_type)
 
 	zyk_spawn_crystal(x, y, z, duration, crystal_type);
 }
+*/
 
 // zyk: spawns any of the quest item types at specific coordinates in map
 int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int model_scale, float x, float y, float z)
@@ -6036,7 +6038,7 @@ void duel_tournament_generate_leaderboard(char *filename, char *netname)
 }
 
 // zyk: determines who is the tournament winner
-extern void set_item_making_energy(gentity_t* ent, int amount, qboolean add);
+extern void set_nature_energy(gentity_t* ent, int amount, qboolean add);
 void duel_tournament_winner()
 {
 	gentity_t *ent = NULL;
@@ -6572,13 +6574,13 @@ void rpg_lms_winner()
 
 	if (ent)
 	{
-		set_item_making_energy(ent, credits, qtrue);
+		set_nature_energy(ent, credits, qtrue);
 
 		save_account(ent, qtrue);
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 
-		trap->SendServerCommand(-1, va("chat \"^3RPG LMS: ^7%s ^7is the winner! prize: %d Item-Making Energy! Kills: %d\"", ent->client->pers.netname, credits, level.rpg_lms_players[ent->s.number]));
+		trap->SendServerCommand(-1, va("chat \"^3RPG LMS: ^7%s ^7is the winner! prize: %d Nature Energy! Kills: %d\"", ent->client->pers.netname, credits, level.rpg_lms_players[ent->s.number]));
 	}
 	else
 	{
@@ -6759,8 +6761,9 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 10;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 300;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 700;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 200;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = 300;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 500;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 100;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 30;
@@ -6780,7 +6783,6 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
 
-	rpg_inventory_weights[RPG_INVENTORY_MISC_BLUE_CRYSTAL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_QUEST_LOG] = 50;
 
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 200;
@@ -6871,7 +6873,7 @@ void zyk_show_tutorial(gentity_t* ent)
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 2))
 		{
-			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can make inventory items. It will require Item-Making Energy, which is gained by having Blue Crystals.\n\"", QUESTCHAR_MAIN));
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can make inventory items. It will require Nature Energy, which is gained by having Blue Crystals.\n\"", QUESTCHAR_MAIN));
 		}
 		else if (ent->client->pers.tutorial_step == (TUTORIAL_INVENTORY_START + 3))
 		{
@@ -7212,7 +7214,7 @@ void zyk_spirit_tree_events(gentity_t* ent)
 			trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
 		}
 
-		quest_progress_change += ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
+		quest_progress_change += 10;
 
 		if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 		{ // zyk: Hard Mode
@@ -8651,10 +8653,10 @@ void G_RunFrame( int levelTime ) {
 							{ // zyk: this player won the race. Send message to everyone and give his prize
 								if (ent->client->sess.account_mode == ACC_MODE_RPG)
 								{ // zyk: give him credits
-									set_item_making_energy(ent, 2000, qtrue);
+									set_nature_energy(ent, 2000, qtrue);
 									save_account(ent, qtrue);
 									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
-									trap->SendServerCommand(-1, va("chat \"^3Race System: ^7Winner: %s^7 - Prize: 2000 Item-Making Energy!\"", ent->client->pers.netname));
+									trap->SendServerCommand(-1, va("chat \"^3Race System: ^7Winner: %s^7 - Prize: 2000 Nature Energy!\"", ent->client->pers.netname));
 								}
 								else
 								{ // zyk: give him some stuff
@@ -8788,29 +8790,36 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.tutorial_timer = level.time + 5000;
 				}
 
-				// zyk: Item-Making Energy is generated based on the amount of Blue Crystals
-				if (ent->health > 0 && ent->client->pers.item_making_energy_timer < level.time)
+				// zyk: Nature Energy generation
+				if (ent->health > 0 && ent->client->pers.nature_energy_timer < level.time)
 				{
-					int item_making_energy_time = 10000;
+					int nature_energy_time = 2000;
+					int nature_energy_amount = 1;
 
-					// zyk: Energy Modulator, while active, stops Item-Making Energy regen
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL] > 0 && ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_OFF)
+					if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
+						ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 					{
-						set_item_making_energy(ent, ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL], qtrue);
+						nature_energy_amount *= 2;
 					}
 
-					if (ent->client->pers.skill_levels[SKILL_ITEM_MAKER] > 0)
+					// zyk: Energy Modulator, while active, stops Nature Energy regen. It must be Off for Nature Energy to generate
+					if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_OFF)
 					{
-						item_making_energy_time -= (ent->client->pers.skill_levels[SKILL_ITEM_MAKER] * 200);
+						set_nature_energy(ent, nature_energy_amount, qtrue);
 					}
 
-					ent->client->pers.item_making_energy_timer = level.time + item_making_energy_time;
+					if (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] > 0)
+					{
+						nature_energy_time -= (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] * 100);
+					}
+
+					ent->client->pers.nature_energy_timer = level.time + nature_energy_time;
 				}
 
-				// zyk: Energy Modulator consumes Item-Making Energy
+				// zyk: Energy Modulator consumes Nature Energy
 				if (ent->health > 0 && ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON && ent->client->pers.energy_modulator_energy_usage_timer < level.time)
 				{
-					set_item_making_energy(ent, ENERGY_MODULATOR_ENERGY_USAGE, qfalse);
+					set_nature_energy(ent, ENERGY_MODULATOR_ENERGY_USAGE, qfalse);
 
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < 1)
 					{ // zyk: no longer has the Energy Modulator. Turn it off
@@ -8960,21 +8969,15 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.thermal_vision_cooldown_time = level.time + 300;
 				}
 
-				// zyk: spawn magic crystals and side quest stuff
+				// zyk: spawn quest stuff
 				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time && 
 					!(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
 				{
 					int main_quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS);
-					int power_level = zyk_total_skillpoints(ent) + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
+					int power_level = zyk_total_skillpoints(ent);
 					int level_chance = ((MAX_GENTITIES - level.num_entities) / 100);
 
 					int energy_modulator_chance = (main_quest_progress / 10) + (power_level / 4) - level_chance;
-					int crystal_duration = (RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME * 3) - (power_level * 50);
-
-					if (crystal_duration >= 2000)
-					{
-						zyk_spawn_magic_crystal(crystal_duration, QUEST_ITEM_SKILL_CRYSTAL);
-					}
 					
 					if (Q_irand(0, 99) < energy_modulator_chance && level.energy_modulator_timer < level.time && 
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < 1)
@@ -9067,9 +9070,9 @@ void G_RunFrame( int levelTime ) {
 								{
 									G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
 
-									zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_BLUE_CRYSTAL, 20);
+									ent->client->pers.nature_energy += 1000;
 
-									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Receive 20 blue crystals! A reward for your efforts.\n\"", QUESTCHAR_MAIN));
+									trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Receive 1000 Nature Energy! A reward for your efforts.\n\"", QUESTCHAR_MAIN));
 								}
 								else if (ent->client->pers.quest_spirits_event_step == 6)
 								{
@@ -9152,7 +9155,7 @@ void G_RunFrame( int levelTime ) {
 								Q_irand(0, 99) < ((main_quest_progress / 2) + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 							{
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
-								int ally_bonus = (main_quest_progress / 2) + ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_BLUE_CRYSTAL];
+								int ally_bonus = main_quest_progress;
 
 								zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
 							}
