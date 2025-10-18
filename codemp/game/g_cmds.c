@@ -5426,7 +5426,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.magic_consumption_timer = 0;
 			ent->client->pers.magic_regen_debounce_timer = 0;
 
-			ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME;
+			ent->client->pers.quest_stuff_timer = level.time + RPG_QUEST_STUFF_MIN_SPAWN_TIME;
 
 			// zyk: loading initial force
 			ent->client->ps.fd.forcePower = ent->client->pers.max_force_power;
@@ -7892,7 +7892,6 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 	settings_descriptions[SETTINGS_JETPACK] = "Jetpack";
 	settings_descriptions[SETTINGS_ADMIN_PROTECT] = "Admin Protect";
 	settings_descriptions[SETTINGS_DIFFICULTY] = "Quest Difficulty";
-	settings_descriptions[SETTINGS_MAGIC_CRYSTALS] = "Spawn Quest Stuff in map";
 	settings_descriptions[SETTINGS_PICKUP_MAX_WEIGHT] = "Do not pick-up stuff in map above max weight";
 	settings_descriptions[SETTINGS_SHOW_MP_LEVEL] = "Red bar show Fuel (Jetpack/Flame Thrower) or MP";
 	settings_descriptions[SETTINGS_SHOW_STAMINA_BAR] = "Show Stamina Blue Bar";
@@ -7918,7 +7917,18 @@ char* zyk_get_settings(gentity_t* ent, zyk_settings_t settings_value)
 		strcpy(settings_value_string, va(" %d", settings_value));
 	}
 
-	if (settings_value == SETTINGS_DIFFICULTY)
+	if (settings_value == SETTINGS_SABER_START)
+	{
+		if (ent->client->pers.player_settings & (1 << SETTINGS_SABER_START))
+		{
+			strcpy(message, va("^3%s - %s - ^1Melee", settings_value_string, zyk_get_settings_description(SETTINGS_SABER_START)));
+		}
+		else
+		{
+			strcpy(message, va("^3%s - %s - ^2Saber", settings_value_string, zyk_get_settings_description(SETTINGS_SABER_START)));
+		}
+	}
+	else if (settings_value == SETTINGS_DIFFICULTY)
 	{
 		if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 		{

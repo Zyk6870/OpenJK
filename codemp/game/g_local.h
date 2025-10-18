@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.18"
+#define	GAMEVERSION	"New Zyk Mod v1.6.19"
 
 #define SECURITY_LOG "security.log"
 
@@ -539,7 +539,6 @@ typedef enum {
 	SETTINGS_JETPACK,
 	SETTINGS_ADMIN_PROTECT,
 	SETTINGS_DIFFICULTY,
-	SETTINGS_MAGIC_CRYSTALS,
 	SETTINGS_PICKUP_MAX_WEIGHT,
 	SETTINGS_SHOW_MP_LEVEL,
 	SETTINGS_SHOW_STAMINA_BAR,
@@ -811,8 +810,8 @@ typedef enum {
 // zyk: max RPG skill levels upgraded
 #define RPG_MAX_SKILLPOINTS 80
 
-// zyk: minimum amount of time to spawn magic crystals and side quest stuff
-#define RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME 4000
+// zyk: minimum amount of time to spawn quest stuff
+#define RPG_QUEST_STUFF_MIN_SPAWN_TIME 4000
 
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
 #define RPG_MAX_HEALTH_INCREASE 20
@@ -970,8 +969,8 @@ typedef struct clientPersistant_s {
 	// zyk: RPG skills
 	int skill_levels[NUMBER_OF_SKILLS];
 
-	// zyk: timer to spawn and respawn skill crystals in the map
-	int skill_crystal_timer;
+	// zyk: timer to spawn quest stuff in the map
+	int quest_stuff_timer;
 
 	int max_rpg_health; // zyk: max health the player can have in RPG Mode. This is set to STAT_MAX_HEALTH for RPG players
 	int max_rpg_shield; // zyk: max shield the player can have in RPG Mode based in the skill_levels[30] value

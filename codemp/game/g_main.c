@@ -9057,8 +9057,7 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				// zyk: spawn quest stuff
-				if (ent->client->pers.skill_crystal_timer > 0 && ent->client->pers.skill_crystal_timer < level.time && 
-					!(ent->client->pers.player_settings & (1 << SETTINGS_MAGIC_CRYSTALS)))
+				if (ent->client->pers.quest_stuff_timer > 0 && ent->client->pers.quest_stuff_timer < level.time)
 				{
 					int main_quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS);
 					int power_level = zyk_total_skillpoints(ent);
@@ -9094,7 +9093,7 @@ void G_RunFrame( int levelTime ) {
 						}
 					}
 
-					ent->client->pers.skill_crystal_timer = level.time + RPG_MAGIC_CRYSTAL_MIN_SPAWN_TIME;
+					ent->client->pers.quest_stuff_timer = level.time + RPG_QUEST_STUFF_MIN_SPAWN_TIME;
 				}
 
 				// zyk: control the quest events

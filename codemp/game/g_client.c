@@ -3885,7 +3885,7 @@ void ClientSpawn(gentity_t *ent) {
 	ent->client->pers.active_magic = 0;
 	ent->client->pers.in_magic_flight = qfalse;
 
-	ent->client->pers.skill_crystal_timer = 0;
+	ent->client->pers.quest_stuff_timer = 0;
 
 	// zyk: if player is logged at spawn, load his skills
 	if (ent->client->sess.account_mode == ACC_MODE_RPG)
