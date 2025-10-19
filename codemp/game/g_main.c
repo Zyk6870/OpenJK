@@ -9136,12 +9136,13 @@ void G_RunFrame( int levelTime ) {
 							(hard_difficulty == qtrue || main_quest_progress > 1))
 						{ // zyk: Quest Progress must be at least 2 per cent in Normal Difficulty for quest npcs to appear
 							int enemy_type = 0;
-							int mage_master_chance = 0;
+							int chance_for_ally = main_quest_progress;
 							zyk_quest_npc_t stronger_enemy_type = QUEST_NPC_LOW_TRAINED_WARRIOR;
 
 							if (hard_difficulty == qtrue)
 							{
 								stronger_enemy_type -= (main_quest_progress / 3);
+								chance_for_ally = main_quest_progress / 2;
 							}
 							else
 							{
@@ -9165,7 +9166,7 @@ void G_RunFrame( int levelTime ) {
 							}
 
 							if (zyk_number_of_allies_in_map(NULL) < (zyk_max_quest_npcs.integer / 2) &&
-								Q_irand(0, 99) < ((main_quest_progress / 2) + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
+								Q_irand(0, 99) < (chance_for_ally + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 							{
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
 								int ally_bonus = ent->client->pers.nature_energy / 25;
