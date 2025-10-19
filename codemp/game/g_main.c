@@ -5636,7 +5636,12 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_CIRCLE] < level.time)
 				{
-					int heal_amount = 1 + (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_HEALING_CIRCLE] / 2);
+					int heal_amount = (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_HEALING_CIRCLE] / 2);
+
+					if (heal_amount < 1)
+					{
+						heal_amount = 1;
+					}
 
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing", "4", "env/red_cyc", 0, damage, 228, 400);
 
@@ -5679,7 +5684,7 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
 				{
-					int damage = 1 + (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] / 2);
+					int damage = (magic_bonus / 2) + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME];
 					int max_bonus_damage = damage * MAGIC_LIGHTNING_DOME_MAX_BONUS;
 					int debounce_time = 4000;
 

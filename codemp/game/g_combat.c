@@ -4989,6 +4989,14 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 	}
 
+	// zyk: Bleeding status decreases damage from Melee, Saber, Force powers and Magic
+	if (attacker && attacker->client && attacker->client->pers.rpg_statuses & (1 << RPG_STATUS_BLEEDING) &&
+		(mod == MOD_MELEE || mod == MOD_SABER || mod == MOD_FORCE_DARK || 
+			zyk_is_magic_fist(mod, inflictor) == qtrue || zyk_is_magic_power(inflictor) == qtrue))
+	{
+		damage = (int)ceil(damage * 0.5f);
+	}
+
 	// zyk: Force Rage increases damage of attacks
 	if (attacker && attacker->client && attacker->client->ps.fd.forcePowersActive & (1 << FP_RAGE))
 	{ // zyk: new Force Rage code
@@ -6493,10 +6501,15 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					{
 						if (this_magic_power == MAGIC_HEALING_CIRCLE && magic_power_user != ent && ent->client && ent->health > 0)
 						{ // zyk: Healing Circle magic heals allies
-							int heal_amount = 1 + (magic_power_user->client->pers.skill_levels[SKILL_HEALING_CIRCLE] / 2);
+							int heal_amount = (magic_power_user->client->pers.skill_levels[SKILL_HEALING_CIRCLE] / 2);
 							int magic_bonus = zyk_skill_affinity(magic_power_user, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
 
 							heal_amount += (magic_bonus / 2);
+
+							if (heal_amount < 1)
+							{
+								heal_amount = 1;
+							}
 
 							zyk_add_health(ent, heal_amount);
 
