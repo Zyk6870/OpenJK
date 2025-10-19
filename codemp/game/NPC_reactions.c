@@ -399,6 +399,12 @@ void NPC_Pain(gentity_t *self, gentity_t *attacker, int damage)
 	if ( other == self )
 		return;
 
+	// zyk: quest npcs have less pain chance
+	if (self->client->pers.quest_npc > 0 && Q_irand(0, 99) < (self->client->ps.stats[STAT_MAX_HEALTH] / 16))
+	{
+		return;
+	}
+
 	//MCG: Ignore damage from your own team for now
 	if ( other->client )
 	{
