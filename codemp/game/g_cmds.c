@@ -5692,7 +5692,7 @@ void add_new_char(gentity_t *ent)
 
 	// zyk: starting the tutorial, to help players use the mod features
 	ent->client->pers.tutorial_step = 1;
-	ent->client->pers.tutorial_timer = level.time + 1000;
+	ent->client->pers.tutorial_timer = level.time + 3000;
 }
 
 // zyk: creates the directory correctly depending on the OS
@@ -11525,7 +11525,7 @@ void Cmd_Tutorial_f(gentity_t *ent) {
 
 	if (Q_stricmp(arg1, "stop") == 0)
 	{
-		ent->client->pers.tutorial_step = 24;
+		ent->client->pers.tutorial_step = 21;
 	}
 	else
 	{
