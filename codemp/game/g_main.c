@@ -6931,7 +6931,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 7)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Affinity increases Magic Powers strength, Magic Fist damage, Max MP, MP regen rate and stamina usage for active magic.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Affinity increases Magic Powers strength, Magic Fist damage, Max MP and MP regen rate.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 8)
 	{
