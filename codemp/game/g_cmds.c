@@ -6874,6 +6874,8 @@ void zyk_set_light_source(gentity_t* ent, qboolean activate_light_source)
 	else
 	{
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_USING_FLASHLIGHT);
+
+		ent->client->ps.powerups[PW_NEUTRALFLAG] = 0;
 	}
 
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/sub_select.mp3"));

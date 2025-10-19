@@ -8940,8 +8940,8 @@ void G_RunFrame( int levelTime ) {
 						zyk_set_light_source(ent, qfalse);
 					}
 					else
-					{
-						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + 500;
+					{ // zyk: sets timer based on powercell ammo so the time shown on screen will actually be the light source battery level
+						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] * 1000);
 					}
 
 					ent->client->pers.flashlight_timer = level.time + 200;
