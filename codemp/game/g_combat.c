@@ -5998,7 +5998,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				if (zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue && targ->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] > 0)
 				{
-					bonus_health_resistance += 0.10f;
+					bonus_health_resistance += 0.15f;
 
 					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_AMMO_BLASTER_PACK, 1);
 
@@ -6017,7 +6017,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] > 1 && 
 					(zyk_is_magic_fist(mod, inflictor) == qtrue || zyk_is_magic_power(inflictor) == qtrue))
 				{
-					bonus_health_resistance += 0.40f;
+					bonus_health_resistance += 0.30f;
 
 					zyk_update_inventory_quantity(targ, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 2);
 

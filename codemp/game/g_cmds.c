@@ -479,7 +479,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Uses each ammo type to give extra damage resistance to each attack type. Uses Blaster Pack to reduce knockback of some attacks by 80 per cent and to absorb 10 per cent damage from weapons or melee and has a chance to use this ammo to deflect some types of weapon shots. Uses Metal Bolts to absorb 30 per cent damage from saber. Uses Powercell to absorb 40 per cent damage from Magic attacks\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Uses each ammo type to give extra damage resistance to each attack type. Uses Blaster Pack to reduce knockback of some attacks by 80 per cent and to absorb 15 per cent damage from weapons or melee and has a chance to use this ammo to deflect some types of weapon shots. Uses Metal Bolts to absorb 30 per cent damage from saber. Uses Powercell to absorb 30 per cent damage from Magic attacks\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER)
 	{
