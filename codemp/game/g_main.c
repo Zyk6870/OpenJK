@@ -5652,7 +5652,7 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] < level.time)
 				{
-					int damage = 1 + (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_CHAOS_FIELD] / 2);
+					int damage = (magic_bonus / 2) + ent->client->pers.skill_levels[SKILL_CHAOS_FIELD];
 
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_chaos", "4", "env/dome", 0, damage, 290, 400);
 
@@ -8936,7 +8936,7 @@ void G_RunFrame( int levelTime ) {
 						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] * 1000);
 					}
 
-					ent->client->pers.flashlight_timer = level.time + 200;
+					ent->client->pers.flashlight_timer = level.time + 250;
 				}
 
 				// zyk: updating RPG inventory and calculating current weight
