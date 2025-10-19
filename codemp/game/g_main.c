@@ -9141,12 +9141,12 @@ void G_RunFrame( int levelTime ) {
 
 							if (hard_difficulty == qtrue)
 							{
-								stronger_enemy_type -= (main_quest_progress / 3);
+								stronger_enemy_type -= (main_quest_progress / 4);
 								chance_for_ally = main_quest_progress / 2;
 							}
 							else
 							{
-								stronger_enemy_type -= (main_quest_progress / 6);
+								stronger_enemy_type -= (main_quest_progress / 7);
 							}
 
 							if (stronger_enemy_type > QUEST_NPC_LOW_TRAINED_WARRIOR)
