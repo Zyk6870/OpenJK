@@ -189,7 +189,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MELEE_SPEED)
 		return "Each level increases how fast you can punch with Melee";
 	if (skill_index == SKILL_NATURE_AFFINITY)
-		return "Increases Nature Energy generation rate";
+		return "Your Spirit Tree makes Nature Energy generate automatically, but at a slow rate. Each level of this skill increases Nature Energy generation rate";
 	if (skill_index == SKILL_STATUS_PROTECTION)
 		return "Decreases duration of negative status effects. ^1Poison: ^7loses health, stamina, magic points and lowers run speed. ^1Fire: ^7catches fire, losing a lot of health. ^1Bleeding: ^7loses some health. Melee, Saber, Force powers and Magic attacks do less damage. ^1Confusion: ^7cannot attack or use Force powers or Magic";
 	if (skill_index == SKILL_MAX_WEIGHT)
