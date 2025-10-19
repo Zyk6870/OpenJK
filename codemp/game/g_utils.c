@@ -1613,6 +1613,32 @@ extern void set_nature_energy(gentity_t* ent, int amount, qboolean add);
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void zyk_energy_modulator(gentity_t* ent);
+qboolean zyk_magic_flight(gentity_t* ent)
+{
+	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] > 0 &&
+		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)) && ent->client->jetPackToggleTime < level.time)
+	{
+		if (ent->client->pers.in_magic_flight == qtrue)
+		{
+			ent->client->pers.in_magic_flight = qfalse;
+			Jetpack_Off(ent);
+			ent->client->jetPackToggleTime = level.time + 500;
+
+			return qtrue;
+		}
+		else if (ent->client->ps.groundEntityNum == ENTITYNUM_NONE)
+		{
+			ent->client->pers.in_magic_flight = qtrue;
+			Jetpack_On(ent);
+			ent->client->jetPackToggleTime = level.time + 500;
+
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
 void zyk_use_rpg_stuff(gentity_t* ent)
 {
 	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->health > 1)
@@ -2103,27 +2129,7 @@ tryJetPack:
 			ItemUse_Jetpack(ent);
 			return;
 		}
-	}
-
-	// zyk: Magic Flight
-	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] > 0 &&
-		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)) && ent->client->jetPackToggleTime < level.time)
-	{
-		if (ent->client->pers.in_magic_flight == qtrue)
-		{
-			ent->client->pers.in_magic_flight = qfalse;
-			Jetpack_Off(ent);
-		}
-		else if (ent->client->ps.groundEntityNum == ENTITYNUM_NONE)
-		{
-			ent->client->pers.in_magic_flight = qtrue;
-			Jetpack_On(ent);
-		}
-
-		ent->client->jetPackToggleTime = level.time + 500;
-
-		return;
-	}
+	}	
 
 	if ( (ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_AMMODISP)) /*&&
 		G_ItemUsable(&ent->client->ps, HI_AMMODISP)*/ )
@@ -2143,6 +2149,11 @@ tryJetPack:
 			G_AddEvent(ent, EV_USE_ITEM0+HI_AMMODISP, 0);
 			return;
 		}
+	}
+
+	if (zyk_magic_flight(ent) == qtrue)
+	{
+		return;
 	}
 
 	zyk_use_rpg_stuff(ent);
