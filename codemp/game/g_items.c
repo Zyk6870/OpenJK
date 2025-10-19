@@ -2584,18 +2584,64 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 		quantity = ent->item->quantity;
 	}
 
-	other->health += quantity;
+	/* zyk: new code added
+		other->health += quantity;
 
-	if (other->health > max ) {
-		other->health = max;
+		if (other->health > max) {
+			other->health = max;
+		}
+		other->client->ps.stats[STAT_HEALTH] = other->health;
+
+		if (ent->item->quantity == 100) {		// mega health respawns slow
+			return zyk_holdable_item_respawn_time.integer;
+		}
+
+		return adjustRespawnTime(zyk_health_respawn_time.integer, ent->item->giType, ent->item->giTag);
+	*/
+
+	if (other->client->sess.account_mode == ACC_MODE_RPG)
+	{ // zyk: RPG Mode has the Max Health skill that doesnt allow someone to heal above this value
+		if (other->health < other->client->pers.max_rpg_health)
+		{
+			other->health += quantity;
+
+			if (other->health > other->client->pers.max_rpg_health) 
+			{
+				other->health = other->client->pers.max_rpg_health;
+			}
+
+			other->client->ps.stats[STAT_HEALTH] = other->health;
+		}
+		else // zyk: store medpack in inventory
+		{
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_MISC_MEDPACK, 1);
+		}
+
+		if (ent->item->quantity == 100) {		// mega health respawns slow
+			return zyk_holdable_item_respawn_time.integer;
+		}
+
+		return adjustRespawnTime(zyk_shield_respawn_time.integer, ent->item->giType, ent->item->giTag);
 	}
-	other->client->ps.stats[STAT_HEALTH] = other->health;
+	else if (other->client->sess.account_mode < ACC_MODE_RPG && other->health < max)
+	{
+		other->health += quantity;
 
-	if ( ent->item->quantity == 100 ) {		// mega health respawns slow
-		return zyk_holdable_item_respawn_time.integer;
+		if (other->health > max) {
+			other->health = max;
+		}
+		other->client->ps.stats[STAT_HEALTH] = other->health;
+
+		if (ent->item->quantity == 100) {		// mega health respawns slow
+			return zyk_holdable_item_respawn_time.integer;
+		}
+
+		return adjustRespawnTime(zyk_health_respawn_time.integer, ent->item->giType, ent->item->giTag);
 	}
-
-	return adjustRespawnTime(zyk_health_respawn_time.integer, ent->item->giType, ent->item->giTag);
+	else
+	{
+		return adjustRespawnTime(1, ent->item->giType, ent->item->giTag);
+	}
 }
 
 //======================================================================
@@ -2612,13 +2658,20 @@ int Pickup_Armor( gentity_t *ent, gentity_t *other )
 	return adjustRespawnTime(RESPAWN_ARMOR, ent->item->giType, ent->item->giTag);
 	*/
 
-	if (other->client->sess.account_mode == ACC_MODE_RPG && other->client->ps.stats[STAT_ARMOR] < other->client->pers.max_rpg_shield)
+	if (other->client->sess.account_mode == ACC_MODE_RPG)
 	{ // zyk: RPG Mode has the Max Shield skill that doesnt allow someone to heal shields above this value
-		other->client->ps.stats[STAT_ARMOR] += ent->item->quantity;
-
-		if ( other->client->ps.stats[STAT_ARMOR] > other->client->pers.max_rpg_shield ) 
+		if (other->client->ps.stats[STAT_ARMOR] < other->client->pers.max_rpg_shield)
 		{
-			other->client->ps.stats[STAT_ARMOR] = other->client->pers.max_rpg_shield;
+			other->client->ps.stats[STAT_ARMOR] += ent->item->quantity;
+
+			if (other->client->ps.stats[STAT_ARMOR] > other->client->pers.max_rpg_shield)
+			{
+				other->client->ps.stats[STAT_ARMOR] = other->client->pers.max_rpg_shield;
+			}
+		}
+		else // zyk: store shield booster in inventory
+		{
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_MISC_SHIELD_BOOSTER, 1);
 		}
 
 		return adjustRespawnTime(zyk_shield_respawn_time.integer, ent->item->giType, ent->item->giTag);
@@ -2730,7 +2783,7 @@ Touch_Item
 void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	int			respawn;
 	qboolean	predict;
-	qboolean validate_pickup_item = qtrue;
+	qboolean cannot_pickup_item = qtrue;
 
 	if (ent->genericValue10 > level.time &&
 		other &&
@@ -2764,9 +2817,13 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 
 	if (other->client->sess.account_mode == ACC_MODE_RPG)
 	{
-		if (ent->item->giType == IT_WEAPON || ent->item->giType == IT_AMMO || ent->item->giType == IT_HOLDABLE)
+		if (ent->item->giType == IT_WEAPON || 
+			ent->item->giType == IT_AMMO || 
+			ent->item->giType == IT_HOLDABLE || 
+			ent->item->giType == IT_HEALTH || 
+			ent->item->giType == IT_ARMOR)
 		{
-			validate_pickup_item = qfalse;
+			cannot_pickup_item = qfalse;
 
 			if ((ent->item->giType == IT_WEAPON && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_WEAPONS)) ||
 				(ent->item->giType == IT_AMMO && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_AMMO)) ||
@@ -2811,7 +2868,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	}
 
 	// the same pickup rules are used for client side and server side
-	if ( !BG_CanItemBeGrabbed( level.gametype, &ent->s, &other->client->ps ) && (validate_pickup_item == qtrue || ent->s.powerups > level.time)) {
+	if ( !BG_CanItemBeGrabbed( level.gametype, &ent->s, &other->client->ps ) && (cannot_pickup_item == qtrue || ent->s.powerups > level.time)) {
 		// zyk: if powerups > level.time, item is a dropped item, cant get it now
 		return;
 	}
