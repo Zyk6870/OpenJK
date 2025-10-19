@@ -635,6 +635,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
 		{
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 1;
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = 1;
 
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] = 10000;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] = 10000;
@@ -670,15 +671,22 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_CHANGELING_HOWLER)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_SHIELD, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
 		{
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = 1;
+
 			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = (1 << HI_JETPACK);
 		}
 		else if (quest_npc_type == QUEST_NPC_HEAVY_ARMORED_WARRIOR)
 		{
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 1;
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = 1;
+
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] = 10000;
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] = 10000;
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS] = 10000;
 		}
 		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR)
 		{
@@ -9160,7 +9168,7 @@ void G_RunFrame( int levelTime ) {
 								Q_irand(0, 99) < ((main_quest_progress / 2) + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 							{
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
-								int ally_bonus = main_quest_progress;
+								int ally_bonus = ent->client->pers.nature_energy / 25;
 
 								zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
 							}
