@@ -5491,7 +5491,7 @@ void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target)
 		float fist_damage_increase_factor = 1.0;
 		int fist_damage = zyk_magic_fist_damage.integer;
 
-		fist_damage_increase_factor += ((ent->client->pers.skill_levels[SKILL_MAGIC_FIST] * 0.02) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01));
+		fist_damage_increase_factor += ((ent->client->pers.skill_levels[SKILL_MAGIC_FIST] * 0.02f) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01f));
 		fist_damage *= fist_damage_increase_factor;
 
 		if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
@@ -5698,12 +5698,11 @@ void magic_power_events(gentity_t *ent)
 					lightning_dome(ent, damage);
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
 
-					ent->client->pers.magic_lightning_dome_bonus++;
+					ent->client->pers.magic_lightning_dome_bonus += ((magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME]) / 2);
 
-					if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
-						ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+					if (ent->client->pers.magic_lightning_dome_bonus < 1)
 					{
-						debounce_time = 3000;
+						ent->client->pers.magic_lightning_dome_bonus = 1;
 					}
 
 					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + debounce_time;
@@ -8803,58 +8802,70 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.tutorial_timer = level.time + 5000;
 				}
 
-				// zyk: Nature Energy generation
-				if (ent->health > 0 && ent->client->pers.nature_energy_timer < level.time)
+				if (ent->health > 0)
 				{
-					int nature_energy_time = 2000;
-					int nature_energy_amount = 1;
-
-					if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
-						ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+					// zyk: Nature Energy generation
+					if (ent->client->pers.nature_energy_timer < level.time)
 					{
-						nature_energy_amount *= 2;
-					}
+						int nature_energy_time = 2000;
+						int nature_energy_amount = 1;
 
-					// zyk: Energy Modulator, while active, stops Nature Energy regen. It must be Off for Nature Energy to generate
-					if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_OFF)
-					{
-						set_nature_energy(ent, nature_energy_amount, qtrue);
-					}
-
-					if (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] > 0)
-					{
-						nature_energy_time -= (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] * 100);
-					}
-
-					ent->client->pers.nature_energy_timer = level.time + nature_energy_time;
-				}
-
-				// zyk: Energy Modulator consumes Nature Energy
-				if (ent->health > 0 && ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON && ent->client->pers.energy_modulator_energy_usage_timer < level.time)
-				{
-					set_nature_energy(ent, ENERGY_MODULATOR_ENERGY_USAGE, qfalse);
-
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < 1)
-					{ // zyk: no longer has the Energy Modulator. Turn it off
-						if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
+						// zyk: meditating
+						if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 						{
-							zyk_energy_modulator_sound(ent, ENERGY_MODULATOR_MODE_OFF);
+							nature_energy_amount *= 2;
 						}
 
-						ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
-					}
-
-					if (zyk_has_resources_for_energy_modulator(ent) == qfalse)
-					{
-						if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
+						// zyk: Energy Modulator, while active, stops Nature Energy regen. It must be Off for Nature Energy to generate
+						if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_OFF)
 						{
-							zyk_energy_modulator_sound(ent, ENERGY_MODULATOR_MODE_OFF);
+							set_nature_energy(ent, nature_energy_amount, qtrue);
 						}
 
-						ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
+						if (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] > 0)
+						{
+							nature_energy_time -= (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] * 100);
+						}
+
+						ent->client->pers.nature_energy_timer = level.time + nature_energy_time;
 					}
 
-					ent->client->pers.energy_modulator_energy_usage_timer = level.time + 200;
+					// zyk: MP regen while meditating
+					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time && 
+						ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+					{
+						zyk_set_mp(ent, 1, qtrue);
+
+						ent->client->pers.magic_regen_debounce_timer = level.time + 1000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+					}
+
+					// zyk: Energy Modulator consumes Nature Energy
+					if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON && ent->client->pers.energy_modulator_energy_usage_timer < level.time)
+					{
+						set_nature_energy(ent, ENERGY_MODULATOR_ENERGY_USAGE, qfalse);
+
+						if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < 1)
+						{ // zyk: no longer has the Energy Modulator. Turn it off
+							if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
+							{
+								zyk_energy_modulator_sound(ent, ENERGY_MODULATOR_MODE_OFF);
+							}
+
+							ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
+						}
+
+						if (zyk_has_resources_for_energy_modulator(ent) == qfalse)
+						{
+							if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
+							{
+								zyk_energy_modulator_sound(ent, ENERGY_MODULATOR_MODE_OFF);
+							}
+
+							ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
+						}
+
+						ent->client->pers.energy_modulator_energy_usage_timer = level.time + 200;
+					}
 				}
 
 				if (ent->client->pers.save_stat_changes_timer < level.time)

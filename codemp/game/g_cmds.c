@@ -210,7 +210,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_CHAOS_FIELD)
 		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to them. Higher levels and Magic Affinity increase the field damage and the chance to cause the bad status effects and their duration. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
 	if (skill_index == SKILL_LIGHTNING_DOME)
-		return va("Keeps creating Lightning Domes after some seconds, damaging enemies at a great distance and disabling their Cloak and/or Jetpack. Keeps charging up damage for each dome up to max of %d times the normal damage. Can hit targets through walls. Meditating will make domes be created more often. Higher levels and Magic Affinity make domes do more damage. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", MAGIC_LIGHTNING_DOME_MAX_BONUS, skill_index);
+		return va("Keeps creating Lightning Domes after some seconds, damaging enemies at a great distance and disabling their Cloak and Jetpack. Keeps charging up damage for each dome up to max of %d times the normal damage. Can hit targets through walls. Higher levels and Magic Affinity make domes do more damage. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", MAGIC_LIGHTNING_DOME_MAX_BONUS, skill_index);
 
 	return "";
 }
@@ -559,7 +559,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Nature Energy into attack power, extra shield resistance to damage and can increase Force Affinity, Misc Affinity and Magic Affinity. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/list inv use %d^7. It uses Nature Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Nature Energy into attack power and extra shield resistance to damage. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/list inv use %d^7. It uses Nature Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
@@ -4773,19 +4773,13 @@ int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
 		skill_affinity += ent->client->pers.skill_levels[i];
 	}
 
-	// zyk: Energy Modulator increases Affinity
-	if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON)
-	{
-		skill_affinity += 20;
-	}
-
 	return skill_affinity;
 }
 
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 40);
+	int max_mp = (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 50);
 
 	return max_mp;
 }
@@ -4983,7 +4977,7 @@ void set_max_force(gentity_t* ent)
 
 	if (force_affinity > 0)
 	{
-		ent->client->pers.max_force_power = 50 + (force_affinity * 2.0f);
+		ent->client->pers.max_force_power = 60 + (force_affinity * 2.0f);
 	}
 
 	ent->client->ps.fd.forcePowerMax = ent->client->pers.max_force_power;
