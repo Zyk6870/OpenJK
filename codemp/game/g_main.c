@@ -8970,7 +8970,7 @@ void G_RunFrame( int levelTime ) {
 				{ // zyk: using the Stun Baton light source
 					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
 
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] <= 0)
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] < 1 || ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_STUN_BATON] < 1)
 					{
 						zyk_set_light_source(ent, qfalse);
 					}
