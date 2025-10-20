@@ -5471,6 +5471,8 @@ void magic_lightning_dome(gentity_t* ent)
 
 	ent->client->pers.active_magic |= (1 << MAGIC_LIGHTNING_DOME);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 500;
+
+	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/energy_crackle.wav"));
 }
 
 int magic_fist_velocity(gentity_t* ent)
@@ -5685,29 +5687,21 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
 				{
-					int damage = (magic_bonus / 2) + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME];
-					int max_bonus_damage = damage * MAGIC_LIGHTNING_DOME_MAX_BONUS;
-					int debounce_time = 4000;
+					int debounce_timer = 400 - ((magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME]) * 10);
 
-					if (ent->client->pers.magic_lightning_dome_bonus > max_bonus_damage)
-					{
-						ent->client->pers.magic_lightning_dome_bonus = max_bonus_damage;
-					}
+					ent->client->pers.magic_lightning_dome_bonus++;
 
-					damage += ent->client->pers.magic_lightning_dome_bonus;
-
-					lightning_dome(ent, damage);
-					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
-
-					ent->client->pers.magic_lightning_dome_bonus += ((magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME]) / 2);
-
-					if (ent->client->pers.magic_lightning_dome_bonus < 1)
-					{
-						ent->client->pers.magic_lightning_dome_bonus = 1;
-					}
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + debounce_time;
+					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + debounce_timer;
 				}
+			}
+			else if (ent->client->pers.magic_lightning_dome_bonus > 0)
+			{
+				int damage = magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] + ent->client->pers.magic_lightning_dome_bonus;
+
+				lightning_dome(ent, damage);
+				G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));
+
+				ent->client->pers.magic_lightning_dome_bonus = 0;
 			}
 
 			if (ent->client->pers.magic_consumption_timer < level.time)

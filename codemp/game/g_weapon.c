@@ -1564,6 +1564,7 @@ static void WP_FireDEMP2( gentity_t *ent, qboolean altFire )
 	}
 }
 
+extern void Boba_FlyStop(gentity_t* self);
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
 void zyk_lightning_dome_radius_damage( gentity_t *ent )
 {
@@ -1705,6 +1706,11 @@ void zyk_lightning_dome_radius_damage( gentity_t *ent )
 				{ //disable jetpack temporarily
 					Jetpack_Off(gent);
 					gent->client->jetPackToggleTime = level.time + Q_irand(3000, 10000);
+				}
+
+				if (gent->NPC && gent->client->NPC_class == CLASS_BOBAFETT)
+				{ // zyk: a flying npc
+					Boba_FlyStop(gent);
 				}
 			}
 		}

@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.38"
+#define	GAMEVERSION	"New Zyk Mod v1.6.39"
 
 #define SECURITY_LOG "security.log"
 
@@ -802,7 +802,6 @@ typedef enum {
 #define MAGIC_ANIM_TIME 1400
 
 // zyk: magic power stats
-#define MAGIC_LIGHTNING_DOME_MAX_BONUS 2
 #define MAGIC_AFFINITY_MODIFIER 7
 #define MAGIC_BACTA_MP_REGEN_AMOUNT 25
 
