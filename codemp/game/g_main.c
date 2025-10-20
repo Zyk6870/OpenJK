@@ -6980,7 +6980,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 18)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by meditating or using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by meditating (it converts Nature Energy into MP) or using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 19)
 	{
@@ -8808,7 +8808,7 @@ void G_RunFrame( int levelTime ) {
 					// zyk: Nature Energy generation
 					if (ent->client->pers.nature_energy_timer < level.time)
 					{
-						int nature_energy_time = 2000;
+						int nature_energy_time = 1500;
 						int nature_energy_amount = 1;
 
 						// zyk: meditating
@@ -8825,7 +8825,7 @@ void G_RunFrame( int levelTime ) {
 
 						if (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] > 0)
 						{
-							nature_energy_time -= (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] * 100);
+							nature_energy_time -= (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] * 50);
 						}
 
 						ent->client->pers.nature_energy_timer = level.time + nature_energy_time;
@@ -8835,9 +8835,13 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time && 
 						ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 					{
-						zyk_set_mp(ent, 1, qtrue);
+						if (ent->client->pers.nature_energy > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent))
+						{
+							zyk_set_mp(ent, 1, qtrue);
+							set_nature_energy(ent, 1, qfalse);
+						}
 
-						ent->client->pers.magic_regen_debounce_timer = level.time + 1000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+						ent->client->pers.magic_regen_debounce_timer = level.time + 900 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
 					}
 
 					// zyk: Energy Modulator consumes Nature Energy
