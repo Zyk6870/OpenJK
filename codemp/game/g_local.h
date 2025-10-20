@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.36"
+#define	GAMEVERSION	"New Zyk Mod v1.6.37"
 
 #define SECURITY_LOG "security.log"
 
@@ -795,6 +795,8 @@ typedef enum {
 
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
 #define RPG_MAX_HEALTH_INCREASE 20
+#define RPG_MEDPACK_REGEN 25
+#define RPG_SHIELD_BOOSTER_REGEN 25
 
 // zyk: when casting magic, use anim for this amount of time in miliseconds
 #define MAGIC_ANIM_TIME 1400

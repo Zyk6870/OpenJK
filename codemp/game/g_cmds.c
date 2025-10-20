@@ -204,13 +204,13 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "Allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level decreases mp usage";
 	if (skill_index == SKILL_MAGIC_SHIELD)
-		return va("A magic shield appears around you, decreasing damage to your health from any source. If you have Magic Fist skill, has a chance to automatically shoot at the nearest target. Higher levels and Magic Affinity increase resistance to damage to your health and also increases chance to shoot Magic Fist more often. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("A magic shield appears around you, decreasing damage to your health from any source. If you have Magic Fist skill, has a chance to automatically shoot at the nearest target. Higher levels and Magic Affinity increase resistance to damage to your health and also increases chance to shoot Magic Fist more often. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_HEALING_CIRCLE)
-		return va("Creates Healing Circles that restore health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and ally players or npcs inside the circle. Higher levels and Magic Affinity increase the amount of health restored and decrease bad status effects duration faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("Creates Healing Circles that restore health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and ally players or npcs inside the circle. Higher levels and Magic Affinity increase the amount of health restored and decrease bad status effects duration faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_CHAOS_FIELD)
-		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to them. Higher levels and Magic Affinity increase the field damage and the chance to cause the bad status effects and their duration. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", skill_index);
+		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to them. Higher levels and Magic Affinity increase the field damage and the chance to cause the bad status effects and their duration. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_LIGHTNING_DOME)
-		return va("Keeps creating Lightning Domes after some seconds, damaging enemies at a great distance and disabling their Cloak and Jetpack. Keeps charging up damage for each dome up to max of %d times the normal damage. Can hit targets through walls. Higher levels and Magic Affinity make domes do more damage. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", MAGIC_LIGHTNING_DOME_MAX_BONUS, skill_index);
+		return va("Keeps creating Lightning Domes after some seconds, damaging enemies at a great distance and disabling their Cloak and Jetpack. Keeps charging up damage for each dome up to max of %d times the normal damage. Can hit targets through walls. Higher levels and Magic Affinity make domes do more damage. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", MAGIC_LIGHTNING_DOME_MAX_BONUS, (skill_index + 1));
 
 	return "";
 }
@@ -559,7 +559,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Nature Energy into attack power and extra shield resistance to damage. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/list inv use %d^7. It uses Nature Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Nature Energy into attack power and extra shield resistance to damage. Consumes Nature Energy to use medpacks and shield boosters in your inventory to restore health and shield if they are not full. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/list inv use %d^7. It uses Nature Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
 	{
@@ -6592,7 +6592,7 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_MISC_FUEL][0] = 3;
 	seller_items_cost[RPG_INVENTORY_MISC_FUEL][1] = 1;
 
-	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][0] = 40;
+	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][0] = 50;
 	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][1] = 20;
 
 	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][0] = 50;
@@ -6856,6 +6856,30 @@ void zyk_add_health(gentity_t* ent, int heal_amount)
 		{
 			ent->health = max_health;
 		}
+
+		ent->client->ps.stats[STAT_HEALTH] = ent->health;
+	}
+}
+
+void zyk_add_shield(gentity_t* ent, int shield_amount)
+{
+	if (ent && ent->client)
+	{
+		int max_shield = ent->client->ps.stats[STAT_MAX_HEALTH];
+
+		if (ent->client->sess.account_mode == ACC_MODE_RPG)
+		{ // zyk: a RPG player, not a npc
+			max_shield = ent->client->pers.max_rpg_shield;
+		}
+
+		if ((ent->client->ps.stats[STAT_ARMOR] + shield_amount) < max_shield)
+		{
+			ent->client->ps.stats[STAT_ARMOR] += shield_amount;
+		}
+		else
+		{
+			ent->client->ps.stats[STAT_ARMOR] = max_shield;
+		}
 	}
 }
 
@@ -6945,7 +6969,7 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MEDPACK && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MEDPACK] > 0)
 	{
-		zyk_add_health(ent, 25);
+		zyk_add_health(ent, RPG_MEDPACK_REGEN);
 
 		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
 
@@ -6953,14 +6977,7 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_SHIELD_BOOSTER] > 0)
 	{
-		if ((ent->client->ps.stats[STAT_ARMOR] + 25) < ent->client->pers.max_rpg_shield)
-		{
-			ent->client->ps.stats[STAT_ARMOR] += 25;
-		}
-		else
-		{
-			ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.max_rpg_shield;
-		}
+		zyk_add_shield(ent, RPG_SHIELD_BOOSTER_REGEN);
 
 		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
 

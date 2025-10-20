@@ -2566,6 +2566,8 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 
 
 //======================================================================
+extern void zyk_add_health(gentity_t* ent, int heal_amount);
+extern void zyk_add_shield(gentity_t* ent, int shield_amount);
 
 int Pickup_Health (gentity_t *ent, gentity_t *other) {
 	int			max;
@@ -2603,18 +2605,18 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 	{ // zyk: RPG Mode has the Max Health skill that doesnt allow someone to heal above this value
 		if (other->health < other->client->pers.max_rpg_health)
 		{
-			other->health += quantity;
-
-			if (other->health > other->client->pers.max_rpg_health) 
-			{
-				other->health = other->client->pers.max_rpg_health;
-			}
-
-			other->client->ps.stats[STAT_HEALTH] = other->health;
+			zyk_add_health(other, quantity);
 		}
 		else // zyk: store medpack in inventory
 		{
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_MISC_MEDPACK, 1);
+			int amount_to_store = 1;
+
+			if ((quantity / RPG_MEDPACK_REGEN) > 0)
+			{
+				amount_to_store = (quantity / RPG_MEDPACK_REGEN);
+			}
+
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_MISC_MEDPACK, amount_to_store);
 		}
 
 		if (ent->item->quantity == 100) {		// mega health respawns slow
@@ -2662,16 +2664,18 @@ int Pickup_Armor( gentity_t *ent, gentity_t *other )
 	{ // zyk: RPG Mode has the Max Shield skill that doesnt allow someone to heal shields above this value
 		if (other->client->ps.stats[STAT_ARMOR] < other->client->pers.max_rpg_shield)
 		{
-			other->client->ps.stats[STAT_ARMOR] += ent->item->quantity;
-
-			if (other->client->ps.stats[STAT_ARMOR] > other->client->pers.max_rpg_shield)
-			{
-				other->client->ps.stats[STAT_ARMOR] = other->client->pers.max_rpg_shield;
-			}
+			zyk_add_shield(other, ent->item->quantity);
 		}
 		else // zyk: store shield booster in inventory
 		{
-			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_MISC_SHIELD_BOOSTER, 1);
+			int amount_to_store = 1;
+
+			if ((ent->item->quantity / RPG_SHIELD_BOOSTER_REGEN) > 0)
+			{
+				amount_to_store = (ent->item->quantity / RPG_SHIELD_BOOSTER_REGEN);
+			}
+
+			zyk_update_inventory_quantity(other, qtrue, RPG_INVENTORY_MISC_SHIELD_BOOSTER, amount_to_store);
 		}
 
 		return adjustRespawnTime(zyk_shield_respawn_time.integer, ent->item->giType, ent->item->giTag);

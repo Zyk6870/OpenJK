@@ -5287,6 +5287,7 @@ void clear_special_power_effect(gentity_t* ent)
 }
 
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
+extern void zyk_add_shield(gentity_t* ent, int shield_amount);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern void initialize_rpg_skills(gentity_t* ent, qboolean init_all);
 extern void rpg_skill_counter(gentity_t* ent, int amount);
@@ -8842,7 +8843,27 @@ void G_RunFrame( int levelTime ) {
 					// zyk: Energy Modulator consumes Nature Energy
 					if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_ON && ent->client->pers.energy_modulator_energy_usage_timer < level.time)
 					{
-						set_nature_energy(ent, ENERGY_MODULATOR_ENERGY_USAGE, qfalse);
+						int nature_energy_amount = ENERGY_MODULATOR_ENERGY_USAGE;
+
+						if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MEDPACK] > 0 && ent->health < ent->client->pers.max_rpg_health)
+						{
+							zyk_add_health(ent, RPG_MEDPACK_REGEN);
+							zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_MEDPACK, 1);
+							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickuphealth.mp3"));
+
+							nature_energy_amount += (RPG_MEDPACK_REGEN * 2);
+						}
+
+						if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_SHIELD_BOOSTER] > 0 && ent->client->ps.stats[STAT_ARMOR] < ent->client->pers.max_rpg_shield)
+						{
+							zyk_add_shield(ent, RPG_SHIELD_BOOSTER_REGEN);
+							zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_MISC_SHIELD_BOOSTER, 1);
+							G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupshield.mp3"));
+
+							nature_energy_amount += (RPG_SHIELD_BOOSTER_REGEN * 2);
+						}
+
+						set_nature_energy(ent, nature_energy_amount, qfalse);
 
 						if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] < 1)
 						{ // zyk: no longer has the Energy Modulator. Turn it off

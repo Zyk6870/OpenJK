@@ -4876,6 +4876,7 @@ vec3_t gPainPoint;
 extern void Jedi_Decloak( gentity_t *self );
 extern void Boba_FlyStop( gentity_t *self );
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
+extern void zyk_add_shield(gentity_t* ent, int shield_amount);
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
@@ -6085,14 +6086,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				int shield_regen_amount = 1 + (take / 10);
 
-				if ((attacker->client->ps.stats[STAT_ARMOR] + shield_regen_amount) < attacker->client->pers.max_rpg_shield)
-				{
-					attacker->client->ps.stats[STAT_ARMOR] += shield_regen_amount;
-				}
-				else
-				{
-					attacker->client->ps.stats[STAT_ARMOR] = attacker->client->pers.max_rpg_shield;
-				}
+				zyk_add_shield(attacker, shield_regen_amount);
 			}
 			else if (mod == MOD_BLASTER && inflictor && inflictor->s.weapon == WP_BLASTER && 
 				attacker->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 &&
