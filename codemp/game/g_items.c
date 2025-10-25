@@ -3087,7 +3087,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	// zyk: RPG players can store power-ups in inventory
 	if (ent->item->giType == IT_POWERUP && other->client->sess.account_mode == ACC_MODE_RPG && !(other->client->pers.player_settings & (1 << SETTINGS_STORE_POWERUPS)))
 	{
-		int powerup_amount = other->client->ps.powerups[ent->item->giTag] / RPG_POWERUP_TIMER;
+		int powerup_amount = (other->client->ps.powerups[ent->item->giTag] - level.time) / RPG_POWERUP_TIMER;
 		zyk_inventory_t powerup_type;
 
 		if (powerup_amount < 1)
