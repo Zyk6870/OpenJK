@@ -4471,6 +4471,13 @@ char* zyk_selected_ability_name(zyk_selected_ability_t selected_ability)
 	ability_names[SELECTED_ABILITY_HEALING_CIRCLE] = "Healing Circle (Magic)";
 	ability_names[SELECTED_ABILITY_CHAOS_FIELD] = "Chaos Field (Magic)";
 	ability_names[SELECTED_ABILITY_LIGHTNING_DOME] = "Lightning Dome (Magic)";
+	ability_names[SELECTED_ABILITY_SEEKER_DRONE] = "Seeker Drone Recover (Item)";
+	ability_names[SELECTED_ABILITY_MEDPACK] = "Medpack (Item)";
+	ability_names[SELECTED_ABILITY_SHIELD_BOOSTER] = "Shield Booster (Item)";
+	ability_names[SELECTED_ABILITY_YSALAMIRI] = "Ysalamiri (Item)";
+	ability_names[SELECTED_ABILITY_FORCE_BOON] = "Force Boon (Item)";
+	ability_names[SELECTED_ABILITY_ENLIGHTENMENT_LIGHT] = "Enlightenment - Light (Item)";
+	ability_names[SELECTED_ABILITY_ENLIGHTENMENT_DARK] = "Enlightenment - Dark (Item)";
 	ability_names[SELECTED_ABILITY_ENERGY_MODULATOR] = "Energy Modulator (Item)";
 
 	if (selected_ability >= 0 && selected_ability < MAX_SELECTED_ABILITIES)
@@ -4479,6 +4486,65 @@ char* zyk_selected_ability_name(zyk_selected_ability_t selected_ability)
 	}
 
 	return "";
+}
+
+qboolean validate_selected_ability(gentity_t* ent, zyk_selected_ability_t selected_ability)
+{
+	if (selected_ability == SELECTED_ABILITY_NONE)
+	{
+		return qtrue;
+	}
+
+	if (selected_ability >= SELECTED_ABILITY_MAGIC_FLIGHT && selected_ability <= SELECTED_ABILITY_LIGHTNING_DOME)
+	{
+		zyk_rpg_skill_t skill_indexes[MAX_SELECTED_ABILITIES] = {
+					-1,
+					SKILL_MAGIC_FLIGHT,
+					SKILL_MAGIC_SHIELD,
+					SKILL_HEALING_CIRCLE,
+					SKILL_CHAOS_FIELD,
+					SKILL_LIGHTNING_DOME,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1
+		};
+
+		if (skill_indexes[selected_ability] > -1 && ent->client->pers.skill_levels[skill_indexes[selected_ability]] > 0)
+		{
+			return qtrue;
+		}
+	}
+	else if (selected_ability >= SELECTED_ABILITY_MEDPACK && selected_ability <= SELECTED_ABILITY_ENERGY_MODULATOR)
+	{
+		zyk_inventory_t inventory_indexes[MAX_SELECTED_ABILITIES] = {
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					RPG_INVENTORY_ITEM_SEEKER_DRONE,
+					RPG_INVENTORY_MISC_MEDPACK,
+					RPG_INVENTORY_MISC_SHIELD_BOOSTER,
+					RPG_INVENTORY_MISC_YSALAMIRI,
+					RPG_INVENTORY_MISC_FORCE_BOON,
+					RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT,
+					RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK,
+					RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR
+		};
+
+		if (inventory_indexes[selected_ability] > -1 && ent->client->pers.rpg_inventory[inventory_indexes[selected_ability]] > 0)
+		{
+			return qtrue;
+		}
+	}
+
+	return qfalse;
 }
 
 void Cmd_EngageDuel_f(gentity_t *ent)
@@ -4491,9 +4557,15 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 	{
 		ent->client->pers.selected_ability++;
 
-		if (ent->client->pers.selected_ability >= MAX_SELECTED_ABILITIES)
+		while (validate_selected_ability(ent, ent->client->pers.selected_ability) == qfalse)
 		{
-			ent->client->pers.selected_ability = SELECTED_ABILITY_NONE;
+			ent->client->pers.selected_ability++;
+
+			if (ent->client->pers.selected_ability >= MAX_SELECTED_ABILITIES)
+			{
+				ent->client->pers.selected_ability = SELECTED_ABILITY_NONE;
+				break;
+			}
 		}
 
 		trap->SendServerCommand(ent->s.number, va("print \"Selected ability: ^3%s^7\n\"", zyk_selected_ability_name(ent->client->pers.selected_ability)));
