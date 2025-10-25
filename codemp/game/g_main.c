@@ -6907,93 +6907,88 @@ void zyk_show_tutorial(gentity_t* ent)
 {
 	if (ent->client->pers.tutorial_step == 1)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. I am the %s^7. I will explain everything you need to know. Use ^3/tutorial stop ^7to stop the tutorial.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname, QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info. From there you can find all other commands.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 2)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/list ^7to see all info. From there you can find all other commands.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can upgrade skills listed in 3 categories: ^3/list force^7, ^3/list misc^7, ^3/list magic^7.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 3)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can upgrade skills listed in 3 categories: ^3/list force^7, ^3/list misc^7, ^3/list magic^7.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/up <number> ^7to upgrade a skill. It requires Nature Energy. Upgrading skills increase affinity to the skill category.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 4)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/up <number> ^7to upgrade a skill. It requires Nature Energy. Upgrading skills increase affinity to the skill category.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Force Affinity increases your Max Force points, Force regen rate and Saber damage.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 5)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Force Affinity increases your Max Force points, Force regen rate and Saber damage.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Misc Affinity increases Stamina regen rate, Run Speed and Max Weight.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 6)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Misc Affinity increases Stamina regen rate, Run Speed and Max Weight.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Affinity increases Magic Powers strength, Magic Fist damage, Max MP and MP regen rate.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 7)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Magic Affinity increases Magic Powers strength, Magic Fist damage, Max MP and MP regen rate.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Nature Energy is required for skills and inventory items. It will regen automatically. Meditate to regen it faster.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 8)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Nature Energy is required for skills and inventory items. It will regen automatically. Meditate to regen it faster.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Everything you collect in map is stored in your inventory. Use ^3/list inv ^7to see it.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 9)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Everything you collect in map is stored in your inventory. Use ^3/list inv ^7to see it.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To make or unmake inventory items, use ^3/itemmake <number> ^7or ^3/itemunmake <number>^7.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 10)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To make or unmake inventory items, use ^3/itemmake <number> ^7or ^3/itemunmake <number>^7.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over max weight, run speed will decrease and Stamina will decrease faster.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 11)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over max weight, run speed will decrease and Stamina will decrease faster.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/drop ^7to drop current weapon or get melee and ^3/drop ^7to drop current holdable item. Use ^3/jetpack ^7to drop your jetpack.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 12)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Use ^3/drop ^7to drop current weapon or get melee and ^3/drop ^7to drop current holdable item. Use ^3/jetpack ^7to drop your jetpack.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Doing actions decrease Stamina. It is the blue bar at the right of your screen.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 13)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Doing actions decrease Stamina. It is the blue bar at the right of your screen.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Meditate (Controls menu to set it) to regen Stamina, Force and MP. If Stamina runs out, you faint and lose some Nature Energy.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 14)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Meditate (Controls menu to set it) to regen Stamina, Force and MP. If Stamina runs out, you faint for some seconds.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <number>^7.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 15)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <number>^7.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can also cast magic by pressing Duel key to select a magic power. Press Use key to cast it.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 16)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can also cast magic by pressing Duel key to select a magic power. Press Use key to cast it.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need MP (Magic Points) to cast magic. When you upgrade Magic skills, your max MP increases.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 17)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need MP (Magic Points) to cast magic. When you upgrade Magic skills, your max MP increases.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by meditating (it converts Nature Energy into MP) or using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 18)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by meditating (it converts Nature Energy into MP) or using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
-	}
-	else if (ent->client->pers.tutorial_step == 19)
-	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: I am here because I need your help! Use ^3/list quests^7 too see all info you need to help me.\n\"", QUESTCHAR_MAIN));
 	}
-	else if (ent->client->pers.tutorial_step == 20)
+	if (ent->client->pers.tutorial_step == INITIAL_TUTORIAL_STEP)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Now go %s^7! Use ^3/tutorial ^7if you need all this information again.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. I am the %s^7. Hold Use key on me and I will explain everything you need to know.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname, QUESTCHAR_MAIN));
+
+		ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 	}
 
 	ent->client->pers.tutorial_step++;
 
-	if (ent->client->pers.tutorial_step > 20)
+	if (ent->client->pers.tutorial_step >= INITIAL_TUTORIAL_STEP)
 	{
-		ent->client->pers.tutorial_step = 0;
-
-		ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
-		ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
+		ent->client->pers.tutorial_step = 1;
 	}
 }
 
@@ -7003,9 +6998,9 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 
 	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT))
 	{ //zyk: player is in tutorial for the first time. Do not spawn quest npcs yet
-		interval_time = TUTORIAL_DURATION;
+		interval_time = INITIAL_TUTORIAL_DURATION;
 
-		ent->client->pers.quest_progress_timer = level.time + TUTORIAL_DURATION;
+		ent->client->pers.quest_progress_timer = level.time + INITIAL_TUTORIAL_DURATION;
 
 		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CREATED_ACCOUNT);
 	}
@@ -7173,6 +7168,7 @@ void zyk_start_main_quest_spirits_event(gentity_t* ent)
 }
 
 extern void zyk_reset_quest(gentity_t* ent);
+extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 void zyk_spirit_tree_events(gentity_t* ent)
 {
 	gentity_t* tree_ent = NULL;
@@ -7215,34 +7211,46 @@ void zyk_spirit_tree_events(gentity_t* ent)
 
 		if (distance_to_tree < QUEST_SPIRIT_TREE_RADIUS)
 		{
-			quest_progress_change += (ent->client->pers.nature_energy / 20);
+			// zyk: Holding Use key will show a Tutorial message
+			if (ent->client->pers.cmd.buttons & BUTTON_USE && ent->client->pers.tutorial_step > 0 && ent->client->pers.tutorial_timer < level.time)
+			{
+				zyk_show_tutorial(ent);
 
-			trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
+				ent->client->pers.tutorial_timer = level.time + 2000;
+			}
+			else
+			{
+				trap->SendServerCommand(ent->s.number, "cp \"Your Spirit Tree\n\"");
+			}
 		}
-		else
+
+		if (zyk_is_main_quest_complete(ent) == qfalse &&
+			ent->client->pers.quest_missions & (1 << MAIN_QUEST_START) &&
+			ent->client->pers.quest_spirits_event_step == 0)
 		{
-			quest_progress_change += (ent->client->pers.nature_energy / 40);
-		}
+			quest_progress_change += (ent->client->pers.nature_energy / 25);
 
-		if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
-		{ // zyk: Hard Mode
-			quest_progress_change /= 2;
-		}
+			if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+			{ // zyk: Hard Mode
+				quest_progress_change /= 2;
+			}
 
-		quest_progress_change -= zyk_number_of_enemies_in_map();
+			// zyk: Tree withers based on the number of enemies in the map
+			quest_progress_change -= zyk_number_of_enemies_in_map();
 
-		ent->client->pers.quest_progress += quest_progress_change;
+			ent->client->pers.quest_progress += quest_progress_change;
 
-		if (ent->client->pers.quest_progress >= MAX_QUEST_PROGRESS)
-		{
-			ent->client->pers.quest_progress = MAX_QUEST_PROGRESS;
+			if (ent->client->pers.quest_progress >= MAX_QUEST_PROGRESS)
+			{
+				ent->client->pers.quest_progress = MAX_QUEST_PROGRESS;
 
-			// zyk: completed the quest
-			zyk_start_main_quest_spirits_event(ent);
-		}
-		else if (ent->client->pers.quest_progress <= 0)
-		{ // zyk: if Spirit Tree is completely withered
-			zyk_reset_quest(ent);
+				// zyk: completed the quest
+				zyk_start_main_quest_spirits_event(ent);
+			}
+			else if (ent->client->pers.quest_progress <= 0)
+			{ // zyk: if Spirit Tree is completely withered
+				zyk_reset_quest(ent);
+			}
 		}
 
 		quest_progress_percentage = (ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS;
@@ -7313,7 +7321,6 @@ extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk
 extern void zyk_set_light_source(gentity_t* ent, qboolean activate_light_source);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void WP_FireMelee(gentity_t* ent, qboolean alt_fire);
-extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 
 void G_RunFrame( int levelTime ) {
 	int			i;
@@ -8787,13 +8794,14 @@ void G_RunFrame( int levelTime ) {
 					ent->client->ps.jetpackFuel = (ent->client->pers.magic_power * 100.0) / zyk_max_magic_power(ent);
 				}
 
-				// zyk: tutorial, which teaches the player the RPG Mode features
-				if (ent->client->pers.tutorial_step > 0 && ent->client->pers.tutorial_timer < level.time)
+				// zyk: Initial Tutorial messages
+				if (ent->client->pers.tutorial_step == INITIAL_TUTORIAL_STEP && 
+					!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_START)) && 
+					ent->client->pers.tutorial_timer < level.time)
 				{
 					zyk_show_tutorial(ent);
 
-					// zyk: interval between messages
-					ent->client->pers.tutorial_timer = level.time + 5000;
+					ent->client->pers.tutorial_timer = level.time + 2000;
 				}
 
 				if (ent->health > 0)
@@ -9073,6 +9081,14 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.quest_stuff_timer = level.time + RPG_QUEST_STUFF_MIN_SPAWN_TIME;
 				}
 
+				// zyk: Spirit Tree regen and wither
+				if (ent->client->pers.quest_progress_timer < level.time)
+				{
+					zyk_spirit_tree_events(ent);
+
+					ent->client->pers.quest_progress_timer = level.time + 1000;
+				}
+
 				// zyk: control the quest events
 				if (level.load_entities_timer == 0 && 
 					zyk_allow_quests.integer > 0 && !(ent->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) && 
@@ -9152,17 +9168,6 @@ void G_RunFrame( int levelTime ) {
 						}
 
 						ent->client->pers.quest_spirits_event_timer = level.time + 5000;
-					}
-
-					// zyk: Spirit Tree regen and wither
-					if (zyk_is_main_quest_complete(ent) == qfalse &&
-						ent->client->pers.quest_missions & (1 << MAIN_QUEST_START) &&
-						ent->client->pers.quest_spirits_event_step == 0 &&
-						ent->client->pers.quest_progress_timer < level.time)
-					{
-						zyk_spirit_tree_events(ent);
-
-						ent->client->pers.quest_progress_timer = level.time + 1000;
 					}
 
 					// zyk: quest npcs

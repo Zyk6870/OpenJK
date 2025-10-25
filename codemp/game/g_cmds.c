@@ -195,7 +195,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio. Carrying stuff over the max weight will decrease your run speed and also decrease Stamina";
 	if (skill_index == SKILL_MAX_STAMINA)
-		return "Each level increases your max stamina. Stamina is used by any action the player does. Low stamina makes run speed slower. You can also lose some stamina when taking damage. If Stamina runs out you will pass out for some seconds. Each skill level decreases time you need to recover after passing out and the time you can be underwater before drowning. Meditating recovers stamina by using some Nature Energy, and the amount recovered increases with each skill level. Use bacta canister or big bacta holdable items to regen stamina";
+		return "Each level increases your max stamina. Stamina is used by any action the player does. Low stamina makes run speed slower. You can also lose some stamina when taking damage. If Stamina runs out you will pass out for some seconds and lose some Nature Energy. Each skill level decreases time you need to recover after passing out and the time you can be underwater before drowning. Meditating recovers stamina, and the amount recovered increases with each skill level. Use bacta canister or big bacta holdable items to regen stamina";
 	if (skill_index == SKILL_RUN_SPEED)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
@@ -5484,6 +5484,8 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
 
+			ent->client->pers.tutorial_step = INITIAL_TUTORIAL_STEP;
+
 			zyk_set_quest_event_timer(ent);
 
 			ent->client->pers.quest_spirits_event_step = 0;
@@ -5768,7 +5770,7 @@ void add_new_char(gentity_t *ent)
 	ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_CREATED_ACCOUNT);
 
 	// zyk: starting the tutorial, to help players use the mod features
-	ent->client->pers.tutorial_step = 1;
+	ent->client->pers.tutorial_step = INITIAL_TUTORIAL_STEP;
 	ent->client->pers.tutorial_timer = level.time + 3000;
 }
 
@@ -7126,7 +7128,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, va("\n\n^7The Conquerors are attacking everywhere!\nTheir excessive magic usage is weakening the Spirit Tree.\nYou must fully regenerate it to defeat all of them.\nThe Tree regeneration rate is based on the amount of Nature Energy you have.\nMeditate inside the tree to regen it faster.\nEnemies in the map wither the tree based on their numbers.\nMeditate and hold ^2Use ^7key to use some Nature Energy to call your Spirit Tree.\nSometimes allies will come to help.\n\n"));
+			strcpy(quest_desc, va("\n^7The Conquerors are attacking everywhere!\nYou must fully regenerate your Spirit Tree to defeat all of them.\nThe Tree regeneration rate is based on the amount of Nature Energy you have.\nEnemies in the map wither the tree based on their numbers.\nHold ^2Use ^7key inside the Tree and it will show tutorial info.\nMeditate and hold ^2Use ^7key to call your Spirit Tree.\nSometimes allies will come to help.\n\n"));
 
 			trap->SendServerCommand(target_ent->s.number,
 				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
@@ -11638,33 +11640,6 @@ void Cmd_RpgLmsTable_f(gentity_t *ent) {
 
 /*
 ==================
-Cmd_Tutorial_f
-==================
-*/
-void Cmd_Tutorial_f(gentity_t *ent) {
-	char arg1[MAX_STRING_CHARS];
-
-	strcpy(arg1, "");
-
-	if (trap->Argc() > 1)
-	{
-		trap->Argv(1, arg1, sizeof(arg1));
-	}
-
-	if (Q_stricmp(arg1, "stop") == 0)
-	{
-		ent->client->pers.tutorial_step = 21;
-	}
-	else
-	{
-		ent->client->pers.tutorial_step = 1;
-	}
-	
-	ent->client->pers.tutorial_timer = level.time + 1000;
-}
-
-/*
-==================
 Cmd_NoFight_f
 ==================
 */
@@ -12199,7 +12174,6 @@ command_t commands[] = {
 	{ "teleport",			Cmd_Teleport_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "tell",				Cmd_Tell_f,					0 },
 	{ "thedestroyer",		Cmd_TheDestroyer_f,			CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
-	{ "tutorial",			Cmd_Tutorial_f,				CMD_LOGGEDIN | CMD_NOINTERMISSION },
 	{ "t_use",				Cmd_TargetUse_f,			CMD_CHEAT|CMD_ALIVE },
 	{ "up",					Cmd_UpSkill_f,				CMD_RPG|CMD_NOINTERMISSION },
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			CMD_NOINTERMISSION },

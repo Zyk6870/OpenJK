@@ -1508,10 +1508,18 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 	{
 		if (ent->client->pers.stamina_out_timer > level.time)
 		{ // zyk: passed out, recover some stamina
-			int stamina_out_recovery = 20 + (5 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
+			int stamina_out_recovery = 30 + (5 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
+
+			// zyk: Enlightenment Light regens more Stamina
+			if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] > level.time)
+			{
+				stamina_out_recovery *= 2;
+			}
 
 			zyk_set_stamina(ent, stamina_out_recovery, qtrue);
-			set_nature_energy(ent, stamina_out_recovery, qfalse);
+
+			// zyk: loses some Nature Energy
+			set_nature_energy(ent, 1, qfalse);
 
 			// zyk: also lose some health
 			ent->health--;
@@ -1559,7 +1567,6 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 			{ // zyk: meditating, recover some stamina
 				int stamina_meditate_recovery = 5 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
-				int stamina_nature_energy_usage = stamina_meditate_recovery;
 
 				// zyk: Enlightenment Light regens more Stamina
 				if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] > level.time)
@@ -1568,7 +1575,6 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 				}
 
 				zyk_set_stamina(ent, stamina_meditate_recovery, qtrue);
-				set_nature_energy(ent, stamina_nature_energy_usage, qfalse);
 			}
 			else if (zyk_is_player_idle(ent, ucmd) == qfalse)
 			{
