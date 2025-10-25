@@ -6867,15 +6867,16 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
 
-	rpg_inventory_weights[RPG_INVENTORY_MISC_QUEST_LOG] = 50;
-
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 200;
-
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FUEL] = 1;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 5;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 7;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = 20;
+
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 50;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 200;
 
 	if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -8833,9 +8834,17 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time && 
 						ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 					{
+						int mp_regen_amount = 1;
+
+						// zyk: Enlightenment Dark regens more mp
+						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time)
+						{
+							mp_regen_amount *= 2;
+						}
+
 						if (ent->client->pers.nature_energy > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent))
 						{
-							zyk_set_mp(ent, 1, qtrue);
+							zyk_set_mp(ent, mp_regen_amount, qtrue);
 							set_nature_energy(ent, 1, qfalse);
 						}
 

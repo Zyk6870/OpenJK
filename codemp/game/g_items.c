@@ -2825,7 +2825,8 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 			ent->item->giType == IT_AMMO || 
 			ent->item->giType == IT_HOLDABLE || 
 			ent->item->giType == IT_HEALTH || 
-			ent->item->giType == IT_ARMOR)
+			ent->item->giType == IT_ARMOR || 
+			ent->item->giType == IT_POWERUP)
 		{
 			cannot_pickup_item = qfalse;
 
@@ -2852,7 +2853,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		return;
 	}
 
-	if (ent->item->giType == IT_POWERUP &&
+	if (ent->item->giType == IT_POWERUP && other->client->sess.account_mode < ACC_MODE_RPG && // zyk: now RPG players can pickup both
 		(ent->item->giTag == PW_FORCE_ENLIGHTENED_LIGHT || ent->item->giTag == PW_FORCE_ENLIGHTENED_DARK))
 	{
 		if (ent->item->giTag == PW_FORCE_ENLIGHTENED_LIGHT)

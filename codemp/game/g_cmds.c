@@ -323,15 +323,16 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
 
-	inventory_item_names[RPG_INVENTORY_MISC_QUEST_LOG] = "Quest Log";
-
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
-
 	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "Fuel";
 	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "Medpack";
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
+	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = "Enlightenment (Light)";
+	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = "Enlightenment (Dark)";
+
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -557,14 +558,6 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes E-Web have more health and damage\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
-	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Nature Energy into attack power and extra shield resistance to damage. Consumes Nature Energy to use medpacks and shield boosters in your inventory to restore health and shield if they are not full. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/list inv use %d^7. It uses Nature Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_QUEST_LOG)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Has a lot of useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
-	}
 	else if (item_index == RPG_INVENTORY_MISC_FUEL)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Fuel used by the Jetpack and the Flame Thrower\n\n\"", zyk_get_inventory_item_name(item_index)));
@@ -584,6 +577,22 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that regens more Stamina (when meditating) for a short time without consuming more Nature Energy. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that regens more MP (when meditating) for a short time without consuming more Nature Energy. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+	}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Has a lot of useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
+		}
+	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Nature Energy into attack power and extra shield resistance to damage. Consumes Nature Energy to use medpacks and shield boosters in your inventory to restore health and shield if they are not full. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/list inv use %d^7. It uses Nature Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
 	}
 }
 
@@ -648,15 +657,16 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "inventorySeekerDroneUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "inventoryEWebUpgrade";
 
-	inventory_item_names[RPG_INVENTORY_MISC_QUEST_LOG] = "inventoryQuestLog";
-
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
-
 	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "inventoryFuel";
 	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "inventoryMedpack";
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "inventoryShieldBooster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "inventoryYsalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "inventoryForceBoon";
+	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = "inventoryEnlightenmentLight";
+	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = "inventoryEnlightenmentDark";
+
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "inventoryQuestLog";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -6583,12 +6593,6 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][0] = 1000;
-	seller_items_cost[RPG_INVENTORY_MISC_QUEST_LOG][1] = 500;
-
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 1000;
-
 	seller_items_cost[RPG_INVENTORY_MISC_FUEL][0] = 3;
 	seller_items_cost[RPG_INVENTORY_MISC_FUEL][1] = 1;
 
@@ -6603,6 +6607,18 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 
 	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][0] = 100;
 	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][1] = 50;
+
+	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT][0] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT][1] = 50;
+
+	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK][0] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK][1] = 50;
+
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][0] = 1000;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][1] = 500;
+
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 1000;
 
 	if (buy_item == qtrue)
 	{
@@ -6999,6 +7015,22 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/boon.mp3"));
 	}
+	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] > 0)
+	{
+		ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 30000;
+
+		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] > 0)
+	{
+		ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = level.time + 30000;
+
+		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
+	}
 }
 
 void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
@@ -7140,7 +7172,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 							{
 								zyk_use_inventory_item(ent, item_index);
 							}
-							else if (item_index >= RPG_INVENTORY_MISC_MEDPACK && item_index <= RPG_INVENTORY_MISC_FORCE_BOON)
+							else if (item_index >= RPG_INVENTORY_MISC_MEDPACK && item_index <= RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK)
 							{ // zyk: these items can be used
 								zyk_use_inventory_item(ent, item_index);
 							}
@@ -7149,7 +7181,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 								trap->SendServerCommand(ent->s.number, va("print \"Item number must be %d, or between %d and %d, or between %d and %d\n\"", 
 									(RPG_INVENTORY_ITEM_SEEKER_DRONE + 1),
 									(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_EXPLOSIVE + 1),
-									(RPG_INVENTORY_MISC_MEDPACK + 1), (RPG_INVENTORY_MISC_FORCE_BOON + 1)));
+									(RPG_INVENTORY_MISC_MEDPACK + 1), (RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK + 1)));
 							}
 						}
 					}
@@ -7170,7 +7202,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			{
 				if (zyk_allow_quests.integer == 1)
 				{
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_QUEST_LOG] > 0)
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] > 0)
 					{
 						int page = 1; // zyk: page the user wants to see
 						char arg2[MAX_STRING_CHARS];
@@ -7192,24 +7224,24 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 						if (page == 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7the most common enemy. After a while he will be able to use E11 Blaster Rifle\n^3Heavy Armored Warrior: ^7armored soldier with guns and wearing Protective Armor and Adaptive Armor\n^3Flying Warrior: ^7a flying armored soldier wearing Protective Armor\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Melee attacks can cause Poison status. Has Chaos Field magic\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. Melee attacks can cause Bleeding status. Has Healing Circle magic\n^3Force Saber Warrior (Light): ^7uses blue clothes and has Light-Side force powers and saber\n^3Force Saber Warrior (Dark): ^7uses red clothes and has Dark-Side force powers and saber^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7the most common enemy. After a while he will be able to use E11 Blaster Rifle\n^3Heavy Armored Warrior: ^7armored soldier with guns and wearing Protective Armor and Adaptive Armor\n^3Flying Warrior: ^7a flying armored soldier wearing Protective Armor\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Melee attacks can cause Poison status. Has Chaos Field magic\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. Melee attacks can cause Bleeding status. Has Healing Circle magic\n^3Force Saber Warrior (Light): ^7uses blue clothes and has Light-Side force powers and saber\n^3Force Saber Warrior (Dark): ^7uses red clothes and has Dark-Side force powers and saber^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Force Saber Warrior (Both): ^7uses brown clothes and has both Light-Side and Dark-Side force powers and saber\n^3Force Saber Warrior (Guns): ^7uses green clothes and has both Light-Side and Dark-Side force powers and guns\n^3Mage Scholar: ^7mage in blue clothes with Magic Fist and Magic Flight skills. Can use Healing Circle and Chaos Field magic powers\n^3Mage Minister: ^7mage in red clothes with Magic Fist and Magic Flight skills. Can use Magic Shield and Lightning Dome magic powers\n^3Mage Master: ^7the Mage Masters are the leaders of The Conquerors. Mage in gray clothes, wearing Protective Armor and Adaptive Armor. Can cloak himself. Has Magic Fist, Magic Flight and high level of all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Force Saber Warrior (Both): ^7uses brown clothes and has both Light-Side and Dark-Side force powers and saber\n^3Force Saber Warrior (Guns): ^7uses green clothes and has both Light-Side and Dark-Side force powers and guns\n^3Mage Scholar: ^7mage in blue clothes with Magic Fist and Magic Flight skills. Can use Healing Circle and Chaos Field magic powers\n^3Mage Minister: ^7mage in red clothes with Magic Fist and Magic Flight skills. Can use Magic Shield and Lightning Dome magic powers\n^3Mage Master: ^7the Mage Masters are the leaders of The Conquerors. Mage in gray clothes, wearing Protective Armor and Adaptive Armor. Can cloak himself. Has Magic Fist, Magic Flight and high level of all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 3)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance ally. Has force/saber\n^3Ally Flying Warrior: ^7a Resistance ally. Flies and has guns\n^3Ally Mage: ^7a Resistance ally. Can use Magic Fist, Magic Flight and all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance ally. Has force/saber\n^3Ally Flying Warrior: ^7a Resistance ally. Flies and has guns\n^3Ally Mage: ^7a Resistance ally. Can use Magic Fist, Magic Flight and all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 4)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your allies strength is based on your amount of Nature Energy. I created a special item that may help you if you can find it: Energy Modulator. Your quest progress increases the chance to get it\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG), QUESTCHAR_MAIN));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your allies strength is based on your amount of Nature Energy. I created a special item that may help you if you can find it: Energy Modulator. Your quest progress increases the chance to get it\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
 						}
 					}
 					else
 					{
-						trap->SendServerCommand(ent->s.number, va("print \"\nYou don't have the %s^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_MISC_QUEST_LOG)));
+						trap->SendServerCommand(ent->s.number, va("print \"\nYou don't have the %s^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 					}
 				}
 				else
