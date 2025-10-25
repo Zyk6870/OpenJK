@@ -1612,10 +1612,11 @@ qboolean TryHeal(gentity_t *ent, gentity_t *target)
 extern void set_nature_energy(gentity_t* ent, int amount, qboolean add);
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
-extern void zyk_energy_modulator(gentity_t* ent);
+extern void zyk_use_inventory_item(gentity_t* ent, zyk_inventory_t item_index);
 qboolean zyk_magic_flight(gentity_t* ent)
 {
 	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] > 0 &&
+		ent->client->pers.magic_power > 0 && 
 		!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_JETPACK)) && ent->client->jetPackToggleTime < level.time)
 	{
 		if (ent->client->pers.in_magic_flight == qtrue)
@@ -1684,9 +1685,29 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 			{
 				zyk_cast_magic(ent, SKILL_LIGHTNING_DOME);
 			}
-			else if (ent->client->pers.selected_ability == SELECTED_ABILITY_ENERGY_MODULATOR)
+			else if (ent->client->pers.selected_ability >= SELECTED_ABILITY_SEEKER_DRONE && ent->client->pers.selected_ability <= SELECTED_ABILITY_ENERGY_MODULATOR)
 			{
-				zyk_energy_modulator(ent);
+				zyk_inventory_t inventory_indexes[MAX_SELECTED_ABILITIES] = {
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					-1,
+					RPG_INVENTORY_ITEM_SEEKER_DRONE,
+					RPG_INVENTORY_MISC_MEDPACK,
+					RPG_INVENTORY_MISC_SHIELD_BOOSTER,
+					RPG_INVENTORY_MISC_YSALAMIRI,
+					RPG_INVENTORY_MISC_FORCE_BOON,
+					RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT,
+					RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK,
+					RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR
+				};
+
+				if (inventory_indexes[ent->client->pers.selected_ability] > -1)
+				{
+					zyk_use_inventory_item(ent, inventory_indexes[ent->client->pers.selected_ability]);
+				}
 			}
 		}
 	}

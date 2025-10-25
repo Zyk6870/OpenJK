@@ -8586,11 +8586,9 @@ void G_RunFrame( int levelTime ) {
 				{
 					int magic_flight_mp_usage = 1 + zyk_max_skill_level(SKILL_MAGIC_FLIGHT) - ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT];
 
-					if (ent->client->pers.magic_power >= magic_flight_mp_usage)
-					{
-						zyk_set_mp(ent, magic_flight_mp_usage, qfalse);
-					}
-					else
+					zyk_set_mp(ent, magic_flight_mp_usage, qfalse);
+
+					if (ent->client->pers.magic_power < magic_flight_mp_usage)
 					{
 						ent->client->pers.in_magic_flight = qfalse;
 						Jetpack_Off(ent);

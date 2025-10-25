@@ -202,7 +202,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FIST)
 		return va("Allows you to attack with magic bolts when using melee punches. Each level increases damage. Magic Affinity increases damage. At max level, can damage any objects that normally would only be able to be damaged by Saber or Heavy Weapons, and can also interact with some objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAGIC_FLIGHT)
-		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases mp usage";
+		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases mp usage. You can also bind it to a key like this: ^3/bind <key> magicflight^7";
 	if (skill_index == SKILL_MAGIC_SHIELD)
 		return va("A magic shield appears around you, decreasing damage to your health from any source. If you have Magic Fist skill, has a chance to automatically shoot at the nearest target. Higher levels and Magic Affinity increase resistance to damage to your health and also increases chance to shoot Magic Fist more often. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_HEALING_CIRCLE)
@@ -328,8 +328,8 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
-	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = "Enlightenment (Light)";
-	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = "Enlightenment (Dark)";
+	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = "Enlightenment - Light";
+	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = "Enlightenment - Dark";
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
@@ -6934,7 +6934,7 @@ void zyk_toggle_light_source(gentity_t* ent)
 	}
 }
 
-void zyk_use_inventory_item(gentity_t* ent, int item_index)
+void zyk_use_inventory_item(gentity_t* ent, zyk_inventory_t item_index)
 {
 	int weapon_upgrades[12][2] = {
 		{INV_UPGRADE_STUN_BATON1, INV_UPGRADE_STUN_BATON2},
@@ -10885,6 +10885,17 @@ void Cmd_Magic_f( gentity_t *ent ) {
 
 /*
 ==================
+Cmd_MagicFlight_f
+==================
+*/
+extern qboolean zyk_magic_flight(gentity_t* ent);
+void Cmd_MagicFlight_f(gentity_t* ent)
+{
+	zyk_magic_flight(ent);
+}
+
+/*
+==================
 Cmd_DuelMode_f
 ==================
 */
@@ -12075,6 +12086,7 @@ command_t commands[] = {
 	{ "login",				Cmd_LoginAccount_f,			CMD_NOINTERMISSION },
 	{ "logout",				Cmd_LogoutAccount_f,		CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "magic",				Cmd_Magic_f,				CMD_RPG|CMD_NOINTERMISSION },
+	{ "magicflight",		Cmd_MagicFlight_f,			CMD_RPG | CMD_NOINTERMISSION },
 	{ "maplist",			Cmd_MapList_f,				CMD_NOINTERMISSION },
 	{ "meleearena",			Cmd_MeleeArena_f,			CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "meleemode",			Cmd_MeleeMode_f,			CMD_ALIVE|CMD_NOINTERMISSION },
