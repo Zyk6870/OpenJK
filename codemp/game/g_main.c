@@ -9311,6 +9311,14 @@ void G_RunFrame( int levelTime ) {
 					}
 					*/
 
+					// zyk: quest npcs regen mp
+					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
+					{
+						zyk_set_mp(ent, 1, qtrue);
+
+						ent->client->pers.magic_regen_debounce_timer = level.time + 900 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+					}
+
 					if (ent->enemy)
 					{
 						int first_magic_skill = SKILL_MAGIC_SHIELD;
@@ -9436,9 +9444,11 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					// zyk: regen mp and level of this mage
-					if (ent->client->pers.magic_power < 20)
+					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 					{
-						ent->client->pers.magic_power = zyk_max_magic_power(ent);
+						zyk_set_mp(ent, 1, qtrue);
+
+						ent->client->pers.magic_regen_debounce_timer = level.time + 900 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
 					}
 
 					zyk_cast_magic(ent, first_magic_skill + random_magic);

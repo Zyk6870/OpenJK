@@ -4779,7 +4779,7 @@ int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 50);
+	int max_mp = (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 40);
 
 	return max_mp;
 }

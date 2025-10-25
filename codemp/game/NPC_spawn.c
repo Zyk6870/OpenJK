@@ -1778,6 +1778,7 @@ finish:
 		// zyk: initializing Magic Power attributes
 		newent->client->pers.active_magic = 0;
 		newent->client->pers.magic_lightning_dome_bonus = 0;
+		newent->client->pers.magic_regen_debounce_timer = 0;
 		newent->client->pers.magic_power_usage_timer = 0;
 		newent->client->pers.magic_power = 0;
 
