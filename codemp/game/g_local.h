@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.50"
+#define	GAMEVERSION	"New Zyk Mod v1.6.51"
 
 #define SECURITY_LOG "security.log"
 
@@ -1439,7 +1439,7 @@ typedef struct {
 #define MAX_DUEL_MATCHES 496
 
 // zyk: number of chosen crystals in the secret artifact puzzle
-#define LEGENDARY_CRYSTALS_CHOSEN 10
+#define LEGENDARY_CRYSTALS_CHOSEN 9
 
 typedef enum {
 	QUEST_SECRET_INIT_STEP,
