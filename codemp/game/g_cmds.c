@@ -7990,6 +7990,7 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 	settings_descriptions[SETTINGS_SHOW_MP_LEVEL] = "Red bar show Fuel (Jetpack/Flame Thrower) or MP";
 	settings_descriptions[SETTINGS_SHOW_STAMINA_BAR] = "Show Stamina Blue Bar";
 	settings_descriptions[SETTINGS_STORE_POWERUPS] = "Store picked-up power-ups in inventory";
+	settings_descriptions[SETTINGS_QUEST_TREE] = "Show Spirit Tree after quest is completed";
 
 	if (settings_value >= 0 && settings_value < MAX_PLAYER_SETTINGS)
 	{

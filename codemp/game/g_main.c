@@ -9082,7 +9082,8 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				// zyk: Spirit Tree regen and wither
-				if (ent->client->pers.quest_progress_timer < level.time)
+				if (ent->client->pers.quest_progress_timer < level.time && 
+					(!(ent->client->pers.player_settings & (1 << SETTINGS_QUEST_TREE)) || zyk_is_main_quest_complete(ent) == qfalse))
 				{
 					zyk_spirit_tree_events(ent);
 
