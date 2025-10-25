@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.44"
+#define	GAMEVERSION	"New Zyk Mod v1.6.45"
 
 #define SECURITY_LOG "security.log"
 
@@ -767,6 +767,7 @@ typedef enum {
 
 typedef enum {
 	SELECTED_ABILITY_NONE,
+	SELECTED_ABILITY_MAGIC_FLIGHT,
 	SELECTED_ABILITY_MAGIC_SHIELD,
 	SELECTED_ABILITY_HEALING_CIRCLE,
 	SELECTED_ABILITY_CHAOS_FIELD,

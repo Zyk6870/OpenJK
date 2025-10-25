@@ -202,7 +202,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FIST)
 		return va("Allows you to attack with magic bolts when using melee punches. Each level increases damage. Magic Affinity increases damage. At max level, can damage any objects that normally would only be able to be damaged by Saber or Heavy Weapons, and can also interact with some objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAGIC_FLIGHT)
-		return "Allows you to fly using Magic Points. Jump and press Use key midair to activate flight (similar to Jetpack). Each level decreases mp usage";
+		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases mp usage";
 	if (skill_index == SKILL_MAGIC_SHIELD)
 		return va("A magic shield appears around you, decreasing damage to your health from any source. If you have Magic Fist skill, has a chance to automatically shoot at the nearest target. Higher levels and Magic Affinity increase resistance to damage to your health and also increases chance to shoot Magic Fist more often. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_HEALING_CIRCLE)
@@ -4466,10 +4466,11 @@ char* zyk_selected_ability_name(zyk_selected_ability_t selected_ability)
 	char* ability_names[MAX_SELECTED_ABILITIES];
 
 	ability_names[SELECTED_ABILITY_NONE] = "None";
-	ability_names[SELECTED_ABILITY_MAGIC_SHIELD] = "Magic Shield (Magic power)";
-	ability_names[SELECTED_ABILITY_HEALING_CIRCLE] = "Healing Circle (Magic power)";
-	ability_names[SELECTED_ABILITY_CHAOS_FIELD] = "Chaos Field (Magic power)";
-	ability_names[SELECTED_ABILITY_LIGHTNING_DOME] = "Lightning Dome (Magic power)";
+	ability_names[SELECTED_ABILITY_MAGIC_FLIGHT] = "Magic Flight (Magic)";
+	ability_names[SELECTED_ABILITY_MAGIC_SHIELD] = "Magic Shield (Magic)";
+	ability_names[SELECTED_ABILITY_HEALING_CIRCLE] = "Healing Circle (Magic)";
+	ability_names[SELECTED_ABILITY_CHAOS_FIELD] = "Chaos Field (Magic)";
+	ability_names[SELECTED_ABILITY_LIGHTNING_DOME] = "Lightning Dome (Magic)";
 	ability_names[SELECTED_ABILITY_ENERGY_MODULATOR] = "Energy Modulator (Item)";
 
 	if (selected_ability >= 0 && selected_ability < MAX_SELECTED_ABILITIES)

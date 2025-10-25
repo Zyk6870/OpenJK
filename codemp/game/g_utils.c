@@ -1626,7 +1626,7 @@ qboolean zyk_magic_flight(gentity_t* ent)
 
 			return qtrue;
 		}
-		else if (ent->client->ps.groundEntityNum == ENTITYNUM_NONE)
+		else // if (ent->client->ps.groundEntityNum == ENTITYNUM_NONE)
 		{
 			ent->client->pers.in_magic_flight = qtrue;
 			Jetpack_On(ent);
@@ -1664,7 +1664,11 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 		}
 		else if (ent->client->pers.selected_ability > SELECTED_ABILITY_NONE)
 		{
-			if (ent->client->pers.selected_ability == SELECTED_ABILITY_MAGIC_SHIELD)
+			if (ent->client->pers.selected_ability == SELECTED_ABILITY_MAGIC_FLIGHT)
+			{
+				zyk_magic_flight(ent);
+			}
+			else if (ent->client->pers.selected_ability == SELECTED_ABILITY_MAGIC_SHIELD)
 			{
 				zyk_cast_magic(ent, SKILL_MAGIC_SHIELD);
 			}
@@ -2151,10 +2155,12 @@ tryJetPack:
 		}
 	}
 
+	/*
 	if (zyk_magic_flight(ent) == qtrue)
 	{
 		return;
 	}
+	*/
 
 	zyk_use_rpg_stuff(ent);
 }
