@@ -8802,7 +8802,8 @@ void G_RunFrame( int levelTime ) {
 					// zyk: Nature Energy generation
 					if (ent->client->pers.nature_energy_timer < level.time)
 					{
-						int nature_energy_time = 1500;
+						int main_quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS);
+						int nature_energy_time = 1200;
 						int nature_energy_amount = 1;
 
 						// zyk: meditating
@@ -8817,9 +8818,12 @@ void G_RunFrame( int levelTime ) {
 							set_nature_energy(ent, nature_energy_amount, qtrue);
 						}
 
+						// zyk: Quest progress increase Nature Energy regen rate
+						nature_energy_time -= (main_quest_progress * 5);
+
 						if (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] > 0)
 						{
-							nature_energy_time -= (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] * 50);
+							nature_energy_time -= (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] * 20);
 						}
 
 						ent->client->pers.nature_energy_timer = level.time + nature_energy_time;

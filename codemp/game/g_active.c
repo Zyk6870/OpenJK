@@ -1297,6 +1297,7 @@ qboolean G_ActionButtonPressed(int buttons)
 	return qfalse;
 }
 
+extern void set_nature_energy(gentity_t* ent, int amount, qboolean add);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 
@@ -1510,6 +1511,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			int stamina_out_recovery = 20 + (5 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
 
 			zyk_set_stamina(ent, stamina_out_recovery, qtrue);
+			set_nature_energy(ent, stamina_out_recovery, qfalse);
 
 			// zyk: also lose some health
 			ent->health--;
@@ -1559,6 +1561,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 				int stamina_meditate_recovery = 5 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
 
 				zyk_set_stamina(ent, stamina_meditate_recovery, qtrue);
+				set_nature_energy(ent, stamina_meditate_recovery, qfalse);
 			}
 			else if (zyk_is_player_idle(ent, ucmd) == qfalse)
 			{
