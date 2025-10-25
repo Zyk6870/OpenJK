@@ -589,7 +589,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Has a lot of useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
-		}
+	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Nature Energy into attack power and extra shield resistance to damage. Consumes Nature Energy to use medpacks and shield boosters in your inventory to restore health and shield if they are not full. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/list inv use %d^7. It uses Nature Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
@@ -7001,7 +7001,7 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_YSALAMIRI] > 0)
 	{
-		ent->client->ps.powerups[PW_YSALAMIRI] = level.time + 30000;
+		ent->client->ps.powerups[PW_YSALAMIRI] = level.time + RPG_POWERUP_TIMER;
 
 		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
 
@@ -7009,7 +7009,7 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FORCE_BOON] > 0)
 	{
-		ent->client->ps.powerups[PW_FORCE_BOON] = level.time + 30000;
+		ent->client->ps.powerups[PW_FORCE_BOON] = level.time + RPG_POWERUP_TIMER;
 
 		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
 
@@ -7017,7 +7017,7 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] > 0)
 	{
-		ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + 30000;
+		ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] = level.time + RPG_POWERUP_TIMER;
 
 		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
 
@@ -7025,7 +7025,7 @@ void zyk_use_inventory_item(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] > 0)
 	{
-		ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = level.time + 30000;
+		ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] = level.time + RPG_POWERUP_TIMER;
 
 		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
 
@@ -7914,6 +7914,7 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 	settings_descriptions[SETTINGS_PICKUP_MAX_WEIGHT] = "Do not pick-up stuff in map above max weight";
 	settings_descriptions[SETTINGS_SHOW_MP_LEVEL] = "Red bar show Fuel (Jetpack/Flame Thrower) or MP";
 	settings_descriptions[SETTINGS_SHOW_STAMINA_BAR] = "Show Stamina Blue Bar";
+	settings_descriptions[SETTINGS_STORE_POWERUPS] = "Store picked-up power-ups in inventory";
 
 	if (settings_value >= 0 && settings_value < MAX_PLAYER_SETTINGS)
 	{

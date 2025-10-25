@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.43"
+#define	GAMEVERSION	"New Zyk Mod v1.6.44"
 
 #define SECURITY_LOG "security.log"
 
@@ -542,6 +542,7 @@ typedef enum {
 	SETTINGS_PICKUP_MAX_WEIGHT,
 	SETTINGS_SHOW_MP_LEVEL,
 	SETTINGS_SHOW_STAMINA_BAR,
+	SETTINGS_STORE_POWERUPS,
 	MAX_PLAYER_SETTINGS
 } zyk_settings_t;
 
@@ -799,6 +800,7 @@ typedef enum {
 #define RPG_MAX_HEALTH_INCREASE 20
 #define RPG_MEDPACK_REGEN 25
 #define RPG_SHIELD_BOOSTER_REGEN 25
+#define RPG_POWERUP_TIMER 30000
 
 // zyk: when casting magic, use anim for this amount of time in miliseconds
 #define MAGIC_ANIM_TIME 1400

@@ -3084,6 +3084,39 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	}
 	ent->r.contents = 0;
 
+	// zyk: RPG players can store power-ups in inventory
+	if (ent->item->giType == IT_POWERUP && other->client->sess.account_mode == ACC_MODE_RPG && !(other->client->pers.player_settings & (1 << SETTINGS_STORE_POWERUPS)))
+	{
+		int powerup_amount = other->client->ps.powerups[ent->item->giTag] / RPG_POWERUP_TIMER;
+		zyk_inventory_t powerup_type;
+
+		if (powerup_amount < 1)
+		{
+			powerup_amount = 1;
+		}
+
+		if (ent->item->giTag == PW_FORCE_BOON)
+		{
+			powerup_type = RPG_INVENTORY_MISC_FORCE_BOON;
+		}
+		else if (ent->item->giTag == PW_FORCE_ENLIGHTENED_LIGHT)
+		{
+			powerup_type = RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT;
+		}
+		else if (ent->item->giTag == PW_FORCE_ENLIGHTENED_DARK)
+		{
+			powerup_type = RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK;
+		}
+		else
+		{
+			powerup_type = RPG_INVENTORY_MISC_YSALAMIRI;
+		}
+
+		zyk_update_inventory_quantity(other, qtrue, powerup_type, powerup_amount);
+
+		other->client->ps.powerups[ent->item->giTag] = level.time + 500;
+	}
+
 	if (ent->genericValue9)
 	{ //dropped item, should be removed when picked up
 		ent->think = G_FreeEntity;
