@@ -6922,7 +6922,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	if (ent->client->pers.tutorial_step == INITIAL_TUTORIAL_STEP)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. I am the %s^7. Hold Use key on me and I will explain everything you need to know.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname, QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. I am the %s^7. Hold ^2Use ^7key on me and I will explain everything you need to know.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname, QUESTCHAR_MAIN));
 
 		ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 	}
@@ -9040,7 +9040,7 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR
 					)
 				{
-					int quest_log_chance = (RPG_MAX_QUEST_LOG_PARTS - ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG]) * 4;
+					int quest_log_chance = (RPG_MAX_QUEST_LOG_PARTS - ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG]) * 5;
 
 					// zyk: Quest Log
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < RPG_MAX_QUEST_LOG_PARTS && 

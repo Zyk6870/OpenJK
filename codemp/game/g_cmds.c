@@ -7297,7 +7297,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						if (page <= 0)
 							page = 1;
 
-						if (page > RPG_MAX_QUEST_LOG_PARTS)
+						if (page > ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG])
 						{
 							trap->SendServerCommand(ent->s.number, "print \"Find more Quest Log parts to read more info.\n\"");
 							return;

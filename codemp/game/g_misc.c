@@ -2847,7 +2847,8 @@ void fx_runner_think( gentity_t *ent )
 
 						return;
 					}
-					else if (Q_stricmp(ent->targetname, "zyk_quest_log") == 0)
+					else if (Q_stricmp(ent->targetname, "zyk_quest_log") == 0 && 
+							 player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < RPG_MAX_QUEST_LOG_PARTS)
 					{
 						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_LEGENDARY_QUEST_LOG, 1);
 
@@ -2855,7 +2856,7 @@ void fx_runner_think( gentity_t *ent )
 
 						zyk_clear_quest_effect(ent);
 
-						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7You found part of the Quest Log. Read it with /questlog\n\"", QUESTCHAR_MAIN));
+						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7You found part of the Quest Log. Read it with ^3/list questlog^7\n\"", QUESTCHAR_MAIN));
 
 						return;
 					}
