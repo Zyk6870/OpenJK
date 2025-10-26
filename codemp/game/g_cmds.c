@@ -492,7 +492,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Decrease light source powercell usage. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds, and has a chance to cause Confusion status\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
 	{
@@ -5476,7 +5476,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.energy_modulator_energy_usage_timer = 0;
 
 			ent->client->pers.quickdraw_timer = 0;
-			ent->client->pers.flashlight_timer = 0;
+			ent->client->pers.light_source_timer = 0;
 
 			ent->client->pers.nature_energy_timer = 0;
 			ent->client->pers.buy_sell_timer = 0;

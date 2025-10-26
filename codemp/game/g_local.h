@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.53"
+#define	GAMEVERSION	"New Zyk Mod v1.6.54"
 
 #define SECURITY_LOG "security.log"
 
@@ -1011,7 +1011,7 @@ typedef struct clientPersistant_s {
 	// zyk: all stuff the player can carry. Used to determine if player is carrying above the max weight
 	int rpg_inventory[MAX_RPG_INVENTORY_ITEMS];
 
-	int flashlight_timer;
+	int light_source_timer;
 
 	// zyk: has the flags of the Upgrades being used right now
 	int active_inventory_upgrades;

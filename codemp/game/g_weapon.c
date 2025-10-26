@@ -135,6 +135,7 @@ extern void Jedi_Decloak( gentity_t *self );
 
 extern int zyk_calculate_rpg_weapon_damage(gentity_t* ent, int base_dmg, int inventory_index);
 extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
+extern void zyk_set_rpg_status(gentity_t* ent, zyk_rpg_status_t rpg_status, int duration, qboolean add_status);
 
 static void WP_FireEmplaced( gentity_t *ent, qboolean altFire );
 
@@ -3963,6 +3964,12 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 					if (tr_ent->client->ps.powerups[PW_CLOAKED])
 					{ // zyk: stun baton upgrade decloaks players
 						Jedi_Decloak(tr_ent);
+					}
+
+					// zyk: has a chance to cause Confusion
+					if (Q_irand(0, 99) < 10)
+					{
+						zyk_set_rpg_status(tr_ent, RPG_STATUS_CONFUSED, 2000, qtrue);
 					}
 
 					tr_ent->client->pers.stun_baton_less_speed_timer = level.time + 1500;

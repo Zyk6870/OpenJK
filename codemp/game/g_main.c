@@ -8928,8 +8928,10 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.is_getting_up = qtrue;
 				}
 
-				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_USING_FLASHLIGHT) && ent->client->pers.flashlight_timer < level.time)
+				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_USING_FLASHLIGHT) && ent->client->pers.light_source_timer < level.time)
 				{ // zyk: using the Stun Baton light source
+					int light_source_timer = 250;
+
 					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
 
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] < 1 || ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_STUN_BATON] < 1)
@@ -8941,7 +8943,13 @@ void G_RunFrame( int levelTime ) {
 						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] * 1000);
 					}
 
-					ent->client->pers.flashlight_timer = level.time + 250;
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 &&
+						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON1))
+					{
+						light_source_timer = 400;
+					}
+
+					ent->client->pers.light_source_timer = level.time + light_source_timer;
 				}
 
 				// zyk: updating RPG inventory and calculating current weight
