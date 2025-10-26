@@ -499,12 +499,14 @@ char* zyk_get_enemy_type(int enemy_type)
 	enemy_names[QUEST_NPC_MAGE_SCHOLAR] = "mage_scholar";
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR_GUNS] = "force_saber_warrior_guns";
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = "force_saber_warrior_both";
+	enemy_names[QUEST_NPC_MAGE_APPRENTICE] = "mage_apprentice";
+	enemy_names[QUEST_NPC_FLYING_WARRIOR] = "flying_warrior";
+	enemy_names[QUEST_NPC_CHANGELING_WORM] = "changeling_worm";
+	enemy_names[QUEST_NPC_MAGE_FORCE] = "mage_force";
+	enemy_names[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = "heavy_armored_warrior";
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = "force_saber_warrior_dark";
 	enemy_names[QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT] = "force_saber_warrior_light";
-	enemy_names[QUEST_NPC_CHANGELING_WORM] = "changeling_worm";
 	enemy_names[QUEST_NPC_CHANGELING_HOWLER] = "changeling_howler";
-	enemy_names[QUEST_NPC_FLYING_WARRIOR] = "flying_warrior";
-	enemy_names[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = "heavy_armored_warrior";
 	enemy_names[QUEST_NPC_LOW_TRAINED_WARRIOR] = "low_trained_warrior";
 
 	enemy_names[QUEST_NPC_ALLY_MAGE] = "ally_mage";
@@ -530,12 +532,14 @@ int zyk_bonus_increase_for_quest_npc(zyk_quest_npc_t enemy_type)
 	bonus_increase[QUEST_NPC_MAGE_SCHOLAR] = QUEST_NPC_BONUS_INCREASE / 2;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_GUNS] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_MAGE_APPRENTICE] = QUEST_NPC_BONUS_INCREASE / 2;
+	bonus_increase[QUEST_NPC_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_CHANGELING_WORM] = QUEST_NPC_BONUS_INCREASE;
+	bonus_increase[QUEST_NPC_MAGE_FORCE] = QUEST_NPC_BONUS_INCREASE / 2;
+	bonus_increase[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT] = QUEST_NPC_BONUS_INCREASE;
-	bonus_increase[QUEST_NPC_CHANGELING_WORM] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_CHANGELING_HOWLER] = QUEST_NPC_BONUS_INCREASE;
-	bonus_increase[QUEST_NPC_FLYING_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
-	bonus_increase[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
 	bonus_increase[QUEST_NPC_LOW_TRAINED_WARRIOR] = QUEST_NPC_BONUS_INCREASE;
 
 	bonus_increase[QUEST_NPC_ALLY_MAGE] = QUEST_NPC_BONUS_INCREASE / 2;
@@ -561,12 +565,14 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 10;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_GUNS] = 0;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_BOTH] = 0;
+	max_levels[QUEST_NPC_MAGE_APPRENTICE] = 9;
+	max_levels[QUEST_NPC_FLYING_WARRIOR] = 0;
+	max_levels[QUEST_NPC_CHANGELING_WORM] = 5;
+	max_levels[QUEST_NPC_MAGE_FORCE] = 7;
+	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 0;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_DARK] = 0;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_LIGHT] = 0;
-	max_levels[QUEST_NPC_CHANGELING_WORM] = 5;
 	max_levels[QUEST_NPC_CHANGELING_HOWLER] = 5;
-	max_levels[QUEST_NPC_FLYING_WARRIOR] = 0;
-	max_levels[QUEST_NPC_HEAVY_ARMORED_WARRIOR] = 0;
 	max_levels[QUEST_NPC_LOW_TRAINED_WARRIOR] = 0;
 	
 	max_levels[QUEST_NPC_ALLY_MAGE] = 10;
@@ -665,19 +671,28 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
 		}
-		else if (quest_npc_type == QUEST_NPC_CHANGELING_WORM)
+		else if (quest_npc_type == QUEST_NPC_MAGE_APPRENTICE)
 		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
-		}
-		else if (quest_npc_type == QUEST_NPC_CHANGELING_HOWLER)
-		{
-			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_MAGIC_SHIELD, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
 		{
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = 1;
 
 			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = (1 << HI_JETPACK);
+		}
+		else if (quest_npc_type == QUEST_NPC_CHANGELING_WORM)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_HEALING_CIRCLE, npc_skill_level + skill_level_bonus);
+		}
+		else if (quest_npc_type == QUEST_NPC_MAGE_FORCE)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
+
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_HEAVY_ARMORED_WARRIOR)
 		{
@@ -687,6 +702,10 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] = 10000;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] = 10000;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS] = 10000;
+		}
+		else if (quest_npc_type == QUEST_NPC_CHANGELING_HOWLER)
+		{
+			zyk_set_magic_level_for_quest_npc(npc_ent, quest_npc_type, SKILL_CHAOS_FIELD, npc_skill_level + skill_level_bonus);
 		}
 		else if (quest_npc_type == QUEST_NPC_LOW_TRAINED_WARRIOR)
 		{
@@ -9185,7 +9204,7 @@ void G_RunFrame( int levelTime ) {
 							}
 							else
 							{
-								stronger_enemy_type -= (main_quest_progress / 7);
+								stronger_enemy_type -= (main_quest_progress / 6);
 							}
 
 							if (stronger_enemy_type > QUEST_NPC_LOW_TRAINED_WARRIOR)

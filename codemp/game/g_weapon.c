@@ -3967,7 +3967,7 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 					}
 
 					// zyk: has a chance to cause Confusion
-					if (Q_irand(0, 99) < 10)
+					if (Q_irand(0, 99) < 20)
 					{
 						zyk_set_rpg_status(tr_ent, RPG_STATUS_CONFUSED, 2000, qtrue);
 					}
