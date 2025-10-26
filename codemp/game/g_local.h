@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.55"
+#define	GAMEVERSION	"New Zyk Mod v1.6.56"
 
 #define SECURITY_LOG "security.log"
 
@@ -860,7 +860,7 @@ typedef enum {
 
 // zyk: quest values
 #define INITIAL_QUEST_PROGRESS 1000
-#define QUEST_PROGRESS_DECREASE 2000
+#define QUEST_PROGRESS_DECREASE 1000
 #define MAX_QUEST_PROGRESS 100000
 #define SIDE_QUEST_STUFF_TIMER 1000
 #define SIDE_QUEST_PUZZLE_TIMER 90000
