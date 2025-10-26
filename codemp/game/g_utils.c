@@ -1644,7 +1644,7 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 {
 	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->health > 1)
 	{
-		if (!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_COMPLETED)) && ent->client->pers.quest_spirit_tree_id > -1 &&
+		if (ent->client->pers.quest_spirit_tree_id > -1 &&
 			ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT &&
 			ent->client->ps.forceDodgeAnim == BOTH_MEDITATE &&
 			ent->client->pers.quest_spirit_tree_call_timer < level.time)
