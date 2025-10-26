@@ -6811,6 +6811,7 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = 300;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 500;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 100;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = 30;
@@ -8799,18 +8800,18 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					// zyk: MP regen while meditating
-					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time && 
-						ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 					{
 						int mp_regen_amount = 1;
 
 						// zyk: Enlightenment Dark regens more mp
-						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time)
+						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time && ent->client->pers.magic_power < zyk_max_magic_power(ent))
 						{
-							mp_regen_amount *= 2;
+							zyk_set_mp(ent, mp_regen_amount, qtrue);
 						}
 
-						if (ent->client->pers.nature_energy > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent))
+						if (ent->client->pers.nature_energy > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent) && 
+							ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 						{
 							zyk_set_mp(ent, mp_regen_amount, qtrue);
 							set_nature_energy(ent, 1, qfalse);

@@ -1564,15 +1564,17 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 				stamina_usage += 2;
 			}
 
+			// zyk: Enlightenment Light regens more Stamina
+			if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] > level.time)
+			{
+				int stamina_powerup_recovery = 5 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
+
+				zyk_set_stamina(ent, stamina_powerup_recovery, qtrue);
+			}
+
 			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 			{ // zyk: meditating, recover some stamina
 				int stamina_meditate_recovery = 5 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
-
-				// zyk: Enlightenment Light regens more Stamina
-				if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] > level.time)
-				{
-					stamina_meditate_recovery *= 2;
-				}
 
 				zyk_set_stamina(ent, stamina_meditate_recovery, qtrue);
 			}

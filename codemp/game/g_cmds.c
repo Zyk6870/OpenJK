@@ -580,11 +580,11 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that regens more Stamina (when meditating) for a short time without consuming more Nature Energy. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that regens more Stamina for a short time. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that regens more MP (when meditating) for a short time without consuming more Nature Energy. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that regens more MP for a short time. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
 	{
