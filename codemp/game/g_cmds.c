@@ -6867,7 +6867,7 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 		strcpy(message, va("%s^3Nature Energy: ^2%d\n", message, ent->client->pers.nature_energy));
 	}
 
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                          - ^5Count - ^2Weight - ^3Make - Unmake\n\n%s\n^7Use ^3/itemmake <item number> ^7or ^3/itemunmake <item number> ^7to make or unmake items\n\"", message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                          - ^5Count - ^2Weight - ^3Make - Unmake\n\n%s\n^7Use ^3/make <item number> ^7or ^3/unmake <item number> ^7to make or unmake items\n\"", message));
 }
 
 qboolean zyk_is_main_quest_complete(gentity_t* ent)
@@ -7454,10 +7454,10 @@ void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add)
 
 /*
 ==================
-Cmd_ItemMake_f
+Cmd_Make_f
 ==================
 */
-void Cmd_ItemMake_f( gentity_t *ent ) {
+void Cmd_Make_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	char arg2[MAX_STRING_CHARS];
 	int value = 0;
@@ -7467,7 +7467,7 @@ void Cmd_ItemMake_f( gentity_t *ent ) {
 
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"You must specify an item number and an optional amount. Example: ^3/itemmake 1 ^7or ^3/itemmake 1 20^7. Max amount of %d.\n\"", RPG_MAX_BUY_AMOUNT));
+		trap->SendServerCommand(ent->s.number, va("print \"You must specify an item number and an optional amount. Example: ^3/make 1 ^7or ^3/make 1 20^7. Max amount of %d.\n\"", RPG_MAX_BUY_AMOUNT));
 		return;
 	}
 
@@ -7561,10 +7561,10 @@ void Cmd_ItemMake_f( gentity_t *ent ) {
 
 /*
 ==================
-Cmd_ItemUnmake_f
+Cmd_Unmake_f
 ==================
 */
-void Cmd_ItemUnmake_f( gentity_t *ent ) {
+void Cmd_Unmake_f( gentity_t *ent ) {
 	char arg1[MAX_STRING_CHARS];
 	char arg2[MAX_STRING_CHARS];
 	int value = 0;
@@ -7574,7 +7574,7 @@ void Cmd_ItemUnmake_f( gentity_t *ent ) {
 
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"You must specify an item number and an optional amount. Example: ^3/itemunmake 1 ^7or ^3/itemunmake 1 20^7.\n\"" );
+		trap->SendServerCommand(ent->s.number, "print \"You must specify an item number and an optional amount. Example: ^3/unmake 1 ^7or ^3/unmake 1 20^7.\n\"" );
 		return;
 	}
 
@@ -12173,8 +12173,6 @@ command_t commands[] = {
 	{ "god",				Cmd_God_f,					CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "ignore",				Cmd_Ignore_f,				CMD_NOINTERMISSION },
 	{ "ignorelist",			Cmd_IgnoreList_f,			CMD_NOINTERMISSION },
-	{ "itemmake",			Cmd_ItemMake_f,				CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
-	{ "itemunmake",			Cmd_ItemUnmake_f,			CMD_RPG|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "jetpack",			Cmd_Jetpack_f,				CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "kill",				Cmd_Kill_f,					CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "killother",			Cmd_KillOther_f,			CMD_CHEAT|CMD_NOINTERMISSION },
@@ -12185,6 +12183,7 @@ command_t commands[] = {
 	{ "logout",				Cmd_LogoutAccount_f,		CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "magic",				Cmd_Magic_f,				CMD_RPG|CMD_NOINTERMISSION },
 	{ "magicflight",		Cmd_MagicFlight_f,			CMD_RPG | CMD_NOINTERMISSION },
+	{ "make",				Cmd_Make_f,					CMD_RPG | CMD_ALIVE | CMD_NOINTERMISSION },
 	{ "maplist",			Cmd_MapList_f,				CMD_NOINTERMISSION },
 	{ "meleearena",			Cmd_MeleeArena_f,			CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "meleemode",			Cmd_MeleeMode_f,			CMD_ALIVE|CMD_NOINTERMISSION },
@@ -12226,6 +12225,7 @@ command_t commands[] = {
 	{ "tell",				Cmd_Tell_f,					0 },
 	{ "thedestroyer",		Cmd_TheDestroyer_f,			CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "t_use",				Cmd_TargetUse_f,			CMD_CHEAT|CMD_ALIVE },
+	{ "unmake",				Cmd_Unmake_f,				CMD_RPG | CMD_ALIVE | CMD_NOINTERMISSION },
 	{ "up",					Cmd_UpSkill_f,				CMD_RPG|CMD_NOINTERMISSION },
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			CMD_NOINTERMISSION },
 	{ "vote",				Cmd_Vote_f,					CMD_NOINTERMISSION },

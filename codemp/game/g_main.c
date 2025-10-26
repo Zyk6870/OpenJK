@@ -6902,7 +6902,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 9)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To make or unmake inventory items, use ^3/itemmake <number> ^7or ^3/itemunmake <number>^7.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To make or unmake inventory items, use ^3/make <number> ^7or ^3/unmake <number>^7.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 10)
 	{

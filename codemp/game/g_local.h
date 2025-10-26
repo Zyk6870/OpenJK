@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.59"
+#define	GAMEVERSION	"New Zyk Mod v1.6.60"
 
 #define SECURITY_LOG "security.log"
 
@@ -794,7 +794,7 @@ typedef enum {
 // zyk: RPG Nature Energy
 #define RPG_INITIAL_NATURE_ENERGY 0
 #define RPG_MAX_NATURE_ENERGY 20000
-#define RPG_MAX_BUY_AMOUNT 100
+#define RPG_MAX_BUY_AMOUNT 200
 
 // zyk: cost in Energy to upgrade a skill
 #define COST_TO_UPGRADE_SKILL 100
