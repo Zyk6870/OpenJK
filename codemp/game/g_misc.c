@@ -2755,6 +2755,7 @@ extern int	BMS_START;
 extern int	BMS_MID;
 extern int	BMS_END;
 
+extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 extern void zyk_clear_quest_items(gentity_t* effect_ent);
 extern void zyk_TeleportPlayer(gentity_t* player, vec3_t origin, vec3_t angles);
@@ -2815,7 +2816,8 @@ void fx_runner_think( gentity_t *ent )
 	}
 
 	// zyk: special items
-	if (Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0)
+	if (Q_stricmp(ent->targetname, "zyk_quest_log") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0)
 	{
 		int i = 0;
 
@@ -2842,6 +2844,18 @@ void fx_runner_think( gentity_t *ent )
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/effects/cairn_beam_start.mp3"));
 
 						zyk_clear_quest_effect(ent);
+
+						return;
+					}
+					else if (Q_stricmp(ent->targetname, "zyk_quest_log") == 0)
+					{
+						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_LEGENDARY_QUEST_LOG, 1);
+
+						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
+
+						zyk_clear_quest_effect(ent);
+
+						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7You found part of the Quest Log. Read it with /questlog\n\"", QUESTCHAR_MAIN));
 
 						return;
 					}

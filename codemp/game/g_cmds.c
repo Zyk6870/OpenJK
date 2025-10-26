@@ -588,7 +588,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Has a lot of useful info. To see it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. Has the Lore of the places the player is exploring, and will tell what happened to it. To read it, use ^3/list questlog^7\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN));
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
@@ -6689,8 +6689,8 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK][0] = 100;
 	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK][1] = 50;
 
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][0] = 1000;
-	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][1] = 500;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][0] = 0;
+	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][1] = 100;
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][0] = 0;
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR][1] = 1000;
@@ -7128,7 +7128,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, va("\n^7The Conquerors are attacking everywhere!\nYou must fully regenerate your Spirit Tree to defeat all of them.\nThe Tree regeneration rate is based on the amount of Nature Energy you have.\nEnemies in the map wither the tree based on their numbers.\nHold ^2Use ^7key inside the Tree and it will show tutorial info.\nMeditate and hold ^2Use ^7key to call your Spirit Tree.\nSometimes allies will come to help.\n\n"));
+			strcpy(quest_desc, va("\n^7You must fully regenerate your Spirit Tree.\nTo do it, find the Quest Log parts (blue crystals).\nEach one you find will increase regen rate a little.\nHold ^2Use ^7key inside the Tree and it will show tutorial info.\nMeditate and hold ^2Use ^7key to call your Spirit Tree.\n\n"));
 
 			trap->SendServerCommand(target_ent->s.number,
 				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
@@ -7297,21 +7297,71 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						if (page <= 0)
 							page = 1;
 
+						if (page > RPG_MAX_QUEST_LOG_PARTS)
+						{
+							trap->SendServerCommand(ent->s.number, "print \"Find more Quest Log parts to read more info.\n\"");
+							return;
+						}
+
 						if (page == 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7the most common enemy. After a while he will be able to use E11 Blaster Rifle\n^3Heavy Armored Warrior: ^7armored soldier with guns and wearing Protective Armor and Adaptive Armor\n^3Flying Warrior: ^7a flying armored soldier wearing Protective Armor\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Melee attacks can cause Poison status. Has Chaos Field magic\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. Melee attacks can cause Bleeding status. Has Healing Circle magic\n^3Force Saber Warrior (Light): ^7uses blue clothes and has Light-Side force powers and saber\n^3Force Saber Warrior (Dark): ^7uses red clothes and has Dark-Side force powers and saber^7\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7the most common enemy. After a while he will be able to use E11 Blaster Rifle\n^3Heavy Armored Warrior: ^7armored soldier with guns and wearing Protective Armor and Adaptive Armor\n^3Flying Warrior: ^7a flying armored soldier wearing Protective Armor\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Melee attacks can cause Poison status. Has Chaos Field magic\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. Melee attacks can cause Bleeding status. Has Healing Circle magic\n^3Force Saber Warrior (Light): ^7uses blue clothes and has Light-Side force powers and saber\n^3Force Saber Warrior (Dark): ^7uses red clothes and has Dark-Side force powers and saber^7...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Force Saber Warrior (Both): ^7uses brown clothes and has both Light-Side and Dark-Side force powers and saber\n^3Force Saber Warrior (Guns): ^7uses green clothes and has both Light-Side and Dark-Side force powers and guns\n^3Mage Scholar: ^7mage in blue clothes with Magic Fist and Magic Flight skills. Can use Healing Circle and Chaos Field magic powers\n^3Mage Minister: ^7mage in red clothes with Magic Fist and Magic Flight skills. Can use Magic Shield and Lightning Dome magic powers\n^3Mage Master: ^7the Mage Masters are the leaders of The Conquerors. Mage in gray clothes, wearing Protective Armor and Adaptive Armor. Can cloak himself. Has Magic Fist, Magic Flight and high level of all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Force Saber Warrior (Both): ^7uses brown clothes and has both Light-Side and Dark-Side force powers and saber\n^3Force Saber Warrior (Guns): ^7uses green clothes and has both Light-Side and Dark-Side force powers and guns\n^3Mage Scholar: ^7mage in blue clothes with Magic Fist and Magic Flight skills. Can use Healing Circle and Chaos Field magic powers\n^3Mage Minister: ^7mage in red clothes with Magic Fist and Magic Flight skills. Can use Magic Shield and Lightning Dome magic powers\n^3Mage Master: ^7the Mage Masters are the leaders of The Conquerors. Mage in gray clothes, wearing Protective Armor and Adaptive Armor. Can cloak himself. Has Magic Fist, Magic Flight and high level of all magic powers...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 3)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance ally. Has force/saber\n^3Ally Flying Warrior: ^7a Resistance ally. Flies and has guns\n^3Ally Mage: ^7a Resistance ally. Can use Magic Fist, Magic Flight and all magic powers\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Ally Force Warrior: ^7a Resistance ally. Has force/saber\n^3Ally Flying Warrior: ^7a Resistance ally. Flies and has guns\n^3Ally Mage: ^7a Resistance ally. Can use Magic Fist, Magic Flight and all magic powers...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 4)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your allies strength is based on your amount of Nature Energy. I created a special item that may help you if you can find it: Energy Modulator. Your quest progress increases the chance to get it\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7You got info for enemies and allies. Now here are some hints: choose the map well, each map may give you advantages when fighting your enemies. Your allies strength is based on your amount of Nature Energy. I created a special item that may help you if you can find it: Energy Modulator. Your quest progress increases the chance to get it...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+						}
+						else if (page == 5)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7You must be asking why enemies and allies are appearing, why a war is happening and what is this Dimension you are now. This is the Liminal Dimension. Habitants from different worlds are brought here sometimes but were free to come back to their homeworlds. But some recent events made a lot of people ending up here without being able to leave...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+						}
+						else if (page == 6)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Every person that ends up here manifests their Spirit Tree. But due to the actions of a group known as the Conquerors (the enemies you fight), they are disappearing because they are absorbing Nature Energy to become more powerful. Some people are either convinced to join them or killed...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+						}
+						else if (page == 7)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Regenerating me will make me stronger and allow me to have a higher chance to call allies to help you. But beware, the enemies make me wither depending on how many appear...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+						}
+						else if (page == 8)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7This dimension was like a safe haven. We Spirit Trees tried to help some people to come here when cataclysmic events happened in their worlds...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+						}
+						else if (page == 9)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7One day, some groups started to actively seek this dimension to get power from it. They used technology and magic to absorb Nature Energy from here and become strong...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+						}
+						else if (page == 10)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7the survivors from their attacks formed a Resistance group (the allies that help you). But calling them is not easy, you will need Nature Energy for that...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+						}
+						else if (page == 11)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7I will keep giving some Nature Energy to you to help you defeat The Conquerors. Only after im fully regenerated I will be able to defeat them all. Only then you will be able to leave this Dimension...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+						}
+						else if (page == 12)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7As you probably know already, you can travel to different levels (maps) in this dimension...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+						}
+						else if (page == 13)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7If you are having trouble with the memory puzzle to get the Energy Modulator, try to memorize the crystals by groups of 2 or 3 of them...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+						}
+						else if (page == 14)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Each part of this Quest Log is what was left from the Nature Energy that the Conquerors absorbed, but finding the parts will allow me to regenerate. If you complete your mission, The Spirit Trees will come back and restore balance to Nature...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+						}
+						else if (page == 15)
+						{
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Nice. You have all Quest Log parts. Now my regeneration rate is at the max level.\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
 						}
 					}
 					else

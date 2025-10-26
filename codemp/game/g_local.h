@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"New Zyk Mod v1.6.51"
+#define	GAMEVERSION	"New Zyk Mod v1.6.52"
 
 #define SECURITY_LOG "security.log"
 
@@ -730,6 +730,7 @@ typedef enum {
 
 typedef enum {
 	QUEST_ITEM_NONE,
+	QUEST_ITEM_LOG,
 	QUEST_ITEM_ENERGY_MODULATOR,
 	QUEST_ITEM_SPIRIT_TREE,
 	NUM_QUEST_ITEMS
@@ -804,6 +805,7 @@ typedef enum {
 
 // zyk: minimum amount of time to spawn quest stuff
 #define RPG_QUEST_STUFF_MIN_SPAWN_TIME 4000
+#define RPG_MAX_QUEST_LOG_PARTS 15
 
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
 #define RPG_MAX_HEALTH_INCREASE 20
@@ -1439,7 +1441,7 @@ typedef struct {
 #define MAX_DUEL_MATCHES 496
 
 // zyk: number of chosen crystals in the secret artifact puzzle
-#define LEGENDARY_CRYSTALS_CHOSEN 9
+#define LEGENDARY_CRYSTALS_CHOSEN 7
 
 typedef enum {
 	QUEST_SECRET_INIT_STEP,
@@ -1742,6 +1744,9 @@ typedef struct level_locals_s {
 
 	// zyk: time to spawn the same side quest secret item again
 	int energy_modulator_timer;
+
+	// zyk: time to spawn a quest log part
+	int quest_log_timer;
 
 	char		mapname[MAX_QPATH];
 	char		rawmapname[MAX_QPATH];

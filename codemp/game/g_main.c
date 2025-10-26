@@ -1147,6 +1147,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.num_fully_connected_clients = 0;
 
 	level.energy_modulator_timer = 0;
+	level.quest_log_timer = 0;
 
 	level.special_quest_npc_in_map = 0;
 
@@ -5179,69 +5180,6 @@ void zyk_spawn_quest_item_model(float x, float y, float z, char* model_path, int
 	}
 }
 
-/*
-void zyk_spawn_crystal(float x, float y, float z, int duration, zyk_quest_item_t crystal_type)
-{
-	int crystal_effect_id = 0;
-
-	if (crystal_type == QUEST_ITEM_SKILL_CRYSTAL)
-	{
-		crystal_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_skill_crystal", crystal_type);
-		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", 45, duration, crystal_effect_id, crystal_type);
-	}
-}
-
-// zyk: spawn the model and effect used by magic crystals
-void zyk_spawn_magic_crystal(int duration, zyk_quest_item_t crystal_type)
-{
-	float x, y, z;
-	int distance_factor = 20;
-	gentity_t* chosen_entity = NULL;
-	
-	chosen_entity = zyk_find_entity_for_quest();
-
-	if (!chosen_entity)
-	{ // zyk: if for some reason there was no chosen entity, try again later
-		return;
-	}
-
-	// zyk: the distance the magic crystal is from the chosen entity origin will increase as the player gets more skillpoints
-	x = Q_irand(0, distance_factor);
-	y = Q_irand(0, distance_factor);
-	z = Q_irand(0, distance_factor);
-
-	if (Q_irand(0, 1) == 0)
-	{
-		x *= -1;
-	}
-
-	if (Q_irand(0, 1) == 0)
-	{
-		y *= -1;
-	}
-
-	if (Q_irand(0, 1) == 0)
-	{
-		z *= -1;
-	}
-
-	if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
-	{
-		x += chosen_entity->r.currentOrigin[0];
-		y += chosen_entity->r.currentOrigin[1];
-		z += chosen_entity->r.currentOrigin[2];
-	}
-	else
-	{
-		x += chosen_entity->s.origin[0];
-		y += chosen_entity->s.origin[1];
-		z += chosen_entity->s.origin[2];
-	}
-
-	zyk_spawn_crystal(x, y, z, duration, crystal_type);
-}
-*/
-
 // zyk: spawns any of the quest item types at specific coordinates in map
 int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int model_scale, float x, float y, float z)
 {
@@ -5259,6 +5197,11 @@ int zyk_spawn_quest_item(zyk_quest_item_t quest_item_type, int duration, int mod
 		z *= QUEST_SPIRIT_TREE_ORIGIN_Z_OFFSET;
 
 		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/yavin/tree10_b.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
+	}
+	else if (quest_item_type == QUEST_ITEM_LOG)
+	{
+		quest_item_effect_id = zyk_spawn_quest_item_effect(x, y, z, duration, "zyk_quest_log", quest_item_type);
+		zyk_spawn_quest_item_model(x, y, z, "models/map_objects/mp/crystal_blue.md3", model_scale, duration, quest_item_effect_id, quest_item_type);
 	}
 
 	return quest_item_effect_id;
@@ -6875,7 +6818,7 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = 20;
 
-	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 50;
+	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 2;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 200;
 
 	if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
@@ -7228,7 +7171,7 @@ void zyk_spirit_tree_events(gentity_t* ent)
 			ent->client->pers.quest_missions & (1 << MAIN_QUEST_START) &&
 			ent->client->pers.quest_spirits_event_step == 0)
 		{
-			quest_progress_change += (ent->client->pers.nature_energy / 25);
+			quest_progress_change += (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] * 2);
 
 			if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 			{ // zyk: Hard Mode
@@ -9097,6 +9040,42 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR
 					)
 				{
+					int quest_log_chance = (RPG_MAX_QUEST_LOG_PARTS - ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG]) * 4;
+
+					// zyk: Quest Log
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < RPG_MAX_QUEST_LOG_PARTS && 
+						Q_irand(0, 99) < quest_log_chance && 
+						ent->client->pers.quest_missions & (1 << MAIN_QUEST_START) &&
+						zyk_is_main_quest_complete(ent) == qfalse && 
+						level.quest_log_timer < level.time)
+					{
+						float quest_log_x, quest_log_y, quest_log_z;
+						int quest_log_duration = 20000;
+						gentity_t* chosen_entity = NULL;
+
+						chosen_entity = zyk_find_entity_for_quest();
+
+						if (chosen_entity)
+						{
+							if (chosen_entity->r.svFlags & SVF_USE_CURRENT_ORIGIN)
+							{
+								quest_log_x = chosen_entity->r.currentOrigin[0];
+								quest_log_y = chosen_entity->r.currentOrigin[1];
+								quest_log_z = chosen_entity->r.currentOrigin[2];
+							}
+							else
+							{
+								quest_log_x = chosen_entity->s.origin[0];
+								quest_log_y = chosen_entity->s.origin[1];
+								quest_log_z = chosen_entity->s.origin[2];
+							}
+
+							zyk_spawn_quest_item(QUEST_ITEM_LOG, quest_log_duration, 45, quest_log_x, quest_log_y, quest_log_z);
+
+							level.quest_log_timer = level.time + quest_log_duration;
+						}
+					}
+
 					// zyk: final events of the quest
 					if (ent->client->pers.quest_spirits_event_step > 0 && ent->client->pers.quest_spirits_event_timer < level.time)
 					{
