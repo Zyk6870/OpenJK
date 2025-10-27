@@ -1649,18 +1649,21 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 			ent->client->ps.forceDodgeAnim == BOTH_MEDITATE &&
 			ent->client->pers.quest_spirit_tree_call_timer < level.time)
 		{
-			if (ent->client->pers.nature_energy >= QUEST_SPIRIT_TREE_CALL_COST)
+			if (!(ent->client->pers.player_settings & (1 << SETTINGS_QUEST_TREE)))
 			{
-				ent->client->pers.quest_spirit_tree_id = -1;
-				ent->client->pers.quest_spirit_tree_call_timer = level.time + 2000;
+				if (ent->client->pers.nature_energy >= QUEST_SPIRIT_TREE_CALL_COST)
+				{
+					ent->client->pers.quest_spirit_tree_id = -1;
+					ent->client->pers.quest_spirit_tree_call_timer = level.time + 2000;
 
-				set_nature_energy(ent, QUEST_SPIRIT_TREE_CALL_COST, qfalse);
+					set_nature_energy(ent, QUEST_SPIRIT_TREE_CALL_COST, qfalse);
 
-				trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
-			}
-			else
-			{
-				trap->SendServerCommand(ent->s.number, "cp \"Not enough Nature Energy to call your Spirit Tree\n\"");
+					trap->SendServerCommand(ent->s.number, "cp \"Called your Spirit Tree\n\"");
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, "cp \"Not enough Nature Energy to call your Spirit Tree\n\"");
+				}
 			}
 		}
 		else if (ent->client->pers.selected_ability > SELECTED_ABILITY_NONE)

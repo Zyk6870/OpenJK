@@ -7325,7 +7325,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 6)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Every person that ends up here manifests their Spirit Tree. But due to the actions of a group known as the Conquerors (the enemies you fight), they are disappearing because they are absorbing Nature Energy to become more powerful. Some people are either convinced to join them or killed...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Every person that ends up here manifests their Spirit Tree. But due to the actions of a group known as the Conquerors (the enemies you fight), they are disappearing because the Conquerors are absorbing Nature Energy to become more powerful. Some people are either convinced to join them or get killed...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
 						}
 						else if (page == 7)
 						{
@@ -7545,8 +7545,8 @@ void Cmd_Make_f( gentity_t *ent ) {
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
-		// zyk: buying and selling must use Stamina
-		rpg_skill_counter(ent, amount);
+		// zyk: making items uses Stamina
+		zyk_set_stamina(ent, 5, qfalse);
 
 		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Item made\n\"");
 
@@ -7632,8 +7632,8 @@ void Cmd_Unmake_f( gentity_t *ent ) {
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
-		// zyk: use some Stamina
-		rpg_skill_counter(ent, amount);
+		// zyk: unmaking items uses Stamina
+		zyk_set_stamina(ent, 5, qfalse);
 
 		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Item unmade\n\"");
 	}

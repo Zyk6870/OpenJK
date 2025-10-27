@@ -5403,7 +5403,7 @@ void lightning_dome(gentity_t* ent, int damage)
 
 	VectorCopy(tr.plane.normal, missile->pos1);
 
-	missile->count = 9;
+	missile->count = 6;
 
 	missile->classname = "demp2_alt_proj";
 	missile->targetname = "zyk_magic_lightning";
@@ -5415,7 +5415,7 @@ void lightning_dome(gentity_t* ent, int damage)
 	missile->splashDamage = missile->damage = damage;
 	missile->splashMethodOfDeath = missile->methodOfDeath = MOD_UNKNOWN;
 
-	missile->splashRadius = 768;
+	missile->splashRadius = 512;
 
 	missile->r.ownerNum = ent->s.number;
 
@@ -5649,7 +5649,7 @@ void magic_power_events(gentity_t *ent)
 
 				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
 				{
-					int debounce_timer = 400 - ((magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME]) * 10);
+					int debounce_timer = 400 - ((magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME]) * 15);
 
 					ent->client->pers.magic_lightning_dome_bonus++;
 
