@@ -8489,7 +8489,7 @@ static void Item_ApplyHacks( itemDef_t *item ) {
 		}
 	}
 #endif
-	
+
 	// Fix length of favorite address in createfavorite.menu
 	if ( item->type == ITEM_TYPE_EDITFIELD && item->cvar && !Q_stricmp( item->cvar, "ui_favoriteAddress" ) ) {
 		editFieldDef_t *editField = item->typeData.edit;

@@ -145,9 +145,7 @@ Check for lava / slime contents and drowning
 */
 extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 void P_WorldEffects( gentity_t *ent ) {
-#ifdef BASE_COMPAT
 	qboolean	envirosuit = qfalse;
-#endif
 	int			waterlevel;
 
 	if ( ent->client->noclip ) {
@@ -157,19 +155,15 @@ void P_WorldEffects( gentity_t *ent ) {
 
 	waterlevel = ent->waterlevel;
 
-	#ifdef BASE_COMPAT
-		envirosuit = ent->client->ps.powerups[PW_BATTLESUIT] > level.time;
-	#endif // BASE_COMPAT
+	envirosuit = ent->client->ps.powerups[PW_BATTLESUIT] > level.time;
 
 	//
 	// check for drowning
 	//
 	if ( waterlevel == 3 ) {
-		#ifdef BASE_COMPAT
-			// envirosuit give air
-			if ( envirosuit )
-				ent->client->airOutTime = level.time + 10000;
-		#endif // BASE_COMPAT
+		// envirosuit give air
+		if ( envirosuit )
+			ent->client->airOutTime = level.time + 10000;
 
 		// if out of air, start drowning
 		if ( ent->client->airOutTime < level.time) {
@@ -216,11 +210,9 @@ void P_WorldEffects( gentity_t *ent ) {
 	{
 		if ( ent->health > 0 && ent->client->tempSpectate < level.time && ent->pain_debounce_time <= level.time)
 		{
-		#ifdef BASE_COMPAT
 			if ( envirosuit )
 				G_AddEvent( ent, EV_POWERUP_BATTLESUIT, 0 );
 			else
-		#endif
 			{
 				if ( ent->watertype & CONTENTS_LAVA )
 					G_Damage( ent, NULL, NULL, NULL, NULL, 30*waterlevel, 0, MOD_LAVA );

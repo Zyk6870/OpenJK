@@ -2801,7 +2801,7 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			account_file = fopen(va("zykmod/accounts/%s.txt", ent->client->sess.filename), "w");
 			fprintf(account_file, "%s\n%d\n%d\n%d\n%s\n%s\n",
 				client->pers.password, client->sess.account_mode, client->pers.player_settings, client->pers.bitvalue, client->sess.rpgchar, 
-				zyk_string_with_no_whitespaces(GAMEVERSION));
+				zyk_string_with_no_whitespaces(gamename.string));
 			fclose(account_file);
 		}
 	}
@@ -3824,6 +3824,12 @@ void Cmd_CallTeamVote_f( gentity_t *ent ) {
 	int		i=0, cs_offset=0, numArgs=0;
 	char	arg1[MAX_CVAR_VALUE_STRING] = {0};
 	char	arg2[MAX_CVAR_VALUE_STRING] = {0};
+
+	if ( g_gametype.integer < GT_TEAM )
+	{
+		trap->SendServerCommand( ent-g_entities, "print \"Cannot call a team vote in a non-team gametype!\n\"" );
+		return;
+	}
 
 	if ( team == TEAM_RED )
 		cs_offset = 0;
@@ -11720,7 +11726,7 @@ Cmd_ModVersion_f
 */
 
 void Cmd_ModVersion_f(gentity_t *ent) {
-	trap->SendServerCommand(ent->s.number, va("print \"\n%s\n\n\"", GAMEVERSION));
+	trap->SendServerCommand(ent->s.number, va("print \"\n%s\n\n\"", gamename.string));
 }
 
 /*

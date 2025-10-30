@@ -2037,7 +2037,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 	//FIXME: should really send forcePowersActive over network onto cg.snap->ps...
 	const int fpActive = cg_entities[0].gent->client->ps.forcePowersActive;
 	const bool matrixMode = !!(fpActive & ((1 << FP_SPEED) | (1 << FP_RAGE)));
-	float speed = cg.refdef.fov_y / 75.0 * (matrixMode ? 1.0f : cg_timescale.value);
+	float speed = cg.refdef.fov_y / 75.0 * (matrixMode ? 1.0f : Q_min(cg_timescale.value, 1.0f));
 
 //FIXME: junk code, BUG:168
 
@@ -2141,7 +2141,6 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 	if ( !cg.hyperspace ) {
 		CG_AddPacketEntities(qfalse);			// adter calcViewValues, so predicted player state is correct
 		CG_AddMarks();
-		CG_AddLocalEntities();
 		CG_DrawMiscEnts();
 	}
 
@@ -2209,6 +2208,10 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 	// finish up the rest of the refdef
 	if ( cg.testModelEntity.hModel ) {
 		CG_AddTestModel();
+	}
+
+	if ( !cg.hyperspace ) {
+		CG_AddLocalEntities();
 	}
 
 	memcpy( cg.refdef.areamask, cg.snap->areamask, sizeof( cg.refdef.areamask ) );

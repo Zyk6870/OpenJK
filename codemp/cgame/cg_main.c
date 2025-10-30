@@ -1625,6 +1625,9 @@ CG_ConfigString
 =================
 */
 const char *CG_ConfigString( int index ) {
+	// FIXME: don't read configstrings before initialisation
+	// assert( cgs.gameState.dataCount != 0 );
+
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
 		trap->Error( ERR_DROP, "CG_ConfigString: bad index: %i", index );
 	}
@@ -2406,6 +2409,8 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum )
 	int i = 0;
 	int j = 0;
 
+	Rand_Init( trap->Milliseconds() );
+
 	BG_InitAnimsets(); //clear it out
 
 	trap->RegisterSharedMemory( cg.sharedBuffer.raw );
@@ -2645,6 +2650,9 @@ Ghoul2 Insert End
 	cg.distanceCull = trap->R_GetDistanceCull();
 
 	CG_ParseEntitiesFromString();
+
+	BG_FixSaberMoveData();
+	BG_FixWeaponAttackAnim();
 }
 
 //makes sure returned string is in localized format
