@@ -2667,16 +2667,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		break;
 	case EV_USE_ITEM13:
 		DEBUGNAME("EV_USE_ITEM13");
-		//CG_UseItem( cent );zyk: commented this, not used in mod
-
-		if (cg.snap->ps.clientNum == es->number)
-		{
-			if (es->eventParm <= 100)
-			{ // zyk: scaled magic power
-				cg.scaled_magic_power = es->eventParm;
-			}
-		}
-
+		CG_UseItem( cent );
 		break;
 	case EV_USE_ITEM14:
 		DEBUGNAME("EV_USE_ITEM14");

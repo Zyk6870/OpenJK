@@ -1037,9 +1037,6 @@ Ghoul2 Insert End
 	// zyk: has the client ids of the player to have the Force Shield effect drawn or not
 	int use_rpg_effect[MAX_CLIENTS];
 
-	// zyk: scaled version of current magic power, to be shown in the green bar
-	int scaled_magic_power;
-
 	// zyk: Unique Skill cooldown timer
 	int unique_cooldown_timer;
 	int unique_cooldown_duration;

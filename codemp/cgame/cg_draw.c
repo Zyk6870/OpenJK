@@ -1431,8 +1431,8 @@ void CG_DrawHUD(centity_t	*cent)
 			// zyk: current jetpackFuel
 			CG_DrawProportionalString((8 + 8), y + 24 + 28, va("%i", cg.snap->ps.jetpackFuel), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_MAGENTA]);
 
-			// zyk: current MP
-			CG_DrawProportionalString(SCREEN_WIDTH - (40 + 16), y + 24, va("%i", cg.scaled_magic_power), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_GREEN]);
+			// zyk: current Cloak Fuel
+			CG_DrawProportionalString(SCREEN_WIDTH - (40 + 16), y + 24, va("%i", cg.snap->ps.cloakFuel), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_GREEN]);
 
 			CG_DrawSimpleForcePower( cent );
 
@@ -7358,44 +7358,6 @@ void CG_DrawEWebHealth(void)
 	CG_FillRect(x+1.0f, y+1.0f, EWEBHEALTH_W-1.0f, EWEBHEALTH_H-percent, cColor);
 }
 
-#define RPG_BAR_Y 180.0
-#define RPG_BAR_WIDTH 10.0
-// zyk: draws the magic power bar
-void CG_DrawMagicPower(void)
-{
-	vec4_t aColor;
-	vec4_t cColor;
-	float x = 10.0;
-	float y = RPG_BAR_Y;
-	float scaled_magic_power = cg.scaled_magic_power;
-
-	if (cg_hudFiles.integer)
-	{ // zyk: simple hud
-		return;
-	}
-
-	//color of the bar
-	aColor[0] = 0.0f;
-	aColor[1] = 0.7f;
-	aColor[2] = 0.0f;
-	aColor[3] = 0.8f;
-
-	//color of greyed out "missing fuel"
-	cColor[0] = 0.5f;
-	cColor[1] = 0.5f;
-	cColor[2] = 0.5f;
-	cColor[3] = 0.1f;
-
-	//draw the background (black)
-	CG_DrawRect(x, y, RPG_BAR_WIDTH, JPFUELBAR_H, 1.0f, colorTable[CT_BLACK]);
-
-	//now draw the part to show how much health there is in the color specified
-	CG_FillRect(x+1.0f, y+1.0f+(JPFUELBAR_H-scaled_magic_power), RPG_BAR_WIDTH-1.0f, JPFUELBAR_H-1.0f-(JPFUELBAR_H-scaled_magic_power), aColor);
-
-	//then draw the other part greyed out
-	CG_FillRect(x+1.0f, y+1.0f, RPG_BAR_WIDTH-1.0f, JPFUELBAR_H-scaled_magic_power, cColor);
-}
-
 //draw meter showing cloak fuel when it's not full
 #define CLFUELBAR_H			100.0f
 #define CLFUELBAR_W			15.0f // zyk: changed from 20.0f to 15.0f to reduce bar width
@@ -8334,11 +8296,6 @@ static void CG_Draw2D( void ) {
 
 	if (cg_drawStatus.integer && cg.snap->ps.stats[STAT_MAX_HEALTH] > 100)
 	{
-		if (cg.scaled_magic_power < 100)
-		{ // zyk: draw magic power bar if it is not full and it is a rpg player
-			CG_DrawMagicPower();
-		}
-
 		// zyk: draw RPG bars
 		if (cg.unique_cooldown_duration > 0)
 		{
