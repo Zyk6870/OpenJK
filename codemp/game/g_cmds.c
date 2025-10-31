@@ -2638,15 +2638,6 @@ void load_account(gentity_t* ent)
 				{
 					read_status = fscanf(account_file, "%s", content);
 					ent->client->pers.nature_energy = atoi(content);
-
-					if (ent->client->pers.nature_energy > RPG_MAX_NATURE_ENERGY)
-					{
-						ent->client->pers.nature_energy = RPG_MAX_NATURE_ENERGY;
-					}
-					else if (ent->client->pers.nature_energy < 0)
-					{
-						ent->client->pers.nature_energy = 0;
-					}
 				}
 				else if (Q_stricmp(content_type, "skill_levels") == 0)
 				{
@@ -5040,6 +5031,17 @@ void Cmd_AddBot_f( gentity_t *ent ) {
 
 // zyk: new functions
 
+// zyk: tests if this RPG player completed the Main Quest
+qboolean zyk_is_main_quest_complete(gentity_t* ent)
+{
+	if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_COMPLETED))
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 // zyk: sets the Max HP a player can have in RPG Mode
 void set_max_health(gentity_t *ent)
 {
@@ -5084,6 +5086,17 @@ void set_max_stamina(gentity_t* ent)
 	ent->client->pers.max_stamina = RPG_DEFAULT_STAMINA + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 3000);
 }
 
+// zyk: set max Nature Energy of this player
+void set_max_nature_energy(gentity_t* ent)
+{
+	ent->client->pers.max_nature_energy = RPG_MAX_NATURE_ENERGY;
+
+	if (zyk_is_main_quest_complete(ent) == qtrue)
+	{
+		ent->client->pers.max_nature_energy = RPG_MAX_NATURE_ENERGY * 2;
+	}
+}
+
 // zyk: increases or decreases RPG player stamina
 void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
 {
@@ -5114,9 +5127,9 @@ void set_nature_energy(gentity_t *ent, int amount, qboolean add)
 	{
 		ent->client->pers.nature_energy += amount;
 
-		if (ent->client->pers.nature_energy > RPG_MAX_NATURE_ENERGY)
+		if (ent->client->pers.nature_energy > ent->client->pers.max_nature_energy)
 		{
-			ent->client->pers.nature_energy = RPG_MAX_NATURE_ENERGY;
+			ent->client->pers.nature_energy = ent->client->pers.max_nature_energy;
 		}
 	}
 	else
@@ -5253,7 +5266,6 @@ int zyk_total_skillpoints(gentity_t* ent)
 	return total_skillpoints;
 }
 
-// zyk: validations, for example if a skill has a level above max or below 0 or if max skill levels upgraded is above the max allowed, or some inventory item amount is below 0
 void validate_rpg_player(gentity_t* ent)
 {
 	int i = 0;
@@ -5459,6 +5471,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		set_max_force(ent);
 		set_max_weight(ent);
 		set_max_stamina(ent);
+		set_max_nature_energy(ent);
 
 		// zyk: setting rpg control attributes
 		if (init_all == qtrue)
@@ -6499,13 +6512,13 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 		strcpy(message, va("%s^3Stamina: ^2%d/%d\n", message, ent->client->pers.current_stamina, ent->client->pers.max_stamina));
 	}
 
-	if (ent->client->pers.nature_energy < RPG_MAX_NATURE_ENERGY)
+	if (ent->client->pers.nature_energy < ent->client->pers.max_nature_energy)
 	{
-		strcpy(message, va("%s^3Nature Energy: ^7%d/%d\n", message, ent->client->pers.nature_energy, RPG_MAX_NATURE_ENERGY));
+		strcpy(message, va("%s^3Nature Energy: ^7%d/%d\n", message, ent->client->pers.nature_energy, ent->client->pers.max_nature_energy));
 	}
 	else
 	{
-		strcpy(message, va("%s^3Nature Energy: ^2%d/%d\n", message, ent->client->pers.nature_energy, RPG_MAX_NATURE_ENERGY));
+		strcpy(message, va("%s^3Nature Energy: ^2%d/%d\n", message, ent->client->pers.nature_energy, ent->client->pers.max_nature_energy));
 	}
 
 	strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, rpg_player_speed));
@@ -6869,7 +6882,7 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 		strcpy(message, va("%s\n^3Weight: ^1%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
 	}
 
-	if (ent->client->pers.nature_energy < RPG_MAX_NATURE_ENERGY)
+	if (ent->client->pers.nature_energy < ent->client->pers.max_nature_energy)
 	{
 		strcpy(message, va("%s^3Nature Energy: ^7%d\n", message, ent->client->pers.nature_energy));
 	}
@@ -6879,16 +6892,6 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 	}
 
 	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                          - ^5Count - ^2Weight - ^3Make - Unmake\n\n%s\n^7Use ^3/make <item number> ^7or ^3/unmake <item number> ^7to make or unmake items\n\"", message));
-}
-
-qboolean zyk_is_main_quest_complete(gentity_t* ent)
-{
-	if (ent->client->pers.quest_missions & (1 << MAIN_QUEST_COMPLETED))
-	{
-		return qtrue;
-	}
-
-	return qfalse;
 }
 
 // zyk: if ent is NULL, counts all quest allies from all players

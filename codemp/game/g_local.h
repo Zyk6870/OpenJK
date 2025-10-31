@@ -790,7 +790,7 @@ typedef enum {
 
 // zyk: RPG Nature Energy
 #define RPG_INITIAL_NATURE_ENERGY 0
-#define RPG_MAX_NATURE_ENERGY 20000
+#define RPG_MAX_NATURE_ENERGY 10000
 #define RPG_MAX_BUY_AMOUNT 200
 
 // zyk: cost in Energy to upgrade a skill
@@ -991,8 +991,9 @@ typedef struct clientPersistant_s {
 
 	int max_force_power; // zyk: max force power the player can have based on Force Power skill level
 
-	// zyk: used to craft inventory items
+	// zyk: Nature Energy. Used to make inventory items and to upgrade skills
 	int nature_energy;
+	int max_nature_energy;
 	int nature_energy_timer;
 
 	int tutorial_step; // zyk: sets the current tutorial step, to display the correct message to the player
