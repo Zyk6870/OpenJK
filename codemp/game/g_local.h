@@ -850,7 +850,7 @@ typedef enum {
 // zyk: npc cloak detection distance
 #define NPC_CLOAK_DETECTION_DISTANCE 1000
 
-#define RPG_RUN_SPEED_SKILL_INCREASE 7.5f
+#define RPG_RUN_SPEED_SKILL_INCREASE 6.0f
 
 // zyk: main characters names
 #define QUESTCHAR_MAIN "^6Spirit Tree"
@@ -1060,7 +1060,6 @@ typedef struct clientPersistant_s {
 
 	// zyk: if > 0, this is a quest npc
 	int quest_npc;
-	int quest_npc_event;
 	int quest_npc_chat_timer;
 	int quest_npc_idle_timer;
 	int quest_npc_caller_player_id;

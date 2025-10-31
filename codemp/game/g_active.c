@@ -1525,6 +1525,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 		else
 		{
 			int stamina_usage = 0;
+			int stamina_recovery = 5 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
 			int i = 0;
 
 			if (ent->client->pers.current_weight > ent->client->pers.max_weight)
@@ -1537,7 +1538,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			{
 				if (ent->client->pers.active_magic & (1 << i))
 				{
-					stamina_usage += 10;
+					stamina_usage += 5;
 				}
 			}
 
@@ -1556,19 +1557,16 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 				stamina_usage += 2;
 			}
 
-			// zyk: Enlightenment Light regens more Stamina
+			// zyk: Enlightenment Light
 			if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] > level.time)
 			{
-				int stamina_powerup_recovery = 5 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
-
-				zyk_set_stamina(ent, stamina_powerup_recovery, qtrue);
+				zyk_set_stamina(ent, stamina_recovery, qtrue);
 			}
 
+			// zyk: Meditating
 			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
-			{ // zyk: meditating, recover some stamina
-				int stamina_meditate_recovery = 5 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 2);
-
-				zyk_set_stamina(ent, stamina_meditate_recovery, qtrue);
+			{
+				zyk_set_stamina(ent, stamina_recovery, qtrue);
 			}
 			else if (zyk_is_player_idle(ent, ucmd) == qfalse)
 			{

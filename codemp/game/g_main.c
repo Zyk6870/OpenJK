@@ -614,7 +614,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		int skill_level_bonus = 0;
 
 		npc_ent->client->pers.quest_npc = quest_npc_type;
-		npc_ent->client->pers.quest_npc_event = 0;
 		npc_ent->client->pers.quest_event_timer = 0;
 		npc_ent->client->pers.quest_npc_idle_timer = level.time + QUEST_NPC_IDLE_TIME;
 		npc_ent->client->pers.quest_npc_chat_timer = 0;
@@ -8936,10 +8935,14 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					// zyk: Melee Punch Speed skill
-					if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[SKILL_MELEE_SPEED] > 0 &&
-						ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * (1.0 - (0.15 * ent->client->pers.skill_levels[SKILL_MELEE_SPEED]))))
+					if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[SKILL_MELEE_SPEED] > 0)
 					{
-						ent->client->ps.weaponTime = (weaponData[WP_MELEE].fireTime * (1.0 - (0.15 * ent->client->pers.skill_levels[SKILL_MELEE_SPEED])));
+						float melee_punch_speed_bonus = (1.00f - (0.08f * ent->client->pers.skill_levels[SKILL_MELEE_SPEED]));
+
+						if (ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * melee_punch_speed_bonus))
+						{
+							ent->client->ps.weaponTime = (weaponData[WP_MELEE].fireTime * melee_punch_speed_bonus);
+						}
 					}
 
 					if (ent->client->pers.flame_thrower_timer > level.time && ent->client->cloakDebReduce < level.time)
