@@ -959,12 +959,6 @@ void Cmd_Emote_f( gentity_t *ent )
 		return;
 	}
 
-	if (zyk_allow_emotes.integer != 1 && ent->client->ps.duelInProgress == qtrue)
-	{
-		trap->SendServerCommand(ent->s.number, "print \"Cannot use emotes in private duel\n\"");
-		return;
-	}
-
 	if ( trap->Argc () < 2 ) {
 		trap->SendServerCommand(ent->s.number, va("print \"Usage: ^3/emote <anim id between 0 and %d> ^7or ^3/emote <emote name from the list below>^7. List of emotes: stand, hug, talk, hello, comeon, hips, kneel, surrender, cower, die, die2, die3, die4, die5, sleep, sit, updown, typing, nod, shake\n\"", (MAX_ANIMATIONS-1)) );
 		return;
@@ -976,6 +970,12 @@ void Cmd_Emote_f( gentity_t *ent )
 	if (anim_id == 0 && strlen(arg) > 2)
 	{ // zyk: specific emotes
 		anim_id = zyk_get_emote_id_with_option(G_NewString(arg));
+
+		if (zyk_allow_emotes.integer == 2 && anim_id == 0)
+		{
+			trap->SendServerCommand(ent->s.number, "print \"Cannot use emotes other than the ones from the list\n\"");
+			return;
+		}
 	}
 
 	if (anim_id < 1 || anim_id >= MAX_ANIMATIONS)
