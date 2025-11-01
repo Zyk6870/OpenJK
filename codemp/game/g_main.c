@@ -6975,6 +6975,12 @@ void zyk_set_quest_event_timer(gentity_t* ent)
 	
 	interval_time -= (ent->client->pers.quest_progress / 10);
 
+	// zyk: Hard Difficulty
+	if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
+	{
+		interval_time -= (QUEST_NPC_SPAWN_TIME / 10);
+	}
+
 	ent->client->pers.quest_event_timer = level.time + interval_time;
 }
 

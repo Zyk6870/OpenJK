@@ -868,10 +868,10 @@ typedef enum {
 #define QUEST_SPIRIT_TREE_CALL_COST 50
 #define QUEST_SPIRIT_TREE_SPAWN_TIMER 5000
 #define QUEST_NPC_BONUS_INCREASE 10
-#define QUEST_NPC_SPAWN_TIME 39000
+#define QUEST_NPC_SPAWN_TIME 43000
 
 // zyk: maximum time a quest npc can be idle (without enemies)
-#define QUEST_NPC_IDLE_TIME 43000
+#define QUEST_NPC_IDLE_TIME 47000
 
 // zyk: timer used in the final Main Quest event
 #define QUEST_FINAL_EVENT_TIMER 25000
