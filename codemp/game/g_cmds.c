@@ -5766,6 +5766,8 @@ void zyk_set_default_quest_fields(gentity_t* ent)
 	ent->client->pers.quest_spirit_tree_id = -1;
 
 	ent->client->pers.quest_missions = 0;
+
+	ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 0;
 }
 
 void zyk_reset_quest(gentity_t* ent)
