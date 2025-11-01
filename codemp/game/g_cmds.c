@@ -7373,7 +7373,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 14)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Each part of this Quest Log is what was left from the Nature Energy that the Conquerors absorbed, but finding the parts will allow me to regenerate. If you complete your mission, The Spirit Trees will come back and restore balance to Nature...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Each part of this Quest Log is what was left from the Nature Energy that the Conquerors absorbed, but finding the parts will allow me to regenerate. If you complete your mission, The Spirit Trees will come back and restore balance to Nature, and your max Nature Energy will be increased...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
 						}
 						else if (page == 15)
 						{

@@ -9086,14 +9086,14 @@ void G_RunFrame( int levelTime ) {
 					int quest_log_chance = (RPG_MAX_QUEST_LOG_PARTS - ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG]) * 5;
 
 					// zyk: Quest Log
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < RPG_MAX_QUEST_LOG_PARTS && 
-						Q_irand(0, 99) < quest_log_chance && 
+					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < RPG_MAX_QUEST_LOG_PARTS &&
+						level.quest_log_timer < level.time &&
 						ent->client->pers.quest_missions & (1 << MAIN_QUEST_START) &&
-						zyk_is_main_quest_complete(ent) == qfalse && 
-						level.quest_log_timer < level.time)
+						Q_irand(0, 99) < quest_log_chance && 
+						zyk_is_main_quest_complete(ent) == qfalse)
 					{
 						float quest_log_x, quest_log_y, quest_log_z;
-						int quest_log_duration = 20000;
+						int quest_log_duration = 15000;
 						gentity_t* chosen_entity = NULL;
 
 						chosen_entity = zyk_find_entity_for_quest();
