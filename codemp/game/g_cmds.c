@@ -5621,7 +5621,7 @@ void zyk_change_weapon_in_inventory(gentity_t* ent, weapon_t weapon, qboolean ad
 		-1,
 		RPG_INVENTORY_WP_STUN_BATON,
 		-1,
-		-1,
+		RPG_INVENTORY_WP_SABER,
 		RPG_INVENTORY_WP_BLASTER_PISTOL,
 		RPG_INVENTORY_WP_E11_BLASTER_RIFLE,
 		RPG_INVENTORY_WP_DISRUPTOR,
@@ -7529,7 +7529,7 @@ void Cmd_Make_f( gentity_t *ent ) {
 	}
 
 	// zyk: general validations. Some items require certain conditions to be bought
-	if ((item_index >= RPG_INVENTORY_UPGRADE_BACTA && item_index <= RPG_INVENTORY_UPGRADE_EWEB) || item_index == RPG_INVENTORY_WP_SABER)
+	if (item_index >= RPG_INVENTORY_UPGRADE_BACTA && item_index <= RPG_INVENTORY_UPGRADE_EWEB)
 	{
 		if (ent->client->pers.rpg_inventory[item_index] > 0)
 		{
