@@ -7339,6 +7339,7 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time );
 extern void try_finishing_race();
 extern void set_max_health(gentity_t *ent);
 extern void set_max_shield(gentity_t *ent);
+extern void set_max_nature_energy(gentity_t* ent);
 extern void duel_show_table(gentity_t *ent);
 extern void WP_DisruptorAltFire(gentity_t *ent);
 extern void G_Kill( gentity_t *ent );
@@ -9230,6 +9231,8 @@ void G_RunFrame( int levelTime ) {
 								else if (ent->client->pers.quest_spirits_event_step == 6)
 								{
 									ent->client->pers.quest_missions |= (1 << MAIN_QUEST_COMPLETED);
+
+									set_max_nature_energy(ent);
 								}
 							}
 
