@@ -2643,19 +2643,16 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		attacker = &g_entities[self->client->ps.otherKiller];
 	}
 
-	/*
-	// zyk: enemy npcs have chance to drop crystals
+	// zyk: enemy npcs give Nature Energy when defeated
 	if (self->NPC && self->client->NPC_class != CLASS_VEHICLE && self->client->playerTeam != NPCTEAM_PLAYER)
 	{
-		int crystal_random_chance = Q_irand(0, 99);
-		int chance_to_spawn_crystal = 40 + (self->client->ps.stats[STAT_MAX_HEALTH] / 20);
+		int nature_energy_amount = self->client->ps.stats[STAT_MAX_HEALTH] / 10;
 
-		if (crystal_random_chance < chance_to_spawn_crystal)
+		if (nature_energy_amount > 0 && attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG)
 		{
-			zyk_spawn_crystal(self->client->ps.origin[0], self->client->ps.origin[1], self->client->ps.origin[2] + 32, 60000, QUEST_ITEM_SKILL_CRYSTAL);
+			set_nature_energy(attacker, nature_energy_amount, qtrue);
 		}
 	}
-	*/
 
 	// zyk: Main Quest events
 	if (self->client->pers.quest_npc > QUEST_NPC_NONE)

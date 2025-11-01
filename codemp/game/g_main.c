@@ -6899,7 +6899,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 7)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Nature Energy is required for skills and inventory items. It will regen automatically. Meditate to regen it faster.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Nature Energy is required for skills and inventory items. It will regen automatically. Defeating enemy npcs also give some energy.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 8)
 	{
@@ -6907,7 +6907,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 9)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To make or unmake inventory items, use ^3/make <number> ^7or ^3/unmake <number>^7.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To make or unmake inventory items, use ^3/make <number> ^7or ^3/unmake <number>^7. Unmaking items give Nature Energy.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 10)
 	{
@@ -6923,7 +6923,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 13)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Meditate (Controls menu to set it) to regen Stamina, Force and MP. If Stamina runs out, you faint and lose some Nature Energy.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Meditate (Controls menu) to regen Stamina, Nature Energy, Force and MP. If Stamina runs out, you faint and lose some Nature Energy.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 14)
 	{
