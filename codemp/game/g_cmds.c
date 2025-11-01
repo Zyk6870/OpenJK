@@ -276,7 +276,7 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_WP_DEMP2] = "DEMP2";
 	inventory_item_names[RPG_INVENTORY_WP_FLECHETTE] = "Flechette";
 	inventory_item_names[RPG_INVENTORY_WP_ROCKET_LAUNCHER] = "Rocket Launcher";
-	inventory_item_names[RPG_INVENTORY_WP_CONCUSSION] = "Concussion";
+	inventory_item_names[RPG_INVENTORY_WP_CONCUSSION] = "Concussion Rifle";
 	inventory_item_names[RPG_INVENTORY_WP_BRYAR_PISTOL] = "Bryar Pistol";
 
 	inventory_item_names[RPG_INVENTORY_AMMO_BLASTER_PACK] = "Blaster Pack Ammo";
