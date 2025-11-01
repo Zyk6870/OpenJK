@@ -8835,7 +8835,7 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.nature_energy_timer < level.time)
 					{
 						int main_quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS);
-						int nature_energy_time = 1200;
+						int nature_energy_time = 2500;
 						int nature_energy_amount = 1;
 
 						// zyk: meditating
@@ -8844,7 +8844,7 @@ void G_RunFrame( int levelTime ) {
 							nature_energy_amount *= 2;
 						}
 
-						// zyk: Energy Modulator, while active, stops Nature Energy regen. It must be Off for Nature Energy to generate
+						// zyk: Energy Modulator is active, stops Nature Energy regen
 						if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_OFF)
 						{
 							set_nature_energy(ent, nature_energy_amount, qtrue);
@@ -8855,7 +8855,7 @@ void G_RunFrame( int levelTime ) {
 
 						if (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] > 0)
 						{
-							nature_energy_time -= (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] * 20);
+							nature_energy_time -= (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] * 50);
 						}
 
 						ent->client->pers.nature_energy_timer = level.time + nature_energy_time;
