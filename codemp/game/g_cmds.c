@@ -7144,7 +7144,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, va("\n^7You must fully regenerate your Spirit Tree.\nTo do it, find the Quest Log parts (blue crystals).\nEach one you find will increase regen rate a little.\nHold ^2Use ^7key inside the Tree and it will show tutorial info.\nMeditate and hold ^2Use ^7key to call your Spirit Tree.\n\n"));
+			strcpy(quest_desc, va("\n^7Find all ^2%d ^7Quest Log Parts (blue crystals) to fully regenerate your Spirit Tree.\nEach one you find will increase regen rate a little, up until a point the tree stops regen.\nThen the tree will continue to regen when you find more Quest Log parts.\nUse ^3/list questlog ^7to read the Quest Log.\nHold ^2Use ^7key inside the Tree and it will show tutorial info.\nMeditate and hold ^2Use ^7key to call your Spirit Tree.\n\n", RPG_MAX_QUEST_LOG_PARTS));
 
 			trap->SendServerCommand(target_ent->s.number,
 				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
@@ -7345,7 +7345,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 						}
 						else if (page == 7)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Regenerating me will make me stronger and allow me to have a higher chance to call allies to help you. But beware, the enemies make me wither depending on how many appear...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3%s: ^7Regenerating me will make me stronger and allow me to have a higher chance to call allies to help you. But beware, the enemies make me wither depending on how many appear. If the enemies get too near me, they will make me wither even faster, specially the Mage Masters...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG), QUESTCHAR_MAIN));
 						}
 						else if (page == 8)
 						{

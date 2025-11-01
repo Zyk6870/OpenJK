@@ -7143,6 +7143,45 @@ void zyk_start_main_quest_spirits_event(gentity_t* ent)
 
 extern void zyk_reset_quest(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
+int quest_spirit_tree_wither(gentity_t* tree_ent)
+{
+	int wither_amount = 0;
+	int i = (MAX_CLIENTS + BODY_QUEUE_SIZE);
+	gentity_t* npc_ent = NULL;
+
+	while (i < level.num_entities)
+	{
+		npc_ent = &g_entities[i];
+
+		if (npc_ent && npc_ent->client && npc_ent->NPC &&
+			npc_ent->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && npc_ent->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR &&
+			npc_ent->health > 0)
+		{
+			int distance_to_tree = Distance(npc_ent->client->ps.origin, tree_ent->s.origin);
+
+			if (distance_to_tree < (QUEST_SPIRIT_TREE_RADIUS * 2))
+			{
+				if (npc_ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
+				{
+					wither_amount += 4;
+				}
+				else
+				{
+					wither_amount += 2;
+				}
+			}
+			else
+			{
+				wither_amount++;
+			}
+		}
+
+		i++;
+	}
+
+	return wither_amount;
+}
+
 void zyk_spirit_tree_events(gentity_t* ent)
 {
 	gentity_t* tree_ent = NULL;
@@ -7190,6 +7229,11 @@ void zyk_spirit_tree_events(gentity_t* ent)
 			{
 				zyk_show_tutorial(ent);
 
+				// zyk: setting use anim
+				ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+				ent->client->ps.forceDodgeAnim = BOTH_BUTTON_HOLD;
+				ent->client->ps.forceHandExtendTime = level.time + 500;
+
 				ent->client->pers.tutorial_timer = level.time + 2000;
 			}
 			else
@@ -7202,15 +7246,22 @@ void zyk_spirit_tree_events(gentity_t* ent)
 			ent->client->pers.quest_missions & (1 << MAIN_QUEST_START) &&
 			ent->client->pers.quest_spirits_event_step == 0)
 		{
-			quest_progress_change += (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] * 2);
+			int quest_log_max_progress =
+				MAX_QUEST_PROGRESS * ((ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] * 1.0f) / (RPG_MAX_QUEST_LOG_PARTS * 1.0f));
+
+			// zyk: player must find Quest Log parts to regen more
+			if (ent->client->pers.quest_progress <= quest_log_max_progress)
+			{
+				quest_progress_change += (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] * 2);
+			}
 
 			if (ent->client->pers.player_settings & (1 << SETTINGS_DIFFICULTY))
 			{ // zyk: Hard Mode
 				quest_progress_change /= 2;
 			}
 
-			// zyk: Tree withers based on the number of enemies in the map
-			quest_progress_change -= zyk_number_of_enemies_in_map();
+			// zyk: Tree withers based on the number of enemies in the map and their distance to the tree
+			quest_progress_change -= quest_spirit_tree_wither(tree_ent);
 
 			ent->client->pers.quest_progress += quest_progress_change;
 
