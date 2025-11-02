@@ -1525,7 +1525,7 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 		else
 		{
 			int stamina_usage = 0;
-			int stamina_recovery = 5 + ent->client->pers.skill_levels[SKILL_MAX_STAMINA] + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
+			int stamina_recovery = 5 + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 2) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
 			int i = 0;
 
 			if (ent->client->pers.current_weight > ent->client->pers.max_weight)
