@@ -6472,6 +6472,16 @@ float zyk_get_rpg_player_speed(gentity_t* ent)
 		rpg_player_speed += (10 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]);
 	}
 
+	if (ent->client->pers.current_weight > ent->client->pers.max_weight)
+	{ // zyk: too much weight decreases player speed
+		rpg_player_speed -= (ent->client->pers.current_weight - ent->client->pers.max_weight);
+	}
+
+	if (ent->client->pers.current_stamina > 0 && ent->client->pers.current_stamina < RPG_MIN_STAMINA)
+	{ // zyk: low Stamina decreases player speed
+		rpg_player_speed = rpg_player_speed * (ent->client->pers.current_stamina / RPG_MIN_STAMINA);
+	}
+
 	return rpg_player_speed;
 }
 
@@ -6535,11 +6545,11 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 
 	if (rpg_has_speed_bonus(ent) == qtrue)
 	{
-		strcpy(message, va("%s^3Run Speed: ^5%.1f\n", message, rpg_player_speed));
+		strcpy(message, va("%s^3Run Speed: ^5%.1f\n", message, ent->client->ps.speed));
 	}
 	else
 	{
-		strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, rpg_player_speed));
+		strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, ent->client->ps.speed));
 	}
 
 	strcpy(message, va("%s^3Force Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE)));
