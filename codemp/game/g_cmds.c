@@ -195,7 +195,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio. Carrying stuff over the max weight will decrease your run speed and also decrease Stamina";
 	if (skill_index == SKILL_MAX_STAMINA)
-		return "Stamina is used by any action you do. Low stamina makes run speed slower. You also lose some stamina when taking damage. If Stamina runs out you will faint for some seconds and lose some Nature Energy. Each skill level increases max Stamina, Stamina recovery when meditating, gives a run speed bonus when current Stamina is at least 75 per cent (and the skill level is at least 1), decreases time you need to recover after fainting and the time you can be underwater before drowning. Use bacta canister or big bacta holdable items to regen stamina";
+		return va("Stamina is used by any action you do. Low stamina makes run speed slower. You also lose some stamina when taking damage. If Stamina runs out you will faint for some seconds and lose some Nature Energy. Each skill level increases max Stamina, Stamina recovery when meditating, gives a run speed bonus when current Stamina is at least %.1f per cent (and the skill level is at least 1), decreases time you need to recover after fainting and the time you can be underwater before drowning. Use bacta canister or big bacta holdable items to regen stamina", RPG_RUN_SPEED_STAMINA_BONUS);
 	if (skill_index == SKILL_RUN_SPEED)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
@@ -6448,6 +6448,16 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 }
 
+qboolean rpg_has_speed_bonus(gentity_t* ent)
+{
+	if (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] > 0 && ent->client->pers.current_stamina >= (ent->client->pers.max_stamina * (RPG_RUN_SPEED_STAMINA_BONUS * 0.01f)))
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 float zyk_get_rpg_player_speed(gentity_t* ent)
 {
 	float rpg_player_speed = g_speed.value + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
@@ -6457,7 +6467,7 @@ float zyk_get_rpg_player_speed(gentity_t* ent)
 		rpg_player_speed += (ent->client->pers.skill_levels[SKILL_RUN_SPEED] * RPG_RUN_SPEED_SKILL_INCREASE);
 	}
 
-	if (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] > 0 && ent->client->pers.current_stamina >= (ent->client->pers.max_stamina * 0.75f))
+	if (rpg_has_speed_bonus(ent) == qtrue)
 	{
 		rpg_player_speed += (10 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]);
 	}
@@ -6523,7 +6533,15 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 		strcpy(message, va("%s^3Nature Energy: ^2%d/%d\n", message, ent->client->pers.nature_energy, ent->client->pers.max_nature_energy));
 	}
 
-	strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, rpg_player_speed));
+	if (rpg_has_speed_bonus(ent) == qtrue)
+	{
+		strcpy(message, va("%s^3Run Speed: ^5%.1f\n", message, rpg_player_speed));
+	}
+	else
+	{
+		strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, rpg_player_speed));
+	}
+
 	strcpy(message, va("%s^3Force Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE)));
 	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MISC)));
 	strcpy(message, va("%s^3Magic Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC)));

@@ -851,6 +851,7 @@ typedef enum {
 #define NPC_CLOAK_DETECTION_DISTANCE 1000
 
 #define RPG_RUN_SPEED_SKILL_INCREASE 6.0f
+#define RPG_RUN_SPEED_STAMINA_BONUS 75.0f
 
 // zyk: main characters names
 #define QUESTCHAR_MAIN "^6Spirit Tree"
