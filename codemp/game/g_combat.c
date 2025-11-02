@@ -4915,8 +4915,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	}
 
 	if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG &&
-		targ && targ->client && targ->NPC &&
-		targ->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && 
+		targ && targ->client && targ->NPC && targ->health > 0 &&
+		targ->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE &&
 		targ->client->pers.quest_npc < NUM_QUEST_NPCS &&
 		targ->client->pers.quest_npc_chat_timer < level.time)
 	{
