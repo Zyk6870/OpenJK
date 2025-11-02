@@ -8864,6 +8864,12 @@ void G_RunFrame( int levelTime ) {
 						int nature_energy_time = 2500;
 						int nature_energy_amount = 1;
 
+						// zyk: if Quests are disabled, make Nature Energy regen faster
+						if (zyk_allow_quests.integer < 1)
+						{
+							nature_energy_time -= 500;
+						}
+
 						// zyk: meditating
 						if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 						{
