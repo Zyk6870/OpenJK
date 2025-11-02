@@ -1019,7 +1019,7 @@ typedef struct clientPersistant_s {
 	// zyk: quickdraw pistol upgrade uses this
 	int quickdraw_timer;
 
-	// zyk: bitvalue. Sets the magic this player is using or the magic that is affecting this player
+	// zyk: bitvalue. Sets the current active magic powers
 	int active_magic;
 
 	// zyk: cooldown between quest power uses

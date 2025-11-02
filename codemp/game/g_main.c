@@ -5544,121 +5544,140 @@ void magic_power_events(gentity_t *ent)
 	{
 		if (ent->health > 0)
 		{
-			int i = 0;
 			int magic_bonus = 0;
 
 			// zyk: Magic Affinity increases magic damage
 			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER);
 
-			if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
+			if (ent->client->pers.active_magic > 0)
 			{
-				zyk_stop_all_magic_powers(ent);
-			}
-
-			if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power <= 0)
-			{ // zyk: run out of mp, stop all magic
-				ent->client->pers.magic_power = 0;
-
-				zyk_stop_all_magic_powers(ent);
-			}
-
-			// zyk: stop magic if skill level is not at least at level 1
-			for (i = 0; i < MAX_MAGIC_POWERS; i++)
-			{
-				int skill_index = SKILL_MAGIC_SHIELD + i;
-
-				if (ent->client->pers.skill_levels[skill_index] < 1)
+				if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
 				{
-					zyk_stop_magic_power(ent, i);
+					zyk_stop_all_magic_powers(ent);
+				}
+
+				if (ent->client->pers.magic_consumption_timer < level.time && ent->client->pers.magic_power <= 0)
+				{
+					ent->client->pers.magic_power = 0;
+
+					zyk_stop_all_magic_powers(ent);
 				}
 			}
 
 			if (ent->client->pers.active_magic & (1 << MAGIC_MAGIC_SHIELD))
 			{
-				if (ent->client->pers.magic_consumption_timer < level.time)
+				if (ent->client->pers.skill_levels[SKILL_MAGIC_SHIELD] > 0)
 				{
-					zyk_mp_usage(ent, SKILL_MAGIC_SHIELD);
-				}
-
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SHIELD] < level.time)
-				{
-					int chance_for_magic_fist = magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_SHIELD];
-
-					if (Q_irand(0, 99) < chance_for_magic_fist && ent->client->ps.hasLookTarget == qtrue)
+					if (ent->client->pers.magic_consumption_timer < level.time)
 					{
-						zyk_magic_fist_bolt(ent, qtrue);
+						zyk_mp_usage(ent, SKILL_MAGIC_SHIELD);
 					}
 
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_defensive", "0", "misc/genrings", 0, 0, 0, 400);
+					if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SHIELD] < level.time)
+					{
+						int chance_for_magic_fist = magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_SHIELD];
 
-					ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SHIELD] = level.time + 300;
+						if (Q_irand(0, 99) < chance_for_magic_fist && ent->client->ps.hasLookTarget == qtrue)
+						{
+							zyk_magic_fist_bolt(ent, qtrue);
+						}
+
+						zyk_quest_effect_spawn(ent, ent, "zyk_magic_defensive", "0", "misc/genrings", 0, 0, 0, 400);
+
+						ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SHIELD] = level.time + 300;
+					}
+				}
+				else
+				{
+					zyk_stop_magic_power(ent, MAGIC_MAGIC_SHIELD);
 				}
 			}
 
 			if (ent->client->pers.active_magic & (1 << MAGIC_HEALING_CIRCLE))
 			{
-				int damage = magic_bonus + ent->client->pers.skill_levels[SKILL_HEALING_CIRCLE];
-
-				if (ent->client->pers.magic_consumption_timer < level.time)
+				if (ent->client->pers.skill_levels[SKILL_HEALING_CIRCLE] > 0)
 				{
-					zyk_mp_usage(ent, SKILL_HEALING_CIRCLE);
+					int damage = magic_bonus + ent->client->pers.skill_levels[SKILL_HEALING_CIRCLE];
+
+					if (ent->client->pers.magic_consumption_timer < level.time)
+					{
+						zyk_mp_usage(ent, SKILL_HEALING_CIRCLE);
+					}
+
+					if (ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_CIRCLE] < level.time)
+					{
+						int heal_amount = (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_HEALING_CIRCLE] / 2);
+
+						if (heal_amount < 1)
+						{
+							heal_amount = 1;
+						}
+
+						zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing", "4", "env/red_cyc", 0, damage, 228, 400);
+
+						if (ent->health > 0)
+						{
+							zyk_add_health(ent, heal_amount);
+						}
+
+						healing_circle_status_restoration(ent, heal_amount * 100);
+
+						ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_CIRCLE] = level.time + 300;
+					}
 				}
-
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_CIRCLE] < level.time)
+				else
 				{
-					int heal_amount = (magic_bonus / 2) + (ent->client->pers.skill_levels[SKILL_HEALING_CIRCLE] / 2);
-
-					if (heal_amount < 1)
-					{
-						heal_amount = 1;
-					}
-
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_healing", "4", "env/red_cyc", 0, damage, 228, 400);
-
-					if (ent->health > 0)
-					{
-						zyk_add_health(ent, heal_amount);
-					}
-
-					healing_circle_status_restoration(ent, heal_amount * 100);
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_CIRCLE] = level.time + 300;
+					zyk_stop_magic_power(ent, MAGIC_HEALING_CIRCLE);
 				}
 			}
 
 			if (ent->client->pers.active_magic & (1 << MAGIC_CHAOS_FIELD))
 			{
-				if (ent->client->pers.magic_consumption_timer < level.time)
+				if (ent->client->pers.skill_levels[SKILL_CHAOS_FIELD] > 0)
 				{
-					zyk_mp_usage(ent, SKILL_CHAOS_FIELD);
+					if (ent->client->pers.magic_consumption_timer < level.time)
+					{
+						zyk_mp_usage(ent, SKILL_CHAOS_FIELD);
+					}
+
+					if (ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] < level.time)
+					{
+						int damage = (magic_bonus / 2) + ent->client->pers.skill_levels[SKILL_CHAOS_FIELD];
+
+						zyk_quest_effect_spawn(ent, ent, "zyk_magic_chaos", "4", "env/dome", 0, damage, 290, 400);
+
+						ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] = level.time + 300;
+					}
 				}
-
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] < level.time)
+				else
 				{
-					int damage = (magic_bonus / 2) + ent->client->pers.skill_levels[SKILL_CHAOS_FIELD];
-
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_chaos", "4", "env/dome", 0, damage, 290, 400);
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_CHAOS_FIELD] = level.time + 300;
+					zyk_stop_magic_power(ent, MAGIC_CHAOS_FIELD);
 				}
 			}
 
 			if (ent->client->pers.active_magic & (1 << MAGIC_LIGHTNING_DOME))
 			{
-				if (ent->client->pers.magic_consumption_timer < level.time)
+				if (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] > 0)
 				{
-					zyk_mp_usage(ent, SKILL_LIGHTNING_DOME);
+					if (ent->client->pers.magic_consumption_timer < level.time)
+					{
+						zyk_mp_usage(ent, SKILL_LIGHTNING_DOME);
 
-					zyk_quest_effect_spawn(ent, ent, "zyk_magic_lightning", "0", "howler/sonic", 0, 0, 0, 350);
+						zyk_quest_effect_spawn(ent, ent, "zyk_magic_lightning", "0", "howler/sonic", 0, 0, 0, 350);
+					}
+
+					if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
+					{
+						int debounce_timer = 450 - ((magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME]) * 20);
+
+						ent->client->pers.magic_lightning_dome_bonus++;
+
+						ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + debounce_timer;
+					}
 				}
-
-				if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
+				else
 				{
-					int debounce_timer = 400 - ((magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME]) * 15);
-
-					ent->client->pers.magic_lightning_dome_bonus++;
-
-					ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + debounce_timer;
+					zyk_stop_magic_power(ent, MAGIC_LIGHTNING_DOME);
 				}
 			}
 			else if (ent->client->pers.magic_lightning_dome_bonus > 0)
