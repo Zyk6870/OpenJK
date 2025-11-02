@@ -6990,10 +6990,15 @@ extern int zyk_number_of_enemies_in_map();
 void zyk_update_inventory(gentity_t* ent)
 {
 	// zyk: loading initial inventory
-	ent->client->ps.stats[STAT_WEAPONS] = 0;
-	ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_NONE);
-	ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_MELEE);
 	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = 0;
+
+	// zyk: do not reset weapons while player is in an emplaced gun. This bugs emplaced gun (and e-web) usage
+	if (!ent->client->ps.emplacedIndex)
+	{
+		ent->client->ps.stats[STAT_WEAPONS] = 0;
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_NONE);
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_MELEE);
+	}
 
 	// zyk: weapons inventory
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_STUN_BATON] > 0)
