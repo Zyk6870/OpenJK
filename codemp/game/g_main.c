@@ -7170,6 +7170,7 @@ extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 int quest_spirit_tree_wither(gentity_t* tree_ent)
 {
 	int wither_amount = 0;
+	int wither_distance = QUEST_SPIRIT_TREE_RADIUS * 4;
 	int i = (MAX_CLIENTS + BODY_QUEUE_SIZE);
 	gentity_t* npc_ent = NULL;
 
@@ -7183,7 +7184,7 @@ int quest_spirit_tree_wither(gentity_t* tree_ent)
 		{
 			int distance_to_tree = Distance(npc_ent->client->ps.origin, tree_ent->s.origin);
 
-			if (distance_to_tree < (QUEST_SPIRIT_TREE_RADIUS * 2))
+			if (distance_to_tree < wither_distance)
 			{
 				if (npc_ent->client->pers.quest_npc == QUEST_NPC_MAGE_MASTER)
 				{
