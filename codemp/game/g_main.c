@@ -5668,7 +5668,7 @@ void magic_power_events(gentity_t *ent)
 
 					if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
 					{
-						int debounce_timer = 450 - ((magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME]) * 20);
+						int debounce_timer = 200 - ((magic_bonus + (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 2)) * 5);
 
 						ent->client->pers.magic_lightning_dome_bonus++;
 
@@ -5682,7 +5682,7 @@ void magic_power_events(gentity_t *ent)
 			}
 			else if (ent->client->pers.magic_lightning_dome_bonus > 0)
 			{
-				int damage = magic_bonus + ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] + ent->client->pers.magic_lightning_dome_bonus;
+				int damage = ent->client->pers.magic_lightning_dome_bonus;
 
 				lightning_dome(ent, damage);
 				G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/ambience/thunder_close1.mp3"));

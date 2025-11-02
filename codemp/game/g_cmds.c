@@ -210,7 +210,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_CHAOS_FIELD)
 		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to them. Higher levels and Magic Affinity increase the field damage and the chance to cause the bad status effects and their duration. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_LIGHTNING_DOME)
-		return va("keeps charging up until you stop this magic power. When you do, it will create a powerful Lightning Dome, damaging enemies at a great distance and disabling their Cloak and Jetpack. Can hit targets through walls. Higher levels and Magic Affinity increase initial damage and dome charges up faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
+		return va("keeps charging up until you stop this magic power. When you do, it will create a powerful Lightning Dome, damaging enemies at a great distance and disabling their Cloak and Jetpack. Can hit targets through walls. Higher levels make dome charge up faster, and Magic Affinity also charges it up a little faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 
 	return "";
 }
