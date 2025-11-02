@@ -789,7 +789,6 @@ typedef enum {
 #define RPG_DEFAULT_STAMINA 5000
 
 // zyk: RPG Nature Energy
-#define RPG_INITIAL_NATURE_ENERGY 0
 #define RPG_MAX_NATURE_ENERGY 10000
 #define RPG_MAX_BUY_AMOUNT 200
 
