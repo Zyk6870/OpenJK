@@ -6543,10 +6543,16 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 							if (Q_irand(0, 99) < chaos_chance && ent->client)
 							{
 								zyk_rpg_status_t random_bad_status = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
+								int status_duration = chaos_chance * 2000;
 
 								zyk_remove_emotes(ent);
 
-								zyk_set_rpg_status(ent, random_bad_status, chaos_chance * 1000, qtrue);
+								if (random_bad_status == RPG_STATUS_CONFUSED)
+								{
+									status_duration /= 4;
+								}
+
+								zyk_set_rpg_status(ent, random_bad_status, status_duration, qtrue);
 							}
 						}
 
