@@ -4457,6 +4457,26 @@ qboolean G_OtherPlayersDueling(void)
 	return qfalse;
 }
 
+char* zyk_formatted_amount_with_max(int amount, int max)
+{
+	char amount_string[64];
+
+	if (amount < max)
+	{
+		strcpy(amount_string, va("^7%d/%d", amount, max));
+	}
+	else if (amount == max)
+	{
+		strcpy(amount_string, va("^2%d/%d", amount, max));
+	}
+	else
+	{
+		strcpy(amount_string, va("^1%d/%d", amount, max));
+	}
+
+	return G_NewString(amount_string);
+}
+
 extern void zyk_energy_modulator(gentity_t* ent);
 char* zyk_selected_ability_name(zyk_selected_ability_t selected_ability)
 {
@@ -6490,58 +6510,14 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 	char message[MAX_STRING_CHARS];
 	int total_skill_points = zyk_total_skillpoints(ent);
 	int max_magic_power = zyk_max_magic_power(ent);
-	float rpg_player_speed = zyk_get_rpg_player_speed(ent);
 
 	strcpy(message, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n", ent->client->sess.filename, ent->client->sess.rpgchar));
 
-	if (total_skill_points < RPG_MAX_SKILLPOINTS)
-	{
-		strcpy(message, va("%s^3Skills Upgraded: ^7%d/%d\n", message, total_skill_points, RPG_MAX_SKILLPOINTS));
-	}
-	else
-	{
-		strcpy(message, va("%s^3Skills Upgraded: ^2%d/%d\n", message, total_skill_points, RPG_MAX_SKILLPOINTS));
-	}
-
-	if (ent->client->pers.magic_power < max_magic_power)
-	{
-		strcpy(message, va("%s^3Magic Points: ^7%d/%d\n", message, ent->client->pers.magic_power, max_magic_power));
-	}
-	else
-	{
-		strcpy(message, va("%s^3Magic Points: ^2%d/%d\n", message, ent->client->pers.magic_power, max_magic_power));
-	}
-
-	if (ent->client->pers.current_weight < ent->client->pers.max_weight)
-	{
-		strcpy(message, va("%s^3Weight: ^7%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
-	}
-	else if (ent->client->pers.current_weight == ent->client->pers.max_weight)
-	{
-		strcpy(message, va("%s^3Weight: ^2%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
-	}
-	else
-	{
-		strcpy(message, va("%s^3Weight: ^1%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
-	}
-
-	if (ent->client->pers.current_stamina < ent->client->pers.max_stamina)
-	{
-		strcpy(message, va("%s^3Stamina: ^7%d/%d\n", message, ent->client->pers.current_stamina, ent->client->pers.max_stamina));
-	}
-	else
-	{
-		strcpy(message, va("%s^3Stamina: ^2%d/%d\n", message, ent->client->pers.current_stamina, ent->client->pers.max_stamina));
-	}
-
-	if (ent->client->pers.nature_energy < ent->client->pers.max_nature_energy)
-	{
-		strcpy(message, va("%s^3Nature Energy: ^7%d/%d\n", message, ent->client->pers.nature_energy, ent->client->pers.max_nature_energy));
-	}
-	else
-	{
-		strcpy(message, va("%s^3Nature Energy: ^2%d/%d\n", message, ent->client->pers.nature_energy, ent->client->pers.max_nature_energy));
-	}
+	strcpy(message, va("%s^3Skills Upgraded: %s\n", message, zyk_formatted_amount_with_max(total_skill_points, RPG_MAX_SKILLPOINTS)));
+	strcpy(message, va("%s^3Magic Points: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.magic_power, max_magic_power)));
+	strcpy(message, va("%s^3Nature Energy: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.nature_energy, ent->client->pers.max_nature_energy)));
+	strcpy(message, va("%s^3Stamina: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.current_stamina, ent->client->pers.max_stamina)));
+	strcpy(message, va("%s^3Weight: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.current_weight, ent->client->pers.max_weight)));
 
 	if (rpg_has_speed_bonus(ent) == qtrue)
 	{
@@ -6899,27 +6875,8 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 		}
 	}
 
-	if (ent->client->pers.current_weight < ent->client->pers.max_weight)
-	{
-		strcpy(message, va("%s\n^3Weight: ^7%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
-	}
-	else if (ent->client->pers.current_weight == ent->client->pers.max_weight)
-	{
-		strcpy(message, va("%s\n^3Weight: ^2%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
-	}
-	else
-	{
-		strcpy(message, va("%s\n^3Weight: ^1%d/%d\n", message, ent->client->pers.current_weight, ent->client->pers.max_weight));
-	}
-
-	if (ent->client->pers.nature_energy < ent->client->pers.max_nature_energy)
-	{
-		strcpy(message, va("%s^3Nature Energy: ^7%d\n", message, ent->client->pers.nature_energy));
-	}
-	else
-	{
-		strcpy(message, va("%s^3Nature Energy: ^2%d\n", message, ent->client->pers.nature_energy));
-	}
+	strcpy(message, va("%s\n^3Nature Energy: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.nature_energy, ent->client->pers.max_nature_energy)));
+	strcpy(message, va("%s^3Weight: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.current_weight, ent->client->pers.max_weight)));
 
 	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                          - ^5Count - ^2Weight - ^3Make - Unmake\n\n%s\n^7Use ^3/make <item number> ^7or ^3/unmake <item number> ^7to make or unmake items\n\"", message));
 }
@@ -7175,9 +7132,10 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 			strcpy(quest_desc, va("\n^7Find all ^2%d ^7Quest Log parts (blue crystals) to fully regenerate your Spirit Tree.\nEach one you find will increase regen rate a little, up until a point the tree stops regen.\nThen the tree will continue to regen when you find more Quest Log parts.\nUse ^3/list questlog ^7to read the Quest Log.\nHold ^2Use ^7key inside the Tree and it will show tutorial info.\nMeditate and hold ^2Use ^7key to call your Spirit Tree.\n\n", RPG_MAX_QUEST_LOG_PARTS));
 
 			trap->SendServerCommand(target_ent->s.number,
-				va("print \"%s^3Regen Progress: ^7%d/%d\n^3Quest Log parts: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
+				va("print \"%s^3Regen Progress: %s\n^3Quest Log parts: %s\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
 					quest_desc,
-					ent->client->pers.quest_progress, MAX_QUEST_PROGRESS, ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG], RPG_MAX_QUEST_LOG_PARTS, 
+					zyk_formatted_amount_with_max(ent->client->pers.quest_progress, MAX_QUEST_PROGRESS),
+					zyk_formatted_amount_with_max(ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG], RPG_MAX_QUEST_LOG_PARTS),
 					zyk_number_of_allies_in_map(ent), zyk_number_of_enemies_in_map()));
 		}
 	}
