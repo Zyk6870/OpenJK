@@ -1289,7 +1289,6 @@ qboolean G_ActionButtonPressed(int buttons)
 	return qfalse;
 }
 
-extern void set_nature_energy(gentity_t* ent, int amount, qboolean add);
 extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 
@@ -1509,9 +1508,6 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			}
 
 			zyk_set_stamina(ent, stamina_out_recovery, qtrue);
-
-			// zyk: loses some Nature Energy
-			set_nature_energy(ent, 1, qfalse);
 
 			// zyk: also lose some health
 			ent->health--;

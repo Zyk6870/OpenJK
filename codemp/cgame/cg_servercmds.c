@@ -1800,12 +1800,14 @@ static void CG_ZykMod( void )
 		}
 		else if (j == 108)
 		{ // zyk: duration of Unique Skills
+			/*
 			if (cg.unique_duration_control == 0)
 			{
 				cg.unique_duration = atoi(value);
 				cg.unique_duration_timer = cg.time + cg.unique_duration;
 				cg.unique_duration_control = 1;
 			}
+			*/
 		}
 		else if (j == 109)
 		{ // zyk: Main Quest

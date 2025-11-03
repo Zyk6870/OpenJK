@@ -195,7 +195,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio. Carrying stuff over the max weight will decrease your run speed and also decrease Stamina";
 	if (skill_index == SKILL_MAX_STAMINA)
-		return va("Stamina is used by any action you do. Low stamina makes run speed slower. You also lose some stamina when taking damage. If Stamina runs out you will faint for some seconds and lose some Nature Energy. Each skill level increases max Stamina, Stamina recovery when meditating, gives a run speed bonus when current Stamina is at least %.1f per cent (and the skill level is at least 1), decreases time you need to recover after fainting and the time you can be underwater before drowning. Use bacta canister or big bacta holdable items to regen stamina", RPG_RUN_SPEED_STAMINA_BONUS);
+		return va("Stamina is used by any action you do. Low stamina makes run speed slower. You lose stamina when taking damage. If Stamina runs out you will faint for some seconds. Each skill level increases max Stamina, Stamina recovery when meditating, gives a run speed bonus when current Stamina is at least %.1f per cent (and the skill level is at least 1), decreases time you need to recover after fainting, decreases Stamina loss when taking damage and increases the time you can be underwater before drowning. Use bacta canister or big bacta holdable items to regen stamina", RPG_RUN_SPEED_STAMINA_BONUS);
 	if (skill_index == SKILL_RUN_SPEED)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
@@ -5103,7 +5103,7 @@ void set_max_weight(gentity_t* ent)
 // zyk: set the Max Stamina of this player
 void set_max_stamina(gentity_t* ent)
 {
-	ent->client->pers.max_stamina = RPG_DEFAULT_STAMINA + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 3000);
+	ent->client->pers.max_stamina = RPG_DEFAULT_STAMINA + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 2000);
 }
 
 // zyk: set max Nature Energy of this player

@@ -6042,19 +6042,19 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				take = 1;
 			}
 
-			// zyk: damage to health also makes RPG player lose Stamina
-			stamina_loss = take;
-
 			if (targ->client->sess.account_mode == ACC_MODE_RPG)
 			{
+				// zyk: damage to health also makes RPG player lose Stamina
+				stamina_loss = (take / 2);
+
 				if (targ->client->pers.skill_levels[SKILL_MAX_STAMINA] > 0)
 				{
-					stamina_loss -= (take / (2 * targ->client->pers.skill_levels[SKILL_MAX_STAMINA]));
+					stamina_loss -= (stamina_loss * 0.18f * targ->client->pers.skill_levels[SKILL_MAX_STAMINA]);
+				}
 
-					if (stamina_loss < 1)
-					{
-						stamina_loss = 1;
-					}
+				if (stamina_loss < 1)
+				{
+					stamina_loss = 1;
 				}
 
 				zyk_set_stamina(targ, stamina_loss, qfalse);

@@ -9980,6 +9980,7 @@ void CG_Player( centity_t *cent ) {
 			CG_DrawPlayerSphere(cent, cent->lerpOrigin, 1.4f, cgs.media.ysaliblueShader);
 		}
 
+		/*
 		if (cg.snap->ps.clientNum == cent->currentState.number && cg.unique_cooldown_timer == 0)
 		{ // zyk: using Unique Skill, must show the cooldown time
 			int unique_cooldown_duration = 25000;
@@ -9987,6 +9988,7 @@ void CG_Player( centity_t *cent ) {
 			cg.unique_cooldown_timer = cg.time + unique_cooldown_duration;
 			cg.unique_cooldown_duration = unique_cooldown_duration;
 		}
+		*/
 	}
 
 	if (cent->currentState.powerups & (1 << PW_FORCE_BOON))

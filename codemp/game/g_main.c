@@ -6946,7 +6946,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 13)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Meditate (Controls menu) to regen Stamina, Nature Energy, Force and MP. If Stamina runs out, you faint and lose some Nature Energy.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Meditate (Controls menu) to regen Stamina, Nature Energy, Force and MP. If Stamina runs out, you faint.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 14)
 	{

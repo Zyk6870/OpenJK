@@ -1037,15 +1037,6 @@ Ghoul2 Insert End
 	// zyk: has the client ids of the player to have the Force Shield effect drawn or not
 	int use_rpg_effect[MAX_CLIENTS];
 
-	// zyk: Unique Skill cooldown timer
-	int unique_cooldown_timer;
-	int unique_cooldown_duration;
-	int unique_duration_timer;
-	int unique_duration;
-
-	// zyk: used to control in which moment the Unique duration must be set so it does not reset when a new server command sends the unique duration again
-	int unique_duration_control;
-
 	// zyk: sets clients which must have some RPG stuff set for this cg player to see the stuff on them
 	// Possible bitvalues:
 	// 0 - Blue Jet Flame
