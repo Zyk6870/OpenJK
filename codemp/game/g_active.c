@@ -1548,17 +1548,17 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 
 			if (ent->client->ps.weapon == WP_SABER && ent->client->ps.weaponTime > 0)
 			{ // zyk: attacking with saber
-				stamina_usage += 1;
+				stamina_usage += 2;
 			}
 
 			if (ent->client->ps.saberInFlight && ent->client->ps.saberEntityNum != 0)
 			{ // zyk: active Saber Throw while saber is not dropped in ground
-				stamina_usage += 1;
+				stamina_usage += 2;
 			}
 
 			if (ent->client->ps.fd.forcePowersActive > 0)
 			{ // zyk: active Force Powers
-				stamina_usage += 1;
+				stamina_usage += 2;
 			}
 
 			// zyk: Enlightenment Light

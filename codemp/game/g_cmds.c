@@ -7172,12 +7172,12 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, va("\n^7Find all ^2%d ^7Quest Log Parts (blue crystals) to fully regenerate your Spirit Tree.\nEach one you find will increase regen rate a little, up until a point the tree stops regen.\nThen the tree will continue to regen when you find more Quest Log parts.\nUse ^3/list questlog ^7to read the Quest Log.\nHold ^2Use ^7key inside the Tree and it will show tutorial info.\nMeditate and hold ^2Use ^7key to call your Spirit Tree.\n\n", RPG_MAX_QUEST_LOG_PARTS));
+			strcpy(quest_desc, va("\n^7Find all ^2%d ^7Quest Log parts (blue crystals) to fully regenerate your Spirit Tree.\nEach one you find will increase regen rate a little, up until a point the tree stops regen.\nThen the tree will continue to regen when you find more Quest Log parts.\nUse ^3/list questlog ^7to read the Quest Log.\nHold ^2Use ^7key inside the Tree and it will show tutorial info.\nMeditate and hold ^2Use ^7key to call your Spirit Tree.\n\n", RPG_MAX_QUEST_LOG_PARTS));
 
 			trap->SendServerCommand(target_ent->s.number,
-				va("print \"%s^3Regen Progress: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
+				va("print \"%s^3Regen Progress: ^7%d/%d\n^3Quest Log parts: ^7%d/%d\n\n^3Allies: ^7%d\n^3Enemies: ^7%d\n\n\"",
 					quest_desc,
-					ent->client->pers.quest_progress, MAX_QUEST_PROGRESS,
+					ent->client->pers.quest_progress, MAX_QUEST_PROGRESS, ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG], RPG_MAX_QUEST_LOG_PARTS, 
 					zyk_number_of_allies_in_map(ent), zyk_number_of_enemies_in_map()));
 		}
 	}
