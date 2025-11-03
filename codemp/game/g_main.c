@@ -727,6 +727,10 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = ally_bonus + skill_level_bonus;
 		}
+		else if (quest_npc_type == QUEST_NPC_ALLY_FLYING_WARRIOR)
+		{
+			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = (1 << HI_JETPACK);
+		}
 
 		// zyk: setting the initial amount of magic points
 		npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);

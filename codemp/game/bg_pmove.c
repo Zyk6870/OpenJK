@@ -1872,7 +1872,7 @@ static qboolean PM_CheckJump( void )
 			gentity_t *player_ent = &g_entities[pm->ps->clientNum];
 			if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG)
 			{
-				rpg_skill_counter(player_ent, 5);
+				rpg_skill_counter(player_ent, 2);
 			}
 #endif
 
@@ -2815,7 +2815,7 @@ static qboolean PM_CheckJump( void )
 		gentity_t *player_ent = &g_entities[pm->ps->clientNum];
 		if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG)
 		{
-			rpg_skill_counter(player_ent, 5);
+			rpg_skill_counter(player_ent, 2);
 		}
 	}
 #endif
@@ -3745,7 +3745,7 @@ static int PM_TryRoll( void )
 
 			if (player_ent && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG)
 			{ // zyk: rolling increases skill counter
-				rpg_skill_counter(player_ent, 20);
+				rpg_skill_counter(player_ent, 10);
 			}
 #endif
 			pm->ps->saberMove = LS_NONE;
