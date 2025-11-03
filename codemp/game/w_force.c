@@ -1136,7 +1136,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 	self->client->ps.fd.forcePowerDebounce[forcePower] = 0;
 
 	// zyk: force skill counter
-	rpg_skill_counter(self,100);
+	rpg_skill_counter(self, 20);
 
 	if ((int)forcePower == FP_SPEED && overrideAmt)
 	{
@@ -1187,7 +1187,7 @@ void ForceHeal( gentity_t *self )
 
 			G_Sound(self, CHAN_AUTO, G_SoundIndex("sound/player/pickupshield.wav"));
 
-			rpg_skill_counter(self, 100);
+			rpg_skill_counter(self, 20);
 		}
 
 		return;
@@ -1224,7 +1224,7 @@ void ForceHeal( gentity_t *self )
 
 	BG_ForcePowerDrain(&self->client->ps, FP_HEAL, 0);
 
-	rpg_skill_counter(self, 100);
+	rpg_skill_counter(self, 50);
 
 	G_Sound( self, CHAN_ITEM, G_SoundIndex("sound/weapons/force/heal.wav") );
 }
