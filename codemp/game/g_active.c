@@ -1526,35 +1526,39 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 		{
 			int stamina_usage = 0;
 			int stamina_recovery = 5 + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 2) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
-			int i = 0;
 
 			if (ent->client->pers.current_weight > ent->client->pers.max_weight)
 			{ // zyk: carrying stuff over the max weight, consumes stamina based on how much above the max
-				stamina_usage += (((ent->client->pers.current_weight - ent->client->pers.max_weight) / 10) + 1);
+				stamina_usage += (((ent->client->pers.current_weight - ent->client->pers.max_weight) / 20) + 1);
 			}
 
 			// zyk: active magic uses stamina
-			for (i = 0; i < MAX_MAGIC_POWERS; i++)
+			if (ent->client->pers.active_magic > 0)
 			{
-				if (ent->client->pers.active_magic & (1 << i))
+				int i = 0;
+
+				for (i = 0; i < MAX_MAGIC_POWERS; i++)
 				{
-					stamina_usage += 5;
+					if (ent->client->pers.active_magic & (1 << i))
+					{
+						stamina_usage += 2;
+					}
 				}
 			}
 
 			if (ent->client->ps.weapon == WP_SABER && ent->client->ps.weaponTime > 0)
 			{ // zyk: attacking with saber
-				stamina_usage += 2;
+				stamina_usage += 1;
 			}
 
 			if (ent->client->ps.saberInFlight && ent->client->ps.saberEntityNum != 0)
 			{ // zyk: active Saber Throw while saber is not dropped in ground
-				stamina_usage += 2;
+				stamina_usage += 1;
 			}
 
 			if (ent->client->ps.fd.forcePowersActive > 0)
 			{ // zyk: active Force Powers
-				stamina_usage += 2;
+				stamina_usage += 1;
 			}
 
 			// zyk: Enlightenment Light

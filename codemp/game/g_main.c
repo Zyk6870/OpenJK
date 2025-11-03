@@ -6826,14 +6826,14 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_BIG_BACTA] = 14;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_FORCE_FIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_CLOAK] = 25;
-	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 300;
+	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 250;
 
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 200;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = 300;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 500;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 450;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 100;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 25;
@@ -6848,7 +6848,7 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CONCUSSION] = 40;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = 40;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EXPLOSIVE] = 40;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 100;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = 15;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;

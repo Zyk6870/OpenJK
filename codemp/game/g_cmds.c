@@ -10961,7 +10961,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 
 		if (ent->client->pers.active_magic & (1 << magic_number))
 		{ // zyk: stop using the magic power
-			rpg_skill_counter(ent, 50);
+			rpg_skill_counter(ent, 20);
 
 			zyk_stop_magic_power(ent, magic_number);
 
@@ -11003,7 +11003,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 				// zyk: magic powers cost mp
 				zyk_set_mp(ent, magic_cost, qfalse);
 
-				rpg_skill_counter(ent, 100);
+				rpg_skill_counter(ent, 50);
 
 				if (ent->s.number < MAX_CLIENTS)
 				{
