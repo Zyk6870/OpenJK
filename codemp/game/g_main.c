@@ -6926,7 +6926,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 8)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Everything you collect in map is stored in your inventory. Use ^3/list inv ^7to see it.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Everything you collect in map is stored in your inventory. Use ^3/inv ^7(or ^3/zykinventory^7) to see it.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 9)
 	{

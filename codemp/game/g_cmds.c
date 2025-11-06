@@ -552,7 +552,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_SEEKER_DRONE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes seeker drone shoot faster and with more damage. It lasts longer. Allows picking it up by consuming some powercell ammo, to do it use ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), (RPG_INVENTORY_ITEM_SEEKER_DRONE + 1)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7makes seeker drone shoot faster and with more damage. It lasts longer. Allows picking it up by consuming some powercell ammo, to do it use ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), (RPG_INVENTORY_ITEM_SEEKER_DRONE + 1)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_EWEB)
 	{
@@ -564,27 +564,27 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_MEDPACK)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 health. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 health. Use with ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7restores 25 shield. Use with ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you immune to force powers for a short time. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you immune to force powers for a short time. Use with ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time. Use with ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that regens more Stamina for a short time. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that regens more Stamina for a short time. Use with ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that regens more MP for a short time. Use with ^3/list inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that regens more MP for a short time. Use with ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_QUEST_LOG)
 	{
@@ -592,7 +592,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Nature Energy into attack power and extra shield resistance to damage. Consumes Nature Energy to use medpacks and shield boosters in your inventory to restore health and shield if they are not full. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/list inv use %d^7. It uses Nature Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7created by the %s^7. A device that converts Nature Energy into attack power and extra shield resistance to damage. Consumes Nature Energy to use medpacks and shield boosters in your inventory to restore health and shield if they are not full. You must find it and solve the puzzle to get it. Activate it by pressing Duel key to select it and then pressing Use key, or you can also the command ^3/inv use %d^7. It uses Nature Energy while active\n\n\"", zyk_get_inventory_item_name(item_index), QUESTCHAR_MAIN, item_number));
 	}
 }
 
@@ -6449,7 +6449,7 @@ void zyk_list_category_skills(gentity_t* ent, gentity_t* target_ent, int lowest_
 		strcpy(message, va("%s\n", message));
 	}
 
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n%s^7\nUse ^3/up <skill number> ^7to upgrade skill or ^3/down <skill number> ^7to downgrade it\n\"", message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n%s^7\nUse ^3/up <skill number> ^7to upgrade skill or ^3/down <skill number> ^7to downgrade it\nUse ^3/list <skill number> ^7to see info about a skill\n\"", message));
 }
 
 void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
@@ -6532,7 +6532,7 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MISC)));
 	strcpy(message, va("%s^3Magic Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC)));
 
-	trap->SendServerCommand(target_ent->s.number, va("%s\n^7Use ^2/list rpg ^7to see console commands\n\n\"", message));
+	trap->SendServerCommand(target_ent->s.number, va("%s\n^7Use ^2/list commands ^7for console commands\n\n\"", message));
 }
 
 int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboolean buy_item)
@@ -7147,6 +7147,111 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 
 /*
 ==================
+Cmd_Inventory_f
+==================
+*/
+void Cmd_Inventory_f(gentity_t* ent) {
+	if (trap->Argc() == 1)
+	{
+		trap->SendServerCommand(ent->s.number, "print \"Must pass a page number, ^3desc ^7to see inventory item description, or ^3use ^7to either toggle a weapon/armor upgrade mode or use certain items. Examples: ^3/inventory 1, /inventory desc 1, /inv 1, /inv desc 1, /inv use 42^7\n\"");
+	}
+	else
+	{
+		int page = 1; // zyk: page the user wants to see
+		char arg1[MAX_STRING_CHARS];
+
+		strcpy(arg1, "");
+
+		trap->Argv(1, arg1, sizeof(arg1));
+
+		page = atoi(arg1);
+
+		if (Q_stricmp(arg1, "desc") == 0)
+		{
+			char arg2[MAX_STRING_CHARS];
+			int item_number = 0;
+			int item_index = 0;
+
+			strcpy(arg2, "");
+
+			if (trap->Argc() == 2)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Must pass a number to see inventory item description. Example: ^3/inv desc 1^7\n\"");
+			}
+			else
+			{
+				trap->Argv(2, arg2, sizeof(arg2));
+
+				item_number = atoi(arg2);
+				item_index = item_number - 1;
+
+				if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
+				{
+					zyk_get_inventory_item_description(ent, item_index);
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("print \"Item number must be between 1 and %d\n\"", MAX_RPG_INVENTORY_ITEMS));
+				}
+			}
+		}
+		else if (Q_stricmp(arg1, "use") == 0)
+		{
+			char arg2[MAX_STRING_CHARS];
+			int item_number = 0;
+			int item_index = 0;
+
+			strcpy(arg2, "");
+
+			if (trap->Argc() == 2)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Must pass a number to toggle upgrade. Example: ^3/inv use 42^7\n\"");
+			}
+			else
+			{
+				trap->Argv(2, arg2, sizeof(arg2));
+
+				item_number = atoi(arg2);
+				item_index = item_number - 1;
+
+				if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_EXPLOSIVE)
+				{
+					zyk_use_inventory_item(ent, item_index);
+				}
+				else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE)
+				{
+					zyk_use_inventory_item(ent, item_index);
+				}
+				else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
+				{
+					zyk_use_inventory_item(ent, item_index);
+				}
+				else if (item_index >= RPG_INVENTORY_MISC_MEDPACK && item_index <= RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK)
+				{ // zyk: these items can be used
+					zyk_use_inventory_item(ent, item_index);
+				}
+				else
+				{
+					trap->SendServerCommand(ent->s.number, va("print \"Item number must be %d, or between %d and %d, or between %d and %d, or %d\n\"",
+						(RPG_INVENTORY_ITEM_SEEKER_DRONE + 1),
+						(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_EXPLOSIVE + 1),
+						(RPG_INVENTORY_MISC_MEDPACK + 1), (RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK + 1),
+						(RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR + 1)));
+				}
+			}
+		}
+		else
+		{
+			if (page <= 0)
+				page = 1;
+
+			zyk_list_inventory(ent, ent, page);
+		}
+	}
+}
+
+/*
+==================
 Cmd_ListAccount_f
 ==================
 */
@@ -7164,112 +7269,13 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 			trap->Argv(1, arg1, sizeof( arg1 ));
 
-			if (Q_stricmp( arg1, "rpg" ) == 0)
+			if (Q_stricmp( arg1, "commands" ) == 0)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2/list force: ^7lists force power skills\n^2/list misc: ^7lists miscellaneous skills\n^2/list magic: ^7lists magic skills\n^2/list [skill number]: ^7lists info about a skill\n^2/list inventory: ^7shows player inventory\n^2/list quests: ^7lists the quests\n^2/list commands: ^7lists the RPG Mode console commands\n\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"\n^2/list <force, misc or magic>: ^7lists force, miscellaneous or magic skills\n^2/<inventory or inv>: ^7shows player inventory\n^2/list quests: ^7lists the quests\n^2/<new or zyknew> [login] [password]: ^7creates a new account\n^2/<login or zyklogin> [login] [password]: ^7loads the account\n^2/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7\n^2/nofight: ^7makes you unable to damage other players and they also cannot damage you\n^2/rpgchar: ^7shows your chars (characters) and the char commands\n^2/allyadd [player id or name]: ^7adds player as ally\n^2/allyremove [player id or name]: ^7removes an ally player\n^2/adminlist: ^7lists admin commands\n^2/settings: ^7player settings\n^2/changepassword <new_password>: ^7changes the account password\n^2/<logout or zyklogout>: ^7logout the account\n\n\"");
 			}
 			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "misc" ) == 0 || Q_stricmp(arg1, "magic") == 0)
 			{
 				zyk_list_player_skills(ent, ent, G_NewString(arg1));
-			}
-			else if (Q_stricmp(arg1, "inv") == 0 || Q_stricmp(arg1, "inventory") == 0)
-			{
-				if (trap->Argc() == 2)
-				{
-					trap->SendServerCommand(ent->s.number, "print \"Must pass a page number, ^3desc ^7to see inventory item description, or ^3use ^7to either toggle a weapon/armor upgrade mode or use certain items. Examples: ^3/list inventory 1, /list inventory desc 1, /list inv 1, /list inv desc 1, /list inv use 42^7\n\"");
-				}
-				else
-				{
-					int page = 1; // zyk: page the user wants to see
-					char arg2[MAX_STRING_CHARS];
-
-					strcpy(arg2, "");
-
-					trap->Argv(2, arg2, sizeof(arg2));
-
-					page = atoi(arg2);
-
-					if (Q_stricmp(arg2, "desc") == 0)
-					{
-						char arg3[MAX_STRING_CHARS];
-						int item_number = 0;
-						int item_index = 0;
-
-						strcpy(arg3, "");
-
-						if (trap->Argc() == 3)
-						{
-							trap->SendServerCommand(ent->s.number, "print \"Must pass a number to see inventory item description. Example: ^3/list inventory desc 1^7\n\"");
-						}
-						else
-						{
-							trap->Argv(3, arg3, sizeof(arg3));
-
-							item_number = atoi(arg3);
-							item_index = item_number - 1;
-
-							if (item_index >= 0 && item_index < MAX_RPG_INVENTORY_ITEMS)
-							{
-								zyk_get_inventory_item_description(ent, item_index);
-							}
-							else
-							{
-								trap->SendServerCommand(ent->s.number, va("print \"Item number must be between 1 and %d\n\"", MAX_RPG_INVENTORY_ITEMS));
-							}
-						}
-					}
-					else if (Q_stricmp(arg2, "use") == 0)
-					{
-						char arg3[MAX_STRING_CHARS];
-						int item_number = 0;
-						int item_index = 0;
-
-						strcpy(arg3, "");
-
-						if (trap->Argc() == 3)
-						{
-							trap->SendServerCommand(ent->s.number, "print \"Must pass a number to toggle upgrade. Example: ^3/list inventory use 42^7\n\"");
-						}
-						else
-						{
-							trap->Argv(3, arg3, sizeof(arg3));
-
-							item_number = atoi(arg3);
-							item_index = item_number - 1;
-
-							if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_EXPLOSIVE)
-							{
-								zyk_use_inventory_item(ent, item_index);
-							}
-							else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE)
-							{
-								zyk_use_inventory_item(ent, item_index);
-							}
-							else if (item_index == RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR)
-							{
-								zyk_use_inventory_item(ent, item_index);
-							}
-							else if (item_index >= RPG_INVENTORY_MISC_MEDPACK && item_index <= RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK)
-							{ // zyk: these items can be used
-								zyk_use_inventory_item(ent, item_index);
-							}
-							else
-							{
-								trap->SendServerCommand(ent->s.number, va("print \"Item number must be %d, or between %d and %d, or between %d and %d\n\"", 
-									(RPG_INVENTORY_ITEM_SEEKER_DRONE + 1),
-									(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_EXPLOSIVE + 1),
-									(RPG_INVENTORY_MISC_MEDPACK + 1), (RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK + 1)));
-							}
-						}
-					}
-					else
-					{
-						if (page <= 0)
-							page = 1;
-
-						zyk_list_inventory(ent, ent, page);
-					}
-				}
 			}
 			else if (Q_stricmp( arg1, "quests" ) == 0)
 			{
@@ -7395,10 +7401,6 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 				}
 
 				trap->SendServerCommand( ent->s.number, va("print \"\n^3Bounty Quest Target: ^7%s^7\n\n^3Bounty Quest\n^7Use ^3/bountyquest ^7so the server chooses a player to be the target. If the target defeats a RPG player, he receives 200 bonus Nature Energy. If a bounty hunter kills the target, he receives bonus Nature Energy based on the target player level.\n\n\"", target_player) );
-			}
-			else if (Q_stricmp( arg1, "commands" ) == 0)
-			{
-				trap->SendServerCommand(ent->s.number, "print \"\n^2RPG Mode commands\n\n^3/<new or zyknew> [login] [password]: ^7creates a new account.\n^3/<login or zyklogin> [login] [password]: ^7loads the account.\n^3/playermode: ^7switches between ^2Admin-Only Mode ^7and ^2RPG Mode^7.\n^3/nofight: ^7makes you unable to damage other players and they also cannot damage you.\n^3/rpgchar: ^7shows your chars (characters) and the char commands.\n^3/allyadd [player id or name]: ^7adds player as ally.\n^3/allyremove [player id or name]: ^7removes an ally player.\n^3/adminlist: ^7lists admin commands.\n^3/adminup [player id or name] [command number]: ^7gives an admin command.\n^3/admindown [player id or name] [command number]: ^7removes an admin command.\n^3/settings: ^7player settings.\n^3/changepassword <new_password>: ^7changes the account password.\n^3/tutorial: ^7shows info about the mod.\n^3/<logout or zyklogout>: ^7logout the account.\n\n\"" );
 			}
 			else
 			{ // zyk: the player can also list the specific info of a skill passing the skill number as argument
@@ -9867,7 +9869,7 @@ void zyk_show_admin_commands(gentity_t *ent, gentity_t *target_ent)
 		strcpy(message,va("%s%s",message,message_content[i]));
 	}
 
-	trap->SendServerCommand( target_ent->s.number, va("print \"\n%s^7\n%s\n^7Use ^3/adminlist <number> ^7to see command info or ^3/adminlist show <player ID or name>^7, if you have GiveAdmin, to show the player's commands\n\n\"", ent->client->pers.netname, message) );
+	trap->SendServerCommand( target_ent->s.number, va("print \"\n%s^7\n%s\n^7Use ^3/adminlist <number> ^7to see command info or ^3/adminlist show <player ID or name>^7, if you have GiveAdmin, to show the player's commands\n^3/adminup [player id or name] [command number]: ^7gives an admin command\n^3/admindown [player id or name] [command number]: ^7removes an admin command\n\n\"", ent->client->pers.netname, message) );
 }
 
 /*
@@ -12175,6 +12177,8 @@ command_t commands[] = {
 	{ "god",				Cmd_God_f,					CMD_CHEAT|CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "ignore",				Cmd_Ignore_f,				CMD_NOINTERMISSION },
 	{ "ignorelist",			Cmd_IgnoreList_f,			CMD_NOINTERMISSION },
+	{ "inv",				Cmd_Inventory_f,			CMD_RPG | CMD_NOINTERMISSION },
+	{ "inventory",			Cmd_Inventory_f,			CMD_RPG | CMD_NOINTERMISSION },
 	{ "jetpack",			Cmd_Jetpack_f,				CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "kill",				Cmd_Kill_f,					CMD_ALIVE|CMD_NOINTERMISSION },
 	{ "killother",			Cmd_KillOther_f,			CMD_CHEAT|CMD_NOINTERMISSION },
@@ -12234,6 +12238,8 @@ command_t commands[] = {
 	{ "where",				Cmd_Where_f,				CMD_NOINTERMISSION },
 	{ "wordfilter",			Cmd_WordFilter_f,			CMD_LOGGEDIN | CMD_NOINTERMISSION },
 	{ "zykchars",			Cmd_ZykChars_f,				CMD_LOGGEDIN | CMD_NOINTERMISSION },
+	{ "zykinv",				Cmd_Inventory_f,			CMD_RPG | CMD_NOINTERMISSION },
+	{ "zykinventory",		Cmd_Inventory_f,			CMD_RPG | CMD_NOINTERMISSION },
 	{ "zyklist",			Cmd_ListAccount_f,			CMD_NOINTERMISSION },
 	{ "zyklogin",			Cmd_LoginAccount_f,			CMD_NOINTERMISSION },
 	{ "zyklogout",			Cmd_LogoutAccount_f,		CMD_LOGGEDIN | CMD_NOINTERMISSION },
