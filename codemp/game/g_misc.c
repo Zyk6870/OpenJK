@@ -2849,8 +2849,9 @@ void fx_runner_think( gentity_t *ent )
 		{
 			gentity_t* player_ent = &g_entities[i];
 
-			if (player_ent && player_ent->client && player_ent->health > 0 && player_ent->client->sess.account_mode == ACC_MODE_RPG)
-			{ // zyk: a logged RPG player
+			if (player_ent && player_ent->client && player_ent->health > 0 &&
+				player_ent->client->sess.account_mode == ACC_MODE_RPG && player_ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+			{ // zyk: a logged RPG player, not in Spectator Mode
 				if (Distance(ent->s.origin, player_ent->r.currentOrigin) < QUEST_ITEM_DISTANCE)
 				{
 					if (Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0 &&
