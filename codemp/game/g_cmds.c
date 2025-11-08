@@ -8040,7 +8040,6 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 	settings_descriptions[SETTINGS_JETPACK] = "Jetpack";
 	settings_descriptions[SETTINGS_ADMIN_PROTECT] = "Admin Protect";
 	settings_descriptions[SETTINGS_DIFFICULTY] = "Quest Difficulty";
-	settings_descriptions[SETTINGS_PICKUP_MAX_WEIGHT] = "Do not pick-up stuff in map above max weight";
 	settings_descriptions[SETTINGS_SHOW_MP_LEVEL] = "Red bar show Fuel (Jetpack/Flame Thrower) or MP";
 	settings_descriptions[SETTINGS_SHOW_STAMINA_BAR] = "Show Stamina Blue Bar";
 	settings_descriptions[SETTINGS_STORE_POWERUPS] = "Store picked-up power-ups in inventory";

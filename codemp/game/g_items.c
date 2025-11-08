@@ -2779,6 +2779,22 @@ qboolean CheckItemCanBePickedUpByNPC( gentity_t *item, gentity_t *pickerupper )
 	return qfalse;
 }
 
+// zyk: RPG player should be able to pickup health and armor when needing them
+qboolean zyk_validate_health_pickups(gentity_t* item, gentity_t* player)
+{
+	if (item->item->giType == IT_HEALTH && player->health < player->client->pers.max_rpg_health)
+	{
+		return qtrue;
+	}
+
+	if (item->item->giType == IT_ARMOR && player->client->ps.stats[STAT_ARMOR] < player->client->pers.max_rpg_shield)
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 /*
 ===============
 Touch_Item
@@ -2833,7 +2849,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 			if ((ent->item->giType == IT_WEAPON && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_WEAPONS)) ||
 				(ent->item->giType == IT_AMMO && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_AMMO)) ||
 				(ent->item->giType == IT_HOLDABLE && other->client->pers.player_settings & (1 << SETTINGS_PICKUP_ITEMS)) || 
-				(!(other->client->pers.player_settings & (1 << SETTINGS_PICKUP_MAX_WEIGHT)) && other->client->pers.current_weight >= other->client->pers.max_weight))
+				(other->client->pers.current_weight >= other->client->pers.max_weight && zyk_validate_health_pickups(ent, other) == qfalse))
 			{
 				return;
 			}
