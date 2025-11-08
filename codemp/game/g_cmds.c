@@ -6575,7 +6575,7 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][0] = 140;
 	seller_items_cost[RPG_INVENTORY_ITEM_BIG_BACTA][1] = 70;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][0] = 140;
+	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][0] = 120;
 	seller_items_cost[RPG_INVENTORY_ITEM_EWEB][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_ITEM_BINOCULARS][0] = 15;
@@ -6629,7 +6629,7 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FORCE_FIELD][0] = 1400;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FORCE_FIELD][1] = 700;
 
-	seller_items_cost[RPG_INVENTORY_UPGRADE_CLOAK][0] = 1150;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_CLOAK][0] = 1100;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_CLOAK][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR][0] = 1000;
@@ -6644,17 +6644,17 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE][0] = 1800;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE][1] = 900;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE][0] = 2000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE][1] = 1000;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_STUN_BATON][0] = 1500;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_STUN_BATON][1] = 700;
 
-	seller_items_cost[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL][0] = 800;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL][1] = 300;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL][0] = 1000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL][0] = 800;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL][1] = 300;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL][0] = 1000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL][1] = 500;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE][1] = 600;
@@ -6683,7 +6683,7 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EXPLOSIVE][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EXPLOSIVE][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][0] = 3000;
+	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][0] = 2000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_JETPACK][1] = 1500;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_THERMAL_VISION][0] = 1000;
