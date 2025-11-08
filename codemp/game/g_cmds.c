@@ -6829,9 +6829,10 @@ int zyk_upgrade_mode_in_use(gentity_t* ent, int item_index)
 }
 
 extern int zyk_get_item_weight(zyk_inventory_t item_index);
-void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
+void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page, char* search_text)
 {
 	int inventory_it = 0;
+	int results_shown = 0;
 	int results_per_page = 10; // zyk: number of results per page
 	char message[MAX_STRING_CHARS];
 	char current_column[96];
@@ -6844,10 +6845,13 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page)
 
 	for (inventory_it = 0; inventory_it < MAX_RPG_INVENTORY_ITEMS; inventory_it++)
 	{
-		if (inventory_it >= ((page - 1) * results_per_page) && inventory_it < (page * results_per_page))
+		if ((page > 0 && inventory_it >= ((page - 1) * results_per_page) && inventory_it < (page * results_per_page)) ||
+			(page == 0 && search_text && results_shown < results_per_page && Q_stristr(zyk_get_inventory_item_name(inventory_it), search_text)))
 		{
 			char upgrade_mode_str[8];
 			int upgrade_mode_in_use = 0;
+
+			results_shown++;
 
 			buy_cost = zyk_get_seller_item_cost(ent, inventory_it, qtrue);
 			sell_cost = zyk_get_seller_item_cost(ent, inventory_it, qfalse);
@@ -7170,7 +7174,7 @@ Cmd_Inventory_f
 void Cmd_Inventory_f(gentity_t* ent) {
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"Must pass a page number, ^3desc ^7to see inventory item description, or ^3use ^7to either toggle a weapon/armor upgrade mode or use certain items. Examples: ^3/inventory 1, /inventory desc 1, /inv 1, /inv desc 1, /inv use 42^7\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"Must pass a page number, or ^3desc ^7to see inventory item description, or ^3use ^7to either toggle a weapon/armor upgrade mode or use certain items. You can also pass a search text to show items that match it.\nExamples: ^3/inventory 1, /inventory desc 1, /inv 1, /inv desc 1, /inv use 42, /inv jetpack, /inv jet^7\n\"");
 	}
 	else
 	{
@@ -7257,12 +7261,16 @@ void Cmd_Inventory_f(gentity_t* ent) {
 				}
 			}
 		}
+		else if (page == 0)
+		{ // zyk: player passed a search text
+			zyk_list_inventory(ent, ent, page, arg1);
+		}
 		else
 		{
 			if (page <= 0)
 				page = 1;
 
-			zyk_list_inventory(ent, ent, page);
+			zyk_list_inventory(ent, ent, page, NULL);
 		}
 	}
 }
@@ -10631,7 +10639,7 @@ void Cmd_Players_f( gentity_t *ent ) {
 					if (page <= 0)
 						page = 1;
 
-					zyk_list_inventory(player_ent, ent, page);
+					zyk_list_inventory(player_ent, ent, page, NULL);
 				}
 			}
 			else if (Q_stricmp(arg2, "quests") == 0)
