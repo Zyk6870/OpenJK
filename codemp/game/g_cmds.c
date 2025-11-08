@@ -11860,6 +11860,8 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.account_mode == ACC_MODE_RPG)
 			{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
+				ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_SELF_KILL);
+
 				G_Kill(ent);
 			}
 		}
@@ -11937,6 +11939,8 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.account_mode == ACC_MODE_RPG)
 			{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
+				ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_SELF_KILL);
+
 				G_Kill(ent);
 			}
 		}
@@ -11987,6 +11991,8 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 				if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 				{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
+					ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_SELF_KILL);
+
 					G_Kill(ent);
 				}
 			}
@@ -12000,6 +12006,8 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 
 				if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 				{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
+					ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_SELF_KILL);
+
 					G_Kill(ent);
 				}
 			}
