@@ -1523,9 +1523,10 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			int stamina_usage = 0;
 			int stamina_recovery = 5 + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 2) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
 
+			// zyk: carrying stuff over the max weight, consumes stamina based on how much above the max
 			if (ent->client->pers.current_weight > ent->client->pers.max_weight)
-			{ // zyk: carrying stuff over the max weight, consumes stamina based on how much above the max
-				stamina_usage += (((ent->client->pers.current_weight - ent->client->pers.max_weight) / 20) + 1);
+			{
+				stamina_usage += (((ent->client->pers.current_weight - ent->client->pers.max_weight) / 50) + 1);
 			}
 
 			// zyk: active magic uses stamina
