@@ -6277,7 +6277,7 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 	if (zyk_total_skillpoints(ent) >= RPG_MAX_SKILLPOINTS)
 	{
 		if (dont_show_message == qfalse)
-			trap->SendServerCommand(ent->s.number, va("print \"Cannot upgrade more than %d skills.\n\"", RPG_MAX_SKILLPOINTS));
+			trap->SendServerCommand(ent->s.number, va("print \"Cannot upgrade more than %d skill levels.\n\"", RPG_MAX_SKILLPOINTS));
 		return qfalse;
 	}
 
@@ -6286,6 +6286,7 @@ qboolean validate_upgrade_skill(gentity_t *ent, int upgrade_value, qboolean dont
 
 void do_upgrade_skill(gentity_t *ent, int upgrade_value)
 {
+	int skill_index = upgrade_value - 1;
 	qboolean is_upgraded = qfalse;
 
 	if (validate_upgrade_skill(ent, upgrade_value, qfalse) == qfalse)
@@ -6299,10 +6300,7 @@ void do_upgrade_skill(gentity_t *ent, int upgrade_value)
 	if (is_upgraded == qfalse)
 		return;
 
-	// zyk: saving the account file with the upgraded skill
-	save_account(ent, qtrue);
-
-	trap->SendServerCommand( ent->s.number, "print \"Skill upgraded successfully.\n\"" );
+	trap->SendServerCommand(ent->s.number, va("print \"Skill ^3%s ^7upgraded successfully.\n\"", zyk_skill_name(skill_index)));
 
 	Cmd_ZykMod_f(ent);
 
@@ -6330,23 +6328,45 @@ void Cmd_UpSkill_f( gentity_t *ent ) {
 	do_upgrade_skill(ent, upgrade_value);
 }
 
-void do_downgrade_skill(gentity_t *ent, int downgrade_value)
+qboolean validate_downgrade_skill(gentity_t* ent, int downgrade_value, qboolean dont_show_message)
 {
-	// zyk: validation on the downgrade level, which must be in the range of valid skills.
+	int skill_index = downgrade_value - 1;
+
 	if (downgrade_value < 1 || downgrade_value > NUMBER_OF_SKILLS)
 	{
-		trap->SendServerCommand( ent->s.number, "print \"Invalid skill number.\n\"" );
+		trap->SendServerCommand(ent->s.number, "print \"Invalid skill number.\n\"");
+		return qfalse;
+	}
+
+	if (skill_index == SKILL_MAX_WEIGHT && ent->client->pers.current_weight >= ent->client->pers.max_weight)
+	{
+		if (dont_show_message == qfalse)
+			trap->SendServerCommand(ent->s.number, va("print \"Cannot downgrade ^3%s ^7while your inventory has too much weight.\n\"", zyk_skill_name(skill_index)));
+
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
+void do_downgrade_skill(gentity_t *ent, int downgrade_value)
+{
+	int skill_index = downgrade_value - 1;
+
+	if (validate_downgrade_skill(ent, downgrade_value, qfalse) == qfalse)
+	{
 		return;
 	}
 
 	if (ent->client->pers.skill_levels[downgrade_value - 1] > 0)
 	{
 		ent->client->pers.skill_levels[downgrade_value - 1]--;
-		trap->SendServerCommand(ent->s.number, "print \"Skill downgraded successfully.\n\"");
+
+		trap->SendServerCommand(ent->s.number, va("print \"Skill ^3%s ^7downgraded successfully.\n\"", zyk_skill_name(skill_index)));
 	}
 	else
 	{
-		trap->SendServerCommand( ent->s.number, va("print \"You reached the minimum level of ^3%s ^7skill.\n\"", zyk_skill_name(downgrade_value - 1)));
+		trap->SendServerCommand(ent->s.number, va("print \"You reached the minimum level of ^3%s ^7skill.\n\"", zyk_skill_name(skill_index)));
 		return;
 	}
 }
@@ -6370,9 +6390,6 @@ void Cmd_DownSkill_f( gentity_t *ent ) {
 	downgrade_value = atoi(arg1);
 
 	do_downgrade_skill(ent, downgrade_value);
-
-	// zyk: saving the account file with the downgraded skill
-	save_account(ent, qtrue);
 
 	initialize_rpg_skills(ent, qfalse);
 
@@ -6513,7 +6530,7 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 
 	strcpy(message, va("print \"\n^2Account: ^7%s\n^2Char: ^7%s\n\n", ent->client->sess.filename, ent->client->sess.rpgchar));
 
-	strcpy(message, va("%s^3Skills Upgraded: %s\n", message, zyk_formatted_amount_with_max(total_skill_points, RPG_MAX_SKILLPOINTS)));
+	strcpy(message, va("%s^3Skill Levels Upgraded: %s\n", message, zyk_formatted_amount_with_max(total_skill_points, RPG_MAX_SKILLPOINTS)));
 	strcpy(message, va("%s^3Magic Points: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.magic_power, max_magic_power)));
 	strcpy(message, va("%s^3Nature Energy: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.nature_energy, ent->client->pers.max_nature_energy)));
 	strcpy(message, va("%s^3Stamina: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.current_stamina, ent->client->pers.max_stamina)));
