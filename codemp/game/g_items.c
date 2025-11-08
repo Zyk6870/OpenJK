@@ -1427,6 +1427,27 @@ void Jetpack_On(gentity_t *ent)
 	ent->client->jetPackOn = qtrue;
 }
 
+// zyk: using rocket ammo as Fuel for Jetpack and Flame Thrower
+void zyk_use_rocket_for_fuel(gentity_t* ent, int minimum_amount)
+{
+	if (ent && ent->client)
+	{
+		if (ent->client->sess.account_mode == ACC_MODE_RPG &&
+			ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FUEL] < minimum_amount &&
+			ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_ROCKETS] > 0)
+		{
+			zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_ROCKETS, 1);
+			zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_FUEL, FUEL_ROCKET_RESTORE);
+		}
+		else if (ent->client->sess.account_mode < ACC_MODE_RPG &&
+			ent->client->pers.jetpack_fuel < JETPACK_FUEL_USAGE && ent->client->ps.ammo[AMMO_ROCKETS] > 0)
+		{
+			ent->client->ps.ammo[AMMO_ROCKETS]--;
+			ent->client->pers.jetpack_fuel += FUEL_ROCKET_RESTORE;
+		}
+	}
+}
+
 extern void rpg_skill_counter(gentity_t *ent, int amount);
 extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 void ItemUse_Jetpack( gentity_t *ent )
@@ -1445,6 +1466,8 @@ void ItemUse_Jetpack( gentity_t *ent )
 	{ //can't use it when dead under any circumstances.
 		return;
 	}
+
+	zyk_use_rocket_for_fuel(ent, JETPACK_FUEL_USAGE);
 
 	if (!ent->client->jetPackOn &&
 		// ent->client->ps.jetpackFuel < 5 // zyk: original condition, need 5 jetpack fuel
@@ -2387,13 +2410,13 @@ void Add_Ammo (gentity_t *ent, int weapon, int count)
 
 	if (ent->client->sess.account_mode == ACC_MODE_RPG)
 	{ // zyk: players in RPG Mode have no max ammo
-		max_blasterpack_ammo = 200000000;
-		max_powercell_ammo = 200000000;
-		max_metalbolt_ammo = 200000000;
-		max_rocket_ammo = 200000000;
-		max_thermal_ammo = 200000000;
-		max_tripmine_ammo = 200000000;
-		max_detpack_ammo = 200000000;
+		max_blasterpack_ammo = 2147483647;
+		max_powercell_ammo = 2147483647;
+		max_metalbolt_ammo = 2147483647;
+		max_rocket_ammo = 2147483647;
+		max_thermal_ammo = 2147483647;
+		max_tripmine_ammo = 2147483647;
+		max_detpack_ammo = 2147483647;
 	}
 
 	if (weapon == AMMO_BLASTER){

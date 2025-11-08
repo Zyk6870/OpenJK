@@ -360,7 +360,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_AMMO_ROCKETS)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Rocket Launcher weapon\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Rocket Launcher weapon. Jetpack and Flame Thrower can use 1 rocket to restore %d Fuel\n\n\"", zyk_get_inventory_item_name(item_index), FUEL_ROCKET_RESTORE));
 	}
 	else if (item_index == RPG_INVENTORY_AMMO_THERMALS)
 	{
@@ -404,7 +404,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_JETPACK)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to fly. Jump and press Use Key to use it\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to fly. Jump and press Use Key to use it. Jetpack can use 1 rocket to restore %d Fuel\n\n\"", zyk_get_inventory_item_name(item_index), FUEL_ROCKET_RESTORE));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_CLOAK)
 	{
@@ -484,7 +484,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7gives you the flame thrower. To use it, get stun baton and use alternate fire\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7gives you the flame thrower. To use it, get stun baton and use alternate fire. Flame Thrower can use 1 rocket to restore %d Fuel\n\n\"", zyk_get_inventory_item_name(item_index), FUEL_ROCKET_RESTORE));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE)
 	{

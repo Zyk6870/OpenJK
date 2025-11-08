@@ -7376,6 +7376,7 @@ extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk
 extern void zyk_set_light_source(gentity_t* ent, qboolean activate_light_source);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void WP_FireMelee(gentity_t* ent, qboolean alt_fire);
+extern void zyk_use_rocket_for_fuel(gentity_t* ent, int minimum_amount);
 
 void G_RunFrame( int levelTime ) {
 	int			i;
@@ -8618,6 +8619,8 @@ void G_RunFrame( int levelTime ) {
 					}
 
 					ent->client->pers.jetpack_fuel -= jetpack_debounce_amount;
+
+					zyk_use_rocket_for_fuel(ent, jetpack_debounce_amount);
 
 					if (ent->client->pers.jetpack_fuel <= 0)
 					{

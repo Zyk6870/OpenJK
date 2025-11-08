@@ -834,6 +834,7 @@ typedef enum {
 #define MAX_JETPACK_FUEL 500
 #define JETPACK_SCALE 5 // zyk: used to scale the MAX_JETPACK_FUEL to set the jetpackFuel attribute. Dividing MAX_JETPACK_FUEL per JETPACK_SCALE must result in 100
 #define JETPACK_FUEL_USAGE 2
+#define FUEL_ROCKET_RESTORE 20
 
 // zyk: default size of the globe model used as the Duel Tournament arena
 #define DUEL_TOURNAMENT_ARENA_SIZE 64
@@ -1818,7 +1819,7 @@ gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle );
 gentity_t *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity );
 void G_SpawnItem (gentity_t *ent, gitem_t *item);
 void FinishSpawningItem( gentity_t *ent );
-void	Add_Ammo (gentity_t *ent, int weapon, int count);
+void Add_Ammo (gentity_t *ent, int weapon, int count);
 void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace);
 
 void ClearRegisteredItems( void );

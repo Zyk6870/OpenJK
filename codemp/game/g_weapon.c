@@ -3839,6 +3839,7 @@ static void WP_FireConcussion( gentity_t *ent )
 //---------------------------------------------------------
 // FireStunBaton
 //---------------------------------------------------------
+extern void zyk_use_rocket_for_fuel(gentity_t* ent, int minimum_amount);
 void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 {
 	gentity_t	*tr_ent;
@@ -3870,6 +3871,8 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	trap->Trace ( &tr, muzzleStun, mins, maxs, end, ent->s.number, MASK_SHOT, qfalse, 0, 0 );
 
 	// zyk: starts flame thrower
+	zyk_use_rocket_for_fuel(ent, flame_thrower_fuel_usage);
+
 	if (ent->client && ent->client->sess.account_mode == ACC_MODE_RPG && 
 		alt_fire == qtrue &&
 		ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_FLAME_THROWER] > 0 && 

@@ -1893,6 +1893,17 @@ void ammo_generic_power_converter_use( gentity_t *self, gentity_t *other, gentit
 		return;
 	}
 
+	if (activator->client->sess.account_mode == ACC_MODE_RPG)
+	{ // zyk: players in RPG Mode have no max ammo
+		max_blasterpack_ammo = 2147483647;
+		max_powercell_ammo = 2147483647;
+		max_metalbolt_ammo = 2147483647;
+		max_rocket_ammo = 2147483647;
+		max_thermal_ammo = 2147483647;
+		max_tripmine_ammo = 2147483647;
+		max_detpack_ammo = 2147483647;
+	}
+
 	if (self->setTime < level.time)
 	{
 		int i = AMMO_BLASTER;
@@ -1930,6 +1941,19 @@ void ammo_generic_power_converter_use( gentity_t *self, gentity_t *other, gentit
 			if (add < 1)
 			{
 				add = 1;
+			}
+
+			// zyk: must set to 1 for RPG players or it would regen a huge amount of ammo
+			if (activator->client->sess.account_mode == ACC_MODE_RPG)
+			{
+				add = 1;
+
+				// zyk: cannot regen ammo over the Max Weight
+				if (activator->client->pers.current_weight >= activator->client->pers.max_weight)
+				{
+					stop = 1;
+					break;
+				}
 			}
 
 			if (activator->client->ps.ammo[i] < max_ammo)
