@@ -2562,6 +2562,23 @@ void zyk_load_admin_only_mode_stuff(gentity_t* ent)
 	}
 }
 
+char* parse_inventory_value(char* inv_value_string)
+{
+	char new_value[16];
+	int i = 0;
+
+	while (inv_value_string[i + 1] != '\0')
+	{
+		new_value[i] = inv_value_string[i + 1];
+
+		i++;
+	}
+
+	new_value[i] = '\0';
+
+	return G_NewString(new_value);
+}
+
 // zyk: loads the player account
 void load_account(gentity_t* ent)
 {
@@ -2622,6 +2639,7 @@ void load_account(gentity_t* ent)
 			for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 			{
 				ent->client->pers.rpg_inventory[i] = 0;
+				ent->client->pers.toggle_rpg_inventory[i] = 1;
 			}
 
 			// zyk: reading the rest of the account file
@@ -2674,7 +2692,16 @@ void load_account(gentity_t* ent)
 						{
 							if (Q_stricmp(content_type, zyk_inventory_key(i)) == 0)
 							{
-								ent->client->pers.rpg_inventory[i] = atoi(content);
+								if (content[0] == 't')
+								{ // zyk: item pickup is turned off
+									ent->client->pers.rpg_inventory[i] = atoi(parse_inventory_value(content));
+									ent->client->pers.toggle_rpg_inventory[i] = 0;
+								}
+								else
+								{
+									ent->client->pers.rpg_inventory[i] = atoi(content);
+								}
+								
 								break;
 							}
 						}
@@ -2770,7 +2797,14 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 			strcpy(content, va("%s\nrpg_inventory", content));
 			for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 			{
-				strcpy(content, va("%s\n%s\n%d", content, zyk_inventory_key(i), client->pers.rpg_inventory[i]));
+				if (client->pers.toggle_rpg_inventory[i] == 0)
+				{
+					strcpy(content, va("%s\n%s\nt%d", content, zyk_inventory_key(i), client->pers.rpg_inventory[i]));
+				}
+				else
+				{
+					strcpy(content, va("%s\n%s\n%d", content, zyk_inventory_key(i), client->pers.rpg_inventory[i]));
+				}
 			}
 
 			strcpy(content, va("%s\nquest_progress\n%d\nquest_missions\n%d\nselected_ability\n%d\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d\nlast_stamina\n%d",
@@ -6828,6 +6862,18 @@ int zyk_upgrade_mode_in_use(gentity_t* ent, int item_index)
 	return 0;
 }
 
+char* zyk_get_toggle_status(gentity_t* ent, int inventory_index)
+{
+	if (ent->client->pers.toggle_rpg_inventory[inventory_index] == 1)
+	{
+		return "^2";
+	}
+	else
+	{
+		return "^1";
+	}
+}
+
 extern int zyk_get_item_weight(zyk_inventory_t item_index);
 void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page, char* search_text)
 {
@@ -6885,7 +6931,7 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page, char* s
 				strcpy(upgrade_mode_str, "   ");
 			}
 
-			strcpy(current_column, va("^1%s - ^7%s %s - ^5%s - ^2%s - ^3%s - %s", zyk_get_formatted_number((inventory_it + 1), 2),
+			strcpy(current_column, va("%s%s - ^7%s %s - ^5%s - ^5%s - ^3%s - %s", zyk_get_toggle_status(ent, inventory_it), zyk_get_formatted_number((inventory_it + 1), 2),
 				zyk_get_formatted_string(zyk_get_inventory_item_name(inventory_it), 25),
 				upgrade_mode_str,
 				zyk_get_formatted_number(ent->client->pers.rpg_inventory[inventory_it], 5),
@@ -6899,7 +6945,7 @@ void zyk_list_inventory(gentity_t* ent, gentity_t* target_ent, int page, char* s
 	strcpy(message, va("%s\n^3Nature Energy: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.nature_energy, ent->client->pers.max_nature_energy)));
 	strcpy(message, va("%s^3Weight: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.current_weight, ent->client->pers.max_weight)));
 
-	trap->SendServerCommand(target_ent->s.number, va("print \"\n^1#  - ^7Name                          - ^5Count - ^2Weight - ^3Make - Unmake\n\n%s\n^7Use ^3/make <item number> ^7or ^3/unmake <item number> ^7to make or unmake items\n\"", message));
+	trap->SendServerCommand(target_ent->s.number, va("print \"\n^3#  - ^7Name                          - ^5Count - ^5Weight - ^3Make - Unmake\n\n%s\n^7Use ^3/make <item number> ^7or ^3/unmake <item number> ^7to make or unmake items\n\"", message));
 }
 
 // zyk: if ent is NULL, counts all quest allies from all players
@@ -7174,7 +7220,7 @@ Cmd_Inventory_f
 void Cmd_Inventory_f(gentity_t* ent) {
 	if (trap->Argc() == 1)
 	{
-		trap->SendServerCommand(ent->s.number, "print \"Must pass a page number, or ^3desc ^7to see inventory item description, or ^3use ^7to either toggle a weapon/armor upgrade mode or use certain items. You can also pass a search text to show items that match it.\nExamples: ^3/inventory 1, /inventory desc 1, /inv 1, /inv desc 1, /inv use 42, /inv jetpack, /inv jet^7\n\"");
+		trap->SendServerCommand(ent->s.number, "print \"Must pass a page number, or ^3desc ^7to see inventory item description, or ^3use ^7to either set a weapon/armor upgrade mode or use certain items.\nPass ^3pickup ^7to allow or disallow picking the item up in the map.\nYou can also pass a search text to show items that match it.\nExamples: ^3/inventory 1, /inventory desc 1, /inv 1, /inv desc 1, /inv use 42, /inv jetpack, /inv jet, /inv pickup 5^7\n\"");
 	}
 	else
 	{
@@ -7258,6 +7304,45 @@ void Cmd_Inventory_f(gentity_t* ent) {
 						(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_EXPLOSIVE + 1),
 						(RPG_INVENTORY_MISC_MEDPACK + 1), (RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK + 1),
 						(RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR + 1)));
+				}
+			}
+		}
+		else if (Q_stricmp(arg1, "pickup") == 0)
+		{
+			char arg2[MAX_STRING_CHARS];
+			int item_number = 0;
+			int item_index = 0;
+
+			strcpy(arg2, "");
+
+			if (trap->Argc() == 2)
+			{
+				trap->SendServerCommand(ent->s.number, "print \"Must pass a number to allow or disallow picking up. Example: ^3/inv pickup 5^7\n\"");
+			}
+			else
+			{
+				trap->Argv(2, arg2, sizeof(arg2));
+
+				item_number = atoi(arg2);
+				item_index = item_number - 1;
+
+				if (item_index < 0 || item_index >= MAX_RPG_INVENTORY_ITEMS)
+				{
+					trap->SendServerCommand(ent->s.number, va("print \"Item number must be between 1 and %d.\n\"", MAX_RPG_INVENTORY_ITEMS));
+					return;
+				}
+
+				if (ent->client->pers.toggle_rpg_inventory[item_index] == 1)
+				{
+					ent->client->pers.toggle_rpg_inventory[item_index] = 0;
+
+					trap->SendServerCommand(ent->s.number, va("print \"^3%s ^7pickup disabled.\n\"", zyk_get_inventory_item_name(item_index)));
+				}
+				else
+				{
+					ent->client->pers.toggle_rpg_inventory[item_index] = 1;
+
+					trap->SendServerCommand(ent->s.number, va("print \"^3%s ^7pickup enabled.\n\"", zyk_get_inventory_item_name(item_index)));
 				}
 			}
 		}
@@ -8059,9 +8144,6 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 	settings_descriptions[SETTINGS_SCREEN_MESSAGE] = "Allow Screen Message";
 	settings_descriptions[SETTINGS_HEAL_ALLY] = "Use healing force only at allied players";
 	settings_descriptions[SETTINGS_SABER_START] = "Start With Saber";
-	settings_descriptions[SETTINGS_PICKUP_WEAPONS] = "Pick-up Weapons in Map";
-	settings_descriptions[SETTINGS_PICKUP_AMMO] = "Pick-up Ammo in Map";
-	settings_descriptions[SETTINGS_PICKUP_ITEMS] = "Pick-up Items in Map";
 	settings_descriptions[SETTINGS_JETPACK] = "Jetpack";
 	settings_descriptions[SETTINGS_ADMIN_PROTECT] = "Admin Protect";
 	settings_descriptions[SETTINGS_DIFFICULTY] = "Quest Difficulty";

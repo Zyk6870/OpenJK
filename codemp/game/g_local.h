@@ -530,9 +530,6 @@ typedef enum {
 	SETTINGS_SCREEN_MESSAGE,
 	SETTINGS_HEAL_ALLY,
 	SETTINGS_SABER_START,
-	SETTINGS_PICKUP_WEAPONS,
-	SETTINGS_PICKUP_AMMO,
-	SETTINGS_PICKUP_ITEMS,
 	SETTINGS_JETPACK,
 	SETTINGS_ADMIN_PROTECT,
 	SETTINGS_DIFFICULTY,
@@ -1010,6 +1007,7 @@ typedef struct clientPersistant_s {
 
 	// zyk: all stuff the player can carry. Used to determine if player is carrying above the max weight
 	int rpg_inventory[MAX_RPG_INVENTORY_ITEMS];
+	int toggle_rpg_inventory[MAX_RPG_INVENTORY_ITEMS];
 
 	int light_source_timer;
 
