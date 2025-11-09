@@ -8662,7 +8662,7 @@ void Cmd_Drop_f( gentity_t *ent ) {
 			zyk_change_item_in_inventory(ent, item->giTag, qfalse);
 		}
 	}
-	else if (weapon != WP_MELEE)
+	else if (weapon != WP_MELEE && (weapon != WP_DET_PACK || ent->client->ps.ammo[AMMO_DETPACK] > 0))
 	{
 		// find the item type for this weapon
 		item = BG_FindItemForWeapon((weapon_t)weapon);
