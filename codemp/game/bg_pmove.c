@@ -223,7 +223,7 @@ float forceJumpHeight[NUM_FORCE_POWER_LEVELS] =
 	192,//(+stepheight+crouchdiff = 226)
 	384,//(+stepheight+crouchdiff = 418)
 	6016, // zyk: added jump level 4, used in RPG mode. Old value was 928
-	6016 // zyk: added jump level 5, used in RPG mode
+	6016 // zyk: added jump level 5
 };
 
 float forceJumpStrength[NUM_FORCE_POWER_LEVELS] =
@@ -232,8 +232,8 @@ float forceJumpStrength[NUM_FORCE_POWER_LEVELS] =
 	420,
 	590,
 	840,
-	860, // zyk: added jump level 4, used in RPG mode
-	880 // zyk: added jump level 5, used in RPG mode
+	840, // zyk: added jump level 4, used in RPG mode
+	860 // zyk: added jump level 5
 };
 
 //rww - Get a pointer to the bgEntity by the index
