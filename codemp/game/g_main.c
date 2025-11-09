@@ -4832,7 +4832,14 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 		zyk_set_entity_field(new_ent, "spawnflags", spawnflags);
 		zyk_set_entity_field(new_ent, "targetname", targetname);
 
-		zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)target_ent->r.currentOrigin[0], (int)target_ent->r.currentOrigin[1], (int)target_ent->r.currentOrigin[2]));
+		if (Q_stricmp(targetname, "zyk_mindtrick_effect") == 0)
+		{
+			zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)target_ent->r.currentOrigin[0], (int)target_ent->r.currentOrigin[1], (int)target_ent->r.currentOrigin[2] + DEFAULT_MAXS_2));
+		}
+		else
+		{
+			zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)target_ent->r.currentOrigin[0], (int)target_ent->r.currentOrigin[1], (int)target_ent->r.currentOrigin[2]));
+		}
 
 		new_ent->s.modelindex = G_EffectIndex(effect_path);
 
@@ -9408,24 +9415,13 @@ void G_RunFrame( int levelTime ) {
 				if ((ent->client->pers.mind_tricker_player_ids1 > 0 || ent->client->pers.mind_tricker_player_ids2 > 0) &&
 					ent->client->pers.mind_trick_effect_timer < level.time)
 				{ // zyk: a mind tricked npc. Show effect on head
-					gentity_t* plum;
-					vec3_t plum_origin;
 					int player_it = 0;
 
 					for (player_it = 0; player_it < level.maxclients; player_it++)
 					{
 						if (ent->client->pers.mind_tricker_player_ids1 & (1 << player_it) || ent->client->pers.mind_tricker_player_ids2 & (1 << player_it))
 						{
-							VectorSet(plum_origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + DEFAULT_MAXS_2);
-
-							plum = G_TempEntity(plum_origin, EV_SCOREPLUM);
-
-							// only send this temp entity to a single client
-							plum->r.svFlags |= SVF_SINGLECLIENT;
-							plum->r.singleClient = player_it;
-
-							plum->s.otherEntityNum = player_it;
-							plum->s.time = player_it;
+							zyk_quest_effect_spawn(ent, ent, "zyk_mindtrick_effect", "0", "force/confusion_old", 0, 0, 0, 600);
 						}
 					}
 

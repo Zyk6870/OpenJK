@@ -3104,7 +3104,8 @@ void fx_runner_link( gentity_t *ent )
 		}
 		else if (Q_stricmp(ent->targetname, "zyk_status_poison") == 0 || 
 			Q_stricmp(ent->targetname, "zyk_status_on_fire") == 0 ||
-			Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0)
+			Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0 ||
+			Q_stricmp(ent->targetname, "zyk_mindtrick_effect") == 0)
 		{ // zyk: other RPG effects
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 200; // wait a small bit, then start working
@@ -3177,7 +3178,8 @@ void SP_fx_runner( gentity_t *ent )
 		Q_stricmp(ent->targetname, "zyk_magic_lightning") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_status_poison") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_status_on_fire") == 0 || 
-		Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0)
+		Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_mindtrick_effect") == 0)
 	{
 		ent->nextthink = level.time + 100;
 	}
