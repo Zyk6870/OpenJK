@@ -8973,7 +8973,7 @@ void G_RunFrame( int levelTime ) {
 							ent->client->pers.energy_modulator_mode = ENERGY_MODULATOR_MODE_OFF;
 						}
 
-						ent->client->pers.energy_modulator_energy_usage_timer = level.time + 200;
+						ent->client->pers.energy_modulator_energy_usage_timer = level.time + 500;
 					}
 				}
 

@@ -792,7 +792,7 @@ typedef enum {
 #define COST_TO_UPGRADE_SKILL 100
 
 // zyk: amount of Energy required to keep Energy Modulator On
-#define ENERGY_MODULATOR_ENERGY_USAGE 1
+#define ENERGY_MODULATOR_ENERGY_USAGE 2
 
 // zyk: max RPG skill levels upgraded
 #define RPG_MAX_SKILLPOINTS 80
