@@ -9055,7 +9055,7 @@ void G_RunFrame( int levelTime ) {
 
 				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_USING_FLASHLIGHT) && ent->client->pers.light_source_timer < level.time)
 				{ // zyk: using the Stun Baton light source
-					int light_source_timer = 250;
+					int light_source_timer = 300;
 
 					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
 
@@ -9071,7 +9071,7 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 &&
 						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON1))
 					{
-						light_source_timer = 400;
+						light_source_timer = 500;
 					}
 
 					ent->client->pers.light_source_timer = level.time + light_source_timer;
