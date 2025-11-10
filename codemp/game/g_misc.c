@@ -2856,6 +2856,7 @@ void fx_runner_think( gentity_t *ent )
 				{
 					if (Q_stricmp(ent->targetname, "zyk_energy_modulator_puzzle") == 0 &&
 						player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 0 &&
+						player_ent->client->pers.toggle_rpg_inventory[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] == 1 &&
 						level.legendary_artifact_step == QUEST_SECRET_INIT_STEP)
 					{
 						trap->SendServerCommand(player_ent->s.number, va("chat \"%s: ^7Press ^2Use ^7key and solve the puzzle to receive the Energy Modulator!\n\"", QUESTCHAR_MAIN));
@@ -2873,7 +2874,8 @@ void fx_runner_think( gentity_t *ent )
 						return;
 					}
 					else if (Q_stricmp(ent->targetname, "zyk_quest_log") == 0 && 
-							 player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < RPG_MAX_QUEST_LOG_PARTS)
+							 player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < RPG_MAX_QUEST_LOG_PARTS &&
+							 player_ent->client->pers.toggle_rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 1)
 					{
 						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_LEGENDARY_QUEST_LOG, 1);
 
