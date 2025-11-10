@@ -5660,6 +5660,15 @@ void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_invent
 
 	if (add_item == qtrue)
 	{
+		// zyk: added this validation because of ammo_all items
+		if ((item == RPG_INVENTORY_AMMO_BLASTER_PACK && ent->client->pers.toggle_rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] == 0) ||
+			(item == RPG_INVENTORY_AMMO_POWERCELL && ent->client->pers.toggle_rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] == 0) ||
+			(item == RPG_INVENTORY_AMMO_METAL_BOLTS && ent->client->pers.toggle_rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS] == 0) ||
+			(item == RPG_INVENTORY_AMMO_ROCKETS && ent->client->pers.toggle_rpg_inventory[RPG_INVENTORY_AMMO_ROCKETS] == 0))
+		{
+			return;
+		}
+
 		ent->client->pers.rpg_inventory[item] += amount;
 	}
 	else if (ent->client->pers.rpg_inventory[item] >= amount)

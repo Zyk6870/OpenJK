@@ -2820,110 +2820,123 @@ qboolean zyk_validate_health_pickups(gentity_t* item, gentity_t* player)
 
 qboolean zyk_validate_pickup(gentity_t* item, gentity_t* player)
 {
-	if (item->item->giType == IT_WEAPON)
+	if (item->item->giTag > -1)
 	{
-		zyk_inventory_t weapon_indexes[WP_NUM_WEAPONS] = {
-			-1,
-			RPG_INVENTORY_WP_STUN_BATON,
-			-1,
-			RPG_INVENTORY_WP_SABER,
-			RPG_INVENTORY_WP_BLASTER_PISTOL,
-			RPG_INVENTORY_WP_E11_BLASTER_RIFLE,
-			RPG_INVENTORY_WP_DISRUPTOR,
-			RPG_INVENTORY_WP_BOWCASTER,
-			RPG_INVENTORY_WP_REPEATER,
-			RPG_INVENTORY_WP_DEMP2,
-			RPG_INVENTORY_WP_FLECHETTE,
-			RPG_INVENTORY_WP_ROCKET_LAUNCHER,
-			RPG_INVENTORY_AMMO_THERMALS,
-			RPG_INVENTORY_AMMO_TRIPMINES,
-			RPG_INVENTORY_AMMO_DETPACKS,
-			RPG_INVENTORY_WP_CONCUSSION,
-			RPG_INVENTORY_WP_BRYAR_PISTOL,
-			-1,
-			-1
-		};
+		if (item->item->giType == IT_WEAPON)
+		{
+			zyk_inventory_t weapon_indexes[WP_NUM_WEAPONS] = {
+				-1,
+				RPG_INVENTORY_WP_STUN_BATON,
+				-1,
+				RPG_INVENTORY_WP_SABER,
+				RPG_INVENTORY_WP_BLASTER_PISTOL,
+				RPG_INVENTORY_WP_E11_BLASTER_RIFLE,
+				RPG_INVENTORY_WP_DISRUPTOR,
+				RPG_INVENTORY_WP_BOWCASTER,
+				RPG_INVENTORY_WP_REPEATER,
+				RPG_INVENTORY_WP_DEMP2,
+				RPG_INVENTORY_WP_FLECHETTE,
+				RPG_INVENTORY_WP_ROCKET_LAUNCHER,
+				RPG_INVENTORY_AMMO_THERMALS,
+				RPG_INVENTORY_AMMO_TRIPMINES,
+				RPG_INVENTORY_AMMO_DETPACKS,
+				RPG_INVENTORY_WP_CONCUSSION,
+				RPG_INVENTORY_WP_BRYAR_PISTOL,
+				-1,
+				-1
+			};
 
-		if (weapon_indexes[item->item->giTag] != -1 && player->client->pers.toggle_rpg_inventory[weapon_indexes[item->item->giTag]] == 1)
+			if (weapon_indexes[item->item->giTag] != -1 && player->client->pers.toggle_rpg_inventory[weapon_indexes[item->item->giTag]] == 1)
+			{
+				return qtrue;
+			}
+		}
+		else if (item->item->giType == IT_AMMO)
+		{
+			zyk_inventory_t ammo_indexes[AMMO_MAX] = {
+				-1,
+				-1,
+				RPG_INVENTORY_AMMO_BLASTER_PACK,
+				RPG_INVENTORY_AMMO_POWERCELL,
+				RPG_INVENTORY_AMMO_METAL_BOLTS,
+				RPG_INVENTORY_AMMO_ROCKETS,
+				-1,
+				RPG_INVENTORY_AMMO_THERMALS,
+				RPG_INVENTORY_AMMO_TRIPMINES,
+				RPG_INVENTORY_AMMO_DETPACKS
+			};
+
+			if (ammo_indexes[item->item->giTag] != -1 && player->client->pers.toggle_rpg_inventory[ammo_indexes[item->item->giTag]] == 1)
+			{
+				return qtrue;
+			}
+		}
+		else if (item->item->giType == IT_HOLDABLE)
+		{
+			zyk_inventory_t holdable_item_indexes[HI_NUM_HOLDABLE] = {
+				-1,
+				RPG_INVENTORY_ITEM_SEEKER_DRONE,
+				RPG_INVENTORY_ITEM_FORCE_FIELD,
+				RPG_INVENTORY_ITEM_BACTA_CANISTER,
+				RPG_INVENTORY_ITEM_BIG_BACTA,
+				RPG_INVENTORY_ITEM_BINOCULARS,
+				RPG_INVENTORY_ITEM_SENTRY_GUN,
+				RPG_INVENTORY_ITEM_JETPACK,
+				-1,
+				-1,
+				RPG_INVENTORY_ITEM_EWEB,
+				RPG_INVENTORY_ITEM_CLOAK
+			};
+
+			if (holdable_item_indexes[item->item->giTag] != -1 && player->client->pers.toggle_rpg_inventory[holdable_item_indexes[item->item->giTag]] == 1)
+			{
+				return qtrue;
+			}
+		}
+		else if (item->item->giType == IT_POWERUP)
+		{
+			zyk_inventory_t powerup_indexes[PW_NUM_POWERUPS] = {
+				-1,
+				-1,
+				-1,
+				-1,
+				-1,
+				-1,
+				-1,
+				-1,
+				-1,
+				-1,
+				-1,
+				-1,
+				RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT,
+				RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK,
+				RPG_INVENTORY_MISC_FORCE_BOON,
+				RPG_INVENTORY_MISC_YSALAMIRI
+			};
+
+			if (powerup_indexes[item->item->giTag] != -1 && player->client->pers.toggle_rpg_inventory[powerup_indexes[item->item->giTag]] == 1)
+			{
+				return qtrue;
+			}
+		}
+		else if (item->item->giType == IT_HEALTH && player->client->pers.toggle_rpg_inventory[RPG_INVENTORY_MISC_MEDPACK] == 1)
+		{
+			return qtrue;
+		}
+		else if (item->item->giType == IT_ARMOR && player->client->pers.toggle_rpg_inventory[RPG_INVENTORY_MISC_SHIELD_BOOSTER] == 1)
 		{
 			return qtrue;
 		}
 	}
-	else if (item->item->giType == IT_AMMO)
-	{
-		zyk_inventory_t ammo_indexes[AMMO_MAX] = {
-			-1,
-			-1,
-			RPG_INVENTORY_AMMO_BLASTER_PACK,
-			RPG_INVENTORY_AMMO_POWERCELL,
-			RPG_INVENTORY_AMMO_METAL_BOLTS,
-			RPG_INVENTORY_AMMO_ROCKETS,
-			-1,
-			RPG_INVENTORY_AMMO_THERMALS,
-			RPG_INVENTORY_AMMO_TRIPMINES,
-			RPG_INVENTORY_AMMO_DETPACKS
-		};
-
-		if (ammo_indexes[item->item->giTag] != -1 && player->client->pers.toggle_rpg_inventory[ammo_indexes[item->item->giTag]] == 1)
+	else if (item->item->giTag == -1 && item->item->giType == IT_AMMO)
+	{ // zyk: ammo_all item
+		if (player->client->pers.toggle_rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] == 1 ||
+			player->client->pers.toggle_rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] == 1 ||
+			player->client->pers.toggle_rpg_inventory[RPG_INVENTORY_AMMO_METAL_BOLTS] == 1 ||
+			player->client->pers.toggle_rpg_inventory[RPG_INVENTORY_AMMO_ROCKETS] == 1)
 		{
 			return qtrue;
 		}
-	}
-	else if (item->item->giType == IT_HOLDABLE)
-	{
-		zyk_inventory_t holdable_item_indexes[HI_NUM_HOLDABLE] = {
-			-1,
-			RPG_INVENTORY_ITEM_SEEKER_DRONE,
-			RPG_INVENTORY_ITEM_FORCE_FIELD,
-			RPG_INVENTORY_ITEM_BACTA_CANISTER,
-			RPG_INVENTORY_ITEM_BIG_BACTA,
-			RPG_INVENTORY_ITEM_BINOCULARS,
-			RPG_INVENTORY_ITEM_SENTRY_GUN,
-			RPG_INVENTORY_ITEM_JETPACK,
-			-1,
-			-1,
-			RPG_INVENTORY_ITEM_EWEB,
-			RPG_INVENTORY_ITEM_CLOAK
-		};
-
-		if (holdable_item_indexes[item->item->giTag] != -1 && player->client->pers.toggle_rpg_inventory[holdable_item_indexes[item->item->giTag]] == 1)
-		{
-			return qtrue;
-		}
-	}
-	else if (item->item->giType == IT_POWERUP)
-	{
-		zyk_inventory_t powerup_indexes[PW_NUM_POWERUPS] = {
-			-1,
-			-1,
-			-1,
-			-1,
-			-1,
-			-1,
-			-1,
-			-1,
-			-1,
-			-1,
-			-1,
-			-1,
-			RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT,
-			RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK,
-			RPG_INVENTORY_MISC_FORCE_BOON,
-			RPG_INVENTORY_MISC_YSALAMIRI
-		};
-
-		if (powerup_indexes[item->item->giTag] != -1 && player->client->pers.toggle_rpg_inventory[powerup_indexes[item->item->giTag]] == 1)
-		{
-			return qtrue;
-		}
-	}
-	else if (item->item->giType == IT_HEALTH && player->client->pers.toggle_rpg_inventory[RPG_INVENTORY_MISC_MEDPACK] == 1)
-	{
-		return qtrue;
-	}
-	else if (item->item->giType == IT_ARMOR && player->client->pers.toggle_rpg_inventory[RPG_INVENTORY_MISC_SHIELD_BOOSTER] == 1)
-	{
-		return qtrue;
 	}
 
 	return qfalse;
