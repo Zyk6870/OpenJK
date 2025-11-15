@@ -7326,32 +7326,59 @@ void Cmd_Inventory_f(gentity_t* ent) {
 
 			if (trap->Argc() == 2)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"Must pass a number to allow or disallow picking up. Example: ^3/inv pickup 5^7\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"Must pass a number to allow or disallow picking up, or pass ^3on ^7or ^3off ^7to allow or disallow picking up all items. Examples: ^3/inv pickup 5^7, ^3/inv pickup on^7\n\"");
 			}
 			else
 			{
 				trap->Argv(2, arg2, sizeof(arg2));
 
-				item_number = atoi(arg2);
-				item_index = item_number - 1;
-
-				if (item_index < 0 || item_index >= MAX_RPG_INVENTORY_ITEMS)
+				if (Q_stricmp(arg2, "on") == 0 || Q_stricmp(arg2, "off") == 0)
 				{
-					trap->SendServerCommand(ent->s.number, va("print \"Item number must be between 1 and %d.\n\"", MAX_RPG_INVENTORY_ITEMS));
-					return;
-				}
+					int i = 0;
+					int toggle_all = 0;
 
-				if (ent->client->pers.toggle_rpg_inventory[item_index] == 1)
-				{
-					ent->client->pers.toggle_rpg_inventory[item_index] = 0;
+					if (Q_stricmp(arg2, "on") == 0)
+					{
+						toggle_all = 1;
+					}
 
-					trap->SendServerCommand(ent->s.number, va("print \"^3%s ^7pickup disabled.\n\"", zyk_get_inventory_item_name(item_index)));
+					for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+					{
+						ent->client->pers.toggle_rpg_inventory[i] = toggle_all;
+					}
+
+					if (toggle_all == 1)
+					{
+						trap->SendServerCommand(ent->s.number, "print \"^2Enabled ^7pickup of all items.\n\"");
+					}
+					else
+					{
+						trap->SendServerCommand(ent->s.number, "print \"^1Disabled ^7pickup of all items.\n\"");
+					}
 				}
 				else
 				{
-					ent->client->pers.toggle_rpg_inventory[item_index] = 1;
+					item_number = atoi(arg2);
+					item_index = item_number - 1;
 
-					trap->SendServerCommand(ent->s.number, va("print \"^3%s ^7pickup enabled.\n\"", zyk_get_inventory_item_name(item_index)));
+					if (item_index < 0 || item_index >= MAX_RPG_INVENTORY_ITEMS)
+					{
+						trap->SendServerCommand(ent->s.number, va("print \"Item number must be between 1 and %d.\n\"", MAX_RPG_INVENTORY_ITEMS));
+						return;
+					}
+
+					if (ent->client->pers.toggle_rpg_inventory[item_index] == 1)
+					{
+						ent->client->pers.toggle_rpg_inventory[item_index] = 0;
+
+						trap->SendServerCommand(ent->s.number, va("print \"^3%s ^7pickup disabled.\n\"", zyk_get_inventory_item_name(item_index)));
+					}
+					else
+					{
+						ent->client->pers.toggle_rpg_inventory[item_index] = 1;
+
+						trap->SendServerCommand(ent->s.number, va("print \"^3%s ^7pickup enabled.\n\"", zyk_get_inventory_item_name(item_index)));
+					}
 				}
 			}
 		}
