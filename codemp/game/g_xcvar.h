@@ -283,6 +283,7 @@ XCVAR_DEF(zyk_duel_tournament_time_to_start, "12000", NULL, CVAR_ARCHIVE | CVAR_
 XCVAR_DEF(zyk_duel_tournament_rounds_per_match, "1", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue)
 XCVAR_DEF(zyk_sniper_battle_time_to_start, "12000", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue)
 XCVAR_DEF(zyk_buying_selling_cooldown,	"500", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue)
+XCVAR_DEF(zyk_force_account_login, "0", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue)
 XCVAR_DEF(zyk_duelForcePowerDisable,	"0", NULL, CVAR_ARCHIVE | CVAR_LATCH, qtrue)
 
 #undef XCVAR_DEF

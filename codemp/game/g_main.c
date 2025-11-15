@@ -8818,6 +8818,12 @@ void G_RunFrame( int levelTime ) {
 				}
 			}
 
+			// zyk: if this cvar is active, players must login account or must remain in Spectator Mode
+			if (zyk_force_account_login.integer > 0 && ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.account_mode == ACC_MODE_LOGGED_OUT)
+			{
+				SetTeam(ent, "s");
+			}
+
 			if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			{ // zyk: RPG Mode skills and quests actions. Must be done if player is not at Spectator Mode
 				
