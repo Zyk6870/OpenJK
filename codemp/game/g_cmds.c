@@ -297,6 +297,14 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_ITEM_CLOAK] = "Cloak Item";
 	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "Jetpack";
 
+	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "Fuel";
+	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "Medpack";
+	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
+	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
+	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
+	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = "Enlightenment - Light";
+	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = "Enlightenment - Dark";
+
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BACTA] = "Bacta Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "Force Field Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
@@ -323,16 +331,8 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
 
-	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "Fuel";
-	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "Medpack";
-	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
-	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
-	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
-	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = "Enlightenment - Light";
-	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = "Enlightenment - Dark";
-
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
@@ -631,6 +631,14 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_ITEM_CLOAK] = "inventoryCloakItem";
 	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "inventoryJetpack";
 
+	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "inventoryFuel";
+	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "inventoryMedpack";
+	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "inventoryShieldBooster";
+	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "inventoryYsalamiri";
+	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "inventoryForceBoon";
+	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = "inventoryEnlightenmentLight";
+	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = "inventoryEnlightenmentDark";
+
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BACTA] = "inventoryBactaUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "inventoryForceFieldUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "inventoryCloakItemUpgrade";
@@ -657,16 +665,8 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "inventorySeekerDroneUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "inventoryEWebUpgrade";
 
-	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "inventoryFuel";
-	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "inventoryMedpack";
-	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "inventoryShieldBooster";
-	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "inventoryYsalamiri";
-	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "inventoryForceBoon";
-	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = "inventoryEnlightenmentLight";
-	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = "inventoryEnlightenmentDark";
-
-	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "inventoryQuestLog";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
+	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "inventoryQuestLog";
 
 	if (inventory_index >= 0 && inventory_index < MAX_RPG_INVENTORY_ITEMS)
 	{
