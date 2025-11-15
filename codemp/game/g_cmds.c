@@ -360,7 +360,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_AMMO_ROCKETS)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Rocket Launcher weapon. Jetpack and Flame Thrower can use 1 rocket to restore %d Fuel\n\n\"", zyk_get_inventory_item_name(item_index), FUEL_ROCKET_RESTORE));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Rocket Launcher weapon. Jetpack and Flame Thrower can use 1 rocket to restore %d Fuel. To make Fuel with it, use ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), FUEL_ROCKET_RESTORE, (RPG_INVENTORY_AMMO_ROCKETS + 1)));
 	}
 	else if (item_index == RPG_INVENTORY_AMMO_THERMALS)
 	{
@@ -4523,6 +4523,7 @@ char* zyk_selected_ability_name(zyk_selected_ability_t selected_ability)
 	ability_names[SELECTED_ABILITY_CHAOS_FIELD] = "Chaos Field (Magic)";
 	ability_names[SELECTED_ABILITY_LIGHTNING_DOME] = "Lightning Dome (Magic)";
 	ability_names[SELECTED_ABILITY_SEEKER_DRONE] = "Seeker Drone Recover (Item)";
+	ability_names[SELECTED_ABILITY_ROCKET_FUEL] = "Use Rocket Ammo As Fuel (Item)";
 	ability_names[SELECTED_ABILITY_MEDPACK] = "Medpack (Item)";
 	ability_names[SELECTED_ABILITY_SHIELD_BOOSTER] = "Shield Booster (Item)";
 	ability_names[SELECTED_ABILITY_YSALAMIRI] = "Ysalamiri (Item)";
@@ -4562,6 +4563,7 @@ qboolean validate_selected_ability(gentity_t* ent, zyk_selected_ability_t select
 					-1,
 					-1,
 					-1,
+					-1,
 					-1
 		};
 
@@ -4570,7 +4572,7 @@ qboolean validate_selected_ability(gentity_t* ent, zyk_selected_ability_t select
 			return qtrue;
 		}
 	}
-	else if (selected_ability >= SELECTED_ABILITY_MEDPACK && selected_ability <= SELECTED_ABILITY_ENERGY_MODULATOR)
+	else if (selected_ability >= SELECTED_ABILITY_SEEKER_DRONE && selected_ability <= SELECTED_ABILITY_ENERGY_MODULATOR)
 	{
 		zyk_inventory_t inventory_indexes[MAX_SELECTED_ABILITIES] = {
 					-1,
@@ -4579,7 +4581,8 @@ qboolean validate_selected_ability(gentity_t* ent, zyk_selected_ability_t select
 					-1,
 					-1,
 					-1,
-					RPG_INVENTORY_ITEM_SEEKER_DRONE,
+					RPG_INVENTORY_UPGRADE_SEEKER_DRONE,
+					RPG_INVENTORY_AMMO_ROCKETS,
 					RPG_INVENTORY_MISC_MEDPACK,
 					RPG_INVENTORY_MISC_SHIELD_BOOSTER,
 					RPG_INVENTORY_MISC_YSALAMIRI,
@@ -7121,6 +7124,13 @@ void zyk_use_inventory_item(gentity_t* ent, zyk_inventory_t item_index)
 			trap->SendServerCommand(ent->s.number, va("print \"\n^3%s Mode 1 ^2ON^7\n\n\"", zyk_get_inventory_item_name(item_index)));
 		}
 	}
+	else if (item_index == RPG_INVENTORY_AMMO_ROCKETS && ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_ROCKETS] > 0)
+	{
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_ROCKETS, 1);
+		zyk_update_inventory_quantity(ent, qtrue, RPG_INVENTORY_MISC_FUEL, FUEL_ROCKET_RESTORE);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
+	}
 	else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] > 0 && ent->client->ps.eFlags & EF_SEEKERDRONE)
 	{
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
@@ -7281,7 +7291,7 @@ void Cmd_Inventory_f(gentity_t* ent) {
 
 			if (trap->Argc() == 2)
 			{
-				trap->SendServerCommand(ent->s.number, "print \"Must pass a number to toggle upgrade. Example: ^3/inv use 42^7\n\"");
+				trap->SendServerCommand(ent->s.number, "print \"Must pass a number to toggle upgrade. Example: ^3/inv use 30^7\n\"");
 			}
 			else
 			{
@@ -7291,6 +7301,10 @@ void Cmd_Inventory_f(gentity_t* ent) {
 				item_index = item_number - 1;
 
 				if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_EXPLOSIVE)
+				{
+					zyk_use_inventory_item(ent, item_index);
+				}
+				else if (item_index == RPG_INVENTORY_AMMO_ROCKETS)
 				{
 					zyk_use_inventory_item(ent, item_index);
 				}
@@ -7308,7 +7322,8 @@ void Cmd_Inventory_f(gentity_t* ent) {
 				}
 				else
 				{
-					trap->SendServerCommand(ent->s.number, va("print \"Item number must be %d, or between %d and %d, or between %d and %d, or %d\n\"",
+					trap->SendServerCommand(ent->s.number, va("print \"Item number must be %d, or %d, or between %d and %d, or between %d and %d, or %d\n\"",
+						(RPG_INVENTORY_AMMO_ROCKETS + 1),
 						(RPG_INVENTORY_ITEM_SEEKER_DRONE + 1),
 						(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_EXPLOSIVE + 1),
 						(RPG_INVENTORY_MISC_MEDPACK + 1), (RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK + 1),
