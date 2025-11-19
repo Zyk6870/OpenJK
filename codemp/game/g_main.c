@@ -8904,23 +8904,33 @@ void G_RunFrame( int levelTime ) {
 						ent->client->pers.nature_energy_timer = level.time + nature_energy_time;
 					}
 
-					// zyk: MP regen while meditating
+					// zyk: MP regen
 					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 					{
-						int mp_regen_amount = 1;
-						int mp_regen_rate = 900 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10) - (ent->client->pers.skill_levels[SKILL_MEDITATION] * 20);
+						int mp_regen_amount = 0;
+						int mp_regen_rate = 900 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
 
 						// zyk: Enlightenment Dark regens more mp
 						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time && ent->client->pers.magic_power < zyk_max_magic_power(ent))
 						{
-							zyk_set_mp(ent, mp_regen_amount, qtrue);
+							mp_regen_amount += 1;
 						}
 
-						if (ent->client->pers.nature_energy > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent) && 
-							ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+						// zyk: meditating
+						if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+						{
+							mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MEDITATION] * 20);
+
+							if (ent->client->pers.nature_energy > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent))
+							{
+								mp_regen_amount += 1;
+								set_nature_energy(ent, 1, qfalse);
+							}
+						}
+
+						if (mp_regen_amount > 0)
 						{
 							zyk_set_mp(ent, mp_regen_amount, qtrue);
-							set_nature_energy(ent, 1, qfalse);
 						}
 
 						ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;
