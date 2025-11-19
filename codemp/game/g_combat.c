@@ -2258,7 +2258,6 @@ void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int 
 	self->client->pers.rpg_statuses = 0;
 	
 	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_GOT_PUZZLE_CRYSTAL);
-	self->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_USING_FLASHLIGHT);
 
 	if (self->client->pers.race_position > 0) // zyk: if a player dies during a race, he loses the race
 	{

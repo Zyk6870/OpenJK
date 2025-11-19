@@ -557,7 +557,6 @@ typedef enum {
 	PLAYER_STATUS_GOT_PUZZLE_CRYSTAL,
 	PLAYER_STATUS_KEEP_QUEST_TRIES,
 	PLAYER_STATUS_RESET_TO_MELEE,
-	PLAYER_STATUS_USING_FLASHLIGHT,
 	NUM_PLAYER_STATUSES
 } zyk_player_status_t;
 
@@ -1009,8 +1008,6 @@ typedef struct clientPersistant_s {
 	// zyk: all stuff the player can carry. Used to determine if player is carrying above the max weight
 	int rpg_inventory[MAX_RPG_INVENTORY_ITEMS];
 	int toggle_rpg_inventory[MAX_RPG_INVENTORY_ITEMS];
-
-	int light_source_timer;
 
 	// zyk: has the flags of the Upgrades being used right now
 	int active_inventory_upgrades;

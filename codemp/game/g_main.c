@@ -7380,7 +7380,6 @@ extern void duel_show_table(gentity_t *ent);
 extern void WP_DisruptorAltFire(gentity_t *ent);
 extern void G_Kill( gentity_t *ent );
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
-extern void zyk_set_light_source(gentity_t* ent, qboolean activate_light_source);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void WP_FireMelee(gentity_t* ent, qboolean alt_fire);
 
@@ -9061,30 +9060,6 @@ void G_RunFrame( int levelTime ) {
 					G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_GETUP1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
 
 					ent->client->pers.is_getting_up = qtrue;
-				}
-
-				if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_USING_FLASHLIGHT) && ent->client->pers.light_source_timer < level.time)
-				{ // zyk: using the Stun Baton light source
-					int light_source_timer = 300;
-
-					zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, 1);
-
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] < 1 || ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_STUN_BATON] < 1)
-					{
-						zyk_set_light_source(ent, qfalse);
-					}
-					else
-					{ // zyk: sets timer based on powercell ammo so the time shown on screen will actually be the light source battery level
-						ent->client->ps.powerups[PW_NEUTRALFLAG] = level.time + (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] * 1000);
-					}
-
-					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_STUN_BATON] > 0 &&
-						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_STUN_BATON1))
-					{
-						light_source_timer = 500;
-					}
-
-					ent->client->pers.light_source_timer = level.time + light_source_timer;
 				}
 
 				// zyk: updating RPG inventory and calculating current weight

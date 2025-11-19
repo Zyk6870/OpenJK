@@ -352,7 +352,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_AMMO_POWERCELL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Disruptor, Bowcaster and DEMP2 weapons. Stun Baton can use this ammo to toggle a light source\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7ammo for Disruptor, Bowcaster and DEMP2 weapons\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_AMMO_METAL_BOLTS)
 	{
@@ -456,7 +456,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_WP_STUN_BATON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that fires a small electric charge. Press Saber Stance key to toggle a light source, it uses Powercell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that fires a small electric charge\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA)
 	{
@@ -492,7 +492,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Decrease light source powercell usage. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds, and has a chance to cause Confusion status\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds, and has a chance to cause Confusion status\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
 	{
@@ -5558,7 +5558,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.energy_modulator_energy_usage_timer = 0;
 
 			ent->client->pers.quickdraw_timer = 0;
-			ent->client->pers.light_source_timer = 0;
 
 			ent->client->pers.nature_energy_timer = 0;
 			ent->client->pers.buy_sell_timer = 0;
@@ -7057,40 +7056,6 @@ void zyk_add_shield(gentity_t* ent, int shield_amount)
 		{
 			ent->client->ps.stats[STAT_ARMOR] = max_shield;
 		}
-	}
-}
-
-void zyk_set_light_source(gentity_t* ent, qboolean activate_light_source)
-{
-	if (activate_light_source == qtrue)
-	{
-		ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_USING_FLASHLIGHT);
-	}
-	else
-	{
-		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_USING_FLASHLIGHT);
-
-		ent->client->ps.powerups[PW_NEUTRALFLAG] = 0;
-	}
-
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/interface/sub_select.mp3"));
-}
-
-void zyk_toggle_light_source(gentity_t* ent)
-{
-	if (!(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_USING_FLASHLIGHT)))
-	{
-		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] <= 0)
-		{
-			trap->SendServerCommand(ent->s.number, "print \"\n^7Not enough powercell ammo to turn on the light source\n\n\"");
-			return;
-		}
-
-		zyk_set_light_source(ent, qtrue);
-	}
-	else
-	{
-		zyk_set_light_source(ent, qfalse);
 	}
 }
 
