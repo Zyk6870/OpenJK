@@ -533,8 +533,8 @@ typedef enum {
 	SETTINGS_JETPACK,
 	SETTINGS_ADMIN_PROTECT,
 	SETTINGS_DIFFICULTY,
-	SETTINGS_SHOW_MP_LEVEL,
-	SETTINGS_SHOW_STAMINA_BAR,
+	SETTINGS_SHOW_FUEL_BAR,
+	SETTINGS_SHOW_MP_BAR,
 	SETTINGS_STORE_POWERUPS,
 	SETTINGS_QUEST_TREE,
 	MAX_PLAYER_SETTINGS
@@ -608,7 +608,7 @@ typedef enum {
 	SKILL_NATURE_AFFINITY,
 	SKILL_STATUS_PROTECTION,
 	SKILL_MAX_WEIGHT,
-	SKILL_MAX_STAMINA,
+	SKILL_MEDITATION,
 	SKILL_RUN_SPEED,
 	SKILL_MAGIC_FIST,
 	SKILL_MAGIC_FLIGHT,
@@ -780,10 +780,6 @@ typedef enum {
 	MAX_SELECTED_ABILITIES
 } zyk_selected_ability_t;
 
-// zyk: Minimum Stamina before player starts to get tired
-#define RPG_MIN_STAMINA 1000.0
-#define RPG_DEFAULT_STAMINA 5000
-
 // zyk: RPG Nature Energy
 #define RPG_MAX_NATURE_ENERGY 10000
 #define RPG_MAX_BUY_AMOUNT 200
@@ -841,13 +837,12 @@ typedef enum {
 
 // zyk: tutorial duration time
 #define INITIAL_TUTORIAL_DURATION 3000
-#define INITIAL_TUTORIAL_STEP 19
+#define INITIAL_TUTORIAL_STEP 18
 
 // zyk: npc cloak detection distance
 #define NPC_CLOAK_DETECTION_DISTANCE 1000
 
 #define RPG_RUN_SPEED_SKILL_INCREASE 6.0f
-#define RPG_RUN_SPEED_STAMINA_BONUS 75.0f
 
 // zyk: main characters names
 #define QUESTCHAR_MAIN "^6Spirit Tree"
@@ -914,11 +909,10 @@ typedef struct clientPersistant_s {
 	int rpg_status_duration[NUM_RPG_STATUSES];
 	int rpg_status_debounce_timer[NUM_RPG_STATUSES];
 
-	// zyk: last health, shield, mp and stamina are saved into account
+	// zyk: last health, shield and mp are saved into account
 	int last_health;
 	int last_shield;
 	int last_mp;
-	int last_stamina;
 
 	// zyk: if health, shield or mp changes, save it into account after this time in miliseconds
 	int save_stat_changes_timer;
@@ -964,16 +958,7 @@ typedef struct clientPersistant_s {
 	int quest_stuff_timer;
 
 	int max_rpg_health; // zyk: max health the player can have in RPG Mode. This is set to STAT_MAX_HEALTH for RPG players
-	int max_rpg_shield; // zyk: max shield the player can have in RPG Mode based in the skill_levels[30] value
-
-	// zyk: RPG Stamina
-	int current_stamina;
-	int max_stamina;
-	int stamina_out_timer;
-	qboolean is_getting_up;
-
-	// zyk: in time, player Stamina changes
-	int stamina_timer;
+	int max_rpg_shield; // zyk: max shield the player can have in RPG Mode
 
 	int jetpack_fuel; // zyk: now this is the fuel that is spent. Then we scale this value to the 0 - 100 range to set it in the jetpackFuel attribute to show the fuel bar correctly to the client
 

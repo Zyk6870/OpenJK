@@ -5266,7 +5266,6 @@ void clear_special_power_effect(gentity_t* ent)
 
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern void zyk_add_shield(gentity_t* ent, int shield_amount);
-extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern void initialize_rpg_skills(gentity_t* ent, qboolean init_all);
 extern void rpg_skill_counter(gentity_t* ent, int amount);
 
@@ -5318,7 +5317,6 @@ void zyk_status_effects(gentity_t* ent)
 
 					G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
 
-					zyk_set_stamina(ent, 50, qfalse);
 					zyk_set_mp(ent, 1, qfalse);
 				}
 				else if (i == RPG_STATUS_IN_FLAMES)
@@ -6921,7 +6919,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 5)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Misc Affinity increases Stamina regen rate, Run Speed and Max Weight.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Misc Affinity increases Run Speed, Max Weight and max time you can be underwater before drowning.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 6)
 	{
@@ -6941,7 +6939,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 10)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over max weight, run speed will decrease and Stamina will decrease faster.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Your inventory has weight. If it goes over max weight, run speed will decrease.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 11)
 	{
@@ -6949,29 +6947,25 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 12)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Doing actions decrease Stamina. It is the blue bar at the right of your screen.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Meditate (Controls menu) to regen Nature Energy, Force and MP.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 13)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Meditate (Controls menu) to regen Stamina, Nature Energy, Force and MP. If Stamina runs out, you faint.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <number>^7.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 14)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: To cast magic, upgrade the magic skill in ^3/list magic^7, then bind to a key like this: ^3/bind <key> magic <number>^7.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can also cast magic by pressing Duel key to select a magic power. Press Use key to cast it.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 15)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can also cast magic by pressing Duel key to select a magic power. Press Use key to cast it.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need MP (Magic Points) to cast magic. When you upgrade Magic skills, your max MP increases.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 16)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You need MP (Magic Points) to cast magic. When you upgrade Magic skills, your max MP increases.\n\"", QUESTCHAR_MAIN));
-	}
-	else if (ent->client->pers.tutorial_step == 17)
-	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by meditating (it converts Nature Energy into MP) or using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
 	}
-	else if (ent->client->pers.tutorial_step == 18)
+	else if (ent->client->pers.tutorial_step == 17)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: I am here because I need your help! Use ^3/list quests^7 too see all info you need to help me.\n\"", QUESTCHAR_MAIN));
 	}
@@ -7116,16 +7110,13 @@ void zyk_update_inventory(gentity_t* ent)
 	// zyk: jetpack/flame thrower fuel
 	ent->client->pers.jetpack_fuel = ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FUEL];
 
-	if (!(ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL)))
+	if (!(ent->client->pers.player_settings & (1 << SETTINGS_SHOW_FUEL_BAR)) && ent->client->pers.jetpack_fuel < 100)
 	{
-		if (ent->client->pers.jetpack_fuel < 100)
-		{
-			ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
-		}
-		else
-		{
-			ent->client->ps.jetpackFuel = 100;
-		}
+		ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
+	}
+	else
+	{
+		ent->client->ps.jetpackFuel = 100;
 	}
 
 	if (!(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_BINOCULARS)) && !(ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & (1 << HI_MEDPAC)) &&
@@ -8637,16 +8628,13 @@ void G_RunFrame( int levelTime ) {
 					{
 						ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_FUEL] = ent->client->pers.jetpack_fuel;
 
-						if (!(ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL)))
+						if (!(ent->client->pers.player_settings & (1 << SETTINGS_SHOW_FUEL_BAR)) && ent->client->pers.jetpack_fuel < 100)
 						{
-							if (ent->client->pers.jetpack_fuel < 100)
-							{
-								ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
-							}
-							else
-							{
-								ent->client->ps.jetpackFuel = 100;
-							}
+							ent->client->ps.jetpackFuel = ent->client->pers.jetpack_fuel;
+						}
+						else
+						{
+							ent->client->ps.jetpackFuel = 100;
 						}
 					}
 				}
@@ -8846,19 +8834,21 @@ void G_RunFrame( int levelTime ) {
 				if (!(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SELF_KILL)) &&
 					(ent->client->pers.last_health != ent->health || 
 					 ent->client->pers.last_shield != ent->client->ps.stats[STAT_ARMOR] || 
-					 ent->client->pers.last_mp != ent->client->pers.magic_power || 
-					 ent->client->pers.last_stamina != ent->client->pers.current_stamina))
+					 ent->client->pers.last_mp != ent->client->pers.magic_power))
 				{
 					ent->client->pers.last_health = ent->health;
 					ent->client->pers.last_shield = ent->client->ps.stats[STAT_ARMOR];
 					ent->client->pers.last_mp = ent->client->pers.magic_power;
-					ent->client->pers.last_stamina = ent->client->pers.current_stamina;
 				}
 
 				// zyk: show MP level in this case
-				if (ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL))
+				if (!(ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_BAR)))
 				{
-					ent->client->ps.jetpackFuel = (ent->client->pers.magic_power * 100.0) / zyk_max_magic_power(ent);
+					ent->client->ps.cloakFuel = (ent->client->pers.magic_power * 100.0) / zyk_max_magic_power(ent);
+				}
+				else
+				{
+					ent->client->ps.cloakFuel = 100;
 				}
 
 				// zyk: Initial Tutorial messages
@@ -8906,6 +8896,11 @@ void G_RunFrame( int levelTime ) {
 							nature_energy_time -= (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] * 50);
 						}
 
+						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] > level.time)
+						{
+							nature_energy_time -= 500;
+						}
+
 						ent->client->pers.nature_energy_timer = level.time + nature_energy_time;
 					}
 
@@ -8913,6 +8908,7 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 					{
 						int mp_regen_amount = 1;
+						int mp_regen_rate = 900 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10) - (ent->client->pers.skill_levels[SKILL_MEDITATION] * 20);
 
 						// zyk: Enlightenment Dark regens more mp
 						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time && ent->client->pers.magic_power < zyk_max_magic_power(ent))
@@ -8927,7 +8923,7 @@ void G_RunFrame( int levelTime ) {
 							set_nature_energy(ent, 1, qfalse);
 						}
 
-						ent->client->pers.magic_regen_debounce_timer = level.time + 900 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+						ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;
 					}
 
 					// zyk: Energy Modulator consumes Nature Energy
@@ -8987,79 +8983,70 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.save_stat_changes_timer = level.time + SAVE_ACCOUNT_TIMER;
 				}
 
-				// zyk: Weapon Upgrades. Do not change weaponTime if player has no stamina
-				if (ent->client->pers.stamina_out_timer < level.time)
+				// zyk: Weapon Upgrades
+				if (ent->client->ps.weapon == WP_BLASTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 &&
+					ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_E11_BLASTER1) &&
+					ent->client->ps.weaponTime > (weaponData[WP_BLASTER].fireTime * 0.7))
 				{
-					if (ent->client->ps.weapon == WP_BLASTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE] > 0 &&
-						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_E11_BLASTER1) &&
-						ent->client->ps.weaponTime > (weaponData[WP_BLASTER].fireTime * 0.7))
+					ent->client->ps.weaponTime = weaponData[WP_BLASTER].fireTime * 0.7;
+				}
+
+				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0 &&
+					ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DISRUPTOR1) && 
+					ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 0.6))
+				{
+					ent->client->ps.weaponTime = weaponData[WP_DISRUPTOR].fireTime * 0.6;
+				}
+
+				if (ent->client->ps.weapon == WP_DEMP2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0 &&
+					ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DEMP21) &&
+					ent->client->ps.weaponTime > (weaponData[WP_DEMP2].fireTime * 0.5))
+				{
+					ent->client->ps.weaponTime = weaponData[WP_DEMP2].fireTime * 0.5;
+				}
+
+				if (ent->client->ps.weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
+					ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BLASTER_PISTOL1) && 
+					ent->client->ps.weaponTime > (weaponData[WP_BRYAR_PISTOL].fireTime * 0.6))
+				{
+					ent->client->ps.weaponTime = weaponData[WP_BRYAR_PISTOL].fireTime * 0.6;
+				}
+
+				if (ent->client->ps.weapon == WP_BRYAR_OLD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0 &&
+					ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BRYAR_PISTOL1) &&
+					ent->client->ps.weaponTime > (weaponData[WP_BRYAR_OLD].fireTime * 0.6))
+				{
+					ent->client->ps.weaponTime = weaponData[WP_BRYAR_OLD].fireTime * 0.6;
+				}
+
+				if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0 &&
+					ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_REPEATER1) &&
+					ent->client->ps.weaponTime > (weaponData[WP_REPEATER].altFireTime * 0.5))
+				{
+					ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime * 0.5;
+				}
+
+				if (ent->client->ps.weapon == WP_ROCKET_LAUNCHER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0 &&
+					ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_ROCKET2) &&
+					ent->client->ps.weaponTime > (weaponData[WP_ROCKET_LAUNCHER].altFireTime * 0.5))
+				{
+					ent->client->ps.weaponTime = weaponData[WP_ROCKET_LAUNCHER].altFireTime * 0.5;
+				}
+
+				// zyk: Melee Punch Speed skill
+				if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[SKILL_MELEE_SPEED] > 0)
+				{
+					float melee_punch_speed_bonus = (1.00f - (0.08f * ent->client->pers.skill_levels[SKILL_MELEE_SPEED]));
+
+					if (ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * melee_punch_speed_bonus))
 					{
-						ent->client->ps.weaponTime = weaponData[WP_BLASTER].fireTime * 0.7;
-					}
-
-					if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0 &&
-						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DISRUPTOR1) && 
-						ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 0.6))
-					{
-						ent->client->ps.weaponTime = weaponData[WP_DISRUPTOR].fireTime * 0.6;
-					}
-
-					if (ent->client->ps.weapon == WP_DEMP2 && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DEMP2] > 0 &&
-						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DEMP21) &&
-						ent->client->ps.weaponTime > (weaponData[WP_DEMP2].fireTime * 0.5))
-					{
-						ent->client->ps.weaponTime = weaponData[WP_DEMP2].fireTime * 0.5;
-					}
-
-					if (ent->client->ps.weapon == WP_BRYAR_PISTOL && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] > 0 &&
-						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BLASTER_PISTOL1) && 
-						ent->client->ps.weaponTime > (weaponData[WP_BRYAR_PISTOL].fireTime * 0.6))
-					{
-						ent->client->ps.weaponTime = weaponData[WP_BRYAR_PISTOL].fireTime * 0.6;
-					}
-
-					if (ent->client->ps.weapon == WP_BRYAR_OLD && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] > 0 &&
-						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRAGE_BRYAR_PISTOL1) &&
-						ent->client->ps.weaponTime > (weaponData[WP_BRYAR_OLD].fireTime * 0.6))
-					{
-						ent->client->ps.weaponTime = weaponData[WP_BRYAR_OLD].fireTime * 0.6;
-					}
-
-					if (ent->client->ps.weapon == WP_REPEATER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_REPEATER] > 0 &&
-						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_REPEATER1) &&
-						ent->client->ps.weaponTime > (weaponData[WP_REPEATER].altFireTime * 0.5))
-					{
-						ent->client->ps.weaponTime = weaponData[WP_REPEATER].altFireTime * 0.5;
-					}
-
-					if (ent->client->ps.weapon == WP_ROCKET_LAUNCHER && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] > 0 &&
-						ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_ROCKET2) &&
-						ent->client->ps.weaponTime > (weaponData[WP_ROCKET_LAUNCHER].altFireTime * 0.5))
-					{
-						ent->client->ps.weaponTime = weaponData[WP_ROCKET_LAUNCHER].altFireTime * 0.5;
-					}
-
-					// zyk: Melee Punch Speed skill
-					if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[SKILL_MELEE_SPEED] > 0)
-					{
-						float melee_punch_speed_bonus = (1.00f - (0.08f * ent->client->pers.skill_levels[SKILL_MELEE_SPEED]));
-
-						if (ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * melee_punch_speed_bonus))
-						{
-							ent->client->ps.weaponTime = (weaponData[WP_MELEE].fireTime * melee_punch_speed_bonus);
-						}
-					}
-
-					if (ent->client->pers.flame_thrower_timer > level.time && ent->client->cloakDebReduce < level.time)
-					{ // zyk: fires the flame thrower
-						Player_FireFlameThrower(ent);
+						ent->client->ps.weaponTime = (weaponData[WP_MELEE].fireTime * melee_punch_speed_bonus);
 					}
 				}
-				else if (ent->client->pers.is_getting_up == qfalse && (ent->client->pers.stamina_out_timer - level.time) < 1200)
-				{ // zyk: setting the getup anim
-					G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_GETUP1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
 
-					ent->client->pers.is_getting_up = qtrue;
+				if (ent->client->pers.flame_thrower_timer > level.time && ent->client->cloakDebReduce < level.time)
+				{ // zyk: fires the flame thrower
+					Player_FireFlameThrower(ent);
 				}
 
 				// zyk: updating RPG inventory and calculating current weight

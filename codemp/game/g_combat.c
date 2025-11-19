@@ -4874,7 +4874,6 @@ extern void Boba_FlyStop( gentity_t *self );
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern void zyk_add_shield(gentity_t* ent, int shield_amount);
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
-extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
@@ -5986,7 +5985,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		if (targ->client && (targ->client->sess.account_mode == ACC_MODE_RPG || targ->NPC))
 		{ // zyk: bonus resistance
 			float bonus_health_resistance = 0.00;
-			int stamina_loss = 0;
 			int magic_bonus = zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
 
 			// zyk: Protective Armor
@@ -6039,24 +6037,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			if (take < 1)
 			{ // zyk: cannot make player fully absorb all damage
 				take = 1;
-			}
-
-			if (targ->client->sess.account_mode == ACC_MODE_RPG)
-			{
-				// zyk: damage to health also makes RPG player lose Stamina
-				stamina_loss = (take / 2);
-
-				if (targ->client->pers.skill_levels[SKILL_MAX_STAMINA] > 0)
-				{
-					stamina_loss -= (stamina_loss * 0.18f * targ->client->pers.skill_levels[SKILL_MAX_STAMINA]);
-				}
-
-				if (stamina_loss < 1)
-				{
-					stamina_loss = 1;
-				}
-
-				zyk_set_stamina(targ, stamina_loss, qfalse);
 			}
 		}
 

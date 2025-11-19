@@ -6462,10 +6462,9 @@ int PM_ItemUsable(playerState_t *ps, int forcedUse)
 	case HI_MEDPAC:
 #if defined( _GAME )
 		if (item_user && item_user->client && item_user->client->sess.account_mode == ACC_MODE_RPG)
-		{ // zyk: bacta canister. Must allow even with max health to regen MP and stamina
+		{ // zyk: bacta canister. Must allow even with max health to regen MP
 			if (ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] && 
-				item_user->client->pers.magic_power == zyk_max_magic_power(item_user) &&
-				item_user->client->pers.current_stamina == item_user->client->pers.max_stamina)
+				item_user->client->pers.magic_power == zyk_max_magic_power(item_user))
 				return 0;
 
 			if (ps->stats[STAT_HEALTH] <= 0 ||
@@ -6494,10 +6493,9 @@ int PM_ItemUsable(playerState_t *ps, int forcedUse)
 	case HI_MEDPAC_BIG:
 #if defined( _GAME )
 		if (item_user && item_user->client && item_user->client->sess.account_mode == ACC_MODE_RPG)
-		{ // zyk: Big Bacta. Must allow even with max health to regen stamina
+		{ // zyk: Big Bacta. Must allow even with max health to regen MP
 			if (ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] && 
-				item_user->client->pers.magic_power == zyk_max_magic_power(item_user) &&
-				item_user->client->pers.current_stamina == item_user->client->pers.max_stamina)
+				item_user->client->pers.magic_power == zyk_max_magic_power(item_user))
 				return 0;
 
 			if (ps->stats[STAT_HEALTH] <= 0 ||
@@ -10975,12 +10973,6 @@ void PmoveSingle (pmove_t *pmove) {
 	*/
 
 #if defined( _GAME )
-	if (player_ent && player_ent->s.number < MAX_CLIENTS && player_ent->client && player_ent->client->sess.account_mode == ACC_MODE_RPG &&
-		player_ent->client->pers.stamina_out_timer > level.time)
-	{ // zyk: no Stamina, cannot move
-		stiffenedUp = qtrue;
-	}
-
 	if (level.duel_tournament_mode == 4 && player_ent && player_ent->s.number < MAX_CLIENTS && duel_tournament_is_duelist(player_ent) == qtrue && 
 			 (level.duel_tournament_timer - level.time) > (zyk_duel_tournament_duel_time.integer - DUEL_TOURNAMENT_PROTECTION_TIME))
 	{ // zyk: Duel Tournament duelist that has just been placed in arena. Wait some time before moving

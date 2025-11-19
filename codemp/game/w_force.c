@@ -1401,7 +1401,6 @@ void ForceTeamHeal( gentity_t *self )
 	}
 }
 
-extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 void ForceTeamForceReplenish( gentity_t *self )
 {
 	float radius = 256;
@@ -1449,7 +1448,7 @@ void ForceTeamForceReplenish( gentity_t *self )
 			(ent->client->ps.fd.forcePower < ent->client->ps.fd.forcePowerMax || 
 			 (self->client->sess.account_mode == ACC_MODE_RPG && self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] > 3 && !ent->NPC && // zyk: at a level > 3, restores some ammo
 			  ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
-			  (ent->client->pers.current_stamina < ent->client->pers.max_stamina || ent->client->ps.ammo[AMMO_POWERCELL] < max_powercell_ammo)
+			  ent->client->ps.ammo[AMMO_POWERCELL] < max_powercell_ammo
 			 )
 			) && 
 			ForcePowerUsableOn(self, ent, FP_TEAM_FORCE) &&
@@ -1495,12 +1494,11 @@ void ForceTeamForceReplenish( gentity_t *self )
 
 	while (i < numpl)
 	{
-		// zyk: Team Energize now can recover ammo and Stamina if the player has full force
+		// zyk: Team Energize now can recover ammo if the player has full force
 		if (self->client->sess.account_mode == ACC_MODE_RPG && 
 			self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] > 3 &&
 			!g_entities[pl[i]].NPC && g_entities[pl[i]].client->ps.fd.forcePower == g_entities[pl[i]].client->ps.fd.forcePowerMax)
 		{
-			zyk_set_stamina(&g_entities[pl[i]], poweradd, qtrue);
 			Add_Ammo(&g_entities[pl[i]], AMMO_POWERCELL, (poweradd / 5));
 			G_Sound(&g_entities[pl[i]], CHAN_AUTO, G_SoundIndex("sound/player/pickupenergy.wav"));
 		}
@@ -5431,8 +5429,6 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 	char client_name[64];
 	int magic_power = 0;
 	int max_magic_power = 0;
-	int stamina = 0;
-	int max_stamina = 0;
 
 	if (!target || !target->client)
 	{ // zyk: for some reason, this guy has no client structure. Happens to quest_ragnos npc
@@ -5453,8 +5449,6 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 		if (target->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			client_max_health = target->client->pers.max_rpg_health;
-			stamina = target->client->pers.current_stamina;
-			max_stamina = target->client->pers.max_stamina;
 		}
 
 		strcpy(client_name, target->client->pers.netname);
@@ -5484,9 +5478,9 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 			max_magic_power = zyk_max_magic_power(target);
 		}
 
-		trap->SendServerCommand(self->s.number, va("cp \"%s\n^1%d^3/^1%d  ^2%d^3/^2%d\n^5%d^3/^5%d  ^6%d^3/^6%d\n^4%d^3/^4%d\n\"", 
+		trap->SendServerCommand(self->s.number, va("cp \"%s\n^1%d^3/^1%d  ^2%d^3/^2%d\n^5%d^3/^5%d  ^6%d^3/^6%d\n\"", 
 			client_name, client_health, client_max_health, client_armor, client_max_armor, target->client->ps.fd.forcePower, target->client->ps.fd.forcePowerMax, 
-			magic_power, max_magic_power, stamina, max_stamina));
+			magic_power, max_magic_power));
 	}
 }
 
@@ -5999,7 +5993,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 					// zyk: meditating makes Force regen faster
 					if (self->client->ps.forceHandExtend == HANDEXTEND_TAUNT && self->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 					{
-						rpg_force_regen_time -= 30;
+						rpg_force_regen_time -= (10 + (5 * self->client->pers.skill_levels[SKILL_MEDITATION]));
 					}
 
 					self->client->ps.fd.forcePowerRegenDebounceTime += rpg_force_regen_time;

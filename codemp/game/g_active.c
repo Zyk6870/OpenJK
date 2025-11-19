@@ -196,10 +196,10 @@ void P_WorldEffects( gentity_t *ent ) {
 		ent->client->airOutTime = level.time + 12000;
 		ent->damage = 2;
 
-		// zyk: Underwater time will increase based on Max Stamina
-		if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.skill_levels[SKILL_MAX_STAMINA] > 0)
+		// zyk: Underwater time will increase based on Misc Affinity
+		if (ent->client->sess.account_mode == ACC_MODE_RPG)
 		{
-			ent->client->airOutTime = level.time + (12000 * (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 5));
+			ent->client->airOutTime = level.time + (12000 * (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 5));
 		}
 	}
 
@@ -1289,69 +1289,6 @@ qboolean G_ActionButtonPressed(int buttons)
 	return qfalse;
 }
 
-extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
-extern void zyk_stop_all_magic_powers(gentity_t* ent);
-
-// zyk: if Stamina runs out, player must rest for some seconds
-void zyk_stamina_out(gentity_t* ent)
-{
-	if (ent->client->pers.current_stamina <= 0 && ent->client->pers.stamina_out_timer <= level.time)
-	{ // zyk: if run out of stamina, knock out the player until stamina recovers a bit
-		int stamina_out_time = 12000 - (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 500) - (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) * 50);
-
-		if (ent->client->jetPackOn)
-		{
-			Jetpack_Off(ent);
-			ent->client->pers.in_magic_flight = qfalse;
-		}
-
-		zyk_stop_all_magic_powers(ent);
-
-		// zyk: reset Stamina. If player took massive damage from something it may have a too low negative value
-		ent->client->pers.current_stamina = 0;
-
-		G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_DEATH22, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-		ent->client->ps.torsoTimer = stamina_out_time;
-		ent->client->ps.legsTimer = stamina_out_time;
-		ent->client->ps.weaponTime = stamina_out_time;
-
-		ent->client->pers.stamina_out_timer = level.time + stamina_out_time;
-
-		// zyk: cannot use magic while passed out
-		ent->client->pers.magic_power_usage_timer = level.time + stamina_out_time;
-
-		ent->client->pers.is_getting_up = qfalse;
-
-		trap->SendServerCommand(ent->s.number, va("chat \"^3%s: ^7I am tired...\"", ent->client->pers.netname));
-	}
-}
-
-qboolean zyk_is_player_idle(gentity_t* ent, usercmd_t* ucmd)
-{
-	int buttons;
-	qboolean actionPressed;
-
-	buttons = ucmd->buttons;
-	actionPressed = G_ActionButtonPressed(buttons);
-
-	if (!VectorCompare(vec3_origin, ent->client->ps.velocity)
-		|| actionPressed || ucmd->forwardmove || ucmd->rightmove || ucmd->upmove
-		|| ent->client->ps.weaponTime > 0
-		|| ent->client->ps.weaponstate == WEAPON_CHARGING
-		|| ent->client->ps.weaponstate == WEAPON_CHARGING_ALT
-		|| ent->client->ps.zoomMode
-		|| (ent->client->ps.weaponstate != WEAPON_READY && ent->client->ps.weapon != WP_SABER)
-		|| ent->client->ps.forceHandExtend != HANDEXTEND_NONE
-		|| ent->client->ps.saberBlocked != BLOCKED_NONE
-		|| ent->client->ps.saberBlocking >= level.time
-		|| (ent->client->ps.weapon != ent->client->pers.cmd.weapon && !(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_RESET_TO_MELEE)) && ent->s.eType != ET_NPC))
-	{
-		return qfalse;
-	}
-
-	return qtrue;
-}
-
 void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 {
 	vec3_t viewChange;
@@ -1492,106 +1429,6 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			//ent->client->idleTime = level.time + PM_AnimLength( ent->client->clientInfo.animFileIndex, (animNumber_t)idleAnim ) + Q_irand( 0, 2000 );
 			ent->client->idleTime = level.time + ent->client->ps.legsTimer + Q_irand( 0, 2000 );
 		}
-	}
-
-	// zyk: Stamina
-	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.stamina_timer < level.time && ent->health > 0)
-	{
-		if (ent->client->pers.stamina_out_timer > level.time)
-		{ // zyk: passed out, recover some stamina
-			int stamina_out_recovery = 30 + (5 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
-
-			// zyk: Enlightenment Light regens more Stamina
-			if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] > level.time)
-			{
-				stamina_out_recovery *= 2;
-			}
-
-			zyk_set_stamina(ent, stamina_out_recovery, qtrue);
-
-			// zyk: also lose some health
-			ent->health--;
-			ent->client->ps.stats[STAT_HEALTH] = ent->health;
-
-			if (ent->health < 1)
-			{
-				player_die(ent, ent, ent, 100000, MOD_SUICIDE);
-			}
-		}
-		else
-		{
-			int stamina_usage = 0;
-			int stamina_recovery = 5 + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 2) + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
-
-			// zyk: carrying stuff over the max weight, consumes stamina based on how much above the max
-			if (ent->client->pers.current_weight > ent->client->pers.max_weight)
-			{
-				stamina_usage += (((ent->client->pers.current_weight - ent->client->pers.max_weight) / 50) + 1);
-			}
-
-			// zyk: active magic uses stamina
-			if (ent->client->pers.active_magic > 0)
-			{
-				int i = 0;
-
-				for (i = 0; i < MAX_MAGIC_POWERS; i++)
-				{
-					if (ent->client->pers.active_magic & (1 << i))
-					{
-						stamina_usage += 2;
-					}
-				}
-			}
-
-			if (ent->client->ps.weapon == WP_SABER && ent->client->ps.weaponTime > 0)
-			{ // zyk: attacking with saber
-				stamina_usage += 2;
-			}
-
-			if (ent->client->ps.saberInFlight && ent->client->ps.saberEntityNum != 0)
-			{ // zyk: active Saber Throw while saber is not dropped in ground
-				stamina_usage += 2;
-			}
-
-			if (ent->client->ps.fd.forcePowersActive > 0)
-			{ // zyk: active Force Powers
-				stamina_usage += 2;
-			}
-
-			// zyk: Enlightenment Light
-			if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] > level.time)
-			{
-				zyk_set_stamina(ent, stamina_recovery, qtrue);
-			}
-
-			// zyk: Meditating
-			if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
-			{
-				zyk_set_stamina(ent, stamina_recovery, qtrue);
-			}
-			else if (zyk_is_player_idle(ent, ucmd) == qfalse)
-			{
-				stamina_usage += 1;
-			}
-
-			if (stamina_usage > 0)
-			{
-				zyk_set_stamina(ent, stamina_usage, qfalse);
-			}
-
-			zyk_stamina_out(ent);
-		}
-
-		if (ent->client->pers.player_settings & (1 << SETTINGS_SHOW_STAMINA_BAR))
-		{ // zyk: hide Stamina bar in this case
-			ent->client->ps.cloakFuel = 100;
-		}
-		else if (ent->client->pers.max_stamina > 0)
-		{ // zyk: update the cloak fuel bar for the client, which is now used to show current Stamina level
-			ent->client->ps.cloakFuel = ((ent->client->pers.current_stamina * 1.0) / ent->client->pers.max_stamina) * 100;
-		}
-
-		ent->client->pers.stamina_timer = level.time + 200;
 	}
 }
 

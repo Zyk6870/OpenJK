@@ -1317,7 +1317,6 @@ static void MedPackGive(gentity_t *ent, int amount)
 	}
 }
 
-extern void zyk_set_stamina(gentity_t* ent, int amount, qboolean add);
 extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
 void ItemUse_MedPack_Big(gentity_t *ent)
 {
@@ -1329,18 +1328,12 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 			MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT * 2);
 
 			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT * 4, qtrue);
-
-			// zyk: Big Bacta can regen some stamina
-			zyk_set_stamina(ent, 2000, qtrue);
 		}
 		else
 		{
 			MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT);
 
 			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT * 2, qtrue);
-
-			// zyk: Big Bacta can regen some stamina
-			zyk_set_stamina(ent, 1000, qtrue);
 		}
 
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_BIG_BACTA, 1);
@@ -1361,18 +1354,12 @@ void ItemUse_MedPack(gentity_t *ent)
 			MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT * 2);
 
 			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT * 2, qtrue);
-
-			// zyk: Bacta Canister can regen some stamina
-			zyk_set_stamina(ent, 1000, qtrue);
 		}
 		else
 		{
 			MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT);
 
 			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT, qtrue);
-
-			// zyk: Bacta Canister can regen some stamina
-			zyk_set_stamina(ent, 500, qtrue);
 		}
 
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_BACTA_CANISTER, 1);

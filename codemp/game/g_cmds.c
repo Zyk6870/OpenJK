@@ -76,7 +76,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_NATURE_AFFINITY] = 10;
 	max_skill_levels[SKILL_STATUS_PROTECTION] = 5;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 25;
-	max_skill_levels[SKILL_MAX_STAMINA] = 5;
+	max_skill_levels[SKILL_MEDITATION] = 5;
 	max_skill_levels[SKILL_RUN_SPEED] = 5;
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 15;
@@ -124,7 +124,7 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_NATURE_AFFINITY] = "Nature Affinity";
 	skill_names[SKILL_STATUS_PROTECTION] = "Status Protection";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
-	skill_names[SKILL_MAX_STAMINA] = "Max Stamina";
+	skill_names[SKILL_MEDITATION] = "Meditation";
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
@@ -180,7 +180,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_RAGE)
 		return "makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage";
 	if (skill_index == SKILL_TEAM_ENERGIZE)
-		return "restores some force power to players near you. At a level > 3, If force power is full, restores some Stamina and power cell ammo";
+		return "restores some force power to players near you. At a level > 3, If force power is full, restores some power cell ammo";
 
 	if (skill_index == SKILL_MAX_HEALTH)
 		return va("Each level increases your max health by %d", RPG_MAX_HEALTH_INCREASE);
@@ -191,11 +191,11 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_NATURE_AFFINITY)
 		return "Your Spirit Tree makes Nature Energy generate automatically, but at a slow rate. Each level of this skill increases Nature Energy generation rate";
 	if (skill_index == SKILL_STATUS_PROTECTION)
-		return "Decreases duration of negative status effects. ^1Poison: ^7loses health, stamina, magic points and lowers run speed. ^1Fire: ^7catches fire, losing a lot of health. ^1Bleeding: ^7loses some health. Melee, Saber, Force powers and Magic attacks do less damage. ^1Confusion: ^7cannot attack or use Force powers or Magic";
+		return "Decreases duration of negative status effects. ^1Poison: ^7loses health and magic points and lowers run speed. ^1Fire: ^7catches fire, losing a lot of health. ^1Bleeding: ^7loses some health. Melee, Saber, Force powers and Magic attacks do less damage. ^1Confusion: ^7cannot attack or use Force powers or Magic";
 	if (skill_index == SKILL_MAX_WEIGHT)
-		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio. Carrying stuff over the max weight will decrease your run speed and also decrease Stamina";
-	if (skill_index == SKILL_MAX_STAMINA)
-		return va("Stamina is used by any action you do. Low stamina makes run speed slower. You lose stamina when taking damage. If Stamina runs out you will faint for some seconds. Each skill level increases max Stamina, Stamina recovery when meditating, gives a run speed bonus when current Stamina is at least %.1f per cent (and the skill level is at least 1), decreases time you need to recover after fainting, decreases Stamina loss when taking damage and increases the time you can be underwater before drowning. Use bacta canister or big bacta holdable items to regen stamina", RPG_RUN_SPEED_STAMINA_BONUS);
+		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio. Carrying stuff over the max weight will decrease your run speed";
+	if (skill_index == SKILL_MEDITATION)
+		return "Each level of this skill increases regen rate of Force and MP while meditating";
 	if (skill_index == SKILL_RUN_SPEED)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
@@ -244,7 +244,7 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_NATURE_AFFINITY] = "skillnatureaffinity";
 	skill_names[SKILL_STATUS_PROTECTION] = "skillstatusprotection";
 	skill_names[SKILL_MAX_WEIGHT] = "skillmaxweight";
-	skill_names[SKILL_MAX_STAMINA] = "skillmaxstamina";
+	skill_names[SKILL_MEDITATION] = "skillmeditation";
 	skill_names[SKILL_RUN_SPEED] = "skillrunspeed";
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
@@ -384,7 +384,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_BACTA_CANISTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health and mp\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_FORCE_FIELD)
 	{
@@ -392,7 +392,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_BIG_BACTA)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health, mp and Stamina. Recovers double the amount of a Bacta Canister\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health and mp. Recovers double the amount of a Bacta Canister\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_EWEB)
 	{
@@ -460,7 +460,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister and Big Bacta recovers more HP, more MP and more Stamina\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister and Big Bacta recovers more HP and more MP\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FORCE_FIELD)
 	{
@@ -576,11 +576,11 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_MISC_FORCE_BOON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that makes you regen force faster for a short time. Use with ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that increases Force regen rate for a short time. Use with ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that regens more Stamina for a short time. Use with ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7a power-up that increases Nature Energy regen rate for a short time. Use with ^3/inv use %d^7\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK)
 	{
@@ -2747,11 +2747,6 @@ void load_account(gentity_t* ent)
 					read_status = fscanf(account_file, "%s", content);
 					ent->client->pers.last_mp = atoi(content);
 				}
-				else if (Q_stricmp(content_type, "last_stamina") == 0)
-				{
-					read_status = fscanf(account_file, "%s", content);
-					ent->client->pers.last_stamina = atoi(content);
-				}
 
 				if (read_content_type == qtrue)
 				{
@@ -2813,9 +2808,9 @@ void save_account(gentity_t* ent, qboolean save_char_file)
 				}
 			}
 
-			strcpy(content, va("%s\nquest_progress\n%d\nquest_missions\n%d\nselected_ability\n%d\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d\nlast_stamina\n%d",
+			strcpy(content, va("%s\nquest_progress\n%d\nquest_missions\n%d\nselected_ability\n%d\nlast_health\n%d\nlast_shield\n%d\nlast_mp\n%d",
 				content, client->pers.quest_progress, client->pers.quest_missions, client->pers.selected_ability, 
-				client->pers.last_health, client->pers.last_shield, client->pers.last_mp, client->pers.last_stamina));
+				client->pers.last_health, client->pers.last_shield, client->pers.last_mp));
 
 			// zyk: saving all content into the file
 			account_file = fopen(va("zykmod/accounts/%s_%s.txt", ent->client->sess.filename, ent->client->sess.rpgchar), "w");
@@ -5143,12 +5138,6 @@ void set_max_weight(gentity_t* ent)
 	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 200) + (50 * zyk_skill_affinity(ent, SKILL_CATEGORY_MISC));
 }
 
-// zyk: set the Max Stamina of this player
-void set_max_stamina(gentity_t* ent)
-{
-	ent->client->pers.max_stamina = RPG_DEFAULT_STAMINA + (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] * 2000);
-}
-
 // zyk: set max Nature Energy of this player
 void set_max_nature_energy(gentity_t* ent)
 {
@@ -5157,29 +5146,6 @@ void set_max_nature_energy(gentity_t* ent)
 	if (zyk_is_main_quest_complete(ent) == qtrue)
 	{
 		ent->client->pers.max_nature_energy = RPG_MAX_NATURE_ENERGY * 2;
-	}
-}
-
-// zyk: increases or decreases RPG player stamina
-void zyk_set_stamina(gentity_t* ent, int amount, qboolean add)
-{
-	if (add == qtrue)
-	{
-		ent->client->pers.current_stamina += amount;
-
-		if (ent->client->pers.current_stamina > ent->client->pers.max_stamina)
-		{
-			ent->client->pers.current_stamina = ent->client->pers.max_stamina;
-		}
-	}
-	else if (ent->client->pers.stamina_out_timer <= level.time)
-	{
-		ent->client->pers.current_stamina -= amount;
-
-		if (ent->client->pers.current_stamina < 0)
-		{
-			ent->client->pers.current_stamina = 0;
-		}
 	}
 }
 
@@ -5533,7 +5499,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		set_max_shield(ent);
 		set_max_force(ent);
 		set_max_weight(ent);
-		set_max_stamina(ent);
 		set_max_nature_energy(ent);
 
 		// zyk: setting rpg control attributes
@@ -5574,10 +5539,6 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.quest_spirit_tree_id = -1;
 			ent->client->pers.quest_spirit_tree_call_timer = 0;
 
-			ent->client->pers.stamina_timer = 0;
-			ent->client->pers.stamina_out_timer = 0;
-			ent->client->pers.is_getting_up = qtrue;
-
 			ent->client->pers.magic_consumption_timer = 0;
 			ent->client->pers.magic_regen_debounce_timer = 0;
 
@@ -5592,18 +5553,12 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			// zyk: loading last shield
 			ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.last_shield;
 
-			// zyk: loading initial Stamina
-			ent->client->pers.current_stamina = ent->client->pers.last_stamina;
-
 			if (!(ent->client->pers.player_statuses & (1 << PLAYER_STATUS_SELF_KILL)) &&
 				ent->client->pers.last_health <= 0)
 			{ // zyk: reload player stats if he died and he did not use /kill command
 				// zyk: loading initial health
 				ent->health = ent->client->pers.max_rpg_health / 2;
 				ent->client->ps.stats[STAT_HEALTH] = ent->health;
-
-				// zyk: loading initial Stamina as the last value plus the default Stamina
-				zyk_set_stamina(ent, RPG_DEFAULT_STAMINA, qtrue);
 			}
 			else
 			{ // zyk: reload the last stats
@@ -5633,24 +5588,18 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			{
 				ent->client->pers.magic_power = zyk_max_magic_power(ent);
 			}
-
-			if (ent->client->pers.current_stamina > ent->client->pers.max_stamina)
-			{
-				ent->client->pers.current_stamina = ent->client->pers.max_stamina;
-			}
 		}
 
 		ent->client->pers.last_magic_power_shown = ent->client->pers.magic_power;
 	}
 }
 
-// zyk: using skills (weapons, force, etc) calls this. Used to set Stamina
+// zyk: using skills (weapons, force, etc) calls this
 void rpg_skill_counter(gentity_t *ent, int amount)
 {
 	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
-		// zyk: when player does things, it will decrease Stamina
-		zyk_set_stamina(ent, amount, qfalse);
+		// zyk: no longer used. In the future, if a new feature needs to count actions and skills used, this function is ready to be used
 	}
 }
 
@@ -5813,8 +5762,6 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 
 	// zyk: so the char starts with the original health
 	ent->client->pers.last_health = 100;
-	ent->client->pers.current_stamina = RPG_DEFAULT_STAMINA;
-	ent->client->pers.last_stamina = RPG_DEFAULT_STAMINA;
 
 	// zyk: player starts with no weapons, ammo or items
 	ent->client->ps.stats[STAT_WEAPONS] = 0;
@@ -6536,16 +6483,6 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 	}
 }
 
-qboolean rpg_has_speed_bonus(gentity_t* ent)
-{
-	if (ent->client->pers.skill_levels[SKILL_MAX_STAMINA] > 0 && ent->client->pers.current_stamina >= (ent->client->pers.max_stamina * (RPG_RUN_SPEED_STAMINA_BONUS * 0.01f)))
-	{
-		return qtrue;
-	}
-
-	return qfalse;
-}
-
 float zyk_get_rpg_player_speed(gentity_t* ent)
 {
 	float rpg_player_speed = g_speed.value + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
@@ -6555,19 +6492,9 @@ float zyk_get_rpg_player_speed(gentity_t* ent)
 		rpg_player_speed += (ent->client->pers.skill_levels[SKILL_RUN_SPEED] * RPG_RUN_SPEED_SKILL_INCREASE);
 	}
 
-	if (rpg_has_speed_bonus(ent) == qtrue)
-	{
-		rpg_player_speed += (10 * ent->client->pers.skill_levels[SKILL_MAX_STAMINA]);
-	}
-
 	if (ent->client->pers.current_weight > ent->client->pers.max_weight)
 	{ // zyk: too much weight decreases player speed
 		rpg_player_speed -= (ent->client->pers.current_weight - ent->client->pers.max_weight);
-	}
-
-	if (ent->client->pers.current_stamina > 0 && ent->client->pers.current_stamina < RPG_MIN_STAMINA)
-	{ // zyk: low Stamina decreases player speed
-		rpg_player_speed = rpg_player_speed * (ent->client->pers.current_stamina / RPG_MIN_STAMINA);
 	}
 
 	return rpg_player_speed;
@@ -6584,17 +6511,9 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 	strcpy(message, va("%s^3Skill Levels Upgraded: %s\n", message, zyk_formatted_amount_with_max(total_skill_points, RPG_MAX_SKILLPOINTS)));
 	strcpy(message, va("%s^3Magic Points: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.magic_power, max_magic_power)));
 	strcpy(message, va("%s^3Nature Energy: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.nature_energy, ent->client->pers.max_nature_energy)));
-	strcpy(message, va("%s^3Stamina: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.current_stamina, ent->client->pers.max_stamina)));
 	strcpy(message, va("%s^3Weight: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.current_weight, ent->client->pers.max_weight)));
 
-	if (rpg_has_speed_bonus(ent) == qtrue)
-	{
-		strcpy(message, va("%s^3Run Speed: ^5%.1f\n", message, ent->client->ps.speed));
-	}
-	else
-	{
-		strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, ent->client->ps.speed));
-	}
+	strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, ent->client->ps.speed));
 
 	strcpy(message, va("%s^3Force Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE)));
 	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MISC)));
@@ -7681,9 +7600,6 @@ void Cmd_Make_f( gentity_t *ent ) {
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
-		// zyk: making items uses Stamina
-		zyk_set_stamina(ent, 5, qfalse);
-
 		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Item made\n\"");
 
 		Cmd_ZykMod_f(ent);
@@ -7767,9 +7683,6 @@ void Cmd_Unmake_f( gentity_t *ent ) {
 		set_nature_energy(ent, (zyk_get_seller_item_cost(ent, item_index, qfalse) * amount), qtrue);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
-
-		// zyk: unmaking items uses Stamina
-		zyk_set_stamina(ent, 5, qfalse);
 
 		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Item unmade\n\"");
 	}
@@ -8169,8 +8082,8 @@ char* zyk_get_settings_description(zyk_settings_t settings_value)
 	settings_descriptions[SETTINGS_JETPACK] = "Jetpack";
 	settings_descriptions[SETTINGS_ADMIN_PROTECT] = "Admin Protect";
 	settings_descriptions[SETTINGS_DIFFICULTY] = "Quest Difficulty";
-	settings_descriptions[SETTINGS_SHOW_MP_LEVEL] = "Red bar show Fuel (Jetpack/Flame Thrower) or MP";
-	settings_descriptions[SETTINGS_SHOW_STAMINA_BAR] = "Show Stamina Blue Bar";
+	settings_descriptions[SETTINGS_SHOW_FUEL_BAR] = "Show Fuel Red Bar";
+	settings_descriptions[SETTINGS_SHOW_MP_BAR] = "Show MP Blue Bar";
 	settings_descriptions[SETTINGS_STORE_POWERUPS] = "Store picked-up power-ups in inventory";
 	settings_descriptions[SETTINGS_QUEST_TREE] = "Show Spirit Tree after quest is completed";
 
@@ -8215,17 +8128,6 @@ char* zyk_get_settings(gentity_t* ent, zyk_settings_t settings_value)
 		else
 		{
 			strcpy(message, va("^3%s - %s - ^2Normal", settings_value_string, zyk_get_settings_description(SETTINGS_DIFFICULTY)));
-		}
-	}
-	else if (settings_value == SETTINGS_SHOW_MP_LEVEL)
-	{
-		if (ent->client->pers.player_settings & (1 << SETTINGS_SHOW_MP_LEVEL))
-		{
-			strcpy(message, va("^3%s - %s - ^1MP", settings_value_string, zyk_get_settings_description(SETTINGS_SHOW_MP_LEVEL)));
-		}
-		else
-		{
-			strcpy(message, va("^3%s - %s - ^2Fuel", settings_value_string, zyk_get_settings_description(SETTINGS_SHOW_MP_LEVEL)));
 		}
 	}
 	else
