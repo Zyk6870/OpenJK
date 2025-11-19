@@ -1297,7 +1297,7 @@ static void CG_DrawSimpleAmmo( const centity_t *cent )
 		// zyk: added Flame Thrower ammo
 		if (cent->currentState.weapon == WP_STUN_BATON)
 		{
-			Com_sprintf(num, sizeof(num), "%i", cg.snap->ps.cloakFuel);
+			Com_sprintf(num, sizeof(num), "%i", cg.snap->ps.jetpackFuel);
 			CG_DrawProportionalString(SCREEN_WIDTH - 40, (SCREEN_HEIGHT - 80) + 24 + 28, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_HUD_ORANGE]);
 			return;
 		}
@@ -1429,10 +1429,10 @@ void CG_DrawHUD(centity_t	*cent)
 			CG_DrawProportionalString( x+8+4, y+24+14, va( "%i", cg.snap->ps.stats[STAT_ARMOR] ), UI_SMALLFONT|UI_DROPSHADOW, colorTable[CT_HUD_GREEN] );
 
 			// zyk: current jetpackFuel
-			CG_DrawProportionalString((8 + 8), y + 24 + 28, va("%i", cg.snap->ps.jetpackFuel), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_MAGENTA]);
+			CG_DrawProportionalString((8 + 8), y + 24 + 28, va("%i", cg.snap->ps.cloakFuel), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_LTBLUE3]);
 
 			// zyk: current Cloak Fuel
-			CG_DrawProportionalString(SCREEN_WIDTH - (40 + 16), y + 24, va("%i", cg.snap->ps.cloakFuel), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_GREEN]);
+			CG_DrawProportionalString(SCREEN_WIDTH - (40 + 16), y + 24, va("%i", cg.snap->ps.jetpackFuel), UI_SMALLFONT | UI_DROPSHADOW, colorTable[CT_LTRED1]);
 
 			CG_DrawSimpleForcePower( cent );
 

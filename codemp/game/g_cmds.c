@@ -897,6 +897,9 @@ int zyk_get_emote_id_with_option(char *option)
 		return BOTH_STAND5TOSTAND8;
 
 	if (Q_stricmp(option, "kneel") == 0)
+		return BOTH_CROUCH3;
+
+	if (Q_stricmp(option, "beg") == 0)
 		return BOTH_KNEES2;
 
 	if (Q_stricmp(option, "surrender") == 0)
@@ -904,6 +907,9 @@ int zyk_get_emote_id_with_option(char *option)
 
 	if (Q_stricmp(option, "cower") == 0)
 		return BOTH_SONICPAIN_HOLD;
+
+	if (Q_stricmp(option, "slap") == 0)
+		return BOTH_FORCEGRIP3THROW;
 
 	if (Q_stricmp(option, "die") == 0)
 		return BOTH_DEATH2;
@@ -960,7 +966,7 @@ void Cmd_Emote_f( gentity_t *ent )
 	}
 
 	if ( trap->Argc () < 2 ) {
-		trap->SendServerCommand(ent->s.number, va("print \"Usage: ^3/emote <anim id between 0 and %d> ^7or ^3/emote <emote name from the list below>^7. List of emotes: stand, hug, talk, hello, comeon, hips, kneel, surrender, cower, die, die2, die3, die4, die5, sleep, sit, updown, typing, nod, shake\n\"", (MAX_ANIMATIONS-1)) );
+		trap->SendServerCommand(ent->s.number, va("print \"Usage: ^3/emote <anim id between 0 and %d> ^7or ^3/emote <emote name from the list below>^7. List of emotes: stand, hug, talk, hello, comeon, hips, kneel, beg, surrender, cower, slap, die, die2, die3, die4, die5, sleep, sit, updown, typing, nod, shake\n\"", (MAX_ANIMATIONS-1)) );
 		return;
 	}
 
