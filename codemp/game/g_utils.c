@@ -1613,6 +1613,7 @@ extern void set_nature_energy(gentity_t* ent, int amount, qboolean add);
 extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void zyk_use_inventory_item(gentity_t* ent, zyk_inventory_t item_index);
+extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
 qboolean zyk_magic_flight(gentity_t* ent)
 {
 	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] > 0 &&
@@ -1649,7 +1650,7 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 			ent->client->ps.forceDodgeAnim == BOTH_MEDITATE &&
 			ent->client->pers.quest_spirit_tree_call_timer < level.time)
 		{
-			if (!(ent->client->pers.player_settings & (1 << SETTINGS_QUEST_TREE)))
+			if (!(ent->client->pers.player_settings & (1 << SETTINGS_QUEST_TREE)) || zyk_is_main_quest_complete(ent) == qfalse)
 			{
 				if (ent->client->pers.nature_energy >= QUEST_SPIRIT_TREE_CALL_COST)
 				{
