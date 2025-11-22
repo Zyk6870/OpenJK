@@ -476,7 +476,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from any source (except Magic attacks) by 20 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from saber and other weapons by 20 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR)
 	{
@@ -492,51 +492,51 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds, and has a chance to cause Confusion status\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds, and has a chance to cause Confusion status\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Increases Blaster Pistol firerate. Upgrade ^32^7: quickdraw. If shooting with pistol right after changing weapon to it, shoots a full charged shot\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Increases Blaster Pistol firerate. Upgrade ^32^7: quickdraw. If shooting with pistol right after changing weapon to it, shoots a full charged shot\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Increases Bryar Pistol firerate. Upgrade ^32^7: Altfire can charge more for more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Increases Bryar Pistol firerate. Upgrade ^32^7: Altfire can charge more for more damage\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: E11 Blaster Rifle altfire has less spread and faster firerate. Upgrade ^32^7: has a chance to make target burn\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: E11 Blaster Rifle altfire has less spread and faster firerate. Upgrade ^32^7: has a chance to make target burn\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases Disruptor firerate. Upgrade ^32^7: altfire full charged shot has a lot more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases Disruptor firerate. Upgrade ^32^7: altfire full charged shot has a lot more damage\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times. Upgrade ^32^7: shots have a chance to poison targets\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times. Upgrade ^32^7: shots have a chance to poison targets\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases firerate of DEMP2 main fire. Upgrade ^32^7: primary and altfire shots can stun targets for a longer time\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases firerate of DEMP2 main fire. Upgrade ^32^7: primary and altfire shots can stun targets for a longer time\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases accuracy of primary fire and firerate of Repeater altfire. Upgrade ^32^7: altfire has chance to knockdown targets based on distance to the impact\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases accuracy of primary fire and firerate of Repeater altfire. Upgrade ^32^7: altfire has chance to knockdown targets based on distance to the impact\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: increases number of bolts shot by Flechette primary and alt fires. Upgrade ^32^7: primary fire shots cause bleeding\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases number of bolts shot by Flechette primary and alt fires. Upgrade ^32^7: primary fire shots cause bleeding\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: Concussion rifle has better splash radius, can break saber-only damage objects and can move pushable/pullable objects. Upgrade ^32^7: altfire stronger knockdown and for a longer time\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Concussion rifle has better splash radius, can break saber-only damage objects and can move pushable/pullable objects. Upgrade ^32^7: altfire stronger knockdown and for a longer time\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: increases firerate of primary fire\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: increases firerate of primary fire\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_EXPLOSIVE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Upgrade ^31^7: makes thermals, trip mines and detpacks have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: thermals, trip mines and detpacks create a fire area when explosive, making targets catch fire\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: makes thermals, trip mines and detpacks have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: thermals, trip mines and detpacks create a fire area when explosive, making targets catch fire\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK)
 	{
@@ -6568,11 +6568,32 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_ITEM_BINOCULARS][0] = 15;
 	seller_items_cost[RPG_INVENTORY_ITEM_BINOCULARS][1] = 5;
 
+	seller_items_cost[RPG_INVENTORY_ITEM_CLOAK][0] = 500;
+	seller_items_cost[RPG_INVENTORY_ITEM_CLOAK][1] = 200;
+
 	seller_items_cost[RPG_INVENTORY_ITEM_JETPACK][0] = 500;
 	seller_items_cost[RPG_INVENTORY_ITEM_JETPACK][1] = 200;
 
-	seller_items_cost[RPG_INVENTORY_ITEM_CLOAK][0] = 500;
-	seller_items_cost[RPG_INVENTORY_ITEM_CLOAK][1] = 200;
+	seller_items_cost[RPG_INVENTORY_MISC_FUEL][0] = 2;
+	seller_items_cost[RPG_INVENTORY_MISC_FUEL][1] = 1;
+
+	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][0] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][1] = 50;
+
+	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][0] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][1] = 50;
+
+	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT][0] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT][1] = 50;
+
+	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK][0] = 100;
+	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK][1] = 50;
+
+	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][0] = 50;
+	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][1] = 20;
+
+	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][0] = 50;
+	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][1] = 20;
 
 	seller_items_cost[RPG_INVENTORY_WP_BLASTER_PISTOL][0] = 90;
 	seller_items_cost[RPG_INVENTORY_WP_BLASTER_PISTOL][1] = 45;
@@ -6684,27 +6705,6 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][0] = 1200;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_EWEB][1] = 500;
-
-	seller_items_cost[RPG_INVENTORY_MISC_FUEL][0] = 3;
-	seller_items_cost[RPG_INVENTORY_MISC_FUEL][1] = 1;
-
-	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][0] = 50;
-	seller_items_cost[RPG_INVENTORY_MISC_MEDPACK][1] = 20;
-
-	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][0] = 50;
-	seller_items_cost[RPG_INVENTORY_MISC_SHIELD_BOOSTER][1] = 20;
-
-	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][0] = 100;
-	seller_items_cost[RPG_INVENTORY_MISC_YSALAMIRI][1] = 50;
-
-	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][0] = 100;
-	seller_items_cost[RPG_INVENTORY_MISC_FORCE_BOON][1] = 50;
-
-	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT][0] = 100;
-	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT][1] = 50;
-
-	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK][0] = 100;
-	seller_items_cost[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK][1] = 50;
 
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][0] = 0;
 	seller_items_cost[RPG_INVENTORY_LEGENDARY_QUEST_LOG][1] = 100;
@@ -7035,22 +7035,6 @@ void zyk_use_inventory_item(gentity_t* ent, zyk_inventory_t item_index)
 	{
 		zyk_energy_modulator(ent);
 	}
-	else if (item_index == RPG_INVENTORY_MISC_MEDPACK && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MEDPACK] > 0)
-	{
-		zyk_add_health(ent, RPG_MEDPACK_REGEN);
-
-		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
-
-		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickuphealth.mp3"));
-	}
-	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_SHIELD_BOOSTER] > 0)
-	{
-		zyk_add_shield(ent, RPG_SHIELD_BOOSTER_REGEN);
-
-		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
-
-		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupshield.mp3"));
-	}
 	else if (item_index == RPG_INVENTORY_MISC_YSALAMIRI && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_YSALAMIRI] > 0)
 	{
 		ent->client->ps.powerups[PW_YSALAMIRI] = level.time + RPG_POWERUP_TIMER;
@@ -7082,6 +7066,22 @@ void zyk_use_inventory_item(gentity_t* ent, zyk_inventory_t item_index)
 		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
 
 		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/enlightenment.mp3"));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_MEDPACK && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_MEDPACK] > 0)
+	{
+		zyk_add_health(ent, RPG_MEDPACK_REGEN);
+
+		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickuphealth.mp3"));
+	}
+	else if (item_index == RPG_INVENTORY_MISC_SHIELD_BOOSTER && ent->client->pers.rpg_inventory[RPG_INVENTORY_MISC_SHIELD_BOOSTER] > 0)
+	{
+		zyk_add_shield(ent, RPG_SHIELD_BOOSTER_REGEN);
+
+		zyk_update_inventory_quantity(ent, qfalse, item_index, 1);
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/player/pickupshield.mp3"));
 	}
 }
 
@@ -7206,7 +7206,7 @@ void Cmd_Inventory_f(gentity_t* ent) {
 				{
 					zyk_use_inventory_item(ent, item_index);
 				}
-				else if (item_index >= RPG_INVENTORY_MISC_MEDPACK && item_index <= RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK)
+				else if (item_index >= RPG_INVENTORY_MISC_YSALAMIRI && item_index <= RPG_INVENTORY_MISC_SHIELD_BOOSTER)
 				{ // zyk: these items can be used
 					zyk_use_inventory_item(ent, item_index);
 				}
@@ -7216,7 +7216,7 @@ void Cmd_Inventory_f(gentity_t* ent) {
 						(RPG_INVENTORY_AMMO_ROCKETS + 1),
 						(RPG_INVENTORY_ITEM_SEEKER_DRONE + 1),
 						(RPG_INVENTORY_UPGRADE_STUN_BATON + 1), (RPG_INVENTORY_UPGRADE_EXPLOSIVE + 1),
-						(RPG_INVENTORY_MISC_MEDPACK + 1), (RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK + 1),
+						(RPG_INVENTORY_MISC_YSALAMIRI + 1), (RPG_INVENTORY_MISC_SHIELD_BOOSTER + 1),
 						(RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR + 1)));
 				}
 			}
@@ -7587,7 +7587,15 @@ void Cmd_Make_f( gentity_t *ent ) {
 	// zyk: buying the item if player has enough credits
 	if (ent->client->pers.nature_energy >= total_cost)
 	{
+		int toggle_mode = ent->client->pers.toggle_rpg_inventory[item_index];
+
+		// zyk: enable item. The ammo_all validation may prevent it to be added to the inventory
+		ent->client->pers.toggle_rpg_inventory[item_index] = 1;
+
 		zyk_update_inventory_quantity(ent, qtrue, item_index, amount);
+
+		// zyk: reset the toggle mode for this item
+		ent->client->pers.toggle_rpg_inventory[item_index] = toggle_mode;
 
 		if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR)
 		{

@@ -2212,13 +2212,10 @@ extern void saberReactivate(gentity_t *saberent, gentity_t *saberOwner);
 extern void saberBackToOwner(gentity_t *saberent);
 extern void try_finishing_race();
 extern void set_nature_energy(gentity_t* ent, int amount, qboolean add);
-extern gentity_t *Zyk_NPC_SpawnType(char *npc_type, int x, int y, int z, int yaw);
 extern qboolean duel_tournament_is_duelist(gentity_t *ent);
 extern void player_restore_force(gentity_t *ent);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
-// extern void zyk_spawn_crystal(float x, float y, float z, int duration, zyk_quest_item_t crystal_type);
-extern void zyk_quest_effect_spawn(gentity_t* ent, gentity_t* target_ent, char* targetname, char* spawnflags, char* effect_path, int start_time, int damage, int radius, int duration);
 extern void zyk_set_rpg_status(gentity_t* ent, zyk_rpg_status_t rpg_status, int duration, qboolean add_status);
 
 void player_die(gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int damage, int meansOfDeath) {
