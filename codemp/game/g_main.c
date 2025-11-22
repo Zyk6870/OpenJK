@@ -5274,6 +5274,32 @@ qboolean zyk_is_bad_status_effect(zyk_rpg_status_t rpg_status)
 	return qtrue;
 }
 
+// zyk: some status effects make the player lose a certain amount of health directly (without hitting the shield)
+void zyk_health_loss(gentity_t* ent, int amount, int mod)
+{
+	ent->health -= amount;
+
+	if ((ent->flags & FL_UNDYING) && ent->health < 1)
+	{//take damage down to 1, but never die
+		ent->health = 1;
+	}
+
+	if (ent->client)
+	{
+		ent->client->ps.stats[STAT_HEALTH] = ent->health;
+	}
+
+	if (ent->maxHealth)
+	{ //if this is non-zero this guy should be updated his s.health to send to the client
+		G_ScaleNetHealth(ent);
+	}
+
+	if (ent->health < 1)
+	{
+		player_die(ent, ent, ent, amount, mod);
+	}
+}
+
 void zyk_set_rpg_status(gentity_t* ent, zyk_rpg_status_t rpg_status, int duration, qboolean add_status)
 {
 	if (ent->health < 1 || !(ent->client))
@@ -5315,7 +5341,7 @@ void zyk_status_effects(gentity_t* ent)
 				{
 					zyk_quest_effect_spawn(ent, ent, "zyk_status_poison", "0", "noghri_stick/gas_cloud", 100, 0, 0, 1000);
 
-					G_Damage(ent, ent, ent, NULL, NULL, 1, 0, MOD_UNKNOWN);
+					zyk_health_loss(ent, 1, MOD_UNKNOWN);
 
 					zyk_set_mp(ent, 1, qfalse);
 				}
@@ -5331,7 +5357,7 @@ void zyk_status_effects(gentity_t* ent)
 				{
 					zyk_quest_effect_spawn(ent, ent, "zyk_status_bleeding", "0", "sparks/blood_sparks2", 100, 0, 0, 500);
 
-					G_Damage(ent, ent, ent, NULL, NULL, 5, 0, MOD_UNKNOWN);
+					zyk_health_loss(ent, 2, MOD_UNKNOWN);
 				}
 				else if (i == RPG_STATUS_CONFUSED)
 				{
@@ -9548,7 +9574,7 @@ void G_RunFrame( int levelTime ) {
 					// zyk: regen mp and level of this mage
 					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 					{
-						zyk_set_mp(ent, 1, qtrue);
+						ent->client->pers.magic_power = zyk_max_magic_power(ent);
 
 						ent->client->pers.magic_regen_debounce_timer = level.time + 900 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
 					}
