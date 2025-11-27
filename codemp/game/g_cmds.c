@@ -5743,12 +5743,15 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 
 	// zyk: resetting all skills
 	for (i = 0; i < NUMBER_OF_SKILLS; i++)
+	{
 		ent->client->pers.skill_levels[i] = 0;
+	}
 
 	// zyk: initializing RPG inventory
 	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
 	{
 		ent->client->pers.rpg_inventory[i] = 0;
+		ent->client->pers.toggle_rpg_inventory[i] = 1;
 	}
 
 	ent->client->pers.active_inventory_upgrades = 0;
@@ -6092,6 +6095,8 @@ Cmd_LogoutAccount_f
 extern void zyk_stop_magic_power(gentity_t* ent, zyk_magic_t magic_number);
 extern void zyk_stop_all_magic_powers(gentity_t* ent);
 void Cmd_LogoutAccount_f( gentity_t *ent ) {
+	int i = 0;
+
 	if (level.duel_tournament_mode > 0 && level.duel_players[ent->s.number] != -1)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Cannot logout while in a Duel Tournament\n\"");
@@ -6123,6 +6128,19 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 
 	if (ent->client->ps.stats[STAT_ARMOR] > 100)
 		ent->client->ps.stats[STAT_ARMOR] = 100;
+
+	// zyk: resetting all skills
+	for (i = 0; i < NUMBER_OF_SKILLS; i++)
+	{
+		ent->client->pers.skill_levels[i] = 0;
+	}
+
+	// zyk: initializing RPG inventory
+	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+	{
+		ent->client->pers.rpg_inventory[i] = 0;
+		ent->client->pers.toggle_rpg_inventory[i] = 1;
+	}
 
 	// zyk: resetting force powers
 	WP_InitForcePowers( ent );

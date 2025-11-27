@@ -2980,9 +2980,9 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		{
 			cannot_pickup_item = qfalse;
 
-			// zyk: cannot pickup items if above Max Weight or if the player disabled picking up the item
-			if ((other->client->pers.current_weight >= other->client->pers.max_weight && zyk_validate_health_pickups(ent, other) == qfalse) ||
-				zyk_validate_pickup(ent, other) == qfalse)
+			// zyk: cannot pickup items if above Max Weight or if the player disabled picking up the item. Allow Medpacks and shield boosters if player needs them
+			if (zyk_validate_health_pickups(ent, other) == qfalse &&
+				(other->client->pers.current_weight >= other->client->pers.max_weight || zyk_validate_pickup(ent, other) == qfalse))
 			{
 				return;
 			}
