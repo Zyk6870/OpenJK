@@ -374,41 +374,41 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7det packs\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
-	else if (item_index == RPG_INVENTORY_ITEM_SENTRY_GUN)
+	else if (item_index == RPG_INVENTORY_ITEM_BINOCULARS)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable gun which is placed in the ground and shoots nearby enemies\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable remote drone that shoots enemies at sight\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to see far things better with the zoom feature. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_BACTA_CANISTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health and mp\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health and mp. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
-	else if (item_index == RPG_INVENTORY_ITEM_FORCE_FIELD)
+	else if (item_index == RPG_INVENTORY_ITEM_SENTRY_GUN)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7creates a force field wall in front of the player that can hold almost any attack, except the concussion rifle alternate fire, which can get through\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable gun which is placed in the ground and shoots nearby enemies. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
-	else if (item_index == RPG_INVENTORY_ITEM_BIG_BACTA)
+	else if (item_index == RPG_INVENTORY_ITEM_SEEKER_DRONE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health and mp. Recovers double the amount of a Bacta Canister\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable remote drone that shoots enemies at sight. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_EWEB)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable emplaced gun\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7portable emplaced gun. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
-	else if (item_index == RPG_INVENTORY_ITEM_BINOCULARS)
+	else if (item_index == RPG_INVENTORY_ITEM_BIG_BACTA)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to see far things better with the zoom feature\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health and mp. Recovers double the amount of a Bacta Canister. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_FORCE_FIELD)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7creates a force field wall in front of the player that can hold almost any attack, except the concussion rifle alternate fire, which can get through. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
+	}
+	else if (item_index == RPG_INVENTORY_ITEM_CLOAK)
+	{
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to cloak himself. Npcs cannot detect you unless close enough. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_JETPACK)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to fly. Jump and press Use Key to use it. Jetpack can use 1 rocket to restore %d Fuel\n\n\"", zyk_get_inventory_item_name(item_index), FUEL_ROCKET_RESTORE));
-	}
-	else if (item_index == RPG_INVENTORY_ITEM_CLOAK)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to cloak himself. Npcs cannot detect you unless close enough\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_WP_BLASTER_PISTOL)
 	{
