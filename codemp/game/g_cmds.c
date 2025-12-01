@@ -36,6 +36,21 @@ void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *sab
 void Cmd_NPC_f( gentity_t *ent );
 void SetTeamQuick(gentity_t *ent, int team, qboolean doBegin);
 
+int weapon_upgrades[12][2] = {
+				{INV_UPGRADE_STUN_BATON1, INV_UPGRADE_STUN_BATON2},
+				{INV_UPGRAGE_BLASTER_PISTOL1, INV_UPGRAGE_BLASTER_PISTOL2},
+				{INV_UPGRAGE_BRYAR_PISTOL1, INV_UPGRAGE_BRYAR_PISTOL2},
+				{INV_UPGRADE_E11_BLASTER1, INV_UPGRADE_E11_BLASTER2},
+				{INV_UPGRADE_DISRUPTOR1, INV_UPGRADE_DISRUPTOR2},
+				{INV_UPGRADE_BOWCASTER1, INV_UPGRADE_BOWCASTER2},
+				{INV_UPGRADE_DEMP21, INV_UPGRADE_DEMP22},
+				{INV_UPGRADE_REPEATER1, INV_UPGRADE_REPEATER2},
+				{INV_UPGRADE_FLECHETTE1, INV_UPGRADE_FLECHETTE2},
+				{INV_UPGRADE_CONCUSSION1, INV_UPGRADE_CONCUSSION2},
+				{INV_UPGRADE_ROCKET1, INV_UPGRADE_ROCKET2},
+				{INV_UPGRADE_EXPLOSIVE1, INV_UPGRADE_EXPLOSIVE2}
+};
+
 void password_encrypt(char password[], int key)
 {
 	int i = 0;
@@ -6784,21 +6799,6 @@ char* zyk_get_formatted_string(char *original_str, int max_number_chars)
 
 int zyk_upgrade_mode_in_use(gentity_t* ent, int item_index)
 {
-	int weapon_upgrades[12][2] = {
-		{INV_UPGRADE_STUN_BATON1, INV_UPGRADE_STUN_BATON2},
-		{INV_UPGRAGE_BLASTER_PISTOL1, INV_UPGRAGE_BLASTER_PISTOL2},
-		{INV_UPGRAGE_BRYAR_PISTOL1, INV_UPGRAGE_BRYAR_PISTOL2},
-		{INV_UPGRADE_E11_BLASTER1, INV_UPGRADE_E11_BLASTER2},
-		{INV_UPGRADE_DISRUPTOR1, INV_UPGRADE_DISRUPTOR2},
-		{INV_UPGRADE_BOWCASTER1, INV_UPGRADE_BOWCASTER2},
-		{INV_UPGRADE_DEMP21, INV_UPGRADE_DEMP22},
-		{INV_UPGRADE_REPEATER1, INV_UPGRADE_REPEATER2},
-		{INV_UPGRADE_FLECHETTE1, INV_UPGRADE_FLECHETTE2},
-		{INV_UPGRADE_CONCUSSION1, INV_UPGRADE_CONCUSSION2},
-		{INV_UPGRADE_ROCKET1, INV_UPGRADE_ROCKET2},
-		{INV_UPGRADE_EXPLOSIVE1, INV_UPGRADE_EXPLOSIVE2}
-	};
-
 	if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_EXPLOSIVE)
 	{
 		int weapon_upgrade_index = item_index - RPG_INVENTORY_UPGRADE_STUN_BATON;
@@ -6998,21 +6998,6 @@ void zyk_add_shield(gentity_t* ent, int shield_amount)
 
 void zyk_use_inventory_item(gentity_t* ent, zyk_inventory_t item_index)
 {
-	int weapon_upgrades[12][2] = {
-		{INV_UPGRADE_STUN_BATON1, INV_UPGRADE_STUN_BATON2},
-		{INV_UPGRAGE_BLASTER_PISTOL1, INV_UPGRAGE_BLASTER_PISTOL2},
-		{INV_UPGRAGE_BRYAR_PISTOL1, INV_UPGRAGE_BRYAR_PISTOL2},
-		{INV_UPGRADE_E11_BLASTER1, INV_UPGRADE_E11_BLASTER2},
-		{INV_UPGRADE_DISRUPTOR1, INV_UPGRADE_DISRUPTOR2},
-		{INV_UPGRADE_BOWCASTER1, INV_UPGRADE_BOWCASTER2},
-		{INV_UPGRADE_DEMP21, INV_UPGRADE_DEMP22},
-		{INV_UPGRADE_REPEATER1, INV_UPGRADE_REPEATER2},
-		{INV_UPGRADE_FLECHETTE1, INV_UPGRADE_FLECHETTE2},
-		{INV_UPGRADE_CONCUSSION1, INV_UPGRADE_CONCUSSION2},
-		{INV_UPGRADE_ROCKET1, INV_UPGRADE_ROCKET2},
-		{INV_UPGRADE_EXPLOSIVE1, INV_UPGRADE_EXPLOSIVE2}
-	};
-
 	if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_EXPLOSIVE)
 	{
 		int weapon_upgrade_index = item_index - RPG_INVENTORY_UPGRADE_STUN_BATON;
@@ -7625,6 +7610,15 @@ void Cmd_Make_f( gentity_t *ent ) {
 		set_nature_energy(ent, total_cost, qfalse);
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
+
+		// zyk: making upgrades that have upgrade modes must already set first mode
+		if (item_index >= RPG_INVENTORY_UPGRADE_STUN_BATON && item_index <= RPG_INVENTORY_UPGRADE_EXPLOSIVE &&
+			zyk_upgrade_mode_in_use(ent, item_index) == 0)
+		{
+			int weapon_upgrade_index = item_index - RPG_INVENTORY_UPGRADE_STUN_BATON;
+
+			ent->client->pers.active_inventory_upgrades |= (1 << weapon_upgrades[weapon_upgrade_index][0]);
+		}
 
 		trap->SendServerCommand(ent->s.number, va("chat \"^3Quest system: ^7Item ^3%s ^7made\n\"", zyk_get_inventory_item_name(item_index)));
 
