@@ -313,19 +313,23 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "Jetpack";
 
 	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "Fuel";
-	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "Medpack";
-	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "Ysalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "Force Boon";
 	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = "Enlightenment - Light";
 	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = "Enlightenment - Dark";
+	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "Medpack";
+	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "Shield Booster";
 
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "Shield Generator";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = "Adaptive Armor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BACTA] = "Bacta Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = "Thermal Vision";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "Sentry Gun Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "Force Field Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "Shield Generator";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = "Protective Armor";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = "Adaptive Armor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "Jetpack Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "Flame Thrower";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = "Weapon Damage Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "Stun Baton Upgrade";
@@ -340,11 +344,6 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CONCUSSION] = "Concussion Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = "Rocket Launcher Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EXPLOSIVE] = "Explosive Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "Jetpack Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = "Thermal Vision";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "Sentry Gun Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "Seeker Drone Upgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "E-Web Upgrade";
 
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "Energy Modulator";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "Quest Log";
@@ -487,15 +486,11 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to restore his shield\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7decreases damage to your health from saber and other weapons by 20 per cent\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Allows the player to restore his shield\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Uses each ammo type to give extra damage resistance to each attack type. Uses Blaster Pack to reduce knockback of some attacks by 80 per cent and to absorb 15 per cent damage from weapons or melee and has a chance to use this ammo to deflect some types of weapon shots. Uses Metal Bolts to absorb 30 per cent damage from saber. Uses Powercell to absorb 30 per cent damage from Magic attacks\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Decreases damage to your health from any source by 10 per cent. Uses each ammo type to give extra damage resistance to each attack type. Uses Blaster Pack to reduce knockback of some attacks by 80 per cent and to absorb 15 per cent damage from weapons or melee and has a chance to use this ammo to deflect some types of weapon shots. Uses Metal Bolts to absorb 30 per cent damage from saber. Uses Powercell to absorb 30 per cent damage from Magic attacks\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLAME_THROWER)
 	{
@@ -647,19 +642,23 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_ITEM_JETPACK] = "inventoryJetpack";
 
 	inventory_item_names[RPG_INVENTORY_MISC_FUEL] = "inventoryFuel";
-	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "inventoryMedpack";
-	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "inventoryShieldBooster";
 	inventory_item_names[RPG_INVENTORY_MISC_YSALAMIRI] = "inventoryYsalamiri";
 	inventory_item_names[RPG_INVENTORY_MISC_FORCE_BOON] = "inventoryForceBoon";
 	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = "inventoryEnlightenmentLight";
 	inventory_item_names[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = "inventoryEnlightenmentDark";
+	inventory_item_names[RPG_INVENTORY_MISC_MEDPACK] = "inventoryMedpack";
+	inventory_item_names[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = "inventoryShieldBooster";
 
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "inventoryShieldGenerator";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = "inventoryAdaptiveArmor";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BACTA] = "inventoryBactaUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = "inventoryThermalVision";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "inventorySentryGunUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "inventorySeekerDroneUpgrade";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "inventoryEWebUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = "inventoryForceFieldUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "inventoryCloakItemUpgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = "inventoryShieldGenerator";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = "inventoryProtectiveArmor";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = "inventoryAdaptiveArmor";
+	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "inventoryJetpackUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "inventoryFlameThrower";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = "inventoryWeaponDamage";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "inventoryStunBatonUpgrade";
@@ -674,12 +673,7 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CONCUSSION] = "inventoryConcussionUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = "inventoryRocketLauncherUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_EXPLOSIVE] = "inventoryExplosiveUpgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "inventoryJetpackUpgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = "inventoryThermalVision";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = "inventorySentryGunUpgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = "inventorySeekerDroneUpgrade";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_EWEB] = "inventoryEWebUpgrade";
-
+	
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = "inventoryEnergyModulator";
 	inventory_item_names[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = "inventoryQuestLog";
 
@@ -6676,9 +6670,6 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR][1] = 500;
 
-	seller_items_cost[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR][0] = 1000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR][1] = 1000;
-
 	seller_items_cost[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR][0] = 2000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR][1] = 1000;
 
@@ -7367,11 +7358,11 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 
 						if (page == 1)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7the most common enemy. After a while he will be able to use E11 Blaster Rifle\n^3Heavy Armored Warrior: ^7armored soldier with guns and wearing Protective Armor and Adaptive Armor\n^3Flying Warrior: ^7a flying armored soldier wearing Protective Armor\n^3Mage Force: ^7a mage that has Chaos Field magic and some force powers\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Melee attacks can cause Poison status. Has Chaos Field magic\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. Melee attacks can cause Bleeding status. Has Healing Circle magic\n^3Force Saber Warrior (Light): ^7uses blue clothes and has Light-Side force powers and saber\n^3Force Saber Warrior (Dark): ^7uses red clothes and has Dark-Side force powers and saber^7...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Low Trained Warrior: ^7the most common enemy. After a while he will be able to use E11 Blaster Rifle\n^3Heavy Armored Warrior: ^7armored soldier with guns and wearing Adaptive Armor with the extra resistance bonuses\n^3Flying Warrior: ^7a flying armored soldier wearing Adaptive Armor\n^3Mage Force: ^7a mage that has Chaos Field magic and some force powers\n^3Changeling Howler: ^7a warrior that transformed himself into a howler. Melee attacks can cause Poison status. Has Chaos Field magic\n^3Changeling Worm: ^7a changeling in worm form. Attacks from underground. Melee attacks can cause Bleeding status. Has Healing Circle magic\n^3Force Saber Warrior (Light): ^7uses blue clothes and has Light-Side force powers and saber\n^3Force Saber Warrior (Dark): ^7uses red clothes and has Dark-Side force powers and saber^7...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 2)
 						{
-							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Force Saber Warrior (Both): ^7uses brown clothes and has both Light-Side and Dark-Side force powers and saber\n^3Mage Apprentice: ^7a mage that has Magic Fist and Magic Shield magic power\n^3Force Saber Warrior (Guns): ^7uses green clothes and has both Light-Side and Dark-Side force powers and guns\n^3Mage Scholar: ^7mage in blue clothes with Magic Fist and Magic Flight skills. Can use Healing Circle and Chaos Field magic powers\n^3Mage Minister: ^7mage in red clothes with Magic Fist and Magic Flight skills. Can use Magic Shield and Lightning Dome magic powers\n^3Mage Master: ^7the Mage Masters are the leaders of The Conquerors. Mage in gray clothes, wearing Protective Armor and Adaptive Armor. Can cloak himself. Has Magic Fist, Magic Flight and high level of all magic powers...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
+							trap->SendServerCommand(ent->s.number, va("print \"\n^1%s\n\n^3Force Saber Warrior (Both): ^7uses brown clothes and has both Light-Side and Dark-Side force powers and saber\n^3Mage Apprentice: ^7a mage that has Magic Fist and Magic Shield magic power\n^3Force Saber Warrior (Guns): ^7uses green clothes and has both Light-Side and Dark-Side force powers and guns\n^3Mage Scholar: ^7mage in blue clothes with Magic Fist and Magic Flight skills. Can use Healing Circle and Chaos Field magic powers\n^3Mage Minister: ^7mage in red clothes with Magic Fist and Magic Flight skills. Can use Magic Shield and Lightning Dome magic powers\n^3Mage Master: ^7the Mage Masters are the leaders of The Conquerors. Mage in gray clothes, wearing Adaptive Armor with the extra resistance bonuses. Can cloak himself. Has Magic Fist, Magic Flight and high level of all magic powers...\n\n\"", zyk_get_inventory_item_name(RPG_INVENTORY_LEGENDARY_QUEST_LOG)));
 						}
 						else if (page == 3)
 						{
@@ -7571,7 +7562,7 @@ void Cmd_Make_f( gentity_t *ent ) {
 	}
 
 	// zyk: general validations. Some items require certain conditions to be bought
-	if (item_index >= RPG_INVENTORY_UPGRADE_BACTA && item_index <= RPG_INVENTORY_UPGRADE_EWEB)
+	if (item_index >= RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR && item_index <= RPG_INVENTORY_UPGRADE_EXPLOSIVE)
 	{
 		if (ent->client->pers.rpg_inventory[item_index] > 0)
 		{

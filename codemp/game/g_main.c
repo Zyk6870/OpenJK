@@ -641,7 +641,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
 		{
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 1;
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = 1;
 
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] = 10000;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] = 10000;
@@ -680,7 +679,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		}
 		else if (quest_npc_type == QUEST_NPC_FLYING_WARRIOR)
 		{
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = 1;
+			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 1;
 
 			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = (1 << HI_JETPACK);
 		}
@@ -697,7 +696,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 		else if (quest_npc_type == QUEST_NPC_HEAVY_ARMORED_WARRIOR)
 		{
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 1;
-			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = 1;
 
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] = 10000;
 			npc_ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] = 10000;
@@ -6864,19 +6862,23 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_ITEM_JETPACK] = 250;
 
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FUEL] = 1;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 5;
-	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 7;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_YSALAMIRI] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_FORCE_BOON] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_ENLIGHTENMENT_LIGHT] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_MISC_ENLIGHTENMENT_DARK] = 20;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_MEDPACK] = 5;
+	rpg_inventory_weights[RPG_INVENTORY_MISC_SHIELD_BOOSTER] = 7;
 
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 200;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 450;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BACTA] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = 15;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = 25;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FORCE_FIELD] = 20;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 10;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR] = 200;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] = 300;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] = 450;
+	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 100;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 25;
@@ -6891,11 +6893,6 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CONCUSSION] = 40;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER] = 40;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EXPLOSIVE] = 40;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 50;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_THERMAL_VISION] = 15;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SENTRY_GUN] = 25;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_SEEKER_DRONE] = 10;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_EWEB] = 30;
 
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_ENERGY_MODULATOR] = 200;
 	rpg_inventory_weights[RPG_INVENTORY_LEGENDARY_QUEST_LOG] = 2;

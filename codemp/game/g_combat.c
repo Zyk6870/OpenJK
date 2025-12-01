@@ -5947,16 +5947,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			float bonus_health_resistance = 0.00;
 			int magic_bonus = zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
 
-			// zyk: Protective Armor
-			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_PROTECTIVE_ARMOR] > 0 && 
-				(mod == MOD_SABER || zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue))
-			{
-				bonus_health_resistance += 0.20f;
-			}
-
 			// zyk: Adaptive Armor
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] > 0)
 			{
+				bonus_health_resistance += 0.10f;
+
 				if (zyk_source_is_non_saber_weapon(mod, inflictor) == qtrue && targ->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_BLASTER_PACK] > 0)
 				{
 					bonus_health_resistance += 0.15f;
