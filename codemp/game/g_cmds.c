@@ -7626,7 +7626,7 @@ void Cmd_Make_f( gentity_t *ent ) {
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
-		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Item made\n\"");
+		trap->SendServerCommand(ent->s.number, va("chat \"^3Quest system: ^7Item ^3%s ^7made\n\"", zyk_get_inventory_item_name(item_index)));
 
 		Cmd_ZykMod_f(ent);
 	}
@@ -7710,7 +7710,7 @@ void Cmd_Unmake_f( gentity_t *ent ) {
 
 		ent->client->pers.buy_sell_timer = level.time + zyk_buying_selling_cooldown.integer;
 
-		trap->SendServerCommand(ent->s.number, "chat \"^3Quest system: ^7Item unmade\n\"");
+		trap->SendServerCommand(ent->s.number, va("chat \"^3Quest system: ^7Item ^3%s ^7unmade\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else
 	{
