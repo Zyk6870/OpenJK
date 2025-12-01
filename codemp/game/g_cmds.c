@@ -7115,7 +7115,7 @@ void zyk_list_quests(gentity_t* ent, gentity_t* target_ent)
 		{
 			char quest_desc[MAX_STRING_CHARS];
 
-			strcpy(quest_desc, "\n\n^7Main Quest will start after the Tutorial.\n");
+			strcpy(quest_desc, "\n\n^7Main Quest will start after you get a Quest Log part (blue crystal).\n");
 
 			trap->SendServerCommand(target_ent->s.number, va("print \"%s\n\"", quest_desc));
 		}
@@ -12039,8 +12039,6 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 			{
 				zyk_set_default_quest_fields(ent);
 				zyk_set_quest_event_timer(ent);
-
-				ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 
 				save_account(ent, qtrue);
 

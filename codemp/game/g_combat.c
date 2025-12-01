@@ -2181,16 +2181,6 @@ void zyk_decrease_quest_progress(gentity_t *ent)
 	}
 }
 
-qboolean zyk_is_quest_ally(gentity_t* ent)
-{
-	if (ent->NPC && ent->client->pers.quest_npc >= QUEST_NPC_ALLY_MAGE && ent->client->pers.quest_npc < NUM_QUEST_NPCS)
-	{
-		return qtrue;
-	}
-
-	return qfalse;
-}
-
 /*
 ==================
 player_die
@@ -2647,33 +2637,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		if (nature_energy_amount > 0 && attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG)
 		{
 			set_nature_energy(attacker, nature_energy_amount, qtrue);
-		}
-	}
-
-	// zyk: Main Quest events
-	if (self->client->pers.quest_npc > QUEST_NPC_NONE)
-	{ // zyk: quest npc died
-		if (level.special_quest_npc_in_map & (1 << self->client->pers.quest_npc))
-		{
-			level.special_quest_npc_in_map &= ~(1 << self->client->pers.quest_npc);
-		}
-
-		if (attacker && attacker->client &&
-			(attacker->client->sess.account_mode == ACC_MODE_RPG || zyk_is_quest_ally(attacker) == qtrue))
-		{
-			gentity_t* quest_player = attacker;
-
-			if (attacker->NPC && attacker->client->pers.quest_npc_caller_player_id > -1)
-			{ // zyk: get the player in this case
-				quest_player = &g_entities[attacker->client->pers.quest_npc_caller_player_id];
-			}
-
-			if (quest_player && quest_player->client && quest_player->client->sess.account_mode == ACC_MODE_RPG &&
-				zyk_is_main_quest_complete(quest_player) == qfalse && !(quest_player->client->pers.player_settings & (1 << SETTINGS_RPG_QUESTS)) &&
-				self->client->pers.quest_npc >= QUEST_NPC_MAGE_MASTER && self->client->pers.quest_npc <= QUEST_NPC_LOW_TRAINED_WARRIOR)
-			{
-				quest_player->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
-			}
 		}
 	}
 

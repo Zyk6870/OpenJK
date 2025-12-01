@@ -835,8 +835,7 @@ typedef enum {
 // zyk: duration of the duelists protection in Duel Tournament
 #define DUEL_TOURNAMENT_PROTECTION_TIME 2000
 
-// zyk: tutorial duration time
-#define INITIAL_TUTORIAL_DURATION 3000
+// zyk: tutorial
 #define INITIAL_TUTORIAL_STEP 18
 
 // zyk: npc cloak detection distance

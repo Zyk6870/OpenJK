@@ -6998,8 +6998,6 @@ void zyk_show_tutorial(gentity_t* ent)
 	if (ent->client->pers.tutorial_step == INITIAL_TUTORIAL_STEP)
 	{
 		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Hello %s^7. I am the %s^7. Hold ^2Use ^7key on me and I will explain everything you need to know.\n\"", QUESTCHAR_MAIN, ent->client->pers.netname, QUESTCHAR_MAIN));
-
-		ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
 	}
 
 	ent->client->pers.tutorial_step++;
@@ -7013,15 +7011,6 @@ void zyk_show_tutorial(gentity_t* ent)
 void zyk_set_quest_event_timer(gentity_t* ent)
 {
 	int interval_time = QUEST_NPC_SPAWN_TIME - (level.num_entities * 10); // zyk: bigger maps have more entities. A higher spawn frequency increases chance to find quest npcs
-
-	if (ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT))
-	{ //zyk: player is in tutorial for the first time. Do not spawn quest npcs yet
-		interval_time = INITIAL_TUTORIAL_DURATION;
-
-		ent->client->pers.quest_progress_timer = level.time + INITIAL_TUTORIAL_DURATION;
-
-		ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CREATED_ACCOUNT);
-	}
 	
 	interval_time -= (ent->client->pers.quest_progress / 10);
 
@@ -8879,10 +8868,12 @@ void G_RunFrame( int levelTime ) {
 
 				// zyk: Initial Tutorial messages
 				if (ent->client->pers.tutorial_step == INITIAL_TUTORIAL_STEP && 
-					!(ent->client->pers.quest_missions & (1 << MAIN_QUEST_START)) && 
+					ent->client->pers.player_statuses & (1 << PLAYER_STATUS_CREATED_ACCOUNT) &&
 					ent->client->pers.tutorial_timer < level.time)
 				{
 					zyk_show_tutorial(ent);
+
+					ent->client->pers.player_statuses &= ~(1 << PLAYER_STATUS_CREATED_ACCOUNT);
 
 					ent->client->pers.tutorial_timer = level.time + 2000;
 				}
@@ -9186,7 +9177,6 @@ void G_RunFrame( int levelTime ) {
 					// zyk: Quest Log
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < RPG_MAX_QUEST_LOG_PARTS &&
 						level.quest_log_timer < level.time &&
-						ent->client->pers.quest_missions & (1 << MAIN_QUEST_START) &&
 						Q_irand(0, 99) < quest_log_chance && 
 						zyk_is_main_quest_complete(ent) == qfalse)
 					{
@@ -9306,9 +9296,8 @@ void G_RunFrame( int levelTime ) {
 
 						zyk_set_quest_event_timer(ent);
 
-						if (ent->client->pers.quest_spirits_event_step == 0 && zyk_is_main_quest_complete(ent) == qfalse && 
-							(hard_difficulty == qtrue || main_quest_progress > 1))
-						{ // zyk: Quest Progress must be at least 2 per cent in Normal Difficulty for quest npcs to appear
+						if (ent->client->pers.quest_spirits_event_step == 0 && zyk_is_main_quest_complete(ent) == qfalse)
+						{
 							int enemy_type = 0;
 							int chance_for_ally = main_quest_progress;
 							zyk_quest_npc_t stronger_enemy_type = QUEST_NPC_LOW_TRAINED_WARRIOR;

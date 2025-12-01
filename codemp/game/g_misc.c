@@ -2877,6 +2877,8 @@ void fx_runner_think( gentity_t *ent )
 							 player_ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < RPG_MAX_QUEST_LOG_PARTS &&
 							 player_ent->client->pers.toggle_rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] == 1)
 					{
+						player_ent->client->pers.quest_missions |= (1 << MAIN_QUEST_START);
+
 						zyk_update_inventory_quantity(player_ent, qtrue, RPG_INVENTORY_LEGENDARY_QUEST_LOG, 1);
 
 						G_Sound(player_ent, CHAN_AUTO, G_SoundIndex("sound/interface/secret_area.mp3"));
