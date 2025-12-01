@@ -6880,7 +6880,6 @@ int zyk_get_item_weight(zyk_inventory_t item_index)
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_CLOAK] = 10;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_JETPACK] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = 100;
-	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = 50;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_STUN_BATON] = 25;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = 30;
 	rpg_inventory_weights[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = 30;

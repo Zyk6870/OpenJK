@@ -331,7 +331,6 @@ char* zyk_get_inventory_item_name(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "Cloak Item Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "Jetpack Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "Flame Thrower";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = "Weapon Damage Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "Stun Baton Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = "Blaster Pistol Upgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = "Bryar Pistol Upgrade";
@@ -496,53 +495,49 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	{
 		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7gives you the flame thrower. To use it, get stun baton and use alternate fire. Flame Thrower can use 1 rocket to restore %d Fuel\n\n\"", zyk_get_inventory_item_name(item_index), FUEL_ROCKET_RESTORE));
 	}
-	else if (item_index == RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE)
-	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage to your current weapon based on the amount of them in your inventory. For example, if you are using a Disruptor and have a total of 20 Disruptors in your inventory, the damage will be multiplied by 1 per cent times 20, a total of 20 per cent bonus damage\n\n\"", zyk_get_inventory_item_name(item_index)));
-	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds, and has a chance to cause Confusion status\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds, and has a chance to cause Confusion status\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Increases Blaster Pistol firerate. Upgrade ^32^7: quickdraw. If shooting with pistol right after changing weapon to it, shoots a full charged shot\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Increases Blaster Pistol firerate. Upgrade ^32^7: quickdraw. If shooting with pistol right after changing weapon to it, shoots a full charged shot\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Increases Bryar Pistol firerate. Upgrade ^32^7: Altfire can charge more for more damage\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Increases Bryar Pistol firerate. Upgrade ^32^7: Altfire can charge more for more damage\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: E11 Blaster Rifle altfire has less spread and faster firerate. Upgrade ^32^7: has a chance to make target burn\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: E11 Blaster Rifle altfire has less spread and faster firerate. Upgrade ^32^7: has a chance to make target burn\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases Disruptor firerate. Upgrade ^32^7: altfire full charged shot has a lot more damage\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases Disruptor firerate. Upgrade ^32^7: altfire full charged shot has a lot more damage\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times. Upgrade ^32^7: shots have a chance to poison targets\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times. Upgrade ^32^7: shots have a chance to poison targets\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases firerate of DEMP2 main fire. Upgrade ^32^7: primary and altfire shots can stun targets for a longer time\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases firerate of DEMP2 main fire. Upgrade ^32^7: primary and altfire shots can stun targets for a longer time\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases accuracy of primary fire and firerate of Repeater altfire. Upgrade ^32^7: altfire has chance to knockdown targets based on distance to the impact\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases accuracy of primary fire and firerate of Repeater altfire. Upgrade ^32^7: altfire has chance to knockdown targets based on distance to the impact\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases number of bolts shot by Flechette primary and alt fires. Upgrade ^32^7: primary fire shots cause bleeding\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases number of bolts shot by Flechette primary and alt fires. Upgrade ^32^7: primary fire shots cause bleeding\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Concussion rifle has better splash radius, can break saber-only damage objects and can move pushable/pullable objects. Upgrade ^32^7: altfire stronger knockdown and for a longer time\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Concussion rifle has better splash radius, can break saber-only damage objects and can move pushable/pullable objects. Upgrade ^32^7: altfire stronger knockdown and for a longer time\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: increases firerate of primary fire\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: increases firerate of primary fire\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_EXPLOSIVE)
 	{
@@ -660,7 +655,6 @@ char* zyk_inventory_key(int inventory_index)
 	inventory_item_names[RPG_INVENTORY_UPGRADE_CLOAK] = "inventoryCloakItemUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_JETPACK] = "inventoryJetpackUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_FLAME_THROWER] = "inventoryFlameThrower";
-	inventory_item_names[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE] = "inventoryWeaponDamage";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_STUN_BATON] = "inventoryStunBatonUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BLASTER_PISTOL] = "inventoryBlasterPistolUpgrade";
 	inventory_item_names[RPG_INVENTORY_UPGRADE_BRYAR_PISTOL] = "inventoryBryarPistolUpgrade";
@@ -6675,9 +6669,6 @@ int zyk_get_seller_item_cost(gentity_t* ent, zyk_inventory_t item_number, qboole
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][0] = 1000;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_FLAME_THROWER][1] = 500;
-
-	seller_items_cost[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE][0] = 2000;
-	seller_items_cost[RPG_INVENTORY_UPGRADE_WEAPON_DAMAGE][1] = 1000;
 
 	seller_items_cost[RPG_INVENTORY_UPGRADE_STUN_BATON][0] = 1500;
 	seller_items_cost[RPG_INVENTORY_UPGRADE_STUN_BATON][1] = 700;
