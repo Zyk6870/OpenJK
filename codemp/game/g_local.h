@@ -782,6 +782,9 @@ typedef enum {
 #define RPG_MAX_NATURE_ENERGY 10000
 #define RPG_MAX_BUY_AMOUNT 200
 
+// zyk: inventory weight
+#define INVENTORY_WEIGHT_INCREASE 200
+
 // zyk: cost in Energy to upgrade a skill
 #define COST_TO_UPGRADE_SKILL 100
 

@@ -163,25 +163,25 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_JUMP)
 		return "increases force Jump. Max Level has no height limit, and it lets you jump out of water";
 	if (skill_index == SKILL_PUSH)
-		return "pushes the opponent forward";
+		return "pushes players, npcs and items away. Each level increases push strength and range";
 	if (skill_index == SKILL_PULL)
-		return "pulls the opponent towards you";
+		return "pulls players, npcs and items towards you. Each level increases pull strength and range";
 	if (skill_index == SKILL_SPEED)
-		return "increases your speed by 1.7 times at level 1 and +0.4 at other levels";
+		return "increases your run speed by 1.7 times at level 1 and +0.4 at other levels";
 	if (skill_index == SKILL_SENSE)
-		return "See people through walls, invisible people or cloaked people. Dodge disruptor shots. At a level higher than 3, allows you to see info about the nearest player or npc";
+		return "See players and npcs through walls, including Mind Trick and Cloak users. At level 3 or higher, allows you to dodge disruptor shots. At a level higher than 3, allows you to see info about the nearest player or npc";
 	if (skill_index == SKILL_SABER_ATTACK)
-		return va("gives you the saber. If you are using Single Saber, gives you the saber styles. If using duals or staff, increases saber damage, which is increased by 20 per cent for each level. Saber damage scale is %.2f", g_saberDamageScale.value);
+		return va("If you are using Single Saber, gives you the saber styles. If using duals or staff, increases saber damage, which is increased by 20 per cent for each level. Saber damage scale is %.2f", g_saberDamageScale.value);
 	if (skill_index == SKILL_SABER_DEFENSE)
 		return "increases your ability to block, parry enemy saber attacks or enemy shots";
 	if (skill_index == SKILL_SABER_THROW)
 		return va("throws your saber at enemy and gets it back. Each level increases max distance and saber throw speed. Has %d damage", zyk_saber_throw_damage.integer);
 	if (skill_index == SKILL_ABSORB)
-		return "allows you to absorb force power attacks done to you";
+		return "allows you to absorb force power attacks done to you, restoring some force points";
 	if (skill_index == SKILL_HEAL)
-		return "recover some Health. Each level increases hp restored. At a level > 3, also restores some shield";
+		return "Restores 5 hp at level 1, 10 hp at level 2, 25 hp at level 3 and 30 hp at level 4. At a level > 3, also restores some shield";
 	if (skill_index == SKILL_PROTECT)
-		return "decreases damage done to you by non-force power attacks. At level 4 decreases force consumption when receiving damage";
+		return "decreases damage done to your health by non-force power attacks. Decreases 15 per cent at level 1, 30 per cent at level 2, 45 per cent at level 3 and 4. At level 4 decreases force consumption when receiving damage";
 	if (skill_index == SKILL_MIND_TRICK)
 		return "makes yourself invisible to the players affected by this force power. Works on some npcs. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds";
 	if (skill_index == SKILL_TEAM_HEAL)
@@ -189,11 +189,11 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_LIGHTNING)
 		return "attacks with a powerful electric attack at players near you. At level 4, does more damage and pushes the enemy back";
 	if (skill_index == SKILL_GRIP)
-		return "attacks a player by holding and damaging him";
+		return "allows holding and damaging a player or npc";
 	if (skill_index == SKILL_DRAIN)
 		return "drains force power from a player to restore your health. At level 4, with full health, restores some shield and also suck hp/shield from the enemy to restore your hp/shield";
 	if (skill_index == SKILL_RAGE)
-		return "makes you 1.3 times faster, increases your saber attack speed and damage and makes you get less damage";
+		return "makes you 1.3 times faster, increases your attack damage and saber attack speed and makes you get less damage. At level 4, you will not lose health while this power is active";
 	if (skill_index == SKILL_TEAM_ENERGIZE)
 		return "restores some force power to players near you. At a level > 3, If force power is full, restores some power cell ammo";
 
@@ -208,7 +208,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_STATUS_PROTECTION)
 		return "Decreases duration of negative status effects. ^1Poison: ^7loses health and magic points and lowers run speed. ^1Fire: ^7catches fire, losing a lot of health. ^1Bleeding: ^7loses some health. Melee, Saber, Force powers and Magic attacks do less damage. ^1Confusion: ^7cannot attack or use Force powers or Magic";
 	if (skill_index == SKILL_MAX_WEIGHT)
-		return "Everything you carry has a weight. This skill increases the max weight you can carry. Use /list to see the currentweight/maxweight ratio. Carrying stuff over the max weight will decrease your run speed";
+		return va("Everything you carry has a weight. Each level increases the max weight you can carry by %d. Carrying stuff over the max weight will decrease your run speed", INVENTORY_WEIGHT_INCREASE);
 	if (skill_index == SKILL_MEDITATION)
 		return "Each level of this skill increases regen rate of Force and MP while meditating";
 	if (skill_index == SKILL_RUN_SPEED)
@@ -377,15 +377,15 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_AMMO_THERMALS)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7thermal detonators\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7throwing them with primary fire makes them explode after some seconds. Throwing with Altfire makes them explode on contact. Deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_thermal_splash_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_AMMO_TRIPMINES)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7trip mines\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows planting mines. Primary fire creates a laser trap. Altfire makes them explode when someone gets near them. Deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_tripmine_splash_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_AMMO_DETPACKS)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7det packs\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows planting explosives with primary fire and detonating them with altfire. Deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_detpack_splash_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_BINOCULARS)
 	{
@@ -393,7 +393,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_BACTA_CANISTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health and mp. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers 25 health and %d mp. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index), MAGIC_BACTA_MP_REGEN_AMOUNT));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_SENTRY_GUN)
 	{
@@ -409,11 +409,11 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_BIG_BACTA)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers some health and mp. Recovers double the amount of a Bacta Canister. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers 50 health and %d mp. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index), (MAGIC_BACTA_MP_REGEN_AMOUNT * 2)));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_FORCE_FIELD)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7creates a force field wall in front of the player that can hold almost any attack, except the concussion rifle alternate fire, which can get through. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7creates a force field wall in front of the player that can hold almost any attack, except the concussion rifle altfire, which can get through. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_CLOAK)
 	{
@@ -421,55 +421,55 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_JETPACK)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to fly. Jump and press Use Key to use it. Jetpack can use 1 rocket to restore %d Fuel\n\n\"", zyk_get_inventory_item_name(item_index), FUEL_ROCKET_RESTORE));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7allows the player to fly. Jump and press Use Key to use it. Needs Fuel. Jetpack can use 1 rocket to restore %d Fuel\n\n\"", zyk_get_inventory_item_name(item_index), FUEL_ROCKET_RESTORE));
 	}
 	else if (item_index == RPG_INVENTORY_WP_BLASTER_PISTOL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7pistol that can shoot a charged shot with alt fire. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7shoots a charged shot with altfire. Uses blaster pack ammo. Deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_blaster_pistol_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_WP_BRYAR_PISTOL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7similar to blaster pistol, but has a faster fire rate with normal fire. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7similar to blaster pistol, but has a faster fire rate with normal fire and uses more ammo for altfire charged shot. Uses blaster pack ammo. Deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_blaster_pistol_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_WP_E11_BLASTER_RIFLE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Rifle that is used by the stormtroopers. Uses blaster pack ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7primary fire has better damage than pistols. Altfire has rapid fire, but it is not accurate. Uses blaster pack ammo. Deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_e11_blaster_rifle_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_WP_DISRUPTOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Sniper rifle which can desintegrate the enemy. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Sniper rifle which can disintegrate the enemy with a full charged altfire shot. Uses power cell ammo. Deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_disruptor_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_WP_BOWCASTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots green bolts, normal fire can be charged, and alt fire shoots a bouncing bolt. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots green bolts, primary fire can be charged to shoot several bolts, and alt fire shoots a bouncing bolt. Uses power cell ammo. Deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_bowcaster_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_WP_DEMP2)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7fires an electro magnetic pulse that causes bonus damage against droids. Uses power cell ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7fires an electro magnetic pulse that causes bonus damage against droids. Altfire can be charged to create an area that deals electric damage. Both primary and altfire disables jetpack and cloak. Uses power cell ammo. Deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_demp2_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_WP_REPEATER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7imperial weapon that shoots orbs and a plasma bomb with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7primary fire has rapid fire, but it is not accurate. Altfire shoots explosive bolts. Uses metal bolts ammo. Deals %d damage. Altfire deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_repeater_damage.integer, zyk_repeater_alt_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_WP_FLECHETTE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7it is the shotgun of the game, and can shoot 2 bombs with alt fire. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the shotgun of the game, and can shoot 2 bombs with alt fire. Uses metal bolts ammo. Deals %d damage. Altfire deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_flechette_damage.integer, zyk_flechette_alt_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_WP_CONCUSSION)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7powerful weapon, alt fire can shoot a beam that gets through force fields. Uses metal bolts ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7powerful weapon. Primary fire shoots explosive bolt. Alt fire can shoot a beam that gets through force fields. Uses metal bolts ammo. Deals %d damage. Altfire deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_concussion_damage.integer, zyk_concussion_alt_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_WP_ROCKET_LAUNCHER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots rockets and a homing missile with alternate fire. Uses rockets ammo\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that shoots rockets. Altfire allows shooting a homing missile by holding altfire button while targeting the enemy and them releasing it once it is fully locked on the enemy. Uses rockets ammo. Deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_rocket_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_WP_SABER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the weapon of a Jedi/Sith. With single, each Saber Attack skill level gives new saber stances. With duals/staff the Saber Attack skill level gives more damage\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7the weapon of a Jedi/Sith. With single, each Saber Attack skill level gives new saber stances. With duals/staff the Saber Attack skill level gives more damage. Saber damage scale is %.2f", zyk_get_inventory_item_name(item_index), g_saberDamageScale.value));
 	}
 	else if (item_index == RPG_INVENTORY_WP_STUN_BATON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7weapon that fires a small electric charge\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7close-range weapon that uses a small electric charge. Deals %d damage\n\n\"", zyk_get_inventory_item_name(item_index), zyk_stun_baton_damage.integer));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA)
 	{
@@ -485,7 +485,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_SHIELD_GENERATOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Allows the player to restore his shield\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases max shield to %d\n\n\"", zyk_get_inventory_item_name(item_index), (100 + (zyk_max_skill_level(SKILL_MAX_HEALTH) * RPG_MAX_HEALTH_INCREASE))));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR)
 	{
@@ -497,51 +497,51 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_STUN_BATON)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health. Upgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds, and has a chance to cause Confusion status\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: allows stun baton to open any door, including locked ones. Regen shield by damaging enemy health.\nUpgrade ^32^7: Makes stun baton decloak enemies and decrease their running speed for some seconds, and has a chance to cause Confusion status\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BLASTER_PISTOL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Increases Blaster Pistol firerate. Upgrade ^32^7: quickdraw. If shooting with pistol right after changing weapon to it, shoots a full charged shot\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: Increases Blaster Pistol firerate.\nUpgrade ^32^7: quickdraw. If shooting with pistol right after changing weapon to it, shoots a full charged shot\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BRYAR_PISTOL)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Increases Bryar Pistol firerate. Upgrade ^32^7: Altfire can charge more for more damage\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: Increases Bryar Pistol firerate.\nUpgrade ^32^7: Altfire can charge more for more damage\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_E11_BLASTER_RIFLE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: E11 Blaster Rifle altfire has less spread and faster firerate. Upgrade ^32^7: has a chance to make target burn\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: E11 Blaster Rifle altfire has less spread and faster firerate.\nUpgrade ^32^7: has a chance to make target burn\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DISRUPTOR)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases Disruptor firerate. Upgrade ^32^7: altfire full charged shot has a lot more damage\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: increases Disruptor firerate.\nUpgrade ^32^7: altfire full charged shot has a lot more damage\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BOWCASTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times. Upgrade ^32^7: shots have a chance to poison targets\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: Bowcaster main fire can shoot more shots when charged. Bowcaster altfire bolt can bounce more times.\nUpgrade ^32^7: shots have a chance to poison targets\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_DEMP2)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases firerate of DEMP2 main fire. Upgrade ^32^7: primary and altfire shots can stun targets for a longer time\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: increases firerate of DEMP2 main fire.\nUpgrade ^32^7: primary and altfire shots can stun targets for a longer time\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_REPEATER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases accuracy of primary fire and firerate of Repeater altfire. Upgrade ^32^7: altfire has chance to knockdown targets based on distance to the impact\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: increases accuracy of primary fire and firerate of Repeater altfire.\nUpgrade ^32^7: altfire has chance to knockdown targets based on distance to the impact\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FLECHETTE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: increases number of bolts shot by Flechette primary and alt fires. Upgrade ^32^7: primary fire shots cause bleeding\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: increases number of bolts shot by Flechette primary and alt fires.\nUpgrade ^32^7: primary fire shots cause bleeding\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_CONCUSSION)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: Concussion rifle has better splash radius, can break saber-only damage objects and can move pushable/pullable objects. Upgrade ^32^7: altfire stronger knockdown and for a longer time\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: Concussion rifle has better splash radius, can break saber-only damage objects and can move pushable/pullable objects.\nUpgrade ^32^7: altfire stronger knockdown and for a longer time\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_ROCKET_LAUNCHER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: increases firerate of primary fire\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7increases damage by 1 per cent for each of this weapon in your inventory. Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: makes rockets have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects.\nUpgrade ^32^7: increases firerate of primary fire\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_EXPLOSIVE)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes. Upgrade ^31^7: makes thermals, trip mines and detpacks have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects. Upgrade ^32^7: thermals, trip mines and detpacks create a fire area when explosive, making targets catch fire\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Use ^3/inv use %d^7 to toggle one of the Upgrade modes.\nUpgrade ^31^7: makes thermals, trip mines and detpacks have better splash radius, be able to damage saber-only damage objects and move pushable/pullable objects.\nUpgrade ^32^7: thermals, trip mines and detpacks create a fire area when explosive, making targets catch fire\n\n\"", zyk_get_inventory_item_name(item_index), item_number));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_JETPACK)
 	{
@@ -5138,7 +5138,7 @@ void set_max_force(gentity_t* ent)
 // zyk: sets the Max Weight of stuff the player can carry
 void set_max_weight(gentity_t* ent)
 {
-	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * 200) + (50 * zyk_skill_affinity(ent, SKILL_CATEGORY_MISC));
+	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * INVENTORY_WEIGHT_INCREASE) + (50 * zyk_skill_affinity(ent, SKILL_CATEGORY_MISC));
 }
 
 // zyk: set max Nature Energy of this player
