@@ -5456,13 +5456,9 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 	
 	if (self->client->pers.skill_levels[SKILL_SENSE] == 4)
 	{
-		trap->SendServerCommand(self->s.number, va("cp \"^1%d\n\"", client_health));
+		trap->SendServerCommand(self->s.number, va("cp \"%s\n\n^1%d\n\"", client_name, client_health));
 	}
 	else if (self->client->pers.skill_levels[SKILL_SENSE] == 5)
-	{
-		trap->SendServerCommand(self->s.number, va("cp \"%s\n\n^1%d^3/^2%d\n\"", client_name, client_health, client_armor));
-	}
-	else if (self->client->pers.skill_levels[SKILL_SENSE] == 6)
 	{
 		if (target->NPC)
 		{
@@ -5471,7 +5467,7 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 		}
 		else if (target->client->sess.account_mode == ACC_MODE_RPG)
 		{
-			// zyk: calculating the max armor of this player
+			// zyk: max armor of this player
 			client_max_armor = target->client->pers.max_rpg_shield;
 
 			magic_power = target->client->pers.magic_power;
@@ -5988,12 +5984,14 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 				}
 				else if (self->client->sess.account_mode == ACC_MODE_RPG)
 				{ // zyk: force regen for RPG players is based on meditating and the Force Affinity
-					int rpg_force_regen_time = 120 - zyk_skill_affinity(self, SKILL_CATEGORY_FORCE);
+					int force_affinity = zyk_skill_affinity(self, SKILL_CATEGORY_FORCE);
+					int rpg_force_regen_time = 140 - force_affinity;
 
-					// zyk: meditating makes Force regen faster
-					if (self->client->ps.forceHandExtend == HANDEXTEND_TAUNT && self->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+					// zyk: Meditation skill
+					if (self->client->pers.skill_levels[SKILL_MEDITATION] > 0 &&
+						self->client->ps.forceHandExtend == HANDEXTEND_TAUNT && self->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 					{
-						//rpg_force_regen_time -= (10 + (5 * self->client->pers.skill_levels[SKILL_MEDITATION]));
+						rpg_force_regen_time -= (force_affinity / 2);
 					}
 
 					self->client->ps.fd.forcePowerRegenDebounceTime += rpg_force_regen_time;

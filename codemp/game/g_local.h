@@ -602,6 +602,8 @@ typedef enum {
 	SKILL_DRAIN,
 	SKILL_RAGE,
 	SKILL_TEAM_ENERGIZE,
+	SKILL_MEDITATION,
+	SKILL_FORCE_BEAM,
 	SKILL_MAX_HEALTH,
 	SKILL_MELEE,
 	SKILL_MELEE_SPEED,
@@ -919,9 +921,10 @@ typedef struct clientPersistant_s {
 	int zyk_saved_force_powers;
 	int zyk_saved_force_power_levels[NUM_FORCE_POWERS];
 
-	// zyk: cooldown time to buy or sell
+	// zyk: cooldown time to make or unmake inventory items
 	int buy_sell_timer;
 
+	int meditation_timer;
 	int inventory_update_timer;
 
 	int player_scale;

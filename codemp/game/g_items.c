@@ -1321,7 +1321,6 @@ extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
 extern void rpg_status_restoration(gentity_t* ent, int amount);
 void ItemUse_MedPack_Big(gentity_t *ent)
 {
-	// zyk: RPG Mode Big Bacta. Recover 150 HP
 	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		int status_restore = MAX_MEDPACK_BIG_HEAL_AMOUNT * 20;
@@ -1353,7 +1352,6 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 
 void ItemUse_MedPack(gentity_t *ent)
 {
-	// zyk: RPG Mode Bacta Canister. Recovers some mp
 	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
 		int status_restore = MAX_MEDPACK_HEAL_AMOUNT * 20;

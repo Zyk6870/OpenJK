@@ -70,7 +70,7 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_PUSH] = 3;
 	max_skill_levels[SKILL_PULL] = 3;
 	max_skill_levels[SKILL_SPEED] = 3;
-	max_skill_levels[SKILL_SENSE] = 6;
+	max_skill_levels[SKILL_SENSE] = 5;
 	max_skill_levels[SKILL_SABER_ATTACK] = 5;
 	max_skill_levels[SKILL_SABER_DEFENSE] = 3;
 	max_skill_levels[SKILL_SABER_THROW] = 5;
@@ -84,6 +84,8 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_DRAIN] = 4;
 	max_skill_levels[SKILL_RAGE] = 4;
 	max_skill_levels[SKILL_TEAM_ENERGIZE] = 4;
+	max_skill_levels[SKILL_MEDITATION] = 1;
+	max_skill_levels[SKILL_FORCE_BEAM] = 10;
 
 	max_skill_levels[SKILL_MAX_HEALTH] = 20;
 	max_skill_levels[SKILL_MELEE] = 10;
@@ -130,6 +132,8 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_DRAIN] = "Drain";
 	skill_names[SKILL_RAGE] = "Rage";
 	skill_names[SKILL_TEAM_ENERGIZE] = "Team Energize";
+	skill_names[SKILL_MEDITATION] = "Meditation";
+	skill_names[SKILL_FORCE_BEAM] = "Force Beam";
 
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_MELEE] = "Melee";
@@ -157,46 +161,50 @@ char* zyk_skill_name(int skill_index)
 char* zyk_skill_description(int skill_index)
 {
 	if (skill_index == SKILL_JUMP)
-		return "increases force Jump. Max Level has no height limit, and it lets you jump out of water";
+		return "Increases force Jump. Max Level has no height limit, and it lets you jump out of water";
 	if (skill_index == SKILL_PUSH)
-		return "pushes players, npcs and items away. Each level increases push strength and range";
+		return "Pushes players, npcs and items away. Each level increases push strength and range";
 	if (skill_index == SKILL_PULL)
-		return "pulls players, npcs and items towards you. Each level increases pull strength and range";
+		return "Pulls players, npcs and items towards you. Each level increases pull strength and range";
 	if (skill_index == SKILL_SPEED)
-		return "increases your run speed by 1.7 times at level 1 and +0.4 at other levels";
+		return "Increases your run speed by 1.7 times at level 1 and +0.4 at other levels";
 	if (skill_index == SKILL_SENSE)
 		return "See players and npcs through walls, including Mind Trick and Cloak users. At level 3 or higher, allows you to dodge disruptor shots. At a level higher than 3, allows you to see info about the nearest player or npc";
 	if (skill_index == SKILL_SABER_ATTACK)
 		return va("If you are using Single Saber, gives you the saber styles. If using duals or staff, increases saber damage, which is increased by 20 per cent for each level. Saber damage scale is %.2f", g_saberDamageScale.value);
 	if (skill_index == SKILL_SABER_DEFENSE)
-		return "increases your ability to block, parry enemy saber attacks or enemy shots";
+		return "Increases your ability to block, parry enemy saber attacks or enemy shots";
 	if (skill_index == SKILL_SABER_THROW)
-		return va("throws your saber at enemy and gets it back. Each level increases max distance and saber throw speed. Has %d damage", zyk_saber_throw_damage.integer);
+		return va("Throws your saber at enemy and gets it back. Each level increases max distance and saber throw speed. Has %d damage", zyk_saber_throw_damage.integer);
 	if (skill_index == SKILL_ABSORB)
-		return "allows you to absorb force power attacks done to you, restoring some force points";
+		return "Allows you to absorb force power attacks done to you, restoring some force points";
 	if (skill_index == SKILL_HEAL)
 		return "Restores 5 hp at level 1, 10 hp at level 2, 25 hp at level 3 and 30 hp at level 4. At a level > 3, also restores some shield";
 	if (skill_index == SKILL_PROTECT)
-		return "decreases damage done to your health by non-force power attacks. Decreases 15 per cent at level 1, 30 per cent at level 2, 45 per cent at level 3 and 4. At level 4 decreases force consumption when receiving damage";
+		return "Decreases damage done to your health by non-force power attacks. Decreases 15 per cent at level 1, 30 per cent at level 2, 45 per cent at level 3 and 4. At level 4 decreases force consumption when receiving damage";
 	if (skill_index == SKILL_MIND_TRICK)
-		return "makes yourself invisible to the players affected by this force power. Works on some npcs. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds";
+		return "Makes yourself invisible to the players affected by this force power. Works on some npcs. Level 1 has a duration of 20 seconds, level 2 is 25 seconds and level 3 is 30 seconds";
 	if (skill_index == SKILL_TEAM_HEAL)
-		return "restores some health to players near you. At a level > 3, also restores some shield";
+		return "Restores some health to players near you. At a level > 3, also restores some shield";
 	if (skill_index == SKILL_LIGHTNING)
-		return "attacks with a powerful electric attack at players near you. At level 4, does more damage and pushes the enemy back";
+		return "Attacks with a powerful electric attack at players near you. At level 4, does more damage and pushes the enemy back";
 	if (skill_index == SKILL_GRIP)
-		return "allows holding and damaging a player or npc";
+		return "Allows holding and damaging a player or npc";
 	if (skill_index == SKILL_DRAIN)
-		return "drains force power from a player to restore your health. At level 4, with full health, restores some shield and also suck hp/shield from the enemy to restore your hp/shield";
+		return "Drains force power from a player to restore your health. At level 4, with full health, restores some shield and also suck hp/shield from the enemy to restore your hp/shield";
 	if (skill_index == SKILL_RAGE)
-		return "makes you 1.3 times faster, increases your attack damage and saber attack speed and makes you get less damage. At level 4, you will not lose health while this power is active";
+		return "Makes you 1.3 times faster, increases your attack damage and saber attack speed and makes you get less damage. At level 4, you will not lose health while this power is active";
 	if (skill_index == SKILL_TEAM_ENERGIZE)
-		return "restores some force power to players near you. At a level > 3, If force power is full, restores some power cell ammo";
+		return "Restores some force power to players near you. At a level > 3, If force power is full, restores some power cell ammo";
+	if (skill_index == SKILL_MEDITATION)
+		return "Meditating will slowly restore bad status effects and make Force regen faster. These effects will be based on Force Affinity";
+	if (skill_index == SKILL_FORCE_BEAM)
+		return "A force ability that shoots a powerful beam that deals saber damage. It will consume one of the extra sabers in inventory to double damage by using some Nature Energy. Each level increases damage and Force Affinity decreases cooldown time. Use it by pressing Duel key to select it and then pressing Use key";
 
 	if (skill_index == SKILL_MAX_HEALTH)
 		return va("Each level increases your max health by %d", RPG_MAX_HEALTH_INCREASE);
 	if (skill_index == SKILL_MELEE)
-		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 1, Right hand punch does %d normal damage, left hand punch does %d normal damage and kick does %d damage. Each level increases melee damage", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
+		return va("Allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 1, Right hand punch does %d normal damage, left hand punch does %d normal damage and kick does %d damage. Each level increases melee damage", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	if (skill_index == SKILL_MELEE_SPEED)
 		return "Each level increases how fast you can punch with Melee";
 	if (skill_index == SKILL_STATUS_PROTECTION)
@@ -217,7 +225,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_CHAOS_FIELD)
 		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to them. Higher levels and Magic Affinity increase the field damage and the chance to cause the bad status effects and their duration. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_LIGHTNING_DOME)
-		return va("keeps charging up until you stop this magic power. When you do, it will create a powerful Lightning Dome, damaging enemies at a great distance and disabling their Cloak and Jetpack. Can hit targets through walls. Higher levels make dome charge up faster, and Magic Affinity also charges it up a little faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
+		return va("Keeps charging up until you stop this magic power. When you do, it will create a powerful Lightning Dome, damaging enemies at a great distance and disabling their Cloak and Jetpack. Can hit targets through walls. Higher levels make dome charge up faster, and Magic Affinity also charges it up a little faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 
 	return "";
 }
@@ -244,6 +252,8 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_DRAIN] = "skilldrain";
 	skill_names[SKILL_RAGE] = "skillrage";
 	skill_names[SKILL_TEAM_ENERGIZE] = "skillteamenergize";
+	skill_names[SKILL_MEDITATION] = "skillmeditation";
+	skill_names[SKILL_FORCE_BEAM] = "skillforcebeam";
 
 	skill_names[SKILL_MAX_HEALTH] = "skillmaxhealth";
 	skill_names[SKILL_MELEE] = "skillmelee";
@@ -4886,7 +4896,7 @@ int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
 	if (skill_category == SKILL_CATEGORY_FORCE)
 	{
 		first_skill_index = SKILL_JUMP;
-		last_skill_index = SKILL_TEAM_ENERGIZE;
+		last_skill_index = SKILL_FORCE_BEAM;
 	}
 	else if (skill_category == SKILL_CATEGORY_MISC)
 	{
@@ -5119,7 +5129,7 @@ void set_max_force(gentity_t* ent)
 
 	if (force_affinity > 0)
 	{
-		ent->client->pers.max_force_power = 60 + (force_affinity * 2.0f);
+		ent->client->pers.max_force_power = 50 + (force_affinity * 2.5f);
 	}
 
 	ent->client->ps.fd.forcePowerMax = ent->client->pers.max_force_power;
@@ -5519,6 +5529,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.nature_energy_timer = 0;
 			ent->client->pers.buy_sell_timer = 0;
+			ent->client->pers.meditation_timer = level.time + 100;
 			ent->client->pers.inventory_update_timer = level.time + 100;
 
 			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;
@@ -6482,7 +6493,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 {
 	if (Q_stricmp( arg1, "force" ) == 0)
 	{
-		zyk_list_category_skills(ent, target_ent, SKILL_JUMP, SKILL_TEAM_ENERGIZE);
+		zyk_list_category_skills(ent, target_ent, SKILL_JUMP, SKILL_FORCE_BEAM);
 	}
 	else if (Q_stricmp( arg1, "misc" ) == 0)
 	{
