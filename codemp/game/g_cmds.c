@@ -393,7 +393,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_BACTA_CANISTER)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers 25 health and %d mp. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index), MAGIC_BACTA_MP_REGEN_AMOUNT));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers 25 health and %d mp. Also decreases duration of bad status effects. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index), MAGIC_BACTA_MP_REGEN_AMOUNT));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_SENTRY_GUN)
 	{
@@ -409,7 +409,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_BIG_BACTA)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers 50 health and %d mp. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index), (MAGIC_BACTA_MP_REGEN_AMOUNT * 2)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7item that recovers 50 health and %d mp. Also heavily decreases duration of bad status effects. Use it by setting Use Held Item and Inv Next binds in Controls menu\n\n\"", zyk_get_inventory_item_name(item_index), (MAGIC_BACTA_MP_REGEN_AMOUNT * 2)));
 	}
 	else if (item_index == RPG_INVENTORY_ITEM_FORCE_FIELD)
 	{
@@ -473,7 +473,7 @@ void zyk_get_inventory_item_description(gentity_t* ent, int item_index)
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_BACTA)
 	{
-		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister and Big Bacta recovers more HP and more MP\n\n\"", zyk_get_inventory_item_name(item_index)));
+		trap->SendServerCommand(ent->s.number, va("print \"\n^3%s: ^7Bacta Canister and Big Bacta recovers more HP and more MP and decreases bad status effects duration even more\n\n\"", zyk_get_inventory_item_name(item_index)));
 	}
 	else if (item_index == RPG_INVENTORY_UPGRADE_FORCE_FIELD)
 	{

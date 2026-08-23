@@ -1318,16 +1318,21 @@ static void MedPackGive(gentity_t *ent, int amount)
 }
 
 extern void zyk_set_mp(gentity_t* ent, int mp_amount, qboolean add);
+extern void rpg_status_restoration(gentity_t* ent, int amount);
 void ItemUse_MedPack_Big(gentity_t *ent)
 {
 	// zyk: RPG Mode Big Bacta. Recover 150 HP
 	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
+		int status_restore = MAX_MEDPACK_BIG_HEAL_AMOUNT * 20;
+
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 		{
 			MedPackGive(ent, MAX_MEDPACK_BIG_HEAL_AMOUNT * 2);
 
 			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT * 4, qtrue);
+
+			status_restore *= 2;
 		}
 		else
 		{
@@ -1335,6 +1340,8 @@ void ItemUse_MedPack_Big(gentity_t *ent)
 
 			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT * 2, qtrue);
 		}
+
+		rpg_status_restoration(ent, status_restore);
 
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_BIG_BACTA, 1);
 	}
@@ -1349,11 +1356,15 @@ void ItemUse_MedPack(gentity_t *ent)
 	// zyk: RPG Mode Bacta Canister. Recovers some mp
 	if (ent && ent->client && ent->client->sess.account_mode == ACC_MODE_RPG)
 	{
+		int status_restore = MAX_MEDPACK_HEAL_AMOUNT * 20;
+
 		if (ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_BACTA] > 0)
 		{
 			MedPackGive(ent, MAX_MEDPACK_HEAL_AMOUNT * 2);
 
 			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT * 2, qtrue);
+
+			status_restore *= 2;
 		}
 		else
 		{
@@ -1361,6 +1372,8 @@ void ItemUse_MedPack(gentity_t *ent)
 
 			zyk_set_mp(ent, MAGIC_BACTA_MP_REGEN_AMOUNT, qtrue);
 		}
+
+		rpg_status_restoration(ent, status_restore);
 
 		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_ITEM_BACTA_CANISTER, 1);
 	}

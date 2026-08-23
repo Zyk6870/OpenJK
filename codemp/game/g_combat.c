@@ -6281,7 +6281,7 @@ G_RadiusDamage
 ============
 */
 extern qboolean npcs_on_same_team(gentity_t *attacker, gentity_t *target);
-extern void healing_circle_status_restoration(gentity_t* ent, int amount);
+extern void rpg_status_restoration(gentity_t* ent, int amount);
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, gentity_t *missile, int mod) {
 	float		points, dist;
@@ -6421,7 +6421,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 							zyk_add_health(ent, heal_amount);
 
-							healing_circle_status_restoration(ent, heal_amount * 100);
+							rpg_status_restoration(ent, heal_amount * 100);
 						}
 
 						continue;

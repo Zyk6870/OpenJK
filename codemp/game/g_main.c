@@ -5390,8 +5390,8 @@ void magic_shield(gentity_t* ent)
 	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/bumpfield.mp3"));
 }
 
-// zyk: Healing Circle can decrease duration of bad status effects
-void healing_circle_status_restoration(gentity_t* ent, int amount)
+// zyk: decrease duration of bad status effects
+void rpg_status_restoration(gentity_t* ent, int amount)
 {
 	int current_status = 0;
 
@@ -5653,7 +5653,7 @@ void magic_power_events(gentity_t *ent)
 							zyk_add_health(ent, heal_amount);
 						}
 
-						healing_circle_status_restoration(ent, heal_amount * 100);
+						rpg_status_restoration(ent, heal_amount * 100);
 
 						ent->client->pers.magic_power_debounce_timer[MAGIC_HEALING_CIRCLE] = level.time + 300;
 					}
