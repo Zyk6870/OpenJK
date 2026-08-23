@@ -5605,13 +5605,6 @@ void magic_power_events(gentity_t *ent)
 
 					if (ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SHIELD] < level.time)
 					{
-						int chance_for_magic_fist = magic_bonus + ent->client->pers.skill_levels[SKILL_MAGIC_SHIELD];
-
-						if (Q_irand(0, 99) < chance_for_magic_fist && ent->client->ps.hasLookTarget == qtrue)
-						{
-							zyk_magic_fist_bolt(ent, qtrue);
-						}
-
 						zyk_quest_effect_spawn(ent, ent, "zyk_magic_defensive", "0", "misc/genrings", 0, 0, 0, 400);
 
 						ent->client->pers.magic_power_debounce_timer[MAGIC_MAGIC_SHIELD] = level.time + 300;
@@ -8953,6 +8946,19 @@ void G_RunFrame( int levelTime ) {
 						}
 
 						ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;
+					}
+
+					// zyk: Magic Reaction skill. Shoots Magic Fist bolts while meditating
+					if (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] > 0 &&
+						ent->client->ps.hasLookTarget == qtrue && 
+						ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+					{
+						int chance_for_magic_fist = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION];
+
+						if (Q_irand(0, 99) < chance_for_magic_fist)
+						{
+							zyk_magic_fist_bolt(ent, qtrue);
+						}
 					}
 
 					// zyk: Energy Modulator consumes Nature Energy

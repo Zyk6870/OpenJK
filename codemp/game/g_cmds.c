@@ -225,7 +225,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_REGEN)
 		return "Meditating regens mp faster";
 	if (skill_index == SKILL_MAGIC_REACTION)
-		return "If you have Magic Fist skill, has a chance to automatically shoot at the nearest target while meditating. Each level increases chance to shoot Magic Fist more often";
+		return "If you have Magic Fist skill, has a chance to automatically shoot at the nearest target while meditating. Each level increases chance to shoot Magic Fist";
 	if (skill_index == SKILL_MAGIC_SHIELD)
 		return va("A magic shield appears around you, decreasing damage to your health from any source. Higher levels and Magic Affinity increase resistance to damage to your health. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_HEALING_CIRCLE)
