@@ -2794,6 +2794,21 @@ void zyk_clear_quest_effect(gentity_t* ent)
 	level.special_power_effects[ent->s.number] = -1;
 }
 
+int zyk_force_beam_damage(gentity_t* ent)
+{
+	int damage = ent->client->pers.skill_levels[SKILL_FORCE_BEAM];
+
+	// zyk: consume one of the extra sabers in inventory to increase damage
+	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 1 && ent->client->pers.force_beam_timer < level.time)
+	{
+		damage *= 2;
+
+		ent->client->pers.force_beam_timer = level.time + RPG_FORCE_BEAM_DURATION;
+	}
+
+	return damage;
+}
+
 //----------------------------------------------------------
 void fx_runner_think( gentity_t *ent )
 {
@@ -2921,9 +2936,8 @@ void fx_runner_think( gentity_t *ent )
 		zyk_clear_quest_effect(ent);
 	}
 
-	// zyk: Super Beam. Traces enemies and damages them
-	/*
-	if (Q_stricmp(ent->targetname, "zyk_super_beam") == 0)
+	// zyk: Force Beam. Traces enemies and damages them
+	if (Q_stricmp(ent->targetname, "zyk_force_beam") == 0)
 	{
 		gentity_t *user_ent = ent->parent;
 		gentity_t *target_ent = NULL;
@@ -2951,17 +2965,16 @@ void fx_runner_think( gentity_t *ent )
 
 		if (target_ent && target_ent->client && user_ent && user_ent->client && user_ent != target_ent &&
 			zyk_is_ally(user_ent, target_ent) == qfalse)
-		{ // zyk: if the enemy is hit by the super beam, damage him
-			G_Damage(target_ent, user_ent, user_ent, NULL, target_ent->client->ps.origin, 32, DAMAGE_NO_PROTECTION, MOD_CONC_ALT);
+		{ // zyk: a enemy player or npc
+			G_Damage(target_ent, ent, user_ent, NULL, target_ent->client->ps.origin, zyk_force_beam_damage(user_ent), DAMAGE_NO_PROTECTION, MOD_SABER);
 		}
 		else if (target_ent && user_ent != target_ent && !target_ent->client && target_ent->health > 0 && target_ent->takedamage == qtrue)
 		{ // zyk: non-client damageable entity
-			G_Damage(target_ent, user_ent, user_ent, NULL, target_ent->r.currentOrigin, 32, DAMAGE_NO_PROTECTION, MOD_CONC_ALT);
+			G_Damage(target_ent, ent, user_ent, NULL, target_ent->r.currentOrigin, zyk_force_beam_damage(user_ent), DAMAGE_NO_PROTECTION, MOD_SABER);
 		}
 
 		ent->nextthink = level.time + 100;
 	}
-	*/
 }
 
 //----------------------------------------------------------
@@ -3101,7 +3114,8 @@ void fx_runner_link( gentity_t *ent )
 		if (Q_stricmp(ent->targetname, "zyk_magic_defensive") == 0 ||
 			Q_stricmp(ent->targetname, "zyk_magic_healing") == 0 || 
 			Q_stricmp(ent->targetname, "zyk_magic_chaos") == 0 ||
-			Q_stricmp(ent->targetname, "zyk_magic_lightning") == 0)
+			Q_stricmp(ent->targetname, "zyk_magic_lightning") == 0 ||
+			Q_stricmp(ent->targetname, "zyk_force_beam") == 0)
 		{ // zyk: effects from magic powers start right now
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
 			ent->nextthink = level.time + 100; // wait a small bit, then start working
@@ -3179,7 +3193,8 @@ void SP_fx_runner( gentity_t *ent )
 	if (Q_stricmp(ent->targetname, "zyk_magic_defensive") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_healing") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_chaos") == 0 ||
-		Q_stricmp(ent->targetname, "zyk_magic_lightning") == 0 || 
+		Q_stricmp(ent->targetname, "zyk_magic_lightning") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_force_beam") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_status_poison") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_status_on_fire") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_status_bleeding") == 0 ||

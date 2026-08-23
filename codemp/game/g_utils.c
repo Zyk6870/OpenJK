@@ -1614,6 +1614,7 @@ extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void zyk_use_inventory_item(gentity_t* ent, zyk_inventory_t item_index);
 extern qboolean zyk_is_main_quest_complete(gentity_t* ent);
+extern void zyk_force_beam(gentity_t* ent);
 qboolean zyk_magic_flight(gentity_t* ent)
 {
 	if (ent->client->sess.account_mode == ACC_MODE_RPG && ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] > 0 &&
@@ -1669,7 +1670,11 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 		}
 		else if (ent->client->pers.selected_ability > SELECTED_ABILITY_NONE)
 		{
-			if (ent->client->pers.selected_ability == SELECTED_ABILITY_MAGIC_FLIGHT)
+			if (ent->client->pers.selected_ability == SELECTED_ABILITY_FORCE_BEAM)
+			{
+				zyk_force_beam(ent);
+			}
+			else if (ent->client->pers.selected_ability == SELECTED_ABILITY_MAGIC_FLIGHT)
 			{
 				zyk_magic_flight(ent);
 			}

@@ -761,6 +761,7 @@ typedef enum {
 
 typedef enum {
 	SELECTED_ABILITY_NONE,
+	SELECTED_ABILITY_FORCE_BEAM,
 	SELECTED_ABILITY_MAGIC_FLIGHT,
 	SELECTED_ABILITY_MAGIC_SHIELD,
 	SELECTED_ABILITY_HEALING_CIRCLE,
@@ -813,6 +814,9 @@ typedef enum {
 
 // zyk: damage bonus of weapons
 #define RPG_WEAPON_DMG_BONUS 0.01
+
+// zyk: Force Beam duration
+#define RPG_FORCE_BEAM_DURATION 1000
 
 // zyk: max RPG chars an account can have
 #define MAX_RPG_CHARS 15
@@ -925,6 +929,10 @@ typedef struct clientPersistant_s {
 	int buy_sell_timer;
 
 	int meditation_timer;
+
+	int force_beam_timer;
+	int force_beam_cooldown_timer;
+
 	int inventory_update_timer;
 
 	int player_scale;

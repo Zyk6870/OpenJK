@@ -5731,6 +5731,23 @@ void magic_power_events(gentity_t *ent)
 	}
 }
 
+// zyk: Force Beam ability
+void zyk_force_beam(gentity_t* ent)
+{
+	if (ent->client->pers.force_beam_cooldown_timer < level.time)
+	{
+		int force_beam_cooldown = 10000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) * 100);
+
+		zyk_quest_effect_spawn(ent, ent, "zyk_force_beam", "0", "env/hevil_bolt", 0, 0, 0, RPG_FORCE_BEAM_DURATION);
+
+		ent->client->pers.force_beam_cooldown_timer = level.time + force_beam_cooldown;
+	}
+	else
+	{
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: wait some seconds before trying to use Force Beam again.\n\"", QUESTCHAR_MAIN));
+	}
+}
+
 // zyk: fires the Boba Fett flame thrower
 void Player_FireFlameThrower(gentity_t* self)
 {
