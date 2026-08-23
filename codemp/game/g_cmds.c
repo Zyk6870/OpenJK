@@ -88,10 +88,8 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAX_HEALTH] = 10;
 	max_skill_levels[SKILL_MELEE] = 5;
 	max_skill_levels[SKILL_MELEE_SPEED] = 5;
-	max_skill_levels[SKILL_NATURE_AFFINITY] = 10;
 	max_skill_levels[SKILL_STATUS_PROTECTION] = 5;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 25;
-	max_skill_levels[SKILL_MEDITATION] = 5;
 	max_skill_levels[SKILL_RUN_SPEED] = 5;
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 15;
@@ -136,10 +134,8 @@ char* zyk_skill_name(int skill_index)
 	skill_names[SKILL_MAX_HEALTH] = "Max Health";
 	skill_names[SKILL_MELEE] = "Melee";
 	skill_names[SKILL_MELEE_SPEED] = "Melee Punch Speed";
-	skill_names[SKILL_NATURE_AFFINITY] = "Nature Affinity";
 	skill_names[SKILL_STATUS_PROTECTION] = "Status Protection";
 	skill_names[SKILL_MAX_WEIGHT] = "Max Weight";
-	skill_names[SKILL_MEDITATION] = "Meditation";
 	skill_names[SKILL_RUN_SPEED] = "Run Speed";
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
@@ -203,14 +199,10 @@ char* zyk_skill_description(int skill_index)
 		return va("allows you to punch, kick or do a special melee attack by holding both Attack and Alt Attack buttons (usually the mouse buttons). At level 1, Right hand punch does %d normal damage, left hand punch does %d normal damage and kick does %d damage. Each level increases melee damage", zyk_melee_right_hand_damage.integer, zyk_melee_left_hand_damage.integer, zyk_melee_kick_damage.integer);
 	if (skill_index == SKILL_MELEE_SPEED)
 		return "Each level increases how fast you can punch with Melee";
-	if (skill_index == SKILL_NATURE_AFFINITY)
-		return "Your Spirit Tree makes Nature Energy generate automatically, but at a slow rate. Each level of this skill increases Nature Energy generation rate";
 	if (skill_index == SKILL_STATUS_PROTECTION)
 		return "Decreases duration of negative status effects. ^1Poison: ^7loses health and magic points and lowers run speed. ^1Fire: ^7catches fire, losing a lot of health. ^1Bleeding: ^7loses some health. Melee, Saber, Force powers and Magic attacks do less damage. ^1Confusion: ^7cannot attack or use Force powers or Magic";
 	if (skill_index == SKILL_MAX_WEIGHT)
 		return va("Everything you carry has a weight. Each level increases the max weight you can carry by %d. Carrying stuff over the max weight will decrease your run speed", INVENTORY_WEIGHT_INCREASE);
-	if (skill_index == SKILL_MEDITATION)
-		return "Each level of this skill increases regen rate of Force and MP while meditating";
 	if (skill_index == SKILL_RUN_SPEED)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
@@ -256,10 +248,8 @@ char* zyk_skill_key(int skill_index)
 	skill_names[SKILL_MAX_HEALTH] = "skillmaxhealth";
 	skill_names[SKILL_MELEE] = "skillmelee";
 	skill_names[SKILL_MELEE_SPEED] = "skillmeleepunchspeed";
-	skill_names[SKILL_NATURE_AFFINITY] = "skillnatureaffinity";
 	skill_names[SKILL_STATUS_PROTECTION] = "skillstatusprotection";
 	skill_names[SKILL_MAX_WEIGHT] = "skillmaxweight";
-	skill_names[SKILL_MEDITATION] = "skillmeditation";
 	skill_names[SKILL_RUN_SPEED] = "skillrunspeed";
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";

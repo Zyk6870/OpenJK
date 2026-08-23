@@ -8904,11 +8904,6 @@ void G_RunFrame( int levelTime ) {
 						// zyk: Quest progress increase Nature Energy regen rate
 						nature_energy_time -= (main_quest_progress * 5);
 
-						if (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] > 0)
-						{
-							nature_energy_time -= (ent->client->pers.skill_levels[SKILL_NATURE_AFFINITY] * 50);
-						}
-
 						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] > level.time)
 						{
 							nature_energy_time -= 500;
@@ -8932,8 +8927,6 @@ void G_RunFrame( int levelTime ) {
 						// zyk: meditating
 						if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 						{
-							mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MEDITATION] * 20);
-
 							if (ent->client->pers.nature_energy > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent))
 							{
 								mp_regen_amount += 1;

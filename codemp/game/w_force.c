@@ -5993,7 +5993,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 					// zyk: meditating makes Force regen faster
 					if (self->client->ps.forceHandExtend == HANDEXTEND_TAUNT && self->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 					{
-						rpg_force_regen_time -= (10 + (5 * self->client->pers.skill_levels[SKILL_MEDITATION]));
+						//rpg_force_regen_time -= (10 + (5 * self->client->pers.skill_levels[SKILL_MEDITATION]));
 					}
 
 					self->client->ps.fd.forcePowerRegenDebounceTime += rpg_force_regen_time;
