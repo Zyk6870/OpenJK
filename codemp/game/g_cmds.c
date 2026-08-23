@@ -4921,7 +4921,7 @@ int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 40);
+	int max_mp = (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 100);
 
 	return max_mp;
 }
@@ -10902,18 +10902,6 @@ qboolean zyk_can_deflect_shots(gentity_t *ent)
 Cmd_Magic_f
 ==================
 */
-int zyk_get_magic_cost(int magic_number)
-{
-	int magic_costs[MAX_MAGIC_POWERS] = {
-		20,
-		20,
-		20,
-		20
-	};
-
-	return magic_costs[magic_number];
-}
-
 qboolean zyk_can_cast_magic(gentity_t* ent)
 {
 	if (ent->client->ps.forceHandExtend != HANDEXTEND_NONE || 
@@ -10969,7 +10957,7 @@ void zyk_cast_magic(gentity_t* ent, int skill_index)
 		}
 		else
 		{ // zyk: use the magic power
-			int magic_cost = zyk_get_magic_cost(magic_number);
+			int magic_cost = ent->client->pers.skill_levels[skill_index] * 2;
 
 			if (ent->client->pers.magic_power >= magic_cost)
 			{

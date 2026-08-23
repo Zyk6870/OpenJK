@@ -5485,9 +5485,11 @@ int magic_fist_velocity(gentity_t* ent)
 // zyk: Magic Fist. RPG players with Magic Fist skill can shoot electric bolts. If shoot_nearest_target is qtrue, try to shoot at lookTarget entity instead of shooting forward
 void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target)
 {
+	int magic_fist_mp_cost = ent->client->pers.skill_levels[SKILL_MAGIC_FIST];
+
 	if (ent && ent->client && (ent->client->sess.account_mode == ACC_MODE_RPG || ent->NPC) &&
 		ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0 &&
-		ent->client->pers.magic_power >= zyk_magic_fist_mp_cost.integer)
+		ent->client->pers.magic_power >= magic_fist_mp_cost)
 	{
 		gentity_t* missile;
 		vec3_t origin, dir, zyk_forward;
@@ -5538,7 +5540,7 @@ void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target)
 
 		rpg_skill_counter(ent, (fist_damage / 10));
 
-		zyk_set_mp(ent, zyk_magic_fist_mp_cost.integer, qfalse);
+		zyk_set_mp(ent, magic_fist_mp_cost, qfalse);
 
 		G_Sound(ent, CHAN_WEAPON, G_SoundIndex("sound/weapons/demp2/fire.mp3"));
 	}
@@ -5561,12 +5563,7 @@ void zyk_stop_all_magic_powers(gentity_t* ent)
 
 void zyk_mp_usage(gentity_t* ent, int magic_skill_index)
 {
-	int magic_mp_usage = (ent->client->pers.skill_levels[magic_skill_index] / 2);
-
-	if (magic_mp_usage < 1)
-	{
-		magic_mp_usage = 1;
-	}
+	int magic_mp_usage = ent->client->pers.skill_levels[magic_skill_index];
 
 	zyk_set_mp(ent, magic_mp_usage, qfalse);
 }

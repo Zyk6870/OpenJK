@@ -244,7 +244,6 @@ XCVAR_DEF(zyk_allow_race_mode,			"1", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue
 XCVAR_DEF(zyk_allow_duel_tournament,	"1", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue)
 XCVAR_DEF(zyk_allow_sniper_battle,		"1", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue)
 XCVAR_DEF(zyk_allow_melee_battle,		"1", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue)
-XCVAR_DEF(zyk_magic_fist_mp_cost,		"1", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue)
 XCVAR_DEF(zyk_screen_message,			"", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue)
 XCVAR_DEF(zyk_screen_message_timer,		"3000", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue)
 XCVAR_DEF(zyk_allow_rpg_mode,			"1", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue)
