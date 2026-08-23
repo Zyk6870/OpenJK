@@ -85,12 +85,12 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_RAGE] = 4;
 	max_skill_levels[SKILL_TEAM_ENERGIZE] = 4;
 
-	max_skill_levels[SKILL_MAX_HEALTH] = 10;
-	max_skill_levels[SKILL_MELEE] = 5;
-	max_skill_levels[SKILL_MELEE_SPEED] = 5;
+	max_skill_levels[SKILL_MAX_HEALTH] = 20;
+	max_skill_levels[SKILL_MELEE] = 10;
+	max_skill_levels[SKILL_MELEE_SPEED] = 10;
 	max_skill_levels[SKILL_STATUS_PROTECTION] = 5;
 	max_skill_levels[SKILL_MAX_WEIGHT] = 25;
-	max_skill_levels[SKILL_RUN_SPEED] = 5;
+	max_skill_levels[SKILL_RUN_SPEED] = 10;
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 15;
 	max_skill_levels[SKILL_MAGIC_FLIGHT] = 15;
@@ -6496,7 +6496,7 @@ void zyk_list_player_skills(gentity_t *ent, gentity_t *target_ent, char *arg1)
 
 float zyk_get_rpg_player_speed(gentity_t* ent)
 {
-	float rpg_player_speed = g_speed.value + zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
+	float rpg_player_speed = g_speed.value;
 
 	if (ent->client->pers.skill_levels[SKILL_RUN_SPEED] > 0)
 	{

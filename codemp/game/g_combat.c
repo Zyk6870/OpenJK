@@ -4926,7 +4926,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		}
 		else if (mod == MOD_MELEE && zyk_is_magic_fist(mod, inflictor) == qfalse)
 		{ // zyk: Melee damage. Will not consider the magic bolt attacks
-			damage = (int)ceil(damage * (1.0 + (0.40 * attacker->client->pers.skill_levels[SKILL_MELEE])));
+			damage = (int)ceil(damage * (1.0 + (0.20 * attacker->client->pers.skill_levels[SKILL_MELEE])));
 		}
 	}
 

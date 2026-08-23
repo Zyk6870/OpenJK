@@ -6941,7 +6941,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 5)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Misc Affinity increases Run Speed, Max Weight and max time you can be underwater before drowning.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Misc Affinity increases Nature Energy regeneration rate, Max Weight and max time you can be underwater before drowning.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 6)
 	{
@@ -8880,7 +8880,7 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.nature_energy_timer < level.time)
 					{
 						int main_quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS);
-						int nature_energy_time = 2500;
+						int nature_energy_time = 2400 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) * 5);
 						int nature_energy_amount = 1;
 
 						// zyk: if Quests are disabled, make Nature Energy regen faster
@@ -9052,7 +9052,7 @@ void G_RunFrame( int levelTime ) {
 				// zyk: Melee Punch Speed skill
 				if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[SKILL_MELEE_SPEED] > 0)
 				{
-					float melee_punch_speed_bonus = (1.00f - (0.08f * ent->client->pers.skill_levels[SKILL_MELEE_SPEED]));
+					float melee_punch_speed_bonus = (1.00f - (0.04f * ent->client->pers.skill_levels[SKILL_MELEE_SPEED]));
 
 					if (ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * melee_punch_speed_bonus))
 					{

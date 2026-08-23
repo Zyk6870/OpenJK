@@ -797,7 +797,7 @@ typedef enum {
 #define RPG_MAX_QUEST_LOG_PARTS 15
 
 // zyk: amount of max health increase a RPG player gets when he upgrades Max Health skill
-#define RPG_MAX_HEALTH_INCREASE 20
+#define RPG_MAX_HEALTH_INCREASE 10
 #define RPG_MEDPACK_REGEN 25
 #define RPG_SHIELD_BOOSTER_REGEN 25
 #define RPG_POWERUP_TIMER 30000
@@ -840,7 +840,7 @@ typedef enum {
 // zyk: npc cloak detection distance
 #define NPC_CLOAK_DETECTION_DISTANCE 1000
 
-#define RPG_RUN_SPEED_SKILL_INCREASE 6.0f
+#define RPG_RUN_SPEED_SKILL_INCREASE 10.0f
 
 // zyk: main characters names
 #define QUESTCHAR_MAIN "^6Spirit Tree"
