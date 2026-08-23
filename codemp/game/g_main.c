@@ -6984,7 +6984,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 12)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Meditate (Controls menu) to regen Nature Energy, Force and MP.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Meditate (Controls menu) to regen Nature Energy.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 13)
 	{
@@ -7000,7 +7000,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 16)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You can regen MP by meditating (it converts Nature Energy into MP) or using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: MP regens by converting Nature Energy into MP, or by using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 17)
 	{
@@ -8930,8 +8930,8 @@ void G_RunFrame( int levelTime ) {
 					// zyk: MP regen
 					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 					{
-						int mp_regen_amount = 0;
-						int mp_regen_rate = 900 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+						int mp_regen_amount = 1;
+						int mp_regen_rate = 1000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
 
 						// zyk: Enlightenment Dark regens more mp
 						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time && ent->client->pers.magic_power < zyk_max_magic_power(ent))
@@ -8939,19 +8939,17 @@ void G_RunFrame( int levelTime ) {
 							mp_regen_amount += 1;
 						}
 
-						// zyk: meditating
-						if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+						// zyk: Magic Regen skill. Meditating regens mp faster
+						if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0 &&
+							ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 						{
-							if (ent->client->pers.nature_energy > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent))
-							{
-								mp_regen_amount += 1;
-								set_nature_energy(ent, 1, qfalse);
-							}
+							mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] * 10);
 						}
 
-						if (mp_regen_amount > 0)
+						if (mp_regen_amount > 0 && ent->client->pers.nature_energy >= mp_regen_amount && ent->client->pers.magic_power < zyk_max_magic_power(ent))
 						{
 							zyk_set_mp(ent, mp_regen_amount, qtrue);
+							set_nature_energy(ent, mp_regen_amount, qfalse);
 						}
 
 						ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;

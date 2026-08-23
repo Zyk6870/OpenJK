@@ -223,11 +223,11 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases mp usage. You can also bind it to a key like this: ^3/bind <key> magicflight^7";
 	if (skill_index == SKILL_MAGIC_REGEN)
-		return "Meditating regens mp faster. If out of Nature Energy, regens MP using powercell ammo, and if out of it, uses shield";
+		return "Meditating regens mp faster";
 	if (skill_index == SKILL_MAGIC_REACTION)
-		return "";
+		return "If you have Magic Fist skill, has a chance to automatically shoot at the nearest target while meditating. Each level increases chance to shoot Magic Fist more often";
 	if (skill_index == SKILL_MAGIC_SHIELD)
-		return va("A magic shield appears around you, decreasing damage to your health from any source. If you have Magic Fist skill, has a chance to automatically shoot at the nearest target. Higher levels and Magic Affinity increase resistance to damage to your health and also increases chance to shoot Magic Fist more often. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
+		return va("A magic shield appears around you, decreasing damage to your health from any source. Higher levels and Magic Affinity increase resistance to damage to your health. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_HEALING_CIRCLE)
 		return va("Creates Healing Circles that restore health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and ally players or npcs inside the circle. Higher levels and Magic Affinity increase the amount of health restored and decrease bad status effects duration faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_CHAOS_FIELD)
