@@ -5693,12 +5693,13 @@ void magic_power_events(gentity_t *ent)
 					{
 						zyk_mp_usage(ent, SKILL_LIGHTNING_DOME);
 
-						zyk_quest_effect_spawn(ent, ent, "zyk_magic_lightning", "0", "howler/sonic", 0, 0, 0, 350);
+						// zyk_quest_effect_spawn(ent, ent, "zyk_magic_lightning", "0", "howler/sonic", 0, 0, 0, 350);
+						ent->client->ps.electrifyTime = level.time + 500;
 					}
 
 					if (ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] < level.time)
 					{
-						int debounce_timer = 200 - ((magic_bonus + (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 2)) * 5);
+						int debounce_timer = 190 - ((magic_bonus + (ent->client->pers.skill_levels[SKILL_LIGHTNING_DOME] * 2)) * 5);
 
 						ent->client->pers.magic_lightning_dome_bonus++;
 

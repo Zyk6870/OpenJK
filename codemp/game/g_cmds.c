@@ -94,8 +94,10 @@ int zyk_max_skill_level(int skill_index)
 	max_skill_levels[SKILL_MAX_WEIGHT] = 25;
 	max_skill_levels[SKILL_RUN_SPEED] = 10;
 
-	max_skill_levels[SKILL_MAGIC_FIST] = 15;
-	max_skill_levels[SKILL_MAGIC_FLIGHT] = 15;
+	max_skill_levels[SKILL_MAGIC_FIST] = 10;
+	max_skill_levels[SKILL_MAGIC_FLIGHT] = 10;
+	max_skill_levels[SKILL_MAGIC_REGEN] = 10;
+	max_skill_levels[SKILL_MAGIC_REACTION] = 10;
 	max_skill_levels[SKILL_MAGIC_SHIELD] = 10;
 	max_skill_levels[SKILL_HEALING_CIRCLE] = 10;
 	max_skill_levels[SKILL_CHAOS_FIELD] = 10;
@@ -144,6 +146,8 @@ char* zyk_skill_name(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "Magic Flight";
+	skill_names[SKILL_MAGIC_REGEN] = "Magic Regen";
+	skill_names[SKILL_MAGIC_REACTION] = "Magic Reaction";
 	skill_names[SKILL_MAGIC_SHIELD] = "Magic Shield";
 	skill_names[SKILL_HEALING_CIRCLE] = "Healing Circle";
 	skill_names[SKILL_CHAOS_FIELD] = "Chaos Field";
@@ -199,7 +203,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MEDITATION)
 		return "Meditating will slowly restore bad status effects and make Force regen faster. These effects will be based on Force Affinity";
 	if (skill_index == SKILL_FORCE_BEAM)
-		return "A force ability that shoots a powerful beam that deals saber damage. It will consume one of the extra sabers in inventory to double damage by using some Nature Energy. Each level increases damage. Force Affinity decreases cooldown time. Use it by pressing Duel key to select it and then pressing Use key";
+		return "A force ability that shoots a powerful beam that deals saber damage. Benefits from Saber damage improvements. It will consume one of the extra sabers in inventory to double damage by using some Nature Energy. Each level increases damage. Force Affinity decreases cooldown time. Use it by pressing Duel key to select it and then pressing Use key";
 
 	if (skill_index == SKILL_MAX_HEALTH)
 		return va("Each level increases your max health by %d", RPG_MAX_HEALTH_INCREASE);
@@ -218,6 +222,10 @@ char* zyk_skill_description(int skill_index)
 		return va("Allows you to attack with magic bolts when using melee punches. Each level increases damage. Magic Affinity increases damage. At max level, can damage any objects that normally would only be able to be damaged by Saber or Heavy Weapons, and can also interact with some objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases mp usage. You can also bind it to a key like this: ^3/bind <key> magicflight^7";
+	if (skill_index == SKILL_MAGIC_REGEN)
+		return "Meditating regens mp faster. If out of Nature Energy, regens MP using powercell ammo, and if out of it, uses shield";
+	if (skill_index == SKILL_MAGIC_REACTION)
+		return "";
 	if (skill_index == SKILL_MAGIC_SHIELD)
 		return va("A magic shield appears around you, decreasing damage to your health from any source. If you have Magic Fist skill, has a chance to automatically shoot at the nearest target. Higher levels and Magic Affinity increase resistance to damage to your health and also increases chance to shoot Magic Fist more often. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_HEALING_CIRCLE)
@@ -264,6 +272,8 @@ char* zyk_skill_key(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "skillmagicflight";
+	skill_names[SKILL_MAGIC_REGEN] = "skillmagicregen";
+	skill_names[SKILL_MAGIC_REACTION] = "skillmagicreaction";
 	skill_names[SKILL_MAGIC_SHIELD] = "skillmagicshield";
 	skill_names[SKILL_HEALING_CIRCLE] = "skillhealingcircle";
 	skill_names[SKILL_CHAOS_FIELD] = "skillchaosfield";
