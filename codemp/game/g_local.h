@@ -817,7 +817,8 @@ typedef enum {
 // zyk: damage bonus of weapons
 #define RPG_WEAPON_DMG_BONUS 0.01
 
-// zyk: Force Beam duration
+// zyk: Force Beam
+#define RPG_FORCE_BEAM_COST 50
 #define RPG_FORCE_BEAM_DURATION 1000
 
 // zyk: max RPG chars an account can have

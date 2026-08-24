@@ -4531,6 +4531,7 @@ char* zyk_selected_ability_name(zyk_selected_ability_t selected_ability)
 	char* ability_names[MAX_SELECTED_ABILITIES];
 
 	ability_names[SELECTED_ABILITY_NONE] = "None";
+	ability_names[SELECTED_ABILITY_FORCE_BEAM] = "Force Beam (Force)";
 	ability_names[SELECTED_ABILITY_MAGIC_FLIGHT] = "Magic Flight (Magic)";
 	ability_names[SELECTED_ABILITY_MAGIC_SHIELD] = "Magic Shield (Magic)";
 	ability_names[SELECTED_ABILITY_HEALING_CIRCLE] = "Healing Circle (Magic)";

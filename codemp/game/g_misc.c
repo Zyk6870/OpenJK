@@ -2801,9 +2801,15 @@ int zyk_force_beam_damage(gentity_t* ent)
 	// zyk: consume one of the extra sabers in inventory to increase damage
 	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 1 && ent->client->pers.force_beam_timer < level.time)
 	{
-		damage *= 2;
+		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_SABER, 1);
 
 		ent->client->pers.force_beam_timer = level.time + RPG_FORCE_BEAM_DURATION;
+	}
+
+	// zyk: used a saber, doubles the damage
+	if (ent->client->pers.force_beam_timer > level.time)
+	{
+		damage *= 2;
 	}
 
 	return damage;

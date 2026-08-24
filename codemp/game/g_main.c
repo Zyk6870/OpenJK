@@ -5472,7 +5472,7 @@ void magic_lightning_dome(gentity_t* ent)
 	ent->client->pers.active_magic |= (1 << MAGIC_LIGHTNING_DOME);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 500;
 
-	G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/energy_crackle.wav"));
+	// G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/energy_crackle.wav"));
 }
 
 int magic_fist_velocity(gentity_t* ent)
@@ -5723,19 +5723,54 @@ void magic_power_events(gentity_t *ent)
 }
 
 // zyk: Force Beam ability
+void zyk_create_force_beam(gentity_t* ent)
+{
+	gentity_t* new_ent = G_Spawn();
+
+	zyk_set_entity_field(new_ent, "classname", "fx_runner");
+	zyk_set_entity_field(new_ent, "spawnflags", "0");
+	zyk_set_entity_field(new_ent, "targetname", "zyk_force_beam");
+	zyk_set_entity_field(new_ent, "origin", va("%f %f %f", ent->r.currentOrigin[0], ent->r.currentOrigin[1], (ent->r.currentOrigin[2] + 32)));
+	zyk_set_entity_field(new_ent, "angles", va("%f %f 0", ent->client->ps.viewangles[0], ent->client->ps.viewangles[1], 0));
+
+	new_ent->s.modelindex = G_EffectIndex("env/hevil_bolt");
+
+	zyk_spawn_entity(new_ent);
+
+	if (new_ent && new_ent->inuse)
+	{ // zyk: do not set these if for some reason the entity was not spawned
+		new_ent->parent = ent;
+
+		level.special_power_effects[new_ent->s.number] = ent->s.number;
+		level.special_power_effects_timer[new_ent->s.number] = level.time + RPG_FORCE_BEAM_DURATION;
+
+		G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/electric_beam_lp.wav"));
+	}
+}
+
 void zyk_force_beam(gentity_t* ent)
 {
 	if (ent->client->pers.force_beam_cooldown_timer < level.time)
 	{
-		int force_beam_cooldown = 10000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) * 100);
+		if (ent->client->ps.fd.forcePower >= RPG_FORCE_BEAM_COST)
+		{
+			int force_beam_cooldown = 10000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) * 100);
 
-		zyk_quest_effect_spawn(ent, ent, "zyk_force_beam", "0", "env/hevil_bolt", 0, 0, 0, RPG_FORCE_BEAM_DURATION);
+			zyk_create_force_beam(ent);
 
-		ent->client->pers.force_beam_cooldown_timer = level.time + force_beam_cooldown;
-	}
-	else
-	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: wait some seconds before trying to use Force Beam again.\n\"", QUESTCHAR_MAIN));
+			G_SetAnim(ent, NULL, SETANIM_BOTH, BOTH_FORCE_2HANDEDLIGHTNING_HOLD, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+			ent->client->ps.torsoTimer = RPG_FORCE_BEAM_DURATION;
+			ent->client->ps.legsTimer = RPG_FORCE_BEAM_DURATION;
+			ent->client->ps.weaponTime = RPG_FORCE_BEAM_DURATION;
+
+			ent->client->ps.fd.forcePower -= RPG_FORCE_BEAM_COST;
+
+			ent->client->pers.force_beam_cooldown_timer = level.time + force_beam_cooldown;
+		}
+		else
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Force Beam requires %d force.\n\"", QUESTCHAR_MAIN, RPG_FORCE_BEAM_COST));
+		}
 	}
 }
 
