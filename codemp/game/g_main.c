@@ -8923,7 +8923,7 @@ void G_RunFrame( int levelTime ) {
 					// zyk: MP regen
 					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 					{
-						qboolean can_regen_mp = qfalse;
+						int regen_mp_mode = 0;
 						int mp_regen_amount = 1;
 						int mp_regen_rate = 3000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 25);
 
@@ -8945,29 +8945,27 @@ void G_RunFrame( int levelTime ) {
 							}
 						}
 
-						if (ent->client->pers.nature_energy >= mp_regen_amount)
+						if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] >= mp_regen_amount)
 						{
-							can_regen_mp = qtrue;
+							regen_mp_mode = 1;
 						}
-						else if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] >= mp_regen_amount)
+						else if (ent->client->pers.nature_energy >= mp_regen_amount)
 						{
-							can_regen_mp = qtrue;
-						}
-						else if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0 && ent->client->ps.stats[STAT_ARMOR] >= mp_regen_amount)
-						{
-							can_regen_mp = qtrue;
+							regen_mp_mode = 2;
 						}
 
-						if (mp_regen_amount > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent) && can_regen_mp == qtrue)
+						if (mp_regen_amount > 0 && regen_mp_mode > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent))
 						{
 							zyk_set_mp(ent, mp_regen_amount, qtrue);
 
-							if (ent->client->pers.nature_energy >= mp_regen_amount)
-								set_nature_energy(ent, mp_regen_amount, qfalse);
-							else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] >= mp_regen_amount)
+							if (regen_mp_mode == 1)
+							{
 								zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, mp_regen_amount);
-							else if (ent->client->ps.stats[STAT_ARMOR] >= mp_regen_amount)
-								ent->client->ps.stats[STAT_ARMOR] -= mp_regen_amount;
+							}
+							else if (regen_mp_mode == 2)
+							{
+								set_nature_energy(ent, mp_regen_amount, qfalse);
+							}
 						}
 
 						ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;
