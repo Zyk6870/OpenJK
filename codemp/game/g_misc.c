@@ -2794,27 +2794,6 @@ void zyk_clear_quest_effect(gentity_t* ent)
 	level.special_power_effects[ent->s.number] = -1;
 }
 
-int zyk_force_beam_damage(gentity_t* ent)
-{
-	int damage = ent->client->pers.skill_levels[SKILL_FORCE_BEAM];
-
-	// zyk: consume one of the extra sabers in inventory to increase damage
-	if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 1 && ent->client->pers.force_beam_timer < level.time)
-	{
-		zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_SABER, 1);
-
-		ent->client->pers.force_beam_timer = level.time + RPG_FORCE_BEAM_DURATION;
-	}
-
-	// zyk: used a saber, doubles the damage
-	if (ent->client->pers.force_beam_timer > level.time)
-	{
-		damage *= 2;
-	}
-
-	return damage;
-}
-
 //----------------------------------------------------------
 void fx_runner_think( gentity_t *ent )
 {
@@ -2972,11 +2951,11 @@ void fx_runner_think( gentity_t *ent )
 		if (target_ent && target_ent->client && user_ent && user_ent->client && user_ent != target_ent &&
 			zyk_is_ally(user_ent, target_ent) == qfalse)
 		{ // zyk: a enemy player or npc
-			G_Damage(target_ent, ent, user_ent, NULL, target_ent->client->ps.origin, zyk_force_beam_damage(user_ent), DAMAGE_NO_PROTECTION, MOD_SABER);
+			G_Damage(target_ent, ent, user_ent, NULL, target_ent->client->ps.origin, user_ent->client->pers.force_beam_damage, DAMAGE_NO_PROTECTION, MOD_SABER);
 		}
 		else if (target_ent && user_ent != target_ent && !target_ent->client && target_ent->health > 0 && target_ent->takedamage == qtrue)
 		{ // zyk: non-client damageable entity
-			G_Damage(target_ent, ent, user_ent, NULL, target_ent->r.currentOrigin, zyk_force_beam_damage(user_ent), DAMAGE_NO_PROTECTION, MOD_SABER);
+			G_Damage(target_ent, ent, user_ent, NULL, target_ent->r.currentOrigin, user_ent->client->pers.force_beam_damage, DAMAGE_NO_PROTECTION, MOD_SABER);
 		}
 
 		ent->nextthink = level.time + 100;

@@ -933,7 +933,7 @@ typedef struct clientPersistant_s {
 
 	int meditation_timer;
 
-	int force_beam_timer;
+	int force_beam_damage;
 	int force_beam_cooldown_timer;
 
 	int inventory_update_timer;

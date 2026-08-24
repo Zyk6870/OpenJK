@@ -203,7 +203,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MEDITATION)
 		return "Meditating will slowly restore bad status effects and make Force regen faster. These effects will be based on Force Affinity";
 	if (skill_index == SKILL_FORCE_BEAM)
-		return "A force ability that shoots a powerful beam that deals saber damage. Benefits from Saber damage improvements. It will consume one of the extra sabers in inventory to double damage by using some Nature Energy. Each level increases damage. Force Affinity decreases cooldown time. Use it by pressing Duel key to select it and then pressing Use key";
+		return "A force ability that shoots a powerful beam that deals saber damage. Benefits from Saber damage improvements. It will consume one of the extra sabers in inventory for extra damage by using some Nature Energy. Each level increases damage. Force Affinity decreases cooldown time. Use it by pressing Duel key to select it and then pressing Use key";
 
 	if (skill_index == SKILL_MAX_HEALTH)
 		return va("Each level increases your max health by %d", RPG_MAX_HEALTH_INCREASE);
@@ -5542,8 +5542,10 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.nature_energy_timer = 0;
 			ent->client->pers.buy_sell_timer = 0;
 			ent->client->pers.meditation_timer = level.time + 100;
-			ent->client->pers.force_beam_timer = level.time + 100;
+
+			ent->client->pers.force_beam_damage = 0;
 			ent->client->pers.force_beam_cooldown_timer = 0;
+
 			ent->client->pers.inventory_update_timer = level.time + 100;
 
 			ent->client->pers.quest_progress_timer = level.time + QUEST_SPIRIT_TREE_SPAWN_TIMER;

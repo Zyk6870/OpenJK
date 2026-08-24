@@ -5262,6 +5262,7 @@ void clear_special_power_effect(gentity_t* ent)
 	}
 }
 
+extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern void zyk_add_shield(gentity_t* ent, int shield_amount);
 extern void initialize_rpg_skills(gentity_t* ent, qboolean init_all);
@@ -5764,6 +5765,18 @@ void zyk_force_beam(gentity_t* ent)
 			ent->client->ps.weaponTime = RPG_FORCE_BEAM_DURATION;
 
 			ent->client->ps.fd.forcePower -= RPG_FORCE_BEAM_COST;
+
+			ent->client->pers.force_beam_damage = ent->client->pers.skill_levels[SKILL_FORCE_BEAM];
+
+			// zyk: consume one of the extra sabers in inventory to increase damage
+			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 1 && ent->client->pers.nature_energy >= RPG_FORCE_BEAM_COST)
+			{
+				ent->client->pers.force_beam_damage *= 2;
+
+				zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_SABER, 1);
+
+				ent->client->pers.nature_energy -= RPG_FORCE_BEAM_COST;
+			}
 
 			ent->client->pers.force_beam_cooldown_timer = level.time + force_beam_cooldown;
 		}
@@ -7424,7 +7437,6 @@ extern void set_max_nature_energy(gentity_t* ent);
 extern void duel_show_table(gentity_t *ent);
 extern void WP_DisruptorAltFire(gentity_t *ent);
 extern void G_Kill( gentity_t *ent );
-extern void zyk_update_inventory_quantity(gentity_t* ent, qboolean add_item, zyk_inventory_t item, int amount);
 extern void zyk_cast_magic(gentity_t* ent, int skill_index);
 extern void WP_FireMelee(gentity_t* ent, qboolean alt_fire);
 
