@@ -1367,6 +1367,9 @@ extern void G_CreateSpeederNPC( Vehicle_t **pVeh, const char *strType );
 extern void G_CreateWalkerNPC( Vehicle_t **pVeh, const char *strAnimalType );
 extern void G_CreateFighterNPC( Vehicle_t **pVeh, const char *strType );
 extern void zyk_main_spawn_entity(gentity_t *ent);
+extern int zyk_max_skill_level(int skill_index);
+extern int zyk_max_magic_power(gentity_t* ent);
+
 gentity_t *NPC_Spawn_Do( gentity_t *ent )
 {
 	gentity_t	*newent = NULL;
@@ -1795,8 +1798,28 @@ finish:
 		newent->client->cloakDebReduce = 0;
 
 		// zyk: saboteur npcs start with cloak
-		if (Q_stristr(newent->NPC_type,"saboteur"))
+		if (Q_stristr(newent->NPC_type, "saboteur"))
+		{
 			Jedi_Cloak(newent);
+		}
+		else if (Q_stricmp(newent->NPC_type, "quest_mage") == 0)
+		{ // zyk: initialize magic powers
+			int first_magic_skill = SKILL_MAGIC_FIST;
+			int current_magic_skill = first_magic_skill;
+
+			// zyk: adding all magic skills to this npc
+			while (current_magic_skill < NUMBER_OF_SKILLS)
+			{
+				if (ent->client->pers.skill_levels[current_magic_skill] < 1)
+				{
+					ent->client->pers.skill_levels[current_magic_skill] = zyk_max_skill_level(current_magic_skill);
+				}
+
+				current_magic_skill++;
+			}
+
+			ent->client->pers.magic_power = zyk_max_magic_power(ent);
+		}
 	}
 
 	return newent;

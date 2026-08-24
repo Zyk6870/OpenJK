@@ -1024,9 +1024,10 @@ typedef struct clientPersistant_s {
 	// zyk: debounce timer used to consume mp when magic is active
 	int magic_consumption_timer;
 
-	// zyk: debounce timer used to regen mp when player is meditating
+	// zyk: debounce timer used to regen mp
 	int magic_regen_debounce_timer;
 
+	int magic_reaction_debounce_timer;
 	int magic_lightning_dome_bonus;
 
 	// zyk: amount of MP, required to use Magic powers

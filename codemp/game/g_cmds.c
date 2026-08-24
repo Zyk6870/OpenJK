@@ -5561,6 +5561,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 
 			ent->client->pers.magic_consumption_timer = 0;
 			ent->client->pers.magic_regen_debounce_timer = 0;
+			ent->client->pers.magic_reaction_debounce_timer = 0;
 
 			ent->client->pers.quest_stuff_timer = level.time + RPG_QUEST_STUFF_MIN_SPAWN_TIME;
 

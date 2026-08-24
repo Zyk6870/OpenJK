@@ -653,6 +653,8 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] = npc_skill_level + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_MINISTER)
 		{
@@ -724,6 +726,8 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = ally_bonus + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] = ally_bonus + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] = ally_bonus + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_FLYING_WARRIOR)
 		{
@@ -732,8 +736,6 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 		// zyk: setting the initial amount of magic points
 		npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
-
-		npc_ent->client->pers.magic_power *= 2;
 	}
 }
 
@@ -5751,7 +5753,7 @@ void zyk_create_force_beam(gentity_t* ent)
 
 void zyk_force_beam(gentity_t* ent)
 {
-	if (ent->client->pers.force_beam_cooldown_timer < level.time)
+	if (ent->client->pers.skill_levels[SKILL_FORCE_BEAM] > 0 && ent->client->pers.force_beam_cooldown_timer < level.time)
 	{
 		if (ent->client->ps.fd.forcePower >= RPG_FORCE_BEAM_COST)
 		{
@@ -8972,7 +8974,7 @@ void G_RunFrame( int levelTime ) {
 					{
 						int regen_mp_mode = 0;
 						int mp_regen_amount = 1;
-						int mp_regen_rate = 3000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 25);
+						int mp_regen_rate = 2500 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 25);
 
 						// zyk: Enlightenment Dark regens more mp
 						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time && ent->client->pers.magic_power < zyk_max_magic_power(ent))
@@ -8984,11 +8986,11 @@ void G_RunFrame( int levelTime ) {
 						{
 							if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 							{
-								mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] * 50);
+								mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] * 40);
 							}
 							else
 							{
-								mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] * 25);
+								mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] * 20);
 							}
 						}
 
@@ -9020,7 +9022,8 @@ void G_RunFrame( int levelTime ) {
 
 					// zyk: Magic Reaction skill. Shoots Magic Fist bolts while meditating
 					if (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] > 0 &&
-						ent->client->ps.hasLookTarget == qtrue && 
+						ent->client->ps.hasLookTarget == qtrue &&
+						ent->client->pers.magic_reaction_debounce_timer < level.time &&
 						ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 					{
 						int chance_for_magic_fist = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION];
@@ -9029,6 +9032,8 @@ void G_RunFrame( int levelTime ) {
 						{
 							zyk_magic_fist_bolt(ent, qtrue);
 						}
+
+						ent->client->pers.magic_reaction_debounce_timer = level.time + 100;
 					}
 
 					// zyk: Energy Modulator consumes Nature Energy
@@ -9518,9 +9523,11 @@ void G_RunFrame( int levelTime ) {
 					// zyk: quest npcs regen mp
 					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 					{
+						int mp_regen_rate = 2500 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 25);
+
 						zyk_set_mp(ent, 1, qtrue);
 
-						ent->client->pers.magic_regen_debounce_timer = level.time + 900 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+						ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;
 					}
 
 					if (ent->enemy)
@@ -9631,28 +9638,15 @@ void G_RunFrame( int levelTime ) {
 				{
 					int random_magic = Q_irand(0, MAGIC_LIGHTNING_DOME);
 					int first_magic_skill = SKILL_MAGIC_SHIELD;
-					int current_magic_skill = first_magic_skill;
-
-					ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = zyk_max_skill_level(SKILL_MAGIC_FIST);
-					ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = zyk_max_skill_level(SKILL_MAGIC_FLIGHT);
-
-					// zyk: adding all magic powers to this npc
-					while (current_magic_skill < NUMBER_OF_SKILLS)
-					{
-						if (ent->client->pers.skill_levels[current_magic_skill] < 1)
-						{
-							ent->client->pers.skill_levels[current_magic_skill] = zyk_max_skill_level(current_magic_skill);
-						}
-
-						current_magic_skill++;
-					}
 
 					// zyk: regen mp and level of this mage
 					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 					{
-						ent->client->pers.magic_power = zyk_max_magic_power(ent);
+						int mp_regen_rate = 2500 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 25);
 
-						ent->client->pers.magic_regen_debounce_timer = level.time + 900 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+						zyk_set_mp(ent, 1, qtrue);
+
+						ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;
 					}
 
 					zyk_cast_magic(ent, first_magic_skill + random_magic);
