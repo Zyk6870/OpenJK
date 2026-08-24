@@ -8923,8 +8923,9 @@ void G_RunFrame( int levelTime ) {
 					// zyk: MP regen
 					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 					{
+						qboolean can_regen_mp = qfalse;
 						int mp_regen_amount = 1;
-						int mp_regen_rate = 1000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+						int mp_regen_rate = 3000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 25);
 
 						// zyk: Enlightenment Dark regens more mp
 						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time && ent->client->pers.magic_power < zyk_max_magic_power(ent))
@@ -8932,17 +8933,41 @@ void G_RunFrame( int levelTime ) {
 							mp_regen_amount += 1;
 						}
 
-						// zyk: Magic Regen skill. Meditating regens mp faster
-						if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0 &&
-							ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+						if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0)
 						{
-							mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] * 10);
+							if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+							{
+								mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] * 50);
+							}
+							else
+							{
+								mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] * 25);
+							}
 						}
 
-						if (mp_regen_amount > 0 && ent->client->pers.nature_energy >= mp_regen_amount && ent->client->pers.magic_power < zyk_max_magic_power(ent))
+						if (ent->client->pers.nature_energy >= mp_regen_amount)
+						{
+							can_regen_mp = qtrue;
+						}
+						else if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] >= mp_regen_amount)
+						{
+							can_regen_mp = qtrue;
+						}
+						else if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0 && ent->client->ps.stats[STAT_ARMOR] >= mp_regen_amount)
+						{
+							can_regen_mp = qtrue;
+						}
+
+						if (mp_regen_amount > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent) && can_regen_mp == qtrue)
 						{
 							zyk_set_mp(ent, mp_regen_amount, qtrue);
-							set_nature_energy(ent, mp_regen_amount, qfalse);
+
+							if (ent->client->pers.nature_energy >= mp_regen_amount)
+								set_nature_energy(ent, mp_regen_amount, qfalse);
+							else if (ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] >= mp_regen_amount)
+								zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, mp_regen_amount);
+							else if (ent->client->ps.stats[STAT_ARMOR] >= mp_regen_amount)
+								ent->client->ps.stats[STAT_ARMOR] -= mp_regen_amount;
 						}
 
 						ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;
