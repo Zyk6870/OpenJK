@@ -489,6 +489,7 @@ extern void Jedi_Cloak(gentity_t* self);
 extern int zyk_max_skill_level(int skill_index);
 extern int zyk_max_magic_power(gentity_t* ent);
 extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
+extern void set_nature_energy(gentity_t* ent, int amount, qboolean add);
 char* zyk_get_enemy_type(int enemy_type)
 {
 	char* enemy_names[NUM_QUEST_NPCS];
@@ -636,6 +637,9 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->pers.max_rpg_shield = npc_ent->health;
 			npc_ent->client->ps.stats[STAT_ARMOR] = npc_ent->client->pers.max_rpg_shield;
 		}
+
+		npc_ent->client->pers.nature_energy = RPG_MAX_NATURE_ENERGY;
+		npc_ent->client->pers.max_nature_energy = RPG_MAX_NATURE_ENERGY;
 
 		// zyk: setting magic abilities
 		if (quest_npc_type == QUEST_NPC_MAGE_MASTER)
@@ -5721,6 +5725,39 @@ void magic_power_events(gentity_t *ent)
 			{
 				ent->client->pers.magic_consumption_timer = level.time + 250;
 			}
+
+			// zyk: MP regen
+			if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
+			{
+				int mp_regen_amount = 1;
+				int max_mp = zyk_max_magic_power(ent);
+				int mp_regen_rate = 1800 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+
+				// zyk: Enlightenment Dark regens mp without using Nature Energy
+				if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time && ent->client->pers.magic_power < max_mp)
+				{
+					zyk_set_mp(ent, 1, qtrue);
+				}
+
+				// zyk: Magic Regen skill regens mp faster while meditating
+				if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0)
+				{
+					mp_regen_amount += ent->client->pers.skill_levels[SKILL_MAGIC_REGEN];
+
+					if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+					{
+						mp_regen_rate /= 2;
+					}
+				}
+
+				if (ent->client->pers.nature_energy >= 1 && ent->client->pers.magic_power < max_mp)
+				{
+					zyk_set_mp(ent, mp_regen_amount, qtrue);
+					set_nature_energy(ent, 1, qfalse);
+				}
+
+				ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;
+			}
 		}
 	}
 }
@@ -6199,7 +6236,6 @@ void duel_tournament_generate_leaderboard(char *filename, char *netname)
 }
 
 // zyk: determines who is the tournament winner
-extern void set_nature_energy(gentity_t* ent, int amount, qboolean add);
 void duel_tournament_winner()
 {
 	gentity_t *ent = NULL;
@@ -7043,7 +7079,7 @@ void zyk_show_tutorial(gentity_t* ent)
 	}
 	else if (ent->client->pers.tutorial_step == 16)
 	{
-		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: MP regens by converting Nature Energy into MP, or by using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
+		trap->SendServerCommand(ent->s.number, va("chat \"%s^7: MP regens by consuming Nature Energy, or by using Bacta and Big Bacta holdable items.\n\"", QUESTCHAR_MAIN));
 	}
 	else if (ent->client->pers.tutorial_step == 17)
 	{
@@ -8969,57 +9005,6 @@ void G_RunFrame( int levelTime ) {
 						ent->client->pers.nature_energy_timer = level.time + nature_energy_time;
 					}
 
-					// zyk: MP regen
-					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
-					{
-						int regen_mp_mode = 0;
-						int mp_regen_amount = 1;
-						int mp_regen_rate = 2500 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 25);
-
-						// zyk: Enlightenment Dark regens more mp
-						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time && ent->client->pers.magic_power < zyk_max_magic_power(ent))
-						{
-							mp_regen_amount += 1;
-						}
-
-						if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0)
-						{
-							if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
-							{
-								mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] * 40);
-							}
-							else
-							{
-								mp_regen_rate -= (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] * 20);
-							}
-						}
-
-						if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0 && ent->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] >= mp_regen_amount)
-						{
-							regen_mp_mode = 1;
-						}
-						else if (ent->client->pers.nature_energy >= mp_regen_amount)
-						{
-							regen_mp_mode = 2;
-						}
-
-						if (mp_regen_amount > 0 && regen_mp_mode > 0 && ent->client->pers.magic_power < zyk_max_magic_power(ent))
-						{
-							zyk_set_mp(ent, mp_regen_amount, qtrue);
-
-							if (regen_mp_mode == 1)
-							{
-								zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_AMMO_POWERCELL, mp_regen_amount);
-							}
-							else if (regen_mp_mode == 2)
-							{
-								set_nature_energy(ent, mp_regen_amount, qfalse);
-							}
-						}
-
-						ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;
-					}
-
 					// zyk: Magic Reaction skill. Shoots Magic Fist bolts while meditating
 					if (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] > 0 &&
 						ent->client->ps.hasLookTarget == qtrue &&
@@ -9520,16 +9505,6 @@ void G_RunFrame( int levelTime ) {
 					}
 					*/
 
-					// zyk: quest npcs regen mp
-					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
-					{
-						int mp_regen_rate = 2500 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 25);
-
-						zyk_set_mp(ent, 1, qtrue);
-
-						ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;
-					}
-
 					if (ent->enemy)
 					{
 						int first_magic_skill = SKILL_MAGIC_SHIELD;
@@ -9638,16 +9613,6 @@ void G_RunFrame( int levelTime ) {
 				{
 					int random_magic = Q_irand(0, MAGIC_LIGHTNING_DOME);
 					int first_magic_skill = SKILL_MAGIC_SHIELD;
-
-					// zyk: regen mp and level of this mage
-					if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
-					{
-						int mp_regen_rate = 2500 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 25);
-
-						zyk_set_mp(ent, 1, qtrue);
-
-						ent->client->pers.magic_regen_debounce_timer = level.time + mp_regen_rate;
-					}
 
 					zyk_cast_magic(ent, first_magic_skill + random_magic);
 				}

@@ -1703,6 +1703,7 @@ void zyk_use_rpg_stuff(gentity_t* ent)
 					-1,
 					-1,
 					-1,
+					-1,
 					RPG_INVENTORY_ITEM_SEEKER_DRONE,
 					RPG_INVENTORY_AMMO_ROCKETS,
 					RPG_INVENTORY_MISC_MEDPACK,

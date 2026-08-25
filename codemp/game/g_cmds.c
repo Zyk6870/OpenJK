@@ -223,7 +223,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases mp usage. You can also bind it to a key like this: ^3/bind <key> magicflight^7";
 	if (skill_index == SKILL_MAGIC_REGEN)
-		return "Regens mp faster, and even faster while meditating. If out of Nature Energy, uses powercell ammo to regen mp";
+		return "Regens more mp by using the same amount of Nature Energy. Meditating makes it regen at a faster rate";
 	if (skill_index == SKILL_MAGIC_REACTION)
 		return "If you have Magic Fist skill, has a chance to automatically shoot at the nearest target while meditating. Each level increases chance to shoot Magic Fist";
 	if (skill_index == SKILL_MAGIC_SHIELD)
@@ -4591,6 +4591,7 @@ qboolean validate_selected_ability(gentity_t* ent, zyk_selected_ability_t select
 	else if (selected_ability >= SELECTED_ABILITY_SEEKER_DRONE && selected_ability <= SELECTED_ABILITY_ENERGY_MODULATOR)
 	{
 		zyk_inventory_t inventory_indexes[MAX_SELECTED_ABILITIES] = {
+					-1,
 					-1,
 					-1,
 					-1,

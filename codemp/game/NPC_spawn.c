@@ -1810,15 +1810,18 @@ finish:
 			// zyk: adding all magic skills to this npc
 			while (current_magic_skill < NUMBER_OF_SKILLS)
 			{
-				if (ent->client->pers.skill_levels[current_magic_skill] < 1)
+				if (newent->client->pers.skill_levels[current_magic_skill] < 1)
 				{
-					ent->client->pers.skill_levels[current_magic_skill] = zyk_max_skill_level(current_magic_skill);
+					newent->client->pers.skill_levels[current_magic_skill] = zyk_max_skill_level(current_magic_skill);
 				}
 
 				current_magic_skill++;
 			}
 
-			ent->client->pers.magic_power = zyk_max_magic_power(ent);
+			newent->client->pers.magic_power = zyk_max_magic_power(newent);
+
+			newent->client->pers.nature_energy = RPG_MAX_NATURE_ENERGY;
+			newent->client->pers.max_nature_energy = RPG_MAX_NATURE_ENERGY;
 		}
 	}
 
