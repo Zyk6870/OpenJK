@@ -219,17 +219,17 @@ char* zyk_skill_description(int skill_index)
 		return va("At level 0 your run speed is %.1f. Each level increases it by %.1f", g_speed.value, RPG_RUN_SPEED_SKILL_INCREASE);
 	
 	if (skill_index == SKILL_MAGIC_FIST)
-		return va("Allows you to attack with magic bolts when using melee punches. Each level increases damage. Magic Affinity increases damage. At max level, can damage any objects that normally would only be able to be damaged by Saber or Heavy Weapons, and can also interact with some objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
+		return va("Allows you to attack with magic bolts when using melee punches. Each level and Magic Affinity increase damage. At max level, can damage any objects that normally would only be able to be damaged by Saber or Heavy Weapons, and can also interact with some objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases mp usage. You can also bind it to a key like this: ^3/bind <key> magicflight^7";
 	if (skill_index == SKILL_MAGIC_REGEN)
 		return "Regens more mp by using the same amount of Nature Energy. Meditating makes it regen at a faster rate";
 	if (skill_index == SKILL_MAGIC_REACTION)
-		return "Each level and Magic Affinity increase chance to automatically shoot a weak Magic Fist shot at the nearest target. Has an even better chance while meditating";
+		return "Automatically shoots a weak Magic Fist shot at the nearest target. Each level, Magic Affinity and meditating increase shooting rate";
 	if (skill_index == SKILL_MAGIC_SHIELD)
-		return va("A magic shield appears around you, decreasing damage to your health from any source. Higher levels and Magic Affinity increase resistance to damage to your health. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
+		return va("A magic shield appears around you, decreasing damage to your health from any source. Higher levels and Magic Affinity increase resistance to damage to your health and chance to resist force powers. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_HEALING_CIRCLE)
-		return va("Creates Healing Circles that restore health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and ally players or npcs inside the circle. Higher levels and Magic Affinity increase the amount of health restored and decrease bad status effects duration faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
+		return va("Restores health and decreases duration of bad status effects (Poison, Fire, Bleeding, Confusion) to you and ally players or npcs inside the circle. Higher levels and Magic Affinity increase the amount of health restored and decrease bad status effects duration faster. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_CHAOS_FIELD)
 		return va("Creates a field that damages enemies inside it and causes bad status effects (Poison, Fire, Bleeding, Confusion) to them. Higher levels and Magic Affinity increase the field damage and the chance to cause the bad status effects and their duration. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_LIGHTNING_DOME)

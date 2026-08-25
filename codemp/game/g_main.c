@@ -5499,7 +5499,7 @@ void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target)
 
 	if (shoot_at_nearest_target == qtrue)
 	{
-		magic_fist_mp_cost = 1;
+		magic_fist_mp_cost = 2;
 	}
 
 	if (ent && ent->client && (ent->client->sess.account_mode == ACC_MODE_RPG || ent->NPC) &&
@@ -5738,39 +5738,41 @@ void magic_power_events(gentity_t *ent)
 				ent->client->pers.magic_consumption_timer = level.time + 250;
 			}
 
-			// zyk: Magic Reaction skill. Shoots Magic Fist bolts while meditating
+			// zyk: Magic Reaction skill. Shoots Magic Fist bolts
 			if (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] > 0 &&
 				ent->client->ps.hasLookTarget == qtrue &&
 				ent->client->pers.magic_reaction_debounce_timer < level.time)
 			{
 				int chance_for_magic_fist = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION];
-				int magic_reaction_debounce = 500 - (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] * 20) - (magic_bonus * 25);
+				int magic_reaction_debounce = 1800 - (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] * 40) - (magic_bonus * 50);
 				qboolean is_ally = qfalse;
 				gentity_t* target_ent = &g_entities[ent->client->ps.lookTarget];
 
 				// zyk: user and the target are allies (player or npc)
-				if (target_ent->client &&
-					(OnSameTeam(ent, target_ent) == qtrue || npcs_on_same_team(ent, target_ent) == qtrue))
+				if (target_ent && target_ent->client)
 				{
-					is_ally = qtrue;
-				}
-
-				if (target_ent->client &&
-					zyk_is_ally(ent, target_ent) == qtrue)
-				{
-					is_ally = qtrue;
-				}
-
-				if (is_ally == qfalse)
-				{
-					if (Q_irand(0, 99) < chance_for_magic_fist)
+					if (OnSameTeam(ent, target_ent) == qtrue || npcs_on_same_team(ent, target_ent) == qtrue)
 					{
-						zyk_magic_fist_bolt(ent, qtrue);
+						is_ally = qtrue;
 					}
 
-					if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+					if (zyk_is_ally(ent, target_ent) == qtrue)
 					{
-						magic_reaction_debounce /= 2;
+						is_ally = qtrue;
+					}
+
+					if (is_ally == qfalse)
+					{
+						// zyk: npcs dont set looktarget based on distance
+						if ((!ent->NPC || Distance(ent->client->ps.origin, target_ent->client->ps.origin) < 270))
+						{
+							zyk_magic_fist_bolt(ent, qtrue);
+						}
+
+						if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+						{
+							magic_reaction_debounce /= 2;
+						}
 					}
 				}
 

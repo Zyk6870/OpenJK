@@ -552,8 +552,11 @@ void WP_SpawnInitForcePowers( gentity_t *ent )
 
 extern qboolean BG_InKnockDown( int anim ); //bg_pmove.c
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
+extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forcePower)
 {
+	qboolean is_ally = qfalse;
+
 	if (other && other->client && BG_HasYsalamiri(level.gametype, &other->client->ps))
 	{
 		return 0;
@@ -650,6 +653,33 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 		level.gametype == GT_SIEGE)
 	{ //can't use powers at all on npc's normally in siege...
 		return 0;
+	}
+
+	if (other && other->client)
+	{
+		if (OnSameTeam(attacker, other) == qtrue || npcs_on_same_team(attacker, other) == qtrue)
+		{
+			is_ally = qtrue;
+		}
+
+		if (zyk_is_ally(attacker, other) == qtrue)
+		{
+			is_ally = qtrue;
+		}
+
+		// zyk: Magic Shield increases chance to absorb force powers
+		if (is_ally == qfalse && other->client->pers.active_magic & (1 << MAGIC_MAGIC_SHIELD))
+		{
+			int magic_bonus = zyk_skill_affinity(other, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
+			int chance_to_resist_force = other->client->pers.skill_levels[SKILL_MAGIC_SHIELD] + magic_bonus;
+
+			if (Q_irand(0, 99) < chance_to_resist_force)
+			{
+				other->client->pushEffectTime = level.time + 1000;
+
+				return 0;
+			}
+		}
 	}
 
 	return 1;
@@ -5481,7 +5511,6 @@ void sense_health_info(gentity_t *self, gentity_t *target)
 }
 
 extern qboolean duel_tournament_is_duelist(gentity_t *ent);
-extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 {
 	int			i, holo, holoregen;
