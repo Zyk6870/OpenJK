@@ -38,9 +38,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define VERSION_STRING_DOTTED XSTRING(VERSION_MAJOR_RELEASE) "." XSTRING(VERSION_MINOR_RELEASE) "." XSTRING(VERSION_EXTERNAL_BUILD) "." XSTRING(VERSION_INTERNAL_BUILD) // "a.b.c.d"
 
 #if defined(_DEBUG)
-	#define	JK_VERSION		"(debug)New Zyk Mod v1.7.91: " GIT_TAG
+	#define	JK_VERSION		"(debug)New Zyk Mod v1.7.92: " GIT_TAG
 	#define JK_VERSION_OLD	"(debug)JAmp: v" VERSION_STRING_DOTTED
 #else
-	#define	JK_VERSION		"New Zyk Mod v1.7.91: " GIT_TAG
+	#define	JK_VERSION		"New Zyk Mod v1.7.92: " GIT_TAG
 	#define JK_VERSION_OLD	"JAmp: v" VERSION_STRING_DOTTED
 #endif

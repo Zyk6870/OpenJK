@@ -9286,7 +9286,7 @@ void G_RunFrame( int levelTime ) {
 					ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR
 					)
 				{
-					int quest_log_chance = (RPG_MAX_QUEST_LOG_PARTS - ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG]) * 5;
+					int quest_log_chance = (RPG_MAX_QUEST_LOG_PARTS - ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG]) * 6;
 
 					// zyk: Quest Log
 					if (ent->client->pers.rpg_inventory[RPG_INVENTORY_LEGENDARY_QUEST_LOG] < RPG_MAX_QUEST_LOG_PARTS &&
@@ -9446,7 +9446,7 @@ void G_RunFrame( int levelTime ) {
 								Q_irand(0, 99) < (chance_for_ally + zyk_number_of_enemies_in_map() - (zyk_number_of_allies_in_map(ent) * 4)))
 							{
 								int ally_type = Q_irand(QUEST_NPC_ALLY_MAGE, QUEST_NPC_ALLY_FORCE_WARRIOR);
-								int ally_bonus = ent->client->pers.nature_energy / 75;
+								int ally_bonus = ent->client->pers.nature_energy / 50;
 
 								zyk_spawn_quest_npc(ally_type, 0, ally_bonus, qfalse, ent->s.number);
 							}

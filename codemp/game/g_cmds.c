@@ -5782,6 +5782,8 @@ void zyk_set_default_rpg_stuff(gentity_t* ent)
 
 	// zyk: so the char starts with the original health
 	ent->client->pers.last_health = 100;
+	ent->client->pers.last_shield = 0;
+	ent->client->pers.last_mp = 0;
 
 	// zyk: player starts with no weapons, ammo or items
 	ent->client->ps.stats[STAT_WEAPONS] = 0;
