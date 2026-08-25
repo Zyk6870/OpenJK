@@ -562,7 +562,7 @@ int zyk_max_magic_level_for_quest_npc(zyk_quest_npc_t enemy_type)
 
 	max_levels[QUEST_NPC_NONE] = 0;
 
-	max_levels[QUEST_NPC_MAGE_MASTER] = 15;
+	max_levels[QUEST_NPC_MAGE_MASTER] = 12;
 	max_levels[QUEST_NPC_MAGE_MINISTER] = 10;
 	max_levels[QUEST_NPC_MAGE_SCHOLAR] = 10;
 	max_levels[QUEST_NPC_FORCE_SABER_WARRIOR_GUNS] = 0;
@@ -667,6 +667,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] = npc_skill_level + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_SCHOLAR)
 		{
@@ -675,6 +676,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] = npc_skill_level + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_APPRENTICE)
 		{
