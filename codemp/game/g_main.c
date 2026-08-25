@@ -5498,7 +5498,6 @@ void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target)
 	if (shoot_at_nearest_target == qtrue)
 	{
 		magic_fist_mp_cost = 1;
-		magic_fist_damage_modifier = 1;
 	}
 
 	if (ent && ent->client && (ent->client->sess.account_mode == ACC_MODE_RPG || ent->NPC) &&
@@ -5510,8 +5509,11 @@ void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target)
 		float fist_damage_increase_factor = 1.0;
 		int fist_damage = zyk_magic_fist_damage.integer;
 
-		fist_damage_increase_factor += ((magic_fist_damage_modifier * 0.02f) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01f));
-		fist_damage *= fist_damage_increase_factor;
+		if (shoot_at_nearest_target == qfalse)
+		{
+			fist_damage_increase_factor += ((magic_fist_damage_modifier * 0.02f) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01f));
+			fist_damage *= fist_damage_increase_factor;
+		}
 
 		if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
 			VectorSet(origin, ent->client->ps.origin[0], ent->client->ps.origin[1], ent->client->ps.origin[2] + 12);
