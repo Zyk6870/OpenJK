@@ -2937,8 +2937,8 @@ void fx_runner_think( gentity_t *ent )
 		tto[1] = tfrom[1] + fwd[1] * radius;
 		tto[2] = tfrom[2] + fwd[2] * radius;
 
-		VectorSet(shot_mins, -20, -20, -20);
-		VectorSet(shot_maxs, 20, 20, 20);
+		VectorSet(shot_mins, -16, -16, -16);
+		VectorSet(shot_maxs, 16, 16, 16);
 
 		trap->Trace(&tr, tfrom, shot_mins, shot_maxs, tto, user_ent->s.number, MASK_PLAYERSOLID, qfalse, 0, 0);
 
