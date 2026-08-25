@@ -5863,7 +5863,7 @@ void zyk_force_beam(gentity_t* ent)
 			// zyk: consume one of the extra sabers in inventory to increase damage
 			if (ent->client->pers.rpg_inventory[RPG_INVENTORY_WP_SABER] > 1 && ent->client->pers.nature_energy >= RPG_FORCE_BEAM_COST)
 			{
-				ent->client->pers.force_beam_damage *= 2;
+				ent->client->pers.force_beam_damage *= 3;
 
 				zyk_update_inventory_quantity(ent, qfalse, RPG_INVENTORY_WP_SABER, 1);
 
