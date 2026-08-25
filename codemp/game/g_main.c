@@ -5497,8 +5497,8 @@ void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target)
 
 	if (shoot_at_nearest_target == qtrue)
 	{
-		magic_fist_mp_cost = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] * 2;
-		magic_fist_damage_modifier = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION];
+		magic_fist_mp_cost = 1;
+		magic_fist_damage_modifier = 1;
 	}
 
 	if (ent && ent->client && (ent->client->sess.account_mode == ACC_MODE_RPG || ent->NPC) &&
@@ -5740,7 +5740,7 @@ void magic_power_events(gentity_t *ent)
 				ent->client->pers.magic_reaction_debounce_timer < level.time)
 			{
 				int chance_for_magic_fist = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION];
-				int magic_reaction_debounce = 600 - (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] * 20) - (magic_bonus * 25);
+				int magic_reaction_debounce = 500 - (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] * 20) - (magic_bonus * 25);
 				qboolean is_ally = qfalse;
 				gentity_t* target_ent = &g_entities[ent->client->ps.lookTarget];
 
