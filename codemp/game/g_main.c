@@ -5493,9 +5493,16 @@ int magic_fist_velocity(gentity_t* ent)
 void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target)
 {
 	int magic_fist_mp_cost = ent->client->pers.skill_levels[SKILL_MAGIC_FIST];
+	int magic_fist_damage_modifier = ent->client->pers.skill_levels[SKILL_MAGIC_FIST];
+
+	if (shoot_at_nearest_target == qtrue)
+	{
+		magic_fist_mp_cost = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] * 2;
+		magic_fist_damage_modifier = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION];
+	}
 
 	if (ent && ent->client && (ent->client->sess.account_mode == ACC_MODE_RPG || ent->NPC) &&
-		ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0 &&
+		(ent->client->pers.skill_levels[SKILL_MAGIC_FIST] > 0 || shoot_at_nearest_target == qtrue) &&
 		ent->client->pers.magic_power >= magic_fist_mp_cost)
 	{
 		gentity_t* missile;
@@ -5503,7 +5510,7 @@ void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target)
 		float fist_damage_increase_factor = 1.0;
 		int fist_damage = zyk_magic_fist_damage.integer;
 
-		fist_damage_increase_factor += ((ent->client->pers.skill_levels[SKILL_MAGIC_FIST] * 0.02f) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01f));
+		fist_damage_increase_factor += ((magic_fist_damage_modifier * 0.02f) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01f));
 		fist_damage *= fist_damage_increase_factor;
 
 		if (ent->client->ps.pm_flags & PMF_DUCKED) // zyk: crouched
@@ -5581,10 +5588,11 @@ void magic_power_events(gentity_t *ent)
 	{
 		if (ent->health > 0)
 		{
+			int magic_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC);
 			int magic_bonus = 0;
 
 			// zyk: Magic Affinity increases magic damage
-			magic_bonus += (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER);
+			magic_bonus += (magic_affinity / MAGIC_AFFINITY_MODIFIER);
 
 			if (ent->client->pers.active_magic > 0)
 			{
@@ -5726,12 +5734,51 @@ void magic_power_events(gentity_t *ent)
 				ent->client->pers.magic_consumption_timer = level.time + 250;
 			}
 
+			// zyk: Magic Reaction skill. Shoots Magic Fist bolts while meditating
+			if (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] > 0 &&
+				ent->client->ps.hasLookTarget == qtrue &&
+				ent->client->pers.magic_reaction_debounce_timer < level.time)
+			{
+				int chance_for_magic_fist = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION];
+				int magic_reaction_debounce = 600 - (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] * 20) - (magic_bonus * 25);
+				qboolean is_ally = qfalse;
+				gentity_t* target_ent = &g_entities[ent->client->ps.lookTarget];
+
+				// zyk: user and the target are allies (player or npc)
+				if (target_ent->client &&
+					(OnSameTeam(ent, target_ent) == qtrue || npcs_on_same_team(ent, target_ent) == qtrue))
+				{
+					is_ally = qtrue;
+				}
+
+				if (target_ent->client &&
+					zyk_is_ally(ent, target_ent) == qtrue)
+				{
+					is_ally = qtrue;
+				}
+
+				if (is_ally == qfalse)
+				{
+					if (Q_irand(0, 99) < chance_for_magic_fist)
+					{
+						zyk_magic_fist_bolt(ent, qtrue);
+					}
+
+					if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+					{
+						magic_reaction_debounce /= 2;
+					}
+				}
+
+				ent->client->pers.magic_reaction_debounce_timer = level.time + magic_reaction_debounce;
+			}
+
 			// zyk: MP regen
 			if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
 			{
 				int mp_regen_amount = 1;
 				int max_mp = zyk_max_magic_power(ent);
-				int mp_regen_rate = 1800 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 10);
+				int mp_regen_rate = 1800 - (magic_affinity * 10);
 
 				// zyk: Enlightenment Dark regens mp without using Nature Energy
 				if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time && ent->client->pers.magic_power < max_mp)
@@ -9003,22 +9050,6 @@ void G_RunFrame( int levelTime ) {
 						}
 
 						ent->client->pers.nature_energy_timer = level.time + nature_energy_time;
-					}
-
-					// zyk: Magic Reaction skill. Shoots Magic Fist bolts while meditating
-					if (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] > 0 &&
-						ent->client->ps.hasLookTarget == qtrue &&
-						ent->client->pers.magic_reaction_debounce_timer < level.time &&
-						ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
-					{
-						int chance_for_magic_fist = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION];
-
-						if (Q_irand(0, 99) < chance_for_magic_fist)
-						{
-							zyk_magic_fist_bolt(ent, qtrue);
-						}
-
-						ent->client->pers.magic_reaction_debounce_timer = level.time + 100;
 					}
 
 					// zyk: Energy Modulator consumes Nature Energy

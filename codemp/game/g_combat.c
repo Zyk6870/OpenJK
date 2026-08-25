@@ -5968,7 +5968,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			if (targ->client->pers.active_magic & (1 << MAGIC_MAGIC_SHIELD))
 			{
-				bonus_health_resistance += (0.02f * (targ->client->pers.skill_levels[SKILL_MAGIC_SHIELD] + magic_bonus));
+				bonus_health_resistance += (0.025f * (targ->client->pers.skill_levels[SKILL_MAGIC_SHIELD] + magic_bonus));
 			}
 			
 			// zyk: reduces damage based on the health resistance bonuses
