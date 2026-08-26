@@ -5970,6 +5970,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			{
 				bonus_health_resistance += (0.025f * (targ->client->pers.skill_levels[SKILL_MAGIC_SHIELD] + magic_bonus));
 			}
+
+			if (targ->client->ps.fd.forcePowersActive & (1 << FP_ABSORB) && targ->client->pers.skill_levels[SKILL_ABSORB] == zyk_max_skill_level(SKILL_ABSORB) &&
+				(zyk_is_magic_fist(mod, inflictor) == qtrue || zyk_is_magic_power(inflictor) == qtrue))
+			{
+				bonus_health_resistance += (0.01f * zyk_skill_affinity(targ, SKILL_CATEGORY_FORCE));
+			}
 			
 			// zyk: reduces damage based on the health resistance bonuses
 			take = (int)ceil(take * (1.00f - bonus_health_resistance));

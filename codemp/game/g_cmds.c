@@ -181,7 +181,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_SABER_THROW)
 		return va("Throws your saber at enemy and gets it back. Each level increases max distance and saber throw speed. Has %d damage", zyk_saber_throw_damage.integer);
 	if (skill_index == SKILL_ABSORB)
-		return "Allows you to absorb force power attacks done to you, restoring some force points";
+		return "Allows you to absorb force power attacks done to you, restoring some force points. At max level, also decreases damage from magic attacks based on Force Affinity";
 	if (skill_index == SKILL_HEAL)
 		return "Restores 5 hp at level 1, 10 hp at level 2, 25 hp at level 3 and 30 hp at level 4. At a level > 3, also restores some shield";
 	if (skill_index == SKILL_PROTECT)
