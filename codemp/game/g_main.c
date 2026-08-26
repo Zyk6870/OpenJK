@@ -5847,7 +5847,7 @@ void zyk_force_beam(gentity_t* ent)
 	{
 		if (ent->client->ps.fd.forcePower >= RPG_FORCE_BEAM_COST)
 		{
-			int force_beam_cooldown = 10000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) * 100);
+			int force_beam_cooldown = 11000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) * 100);
 
 			zyk_create_force_beam(ent);
 

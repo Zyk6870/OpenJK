@@ -6014,13 +6014,13 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 				else if (self->client->sess.account_mode == ACC_MODE_RPG)
 				{ // zyk: force regen for RPG players is based on meditating and the Force Affinity
 					int force_affinity = zyk_skill_affinity(self, SKILL_CATEGORY_FORCE);
-					int rpg_force_regen_time = 140 - force_affinity;
+					int rpg_force_regen_time = 120 - force_affinity;
 
 					// zyk: Meditation skill
 					if (self->client->pers.skill_levels[SKILL_MEDITATION] > 0 &&
 						self->client->ps.forceHandExtend == HANDEXTEND_TAUNT && self->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 					{
-						rpg_force_regen_time -= (force_affinity / 2);
+						rpg_force_regen_time -= (rpg_force_regen_time / 2);
 					}
 
 					self->client->ps.fd.forcePowerRegenDebounceTime += rpg_force_regen_time;
