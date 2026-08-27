@@ -5789,7 +5789,7 @@ void magic_power_events(gentity_t *ent)
 				// zyk: Enlightenment Dark regens mp without using Nature Energy
 				if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] > level.time && ent->client->pers.magic_power < max_mp)
 				{
-					zyk_set_mp(ent, 1, qtrue);
+					zyk_set_mp(ent, 2, qtrue);
 				}
 
 				// zyk: Magic Regen skill regens mp faster while meditating
@@ -9041,6 +9041,11 @@ void G_RunFrame( int levelTime ) {
 							nature_energy_amount *= 2;
 						}
 
+						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] > level.time)
+						{
+							nature_energy_amount *= 2;
+						}
+
 						// zyk: Energy Modulator is active, stops Nature Energy regen
 						if (ent->client->pers.energy_modulator_mode == ENERGY_MODULATOR_MODE_OFF)
 						{
@@ -9049,11 +9054,6 @@ void G_RunFrame( int levelTime ) {
 
 						// zyk: Quest progress increase Nature Energy regen rate
 						nature_energy_time -= (main_quest_progress * 5);
-
-						if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] > level.time)
-						{
-							nature_energy_time -= 500;
-						}
 
 						ent->client->pers.nature_energy_timer = level.time + nature_energy_time;
 					}
