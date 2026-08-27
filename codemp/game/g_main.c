@@ -9176,11 +9176,20 @@ void G_RunFrame( int levelTime ) {
 					}
 				}
 
-				// zyk: Meditation skill. Restore bad status effects while meditating
+				// zyk: Meditation skill. Restore bad status effects while meditating and charge damage resistance against magic attacks
 				if (ent->client->pers.skill_levels[SKILL_MEDITATION] > 0 && ent->client->pers.meditation_timer < level.time &&
 					ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 				{
-					rpg_status_restoration(ent, zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE));
+					int force_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE);
+
+					rpg_status_restoration(ent, force_affinity * 5);
+
+					if (ent->client->pers.meditation_bonus < force_affinity)
+					{
+						ent->client->pers.meditation_bonus++;
+
+						ent->client->pushEffectTime = level.time + 500;
+					}
 
 					ent->client->pers.meditation_timer = level.time + 100;
 				}
