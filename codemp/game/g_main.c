@@ -9184,7 +9184,7 @@ void G_RunFrame( int levelTime ) {
 
 					rpg_status_restoration(ent, force_affinity * 5);
 
-					if (ent->client->pers.meditation_bonus < force_affinity)
+					if (ent->client->pers.meditation_bonus < (force_affinity / 2))
 					{
 						ent->client->pers.meditation_bonus++;
 

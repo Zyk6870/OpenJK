@@ -201,7 +201,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_TEAM_ENERGIZE)
 		return "Restores some force power to players near you. At a level > 3, If force power is full, restores some power cell ammo";
 	if (skill_index == SKILL_MEDITATION)
-		return "Meditating will make Force regen faster. It will also slowly restore bad status effects based on Force Affinity and will charge damage resistance against magic attacks up to Force Affinity value in percentage, and will decrease 1 per cent each time after getting magic damage";
+		return "Meditating will make Force regen faster. Based on Force Affinity, decrease bad status effects duration and also charge damage resistance against magic attacks up to half the Force Affinity value in percentage, and decrease 1 per cent each time after getting magic damage, which will also use some force";
 	if (skill_index == SKILL_FORCE_BEAM)
 		return "A force ability that shoots a powerful beam that deals saber damage. Benefits from Saber damage improvements. It will consume one of the extra sabers in inventory for extra damage by using some Nature Energy. Each level increases damage. Force Affinity decreases cooldown time. Use it by pressing Duel key to select it and then pressing Use key";
 
