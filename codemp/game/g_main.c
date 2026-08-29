@@ -9026,7 +9026,7 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.nature_energy_timer < level.time)
 					{
 						int main_quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS);
-						int nature_energy_time = 2400 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) * 5);
+						int nature_energy_time = 2300 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) * 10);
 						int nature_energy_amount = 1;
 
 						// zyk: if Quests are disabled, make Nature Energy regen faster
