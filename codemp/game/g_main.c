@@ -9026,14 +9026,8 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.nature_energy_timer < level.time)
 					{
 						int main_quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS);
-						int nature_energy_time = 2300 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) * 10);
+						int nature_energy_time = 2060 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) * 7);
 						int nature_energy_amount = 1;
-
-						// zyk: if Quests are disabled, make Nature Energy regen faster
-						if (zyk_allow_quests.integer < 1)
-						{
-							nature_energy_time -= 500;
-						}
 
 						// zyk: meditating
 						if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
@@ -9052,8 +9046,14 @@ void G_RunFrame( int levelTime ) {
 							set_nature_energy(ent, nature_energy_amount, qtrue);
 						}
 
-						// zyk: Quest progress increase Nature Energy regen rate
-						nature_energy_time -= (main_quest_progress * 5);
+						if (zyk_allow_quests.integer < 1)
+						{ // zyk: if Quests are disabled, make Nature Energy regen faster
+							nature_energy_time -= 500;
+						}
+						else
+						{ // zyk: Quest progress increase Nature Energy regen rate
+							nature_energy_time -= (main_quest_progress * 5);
+						}
 
 						ent->client->pers.nature_energy_timer = level.time + nature_energy_time;
 					}
