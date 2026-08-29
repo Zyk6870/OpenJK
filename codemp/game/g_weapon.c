@@ -908,7 +908,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 							if (fullCharge == qtrue && ent->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_DISRUPTOR] > 0 &&
 								ent->client->pers.active_inventory_upgrades & (1 << INV_UPGRADE_DISRUPTOR2))
 							{
-								damage *= 4;
+								damage *= 3;
 							}
 						}
 
