@@ -5972,12 +5972,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 
 			if (targ->client->pers.skill_levels[SKILL_MEDITATION] > 0 && targ->client->pers.meditation_bonus > 0 &&
-				targ->client->ps.fd.forcePower >= (targ->client->pers.meditation_bonus / 10) &&
+				targ->client->ps.fd.forcePower >= (1 + (targ->client->pers.meditation_bonus / 10)) &&
 				(zyk_is_magic_fist(mod, inflictor) == qtrue || zyk_is_magic_power(inflictor) == qtrue))
 			{
 				bonus_health_resistance += (0.01f * targ->client->pers.meditation_bonus);
 
-				targ->client->ps.fd.forcePower -= (targ->client->pers.meditation_bonus / 10);
+				targ->client->ps.fd.forcePower -= (1 + (targ->client->pers.meditation_bonus / 10));
 				targ->client->pers.meditation_bonus--;
 			}
 			
