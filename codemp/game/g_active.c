@@ -199,7 +199,7 @@ void P_WorldEffects( gentity_t *ent ) {
 		// zyk: Underwater time will increase based on Misc Affinity
 		if (ent->client->sess.account_mode == ACC_MODE_RPG)
 		{
-			ent->client->airOutTime = level.time + (12000 * (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 5));
+			ent->client->airOutTime = level.time + (12000 * (1 + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 5)));
 		}
 	}
 
