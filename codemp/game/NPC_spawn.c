@@ -1784,6 +1784,10 @@ finish:
 		newent->client->pers.magic_regen_debounce_timer = 0;
 		newent->client->pers.magic_power_usage_timer = 0;
 		newent->client->pers.magic_power = 0;
+		newent->client->pers.in_magic_flight = qfalse;
+		newent->client->pers.magic_gate_id = -1;
+		newent->client->pers.magic_gate_duration = 0;
+		newent->client->pers.magic_gate_debounce_timer = 0;
 
 		for (zyk_it = 0; zyk_it < NUMBER_OF_SKILLS; zyk_it++)
 		{

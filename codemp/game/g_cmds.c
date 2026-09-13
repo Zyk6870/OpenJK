@@ -221,7 +221,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FIST)
 		return va("Allows you to attack with magic bolts when using melee punches. Each level and Magic Affinity increase damage. At max level, can damage any objects that normally would only be able to be damaged by Saber or Heavy Weapons, and can also interact with some objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAGIC_FLIGHT)
-		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases mp usage. You can also bind it to a key like this: ^3/bind <key> magicflight^7";
+		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases MP usage. You can also bind it to a key like this: ^3/bind <key> magicflight^7";
 	if (skill_index == SKILL_MAGIC_GATE)
 		return "Creates a Magic Gate. Get Melee, Meditate and press Saber Stance key to create the gate, and do the same thing to teleport to it. Do it while holding Use key to make the Gate release a magic wave that damages enemies near it. The magic wave damage and Gate duration increase based on this skill level and Magic Affinity. It will not be possible to teleport if a player or npc is near the Gate";
 	if (skill_index == SKILL_MAGIC_REACTION)
@@ -6560,7 +6560,18 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 	strcpy(message, va("%s^3Nature Energy: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.nature_energy, ent->client->pers.max_nature_energy)));
 	strcpy(message, va("%s^3Weight: %s\n", message, zyk_formatted_amount_with_max(ent->client->pers.current_weight, ent->client->pers.max_weight)));
 
-	strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, ent->client->ps.speed));
+	if (ent->client->ps.speed < g_speed.value)
+	{
+		strcpy(message, va("%s^3Run Speed: ^6%.1f\n", message, ent->client->ps.speed));
+	}
+	else if (ent->client->ps.speed > g_speed.value)
+	{
+		strcpy(message, va("%s^3Run Speed: ^5%.1f\n", message, ent->client->ps.speed));
+	}
+	else
+	{
+		strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, ent->client->ps.speed));
+	}
 
 	strcpy(message, va("%s^3Force Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE)));
 	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MISC)));
