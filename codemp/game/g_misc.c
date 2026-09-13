@@ -2920,10 +2920,18 @@ void fx_runner_think( gentity_t *ent )
 		// zyk: did not find the player, clear the Spirit Tree
 		zyk_clear_quest_effect(ent);
 	}
-
-	// zyk: Force Beam. Traces enemies and damages them
-	if (Q_stricmp(ent->targetname, "zyk_force_beam") == 0)
+	else if (Q_stricmp(ent->targetname, "zyk_magic_gate") == 0)
 	{
+		gentity_t* player_ent = ent->parent;
+
+		// zyk: Magic Gate is no longer active. Remove this effect
+		if (player_ent && player_ent->client && player_ent->client->pers.magic_gate_id == -1)
+		{
+			level.special_power_effects_timer[ent->s.number] = level.time + 100;
+		}
+	}
+	else if (Q_stricmp(ent->targetname, "zyk_force_beam") == 0)
+	{ // zyk: Force Beam. Traces enemies and damages them
 		gentity_t *user_ent = ent->parent;
 		gentity_t *target_ent = NULL;
 		trace_t		tr;
@@ -3101,6 +3109,7 @@ void fx_runner_link( gentity_t *ent )
 			Q_stricmp(ent->targetname, "zyk_magic_chaos") == 0 ||
 			Q_stricmp(ent->targetname, "zyk_magic_lightning") == 0 ||
 			Q_stricmp(ent->targetname, "zyk_magic_gate") == 0 ||
+			Q_stricmp(ent->targetname, "zyk_magic_wave") == 0 ||
 			Q_stricmp(ent->targetname, "zyk_force_beam") == 0)
 		{ // zyk: effects from magic powers start right now
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
@@ -3181,6 +3190,7 @@ void SP_fx_runner( gentity_t *ent )
 		Q_stricmp(ent->targetname, "zyk_magic_chaos") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_lightning") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_gate") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_magic_wave") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_force_beam") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_status_poison") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_status_on_fire") == 0 || 

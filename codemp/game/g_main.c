@@ -4865,6 +4865,7 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 			if (Q_stricmp(targetname, "zyk_magic_gate") == 0)
 			{
 				ent->client->pers.magic_gate_id = new_ent->s.number;
+				new_ent->parent = ent;
 			}
 
 			level.special_power_effects[new_ent->s.number] = ent->s.number;
@@ -5402,10 +5403,13 @@ void magic_gate(gentity_t* ent)
 	{
 		if (ent->client->pers.skill_levels[SKILL_MAGIC_GATE] > 0)
 		{
-			int magic_gate_mp_cost = MAGIC_GATE_MP_COST;
+			int magic_gate_mp_cost = ent->client->pers.skill_levels[SKILL_MAGIC_GATE] * 20;
 
 			if (ent->client->pers.magic_power >= magic_gate_mp_cost)
 			{
+				int magic_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC);
+				int magic_bonus = (magic_affinity / MAGIC_AFFINITY_MODIFIER);
+
 				if (ent->client->pers.magic_gate_id > -1)
 				{ // zyk: gate is active
 					gentity_t* gate_ent = &g_entities[ent->client->pers.magic_gate_id];
@@ -5413,12 +5417,31 @@ void magic_gate(gentity_t* ent)
 					if (gate_ent && gate_ent->inuse &&
 						Q_stricmp(gate_ent->classname, "fx_runner") == 0 && Q_stricmp(gate_ent->targetname, "zyk_magic_gate") == 0)
 					{
-						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/tractorbeam.mp3"));
+						if (ent->client->pers.cmd.buttons & BUTTON_USE)
+						{ // zyk: holding Use key releases the Magic Wave
+							int magic_wave_dmg = ent->client->pers.skill_levels[SKILL_MAGIC_GATE] + magic_bonus;
 
-						zyk_TeleportPlayer(ent, gate_ent->s.origin, ent->client->ps.viewangles);
+							zyk_quest_effect_spawn(ent, gate_ent, "zyk_magic_wave", "4", "ships/proton_impact", 0, magic_wave_dmg, 512, 1000);
 
-						// zyk: play sound again at the destination
-						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/tractorbeam.mp3"));
+							// zyk: remove the gate
+							ent->client->pers.magic_gate_id = -1;
+						}
+						else
+						{ // zyk: trying to use the Gate
+							if (zyk_there_is_player_or_npc_in_spot(gate_ent->s.origin[0], gate_ent->s.origin[1], gate_ent->s.origin[2]) == qfalse)
+							{ // zyk: must not have a player or npc at the teleport destination to avoid telefrag
+								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/tractorbeam.mp3"));
+
+								zyk_TeleportPlayer(ent, gate_ent->s.origin, ent->client->ps.viewangles);
+
+								// zyk: remove the gate
+								ent->client->pers.magic_gate_id = -1;
+							}
+							else
+							{
+								G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/tractorbeam_off_1.mp3"));
+							}
+						}
 					}
 					else
 					{
@@ -5427,10 +5450,12 @@ void magic_gate(gentity_t* ent)
 				}
 				else
 				{ // zyk: creates the gate
-					int gate_duration = (2000 * ent->client->pers.skill_levels[SKILL_MAGIC_GATE]) + (2000 * zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC));
+					int gate_duration = (2000 * ent->client->pers.skill_levels[SKILL_MAGIC_GATE]) + (2000 * magic_affinity);
 
 					zyk_quest_effect_spawn(ent, ent, "zyk_magic_gate", "0", "howler/sonic", 0, 0, 0, gate_duration);
 					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/tram_boost.mp3"));
+
+					ent->client->pers.magic_gate_duration = level.time + gate_duration;
 				}
 
 				zyk_set_mp(ent, magic_gate_mp_cost, qfalse);
@@ -5634,6 +5659,18 @@ void zyk_stop_all_magic_powers(gentity_t* ent)
 	{
 		zyk_stop_magic_power(ent, i);
 	}
+
+	if (ent->client->pers.in_magic_flight == qtrue)
+	{
+		ent->client->pers.in_magic_flight = qfalse;
+		Jetpack_Off(ent);
+		ent->client->jetPackToggleTime = level.time + 500;
+	}
+
+	if (ent->client->pers.magic_gate_id > -1)
+	{
+		ent->client->pers.magic_gate_id = -1;
+	}
 }
 
 void zyk_mp_usage(gentity_t* ent, int magic_skill_index)
@@ -5655,7 +5692,7 @@ void magic_power_events(gentity_t *ent)
 			// zyk: Magic Affinity increases magic damage
 			magic_bonus += (magic_affinity / MAGIC_AFFINITY_MODIFIER);
 
-			if (ent->client->pers.active_magic > 0)
+			if (ent->client->pers.active_magic > 0 || ent->client->pers.in_magic_flight == qtrue || ent->client->pers.magic_gate_id > -1)
 			{
 				if (ent->client->pers.rpg_statuses & (1 << RPG_STATUS_CONFUSED))
 				{
@@ -5668,6 +5705,11 @@ void magic_power_events(gentity_t *ent)
 
 					zyk_stop_all_magic_powers(ent);
 				}
+			}
+
+			if (ent->client->pers.magic_gate_duration < level.time)
+			{
+				ent->client->pers.magic_gate_id = -1;
 			}
 
 			if (ent->client->pers.active_magic & (1 << MAGIC_MAGIC_SHIELD))
@@ -5837,7 +5879,9 @@ void magic_power_events(gentity_t *ent)
 			}
 
 			// zyk: MP regen
-			if (ent->client->pers.active_magic == 0 && ent->client->pers.in_magic_flight == qfalse && ent->client->pers.magic_regen_debounce_timer < level.time)
+			if (ent->client->pers.active_magic == 0 &&
+				ent->client->pers.in_magic_flight == qfalse && ent->client->pers.magic_gate_id == -1 &&
+				ent->client->pers.magic_regen_debounce_timer < level.time)
 			{
 				int mp_regen_amount = 1;
 				int max_mp = zyk_max_magic_power(ent);

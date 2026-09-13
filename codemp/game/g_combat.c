@@ -4722,6 +4722,17 @@ qboolean zyk_is_magic_power(gentity_t* inflictor)
 	return qfalse;
 }
 
+qboolean zyk_is_magic_ability(gentity_t* inflictor)
+{
+	if (inflictor && !inflictor->client && inflictor->targetname != NULL &&
+		Q_stricmp(inflictor->targetname, "zyk_magic_wave") == 0)
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 // zyk: tests if this ability can damage anything
 qboolean zyk_can_damage_saber_only_entities(gentity_t *attacker, gentity_t *inflictor, int mod)
 {
@@ -4826,6 +4837,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	float		shieldAbsorbed = 0;
 	int			check_shield = 1; // zyk: tests if damage can be absorbed by shields
 	qboolean	can_damage_heavy_things = qfalse; // zyk: some attacks can destroy anything
+	qboolean is_magic_fist = qfalse;
+	qboolean is_magic_power = qfalse;
+	qboolean is_magic_ability = qfalse;
+	qboolean is_magic_attack = qfalse;
 
 	if (!targ)
 		return;
@@ -4893,6 +4908,27 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
+	// zyk: Magic attacks
+	if (zyk_is_magic_fist(mod, inflictor) == qtrue)
+	{
+		is_magic_fist = qtrue;
+	}
+
+	if (zyk_is_magic_power(inflictor) == qtrue)
+	{
+		is_magic_power = qtrue;
+	}
+
+	if (zyk_is_magic_ability(inflictor) == qtrue)
+	{
+		is_magic_ability = qtrue;
+	}
+
+	if (is_magic_fist == qtrue || is_magic_power == qtrue || is_magic_ability == qtrue)
+	{
+		is_magic_attack = qtrue;
+	}
+
 	if (attacker && attacker->client && attacker->client->sess.account_mode == ACC_MODE_RPG)
 	{ // zyk: bonus damage for RPG players
 		if (mod == MOD_SABER)
@@ -4924,7 +4960,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 			damage = (int)ceil(damage * bonus_saber_damage_factor);
 		}
-		else if (mod == MOD_MELEE && zyk_is_magic_fist(mod, inflictor) == qfalse)
+		else if (mod == MOD_MELEE && is_magic_fist == qfalse)
 		{ // zyk: Melee damage. Will not consider the magic bolt attacks
 			damage = (int)ceil(damage * (1.0 + (0.20 * attacker->client->pers.skill_levels[SKILL_MELEE])));
 		}
@@ -4932,8 +4968,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 	// zyk: Bleeding status decreases damage from Melee, Saber, Force powers and Magic
 	if (attacker && attacker->client && attacker->client->pers.rpg_statuses & (1 << RPG_STATUS_BLEEDING) &&
-		(mod == MOD_MELEE || mod == MOD_SABER || mod == MOD_FORCE_DARK || 
-			zyk_is_magic_fist(mod, inflictor) == qtrue || zyk_is_magic_power(inflictor) == qtrue))
+		(mod == MOD_MELEE || mod == MOD_SABER || mod == MOD_FORCE_DARK || is_magic_attack == qtrue))
 	{
 		damage = (int)ceil(damage * 0.5f);
 	}
@@ -4973,7 +5008,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		return;
 	}
 
-	if ((mod == MOD_DEMP2 || zyk_is_magic_fist(mod, inflictor) == qtrue) && targ && targ->inuse && targ->client)
+	if ((mod == MOD_DEMP2 || is_magic_fist == qtrue) && targ && targ->inuse && targ->client)
 	{ // zyk: added the Magic Fist condition
 		if ( targ->client->ps.electrifyTime < level.time )
 		{//electrocution effect
@@ -5706,7 +5741,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 	}
 
 	// zyk: Magic Fist can disable jetpacks
-	if (zyk_is_magic_fist(mod, inflictor) == qtrue && client)
+	if (is_magic_fist == qtrue && client)
 	{
 		if (client->jetPackOn)
 		{ //disable jetpack temporarily
@@ -5955,8 +5990,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 					targ->client->ps.powerups[PW_SHIELDHIT] = level.time + 500;
 				}
 
-				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] > 1 && 
-					(zyk_is_magic_fist(mod, inflictor) == qtrue || zyk_is_magic_power(inflictor) == qtrue))
+				if (targ->client->pers.rpg_inventory[RPG_INVENTORY_AMMO_POWERCELL] > 1 && is_magic_attack == qtrue)
 				{
 					bonus_health_resistance += 0.30f;
 
@@ -5972,8 +6006,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 
 			if (targ->client->pers.skill_levels[SKILL_MEDITATION] > 0 && targ->client->pers.meditation_bonus > 0 &&
-				targ->client->ps.fd.forcePower >= (1 + (targ->client->pers.meditation_bonus / 10)) &&
-				(zyk_is_magic_fist(mod, inflictor) == qtrue || zyk_is_magic_power(inflictor) == qtrue))
+				targ->client->ps.fd.forcePower >= (1 + (targ->client->pers.meditation_bonus / 10)) && is_magic_attack == qtrue)
 			{
 				bonus_health_resistance += (0.01f * targ->client->pers.meditation_bonus);
 
@@ -6445,47 +6478,53 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 					}
 
 					// zyk: Magic power. Target will not be knocked back by it
-					if (magic_power_user && magic_power_user->client && magic_power_user != ent && 
-						this_magic_power > -1)
+					if (magic_power_user && magic_power_user->client && magic_power_user != ent)
 					{
 						int final_damage = (int)points;
 
-						if (zyk_can_hit_target(magic_power_user, ent) == qfalse)
+						if (this_magic_power > -1)
 						{
-							continue;
-						}
-
-						// zyk: must do at least 1 damage
-						if (final_damage < 1)
-							final_damage = 1;
-
-						if (this_magic_power == MAGIC_HEALING_CIRCLE)
-						{
-							// zyk: this magic deals no damage
-							final_damage = 0;
-						}
-						else if (this_magic_power == MAGIC_CHAOS_FIELD)
-						{
-							int chaos_chance = final_damage;
-
-							if (Q_irand(0, 99) < chaos_chance && ent->client)
+							if (zyk_can_hit_target(magic_power_user, ent) == qfalse)
 							{
-								zyk_rpg_status_t random_bad_status = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
-								int status_duration = chaos_chance * 2000;
+								continue;
+							}
 
-								zyk_remove_emotes(ent);
+							// zyk: must do at least 1 damage
+							if (final_damage < 1)
+								final_damage = 1;
 
-								if (random_bad_status == RPG_STATUS_CONFUSED)
+							if (this_magic_power == MAGIC_HEALING_CIRCLE)
+							{
+								// zyk: this magic deals no damage
+								final_damage = 0;
+							}
+							else if (this_magic_power == MAGIC_CHAOS_FIELD)
+							{
+								int chaos_chance = final_damage;
+
+								if (Q_irand(0, 99) < chaos_chance && ent->client)
 								{
-									status_duration /= 4;
-								}
+									zyk_rpg_status_t random_bad_status = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
+									int status_duration = chaos_chance * 2000;
 
-								zyk_set_rpg_status(ent, random_bad_status, status_duration, qtrue);
+									zyk_remove_emotes(ent);
+
+									if (random_bad_status == RPG_STATUS_CONFUSED)
+									{
+										status_duration /= 4;
+									}
+
+									zyk_set_rpg_status(ent, random_bad_status, status_duration, qtrue);
+								}
+							}
+
+							if (final_damage > 0)
+							{
+								G_Damage(ent, attacker, magic_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
 							}
 						}
-
-						if (final_damage > 0)
-						{
+						else
+						{ // zyk: special abilities, like Force Beam and the Magic Gate wave
 							G_Damage(ent, attacker, magic_power_user, NULL, origin, final_damage, DAMAGE_RADIUS, mod);
 						}
 					}

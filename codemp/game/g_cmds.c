@@ -223,7 +223,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases mp usage. You can also bind it to a key like this: ^3/bind <key> magicflight^7";
 	if (skill_index == SKILL_MAGIC_GATE)
-		return va("Creates a Magic gate by using %d MP, to which the player can teleport by using %d MP. Gate duration increases based on this skill level and Magic Affinity. Get Melee, Meditate and press Saber Stance key to create the gate, and do the same thing to teleport to it", MAGIC_GATE_MP_COST, MAGIC_GATE_MP_COST);
+		return "Creates a Magic Gate. Get Melee, Meditate and press Saber Stance key to create the gate, and do the same thing to teleport to it. Do it while holding Use key to make the Gate release a magic wave that damages enemies near it. The magic wave damage and Gate duration increase based on this skill level and Magic Affinity. It will not be possible to teleport if a player or npc is near the Gate";
 	if (skill_index == SKILL_MAGIC_REACTION)
 		return "Automatically shoots a weak Magic Fist shot at the nearest target. Each level, Magic Affinity and meditating increase shooting rate";
 	if (skill_index == SKILL_MAGIC_SHIELD)
@@ -5561,6 +5561,7 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.magic_reaction_debounce_timer = 0;
 
 			ent->client->pers.magic_gate_id = -1;
+			ent->client->pers.magic_gate_duration = 0;
 			ent->client->pers.magic_gate_debounce_timer = 0;
 
 			ent->client->pers.quest_stuff_timer = level.time + RPG_QUEST_STUFF_MIN_SPAWN_TIME;
