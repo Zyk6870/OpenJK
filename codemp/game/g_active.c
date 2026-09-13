@@ -1924,6 +1924,7 @@ extern void TossClientWeapon(gentity_t *self, vec3_t direction, float speed);
 extern qboolean saberKnockOutOfHand(gentity_t *saberent, gentity_t *saberOwner, vec3_t velocity);
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
 extern float zyk_get_rpg_player_speed(gentity_t* ent);
+extern void magic_gate(gentity_t* ent);
 void ClientThink_real( gentity_t *ent ) {
 	gclient_t	*client;
 	pmove_t		pmove;
@@ -3265,6 +3266,13 @@ void ClientThink_real( gentity_t *ent ) {
 					{
 						Jedi_Decloak(&g_entities[ent->client->ps.m_iVehicleNum]);
 					}
+				}
+				else if (ent->client->pers.skill_levels[SKILL_MAGIC_GATE] > 0 &&
+						 pmove.cmd.generic_cmd == GENCMD_SABERATTACKCYCLE &&
+						 ent->client->ps.weapon == WP_MELEE &&
+						 ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+				{
+					magic_gate(ent);
 				}
 			}
 

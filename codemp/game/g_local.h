@@ -612,7 +612,7 @@ typedef enum {
 	SKILL_RUN_SPEED,
 	SKILL_MAGIC_FIST,
 	SKILL_MAGIC_FLIGHT,
-	SKILL_MAGIC_REGEN,
+	SKILL_MAGIC_GATE,
 	SKILL_MAGIC_REACTION,
 	SKILL_MAGIC_SHIELD,
 	SKILL_HEALING_CIRCLE,
@@ -813,6 +813,7 @@ typedef enum {
 // zyk: magic power stats
 #define MAGIC_AFFINITY_MODIFIER 8
 #define MAGIC_BACTA_MP_REGEN_AMOUNT 50
+#define MAGIC_GATE_MP_COST 100
 
 // zyk: damage bonus of weapons
 #define RPG_WEAPON_DMG_BONUS 0.01
@@ -1029,6 +1030,10 @@ typedef struct clientPersistant_s {
 	int magic_regen_debounce_timer;
 
 	int magic_reaction_debounce_timer;
+
+	int magic_gate_id;
+	int magic_gate_debounce_timer;
+
 	int magic_lightning_dome_bonus;
 
 	// zyk: amount of MP, required to use Magic powers

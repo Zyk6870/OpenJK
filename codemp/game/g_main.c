@@ -657,7 +657,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_GATE] = npc_skill_level + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] = npc_skill_level + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_MINISTER)
@@ -667,7 +667,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = npc_skill_level + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = npc_skill_level + skill_level_bonus;
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] = npc_skill_level + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] = npc_skill_level + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_MAGE_SCHOLAR)
 		{
@@ -732,7 +732,7 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FIST] = ally_bonus + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_FLIGHT] = ally_bonus + skill_level_bonus;
-			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] = ally_bonus + skill_level_bonus;
+			npc_ent->client->pers.skill_levels[SKILL_MAGIC_GATE] = ally_bonus + skill_level_bonus;
 			npc_ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] = ally_bonus + skill_level_bonus;
 		}
 		else if (quest_npc_type == QUEST_NPC_ALLY_FLYING_WARRIOR)
@@ -4862,6 +4862,11 @@ void zyk_quest_effect_spawn(gentity_t *ent, gentity_t *target_ent, char *targetn
 			if (start_time > 0)
 				new_ent->nextthink = level.time + start_time;
 
+			if (Q_stricmp(targetname, "zyk_magic_gate") == 0)
+			{
+				ent->client->pers.magic_gate_id = new_ent->s.number;
+			}
+
 			level.special_power_effects[new_ent->s.number] = ent->s.number;
 			level.special_power_effects_timer[new_ent->s.number] = level.time + duration;
 		}
@@ -5390,6 +5395,60 @@ void zyk_status_effects(gentity_t* ent)
 	}
 }
 
+// zyk: Magic Gate ability
+void magic_gate(gentity_t* ent)
+{
+	if (ent->client->pers.magic_gate_debounce_timer < level.time)
+	{
+		if (ent->client->pers.skill_levels[SKILL_MAGIC_GATE] > 0)
+		{
+			int magic_gate_mp_cost = MAGIC_GATE_MP_COST;
+
+			if (ent->client->pers.magic_power >= magic_gate_mp_cost)
+			{
+				if (ent->client->pers.magic_gate_id > -1)
+				{ // zyk: gate is active
+					gentity_t* gate_ent = &g_entities[ent->client->pers.magic_gate_id];
+
+					if (gate_ent && gate_ent->inuse &&
+						Q_stricmp(gate_ent->classname, "fx_runner") == 0 && Q_stricmp(gate_ent->targetname, "zyk_magic_gate") == 0)
+					{
+						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/tractorbeam.mp3"));
+
+						zyk_TeleportPlayer(ent, gate_ent->s.origin, ent->client->ps.viewangles);
+
+						// zyk: play sound again at the destination
+						G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/tractorbeam.mp3"));
+					}
+					else
+					{
+						ent->client->pers.magic_gate_id = -1;
+					}
+				}
+				else
+				{ // zyk: creates the gate
+					int gate_duration = (2000 * ent->client->pers.skill_levels[SKILL_MAGIC_GATE]) + (2000 * zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC));
+
+					zyk_quest_effect_spawn(ent, ent, "zyk_magic_gate", "0", "howler/sonic", 0, 0, 0, gate_duration);
+					G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/tram_boost.mp3"));
+				}
+
+				zyk_set_mp(ent, magic_gate_mp_cost, qfalse);
+			}
+			else
+			{
+				trap->SendServerCommand(ent->s.number, va("chat \"%s^7: Requires %d MP.\n\"", QUESTCHAR_MAIN, magic_gate_mp_cost));
+			}
+		}
+		else
+		{
+			trap->SendServerCommand(ent->s.number, va("chat \"%s^7: You do not have this skill.\n\"", QUESTCHAR_MAIN));
+		}
+
+		ent->client->pers.magic_gate_debounce_timer = level.time + 500;
+	}
+}
+
 // zyk: Magic Shield
 void magic_shield(gentity_t* ent)
 {
@@ -5480,8 +5539,6 @@ void magic_lightning_dome(gentity_t* ent)
 
 	ent->client->pers.active_magic |= (1 << MAGIC_LIGHTNING_DOME);
 	ent->client->pers.magic_power_debounce_timer[MAGIC_LIGHTNING_DOME] = level.time + 500;
-
-	// G_Sound(ent, CHAN_AUTO, G_SoundIndex("sound/effects/energy_crackle.wav"));
 }
 
 int magic_fist_velocity(gentity_t* ent)

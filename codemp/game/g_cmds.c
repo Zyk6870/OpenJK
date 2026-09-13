@@ -96,7 +96,7 @@ int zyk_max_skill_level(int skill_index)
 
 	max_skill_levels[SKILL_MAGIC_FIST] = 10;
 	max_skill_levels[SKILL_MAGIC_FLIGHT] = 10;
-	max_skill_levels[SKILL_MAGIC_REGEN] = 10;
+	max_skill_levels[SKILL_MAGIC_GATE] = 10;
 	max_skill_levels[SKILL_MAGIC_REACTION] = 10;
 	max_skill_levels[SKILL_MAGIC_SHIELD] = 10;
 	max_skill_levels[SKILL_HEALING_CIRCLE] = 10;
@@ -146,7 +146,7 @@ char* zyk_skill_name(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "Magic Fist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "Magic Flight";
-	skill_names[SKILL_MAGIC_REGEN] = "Magic Regen";
+	skill_names[SKILL_MAGIC_GATE] = "Magic Gate";
 	skill_names[SKILL_MAGIC_REACTION] = "Magic Reaction";
 	skill_names[SKILL_MAGIC_SHIELD] = "Magic Shield";
 	skill_names[SKILL_HEALING_CIRCLE] = "Healing Circle";
@@ -222,8 +222,8 @@ char* zyk_skill_description(int skill_index)
 		return va("Allows you to attack with magic bolts when using melee punches. Each level and Magic Affinity increase damage. At max level, can damage any objects that normally would only be able to be damaged by Saber or Heavy Weapons, and can also interact with some objects. Base damage per bolt is %d", zyk_magic_fist_damage.integer);
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases mp usage. You can also bind it to a key like this: ^3/bind <key> magicflight^7";
-	if (skill_index == SKILL_MAGIC_REGEN)
-		return "";
+	if (skill_index == SKILL_MAGIC_GATE)
+		return va("Creates a Magic gate by using %d MP, to which the player can teleport by using %d MP. Gate duration increases based on this skill level and Magic Affinity. Get Melee, Meditate and press Saber Stance key to create the gate, and do the same thing to teleport to it", MAGIC_GATE_MP_COST, MAGIC_GATE_MP_COST);
 	if (skill_index == SKILL_MAGIC_REACTION)
 		return "Automatically shoots a weak Magic Fist shot at the nearest target. Each level, Magic Affinity and meditating increase shooting rate";
 	if (skill_index == SKILL_MAGIC_SHIELD)
@@ -272,7 +272,7 @@ char* zyk_skill_key(int skill_index)
 
 	skill_names[SKILL_MAGIC_FIST] = "skillmagicfist";
 	skill_names[SKILL_MAGIC_FLIGHT] = "skillmagicflight";
-	skill_names[SKILL_MAGIC_REGEN] = "skillmagicregen";
+	skill_names[SKILL_MAGIC_GATE] = "skillmagicgate";
 	skill_names[SKILL_MAGIC_REACTION] = "skillmagicreaction";
 	skill_names[SKILL_MAGIC_SHIELD] = "skillmagicshield";
 	skill_names[SKILL_HEALING_CIRCLE] = "skillhealingcircle";
@@ -5559,6 +5559,9 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 			ent->client->pers.magic_consumption_timer = 0;
 			ent->client->pers.magic_regen_debounce_timer = 0;
 			ent->client->pers.magic_reaction_debounce_timer = 0;
+
+			ent->client->pers.magic_gate_id = -1;
+			ent->client->pers.magic_gate_debounce_timer = 0;
 
 			ent->client->pers.quest_stuff_timer = level.time + RPG_QUEST_STUFF_MIN_SPAWN_TIME;
 

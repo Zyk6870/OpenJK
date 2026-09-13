@@ -5979,7 +5979,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 				targ->client->ps.fd.forcePower -= (1 + (targ->client->pers.meditation_bonus / 10));
 			}
-			
+
 			// zyk: reduces damage based on the health resistance bonuses
 			take = (int)ceil(take * (1.00f - bonus_health_resistance));
 

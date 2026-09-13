@@ -3100,6 +3100,7 @@ void fx_runner_link( gentity_t *ent )
 			Q_stricmp(ent->targetname, "zyk_magic_healing") == 0 || 
 			Q_stricmp(ent->targetname, "zyk_magic_chaos") == 0 ||
 			Q_stricmp(ent->targetname, "zyk_magic_lightning") == 0 ||
+			Q_stricmp(ent->targetname, "zyk_magic_gate") == 0 ||
 			Q_stricmp(ent->targetname, "zyk_force_beam") == 0)
 		{ // zyk: effects from magic powers start right now
 			ent->s.modelindex2 = FX_STATE_CONTINUOUS;
@@ -3179,6 +3180,7 @@ void SP_fx_runner( gentity_t *ent )
 		Q_stricmp(ent->targetname, "zyk_magic_healing") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_chaos") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_magic_lightning") == 0 ||
+		Q_stricmp(ent->targetname, "zyk_magic_gate") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_force_beam") == 0 || 
 		Q_stricmp(ent->targetname, "zyk_status_poison") == 0 ||
 		Q_stricmp(ent->targetname, "zyk_status_on_fire") == 0 || 
