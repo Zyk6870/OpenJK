@@ -5843,7 +5843,7 @@ void magic_power_events(gentity_t *ent)
 				ent->client->pers.magic_reaction_debounce_timer < level.time)
 			{
 				int chance_for_magic_fist = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION];
-				int magic_reaction_debounce = 1800 - (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] * 40) - (magic_bonus * 50);
+				int magic_reaction_debounce = 2500 - (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] * 50) - (magic_bonus * 50);
 				qboolean is_ally = qfalse;
 				gentity_t* target_ent = &g_entities[ent->client->ps.lookTarget];
 
@@ -5870,7 +5870,7 @@ void magic_power_events(gentity_t *ent)
 
 						if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 						{
-							magic_reaction_debounce /= 2;
+							magic_reaction_debounce -= 500;
 						}
 					}
 				}

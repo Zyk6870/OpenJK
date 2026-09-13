@@ -225,7 +225,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_GATE)
 		return "Creates a Magic Gate. Get Melee, Meditate and press Saber Stance key to create the gate, and do the same thing to teleport to it. Do it while holding Use key to make the Gate release a magic wave that damages enemies near it. The magic wave damage and Gate duration increase based on this skill level and Magic Affinity. It will not be possible to teleport if a player or npc is near the Gate";
 	if (skill_index == SKILL_MAGIC_REACTION)
-		return "Automatically shoots a weak Magic Fist shot at the nearest target. Each level, Magic Affinity and meditating increase shooting rate";
+		return "Automatically shoots a weak Magic Fist shot at the nearest target. Each level, Magic Affinity and meditating increase fire rate";
 	if (skill_index == SKILL_MAGIC_SHIELD)
 		return va("A magic shield appears around you, decreasing damage to your health from any source. Higher levels and Magic Affinity increase resistance to damage to your health and chance to resist force powers. Cast it by either pressing Duel key to select it and then pressing Use key, or binding it to a key like this: ^3/bind <key> magic %d^7", (skill_index + 1));
 	if (skill_index == SKILL_HEALING_CIRCLE)
