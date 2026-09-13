@@ -5780,7 +5780,7 @@ void magic_power_events(gentity_t *ent)
 			}
 
 			// zyk: MP regen
-			if (ent->client->pers.active_magic == 0 && ent->client->pers.magic_regen_debounce_timer < level.time)
+			if (ent->client->pers.active_magic == 0 && ent->client->pers.in_magic_flight == qfalse && ent->client->pers.magic_regen_debounce_timer < level.time)
 			{
 				int mp_regen_amount = 1;
 				int max_mp = zyk_max_magic_power(ent);
