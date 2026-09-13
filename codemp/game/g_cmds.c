@@ -201,7 +201,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_TEAM_ENERGIZE)
 		return "Restores some force power to players near you. At a level > 3, If force power is full, restores some power cell ammo";
 	if (skill_index == SKILL_MEDITATION)
-		return "Meditating will make Force regen faster. Based on Force Affinity, decrease bad status effects duration and also charge damage resistance against magic attacks up to half the Force Affinity value in percentage, and decrease 1 per cent each time after getting magic damage, which will also use some force";
+		return "Meditating will make Force regen faster. Based on Force Affinity, meditating will decrease bad status effects duration and also charge damage resistance against magic attacks and run speed up to the Force Affinity value in percentage. The bonus will decrease over the time";
 	if (skill_index == SKILL_FORCE_BEAM)
 		return "A force ability that shoots a powerful beam that deals saber damage. Benefits from Saber damage improvements. It will consume one of the extra sabers in inventory for extra damage by using some Nature Energy. Each level increases damage. Force Affinity decreases cooldown time. Use it by pressing Duel key to select it and then pressing Use key";
 
@@ -6528,6 +6528,11 @@ float zyk_get_rpg_player_speed(gentity_t* ent)
 	if (ent->client->pers.skill_levels[SKILL_RUN_SPEED] > 0)
 	{
 		rpg_player_speed += (ent->client->pers.skill_levels[SKILL_RUN_SPEED] * RPG_RUN_SPEED_SKILL_INCREASE);
+	}
+
+	if (ent->client->pers.skill_levels[SKILL_MEDITATION] > 0 && ent->client->pers.meditation_bonus > 0)
+	{
+		rpg_player_speed += ent->client->pers.meditation_bonus;
 	}
 
 	if (ent->client->pers.current_weight > ent->client->pers.max_weight)

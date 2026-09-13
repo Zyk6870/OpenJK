@@ -9177,21 +9177,38 @@ void G_RunFrame( int levelTime ) {
 				}
 
 				// zyk: Meditation skill. Restore bad status effects while meditating and charge damage resistance against magic attacks
-				if (ent->client->pers.skill_levels[SKILL_MEDITATION] > 0 && ent->client->pers.meditation_timer < level.time &&
-					ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+				if (ent->client->pers.skill_levels[SKILL_MEDITATION] > 0 && ent->client->pers.meditation_timer < level.time)
 				{
-					int force_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE);
-
-					rpg_status_restoration(ent, force_affinity * 5);
-
-					if (ent->client->pers.meditation_bonus < (force_affinity / 2))
+					if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 					{
-						ent->client->pers.meditation_bonus++;
+						int force_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE);
 
-						ent->client->pushEffectTime = level.time + 500;
+						rpg_status_restoration(ent, force_affinity * 5);
+
+						if (ent->client->pers.meditation_bonus < force_affinity)
+						{
+							ent->client->pers.meditation_bonus++;
+							ent->client->pushEffectTime = level.time + 500;
+						}
+
+						ent->client->pers.meditation_timer = level.time + 100;
 					}
+					else
+					{
+						if (ent->client->pers.meditation_bonus > 0)
+						{
+							ent->client->pers.meditation_bonus--;
+							ent->client->pushEffectTime = level.time + 1000;
+						}
 
-					ent->client->pers.meditation_timer = level.time + 100;
+						ent->client->pers.meditation_timer = level.time + 500;
+					}
+				}
+
+				// zyk: also show effect when player has the bonus but is not meditating
+				if (ent->client->pers.meditation_bonus > 0 && !(ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE))
+				{
+					ent->client->pushEffectTime = level.time + 500;
 				}
 
 				if (ent->client->pers.flame_thrower_timer > level.time && ent->client->cloakDebReduce < level.time)
