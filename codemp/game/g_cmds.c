@@ -223,7 +223,7 @@ char* zyk_skill_description(int skill_index)
 	if (skill_index == SKILL_MAGIC_FLIGHT)
 		return "Allows you to fly using Magic Points. Press Duel key to select Magic Flight, then press Use key to activate flight (similar to Jetpack). Each level decreases mp usage. You can also bind it to a key like this: ^3/bind <key> magicflight^7";
 	if (skill_index == SKILL_MAGIC_REGEN)
-		return "Regens more mp by using the same amount of Nature Energy. Meditating makes it regen at a faster rate";
+		return "";
 	if (skill_index == SKILL_MAGIC_REACTION)
 		return "Automatically shoots a weak Magic Fist shot at the nearest target. Each level, Magic Affinity and meditating increase shooting rate";
 	if (skill_index == SKILL_MAGIC_SHIELD)

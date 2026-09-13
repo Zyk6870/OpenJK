@@ -5792,15 +5792,12 @@ void magic_power_events(gentity_t *ent)
 					zyk_set_mp(ent, 2, qtrue);
 				}
 
-				// zyk: Magic Regen skill regens mp faster while meditating
-				if (ent->client->pers.skill_levels[SKILL_MAGIC_REGEN] > 0)
-				{
-					mp_regen_amount += ent->client->pers.skill_levels[SKILL_MAGIC_REGEN];
+				mp_regen_amount += magic_bonus;
 
-					if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
-					{
-						mp_regen_rate /= 2;
-					}
+				// zyk: meditating regens mp faster
+				if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+				{
+					mp_regen_rate /= 2;
 				}
 
 				if (ent->client->pers.nature_energy >= 1 && ent->client->pers.magic_power < max_mp)
