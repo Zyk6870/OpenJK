@@ -967,6 +967,11 @@ typedef struct clientPersistant_s {
 	// zyk: RPG skills
 	int skill_levels[NUMBER_OF_SKILLS];
 
+	// zyk: Affinity to each skill category
+	int force_affinity;
+	int misc_affinity;
+	int magic_affinity;
+
 	// zyk: timer to spawn quest stuff in the map
 	int quest_stuff_timer;
 

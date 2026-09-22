@@ -143,7 +143,6 @@ P_WorldEffects
 Check for lava / slime contents and drowning
 =============
 */
-extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 void P_WorldEffects( gentity_t *ent ) {
 	qboolean	envirosuit = qfalse;
 	int			waterlevel;
@@ -199,7 +198,7 @@ void P_WorldEffects( gentity_t *ent ) {
 		// zyk: Underwater time will increase based on Misc Affinity
 		if (ent->client->sess.account_mode == ACC_MODE_RPG)
 		{
-			ent->client->airOutTime = level.time + (12000 * (1 + (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) / 5)));
+			ent->client->airOutTime = level.time + (12000 * (1 + (ent->client->pers.misc_affinity / 5)));
 		}
 	}
 

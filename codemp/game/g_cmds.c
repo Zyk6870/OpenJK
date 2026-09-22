@@ -4933,7 +4933,7 @@ int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category)
 // zyk: returns the max amount of Magic Power this player can have
 int zyk_max_magic_power(gentity_t *ent)
 {
-	int max_mp = (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 100);
+	int max_mp = ent->client->pers.magic_affinity * 100;
 
 	return max_mp;
 }
@@ -5137,7 +5137,8 @@ void set_max_shield(gentity_t *ent)
 
 void set_max_force(gentity_t* ent)
 {
-	int force_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE);
+	int force_affinity = ent->client->pers.force_affinity;
+
 	ent->client->pers.max_force_power = 0;
 
 	if (force_affinity > 0)
@@ -5151,7 +5152,7 @@ void set_max_force(gentity_t* ent)
 // zyk: sets the Max Weight of stuff the player can carry
 void set_max_weight(gentity_t* ent)
 {
-	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * INVENTORY_WEIGHT_INCREASE) + (50 * zyk_skill_affinity(ent, SKILL_CATEGORY_MISC));
+	ent->client->pers.max_weight = 500 + (ent->client->pers.skill_levels[SKILL_MAX_WEIGHT] * INVENTORY_WEIGHT_INCREASE) + (50 * ent->client->pers.misc_affinity);
 }
 
 // zyk: set max Nature Energy of this player
@@ -5505,6 +5506,10 @@ void initialize_rpg_skills(gentity_t* ent, qboolean init_all)
 		if (ent->client->pers.skill_levels[SKILL_TEAM_ENERGIZE] == 0)
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << FP_TEAM_FORCE);
 		ent->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] = ent->client->pers.skill_levels[SKILL_TEAM_ENERGIZE];
+
+		ent->client->pers.force_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE);
+		ent->client->pers.misc_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_MISC);
+		ent->client->pers.magic_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC);
 
 		set_max_health(ent);
 		set_max_shield(ent);
@@ -6111,13 +6116,71 @@ void try_finishing_race()
 	}
 }
 
+extern void zyk_stop_magic_power(gentity_t* ent, zyk_magic_t magic_number);
+extern void zyk_stop_all_magic_powers(gentity_t* ent);
+void zyk_reset_player(gentity_t* ent, qboolean reset_skills)
+{
+	int i = 0;
+
+	// zyk: stop all magic powers
+	zyk_stop_all_magic_powers(ent);
+
+	ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
+
+	// zyk: setting default max hp and shield
+	ent->client->ps.stats[STAT_MAX_HEALTH] = 100;
+
+	if (ent->health > 100)
+		ent->health = 100;
+
+	if (ent->client->ps.stats[STAT_ARMOR] > 100)
+		ent->client->ps.stats[STAT_ARMOR] = 100;
+
+	// zyk: resetting all skills
+	if (reset_skills == qtrue)
+	{
+		for (i = 0; i < NUMBER_OF_SKILLS; i++)
+		{
+			ent->client->pers.skill_levels[i] = 0;
+		}
+
+		// zyk: initializing RPG inventory
+		for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
+		{
+			ent->client->pers.rpg_inventory[i] = 0;
+			ent->client->pers.toggle_rpg_inventory[i] = 1;
+		}
+
+		ent->client->pers.force_affinity = 0;
+		ent->client->pers.misc_affinity = 0;
+		ent->client->pers.magic_affinity = 0;
+	}
+
+	// zyk: reset the force powers of this player
+	WP_InitForcePowers(ent);
+
+	if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] > FORCE_LEVEL_0 &&
+		level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE
+		)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
+
+	if (level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE)
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
+
+	zyk_load_common_settings(ent);
+
+	if (level.bounty_quest_choose_target == qfalse && level.bounty_quest_target_id == ent->s.number)
+	{ // zyk: if this player was the target, remove it so the bounty quest can get a new target
+		level.bounty_quest_choose_target = qtrue;
+		level.bounty_quest_target_id++;
+	}
+}
+
 /*
 ==================
 Cmd_LogoutAccount_f
 ==================
 */
-extern void zyk_stop_magic_power(gentity_t* ent, zyk_magic_t magic_number);
-extern void zyk_stop_all_magic_powers(gentity_t* ent);
 void Cmd_LogoutAccount_f( gentity_t *ent ) {
 	int i = 0;
 
@@ -6133,49 +6196,12 @@ void Cmd_LogoutAccount_f( gentity_t *ent ) {
 		return;
 	}
 
-	// zyk: stop all magic powers
-	zyk_stop_all_magic_powers(ent);
-
 	// zyk: saving the not logged player mode in session
 	ent->client->sess.account_mode = ACC_MODE_LOGGED_OUT;
 
 	ent->client->pers.bitvalue = 0;
 
-	// zyk: resetting the forcePowerMax to the cvar value
-	ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
-
-	// zyk: resetting max hp and shield to 100
-	ent->client->ps.stats[STAT_MAX_HEALTH] = 100;
-
-	if (ent->health > 100)
-		ent->health = 100;
-
-	if (ent->client->ps.stats[STAT_ARMOR] > 100)
-		ent->client->ps.stats[STAT_ARMOR] = 100;
-
-	// zyk: resetting all skills
-	for (i = 0; i < NUMBER_OF_SKILLS; i++)
-	{
-		ent->client->pers.skill_levels[i] = 0;
-	}
-
-	// zyk: initializing RPG inventory
-	for (i = 0; i < MAX_RPG_INVENTORY_ITEMS; i++)
-	{
-		ent->client->pers.rpg_inventory[i] = 0;
-		ent->client->pers.toggle_rpg_inventory[i] = 1;
-	}
-
-	// zyk: resetting force powers
-	WP_InitForcePowers( ent );
-
-	if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] > FORCE_LEVEL_0 &&
-		level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE
-		)
-		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
-
-	if (level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE)
-		ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
+	zyk_reset_player(ent, qtrue);
 			
 	trap->SendServerCommand( ent-g_entities, "print \"Account logout finished succesfully.\n\"" );
 }
@@ -6573,9 +6599,9 @@ void list_rpg_info(gentity_t *ent, gentity_t *target_ent)
 		strcpy(message, va("%s^3Run Speed: ^7%.1f\n", message, ent->client->ps.speed));
 	}
 
-	strcpy(message, va("%s^3Force Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE)));
-	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MISC)));
-	strcpy(message, va("%s^3Magic Affinity: ^7%d\n", message, zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC)));
+	strcpy(message, va("%s^3Force Affinity: ^7%d\n", message, ent->client->pers.force_affinity));
+	strcpy(message, va("%s^3Misc Affinity: ^7%d\n", message, ent->client->pers.misc_affinity));
+	strcpy(message, va("%s^3Magic Affinity: ^7%d\n", message, ent->client->pers.magic_affinity));
 
 	trap->SendServerCommand(target_ent->s.number, va("%s\n^7Use ^2/list commands ^7for console commands\n\n\"", message));
 }
@@ -8342,35 +8368,7 @@ void Cmd_PlayerMode_f( gentity_t *ent ) {
 
 	if (ent->client->sess.account_mode == ACC_MODE_ADMIN)
 	{
-		ent->client->ps.fd.forcePowerMax = zyk_max_force_power.integer;
-
-		// zyk: setting default max hp and shield
-		ent->client->ps.stats[STAT_MAX_HEALTH] = 100;
-
-		if (ent->health > 100)
-			ent->health = 100;
-
-		if (ent->client->ps.stats[STAT_ARMOR] > 100)
-			ent->client->ps.stats[STAT_ARMOR] = 100;
-
-		// zyk: reset the force powers of this player
-		WP_InitForcePowers(ent);
-
-		if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] > FORCE_LEVEL_0 &&
-			level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE
-			)
-			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
-
-		if (level.gametype != GT_JEDIMASTER && level.gametype != GT_SIEGE)
-			ent->client->ps.stats[STAT_WEAPONS] |= (1 << WP_BRYAR_PISTOL);
-
-		zyk_load_common_settings(ent);
-
-		if (level.bounty_quest_choose_target == qfalse && level.bounty_quest_target_id == ent->s.number)
-		{ // zyk: if this player was the target, remove it so the bounty quest can get a new target
-			level.bounty_quest_choose_target = qtrue;
-			level.bounty_quest_target_id++;
-		}
+		zyk_reset_player(ent, qfalse);
 
 		trap->SendServerCommand( ent-g_entities, "print \"^7You are now in ^2Admin-Only mode^7.\n\"" );
 	}
@@ -11998,6 +11996,7 @@ void Cmd_RpgChar_f(gentity_t *ent) {
 			if (ent->client->sess.sessionTeam != TEAM_SPECTATOR && ent->client->sess.account_mode == ACC_MODE_RPG)
 			{ // zyk: this command must kill the player if he is not in spectator mode to prevent exploits
 				ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_SELF_KILL);
+				ent->client->pers.player_statuses |= (1 << PLAYER_STATUS_KEEP_QUEST_TRIES);
 
 				G_Kill(ent);
 			}

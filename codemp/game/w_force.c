@@ -552,7 +552,6 @@ void WP_SpawnInitForcePowers( gentity_t *ent )
 
 extern qboolean BG_InKnockDown( int anim ); //bg_pmove.c
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
-extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forcePower)
 {
 	qboolean is_ally = qfalse;
@@ -670,7 +669,7 @@ int ForcePowerUsableOn(gentity_t *attacker, gentity_t *other, forcePowers_t forc
 		// zyk: Magic Shield increases chance to absorb force powers
 		if (is_ally == qfalse && other->client->pers.active_magic & (1 << MAGIC_MAGIC_SHIELD))
 		{
-			int magic_bonus = zyk_skill_affinity(other, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
+			int magic_bonus = other->client->pers.magic_affinity / MAGIC_AFFINITY_MODIFIER;
 			int chance_to_resist_force = other->client->pers.skill_levels[SKILL_MAGIC_SHIELD] + magic_bonus;
 
 			if (Q_irand(0, 99) < chance_to_resist_force)
@@ -6013,8 +6012,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 				}
 				else if (self->client->sess.account_mode == ACC_MODE_RPG)
 				{ // zyk: force regen for RPG players is based on meditating and the Force Affinity
-					int force_affinity = zyk_skill_affinity(self, SKILL_CATEGORY_FORCE);
-					int rpg_force_regen_time = 120 - force_affinity;
+					int rpg_force_regen_time = 120 - self->client->pers.force_affinity;
 
 					// zyk: Meditation skill
 					if (self->client->pers.skill_levels[SKILL_MEDITATION] > 0 &&

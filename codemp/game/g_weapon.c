@@ -133,7 +133,6 @@ extern qboolean G_BoxInBounds( vec3_t point, vec3_t mins, vec3_t maxs, vec3_t bo
 extern qboolean G_HeavyMelee( gentity_t *attacker );
 extern void Jedi_Decloak( gentity_t *self );
 
-extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 extern void zyk_set_rpg_status(gentity_t* ent, zyk_rpg_status_t rpg_status, int duration, qboolean add_status);
 
 static void WP_FireEmplaced( gentity_t *ent, qboolean altFire );

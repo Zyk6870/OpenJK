@@ -4830,7 +4830,6 @@ extern void Boba_FlyStop( gentity_t *self );
 extern void zyk_add_health(gentity_t* ent, int heal_amount);
 extern void zyk_add_shield(gentity_t* ent, int shield_amount);
 extern qboolean zyk_can_hit_target(gentity_t *attacker, gentity_t *target);
-extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
 	int			take, asave = 0, knockback;
@@ -4956,7 +4955,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 			}
 
 			// zyk: saber damage for RPG players will have a bonus based on Force Affinity
-			bonus_saber_damage_factor += (0.01 * zyk_skill_affinity(attacker, SKILL_CATEGORY_FORCE));
+			bonus_saber_damage_factor += (0.01 * attacker->client->pers.force_affinity);
 
 			damage = (int)ceil(damage * bonus_saber_damage_factor);
 		}
@@ -5965,7 +5964,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 		if (targ->client && (targ->client->sess.account_mode == ACC_MODE_RPG || targ->NPC))
 		{ // zyk: bonus resistance
 			float bonus_health_resistance = 0.00;
-			int magic_bonus = zyk_skill_affinity(targ, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
+			int magic_bonus = targ->client->pers.magic_affinity / MAGIC_AFFINITY_MODIFIER;
 
 			// zyk: Adaptive Armor
 			if (targ->client->pers.rpg_inventory[RPG_INVENTORY_UPGRADE_ADAPTIVE_ARMOR] > 0)
@@ -6452,7 +6451,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 						if (this_magic_power == MAGIC_HEALING_CIRCLE && magic_power_user != ent && ent->client && ent->health > 0)
 						{ // zyk: Healing Circle magic heals allies
 							int heal_amount = (magic_power_user->client->pers.skill_levels[SKILL_HEALING_CIRCLE] / 2);
-							int magic_bonus = zyk_skill_affinity(magic_power_user, SKILL_CATEGORY_MAGIC) / MAGIC_AFFINITY_MODIFIER;
+							int magic_bonus = magic_power_user->client->pers.magic_affinity / MAGIC_AFFINITY_MODIFIER;
 
 							heal_amount += (magic_bonus / 2);
 

@@ -740,6 +740,10 @@ void zyk_set_quest_npc_stuff(gentity_t* npc_ent, zyk_quest_npc_t quest_npc_type,
 			npc_ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = (1 << HI_JETPACK);
 		}
 
+		npc_ent->client->pers.force_affinity = zyk_skill_affinity(npc_ent, SKILL_CATEGORY_FORCE);
+		npc_ent->client->pers.misc_affinity = zyk_skill_affinity(npc_ent, SKILL_CATEGORY_MISC);
+		npc_ent->client->pers.magic_affinity = zyk_skill_affinity(npc_ent, SKILL_CATEGORY_MAGIC);
+
 		// zyk: setting the initial amount of magic points
 		npc_ent->client->pers.magic_power = zyk_max_magic_power(npc_ent);
 	}
@@ -5407,7 +5411,7 @@ void magic_gate(gentity_t* ent)
 
 			if (ent->client->pers.magic_power >= magic_gate_mp_cost)
 			{
-				int magic_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC);
+				int magic_affinity = ent->client->pers.magic_affinity;
 				int magic_bonus = (magic_affinity / MAGIC_AFFINITY_MODIFIER);
 
 				if (ent->client->pers.magic_gate_id > -1)
@@ -5595,7 +5599,7 @@ void zyk_magic_fist_bolt(gentity_t* ent, qboolean shoot_at_nearest_target)
 
 		if (shoot_at_nearest_target == qfalse)
 		{
-			fist_damage_increase_factor += ((magic_fist_damage_modifier * 0.02f) + (zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC) * 0.01f));
+			fist_damage_increase_factor += ((magic_fist_damage_modifier * 0.02f) + (ent->client->pers.magic_affinity * 0.01f));
 			fist_damage *= fist_damage_increase_factor;
 		}
 
@@ -5686,7 +5690,7 @@ void magic_power_events(gentity_t *ent)
 	{
 		if (ent->health > 0)
 		{
-			int magic_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_MAGIC);
+			int magic_affinity = ent->client->pers.magic_affinity;
 			int magic_bonus = 0;
 
 			// zyk: Magic Affinity increases magic damage
@@ -5945,7 +5949,7 @@ void zyk_force_beam(gentity_t* ent)
 	{
 		if (ent->client->ps.fd.forcePower >= RPG_FORCE_BEAM_COST)
 		{
-			int force_beam_cooldown = 11000 - (zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE) * 100);
+			int force_beam_cooldown = 11000 - (ent->client->pers.force_affinity * 100);
 
 			zyk_create_force_beam(ent);
 
@@ -9124,7 +9128,7 @@ void G_RunFrame( int levelTime ) {
 					if (ent->client->pers.nature_energy_timer < level.time)
 					{
 						int main_quest_progress = ((ent->client->pers.quest_progress * 100.0) / MAX_QUEST_PROGRESS);
-						int nature_energy_time = 2060 - (zyk_skill_affinity(ent, SKILL_CATEGORY_MISC) * 7);
+						int nature_energy_time = 2060 - (ent->client->pers.misc_affinity * 7);
 						int nature_energy_amount = 1;
 
 						// zyk: meditating
@@ -9279,7 +9283,7 @@ void G_RunFrame( int levelTime ) {
 				{
 					if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 					{
-						int force_affinity = zyk_skill_affinity(ent, SKILL_CATEGORY_FORCE);
+						int force_affinity = ent->client->pers.force_affinity;
 
 						rpg_status_restoration(ent, force_affinity * 5);
 

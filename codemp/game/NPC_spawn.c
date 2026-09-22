@@ -1369,6 +1369,7 @@ extern void G_CreateFighterNPC( Vehicle_t **pVeh, const char *strType );
 extern void zyk_main_spawn_entity(gentity_t *ent);
 extern int zyk_max_skill_level(int skill_index);
 extern int zyk_max_magic_power(gentity_t* ent);
+extern int zyk_skill_affinity(gentity_t* ent, zyk_skill_category_t skill_category);
 
 gentity_t *NPC_Spawn_Do( gentity_t *ent )
 {
@@ -1822,11 +1823,15 @@ finish:
 				current_magic_skill++;
 			}
 
-			newent->client->pers.magic_power = zyk_max_magic_power(newent);
-
 			newent->client->pers.nature_energy = RPG_MAX_NATURE_ENERGY;
 			newent->client->pers.max_nature_energy = RPG_MAX_NATURE_ENERGY;
 		}
+
+		newent->client->pers.force_affinity = zyk_skill_affinity(newent, SKILL_CATEGORY_FORCE);
+		newent->client->pers.misc_affinity = zyk_skill_affinity(newent, SKILL_CATEGORY_MISC);
+		newent->client->pers.magic_affinity = zyk_skill_affinity(newent, SKILL_CATEGORY_MAGIC);
+
+		newent->client->pers.magic_power = zyk_max_magic_power(newent);
 	}
 
 	return newent;
