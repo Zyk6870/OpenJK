@@ -9303,7 +9303,7 @@ void G_RunFrame( int levelTime ) {
 							ent->client->pushEffectTime = level.time + 1000;
 						}
 
-						ent->client->pers.meditation_timer = level.time + 500;
+						ent->client->pers.meditation_timer = level.time + 1000;
 					}
 				}
 
