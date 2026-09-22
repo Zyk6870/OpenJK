@@ -5684,6 +5684,7 @@ void zyk_mp_usage(gentity_t* ent, int magic_skill_index)
 	zyk_set_mp(ent, magic_mp_usage, qfalse);
 }
 
+extern void zyk_remove_emotes(gentity_t* ent);
 void magic_power_events(gentity_t *ent)
 {
 	if (ent && ent->client)
@@ -5841,45 +5842,69 @@ void magic_power_events(gentity_t *ent)
 				ent->client->pers.magic_consumption_timer = level.time + 250;
 			}
 
-			// zyk: Magic Reaction skill. Shoots Magic Fist bolts
+			// zyk: Magic Reaction skill
 			if (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] > 0 &&
-				ent->client->ps.hasLookTarget == qtrue &&
-				ent->client->pers.magic_reaction_debounce_timer < level.time)
+				ent->client->pers.magic_reaction_debounce_timer < level.time &&
+				ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
 			{
-				int chance_for_magic_fist = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION];
-				int magic_reaction_debounce = 2500 - (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] * 50) - (magic_bonus * 50);
+				int reaction_chance = (ent->client->pers.skill_levels[SKILL_MAGIC_REACTION] + magic_bonus) * 2;
+				int reaction_mp_cost = ent->client->pers.skill_levels[SKILL_MAGIC_REACTION];
 				qboolean is_ally = qfalse;
-				gentity_t* target_ent = &g_entities[ent->client->ps.lookTarget];
 
-				// zyk: user and the target are allies (player or npc)
-				if (target_ent && target_ent->client)
+				int iEntityList[MAX_GENTITIES];
+				int numListedEntities = 0;
+				vec3_t mins, maxs, player_origin;
+				float radius = 80 + (reaction_chance * 2);
+				int i = 0;
+
+				mins[0] = ent->client->ps.origin[0] - radius;
+				mins[1] = ent->client->ps.origin[1] - radius;
+				mins[2] = ent->client->ps.origin[2] - radius;
+
+				maxs[0] = ent->client->ps.origin[0] + radius;
+				maxs[1] = ent->client->ps.origin[1] + radius;
+				maxs[2] = ent->client->ps.origin[2] + radius;
+
+				numListedEntities = trap->EntitiesInBox(mins, maxs, iEntityList, MAX_GENTITIES);
+
+				while (i < numListedEntities)
 				{
-					if (OnSameTeam(ent, target_ent) == qtrue || npcs_on_same_team(ent, target_ent) == qtrue)
-					{
-						is_ally = qtrue;
-					}
+					gentity_t* target_ent = &g_entities[iEntityList[i]];
 
-					if (zyk_is_ally(ent, target_ent) == qtrue)
+					if (target_ent && ent != target_ent && target_ent->client && target_ent->client->NPC_class != CLASS_VEHICLE && target_ent->health > 0)
 					{
-						is_ally = qtrue;
-					}
-
-					if (is_ally == qfalse)
-					{
-						// zyk: npcs dont set looktarget based on distance
-						if ((!ent->NPC || Distance(ent->client->ps.origin, target_ent->client->ps.origin) < 270))
+						if (OnSameTeam(ent, target_ent) == qtrue || npcs_on_same_team(ent, target_ent) == qtrue || zyk_is_ally(ent, target_ent) == qtrue)
 						{
-							zyk_magic_fist_bolt(ent, qtrue);
+							is_ally = qtrue;
 						}
 
-						if (ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE)
+						if (is_ally == qfalse)
 						{
-							magic_reaction_debounce -= 500;
+							zyk_rpg_status_t random_bad_status = Q_irand(RPG_STATUS_POISONED, RPG_STATUS_CONFUSED);
+							int status_duration = reaction_chance * 1000;
+
+							if (ent->client->pers.magic_power >= reaction_mp_cost && Q_irand(0, 99) < reaction_chance)
+							{
+								zyk_magic_fist_bolt(ent, qtrue);
+
+								zyk_remove_emotes(target_ent);
+
+								if (random_bad_status == RPG_STATUS_CONFUSED)
+								{
+									status_duration /= 4;
+								}
+
+								zyk_set_rpg_status(target_ent, random_bad_status, status_duration, qtrue);
+
+								zyk_set_mp(ent, reaction_mp_cost, qfalse);
+							}
 						}
 					}
+
+					i++;
 				}
 
-				ent->client->pers.magic_reaction_debounce_timer = level.time + magic_reaction_debounce;
+				ent->client->pers.magic_reaction_debounce_timer = level.time + 1000;
 			}
 
 			// zyk: MP regen
@@ -9768,18 +9793,39 @@ void G_RunFrame( int levelTime ) {
 							}
 						}
 						else if (ent->client->pers.active_magic > 0)
-						{ // zyk: stop using all magic
+						{
 							zyk_stop_all_magic_powers(ent);
+						}
+						else if (!(ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE) &&
+								 ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
+						{
+							ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+							ent->client->ps.forceDodgeAnim = BOTH_MEDITATE;
+							ent->client->ps.forceHandExtendTime = level.time + 2000;
 						}
 					}
 				}
 
-				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0 && ent->enemy)
+				if (Q_stricmp(ent->NPC_type, "quest_mage") == 0)
 				{
-					int random_magic = Q_irand(0, MAGIC_LIGHTNING_DOME);
-					int first_magic_skill = SKILL_MAGIC_SHIELD;
+					if (ent->enemy)
+					{
+						int random_magic = Q_irand(0, MAGIC_LIGHTNING_DOME);
+						int first_magic_skill = SKILL_MAGIC_SHIELD;
 
-					zyk_cast_magic(ent, first_magic_skill + random_magic);
+						zyk_cast_magic(ent, first_magic_skill + random_magic);
+					}
+					else if (ent->client->pers.active_magic > 0)
+					{
+						zyk_stop_all_magic_powers(ent);
+					}
+					else if (!(ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE) &&
+							ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
+					{
+						ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+						ent->client->ps.forceDodgeAnim = BOTH_MEDITATE;
+						ent->client->ps.forceHandExtendTime = level.time + 2000;
+					}
 				}
 			}
 		}
