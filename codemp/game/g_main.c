@@ -9796,13 +9796,6 @@ void G_RunFrame( int levelTime ) {
 						{
 							zyk_stop_all_magic_powers(ent);
 						}
-						else if (!(ent->client->ps.forceHandExtend == HANDEXTEND_TAUNT && ent->client->ps.forceDodgeAnim == BOTH_MEDITATE) &&
-								 ent->client->ps.groundEntityNum != ENTITYNUM_NONE)
-						{
-							ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-							ent->client->ps.forceDodgeAnim = BOTH_MEDITATE;
-							ent->client->ps.forceHandExtendTime = level.time + 2000;
-						}
 					}
 				}
 
